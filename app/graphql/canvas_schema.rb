@@ -102,6 +102,11 @@ class CanvasSchema < GraphQL::Schema
   def self.for_federation
     @federatable_schema ||= Class.new(CanvasSchema) do
       include ApolloFederation::Schema
+
+      # TODO: once https://github.com/Gusto/apollo-federation-ruby/pull/135 is
+      # merged and published, we can update the `apollo-federation` gem and
+      # remove this line
+      query Types::QueryType
     end
   end
 end

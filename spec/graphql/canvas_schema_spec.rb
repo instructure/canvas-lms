@@ -39,6 +39,21 @@ describe CanvasSchema do
   let(:variables) { {representations: [{ __typename: 'Course', id: @course.id.to_s }]} }
   let(:gql_context) { {current_user: @student} }
 
+  let(:all_courses_query) do
+    <<~GQL
+      query Q {
+        allCourses {
+          name
+        }
+      }
+    GQL
+  end
+
+  it "exposes defined queries" do
+    result = CanvasSchema.execute(all_courses_query, context: gql_context)
+    expect(result["data"]).to eq({"allCourses" => [{"name" => course_name}]})
+  end
+
   it "does not expose Apollo Federation special types" do
     result = CanvasSchema.execute(entities_query, variables: variables, context: gql_context)
     error_messages = result["errors"].map { |e| e["message"] }
@@ -47,6 +62,11 @@ describe CanvasSchema do
   end
 
   describe ".for_federation" do
+    it "exposes defined queries" do
+      result = CanvasSchema.for_federation.execute(all_courses_query, context: gql_context)
+      expect(result["data"]).to eq({"allCourses" => [{"name" => course_name}]})
+    end
+
     it "exposes Apollo Federation special types" do
       result = CanvasSchema.for_federation.execute(entities_query, variables: variables, context: gql_context)
       expect(result["data"]).to eq({"_entities" => [{"name" => course_name}]})
