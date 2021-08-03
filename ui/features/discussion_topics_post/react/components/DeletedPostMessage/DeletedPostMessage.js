@@ -42,7 +42,7 @@ export function DeletedPostMessage({...props}) {
         }
       }}
       render={responsiveProps => (
-        <Flex direction="column" margin="0 0 small 0">
+        <Flex direction="column" margin="0 xx-small small">
           <Flex.Item>
             <Text weight="bold" size={responsiveProps.deletedByTextSize}>
               {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}

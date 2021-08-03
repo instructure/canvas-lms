@@ -19,7 +19,7 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -105,7 +105,10 @@ export const AuthorInfo = props => {
                     </Flex.Item>
                     <Flex.Item overflowY="hidden">
                       <RolePillContainer
-                        discussionRoles={props.author.courseRoles}
+                        discussionRoles={resolveAuthorRoles(
+                          props.isTopicAuthor,
+                          props.author.courseRoles
+                        )}
                         data-testid="pill-container"
                       />
                     </Flex.Item>
@@ -172,7 +175,11 @@ AuthorInfo.propTypes = {
   /**
    * Whether or not we render the created at date in a tooltip
    */
-  showCreatedAsTooltip: PropTypes.bool
+  showCreatedAsTooltip: PropTypes.bool,
+  /**
+   * Boolean to determine if the author is the topic author
+   */
+  isTopicAuthor: PropTypes.bool
 }
 
 const Timestamps = props => {

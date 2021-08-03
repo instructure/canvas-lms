@@ -28,6 +28,7 @@ import {User} from '../../../graphql/User'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
+import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
 export function PostMessage({...props}) {
@@ -42,13 +43,13 @@ export function PostMessage({...props}) {
           titleMargin: '0',
           titleTextSize: 'medium',
           titleTextWeight: 'bold',
-          messageTextSize: 'small'
+          messageTextSize: 'fontSizeSmall'
         },
         desktop: {
           titleMargin: '0 0 small 0',
           titleTextSize: 'x-large',
           titleTextWeight: 'normal',
-          messageTextSize: 'medium'
+          messageTextSize: 'fontSizeMedium'
         }
       }}
       render={responsiveProps => (
@@ -73,16 +74,19 @@ export function PostMessage({...props}) {
             </View>
           ) : (
             <>
-              <Text size={responsiveProps.messageTextSize}>
+              <span
+                style={{
+                  fontSize: theme.variables.typography[responsiveProps.messageTextSize]
+                }}
+                className="no-margin"
+              >
                 <SearchSpan
                   isIsolatedView={props.isIsolatedView}
                   searchTerm={searchTerm}
                   text={props.message}
                 />
-              </Text>
-              <View display="block" margin="small none none none">
-                {props.children}
-              </View>
+              </span>
+              <View display="block">{props.children}</View>
             </>
           )}
         </View>

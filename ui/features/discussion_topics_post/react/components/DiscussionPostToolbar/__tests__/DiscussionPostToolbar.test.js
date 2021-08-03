@@ -20,6 +20,23 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
 const setup = props => {
   return render(<DiscussionPostToolbar {...props} />)
 }

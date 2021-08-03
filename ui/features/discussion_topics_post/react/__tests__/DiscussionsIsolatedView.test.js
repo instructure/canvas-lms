@@ -26,6 +26,10 @@ import {mswServer} from '../../../../shared/msw/mswServer'
 import React from 'react'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('../utils', () => ({
+  ...jest.requireActual('../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
 
 describe('DiscussionsIsolatedView', () => {
   const server = mswServer(handlers)
@@ -42,6 +46,16 @@ describe('DiscussionsIsolatedView', () => {
       course_id: '1',
       isolated_view: true
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
   })
 
   beforeEach(() => {

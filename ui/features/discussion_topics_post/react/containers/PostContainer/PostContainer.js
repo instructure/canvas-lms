@@ -52,12 +52,12 @@ export const PostContainer = props => {
           },
           postUtilities: {
             align: 'stretch',
-            margin: '0 0 small 0',
-            padding: '0'
+            margin: '0 0 x-small 0',
+            padding: 'xx-small'
           },
           postMessage: {
-            padding: '0',
-            paddingNoAuthor: '0',
+            padding: '0 xx-small xx-small',
+            paddingNoAuthor: '0 xx-small xx-small',
             margin: 'xx-small 0 0 0'
           }
         },
@@ -100,6 +100,7 @@ export const PostContainer = props => {
                     editedTimingDisplay={props.editedTimingDisplay}
                     lastReplyAtDisplay={props.lastReplyAtDisplay}
                     showCreatedAsTooltip={!props.isTopic}
+                    isTopicAuthor={props.isTopicAuthor}
                   />
                 </Flex.Item>
               )}
@@ -159,7 +160,8 @@ PostContainer.propTypes = {
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
-  deleted: PropTypes.bool
+  deleted: PropTypes.bool,
+  isTopicAuthor: PropTypes.bool
 }
 
 PostContainer.defaultProps = {

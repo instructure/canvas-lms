@@ -28,13 +28,12 @@ import {
   getPeerReviewsUrl,
   isGraded,
   getReviewLinkUrl,
-  resolveAuthorRoles,
   responsiveQuerySizes
 } from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
-import {OldPostMessage} from '../../components/PostMessage/OldPostMessage'
+import {PostContainer} from '../PostContainer/PostContainer'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
@@ -277,59 +276,75 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 borderRadius="medium"
                 borderStyle="solid"
                 borderColor="primary"
+                padding="small 0"
               >
-                {isGraded(props.discussionTopic.assignment) && (
-                  <View as="div" padding="none medium none">
-                    <AssignmentDetails
-                      dueAtDisplayText={dueAt}
-                      pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
-                      assignmentOverrides={singleOverrideWithNoDefault ? [] : assignmentOverrides}
-                      canSeeMultipleDueDates={canSeeMultipleDueDates}
-                    />
-                    {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
-                      assessmentRequest => (
-                        <PeerReview
-                          key={assessmentRequest._id}
-                          dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-                            props.discussionTopic.assignment.peerReviews?.dueAt
+                <Responsive
+                  match="media"
+                  query={responsiveQuerySizes({mobile: true, desktop: true})}
+                  props={{
+                    mobile: {
+                      assignmentDetails: {
+                        margin: '0'
+                      },
+                      replyButton: {
+                        display: 'block'
+                      },
+                      RCE: {
+                        paddingClosed: 'none',
+                        paddingOpen: 'none none small'
+                      }
+                    },
+                    desktop: {
+                      assignmentDetails: {
+                        margin: '0 0 small 0'
+                      },
+                      replyButton: {
+                        display: 'inline-block'
+                      },
+                      RCE: {
+                        paddingClosed: 'none medium none xx-large',
+                        paddingOpen: 'none medium medium xx-large'
+                      }
+                    }
+                  }}
+                  render={responsiveProps => (
+                    <Flex direction="column" padding="0 medium 0">
+                      {isGraded(props.discussionTopic.assignment) && (
+                        <Flex.Item
+                          shouldShrink
+                          shouldGrow
+                          margin={responsiveProps.assignmentDetails.margin}
+                        >
+                          <AssignmentDetails
+                            dueAtDisplayText={dueAt}
+                            pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
+                            assignmentOverrides={
+                              singleOverrideWithNoDefault ? [] : assignmentOverrides
+                            }
+                            canSeeMultipleDueDates={canSeeMultipleDueDates}
+                          />
+                          {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                            assessmentRequest => (
+                              <PeerReview
+                                key={assessmentRequest._id}
+                                dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                                  props.discussionTopic.assignment.peerReviews?.dueAt
+                                )}
+                                revieweeName={assessmentRequest.user.displayName}
+                                reviewLinkUrl={getReviewLinkUrl(
+                                  ENV.course_id,
+                                  props.discussionTopic.assignment._id,
+                                  assessmentRequest.user._id
+                                )}
+                                workflowState={assessmentRequest.workflowState}
+                              />
+                            )
                           )}
-                          revieweeName={assessmentRequest.user.displayName}
-                          reviewLinkUrl={getReviewLinkUrl(
-                            ENV.course_id,
-                            props.discussionTopic.assignment._id,
-                            assessmentRequest.user._id
-                          )}
-                          workflowState={assessmentRequest.workflowState}
-                        />
-                      )
-                    )}
-                  </View>
-                )}
-
-                <Flex direction="column">
-                  <Flex.Item>
-                    <Flex
-                      direction="row"
-                      justifyItems="space-between"
-                      padding="medium small none"
-                      alignItems="start"
-                    >
-                      <Flex.Item shouldShrink shouldGrow padding="0 0 medium 0">
-                        <OldPostMessage
-                          author={props.discussionTopic.author}
-                          timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                            props.discussionTopic.postedAt
-                          )}
-                          title={props.discussionTopic.title}
-                          message={props.discussionTopic.message}
-                          discussionRoles={resolveAuthorRoles(
-                            true,
-                            props.discussionTopic.author?.courseRoles
-                          )}
-                          editor={props.discussionTopic.editor}
-                          editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                            props.discussionTopic.updatedAt
-                          )}
+                        </Flex.Item>
+                      )}
+                      <Flex.Item shouldShrink shouldGrow>
+                        <PostContainer
+                          isTopic
                           postUtilities={
                             <PostToolbar
                               onReadAll={
@@ -409,71 +424,71 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               discussionTopicId={props.discussionTopic._id}
                             />
                           }
+                          author={props.discussionTopic.author}
+                          title={props.discussionTopic.title}
+                          message={props.discussionTopic.message}
+                          isIsolatedView={false}
+                          editor={props.discussionTopic.editor}
+                          timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                            props.discussionTopic.postedAt
+                          )}
+                          editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                            props.discussionTopic.updatedAt
+                          )}
+                          isTopicAuthor
                         >
                           {props.discussionTopic.attachment && (
-                            <View as="div" padding="medium none none">
+                            <View as="div" padding="small none none">
                               <Link href={props.discussionTopic.attachment.url}>
                                 {props.discussionTopic.attachment.displayName}
                               </Link>
                             </View>
                           )}
-                          {props.discussionTopic.permissions?.reply && (
-                            <View as="div" padding="medium none none">
-                              <Responsive
-                                match="media"
-                                query={responsiveQuerySizes({mobile: true, desktop: true})}
-                                props={{
-                                  mobile: {
-                                    display: 'block'
-                                  },
-                                  desktop: {
-                                    display: 'inline-block'
-                                  }
+                          {props.discussionTopic.permissions?.reply && !expandedReply && (
+                            <View as="div" padding="small none none">
+                              <Button
+                                display={responsiveProps.replyButton.display}
+                                color="primary"
+                                onClick={() => {
+                                  setExpandedReply(!expandedReply)
                                 }}
-                                render={responsiveProps => (
-                                  <Button
-                                    display={responsiveProps.display}
-                                    color="primary"
-                                    onClick={() => {
-                                      setExpandedReply(!expandedReply)
-                                    }}
-                                    data-testid="discussion-topic-reply"
-                                  >
-                                    <Text size="medium">{I18n.t('Reply')}</Text>
-                                  </Button>
-                                )}
-                              />
+                                data-testid="discussion-topic-reply"
+                              >
+                                <Text size="medium">{I18n.t('Reply')}</Text>
+                              </Button>
                             </View>
                           )}
-                        </OldPostMessage>
+                        </PostContainer>
+                      </Flex.Item>
+                      <Flex.Item
+                        shouldShrink
+                        shouldGrow
+                        padding={
+                          expandedReply
+                            ? responsiveProps.RCE.paddingOpen
+                            : responsiveProps.RCE.paddingClosed
+                        }
+                        overflowX="hidden"
+                        overflowY="hidden"
+                      >
+                        {expandedReply && (
+                          <DiscussionEdit
+                            show={expandedReply}
+                            onSubmit={text => {
+                              if (createDiscussionEntry) {
+                                createDiscussionEntry(text)
+                                setExpandedReply(false)
+                              }
+                            }}
+                            onCancel={() => {
+                              setExpandedReply(false)
+                            }}
+                          />
+                        )}
                       </Flex.Item>
                     </Flex>
-                  </Flex.Item>
-                  <Flex.Item
-                    shouldShrink
-                    shouldGrow
-                    padding={
-                      expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
-                    }
-                    overflowX="hidden"
-                    overflowY="hidden"
-                  >
-                    {expandedReply && (
-                      <DiscussionEdit
-                        show={expandedReply}
-                        onSubmit={text => {
-                          if (createDiscussionEntry) {
-                            createDiscussionEntry(text)
-                            setExpandedReply(false)
-                          }
-                        }}
-                        onCancel={() => {
-                          setExpandedReply(false)
-                        }}
-                      />
-                    )}
-                  </Flex.Item>
-                </Flex>
+                  )}
+                />
               </View>
             </Flex.Item>
           </Flex>

@@ -46,7 +46,7 @@ export function AssignmentDetails({...props}) {
 
   const multipleDueDates = useMemo(
     () => (
-      <Flex.Item padding="x-small" shouldGrow align="start">
+      <Flex.Item padding="xx-small" shouldGrow align="start" overflowY="hidden">
         <CondensedButton
           onClick={() => {
             setDueDateTrayOpen(true)
@@ -139,7 +139,7 @@ export function AssignmentDetails({...props}) {
           {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
             ? multipleDueDates
             : singleDueDate}
-          <Flex.Item shouldShrink padding="x-small" align="end">
+          <Flex.Item shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
               {responsiveProps.text}
             </Text>

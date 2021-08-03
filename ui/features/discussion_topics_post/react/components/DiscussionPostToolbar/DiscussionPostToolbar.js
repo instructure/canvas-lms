@@ -97,6 +97,7 @@ export const DiscussionPostToolbar = props => {
 
   return (
     <Responsive
+      match="media"
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {

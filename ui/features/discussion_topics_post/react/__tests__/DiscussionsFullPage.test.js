@@ -18,20 +18,22 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../graphql/Discussion'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {graphql} from 'msw'
 import {handlers} from '../../graphql/mswHandlers'
 import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
-import {Discussion} from '../../graphql/Discussion'
-import {graphql} from 'msw'
 import React from 'react'
+import {responsiveQuerySizes} from '../utils'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../utils/constants', () => ({
   ...jest.requireActual('../utils/constants'),
   HIGHLIGHT_TIMEOUT: 0
 }))
+jest.mock('../utils')
 
 describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
@@ -54,6 +56,16 @@ describe('DiscussionFullPage', () => {
       course_id: '1'
     }
 
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
     window.INST = {
       editorButtons: []
     }
@@ -65,6 +77,9 @@ describe('DiscussionFullPage', () => {
 
   beforeEach(() => {
     mswClient.cache.reset()
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {maxWidth: '1000'}
+    }))
   })
 
   afterEach(() => {
