@@ -1594,7 +1594,7 @@ class RoleOverride < ActiveRecord::Base
 
   def self.permission_for(context, permission, role_or_role_id, role_context=:role_account, no_caching=false, preloaded_overrides: nil)
     # we can avoid a query since we're just using it for the batched keys on redis
-    permissionless_base_key = ["role_override_calculation", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
+    permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
     account = context.is_a?(Account) ? context : Account.new(id: context.account_id)
     default_data = self.permissions[permission]
 
