@@ -2079,8 +2079,8 @@ class User < ActiveRecord::Base
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch_with_batched_keys([self, 'participating_enrollments', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
-        self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
+      Rails.cache.fetch_with_batched_keys([self, 'participating_enrollments2', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+        self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a.each(&:clear_association_cache)
       end
     end
   end
