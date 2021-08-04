@@ -95,14 +95,16 @@ export const DiscussionEdit = props => {
         query={responsiveQuerySizes({mobile: true, desktop: true})}
         props={{
           mobile: {
-            direction: 'column',
+            direction: 'column-reverse',
             display: 'block',
-            margin: 'small 0 0 0'
+            marginCancel: 'small 0 0 0',
+            marginReply: '0 0 0 0'
           },
           desktop: {
             direction: 'row',
             display: 'inline-block',
-            margin: '0 0 0 small'
+            marginCancel: '0 0 0 0',
+            marginReply: '0 0 0 small'
           }
         }}
         render={responsiveProps => (
@@ -120,12 +122,15 @@ export const DiscussionEdit = props => {
                     props.onCancel()
                   }
                 }}
+                margin={responsiveProps.marginCancel}
                 display={responsiveProps.display}
                 color="secondary"
                 data-testid="DiscussionEdit-cancel"
               >
                 <Text size="medium">{I18n.t('Cancel')}</Text>
               </Button>
+            </Flex.Item>
+            <Flex.Item shouldShrink textAlign="end" overflowY="hidden" overflowX="hidden">
               <Button
                 onClick={() => {
                   if (props.onSubmit) {
@@ -134,7 +139,7 @@ export const DiscussionEdit = props => {
                 }}
                 display={responsiveProps.display}
                 color="primary"
-                margin={responsiveProps.margin}
+                margin={responsiveProps.marginReply}
                 data-testid="DiscussionEdit-submit"
               >
                 <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')} </Text>
