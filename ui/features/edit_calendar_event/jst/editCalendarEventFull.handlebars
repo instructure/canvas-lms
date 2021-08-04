@@ -133,12 +133,10 @@
     <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
   </fieldset>
 
-  {{#if include_conference_selection}}
   <fieldset>
     <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
     <div id="calendar_event_conference_selection"></div>
   </fieldset>
-  {{/if}}
 
   {{#if k5_subject}}
     <fieldset>

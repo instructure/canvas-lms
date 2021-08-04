@@ -68,16 +68,17 @@ describe('EditEventView', () => {
     ]
 
     function enableConferences(conference_types = CONFERENCE_TYPES) {
-      window.ENV.CALENDAR = {CONFERENCES_ENABLED: true}
       window.ENV.conferences = {conference_types}
     }
 
-    it('does not show conferencing options when calendar conferences are disabled', () => {
+    it('does not show conferencing options when no conference types are enabled', async () => {
       render()
-      expect(within(document.body).queryByText('Conferencing:')).toBeNull()
+      await waitForRender()
+      const conferencingNode = within(document.body).getByText('Conferencing:')
+      expect(conferencingNode.closest('fieldset').className).toEqual('hide')
     })
 
-    it('shows conferencing options when calendar conferences are enabled', () => {
+    it('shows conferencing options when some conference types are enabled', () => {
       enableConferences()
       render()
       const conferencingNode = within(document.body).getByText('Conferencing:')
@@ -130,15 +131,6 @@ describe('EditEventView', () => {
       const view = render()
       view.model.save = jest.fn(params => {
         expect(params.web_conference).toEqual('')
-      })
-      view.submit(null)
-      expect(view.model.save).toHaveBeenCalled()
-    })
-
-    it('does not submit web_conference params when conferencing is disabled', () => {
-      const view = render()
-      view.model.save = jest.fn(params => {
-        expect(params.web_conference).toBeUndefined()
       })
       view.submit(null)
       expect(view.model.save).toHaveBeenCalled()

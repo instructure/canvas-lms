@@ -494,7 +494,7 @@ class CalendarEventsApiController < ApplicationController
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
-    if Account.site_admin.feature_enabled?(:calendar_conferences) && params_for_create.key?(:web_conference)
+    if params_for_create.key?(:web_conference)
       params_for_create[:web_conference] = find_or_initialize_conference(@context, params_for_create[:web_conference])
     end
 
@@ -681,12 +681,11 @@ class CalendarEventsApiController < ApplicationController
       if params_for_update[:description].present?
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
-      if Account.site_admin.feature_enabled?(:calendar_conferences)
-        if params_for_update.key?(:web_conference)
-          web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
-          return unless authorize_user_for_conference(@current_user, web_conference)
-          params_for_update[:web_conference] = web_conference
-        end
+      if params_for_update.key?(:web_conference)
+        web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
+        return unless authorize_user_for_conference(@current_user, web_conference)
+
+        params_for_update[:web_conference] = web_conference
       end
 
       if @event.update(params_for_update)
@@ -1397,7 +1396,7 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    if Account.site_admin.feature_enabled?(:calendar_conferences) && event_attributes.key?(:web_conference)
+    if event_attributes.key?(:web_conference)
       override_params = { :user_settings => { :scheduled_date => event_attributes[:start_at] } }
       event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
     end

@@ -1313,7 +1313,6 @@ describe CalendarEventsApiController, type: :request do
 
     context "web_conferences" do
       before(:once) do
-        Account.site_admin.enable_feature! :calendar_conferences
         plugin = PluginSetting.create!(name: 'big_blue_button')
         plugin.update_attribute(:settings, { key: 'value' })
       end
@@ -2582,7 +2581,6 @@ describe CalendarEventsApiController, type: :request do
 
     context "web_conferences" do
       before(:once) do
-        Account.site_admin.enable_feature! :calendar_conferences
         plugin = PluginSetting.create!(name: 'big_blue_button')
         plugin.update_attribute(:settings, { key: 'value' })
         3.times do |idx|

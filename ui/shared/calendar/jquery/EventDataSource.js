@@ -535,9 +535,7 @@ export default class EventDataSource {
     if (ag_ids.length > 0) {
       p.appointment_group_ids = ag_ids.join(',')
     }
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
-      p.include = ['web_conference']
-    }
+    p.include = ['web_conference']
     return p
   }
 
