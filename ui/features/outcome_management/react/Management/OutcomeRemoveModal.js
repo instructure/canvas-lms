@@ -113,7 +113,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}
     <List as="ul" size="medium" margin="0" isUnstyled>
       {outcomeLinkIds.map(linkId => (
         <List.Item size="medium" key={linkId}>
-          <TruncateText>{outcomes[linkId].title}</TruncateText>
+          <TruncateText position="middle">{outcomes[linkId].title}</TruncateText>
         </List.Item>
       ))}
     </List>
