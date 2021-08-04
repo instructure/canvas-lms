@@ -66,7 +66,12 @@ function isMentionsNavigationEvent(event, editor) {
 
   if (!inMentionsMarker(editor)) return false
 
-  return which === KEY_CODES.up || which === KEY_CODES.down || which === KEY_CODES.enter
+  return (
+    which === KEY_CODES.up ||
+    which === KEY_CODES.down ||
+    which === KEY_CODES.enter ||
+    which === KEY_CODES.escape
+  )
 }
 
 function inMentionsMarker(editor) {
@@ -101,6 +106,7 @@ export const onSetContent = e => {
         <MentionDropdown
           rceRef={editor.getBody()}
           onActiveDescendantChange={onActiveDescendantChange}
+          onExited={onMentionsExit}
         />,
         elm
       )
@@ -138,6 +144,11 @@ export const onKeyDown = e => {
   if (isMentionsNavigationEvent(e, editor)) {
     // Don't move the cursor please
     e.preventDefault()
+
+    // If the user pressed the 'escape' key
+    if (e.which === KEY_CODES.escape) {
+      return onMentionsExit(editor)
+    }
 
     // Broadcast the event to mentions components
     const message = e.which === KEY_CODES.enter ? selectionMessage(e) : navigationMessage(e)
@@ -200,4 +211,16 @@ export const onActiveDescendantChange = (activeDescendant, ed) => {
   editor.dom
     .select(MARKER_SELECTOR)[0]
     ?.setAttribute('aria-activedescendant', activeDescendant || '')
+}
+
+const onMentionsExit = ed => {
+  const editor = ed || tinymce.activeEditor
+  const menuMountElem = document.querySelector(MENTION_MENU_SELECTOR)
+
+  if (menuMountElem) {
+    // Perform cleanup
+    makeBodyEditable(editor, MARKER_SELECTOR)
+    menuMountElem.remove()
+    return ReactDom.unmountComponentAtNode(menuMountElem)
+  }
 }

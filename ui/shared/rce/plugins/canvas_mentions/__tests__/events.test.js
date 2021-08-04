@@ -31,7 +31,8 @@ jest.mock('../constants', () => ({
 }))
 
 jest.mock('react-dom', () => ({
-  render: jest.fn()
+  render: jest.fn(),
+  unmountComponentAtNode: jest.fn()
 }))
 
 jest.mock('../components/MentionAutoComplete/MentionDropdown')
@@ -116,7 +117,9 @@ describe('events', () => {
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
     })
 
-    describe('when the current node is not he marker', () => {
+    afterEach(() => (document.body.innerHTML = ''))
+
+    describe('when the current node is not the marker', () => {
       beforeEach(() => editor.selection.select(editor.dom.select('#test')[0]))
 
       it('makes the body editable', () => {
@@ -239,6 +242,40 @@ describe('events', () => {
         })
 
         examplesForMentionsEvents()
+      })
+
+      describe('when the key is "esc"', () => {
+        let mountElement
+
+        beforeEach(() => {
+          event.which = 27
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          mountElement = document.createElement('span')
+          mountElement.id = 'mention-menu'
+          document.body.appendChild(mountElement)
+        })
+
+        it('prevents default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('does not broadcast the message', () => {
+          subject()
+          expect(global.postMessage).not.toHaveBeenCalled()
+        })
+
+        it('unmounts the component', () => {
+          subject()
+          expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalledWith(mountElement)
+        })
+
+        it('removes the mount element', () => {
+          subject()
+          expect(document.getElementById(mountElement.id)).toBeNull()
+        })
       })
     })
   })

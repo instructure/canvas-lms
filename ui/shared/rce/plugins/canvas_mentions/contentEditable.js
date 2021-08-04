@@ -35,6 +35,8 @@ export function makeBodyEditable(editor, targetSelector) {
   // If the body is editable, no need to do anything
   if (editor.getBody().getAttribute('contenteditable') === 'true') return
 
+  const bookmark = editor.selection.getBookmark()
+
   // Make the tinymce body editable once again
   editor.getBody().setAttribute('contenteditable', 'true')
 
@@ -48,6 +50,7 @@ export function makeBodyEditable(editor, targetSelector) {
   // and the text they typed should be displayed as normal
   Array.from(marker.attributes).forEach(a => marker.removeAttribute(a.name))
 
+  editor.selection.moveToBookmark(bookmark)
   // TODO: only do this if exited with a selection (or let the component do this)
   // marker.classList.add('mention')
   // marker.classList.add('mceNonEditable')
