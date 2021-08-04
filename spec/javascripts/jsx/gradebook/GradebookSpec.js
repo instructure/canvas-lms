@@ -3042,9 +3042,30 @@ test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
   equal(buttonText, 'View')
 })
 
-test('ActionMenu is rendered on renderActionMenu', function () {
+test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters is enabled', function () {
+  this.gradebook = createGradebook({
+    context_allows_gradebook_uploads: true,
+    export_gradebook_csv_url: 'http://someUrl',
+    gradebook_import_url: 'http://someUrl',
+    enhanced_gradebook_filters: true,
+    navigate() {}
+  })
   this.gradebook.renderActionMenu()
-  const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim()
+  const importButtonText = document
+    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[0]
+    .innerText.trim()
+  const exportButtonText = document
+    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[1]
+    .innerText.trim()
+  equal(importButtonText, 'Import')
+  equal(exportButtonText, 'Export')
+})
+
+test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters is disabled', function () {
+  this.gradebook.renderActionMenu()
+  const buttonText = document
+    .querySelectorAll('[data-component="ActionMenu"] Button')[0]
+    .innerText.trim()
   equal(buttonText, 'Actions')
 })
 

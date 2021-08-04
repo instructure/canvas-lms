@@ -121,6 +121,7 @@ export function setFixtureHtml($fixture) {
         <div id="modules-filter-container"></div>
         <div id="sections-filter-container"></div>
         <div id="student-group-filter-container"></div>
+        <span data-component="EnhancedActionMenu"></span>
         <div id="search-filter-container">
           <input type="text" />
         </div>

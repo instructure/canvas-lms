@@ -75,6 +75,10 @@
           <div class="gradebook-filter-container" id="student-group-filter-container"></div>
         <% end %>
 
+        <% if Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
+          <span data-component="EnhancedActionMenu"></span>
+        <% end %>
+
         <% unless Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
           <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
             <% placeholder = t('Search…') %>

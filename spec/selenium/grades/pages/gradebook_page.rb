@@ -145,6 +145,18 @@ module Gradebook
     f('span[data-menu-id="previous-export"]')
   end
 
+  def self.link_export
+    ff('[data-component="EnhancedActionMenu"] button')[1]
+  end
+
+  def self.link_sync
+    ff('[data-component="EnhancedActionMenu"] button')[0]
+  end
+
+  def self.link_import
+    ff('[data-component="EnhancedActionMenu"] button')[0]
+  end
+
   def self.slick_custom_col_cell
     ff(".slick-cell.custom_column")
   end
@@ -366,6 +378,18 @@ module Gradebook
 
   def self.select_notes_option
     notes_option.click
+  end
+
+  def self.select_export
+    link_export.click
+  end
+
+  def self.select_sync
+    link_sync.click
+  end
+
+  def self.select_import
+    link_import.click
   end
 
   def self.select_previous_grade_export

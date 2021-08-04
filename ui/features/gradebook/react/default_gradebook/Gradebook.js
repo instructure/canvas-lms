@@ -55,6 +55,7 @@ import PostPolicies from './PostPolicies/index'
 import GradebookMenu from '@canvas/gradebook-menu'
 import ViewOptionsMenu from './components/ViewOptionsMenu'
 import ActionMenu from './components/ActionMenu'
+import EnhancedActionMenu from './components/EnhancedActionMenu'
 import AssignmentGroupFilter from './components/content-filters/AssignmentGroupFilter'
 import GradingPeriodFilter from './components/content-filters/GradingPeriodFilter'
 import ModuleFilter from './components/content-filters/ModuleFilter'
@@ -1988,9 +1989,14 @@ class Gradebook extends React.Component {
   }
 
   renderActionMenu() {
-    const mountPoint = document.querySelector("[data-component='ActionMenu']")
+    const componentId = this.options.enhanced_gradebook_filters
+      ? 'EnhancedActionMenu'
+      : 'ActionMenu'
+
+    const component = this.options.enhanced_gradebook_filters ? EnhancedActionMenu : ActionMenu
+    const mountPoint = document.querySelector(`[data-component='${componentId}']`)
     const props = this.getActionMenuProps()
-    return renderComponent(ActionMenu, mountPoint, props)
+    return renderComponent(component, mountPoint, props)
   }
 
   renderFilters() {
