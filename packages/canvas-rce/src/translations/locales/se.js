@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs')
-const path = require('path')
+import formatMessage from '../../format-message'
 
-/**
- * This returns an index of all the translation files for a given package
- * If packageName is omitted, then the base combined files.
- */
-async function getTranslationList(packageName) {
-  const translationList = await fs.promises.readdir(
-    path.resolve(__dirname, `../lib/${packageName || ''}`),
-    {withFileTypes: true}
-  )
-  return translationList.filter(t => t.isFile()).map(t => t.name)
-}
+const locale = {"count_plural_one_item_loaded_other_items_loaded_857023b7":{"message":"{ count, plural,\n    one {}\n    two {}\n  other {}\n}"}}
 
-module.exports = getTranslationList
+formatMessage.addLocale({se: locale})
