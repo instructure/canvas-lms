@@ -1040,5 +1040,14 @@ class MessageableUser
     def section_visible_group_ids
       section_visible_group_ids_by_shard[Shard.current] || []
     end
+
+    def marshal_dump
+      ivars = (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
+      ivars
+    end
+
+    def marshal_load(ivars)
+      ivars.each { |name, val| instance_variable_set(name, val) }
+    end
   end
 end

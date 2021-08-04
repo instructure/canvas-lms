@@ -26,6 +26,14 @@ describe "MessageableUser::Calculator" do
     @calculator = MessageableUser::Calculator.new(@viewing_user)
   end
 
+  it "is dumpable" do
+    @calculator.linked_observer_ids
+    calc2 = Marshal.load(Marshal.dump(@calculator))
+    # have to force this to be re-set
+    calc2.linked_observer_ids
+    expect(calc2.instance_variables.sort).to eq @calculator.instance_variables.sort
+  end
+
   describe "uncached crunchers" do
     describe "#uncached_visible_section_ids" do
       before do
