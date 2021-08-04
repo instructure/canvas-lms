@@ -30,32 +30,18 @@ import {gql} from '@canvas/apollo'
 export const ROOT_ID = '0'
 export const ACCOUNT_FOLDER_ID = '-1'
 
-const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
-  return I18n.t('%{groups} Groups | %{outcomes} Outcomes', {
-    groups: childGroupsCount,
-    outcomes: outcomesCount
-  })
-}
-
 const structFromGroup = (g, parentGroupId) => ({
   id: g._id,
   name: g.title,
-  descriptor: groupDescriptor(g),
   collections: [],
-  outcomesCount: g.outcomesCount,
   isRootGroup: g.isRootGroup,
   parentGroupId
 })
-
-const getChildOutcomesCount = rootGroups =>
-  rootGroups.reduce((acc, group) => acc + group.outcomesCount, 0)
 
 const formatNewGroup = g => ({
   _id: g.id,
   title: g.title,
   description: g.description,
-  outcomesCount: 0,
-  childGroupsCount: 0,
   isRootGroup: false,
   parentGroupId: g.parent_outcome_group.id,
   __typename: 'LearningOutcomeGroup'
@@ -63,9 +49,7 @@ const formatNewGroup = g => ({
 
 const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
-  childGroupsCount: null,
   description: null,
-  outcomesCount: null,
   title: null,
   parentGroupId: null,
   isRootGroup: false,
@@ -368,9 +352,7 @@ export const useFindOutcomeModal = open => {
           childGroups.push({
             _id: ACCOUNT_FOLDER_ID,
             title: I18n.t('Account Standards'),
-            isRootGroup: true,
-            outcomesCount: getChildOutcomesCount(rootGroups),
-            childGroupsCount: rootGroups.length
+            isRootGroup: true
           })
         }
 

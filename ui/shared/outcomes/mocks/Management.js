@@ -27,7 +27,7 @@ import {
   UPDATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
-export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountId = '1'} = {}) => [
+export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -42,8 +42,6 @@ export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountI
           __typename: 'Account',
           _id: accountId,
           rootOutcomeGroup: {
-            childGroupsCount,
-            outcomesCount,
             title: `Root account folder`,
             __typename: 'LearningOutcomeGroup',
             _id: '1',
@@ -52,8 +50,6 @@ export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountI
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 _id: (100 + i).toString(),
-                outcomesCount,
-                childGroupsCount,
                 title: `Account folder ${i}`
               }))
             }
@@ -64,7 +60,7 @@ export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountI
   }
 ]
 
-export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId = '2'} = {}) => [
+export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -79,8 +75,6 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
           __typename: 'Course',
           _id: courseId,
           rootOutcomeGroup: {
-            childGroupsCount,
-            outcomesCount,
             title: `Root course folder`,
             __typename: 'LearningOutcomeGroup',
             _id: '2',
@@ -89,8 +83,6 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 _id: (200 + i).toString(),
-                outcomesCount: 2,
-                childGroupsCount: 10,
                 title: `Course folder ${i}`
               }))
             }
@@ -101,12 +93,7 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
   }
 ]
 
-export const groupMocks = ({
-  groupId,
-  childGroupsCount = 1,
-  outcomesCount = 2,
-  childGroupOffset = 300
-} = {}) => [
+export const groupMocks = ({groupId, childGroupsCount = 1, childGroupOffset = 300} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -120,15 +107,11 @@ export const groupMocks = ({
         context: {
           __typename: 'LearningOutcomeGroup',
           _id: groupId,
-          childGroupsCount,
-          outcomesCount,
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               _id: (childGroupOffset + i).toString(),
-              outcomesCount: 2,
-              childGroupsCount: 5,
               title: `Group ${groupId} folder ${i}`
             }))
           }

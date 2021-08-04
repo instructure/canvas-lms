@@ -113,6 +113,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         </Text>
       ) : isMobileView ? (
         <GroupActionDrillDown
+          isLoadingGroupDetail={loading}
+          outcomesCount={group?.outcomesCount}
           onCollectionClick={toggleGroupId}
           collections={collections}
           rootId={rootId}

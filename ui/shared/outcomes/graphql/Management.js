@@ -23,8 +23,6 @@ import {gql} from '@canvas/apollo'
 export const groupFields = `
   _id
   title
-  outcomesCount
-  childGroupsCount
 `
 
 const groupFragment = gql`
@@ -63,8 +61,6 @@ export const CHILD_GROUPS_QUERY = gql`
       }
       ... on LearningOutcomeGroup {
         _id
-        outcomesCount
-        childGroupsCount
         ...ChildGroupsFragment
       }
     }

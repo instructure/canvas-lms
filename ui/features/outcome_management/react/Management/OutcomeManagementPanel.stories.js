@@ -53,11 +53,11 @@ const Template = args => {
 
 export const Default = Template.bind({})
 Default.args = {
-  queryOptions: {childGroupsCount: 1, outcomesCount: 222}
+  queryOptions: {childGroupsCount: 1}
 }
 
 export const Query = Template.bind({})
 Query.args = {
   // Allow control of only the result data
-  response: accountMocks({childGroupsCount: 1, outcomesCount: 1})[0].result.data
+  response: accountMocks({childGroupsCount: 1})[0].result.data
 }

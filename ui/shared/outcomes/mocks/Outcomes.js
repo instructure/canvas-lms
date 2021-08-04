@@ -190,8 +190,6 @@ export const findModalMocks = ({
               __typename: 'Account',
               rootOutcomeGroup: {
                 title: `Course Account Outcome Group`,
-                childGroupsCount: 1,
-                outcomesCount: 0,
                 __typename: 'LearningOutcomeGroup',
                 _id: '1'
               },
@@ -210,8 +208,6 @@ const parentAccountMock = count => ({
     __typename: 'Account',
     rootOutcomeGroup: {
       title: `Root Account Outcome Group ${i}`,
-      childGroupsCount: 10,
-      outcomesCount: 0,
       __typename: 'LearningOutcomeGroup',
       _id: (100 + i).toString()
     }
@@ -222,8 +218,6 @@ const globalGroupMock = () => ({
   globalRootGroup: {
     __typename: 'LearningOutcomeGroup',
     title: 'Global Root Outcome Group',
-    childGroupsCount: 20,
-    outcomesCount: 5,
     _id: '1'
   }
 })
