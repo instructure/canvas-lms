@@ -36,19 +36,21 @@ const GroupActionDrillDown = ({
   collections,
   rootId,
   loadedGroups,
-  setShowOutcomesView
+  setShowOutcomesView,
+  isLoadingGroupDetail,
+  outcomesCount
 }) => {
   const [selectedGroupId, setSelectedGroupId] = useState(rootId)
   const [highlightedOptionId, setHighlightedOptionId] = useState('')
   const [highlightAction, setHighlightAction] = useState(false)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingGroup, setIsLoadingGroup] = useState(false)
   const hasOpenedGroup = selectedGroupId !== rootId
   const isActionLinkHighlighted = highlightAction || VIEW_OPTION === highlightedOptionId
   const margin = isRTL() ? {marginRight: '-.75em'} : {marginLeft: '-.75em'}
 
   useEffect(() => {
-    setIsLoading(hasOpenedGroup && !loadedGroups.includes(selectedGroupId))
+    setIsLoadingGroup(hasOpenedGroup && !loadedGroups.includes(selectedGroupId))
   }, [hasOpenedGroup, loadedGroups, selectedGroupId])
 
   useEffect(() => {
@@ -88,29 +90,59 @@ const GroupActionDrillDown = ({
     }
   }
 
-  const renderSubgroups = () => {
-    if (isLoading) {
-      return (
-        <Select.Option id={LOADING_OPTION}>
-          <Flex justifyItems="center">
-            <Spinner renderTitle={I18n.t('Loading learning outcome groups')} />
-          </Flex>
-        </Select.Option>
-      )
-    }
-
-    return collections[selectedGroupId].collections.map(subgroupId => (
-      <Select.Option
-        key={subgroupId}
-        id={subgroupId}
-        value={subgroupId}
-        isHighlighted={subgroupId === highlightedOptionId}
-        renderAfterLabel={IconArrowOpenEndLine}
-      >
-        {collections[subgroupId].name}
+  const renderSubgroups = () =>
+    isLoadingGroup ? (
+      <Select.Option id={LOADING_OPTION}>
+        <Flex justifyItems="center">
+          <Spinner renderTitle={I18n.t('Loading learning outcome groups')} />
+        </Flex>
       </Select.Option>
-    ))
-  }
+    ) : (
+      collections[selectedGroupId].collections.map(subgroupId => (
+        <Select.Option
+          key={subgroupId}
+          id={subgroupId}
+          value={subgroupId}
+          isHighlighted={subgroupId === highlightedOptionId}
+          renderAfterLabel={IconArrowOpenEndLine}
+        >
+          {collections[subgroupId].name}
+        </Select.Option>
+      ))
+    )
+
+  const selectedGroup = isLoadingGroupDetail ? (
+    <Select.Option id={VIEW_OPTION} isDisabled isHighlighted={false}>
+      {collections[selectedGroupId].name}
+    </Select.Option>
+  ) : (
+    <Select.Group renderLabel={collections[selectedGroupId].name}>
+      <Select.Option
+        id={VIEW_OPTION}
+        isDisabled={selectedGroupId === ACCOUNT_FOLDER_ID}
+        isHighlighted={selectedGroupId !== ACCOUNT_FOLDER_ID ? isActionLinkHighlighted : false}
+      >
+        {selectedGroupId !== ACCOUNT_FOLDER_ID && (
+          <div
+            style={{
+              ...margin,
+              color: isActionLinkHighlighted ? '' : '#008EE2'
+            }}
+          >
+            {I18n.t(
+              {
+                one: 'View 1 Outcome',
+                other: 'View %{count} Outcomes'
+              },
+              {
+                count: outcomesCount
+              }
+            )}
+          </div>
+        )}
+      </Select.Option>
+    </Select.Group>
+  )
 
   return (
     <Select
@@ -139,34 +171,7 @@ const GroupActionDrillDown = ({
           {I18n.t('Back')}
         </Select.Option>
       )}
-      {hasOpenedGroup && (
-        <Select.Group renderLabel={collections[selectedGroupId].name}>
-          <Select.Option
-            id={VIEW_OPTION}
-            isDisabled={selectedGroupId === ACCOUNT_FOLDER_ID}
-            isHighlighted={selectedGroupId !== ACCOUNT_FOLDER_ID ? isActionLinkHighlighted : false}
-          >
-            {selectedGroupId !== ACCOUNT_FOLDER_ID && (
-              <div
-                style={{
-                  ...margin,
-                  color: isActionLinkHighlighted ? '' : '#008EE2'
-                }}
-              >
-                {I18n.t(
-                  {
-                    one: 'View 1 Outcome',
-                    other: 'View %{count} Outcomes'
-                  },
-                  {
-                    count: collections[selectedGroupId].outcomesCount
-                  }
-                )}
-              </div>
-            )}
-          </Select.Option>
-        </Select.Group>
-      )}
+      {hasOpenedGroup && selectedGroup}
       {renderSubgroups()}
     </Select>
   )
@@ -177,7 +182,13 @@ GroupActionDrillDown.propTypes = {
   rootId: PropTypes.string.isRequired,
   collections: PropTypes.object.isRequired,
   loadedGroups: PropTypes.arrayOf(PropTypes.string).isRequired,
-  setShowOutcomesView: PropTypes.func.isRequired
+  setShowOutcomesView: PropTypes.func.isRequired,
+  isLoadingGroupDetail: PropTypes.bool.isRequired,
+  outcomesCount: PropTypes.number
+}
+
+GroupActionDrillDown.defaultProps = {
+  outcomesCount: 0
 }
 
 export default GroupActionDrillDown

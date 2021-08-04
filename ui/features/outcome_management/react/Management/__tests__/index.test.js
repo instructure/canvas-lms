@@ -98,7 +98,7 @@ describe('OutcomeManagementPanel', () => {
 
   it('renders the empty billboard for accounts without child groups and outcomes', async () => {
     const {getByText} = render(<OutcomeManagementPanel />, {
-      mocks: accountMocks({childGroupsCount: 0, outcomesCount: 0})
+      mocks: accountMocks({childGroupsCount: 0})
     })
     await act(async () => jest.runOnlyPendingTimers())
     expect(getByText(/Outcomes have not been added to this account yet/)).not.toBeNull()
@@ -108,24 +108,14 @@ describe('OutcomeManagementPanel', () => {
     const {getByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
-      mocks: courseMocks({childGroupsCount: 0, outcomesCount: 0})
+      mocks: courseMocks({childGroupsCount: 0})
     })
     await act(async () => jest.runOnlyPendingTimers())
     expect(getByText(/Outcomes have not been added to this course yet/)).not.toBeNull()
   })
 
-  it('does not render the empty billboard if the root group has child outcomes', async () => {
-    const {getByText} = render(<OutcomeManagementPanel />, {
-      contextType: 'Course',
-      contextId: '2',
-      mocks: courseMocks({outcomesCount: 1, childGroupsCount: 0})
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Root course folder')).toBeInTheDocument()
-  })
-
   it('loads outcome group data for Account', async () => {
-    const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       mocks: accountMocks({childGroupsCount: 2})
     })
     await act(async () => jest.runOnlyPendingTimers())
@@ -133,11 +123,10 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Root account folder')).toBeInTheDocument()
     expect(getByText('Account folder 0')).toBeInTheDocument()
     expect(getByText('Account folder 1')).toBeInTheDocument()
-    expect(getAllByText('2 Groups | 2 Outcomes').length).toBe(3)
   })
 
   it('loads outcome group data for Course', async () => {
-    const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
       mocks: courseMocks({childGroupsCount: 2})
@@ -147,7 +136,6 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Root course folder')).toBeInTheDocument()
     expect(getByText('Course folder 0')).toBeInTheDocument()
     expect(getByText('Course folder 1')).toBeInTheDocument()
-    expect(getAllByText('10 Groups | 2 Outcomes').length).toBe(2)
   })
 
   it('loads nested groups', async () => {
