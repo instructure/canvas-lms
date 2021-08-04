@@ -50,7 +50,6 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
-      searchEntryCount
       entryCounts {
         unreadCount
         repliesCount
