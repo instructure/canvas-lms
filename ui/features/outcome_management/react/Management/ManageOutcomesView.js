@@ -19,18 +19,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
-import {isRTL} from '@canvas/i18n/rtlHelper'
 import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import OutcomeGroupHeader from './OutcomeGroupHeader'
 import ManageOutcomeItem from './ManageOutcomeItem'
 import OutcomeSearchBar from './OutcomeSearchBar'
-import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import SearchBreadcrumb from '../shared/SearchBreadcrumb'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import SVGWrapper from '@canvas/svg-wrapper'
@@ -92,56 +89,11 @@ const ManageOutcomesView = ({
         <View as="div" padding="small 0" borderWidth="0 0 small">
           <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
             <Flex.Item size="50%" shouldGrow>
-              <Heading level="h4">
-                {searchString ? (
-                  <Flex>
-                    <Flex.Item shouldShrink>
-                      <div
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          padding: '0.375rem 0'
-                        }}
-                      >
-                        <View data-testid="group-name-ltr">
-                          {isRTL() ? searchString : groupTitle}
-                        </View>
-                        <div
-                          style={{
-                            display: 'inline-block',
-                            transform: 'scale(0.6)',
-                            height: '1em'
-                          }}
-                        >
-                          <IconArrowOpenEndSolid title={I18n.t('search results for')} />
-                        </div>
-                        <View data-testid="search-string-ltr">
-                          {isRTL() ? groupTitle : searchString}
-                        </View>
-                      </div>
-                    </Flex.Item>
-                    <Flex.Item size="2.5rem">
-                      {loading && (
-                        <Spinner
-                          renderTitle={I18n.t('Loading')}
-                          size="x-small"
-                          margin="0 0 0 x-small"
-                          data-testid="search-loading"
-                        />
-                      )}
-                    </Flex.Item>
-                  </Flex>
-                ) : (
-                  <View as="div" padding="x-small medium x-small 0">
-                    <Text wrap="break-word">
-                      {I18n.t('All %{groupTitle} Outcomes', {
-                        groupTitle: addZeroWidthSpace(groupTitle)
-                      })}
-                    </Text>
-                  </View>
-                )}
-              </Heading>
+              <SearchBreadcrumb
+                groupTitle={groupTitle}
+                searchString={searchString}
+                loading={loading}
+              />
             </Flex.Item>
             <Flex.Item as="div" padding="xx-small 0">
               <Text size="medium">
