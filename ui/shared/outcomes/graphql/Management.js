@@ -150,6 +150,10 @@ export const SEARCH_GROUP_OUTCOMES = gql`
                 }
               }
             }
+            group {
+              _id
+              title
+            }
           }
         }
       }

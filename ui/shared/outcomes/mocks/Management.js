@@ -150,6 +150,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       },
       {
@@ -166,6 +171,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       },
       {
@@ -178,6 +188,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       },
       {
@@ -194,6 +209,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       },
       {
@@ -210,6 +230,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       },
       {
@@ -225,6 +250,11 @@ export const outcomeGroup = {
           contextType: null,
           contextId: null,
           canEdit: true
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
         }
       }
     ]
@@ -455,6 +485,11 @@ export const groupDetailMocks = ({
                   friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
                 __typename: 'ContentTag'
               },
               {
@@ -470,6 +505,11 @@ export const groupDetailMocks = ({
                   contextType,
                   friendlyDescription: null,
                   __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
                 },
                 __typename: 'ContentTag'
               }
@@ -520,6 +560,11 @@ export const groupDetailMocks = ({
                   friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
                 __typename: 'ContentTag'
               },
               {
@@ -535,6 +580,11 @@ export const groupDetailMocks = ({
                   contextType,
                   friendlyDescription: null,
                   __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
                 },
                 __typename: 'ContentTag'
               }
@@ -584,6 +634,11 @@ export const groupDetailMocks = ({
                   contextType,
                   friendlyDescription: null,
                   __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
                 },
                 __typename: 'ContentTag'
               }

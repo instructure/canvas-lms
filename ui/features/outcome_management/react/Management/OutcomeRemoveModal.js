@@ -22,6 +22,7 @@ import {useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
@@ -32,6 +33,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {outcomeShape} from './shapes'
+import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
 
 const OutcomeRemoveModal = ({
   outcomes,
@@ -116,15 +118,63 @@ const OutcomeRemoveModal = ({
     onCleanupHandler()
   }
 
-  const generateOutcomesList = outcomeLinkIds => (
-    <List as="ul" size="medium" margin="0" isUnstyled>
-      {outcomeLinkIds.map(linkId => (
-        <List.Item size="medium" key={linkId}>
-          <TruncateText position="middle">{outcomes[linkId].title}</TruncateText>
-        </List.Item>
-      ))}
-    </List>
-  )
+  const generateOutcomesList = outcomeLinkIds => {
+    // Groups outcomes by parent group
+    const groups = {}
+    for (const linkId of outcomeLinkIds) {
+      const groupId = outcomes[linkId].parentGroupId
+      groups[groupId] = groups[groupId]
+        ? {
+            ...groups[groupId],
+            groupOutcomes: [...groups[groupId].groupOutcomes, linkId]
+          }
+        : {
+            groupId,
+            groupTitle: outcomes[linkId].parentGroupTitle,
+            groupOutcomes: [linkId]
+          }
+    }
+
+    return (
+      <>
+        {Object.values(groups)
+          .sort((a, b) => a.groupTitle.localeCompare(b.groupTitle, ENV.LOCALE, {numeric: true}))
+          .map(({groupTitle, groupId, groupOutcomes}) => (
+            <View key={groupId}>
+              <TruncateText position="middle">
+                {I18n.t('From %{groupTitle}', {groupTitle})}
+              </TruncateText>
+              <List as="ul" size="medium" margin="0" isUnstyled>
+                {groupOutcomes
+                  .sort((a, b) =>
+                    outcomes[a].title.localeCompare(outcomes[b].title, ENV.LOCALE, {numeric: true})
+                  )
+                  .map(linkId => (
+                    <List.Item size="medium" padding="0 0 0 x-small" key={linkId}>
+                      <Flex>
+                        <Flex.Item padding="0 xxx-small 0 0">
+                          <div
+                            style={{
+                              display: 'inline-block',
+                              transform: 'scale(0.75)',
+                              height: '1em'
+                            }}
+                          >
+                            <IconCheckMarkIndeterminateLine />
+                          </div>
+                        </Flex.Item>
+                        <Flex.Item>
+                          <TruncateText position="middle">{outcomes[linkId].title}</TruncateText>
+                        </Flex.Item>
+                      </Flex>
+                    </List.Item>
+                  ))}
+              </List>
+            </View>
+          ))}
+      </>
+    )
+  }
 
   let modalLabel, modalMessage
   let modalButtons = (

@@ -31,6 +31,8 @@ export default {
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,
+    parentGroupId: '100',
+    parentGroupTitle: 'Outcome Group',
     onMenuHandler: () => {},
     onCheckboxHandler: () => {}
   }

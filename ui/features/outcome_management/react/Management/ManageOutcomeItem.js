@@ -38,13 +38,16 @@ const ManageOutcomeItem = ({
   description,
   canManageOutcome,
   isChecked,
+  parentGroupId,
+  parentGroupTitle,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
-  const onChangeHandler = () => onCheckboxHandler({_id, linkId, title, canUnlink})
+  const onChangeHandler = () =>
+    onCheckboxHandler({_id, linkId, title, canUnlink, parentGroupId, parentGroupTitle})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
 
   // This allows account admins to edit global outcomes
@@ -142,6 +145,8 @@ ManageOutcomeItem.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
+  parentGroupId: PropTypes.string.isRequired,
+  parentGroupTitle: PropTypes.string.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,

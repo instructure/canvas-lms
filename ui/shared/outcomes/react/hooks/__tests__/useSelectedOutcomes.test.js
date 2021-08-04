@@ -20,20 +20,22 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useSelectedOutcomes from '../useSelectedOutcomes'
 
 describe('useSelectedOutcomes', () => {
-  const initialState = {
-    1: {
-      _id: '11',
-      linkId: '1',
-      title: 'Outcome 11',
-      canUnlink: true
-    },
-    2: {
-      _id: '12',
-      linkId: '2',
-      title: 'Outcome 12',
-      canUnlink: false
-    }
-  }
+  const generateOutcomes = num =>
+    new Array(num).fill(0).reduce(
+      (acc, _val, ind) => ({
+        ...acc,
+        [`${ind + 1}`]: {
+          _id: `${10 + ind}`,
+          linkId: `${ind + 1}`,
+          title: `Outcome ${10 + ind}`,
+          canUnlink: true,
+          parentGroupId: `${100 + ind}`,
+          parentGroupTitle: `Outcome Group ${100 + ind}`
+        }
+      }),
+      {}
+    )
+  const initialState = generateOutcomes(2)
 
   test('should create custom hook with initial state', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
@@ -57,24 +59,11 @@ describe('useSelectedOutcomes', () => {
   })
 
   test('should toggle selected outcome in state if toggleSelectedOutcome is called', () => {
+    const outcome = generateOutcomes(1)[1]
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    act(() =>
-      result.current.toggleSelectedOutcomes({
-        _id: '13',
-        linkId: '3',
-        title: 'Outcome 13',
-        canUnlink: true
-      })
-    )
-    expect(result.current.selectedOutcomesCount).toBe(3)
-    act(() =>
-      result.current.toggleSelectedOutcomes({
-        _id: '13',
-        linkId: '3',
-        title: 'Outcome 13',
-        canUnlink: true
-      })
-    )
+    act(() => result.current.toggleSelectedOutcomes(outcome))
+    expect(result.current.selectedOutcomesCount).toBe(1)
+    act(() => result.current.toggleSelectedOutcomes(outcome))
     expect(result.current.selectedOutcomesCount).toBe(2)
   })
 
