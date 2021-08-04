@@ -92,6 +92,7 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
               maxWidth="260px"
               overflowY="auto"
               overflowX="hidden"
+              tabIndex={outcomeCount > 10 ? '0' : '-1'}
             >
               <List isUnstyled size="small" margin="none small none none">
                 {Object.values(outcomes)

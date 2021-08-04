@@ -41,6 +41,7 @@ export const Default = Template.bind({})
 
 export const MoreThan10 = Template.bind({})
 MoreThan10.args = {
+  outcomeCount: 20,
   outcomes: new Array(20).fill(0).map((_v, i) => ({
     linkId: i + 1,
     title: `Outcome ${i + 1}`
@@ -49,6 +50,7 @@ MoreThan10.args = {
 
 export const ReallyLongTitles = Template.bind({})
 ReallyLongTitles.args = {
+  outcomeCount: 20,
   outcomes: new Array(20).fill(0).map((_v, i) => ({
     linkId: i + 1,
     title: `Outcome ${i + 1} `.repeat(10)

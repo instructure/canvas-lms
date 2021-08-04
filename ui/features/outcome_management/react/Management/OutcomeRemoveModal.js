@@ -240,7 +240,7 @@ const OutcomeRemoveModal = ({
         <View as="div">
           <Text size="medium">{modalMessage}</Text>
         </View>
-        <View as="div" maxHeight="16rem">
+        <View as="div" maxHeight="16rem" tabIndex={removableCount > 10 ? '0' : '-1'}>
           {nonRemovableCount > 0 && removableCount > 0 ? (
             <>
               <View as="div" padding="small 0 xx-small">
