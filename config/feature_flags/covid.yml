@@ -3,11 +3,6 @@ product_tours:
   applies_to: RootAccount
   display_name: "Product Tours"
   description: "In-product training walkthrough and tourpoints for admins, teachers, and students"
-module_dnd:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Module File Upload Enhancements"
-  description: "Drag and Drop files on modules and multi-file module item uploads"
 responsive_awareness:
   state: hidden
   applies_to: RootAccount

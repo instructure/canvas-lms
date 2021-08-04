@@ -24,25 +24,8 @@ describe('Modules Home Page', () => {
   const createButtonText = 'Create a new Module'
   const importExistingButtonText = 'Add existing content'
 
-  it('renders the create and import button', () => {
+  it('renders the create button', () => {
     const {queryByText} = render(<ModulesHomePage />)
     expect(queryByText(createButtonText)).toBeInTheDocument()
-    expect(queryByText(importExistingButtonText)).toBeInTheDocument()
-  })
-
-  describe('with the module_dnd FF enabled', () => {
-    beforeEach(() => {
-      window.ENV = {FEATURES: {module_dnd: true}}
-    })
-
-    afterEach(() => {
-      window.ENV = {}
-    })
-
-    it('does not render the import button', () => {
-      const {queryByText} = render(<ModulesHomePage />)
-      expect(queryByText(createButtonText)).toBeInTheDocument()
-      expect(queryByText(importExistingButtonText)).not.toBeInTheDocument()
-    })
   })
 })

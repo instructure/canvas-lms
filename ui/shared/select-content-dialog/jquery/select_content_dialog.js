@@ -121,15 +121,15 @@ SelectContentDialog.deepLinkingListener = event => {
   }
 }
 
-SelectContentDialog.attachDeepLinkingListner = function() {
+SelectContentDialog.attachDeepLinkingListner = function () {
   window.addEventListener('message', this.deepLinkingListener)
 }
 
-SelectContentDialog.detachDeepLinkingListener = function() {
+SelectContentDialog.detachDeepLinkingListener = function () {
   window.removeEventListener('message', this.deepLinkingListener)
 }
 
-SelectContentDialog.dialogCancelHandler = function(event) {
+SelectContentDialog.dialogCancelHandler = function (event) {
   ;[]
   const response = confirm(
     I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
@@ -139,11 +139,11 @@ SelectContentDialog.dialogCancelHandler = function(event) {
   }
 }
 
-SelectContentDialog.beforeUnloadHandler = function(e) {
+SelectContentDialog.beforeUnloadHandler = function (e) {
   return (e.returnValue = I18n.t('Changes you made may not be saved.'))
 }
 
-SelectContentDialog.handleContentItemResult = function(result, tool) {
+SelectContentDialog.handleContentItemResult = function (result, tool) {
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
   }
@@ -178,10 +178,7 @@ SelectContentDialog.Events = {
     }
 
     $.screenReaderFlashMessage(I18n.t('Selected external tool %{tool}', {tool: toolName}))
-    $tool
-      .parents('.tools')
-      .find('.tool.selected')
-      .removeClass('selected')
+    $tool.parents('.tools').find('.tool.selected').removeClass('selected')
     $tool.addClass('selected')
 
     if ($tool.hasClass('resource_selection')) {
@@ -234,7 +231,7 @@ SelectContentDialog.Events = {
 
         const $iframe = $dialog.find('iframe')
 
-        $external_content_info_alerts.on('focus', function(e) {
+        $external_content_info_alerts.on('focus', function () {
           const iframeWidth = $iframe.outerWidth(true)
           const iframeHeight = $iframe.outerHeight(true)
           $iframe.css('border', '2px solid #008EE2')
@@ -246,7 +243,7 @@ SelectContentDialog.Events = {
           $dialog.scrollLeft(0).scrollTop(0)
         })
 
-        $external_content_info_alerts.on('blur', function(e) {
+        $external_content_info_alerts.on('blur', function () {
           const iframeWidth = $iframe.outerWidth(true)
           const iframeHeight = $iframe.outerHeight(true)
           const alertHeight = $(this).outerHeight(true)
@@ -273,7 +270,7 @@ SelectContentDialog.Events = {
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool')
           })
-          .bind('dialogresize', function() {
+          .bind('dialogresize', function () {
             $(this)
               .find('iframe')
               .add('.fix_for_resizing_over_iframe')
@@ -283,10 +280,10 @@ SelectContentDialog.Events = {
           .bind('dialogresizestop', () => {
             $('.fix_for_resizing_over_iframe').remove()
           })
-          .bind('dialogresizestart', function() {
+          .bind('dialogresizestart', function () {
             $(this)
               .find('iframe')
-              .each(function() {
+              .each(function () {
                 $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
                   .css({
                     width: this.offsetWidth + 'px',
@@ -347,7 +344,7 @@ SelectContentDialog.Events = {
   }
 }
 
-SelectContentDialog.extractContextExternalToolItemData = function() {
+SelectContentDialog.extractContextExternalToolItemData = function () {
   const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
   let tool_type = 'context_external_tool'
   let tool_id = 0
@@ -371,16 +368,16 @@ SelectContentDialog.extractContextExternalToolItemData = function() {
   }
 }
 
-SelectContentDialog.resetExternalToolFields = function() {
+SelectContentDialog.resetExternalToolFields = function () {
   $('#external_tool_create_url').val('')
   $('#external_tool_create_title').val('')
   $('#external_tool_create_custom_params').val('')
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   const external_services = null
   const $dialog = $('#select_context_content_dialog')
-  INST.selectContentDialog = function(options) {
+  INST.selectContentDialog = function (options) {
     var options = options || {}
     const for_modules = options.for_modules
     const select_button_text = options.select_button_text || I18n.t('buttons.add_item', 'Add Item')
@@ -396,7 +393,7 @@ $(document).ready(function() {
     $dialog.find('.select_item_name').showIf(!options.no_name_input)
     if (allow_external_urls && !external_services) {
       const $services = $('#content_tag_services').empty()
-      getUserServices('BookmarkService', function(data) {
+      getUserServices('BookmarkService', function (data) {
         for (const idx in data) {
           const service = data[idx].user_service
           const $service = $("<a href='#' class='bookmark_service no-hover'/>")
@@ -411,7 +408,7 @@ $(document).ready(function() {
           const $img = $('<img/>')
           $img.attr('src', '/images/' + service.service + '_small_icon.png')
           $service.append($img)
-          $service.click(function(event) {
+          $service.click(function (event) {
             event.preventDefault()
             findLinkForService($(this).data('service').service, data => {
               $('#content_tag_create_url').val(data.url)
@@ -446,13 +443,9 @@ $(document).ready(function() {
     )[0]
     if (visibleModuleItemSelect) {
       if (visibleModuleItemSelect.selectedIndex != -1) {
-        $('.add_item_button')
-          .removeClass('disabled')
-          .attr('aria-disabled', false)
+        $('.add_item_button').removeClass('disabled').attr('aria-disabled', false)
       } else {
-        $('.add_item_button')
-          .addClass('disabled')
-          .attr('aria-disabled', true)
+        $('.add_item_button').addClass('disabled').attr('aria-disabled', true)
       }
     }
     $('#select_context_content_dialog').dialog('option', 'title', dialog_title)
@@ -463,19 +456,15 @@ $(document).ready(function() {
   })
   $(
     '#select_context_content_dialog select, #select_context_content_dialog input[type=text], .module_item_select'
-  ).keycodes('return', function(event) {
+  ).keycodes('return', function (event) {
     if (!$('.add_item_button').hasClass('disabled')) {
       // button is enabled
       $(event.currentTarget).blur()
-      $(this)
-        .parents('.ui-dialog')
-        .find('.add_item_button')
-        .last()
-        .click()
+      $(this).parents('.ui-dialog').find('.add_item_button').last().click()
     }
   })
-  $('#select_context_content_dialog .add_item_button').click(function() {
-    const submit = function(item_data, close_dialog = true) {
+  $('#select_context_content_dialog .add_item_button').click(function () {
+    const submit = function (item_data, close_dialog = true) {
       const submitted = $dialog.data('submitted_function')
       if (submitted && $.isFunction(submitted)) {
         submitted(item_data)
@@ -542,7 +531,7 @@ $(document).ready(function() {
       const $options = $(
         '#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected'
       )
-      $options.each(function() {
+      $options.each(function () {
         const $option = $(this)
         let item_id = $option.val()
         let quiz_type
@@ -561,13 +550,10 @@ $(document).ready(function() {
           quiz_lti
         }
         if (item_data['item[id]'] == 'new') {
-          if (!ENV?.FEATURES?.module_dnd) {
-            $('#select_context_content_dialog').loadingImage()
-          }
           const $urls = $(
             '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url'
           )
-          let url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
+          const url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
           ).getFormData()
@@ -578,7 +564,7 @@ $(document).ready(function() {
               quiz_lti: 1
             }
           }
-          const process_upload = function(data, done = true) {
+          const process_upload = function (udata, done = true) {
             let obj
 
             // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` or 'wiki_page' root object
@@ -587,9 +573,9 @@ $(document).ready(function() {
               item_data['item[type]'] === 'wiki_page' ||
               item_data['item[type]'] === 'attachment'
             ) {
-              obj = data
+              obj = udata
             } else {
-              obj = data[item_data['item[type]']] // e.g. data['wiki_page'] for wiki pages
+              obj = udata[item_data['item[type]']] // e.g. data['wiki_page'] for wiki pages
             }
 
             $('#select_context_content_dialog').loadingImage('remove')
@@ -621,63 +607,40 @@ $(document).ready(function() {
           }
 
           if (item_data['item[type]'] == 'attachment') {
-            if (!ENV?.FEATURES?.module_dnd) {
-              const file = $('#module_attachment_uploaded_data')[0].files[0]
-              url = `/api/v1/folders/${data['attachment[folder_id]']}/files`
-              data = {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                parent_folder_id: data['attachment[folder_id]'],
-                on_duplicate: 'rename',
-                no_redirect: true
-              }
-              uploadFile(url, data, file)
-                .then(attachment => {
-                  process_upload(attachment)
-                })
-                .catch(_err => {
-                  $('#select_context_content_dialog').loadingImage('remove')
-                  $('#select_context_content_dialog').errorBox(
-                    I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
-                  )
-                })
-            } else {
-              BaseUploader.prototype.onUploadPosted = attachment => {
-                // if the uploaded file replaced and existing file that already has a module item, don't create a new item
-                const adding_to_module_id = $dialog.data().context_module_id
-                if (
-                  !Object.keys(ENV.MODULE_FILE_DETAILS).find(
-                    fdkey =>
-                      // there's module item with the id of the replaced file
-                      ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId && // eslint-disable-line eqeqeq
-                      // and the module item is in the module we're working in
-                      ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id // eslint-disable-line eqeqeq
-                  )
-                ) {
-                  process_upload(attachment, false)
-                }
-
-                if (UploadQueue.length() === 0) {
-                  renderFileUploadForm()
-                  $dialog.find('.alert').remove()
-                  $dialog.dialog('close')
-                }
-              }
-              BaseUploader.prototype.onUploadFailed = _err => {
-                $('#select_context_content_dialog').loadingImage('remove')
-                $('#select_context_content_dialog').errorBox(
-                  I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
+            BaseUploader.prototype.onUploadPosted = attachment => {
+              // if the uploaded file replaced and existing file that already has a module item, don't create a new item
+              const adding_to_module_id = $dialog.data().context_module_id
+              if (
+                !Object.keys(ENV.MODULE_FILE_DETAILS).find(
+                  fdkey =>
+                    // there's module item with the id of the replaced file
+                    ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId && // eslint-disable-line eqeqeq
+                    // and the module item is in the module we're working in
+                    ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id // eslint-disable-line eqeqeq
                 )
-                renderFileUploadForm()
+              ) {
+                process_upload(attachment, false)
               }
-              // Unmount progress component to reset state
-              ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
-              UploadQueue.flush() // if there was an error uploading earlier, the queue has stuff in it we no longer want.
-              upload_form.queueUploads()
-              fileSelectBox.setDirty()
-              renderCurrentUploads()
+
+              if (UploadQueue.length() === 0) {
+                renderFileUploadForm()
+                $dialog.find('.alert').remove()
+                $dialog.dialog('close')
+              }
             }
+            BaseUploader.prototype.onUploadFailed = _err => {
+              $('#select_context_content_dialog').loadingImage('remove')
+              $('#select_context_content_dialog').errorBox(
+                I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
+              )
+              renderFileUploadForm()
+            }
+            // Unmount progress component to reset state
+            ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
+            UploadQueue.flush() // if there was an error uploading earlier, the queue has stuff in it we no longer want.
+            upload_form.queueUploads()
+            fileSelectBox.setDirty()
+            renderCurrentUploads()
           } else {
             $.ajaxJSON(
               url,
@@ -715,7 +678,7 @@ $(document).ready(function() {
   })
   const initEvents = SelectContentDialog.Events.init.bind(SelectContentDialog.Events)()
   const $tool_template = $('#context_external_tools_select .tools .tool:first').detach()
-  $('#add_module_item_select').change(function() {
+  $('#add_module_item_select').change(function () {
     // Don't disable the form button for these options
     const selectedOption = $(this).val()
     const doNotDisable = [
@@ -724,13 +687,9 @@ $(document).ready(function() {
       'context_module_sub_header'
     ].includes(selectedOption)
     if (doNotDisable) {
-      $('.add_item_button')
-        .removeClass('disabled')
-        .attr('aria-disabled', false)
+      $('.add_item_button').removeClass('disabled').attr('aria-disabled', false)
     } else {
-      $('.add_item_button')
-        .addClass('disabled')
-        .attr('aria-disabled', true)
+      $('.add_item_button').addClass('disabled').attr('aria-disabled', true)
     }
 
     $('#select_context_content_dialog .module_item_option').hide()
@@ -741,20 +700,18 @@ $(document).ready(function() {
         }),
         $('#module_item_select_file')[0]
       )
-      if (ENV?.FEATURES?.module_dnd) {
-        fileSelectBox.refresh()
-        $('#attachment_folder_id').on('change', update_foc)
-        renderFileUploadForm()
-        if (fileSelectBox.folderStore.getState().isLoading) {
-          fileSelectBox.folderStore.addChangeListener(() => {
-            renderFileUploadForm()
-          })
-        }
-        if (fileSelectBox.fileStore.getState().isLoading) {
-          fileSelectBox.fileStore.addChangeListener(() => {
-            renderFileUploadForm()
-          })
-        }
+      fileSelectBox.refresh()
+      $('#attachment_folder_id').on('change', update_foc)
+      renderFileUploadForm()
+      if (fileSelectBox.folderStore.getState().isLoading) {
+        fileSelectBox.folderStore.addChangeListener(() => {
+          renderFileUploadForm()
+        })
+      }
+      if (fileSelectBox.fileStore.getState().isLoading) {
+        fileSelectBox.fileStore.addChangeListener(() => {
+          renderFileUploadForm()
+        })
       }
     }
     $('#' + $(this).val() + 's_select')
@@ -805,61 +762,41 @@ $(document).ready(function() {
       }
     }
   })
-  $('#select_context_content_dialog').on('change', '.module_item_select', function() {
+  $('#select_context_content_dialog').on('change', '.module_item_select', function () {
     const currentSelectItem = $(this)[0]
 
-    if (ENV.FEATURES?.module_dnd) {
-      if ($('#add_module_item_select').val() === 'attachment') {
-        if (currentSelectItem) {
-          // selectedIndex==0 for [new files]
-          if (currentSelectItem.selectedIndex === 0) {
-            update_foc()
-          } else {
-            enable_disable_submit_button(currentSelectItem.selectedIndex > 0)
-          }
+    if ($('#add_module_item_select').val() === 'attachment') {
+      if (currentSelectItem) {
+        // selectedIndex==0 for [new files]
+        if (currentSelectItem.selectedIndex === 0) {
+          update_foc()
+        } else {
+          enable_disable_submit_button(currentSelectItem.selectedIndex > 0)
         }
-      } else {
-        enable_disable_submit_button(
-          $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1
-        )
       }
-    } else if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
-      $('.add_item_button')
-        .removeClass('disabled')
-        .attr('aria-disabled', false)
+    } else {
+      enable_disable_submit_button(
+        $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1
+      )
     }
 
     if ($(this).val() == 'new') {
-      $(this)
-        .parents('.module_item_option')
-        .find('.new')
-        .show()
-        .focus()
-        .select()
+      $(this).parents('.module_item_option').find('.new').show().focus().select()
     } else {
-      $(this)
-        .parents('.module_item_option')
-        .find('.new')
-        .hide()
+      $(this).parents('.module_item_option').find('.new').hide()
     }
   })
 })
 
-if (!ENV?.FEATURES?.module_dnd) {
-  $('#module_attachment_uploaded_data').on('change', function(event) {
-    enable_disable_submit_button(event.target?.files?.length > 0)
-  })
-}
+$('#module_attachment_uploaded_data').on('change', function (event) {
+  enable_disable_submit_button(event.target?.files?.length > 0)
+})
 
 function enable_disable_submit_button(enabled) {
   if (enabled) {
-    $('.add_item_button')
-      .removeClass('disabled')
-      .attr('aria-disabled', false)
+    $('.add_item_button').removeClass('disabled').attr('aria-disabled', false)
   } else {
-    $('.add_item_button')
-      .addClass('disabled')
-      .attr('aria-disabled', true)
+    $('.add_item_button').addClass('disabled').attr('aria-disabled', true)
   }
 }
 
@@ -926,10 +863,7 @@ function renderFileUploadForm() {
   }
   // only show the choose files + folder form if [new files] is selected
   if ($('#select_context_content_dialog').val() === 'new') {
-    $('#module_attachment_upload_form')
-      .parents('.module_item_option')
-      .find('.new')
-      .show()
+    $('#module_attachment_upload_form').parents('.module_item_option').find('.new').show()
 
     enable_disable_submit_button($('#module_attachment_uploaded_data')[0].files.length)
   }

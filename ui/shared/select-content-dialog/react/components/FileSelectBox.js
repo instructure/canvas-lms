@@ -104,7 +104,7 @@ export default class FileSelectBox extends React.Component {
       return <option>{I18n.t('Loading...')}</option>
     }
 
-    const renderFiles = function(folder) {
+    const renderFiles = function (folder) {
       return folder.files.map(file => (
         <option key={`file-${file.id}`} value={file.id}>
           {file.display_name}
@@ -124,24 +124,15 @@ export default class FileSelectBox extends React.Component {
   }
 
   render() {
-    const moduleDnd = window?.ENV?.FEATURES?.module_dnd
     const newQuizzesModulesSupport = window?.ENV?.new_quizzes_modules_support
     const ariaLabel = newQuizzesModulesSupport
-      ? moduleDnd
-        ? I18n.t(
-            'Select the files you want to associate, or add files by selecting "Create File(s)".'
-          )
-        : I18n.t('Select the file you want to associate, or add a file by selecting "Create File".')
-      : moduleDnd
-      ? I18n.t('Select the files you want to associate, or add files by selecting "New File(s)".')
-      : I18n.t('Select the file you want to associate, or add a file by selecting "New File".')
+      ? I18n.t(
+          'Select the files you want to associate, or add files by selecting "Create File(s)".'
+        )
+      : I18n.t('Select the files you want to associate, or add files by selecting "New File(s)".')
     const newFile = newQuizzesModulesSupport
-      ? moduleDnd
-        ? I18n.t('[ Create File(s) ]')
-        : I18n.t('[ Create File ]')
-      : moduleDnd
-      ? I18n.t('[ New File(s) ]')
-      : I18n.t('[ New File ]')
+      ? I18n.t('[ Create File(s) ]')
+      : I18n.t('[ New File(s) ]')
     return (
       <div>
         <select

@@ -294,6 +294,10 @@ describe "context modules" do
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
       @file.save!
+
+      @file2 = @course.attachments.create!(:display_name => "another.txt", :uploaded_data => default_uploaded_data)
+      @file2.context = @course
+      @file2.save!
     end
 
     before(:each) do
@@ -302,42 +306,7 @@ describe "context modules" do
 
     describe "module drag and drop" do
       before(:once) do
-        @course.root_account.enable_feature!(:module_dnd)
-        @course.context_modules.create!(:name => "files module")
-      end
-
-      it 'should upload file via module drag and drop ' do
-        get "/courses/#{@course.id}/modules"
-        wait_for_ajaximations
-
-        # empty module should have a DnD area
-        expect(f('.module_dnd input[type="file"]')).to be_displayed
-        filename1, fullpath1, _data = get_file("testfile1.txt")
-
-        f('.module_dnd input[type="file"]').send_keys(fullpath1)
-        wait_for_ajaximations
-
-        expect(fj(".context_module_item:contains(#{filename1.inspect})")).to be_displayed
-
-        get "/courses/#{@course.id}/modules"
-        wait_for_ajaximations
-
-        # non-empty module should not have a DnD area
-        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
-      end
-
-      it 'creating a new module should display a drag and drop area' do
-        get "/courses/#{@course.id}/modules"
-        wait_for_ajaximations
-
-        f('button.add_module_link').click
-        wait_for_ajaximations
-
-        replace_content(f('#context_module_name'), "New Module")
-        f('#add_context_module_form button.submit_button').click
-        wait_for_ajaximations
-
-        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+        @mod = @course.context_modules.create!(:name => "files module")
       end
 
       describe 'with duplicate modules enabled' do
@@ -374,60 +343,6 @@ describe "context modules" do
           # non-empty module should not have a DnD area
           expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
         end
-      end
-    end
-
-    it "should add a file item to a module", priority: "1", test_id: 126728 do
-      get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
-    end
-
-    it "should not remove the file link in a module when file is overwritten" do
-      course_module
-      @module.add_item({:id => @file.id, :type => 'attachment'})
-      get "/courses/#{@course.id}/modules"
-
-      expect(f('.context_module_item')).to include_text(FILE_NAME)
-      file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
-      file.context = @course
-      file.save!
-      Attachment.last.handle_duplicates(:overwrite)
-      refresh_page
-      expect(f('.context_module_item')).to include_text(FILE_NAME)
-    end
-
-    it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
-      get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
-      ff('.icon-publish')[0].click
-      wait_for_ajaximations
-      set_value f('.UsageRightsSelectBox__select'), 'own_copyright'
-      set_value f('#copyrightHolder'), 'Test User'
-      f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
-      wait_for_ajaximations
-      get "/courses/#{@course.id}/files/folder/unfiled"
-      icon_class = 'icon-files-copyright'
-      expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
-    end
-
-    it 'edit file module item inline', priority: "2", test_id: 132492 do
-      get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
-      verify_edit_item_form
-    end
-
-    describe "with module_dnd feature on" do
-      before(:each) do
-        local_storage!
-      end
-
-      before(:once) do
-        @course.root_account.enable_feature!(:module_dnd)
-        # adding another file to course
-        @file2 = @course.attachments.create!(:display_name => "another.txt", :uploaded_data => default_uploaded_data)
-        @file2.context = @course
-        @file2.save!
-        @mod = @course.context_modules.create!(:name => "files module")
       end
 
       it "should add multiple file items to a module" do
@@ -557,6 +472,79 @@ describe "context modules" do
         upload_file_item_with_selection("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
         expect(ffj(".context_module_item:contains(#{filename})").length).to eq(2)
       end
+
+      it 'should upload file via module drag and drop ' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # empty module should have a DnD area
+        expect(f('.module_dnd input[type="file"]')).to be_displayed
+        filename1, fullpath1, _data = get_file("testfile1.txt")
+
+        f('.module_dnd input[type="file"]').send_keys(fullpath1)
+        wait_for_ajaximations
+
+        expect(fj(".context_module_item:contains(#{filename1.inspect})")).to be_displayed
+
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # non-empty module should not have a DnD area
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+      end
+
+      it 'creating a new module should display a drag and drop area' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        f('button.add_module_link').click
+        wait_for_ajaximations
+
+        replace_content(f('#context_module_name'), "New Module")
+        f('#add_context_module_form button.submit_button').click
+        wait_for_ajaximations
+
+        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+      end
+    end
+
+    it "should add a file item to a module", priority: "1", test_id: 126728 do
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+    end
+
+    it "should not remove the file link in a module when file is overwritten" do
+      course_module
+      @module.add_item({:id => @file.id, :type => 'attachment'})
+      get "/courses/#{@course.id}/modules"
+
+      expect(f('.context_module_item')).to include_text(FILE_NAME)
+      file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      file.context = @course
+      file.save!
+      Attachment.last.handle_duplicates(:overwrite)
+      refresh_page
+      expect(f('.context_module_item')).to include_text(FILE_NAME)
+    end
+
+    it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      ff('.icon-publish')[0].click
+      wait_for_ajaximations
+      set_value f('.UsageRightsSelectBox__select'), 'own_copyright'
+      set_value f('#copyrightHolder'), 'Test User'
+      f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/files/folder/unfiled"
+      icon_class = 'icon-files-copyright'
+      expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+    end
+
+    it 'edit file module item inline', priority: "2", test_id: 132492 do
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      verify_edit_item_form
     end
   end
 
