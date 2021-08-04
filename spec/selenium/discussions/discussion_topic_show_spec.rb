@@ -53,5 +53,24 @@ describe "Discussion Topic Show" do
       expect(fj("span:contains('Send To...')")).to be_present
       expect(fj("span:contains('Copy To...')")).to be_present
     end
+
+    it "has a module progression section when applicable" do
+      module1 = @course.context_modules.create!(:name => "module1")
+      item1 = @course.assignments.create!(
+        :name => "First Item",
+        :submission_types => ["online_text_entry"],
+        :points_possible => 20
+      )
+      module1.add_item(:id => item1.id, :type => 'assignment')
+      item2 = @course.discussion_topics.create!(
+        title: 'Second Item',
+        discussion_type: 'threaded',
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher
+      )
+      module1.add_item(:id => item2.id, :type => 'discussion_topic')
+      get "/courses/#{@course.id}/discussion_topics/#{item2.id}"
+      expect(f("a[aria-label='Previous Module Item']")).to be_present
+    end  
   end
 end
