@@ -94,6 +94,8 @@ class DiscussionEntry < ActiveRecord::Base
       new_message = Nokogiri::HTML.fragment(message)
       new_message.search('[data-discussion-reply-preview]').remove
       self.message = new_message.to_html
+    else
+      self.include_reply_preview = false
     end
   end
 
