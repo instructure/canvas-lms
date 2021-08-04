@@ -51,6 +51,7 @@ ready(() => {
         latestAnnouncement={ENV.COURSE.latest_announcement}
         pagesPath={ENV.COURSE.pages_url}
         hasWikiPages={ENV.COURSE.has_wiki_pages}
+        hasSyllabusBody={ENV.COURSE.has_syllabus_body}
       />,
       courseContainer
     )

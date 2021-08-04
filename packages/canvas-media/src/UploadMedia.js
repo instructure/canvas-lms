@@ -53,8 +53,8 @@ export default class UploadMedia extends React.Component {
     rcsConfig: shape({
       contextId: string,
       contextType: string,
-      origin: string.isRequired,
-      headers: shape({Authorization: string.isRequired})
+      origin: string,
+      headers: shape({Authorization: string})
     }),
     onStartUpload: func,
     onUploadComplete: func,

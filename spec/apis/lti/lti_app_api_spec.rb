@@ -228,7 +228,7 @@ module Lti
       context 'lti 1.1 and 2.0, and 1.3 tools' do
         let(:dev_key) { DeveloperKey.create! account: account }
         let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
-        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
+        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: 'on' }
         let(:advantage_tool) do
           t = new_valid_external_tool(account)
           t.use_1_3 = true

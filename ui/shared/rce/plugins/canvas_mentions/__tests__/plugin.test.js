@@ -18,9 +18,10 @@
 
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
-import TestEditor from './TestEditor'
+import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
+import {screen} from '@testing-library/dom'
 
-let mockAnchorOffset = 2
+const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
 const mockAnchorNode = {wholeText: mockAnchorWholeText}
 
@@ -59,61 +60,196 @@ describe('plugin', () => {
   })
 })
 
-describe('on input', () => {
-  let editor
-
-  beforeEach(() => {
-    editor = new TestEditor()
-    plugin.pluginDefinition.init(editor)
-  })
-})
-
 describe('pluginDefinition', () => {
   let editor
-
   beforeEach(() => {
-    editor = new TestEditor()
+    editor = new FakeEditor()
     plugin.pluginDefinition.init(editor)
   })
 
-  describe('onInput', () => {
-    let logSpy
+  afterEach(() => editor.setContent(''))
 
+  describe('input', () => {
     beforeEach(() => {
-      logSpy = jest.spyOn(console, 'log')
+      editor.setContent('<span id="test"></span>')
+      editor.selection.select(editor.dom.select('#test')[0])
     })
 
-    afterEach(() => {
-      logSpy.mockRestore()
-    })
-
-    describe('when no mention is triggered', () => {
-      it('does not render the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).not.toHaveBeenCalledWith('Mount the mentions component!')
+    const sharedExamplesForTriggeredMentions = () => {
+      it('renders a the mentions marker', async () => {
+        editor.fire('input', {}, editor)
+        expect(screen.getByTestId('mentions-marker')).toBeInTheDocument()
       })
-    })
+
+      it('makes the marker contenteditable', () => {
+        editor.fire('input', {}, editor)
+        expect(screen.getByTestId('mentions-marker').getAttribute('contenteditable')).toEqual(
+          'true'
+        )
+      })
+
+      it('removes contenteditable from the body', () => {
+        editor.fire('input', {}, editor)
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+    }
 
     describe('when an "inline" mention is triggered', () => {
       beforeEach(() => {
-        mockAnchorNode.wholeText = ' @'
+        editor.setContent(
+          '<div data-testid="fake-body" contenteditable="true"><span id="test"> @</span></div>'
+        )
+        editor.selection.select(editor.dom.select('#test')[0])
+        editor.selection.setAnchorOffset(2)
       })
 
-      it('renders the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
-      })
+      sharedExamplesForTriggeredMentions()
     })
 
     describe('when a "starting" mention is triggered', () => {
       beforeEach(() => {
-        mockAnchorOffset = 1
-        mockAnchorNode.wholeText = '@'
+        editor.setContent(
+          '<div data-testid="fake-body" contenteditable="true"><span id="test">@</span></div>'
+        )
+        editor.selection.select(editor.dom.select('#test')[0])
+        editor.selection.setAnchorOffset(1)
       })
 
-      it('renders the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
+      sharedExamplesForTriggeredMentions()
+    })
+  })
+
+  function sharedExamplesForEventHandlers(subject) {
+    it('makes the body contenteditable', () => {
+      subject()
+      expect(editor.getBody().getAttribute('contenteditable')).toEqual('true')
+    })
+
+    it('removes contenteditable from the marker span', () => {
+      subject()
+      expect(screen.getByText('wes').getAttribute('contenteditable')).toBeNull()
+    })
+
+    it('removes the ID from the marker span', () => {
+      subject()
+      expect(screen.getByText('wes').id).toEqual('')
+    })
+  }
+
+  describe('SetContent', () => {
+    let insertionContent
+
+    const subject = () => editor.fire('SetContent', {content: insertionContent, target: editor})
+
+    beforeEach(() => {
+      insertionContent = '<h1>Hello!</h1>'
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the content being inserted includes the marker', () => {
+      beforeEach(() => {
+        insertionContent = '<span id="mentions-marker" contenteditable="true"></span>'
+      })
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+    })
+  })
+
+  describe('KeyDown', () => {
+    let which
+
+    const subject = () => editor.fire('KeyDown', {which, editor})
+
+    beforeEach(() => {
+      which = 1
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the active node is the marker', () => {
+      beforeEach(() => {
+        editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      })
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+
+      describe('with the key down for a "backspace" deleting the trigger character', () => {
+        beforeEach(() => {
+          which = 8
+          editor.selection.setRng({endOffset: 1, startOffset: 1})
+        })
+
+        sharedExamplesForEventHandlers(subject)
+      })
+
+      describe('with the key down for a "backspace" not deleting the trigger char', () => {
+        beforeEach(() => {
+          which = 8
+          editor.selection.setRng({endOffset: 1, startOffset: 2})
+        })
+
+        it('does not make the body contenteditable', () => {
+          subject()
+          expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+        })
+      })
+
+      describe('whith the key down for an "enter"', () => {
+        beforeEach(() => (which = 13))
+
+        sharedExamplesForEventHandlers(subject)
+      })
+    })
+  })
+
+  describe('MouseDown', () => {
+    let currentTarget
+
+    const subject = () => editor.fire('MouseDown', {editor, currentTarget})
+
+    beforeEach(() => {
+      currentTarget = {id: ''}
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the target of the click is the marker', () => {
+      beforeEach(() => (currentTarget = {id: 'mentions-marker'}))
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
       })
     })
   })

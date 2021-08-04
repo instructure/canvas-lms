@@ -120,13 +120,13 @@ test('it should include a List View menu item when Student Planner is enabled', 
   wrapper.unmount()
 })
 
-test('it should include an Elementary View option when the Elementary dashboard is disabled', () => {
+test('it should include an Homeroom View option when the Elementary dashboard is disabled', () => {
   const wrapper = mount(
     <DashboardOptionsMenu canEnableElementaryDashboard onDashboardChange={() => {}} />
   )
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'Elementary View'))
+  ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'Homeroom View'))
   wrapper.unmount()
 })
 

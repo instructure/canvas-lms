@@ -21,45 +21,61 @@ import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {
   IconArrowOpenEndLine,
   IconArrowOpenDownLine,
   IconArrowOpenEndSolid,
-  IconArrowOpenDownSolid
+  IconArrowOpenDownSolid,
+  IconAddLine
 } from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeDescription from './Management/OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const FindOutcomeItem = ({id, title, description, isChecked, onCheckboxHandler}) => {
+const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) => {
   const [truncate, setTruncate] = useState(true)
+  // NOTE: addedOutcome state will not be needed once refetching of groups/outcomes
+  // is completed.  See OUT-4521 & OUT-4559
+  const [addedOutcome, setAddedOutcome] = useState(isAdded)
+  const [buttonMessage, setButtonMessage] = useState(isAdded ? I18n.t('Added') : I18n.t('Add'))
   const onClickHandler = () => description && setTruncate(prevState => !prevState)
-  const onChangeHandler = () => onCheckboxHandler(id)
   const {isMobileView} = useCanvasContext()
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
+
+  const onButtonClick = () => {
+    setAddedOutcome(true)
+    setButtonMessage(I18n.t('Added'))
+    onAddClickHandler(id)
+  }
 
   const checkbox = (
     <Flex.Item size={isMobileView ? '' : '5rem'} alignSelf="end">
       <div
         style={{
-          padding: isMobileView ? '0' : description ? '1.2815rem 0 0 1rem' : '0.313rem 0 0 1rem',
-          marginRight: isMobileView ? '-12px' : '0'
+          padding: isMobileView
+            ? '0'
+            : description && addedOutcome
+            ? '1.2815rem 0 0 0'
+            : description
+            ? '1.2815rem 0 0 1rem'
+            : addedOutcome
+            ? '0.313rem 0 0 0'
+            : '0.313rem 0 0 1rem'
         }}
       >
-        <Checkbox
-          label={<ScreenReaderContent>{I18n.t('Add outcome')}</ScreenReaderContent>}
-          value="medium"
-          variant="toggle"
+        <Button
+          interaction={addedOutcome ? 'disabled' : 'enabled'}
           size="small"
-          checked={isChecked}
-          onChange={onChangeHandler}
-        />
+          margin={isMobileView ? '0' : '0 x-small 0 0'}
+          renderIcon={IconAddLine}
+          onClick={onButtonClick}
+        >
+          {buttonMessage}
+        </Button>
       </div>
     </Flex.Item>
   )
@@ -139,8 +155,8 @@ FindOutcomeItem.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string,
   description: PropTypes.string,
-  isChecked: PropTypes.bool.isRequired,
-  onCheckboxHandler: PropTypes.func.isRequired
+  isAdded: PropTypes.bool.isRequired,
+  onAddClickHandler: PropTypes.func.isRequired
 }
 
 export default memo(FindOutcomeItem)

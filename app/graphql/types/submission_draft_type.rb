@@ -84,6 +84,11 @@ module Types
       end
     end
 
+    field :meets_student_annotation_criteria, Boolean, null: false
+    def meets_student_annotation_criteria
+      object.meets_student_annotation_criteria?
+    end
+
     field :media_object, Types::MediaObjectType, null: true
     def media_object
       Loaders::MediaObjectLoader.load(object.media_object_id)

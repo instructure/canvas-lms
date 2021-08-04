@@ -20,6 +20,7 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import timezone from '@canvas/timezone'
 import tokyo from 'timezone/Asia/Tokyo'
+import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'
 import BulkEdit from '../BulkEdit'
 
@@ -1014,5 +1015,55 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByLabelText('Due Dates'))
       expect(getByText('Ok').closest('button').disabled).toBe(true)
     })
+  })
+})
+
+describe('in a timezone that does DST', () => {
+  let oldEnv
+  let timezoneSnapshot
+  beforeEach(() => {
+    oldEnv = window.ENV
+    window.ENV = {
+      TIMEZONE: 'America/Anchorage',
+      FEATURES: {}
+    }
+    timezoneSnapshot = timezone.snapshot()
+    timezone.changeZone(anchorage, 'America/Anchorage')
+  })
+
+  afterEach(async () => {
+    await flushPromises()
+    window.ENV = oldEnv
+    timezone.restore(timezoneSnapshot)
+  })
+
+  it('preserves the time when shifting to a DST transition day', async () => {
+    const af = [
+      {
+        id: '11',
+        name: 'foo',
+        can_edit: true,
+        all_dates: [
+          {
+            base: true,
+            unlock_at: '2021-11-01T00:00:00Z',
+            due_at: '2021-11-02T13:37:14.5Z',
+            lock_at: '2022-01-01T00:00:00Z',
+            can_edit: true
+          }
+        ]
+      }
+    ]
+    const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait({}, af)
+    const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'America/Anchorage')
+    expect(originalDueAtMoment.format('YYYY-MM-DD h:mm:ss.S')).toEqual('2021-11-02 5:37:14.5')
+    const dueAtInput = getAllByLabelText('Due At')[0]
+    const dueAtDate = '2021-11-07'
+    changeAndBlurInput(dueAtInput, dueAtDate)
+    fireEvent.click(getByText('Save'))
+    await flushPromises()
+    const body = JSON.parse(fetch.mock.calls[1][1].body)
+    const newMoment = moment.tz(body[0].all_dates[0].due_at, 'America/Anchorage')
+    expect(newMoment.format('YYYY-MM-DD h:mm:ss.S')).toEqual('2021-11-07 5:37:14.5')
   })
 })

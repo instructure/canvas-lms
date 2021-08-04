@@ -36,7 +36,6 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../helpers/UploadMediaTranslations'
-import {getRCSAuthenticationHeaders, getRCSOriginFromHost} from '@instructure/canvas-rce'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}
@@ -322,9 +321,7 @@ export default class CommentTextArea extends Component {
                   open={this.state.mediaModalOpen}
                   rcsConfig={{
                     contextId: this.props.assignment.env.courseId,
-                    contextType: 'course',
-                    origin: getRCSOriginFromHost(ENV.RICH_CONTENT_APP_HOST),
-                    headers: getRCSAuthenticationHeaders(ENV.JWT)
+                    contextType: 'course'
                   }}
                   tabs={{embed: false, record: true, upload: true}}
                   uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}

@@ -20,16 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
-# We have the funky indenting here because we will remove this once the granular
-# permission stuff is released, and I don't want to complicate the git history
-RSpec.shared_examples "course_files" do
 describe "better_file_browsing, folders" do
   include_context "in-process server selenium tests"
   include FilesCommon
-
-  before do
-    set_granular_permission
-  end
 
   context "Folders" do
     before(:each) do
@@ -179,18 +172,5 @@ describe "better_file_browsing, folders" do
        wait_for_ajaximations
        expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
      end
-  end
-end
-end # End shared_example block
-
-RSpec.describe 'With granular permission on' do
-  it_behaves_like "course_files" do
-    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_course_files) }
-  end
-end
-
-RSpec.describe 'With granular permission off' do
-  it_behaves_like "course_files" do
-    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

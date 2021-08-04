@@ -19,10 +19,14 @@
 #
 
 require 'spec_helper'
-
 require 'nokogiri'
+require 'webmock/rspec'
 
 describe BasicLTI::BasicOutcomes do
+  before do
+    WebMock.disable_net_connect!(allow_localhost: true)
+  end
+
   before(:each) do
     course_model.offer
     @root_account = @course.root_account
@@ -30,6 +34,10 @@ describe BasicLTI::BasicOutcomes do
     @course.update_attribute(:account, @account)
     @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
     @course.enroll_student(@user)
+  end
+
+  after do
+    WebMock.allow_net_connect!
   end
 
   let(:tool) do
@@ -571,6 +579,7 @@ describe BasicLTI::BasicOutcomes do
         xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+        stub_request(:get, 'http://example.com/download').to_return(status: 200, body: 'file body')
         run_jobs
         expect(submission.reload.versions.count).to eq 2
         expect(submission.attachments.count).to eq 1
@@ -624,8 +633,64 @@ describe BasicLTI::BasicOutcomes do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         Time.zone.now
       end
+      stub_request(:get, "http://example.com/download").to_return(status: 200, body: 'file body')
       run_jobs
       expect(assignment.submissions.find_by(user_id: @user).submitted_at).to eq submitted_at
+    end
+
+    it 'retries attachments if they fail to upload' do
+      submission = assignment.submit_homework(
+        @user,
+        {
+          submission_type: "online_text_entry",
+          body: "sample text",
+          grade: "92%"
+        }
+      )
+      xml.css('resultScore').remove
+      xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+      stub_request(:get, 'http://example.com/download').to_return(status: 500)
+      run_jobs
+      expect(submission.reload.versions.count).to eq 1
+      expect(submission.attachments.count).to eq 0
+      expect(Attachment.last.file_state).to eq 'errored'
+      expect(Delayed::Job.strand_size('file_download/example.com/failed')).to be > 0
+      expect(Delayed::Job.find_by(strand: 'file_download/example.com/failed').run_at).to be > Time.zone.now + 5.seconds
+    end
+
+    it 'submits after the retries complete' do
+      xml.css('resultScore').remove
+      xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+      stub_const("BasicLTI::BasicOutcomes::MAX_ATTEMPTS", 1)
+      stub_request(:get, 'http://example.com/download').to_return(status: 500)
+      run_jobs
+      expect(Delayed::Job.strand_size('file_download/example.com/failed')).to be == 0
+      submission = assignment.submissions.find_by(user: @user)
+      expect(submission.reload.versions.count).to eq 1
+      expect(submission.attachments.count).to eq 1
+      expect(Attachment.last.file_state).to eq 'errored'
+    end
+
+    it 'submits after successful retry' do
+      xml.css('resultScore').remove
+      xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+      stub_request(:get, 'http://example.com/download').to_return({status: 500}, {status: 200, body: 'file body'})
+      run_jobs
+      expect(Delayed::Job.strand_size('file_download/example.com/failed')).to be > 0
+      Timecop.freeze(6.seconds.from_now) do
+        run_jobs
+        expect(Delayed::Job.strand_size('file_download/example.com/failed')).to be == 0
+        submission = assignment.submissions.find_by(user: @user)
+        expect(submission.versions.count).to eq 1
+        expect(submission.attachments.count).to eq 1
+        expect(submission.attachments.take.file_state).to eq 'available'
+      end
     end
   end
 

@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -24,26 +25,13 @@ import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
+import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 import {UPDATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 
 export const IsolatedThreadsContainer = props => {
-  /**
-   * We need the sort function, because we want the subEntries to return in desc (created_at) order,
-   * thus newest to oldest.
-   * But when we want to render the entries, we want them displayed {oldest to newest} => {top to bottom}.
-   */
-  const sortReverseDisplay = (a, b) => {
-    return new Date(a.createdAt) - new Date(b.createdAt)
-  }
-
-  const subentriesCount = props.discussionEntry.subentriesCount
-  const actualSubentriesCount = props.discussionEntry.discussionSubentriesConnection.nodes.length
-  const hasMoreReplies = actualSubentriesCount < subentriesCount
-
   return (
     <div
       style={{
@@ -52,7 +40,7 @@ export const IsolatedThreadsContainer = props => {
       }}
       data-testid="isolated-view-children"
     >
-      {hasMoreReplies && (
+      {props.hasMoreOlderReplies && (
         <div
           style={{
             marginBottom: `1.5rem`
@@ -61,31 +49,36 @@ export const IsolatedThreadsContainer = props => {
           <ShowOlderRepliesButton onClick={props.showOlderReplies} />
         </div>
       )}
-      {props.discussionEntry.discussionSubentriesConnection.nodes
-        .sort(sortReverseDisplay)
-        .map(entry => (
-          <IsolatedThreadContainer
-            discussionEntry={entry}
-            key={entry.id}
-            onToggleRating={props.onToggleRating}
-            onToggleUnread={props.onToggleUnread}
-            onDelete={props.onDelete}
-            onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-            onOpenIsolatedView={props.onOpenIsolatedView}
-          />
-        ))}
+      {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
+        <IsolatedThreadContainer
+          discussionTopic={props.discussionTopic}
+          discussionEntry={entry}
+          key={entry.id}
+          onToggleRating={props.onToggleRating}
+          onToggleUnread={props.onToggleUnread}
+          onDelete={props.onDelete}
+          onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+          onOpenIsolatedView={props.onOpenIsolatedView}
+          goToTopic={props.goToTopic}
+          isHighlighted={entry.id === props.highlightEntryId}
+        />
+      ))}
     </div>
   )
 }
 
 IsolatedThreadsContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   showOlderReplies: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  hasMoreOlderReplies: PropTypes.bool
 }
 
 export default IsolatedThreadsContainer
@@ -124,7 +117,7 @@ const IsolatedThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${entry.id}`}
-        authorName={entry.author.name}
+        authorName={entry.author.displayName}
         delimiterKey={`reply-delimiter-${entry.id}`}
         onClick={() => props.onOpenIsolatedView(entry.id, true)}
       />
@@ -136,7 +129,7 @@ const IsolatedThreadContainer = props => {
         key={`like-${entry.id}`}
         delimiterKey={`like-delimiter-${entry.id}`}
         onClick={() => props.onToggleRating(props.discussionEntry)}
-        authorName={entry.author.name}
+        authorName={entry.author.displayName}
         isLiked={entry.rating}
         likeCount={entry.ratingSum || 0}
         interaction={entry.permissions.rate ? 'enabled' : 'disabled'}
@@ -156,19 +149,15 @@ const IsolatedThreadContainer = props => {
     )
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
-    <Highlight isHighlighted={highlightEntry}>
+    <Highlight isHighlighted={props.isHighlighted}>
       <Flex>
         <Flex.Item shouldShrink shouldGrow>
           <PostMessageContainer
             discussionEntry={entry}
             threadActions={threadActions}
             isEditing={isEditing}
+            isIsolatedView
             onCancel={() => {
               setIsEditing(false)
             }}
@@ -179,9 +168,9 @@ const IsolatedThreadContainer = props => {
           <Flex.Item align="stretch">
             <ThreadActions
               id={entry.id}
-              isUnread={!DiscussionEntry.read}
-              onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
-              onDelete={() => props.onDelete(props.discussionEntry)}
+              isUnread={!entry.read}
+              onToggleUnread={() => props.onToggleUnread(entry)}
+              onDelete={entry.permissions?.delete ? () => props.onDelete(entry) : null}
               onEdit={
                 entry.permissions?.update
                   ? () => {
@@ -189,9 +178,15 @@ const IsolatedThreadContainer = props => {
                     }
                   : null
               }
-              onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
-              goToParent={() => {}}
-              goToTopic={() => {}}
+              onOpenInSpeedGrader={
+                props.discussionTopic.permissions?.speedGrader
+                  ? () => props.onOpenInSpeedGrader(entry)
+                  : null
+              }
+              goToParent={() => {
+                props.onOpenIsolatedView(entry.rootEntry.id, false, entry.rootEntry.id)
+              }}
+              goToTopic={props.goToTopic}
             />
           </Flex.Item>
         )}
@@ -201,10 +196,13 @@ const IsolatedThreadContainer = props => {
 }
 
 IsolatedThreadContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func,
+  isHighlighted: PropTypes.bool
 }

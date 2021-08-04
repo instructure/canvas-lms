@@ -39,9 +39,7 @@ describe DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys do
 
       # Verify
       expect(key.developer_key_account_bindings.count).to eq(1)
-      expect(
-        key.developer_key_account_bindings.first.workflow_state
-      ).to eq(DeveloperKeyAccountBinding::OFF_STATE)
+      expect(key.developer_key_account_bindings.first).to be_off
     end
 
     it "backfills when no binding is present for inactive key" do
@@ -58,9 +56,7 @@ describe DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys do
 
       # Verify
       expect(key.developer_key_account_bindings.count).to eq(1)
-      expect(
-        key.developer_key_account_bindings.first.workflow_state
-      ).to eq(DeveloperKeyAccountBinding::OFF_STATE)
+      expect(key.developer_key_account_bindings.first).to be_off
     end
 
     it "does not backfill when no binding is present for an active key" do

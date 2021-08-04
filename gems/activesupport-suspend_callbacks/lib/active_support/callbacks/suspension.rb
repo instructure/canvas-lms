@@ -127,6 +127,8 @@ module ActiveSupport::Callbacks
       end
 
       def filter_callbacks(callbacks)
+        # common case, we can skip a bunch of tests
+        return callbacks if callbacks.empty?
         # short-circuit re-allocating the chain if no suspensions are active
         return callbacks unless any_suspensions_active?(callbacks.name)
 

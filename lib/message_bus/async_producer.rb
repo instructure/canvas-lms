@@ -54,7 +54,7 @@ module MessageBus
         raise ::MessageBus::MemoryQueueFullError, "Pulsar throughput constrained, queue full"
       end
 
-      @queue << [ namespace, topic_name, message ]
+      @queue << [ namespace, topic_name, message, Shard.current.id ]
     end
 
     def queue_depth
@@ -122,32 +122,33 @@ module MessageBus
 
     def process_one_queue_item
       work_tuple = @queue.pop
+      return :stop if work_tuple == :stop
       status = :none
-      begin
-        status = produce_message(work_tuple)
-      rescue StandardError => e
-        # if we errored, we didn't actually process the message
-        # put it back on the queue to try to get to it later.
-        # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
-        # If your messages within topics are required to be stricly ordered, you need to
-        # generate a producer and manage error handling yourself.
-        @queue.push(work_tuple)
-        # if this is NOT one of the known error types from pulsar
-        # then we actually need to know about it with a full ":error"
-        # level in sentry.
-        err_level = rescuable_pulsar_errors.include?(e.class) ? :warn : :error
-        CanvasErrors.capture_exception(:message_bus, e, err_level)
-        status = :error
-      ensure
-        MessageBus.on_work_unit_end&.call
+      namespace, topic_name, message, shard_id = *work_tuple
+      Shard.find(shard_id).activate do
+        begin
+          status = produce_message(namespace, topic_name, message)
+        rescue StandardError => e
+          # if we errored, we didn't actually process the message
+          # put it back on the queue to try to get to it later.
+          # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
+          # If your messages within topics are required to be stricly ordered, you need to
+          # generate a producer and manage error handling yourself.
+          @queue.push(work_tuple)
+          # if this is NOT one of the known error types from pulsar
+          # then we actually need to know about it with a full ":error"
+          # level in sentry.
+          err_level = rescuable_pulsar_errors.include?(e.class) ? :warn : :error
+          CanvasErrors.capture_exception(:message_bus, e, err_level)
+          status = :error
+        ensure
+          MessageBus.on_work_unit_end&.call
+        end
       end
       status
     end
 
-    def produce_message(work_tuple)
-      return :stop if work_tuple == :stop
-
-      namespace, topic_name, message = *work_tuple
+    def produce_message(namespace, topic_name, message)
       retries = 0
       begin
         producer = MessageBus.producer_for(namespace, topic_name)
@@ -162,7 +163,7 @@ module MessageBus
         # context and reconnect.  If we get a timeout again, that is NOT
         # the problem, and we should let the error raise.
         retries += 1
-        raise ex if retries > 1
+        raise e if retries > 1
 
         Rails.logger.info "[AUA] Pulsar failure during message send, retrying..."
         CanvasErrors.capture_exception(:message_bus, e, :warn)

@@ -178,7 +178,8 @@ module Lti
           verifier: verifier,
           canvas_domain: @opts[:domain],
           context_type: @context.class,
-          context_id: @context.global_id
+          context_id: @context.global_id,
+          canvas_locale: I18n.locale || I18n.default_locale.to_s
         },
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
       )

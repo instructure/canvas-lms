@@ -33,7 +33,6 @@ module Api::V1::Attachment
       session,
       :read_as_admin,
       :manage_contents,
-      :manage_files,
       *RoleOverride::GRANULAR_FILE_PERMISSIONS
     )
   end

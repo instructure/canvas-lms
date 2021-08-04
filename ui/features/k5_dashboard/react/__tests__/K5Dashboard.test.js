@@ -324,9 +324,9 @@ describe('K-5 Dashboard', () => {
     const optionsButton = getByRole('button', {name: 'Dashboard Options'})
     act(() => optionsButton.click())
 
-    // There should be an Elementary View menu option already checked
+    // There should be an Homeroom View menu option already checked
     const elementaryViewOption = screen.getByRole('menuitemradio', {
-      name: 'Elementary View',
+      name: 'Homeroom View',
       checked: true
     })
     expect(elementaryViewOption).toBeInTheDocument()

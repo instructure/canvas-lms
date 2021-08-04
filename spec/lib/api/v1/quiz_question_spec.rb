@@ -136,4 +136,33 @@ describe Api::V1::QuizQuestion do
       it { is_expected.to include("answers") }
     end
   end
+
+  describe 'regrade_option' do
+    let(:account) { Account.create! }
+    let(:user) { User.create }
+    let(:course) { Course.create!(account: account) }
+    let(:quiz) do
+      quiz = course.quizzes.create!(title: 'Quiz')
+      quiz.publish!
+      quiz
+    end
+
+    let(:question) do
+      quiz.quiz_questions.create!(question_data: {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
+    end
+
+     context 'when a valid regrade_option is passed' do
+       it 'creates regrades with the regrade_option' do
+         question.question_data = { regrade_option: 'full_credit', regrade_user: user }
+         expect(quiz.current_quiz_question_regrades.first.regrade_option).to eq 'full_credit'
+       end
+     end
+
+     context 'when an invalid regrade_option is passed' do
+       it 'creates no regrades' do
+         question.question_data = { regrade_option: 'false', regrade_user: user }
+         expect(quiz.current_quiz_question_regrades.count).to be 0
+       end
+     end
+  end
 end

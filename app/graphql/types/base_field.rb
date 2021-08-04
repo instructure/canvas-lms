@@ -17,12 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class GranularCourseFilesPermissions < ActiveRecord::Migration[5.2]
-  tag :postdeploy
 
-  def change
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_files, :manage_files_add)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_files, :manage_files_edit)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_files, :manage_files_delete)
-  end
+class Types::BaseField < GraphQL::Schema::Field
+  include ApolloFederation::Field
 end

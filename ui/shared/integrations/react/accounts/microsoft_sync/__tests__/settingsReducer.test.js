@@ -16,81 +16,192 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validateTenant, doUpdateSettings} from '../lib/settingsHelper'
+import {
+  getTenantErrorMessages,
+  doUpdateSettings,
+  getSuffixErrorMessages
+} from '../lib/settingsHelper'
 import {defaultState, settingsReducer, reducerActions} from '../lib/settingsReducer'
 
 jest.mock('../lib/settingsHelper', () => {
   return {
     ...jest.requireActual('../lib/settingsHelper'),
-    validateTenant: jest.fn(),
-    doUpdateSettings: jest.fn()
+    tenantErrorMessages: jest.fn(),
+    doUpdateSettings: jest.fn(),
+    getSuffixErrorMessages: jest.fn(),
+    getTenantErrorMessages: jest.fn()
   }
 })
 
 const flushPromises = () => new Promise(setImmediate)
 
-const expectedSettings = {
+/**
+ * @type {import('../lib/settingsReducer').State}
+ */
+const expectedState = {
   microsoft_sync_enabled: true,
   microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
   last_saved_microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
-  microsoft_sync_login_attribute: 'email'
+  microsoft_sync_login_attribute: 'email',
+  microsoft_sync_login_attribute_suffix: '@example.com',
+  microsoft_sync_remote_attribute: 'mailNickname'
+}
+
+const cloneDefaultState = () => {
+  return {...defaultState}
 }
 
 describe('settingsReducer', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     doUpdateSettings.mockImplementation(async state => state)
-    validateTenant.mockImplementation(state => state)
+    getTenantErrorMessages.mockImplementation(_ => [])
+    getSuffixErrorMessages.mockImplementation(_ => [])
+  })
+
+  afterEach(() => {
+    doUpdateSettings.mockReset()
+    getTenantErrorMessages.mockReset()
+    getSuffixErrorMessages.mockReset()
   })
 
   describe('basic state updates', () => {
     it('updates the tenant', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateTenant,
-        payload: {microsoft_sync_tenant: expectedSettings.microsoft_sync_tenant}
+        payload: {microsoft_sync_tenant: expectedState.microsoft_sync_tenant}
       })
 
-      expect(result.microsoft_sync_tenant).toBe(expectedSettings.microsoft_sync_tenant)
+      expect(result.microsoft_sync_tenant).toBe(expectedState.microsoft_sync_tenant)
     })
 
     it('updates the login attribute', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState, {
         type: reducerActions.updateAttribute,
         payload: {
-          microsoft_sync_login_attribute: expectedSettings.microsoft_sync_login_attribute
+          microsoft_sync_login_attribute: expectedState.microsoft_sync_login_attribute
         }
       })
 
       expect(result.microsoft_sync_login_attribute).toBe(
-        expectedSettings.microsoft_sync_login_attribute
+        expectedState.microsoft_sync_login_attribute
       )
     })
 
     it('clears errorMessages', () => {
-      const state = settingsReducer(defaultState, {
+      const state = settingsReducer(cloneDefaultState(), {
         type: reducerActions.removeAlerts
       })
 
       expect(state.errorMessage).toEqual('')
       expect(state.successMessage).toEqual('')
     })
+
+    it('updates the login attribute suffix', () => {
+      const actualState = settingsReducer(cloneDefaultState, {
+        type: reducerActions.updateSuffix,
+        payload: {
+          microsoft_sync_login_attribute_suffix: expectedState.microsoft_sync_login_attribute_suffix
+        }
+      })
+
+      expect(actualState.microsoft_sync_login_attribute_suffix).toEqual(
+        expectedState.microsoft_sync_login_attribute_suffix
+      )
+    })
+
+    it('updates the Active Directory lookup attribute', () => {
+      const actualState = settingsReducer(cloneDefaultState, {
+        type: reducerActions.updateRemoteAttribute,
+        payload: {
+          microsoft_sync_remote_attribute: expectedState.microsoft_sync_remote_attribute
+        }
+      })
+
+      expect(actualState.microsoft_sync_remote_attribute).toEqual(
+        expectedState.microsoft_sync_remote_attribute
+      )
+    })
+
+    describe('that affect the info message', () => {
+      const state = {
+        ...cloneDefaultState(),
+        microsoft_sync_tenant: 'saved_value',
+        last_saved_microsoft_sync_tenant: 'saved_value'
+      }
+
+      it('does not set info message if the tenant is unchanged', () => {
+        const result = settingsReducer(state, {
+          type: reducerActions.updateTenant,
+          payload: {microsoft_sync_tenant: 'saved_value'}
+        })
+
+        expect(result.tenantInfoMessages.length).toBe(0)
+      })
+
+      it('sets an info message if the tenant is changed', () => {
+        const result = settingsReducer(state, {
+          type: reducerActions.updateTenant,
+          payload: {microsoft_sync_tenant: 'new_value'}
+        })
+
+        expect(result.tenantInfoMessages.length).toBe(1)
+      })
+
+      it('updates the last saved tenant value on save', () => {
+        const result = settingsReducer(
+          {
+            ...cloneDefaultState(),
+            microsoft_sync_tenant: 'new_value'
+          },
+          {
+            type: reducerActions.updateSuccess
+          }
+        )
+
+        expect(result.last_saved_microsoft_sync_tenant).toBe('new_value')
+      })
+
+      it('does not update the last saved tenant or error', () => {
+        const result = settingsReducer(
+          {
+            ...cloneDefaultState(),
+            microsoft_sync_tenant: 'new_value'
+          },
+          {
+            type: reducerActions.updateError
+          }
+        )
+
+        expect(result.last_saved_microsoft_sync_tenant).not.toBe('new_value')
+      })
+    })
   })
 
   describe('initial data fetching', () => {
     it('updates state to match returned data on success', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchSuccess,
         payload: {
-          ...expectedSettings
+          ...expectedState
         }
       })
       expect(result).toStrictEqual({
-        ...defaultState,
-        ...expectedSettings
+        ...cloneDefaultState(),
+        ...expectedState
       })
     })
 
+    it('still works even if no sync settings are returned', () => {
+      const result = settingsReducer(cloneDefaultState(), {
+        type: reducerActions.fetchSuccess,
+        payload: {}
+      })
+
+      expect(result).toStrictEqual(cloneDefaultState())
+    })
+
     it('adds an error message on fetch failure', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchError
       })
 
@@ -98,7 +209,7 @@ describe('settingsReducer', () => {
     })
 
     it('updates the loading status when told to', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchLoading,
         payload: {
           loading: false
@@ -114,87 +225,34 @@ describe('settingsReducer', () => {
 
     afterEach(() => {
       dispatchMock.mockClear()
-      doUpdateSettings.mockClear()
-      validateTenant.mockClear()
     })
 
-    it('tries to validate the tenant, stops if there are errors, and keeps the UI enabled', async () => {
-      validateTenant.mockImplementationOnce(state => {
-        return {
-          ...state,
-          tenantErrorMessages: ['error!']
-        }
+    it('tries to validate the tenant and suffix, stops if there are errors, and keeps the UI enabled', async () => {
+      getTenantErrorMessages.mockImplementationOnce(_ => {
+        return ['error!']
       })
-      const state = settingsReducer(defaultState, {
+      getSuffixErrorMessages.mockImplementationOnce(_ => {
+        return ['error']
+      })
+      const state = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateSettings,
         dispatch: dispatchMock
       })
 
       await flushPromises()
 
-      expect(validateTenant).toHaveBeenCalledTimes(1)
+      expect(getTenantErrorMessages).toHaveBeenCalledTimes(1)
+      expect(getSuffixErrorMessages).toHaveBeenCalledTimes(1)
       expect(doUpdateSettings).toHaveBeenCalledTimes(0)
       expect(dispatchMock).toHaveBeenCalledTimes(0)
       expect(state.uiEnabled).toBeTruthy()
     })
 
-    const state = {
-      ...defaultState,
-      microsoft_sync_tenant: 'saved_value',
-      last_saved_microsoft_sync_tenant: 'saved_value'
-    }
-
-    it('does not set info message if the tenant is unchanged', () => {
-      const result = settingsReducer(state, {
-        type: reducerActions.updateTenant,
-        payload: {microsoft_sync_tenant: 'saved_value'}
-      })
-
-      expect(result.tenantInfoMessages.length).toBe(0)
-    })
-
-    it('sets an info message if the tenant is changed', () => {
-      const result = settingsReducer(state, {
-        type: reducerActions.updateTenant,
-        payload: {microsoft_sync_tenant: 'new_value'}
-      })
-
-      expect(result.tenantInfoMessages.length).toBe(1)
-    })
-
-    it('updates the last saved tenant value on save', () => {
-      const result = settingsReducer(
-        {
-          ...defaultState,
-          microsoft_sync_tenant: 'new_value'
-        },
-        {
-          type: reducerActions.updateSuccess
-        }
-      )
-
-      expect(result.last_saved_microsoft_sync_tenant).toBe('new_value')
-    })
-
-    it('does not update the last saved tenant or error', () => {
-      const result = settingsReducer(
-        {
-          ...defaultState,
-          microsoft_sync_tenant: 'new_value'
-        },
-        {
-          type: reducerActions.updateError
-        }
-      )
-
-      expect(result.last_saved_microsoft_sync_tenant).not.toBe('new_value')
-    })
-
     it('tries to update settings and indicates success', async () => {
       settingsReducer(
         {
-          ...defaultState,
-          ...expectedSettings
+          ...cloneDefaultState(),
+          ...expectedState
         },
         {
           type: reducerActions.updateSettings,
@@ -204,11 +262,10 @@ describe('settingsReducer', () => {
       await flushPromises()
 
       expect(doUpdateSettings).toHaveBeenCalledTimes(1)
-      const [enable, tenant, loginAttribute] = doUpdateSettings.mock.calls.pop()
+      const [call] = doUpdateSettings.mock.calls.pop()
 
-      expect(enable).toBe(expectedSettings.microsoft_sync_enabled)
-      expect(tenant).toBe(expectedSettings.microsoft_sync_tenant)
-      expect(loginAttribute).toBe(expectedSettings.microsoft_sync_login_attribute)
+      expect(call).toEqual({...cloneDefaultState(), ...expectedState, uiEnabled: false})
+
       expect(dispatchMock).toHaveBeenCalledTimes(1)
       expect(dispatchMock).toHaveBeenLastCalledWith({type: reducerActions.updateSuccess})
     })
@@ -217,7 +274,7 @@ describe('settingsReducer', () => {
       doUpdateSettings.mockImplementationOnce(async () => {
         throw new Error('test failure!')
       })
-      settingsReducer(defaultState, {
+      settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateSettings,
         dispatch: dispatchMock
       })
@@ -230,25 +287,27 @@ describe('settingsReducer', () => {
     })
 
     describe('toggling sync', () => {
-      it('tries to validate the tenant and stops if there were errors', () => {
-        validateTenant.mockImplementationOnce(state => {
-          return {
-            ...state,
-            tenantErrorMessages: ['error!']
-          }
+      it('tries to validate the tenant and suffix, stops if there were errors, and keeps the UI enabled', () => {
+        getTenantErrorMessages.mockImplementationOnce(_ => {
+          return ['error!']
         })
-        settingsReducer(defaultState, {
+        getSuffixErrorMessages.mockImplementationOnce(_ => {
+          return ['error']
+        })
+        const newState = settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
           dispatch: dispatchMock
         })
 
-        expect(validateTenant).toHaveBeenCalledTimes(1)
+        expect(getTenantErrorMessages).toHaveBeenCalledTimes(1)
+        expect(getSuffixErrorMessages).toHaveBeenCalledTimes(1)
         expect(doUpdateSettings).toHaveBeenCalledTimes(0)
         expect(dispatchMock).toHaveBeenCalledTimes(0)
+        expect(newState.uiEnabled).toBeTruthy()
       })
 
       it('tries to toggle sync and indicate success', async () => {
-        settingsReducer(defaultState, {
+        settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
           dispatch: dispatchMock
         })
@@ -264,7 +323,7 @@ describe('settingsReducer', () => {
         doUpdateSettings.mockImplementationOnce(async () => {
           throw new Error('test error!')
         })
-        settingsReducer(defaultState, {
+        settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
           dispatch: dispatchMock
         })
@@ -278,7 +337,7 @@ describe('settingsReducer', () => {
 
       it('disables the UI while trying to update or toggle sync', () => {
         for (const type of [reducerActions.updateSettings, reducerActions.toggleSync]) {
-          const {uiEnabled} = settingsReducer(defaultState, {
+          const {uiEnabled} = settingsReducer(cloneDefaultState(), {
             type
           })
 
@@ -295,7 +354,7 @@ describe('settingsReducer', () => {
         reducerActions.updateError,
         reducerActions.toggleError
       ]) {
-        const {uiEnabled} = settingsReducer(defaultState, {
+        const {uiEnabled} = settingsReducer(cloneDefaultState(), {
           type
         })
         expect(uiEnabled).toBeTruthy()
@@ -303,7 +362,7 @@ describe('settingsReducer', () => {
     })
 
     it('adds a success message on success', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateSuccess
       })
 
@@ -311,7 +370,7 @@ describe('settingsReducer', () => {
     })
 
     it('adds an error message on failure to update', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateError
       })
 
@@ -319,7 +378,7 @@ describe('settingsReducer', () => {
     })
 
     it('adds an error message on failure to toggle and inverts enabled', () => {
-      const result = settingsReducer(defaultState, {
+      const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.toggleError
       })
 

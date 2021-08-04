@@ -19,12 +19,15 @@
 #
 
 class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
-  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false)
+  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
     @current_user = current_user
     @search_term = search_term
     @sort_order = sort_order
     @filter = filter
     @root_entries = root_entries
+    @relative_entry_id = relative_entry_id
+    @before_entry = before_relative_entry
+    @include_entry = include_relative_entry
   end
 
   def perform(objects)
@@ -32,9 +35,17 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope_for(object)
       scope = scope.reorder("created_at #{@sort_order}")
       scope = scope.where(parent_id: nil) if @root_entries
-      if @search_term
+      if @search_term.present?
+        scope = scope.where.not(:workflow_state => 'deleted')
         scope = scope.joins(:user).where("message ILIKE '#{UserSearch.like_string_for(@search_term)}'")
           .or(scope.joins(:user).where("users.name ILIKE '#{UserSearch.like_string_for(@search_term)}'"))
+      end
+
+      if @relative_entry_id
+        relative_entry = scope.find(@relative_entry_id)
+        condition = @before_entry ? "<" : ">"
+        condition += "=" if @include_entry
+        scope = scope.where("created_at #{condition}?", relative_entry.created_at)
       end
 
       scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
@@ -47,7 +58,14 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
     if object.is_a?(DiscussionTopic)
       object.discussion_entries
     elsif object.is_a?(DiscussionEntry)
-      object.discussion_subentries
+      if object.root_entry_id.nil?
+        object.root_discussion_replies
+      elsif object.legacy?
+        object.legacy_subentries
+      else
+        DiscussionEntry.none
+      end
     end
   end
+
 end

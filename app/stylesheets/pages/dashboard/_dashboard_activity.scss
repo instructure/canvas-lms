@@ -94,7 +94,7 @@
   padding: $ic-sp 0;
 
   .image-block {
-    padding-#{direction(right)}: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp*0.5;
   }
 }
 

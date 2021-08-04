@@ -20,7 +20,10 @@ const {transformSync} = require('@babel/core')
 const {compile} = require('../frontend_build/i18nLinerHandlebars')
 
 exports.process = (source, path) => {
-  const amd = compile(source, path)
+  const amd = compile(source, path, {
+    // brandable_css assets are not available in test
+    injectBrandableStylesheet: false
+  })
   const cjs = transformSync(amd).code
   return cjs
 }

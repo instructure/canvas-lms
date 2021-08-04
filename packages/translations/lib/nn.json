@@ -713,6 +713,9 @@
     "my_grades_98834476": {
         "message": "Mine vurderingar"
     },
+    "my_images_427f9b0c": {
+        "message": "Mine bilder"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinja"
     },
@@ -1108,6 +1111,9 @@
     },
     "upload_record_media_e4207d72": {
         "message": "Last opp/Ta opp media"
+    },
+    "uploading_19e8a4e7": {
+        "message": "Lastar opp"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "alfabetisk ordna liste i store bokstavar"

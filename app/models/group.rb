@@ -503,7 +503,6 @@ class Group < ActiveRecord::Base
     can :participate and
     can :manage_calendar and
     can :manage_content and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete and
@@ -567,7 +566,6 @@ class Group < ActiveRecord::Base
       can :allow_course_admin_actions and
       can :manage_calendar and
       can :manage_content and
-      can :manage_files and
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete and
@@ -702,7 +700,7 @@ class Group < ActiveRecord::Base
     ]
 
     if user && self.grants_right?(user, :read)
-      available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path }
+      available_tabs << { :id => TAB_CONFERENCES, :label => WebConference.conference_tab_name, :css_class => 'conferences', :href => :group_conferences_path }
       available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path }
       available_tabs << { :id => TAB_COLLABORATIONS_NEW, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_lti_collaborations_path }
     end

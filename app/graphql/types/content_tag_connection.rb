@@ -44,6 +44,11 @@ module Types
       end
     end
 
+    field :group, LearningOutcomeGroupType, null: true
+    def group
+      Loaders::AssociationLoader.for(object.class, :associated_asset).load(object) if learning_outcome_link?
+    end
+
     private
 
     def learning_outcome_link?

@@ -34,9 +34,10 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
+import GroupActionDrillDown from './shared/GroupActionDrillDown'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {contextType, isMobileView} = useCanvasContext()
+  const {isMobileView, isCourse} = useCanvasContext()
   const {
     rootId,
     isLoading,
@@ -47,7 +48,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     debouncedSearchString,
     updateSearch,
     clearSearch,
-    error
+    error,
+    loadedGroups
   } = useFindOutcomeModal(open)
 
   const {group, loading, loadMore} = useGroupDetail({
@@ -73,19 +75,44 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     />
   )
 
+  const renderGroupNavigation = (
+    <View as="div" padding={isMobileView ? 'x-small 0 0 0' : '0'}>
+      {isLoading ? (
+        <div style={{textAlign: 'center', paddingTop: '2rem'}}>
+          <Spinner renderTitle={I18n.t('Loading')} size="large" />
+        </div>
+      ) : error && Object.keys(collections).length === 0 ? (
+        <Text color="danger">
+          {isCourse
+            ? I18n.t('An error occurred while loading course outcomes: %{error}', {
+                error
+              })
+            : I18n.t('An error occurred while loading account outcomes: %{error}', {
+                error
+              })}
+        </Text>
+      ) : isMobileView ? (
+        <GroupActionDrillDown
+          onCollectionClick={toggleGroupId}
+          collections={collections}
+          rootId={rootId}
+          loadedGroups={loadedGroups}
+        />
+      ) : (
+        <TreeBrowser onCollectionToggle={toggleGroupId} collections={collections} rootId={rootId} />
+      )}
+    </View>
+  )
+
   return (
     <Modal
       open={open}
       onDismiss={onCloseHandler}
       shouldReturnFocus
       size="fullscreen"
-      label={
-        contextType === 'Course'
-          ? I18n.t('Add Outcomes to Course')
-          : I18n.t('Add Outcomes to Account')
-      }
+      label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
     >
-      <Modal.Body padding={isMobileView ? '0 medium small' : '0 small small'}>
+      <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (
           <Flex elementRef={setContainerRef}>
             <Flex.Item
@@ -104,29 +131,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     {I18n.t('Outcome Groups')}
                   </Text>
                 </Heading>
-                <View>
-                  {isLoading ? (
-                    <div style={{textAlign: 'center', paddingTop: '2rem'}}>
-                      <Spinner renderTitle={I18n.t('Loading')} size="large" />
-                    </div>
-                  ) : error && Object.keys(collections).length === 0 ? (
-                    <Text color="danger">
-                      {contextType === 'Course'
-                        ? I18n.t('An error occurred while loading course outcomes: %{error}', {
-                            error
-                          })
-                        : I18n.t('An error occurred while loading account outcomes: %{error}', {
-                            error
-                          })}
-                    </Text>
-                  ) : (
-                    <TreeBrowser
-                      onCollectionToggle={toggleGroupId}
-                      collections={collections}
-                      rootId={rootId}
-                    />
-                  )}
-                </View>
+                {renderGroupNavigation}
               </View>
             </Flex.Item>
             <Flex.Item
@@ -165,7 +170,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             </Flex.Item>
           </Flex>
         ) : (
-          findOutcomesView
+          renderGroupNavigation
+          // TODO Add in `findOutcomesView` with OUT-4483
         )}
       </Modal.Body>
       <Modal.Footer>

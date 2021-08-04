@@ -21,6 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import ManageOutcomesView from '../ManageOutcomesView'
 import {outcomeGroup} from '@canvas/outcomes/mocks/Management'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('ManageOutcomesView', () => {
   let onSelectOutcomesHandler
@@ -61,6 +62,12 @@ describe('ManageOutcomesView', () => {
     jest.spyOn(container, prop, 'get').mockImplementation(() => value)
   }
 
+  const renderWithContext = (children, {canManage = true} = {}) => {
+    return render(
+      <OutcomesContext.Provider value={{env: {canManage}}}>{children}</OutcomesContext.Provider>
+    )
+  }
+
   it('renders loading indicator', () => {
     const {queryByTestId} = render(
       <ManageOutcomesView {...defaultProps({outcomeGroup: null, loading: true})} />
@@ -76,8 +83,7 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
-            canEdit: true
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
           }
         })}
       />
@@ -107,19 +113,19 @@ describe('ManageOutcomesView', () => {
   })
 
   describe('kebab menu', () => {
-    it('is not rendered if canEdit is false', () => {
-      const {queryByText} = render(
+    it('is not rendered if canManage is false', () => {
+      const {queryByText} = renderWithContext(
         <ManageOutcomesView
           {...defaultProps({
             outcomeGroup: {
               _id: '1',
               title: 'Group Title',
               outcomesCount: 0,
-              outcomes: {edges: [], pageInfo: {hasNextPage: false}},
-              canEdit: false
+              outcomes: {edges: [], pageInfo: {hasNextPage: false}}
             }
           })}
-        />
+        />,
+        {canManage: false}
       )
       expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
     })
@@ -129,8 +135,20 @@ describe('ManageOutcomesView', () => {
       expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
     })
 
-    it('rendered if canEdit is true', () => {
-      const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    it('rendered if canManage is true', () => {
+      const {getByText} = renderWithContext(
+        <ManageOutcomesView
+          {...defaultProps({
+            outcomeGroup: {
+              _id: '1',
+              title: 'Group Title',
+              outcomesCount: 0,
+              outcomes: {edges: [], pageInfo: {hasNextPage: false}}
+            }
+          })}
+        />,
+        {canManage: true}
+      )
       expect(getByText('Outcome Group Menu')).toBeInTheDocument()
     })
   })
@@ -150,8 +168,7 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
-            canEdit: false
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
           }
         })}
       />
@@ -168,8 +185,7 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
-            canEdit: false
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
           }
         })}
       />
@@ -191,8 +207,7 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: true}},
-            canEdit: false
+            outcomes: {edges: [], pageInfo: {hasNextPage: true}}
           }
         })}
       />

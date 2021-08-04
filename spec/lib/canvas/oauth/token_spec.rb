@@ -247,8 +247,8 @@ module Canvas::Oauth
 
     context "token expiration" do
       it "starts expiring tokens in 1 hour" do
-        allow(DateTime).to receive(:now).and_return(DateTime.parse('2016-06-29T23:01:00Z'))
-        expect(token.access_token.expires_at.utc).to eq(DateTime.parse('2016-06-30T00:01:00Z'))
+        allow(Time).to receive(:now).and_return(Time.zone.parse('2016-06-29T23:01:00Z'))
+        expect(token.access_token.expires_at.utc).to eq(Time.zone.parse('2016-06-30T00:01:00Z'))
       end
 
       it 'doesn\'t set an expiration if the dev key has auto_expire_tokens set to false' do
@@ -266,7 +266,7 @@ module Canvas::Oauth
       end
 
       it 'Tokens wont expire if the dev key has auto_expire_tokens set to false' do
-        allow(DateTime).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00Z'))
+        allow(Time).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00Z'))
         key = token.key
         key.auto_expire_tokens = false
         key.save!

@@ -24,8 +24,10 @@
  */
 
 // Function for converting a px based font-size to rem.
+@use "sass:math";
+
 @function calculateRem($size) {
-  $remSize: $size / 16px;
+  $remSize: math.div($size, 16px);
 //Default font size on html element is 100%, equivalent to 16px;
   @return #{$remSize}rem;
 }

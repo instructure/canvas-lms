@@ -321,7 +321,7 @@ class FilesController < ApplicationController
                          Attachment.display_name_order_by_clause('attachments')
                        end
         order_clause += ' DESC' if params[:order] == 'desc'
-        scope = scope.order(Arel.sql(order_clause))
+        scope = scope.order(Arel.sql(order_clause)).order(id: params[:order] == 'desc' ? :desc : :asc)
 
         if params[:content_types].present?
           scope = scope.by_content_types(Array(params[:content_types]))
@@ -350,12 +350,7 @@ class FilesController < ApplicationController
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_any_right?(
-          @current_user,
-          session,
-          :manage_files,
-          *RoleOverride::GRANULAR_FILE_PERMISSIONS
-        )
+        if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
           @images = @context.active_images.paginate page: params[:page]
         else
           @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
@@ -372,11 +367,8 @@ class FilesController < ApplicationController
     if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
-    if authorized_action(
-      @context,
-      @current_user,
-      [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
-    ) && tab_enabled?(@context.class::TAB_FILES)
+    if authorized_action(@context, @current_user, [:read, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
+        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -400,24 +392,9 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files_add: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_add
-            ),
-            manage_files_edit: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_edit
-            ),
-            manage_files_delete: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_delete
-            ),
+            manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
+            manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
+            manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
           file_menu_tools: file_menu_tools,
           file_index_menu_tools: file_index_menu_tools
@@ -522,6 +499,7 @@ class FilesController < ApplicationController
       original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
+      set_k5_mode
       # note that the /files/XXX URL implicitly uses the current user as the
       # context, even though it doesn't search for the file using
       # @current_user.attachments.find , since it might not actually be a user
@@ -1174,7 +1152,7 @@ class FilesController < ApplicationController
 
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
-    if authorized_action(@context, @current_user, [:manage_files, :manage_files_edit])
+    if authorized_action(@context, @current_user, :manage_files_edit)
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
@@ -1275,7 +1253,6 @@ class FilesController < ApplicationController
       permission_context.grants_any_right?(
         @current_user,
         nil,
-        :manage_files,
         :manage_files_edit,
         :manage_files_delete
       ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)

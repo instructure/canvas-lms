@@ -265,7 +265,7 @@ module MicrosoftSync
             workflow_state: :completed, job_state: nil, last_error: nil
           )
           steps_object.after_complete
-          statsd_increment(:complete)
+          statsd_increment(:complete, current_step)
           return
         when NextStep
           current_step, memory_state = result.step, result.memory_state
@@ -282,8 +282,8 @@ module MicrosoftSync
       end
     end
 
-    def statsd_increment(bucket, step=nil, error=nil)
-      tags = {category: error&.class&.name, microsoft_sync_step: step&.to_s}.compact
+    def statsd_increment(bucket, step, error=nil)
+      tags = {category: error&.class&.name&.tr(':', '_'), microsoft_sync_step: step.to_s}.compact
       InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags: tags)
     end
 

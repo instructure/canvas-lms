@@ -263,6 +263,7 @@ ja:
   access_token_is_valid_until_d2f048cf: "アクセス トークンの有効期限は"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "アクセス トークンを使用すると、ご自分に代わって他のアプリケーションが API コールを発行できるようにすることが可能です。また、アクセス トークンを生成して、*Canvas のオープン API を使用* することで、独自の統合を策定することもできます。"
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "iOS または Android モバイルデバイスを使ってコースおよびグループにアクセスし、ヘルプメニューからより多くの情報を見つけてください。"
+  accessibility_checker_notifications_da5a49e6: アクセシビリティチェッカーの通知
   accessible_sidebar_menu_b30baf97: アクセシブルサイドバーメニュー
   accordion_section_1_7888782d: アコーディオンセクション1
   accordion_section_2_e1812997: アコーディオンセクション2
@@ -1923,6 +1924,7 @@ ja:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: 課題を追加してください。長いリストにしても、複数のグループに分割しても構いません。各課題グループに重み付けを指定することもできます。
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: 次のそれぞれ(IDを持たないフィールドは、ログインできません)に、あなたのZendeskインスタンスのカスタムフィールドIDを追加します：
   added_caption_1895db92: キャプションを追加
+  added_e8a39b2: 追加しました
   added_mastery_level_dd4792d1: 達成レベルを追加しました
   added_new_proficiency_rating_e30cab8a: 新しい達成度評価が追加されました
   adding_rss_feed_f1202567: "RSS フィードの追加"
@@ -2219,6 +2221,7 @@ ja:
   allows_user_to_access_the_files_tab_in_the_content_a5187929: ユーザーがコンテンツのファイルタブにアクセスできるようにします。
   allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_access_the_manage_question_banks_li_616d45c8: クイズインデックスページの問題バンクの管理のリンクをユーザーがアクセスできるようにします。
+  allows_user_to_access_the_navigation_tab_68efd3f: ユーザーがナビゲーションタブにアクセスできるようにします。
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。コース詳細のタブで、コース画像、名前、コースコード、タイムゾーン、サブカウント、用語、その他のオプションを編集できるようにします。
   allows_user_to_access_the_navigation_tab_in_course_e266d985: ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: アカウントのナビゲーションで人々のリンクにアクセスできるようにします。
@@ -2805,12 +2808,14 @@ ja:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "この成果の作成中にエラーが発生しました：%{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "この成果の作成中にエラーが発生しました：%{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: アナウンスメントの削除中にエラーが発生しました。
+  an_error_occurred_while_loading_account_learning_o_29a11066: アカウントの学習成果グループの読み込み中にエラーが発生しました。
   an_error_occurred_while_loading_account_outcomes_8f337857: アカウント成果を読み込み中にエラーが発生しました
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "アカウント結果を読み込み中にエラーが発生しました：%{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "アカウント熟練度評価を読み込み中にエラーが起こりました：%{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: アカウント熟練度評価を読み込み中にエラーが起こりました
   an_error_occurred_while_loading_associations_9699b3ee: 関連付けの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_changes_9851b56f: 変更内容の読み込み中にエラーが発生しました
+  an_error_occurred_while_loading_course_learning_ou_c4053b06: コースの学習成果グループの読み込み中にエラーが発生しました。
   an_error_occurred_while_loading_course_outcomes_320ccc44: コース成果の読み込み中にエラーが発生しました
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "コース結果の読み込み中にエラーが発生しました%{error}"
   an_error_occurred_while_loading_courses_11d4571e: コースの読み込み中にエラーが発生しました
@@ -2823,6 +2828,12 @@ ja:
   an_error_occurred_while_locking_announcements_8115ccd7: アナウンスメントのロック中にエラーが発生しました。
   an_error_occurred_while_making_a_network_request_544e2b7: ネットワークリクエスト中にエラーが起こりました。
   an_error_occurred_while_migrating_405ac0b5: 移行中にエラーが発生しました。
+  an_error_occurred_while_removing_count_outcomes_15db8ce8: 
+    one: "%{count}結果の計算削除中にエラーが発生しました："
+    other: "%{count}結果の計算削除中にエラーが発生しました："
+  an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
+    one: "%{count}結果の計算削除中にエラーが発生しました：%{errorMessage}."
+    other: "%{count}結果の計算削除中にエラーが発生しました：%{errorMessage}."
   an_error_occurred_while_removing_the_outcome_e47c9553: 結果の計算削除中にエラーが発生しました：
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "結果の計算削除中にエラーが発生しました：%{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: このグループ削除中にエラーが発生しました。
@@ -2867,6 +2878,7 @@ ja:
   an_outcome_import_is_currently_in_progress_11e6cb38: 結果のインポートは現在進行中です。
   an_unexpected_error_has_occurred_bc608420: 予期しないエラーが発生しました
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "予期しないエラーが発生しました：エラーレポートを参照%{id}"
+  an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "不明なエラーが発生しましたCSV ファイルを検証するか、あとでやり直してみてください"
   an_unknown_error_occurred_d77b1cdb: 不明なエラーが発生しました
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "不明なサーバ エラーが発生しました。もう一度やり直してください。"
   an_update_is_available_for_toolname_bba3fa2: "%{toolName}の更新を利用できます"
@@ -3128,6 +3140,12 @@ ja:
   archive_selected_d64506ca: 選択されたアーカイブ
   archived_de543437: アーカイブ済み
   are_you_sure_26795d3c: よろしいですか？
+  are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
+    one: "これらの%{count}結果をこのアカウントから削除してもよろしいですか？"
+    other: "これらの%{count}結果をこのアカウントから削除してもよろしいですか？"
+  are_you_sure_that_you_want_to_remove_these_count_o_8ad349c4: 
+    one: "このコースからこれらの%{count}結果を削除してもよろしいですか？"
+    other: "このコースからこれらの%{count}結果を削除してもよろしいですか？"
   are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: このグループとその内容をコースからすべて削除してもよろしいですか？
   are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: このグループとその内容をアカウントからすべて削除してもよろしいですか？
   are_you_sure_that_you_want_to_remove_this_outcome__38cdb682: この結果をこのアカウントから削除してもよろしいですか？
@@ -5236,6 +5254,7 @@ ja:
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "他のコンテクストから結果のフィールドを変更することはできません：%{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "他のコンテクストから結果を変更することはできません：%{changes}; 結果は次のように変更しなければなりません。%{context}"
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: 採点期間終了のため、割り当てを移動できません
+  cannot_remove_c0fd581d: 削除できません：
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: グループが空欄であり、サイズに制限がない場合を除き、セクションを制限できません
   cannot_save_new_assignment_3bda0792: 新しい課題を保存できません
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 終了した採点期間の締め切り後に、表示されているものだけを上書きするよう設定することはできません
@@ -5459,6 +5478,9 @@ ja:
   choose_one_submission_type_cf4eda5b: 提出タイプを1つ選択する
   choose_student_1513fcd1: "-- 受講生を選択 --"
   choose_the_next_mastery_path_b035b727: 次の習得パスを選ぶ
+  choose_up_to_count_subject_calendars_a7df06d7: 
+    one: "科目の予定表は最大で%{count}選択可能"
+    other: "科目の予定表は最大で%{count}選択可能"
   choose_usage_rights_33683854: 使用権を選択...
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' は有効な色ではありません。"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' は有効な色ではありません。保存する前に有効な16進コードを入力してください。"
@@ -6881,6 +6903,7 @@ ja:
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "SIS ID %{user_id} でのログイン用の既存ユーザーが見つかりませんでした。スキップします。"
   could_not_import_learning_outcome_outcome_id_becau_662152b8: "学習成果がどのグループにも属していないため、%{outcome_id}インポートできませんでした"
   could_not_save_chosencolor_741b74ce: "'%{chosenColor}'を保存できませんでした"
+  could_not_update_parent_group_e83c0253: 親グループを更新できませんでした
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "課題 %{name} (ID %{id}) の日付を調整できませんでした"
   couldn_t_find_an_authority_to_update_44d9407e: 更新する権限が見つかりませんでした
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Canvas CSV インポート ヘッダが見つかりませんでした"
@@ -6909,6 +6932,10 @@ ja:
   count_associated_accounts_9a7128ed: 
     one: "%{count}の関連アカウント"
     other: "%{count}の関連アカウント"
+  count_attempts_allowed_d65a014c: 
+    one: 試行は1回許可
+    other: "%{count}回試行が許可されています"
+    zero: 試行は無制限に許可されています
   count_attempts_d23c69a0: 
     one: 1回の試行
     other: "%{count} 回の試行"
@@ -6985,6 +7012,12 @@ ja:
   count_outcomes_selected_55902958: 
     one: "%{count} 件の結果が選択されています"
     other: "%{count} 件の結果が選択されています"
+  count_outcomes_were_successfully_removed_from_this_ae093b07: 
+    one: "%{count}の結果が、このアカウントから正常に削除されました。"
+    other: "%{count}の結果が、このアカウントから正常に削除されました。"
+  count_outcomes_were_successfully_removed_from_this_e7a7a325: 
+    one: "%{count}の結果が、このコースから正常に削除されました。"
+    other: "%{count}の結果が、このコースから正常に削除されました。"
   count_page_views_b40102b3: 
     one: "%{count} ページ ビュー"
     other: "%{count} ページビュー"
@@ -7433,6 +7466,7 @@ ja:
       move_course: コースの移動
       reset_course_content_dialog_help: コースのコンテンツをリセット
       section_enrollments: セクションの登録
+  course_settings_course_details_1b1576b8: コース設定（コース詳細）
   course_settings_course_details_tab_allows_user_to__2eb67ad2: コース設定（コースの詳細タブ）：ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。コース詳細のタブで、コース画像、名前、コースコード、タイムゾーン、サブカウント、用語、その他のオプションを編集できるようにします。
   course_settings_course_details_tab_fabf1adc: コース設定（コースの詳細タブ）
   course_settings_f6d0bbf8: コース設定
@@ -9556,6 +9590,7 @@ ja:
       find_existing_rubric: 既存の注釈の検索
   edit_rubric_title_104d6fd2: "ルーブリックを編集する：%{title}"
   edit_section_name_558cc89: "セクション\"%{name}\"の編集"
+  edit_submission_status_from_speedgrader_5e1b1cd4: "Speedgrader から送信ステータスを編集する"
   edit_survey_b0d6890d: サーベイの編集
   edit_term_name_29a8a322: "用語の編集%{name}"
   edit_text_27d8aa3d: "%{text} を編集する"
@@ -9573,8 +9608,10 @@ ja:
   edit_user_details_9af7819b: ユーザー詳細を編集する
   edit_when_36c1c2c8: "%{when}を編集する"
   edit_your_catalog_account_cce59310: "Catalog アカウントを編集"
+  edited_by_editorname_editedtimingdisplay_1ff58a2e: "、%{editorName}%{editedTimingDisplay}が編集した"
   edited_c4fcbdbf: 編集日：
   edited_date_b0455372: "（編集済み）：%{date}"
+  edited_editedtimingdisplay_8788890e: "、%{editedTimingDisplay}を編集した"
   editing_permissions_for_name_3503e235: "編集権限: %{name}"
   editor: 
     alt_text: "代替テキスト:"
@@ -10581,6 +10618,7 @@ ja:
   failed_to_save_changes_errors_6920f334: "変更の保存に失敗しました:%{errors}%"
   failed_to_save_dashboard_selection_32e71c72: ダッシュボード選択の保存に失敗しました
   failed_to_save_please_try_again_later_bb7070fb: 保存に失敗しました。後でもう一度試してください
+  failed_to_save_selected_calendars_210b5e8f: 選択した予定表の保存に失敗しました
   failed_to_split_users_d9759007: ユーザーの分割に失敗しました。
   failed_to_submit_draft_comment_1de83451: 下書きコメントの提出に失敗しました
   failed_to_unpin_discussion_503eab82: ディスカッションの固定を解除できませんでした
@@ -10631,6 +10669,7 @@ ja:
   feature_previews_account_settings_274440bc: 機能プレビュー(アカウント設定)
   feature_previews_enable_disable_707af910: "機能プレビュー - 有効 / 無効"
   feature_previews_view_d3f820e4: "機能プレビュー - 表示"
+  feature_settings_ff2b79da: 機能設定
   featured_83f6041d: 注目
   featured_help_links_d805fe44: 注目のヘルプリンク
   features: 
@@ -12631,6 +12670,7 @@ ja:
   hide_grades_5ff26682: 成績を非表示にする
   hide_grades_tray_5ed267fe: 成績トレイを非表示にする
   hide_groups_navigation_menu_62e8b3d0: グループナビゲーションメニューを非表示にする
+  hide_important_dates_c23d2102: 重要な日付を非表示にする
   hide_key_e8fe1e8c: キーを非表示にする
   hide_name_details_23814c37: "%{name}詳細を非表示にする"
   hide_navigation_menu_f0b3e90: ナビゲーションメニューを非表示にする
@@ -12661,6 +12701,7 @@ ja:
   home_page_is_not_valid_2e8a25ae: ホームページが無効です
   home_tutorial_tray_66826983: ホーム.チュートリアルトレイ
   homeroom_12546f9c: ホームルーム
+  homeroom_view_a676e270: ホームルームビュー
   homework_submission_172e8354: 宿題の提出
   honduras_44052cf5: ホンジュラス
   honduras_504_af7aa636: "ホンジュラス (+504)"
@@ -12906,6 +12947,7 @@ ja:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       RCE 機能強化も有効になっている場合、
       RCE が作業を自動で保存します
+  if_set_allows_submission_status_to_be_changed_from_156f57f: "設定されている場合、Speedgrader 内から送信ステータスを変更できます"
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: そう設定されている場合、成績計算機は合計を計算するときに未提出の匿名の課題を無視します。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: 設定されている場合、成績表CSVエクスポータが選択された評価期間のタイトルを評価期間に基づいて値が変化する列ヘッダーに追加します。
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: そう設定されている場合、成績表は課題の読み込みを切り離し、これを選択された採点期間の課題に読み込みます。
@@ -12996,6 +13038,7 @@ ja:
   if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "この権限が無効になっていても、ユーザーは Canvas アプリセンターから承認されたアプリをインストールすることができます（貴機関で有効にされている場合）。"
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "このアクセス許可が有効で、コース - 表示リストの表示が無効な場合、ユーザーはアカウント設定内の新しいコースを追加のボタンを使用して新しいコースを追加できます。"
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "この権限が有効で、[ユーザー - プライマリ電子メールアドレスの表示]が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。"
+  if_this_permission_is_enabled_but_blueprint_course_ccc15486: "この権限が有効になっているが、[ブループリントコース-追加/編集/関連付け/削除]が有効になっていない場合でも、ユーザーはブループリントコースを同期して同期履歴を表示することができます。"
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。ユーザーがコースレベルで SIS ID を管理できないようにするには、SIS データ - 管理および SIS データ - 読み取りの両方が無効にされていなければなりません。SIS ID 経由でコースにユーザーを追加するには、ユーザーがコースおよび/またはユーザーの追加/削除 - コースの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。"
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。ユーザーがコースレベルでSISIDを管理できないようにするには、SISデータ-管理とSISデータ-読み取りの両方を無効にする必要があります。
@@ -13088,6 +13131,7 @@ ja:
   import_status_b147bd27: インポートの状況
   import_tutorial_tray_8b92e956: チュートリアルトレイをインポート
   important_dates_304e306a: 重要な日付
+  important_dates_tray_fa41a025: 重要な日付トレイ
   important_info_3bda6406: 重要な情報
   important_info_for_course_baa4bce1: "%{course} の重要な情報"
   important_note_educational_institutions_have_an_ob_c9350304: "*注意事項: 教育機関は、彼らのコンテンツに可能な限りアクセスできるようにする義務があります。読み取り可能なテキストを維持するために、最低 バックグラウンドカラーに対する3:1 テキストの比率をお勧めします。**WebAIM カラー コントラスト チェッカー***で、簡単にコントラストをテストすることができます。"
@@ -13450,6 +13494,7 @@ ja:
   italian_bd3c792d: イタリア語
   italy_39_cfad867a: "イタリア (+39)"
   italy_daec3097: イタリア
+  item_banks_manage_account_e8040580: "アイテムバンク - アカウントを管理"
   item_cannot_be_duplicated_cebf3109: 項目は重複できません
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category}アイテム名%{item_name}のカテゴリアイコン"
   item_complete_d334fd43: (完了した項目)
@@ -14046,9 +14091,11 @@ ja:
   locking_91f476a5: ロック中...
   log_in_c9e240ef: ログイン
   log_in_to_submit_962106cf: 送信するにはログインしてください
+  log_in_url_is_not_a_valid_uri_7b8c57ee: ログインURLが有効なURIではありません
   log_on_url_fc166e4c: "ログオンの URL"
   log_out_379ba28a: ログアウト
   log_out_url_2605c2c1: "ログアウトの URL"
+  log_out_url_is_not_a_valid_uri_6566751e: ログアウトURLが有効なURIではありません
   logged_in_user_id_5a54b1ae: "ログイン中のユーザ ID"
   logged_out_724b3717: ログアウト
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
@@ -16719,6 +16766,7 @@ ja:
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "複数のCanvasのアカウントは、Clever District %{district_id}に関連しています。"
   multiple_dropdowns_read_surrounding_text_f61274b3: 複数のドロップダウン、周囲のテキストを読む
   multiple_due_dates_283dd861: 複数の締切日
+  multiple_due_dates_47416f7a: （複数の期限）
   multiple_due_dates_6b0d75c6: 複数の期日
   multiple_modules_930713d4: 複数のモジュール
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -17587,6 +17635,7 @@ ja:
   of_students_5d1af0d2: 受講生数
   off_5385ef3f: オフ
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "オフ - このサブアカウントにはポリシーは適用されません"
+  offline_score_8d7b4779: オフラインスコア：
   offline_web_export_dca67174: オフラインウェブエクスポート
   ok_c47544a2: OK
   ok_ff1b646a: OK
@@ -17625,6 +17674,7 @@ ja:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 解答を提出後には、変更することはできません。以前の質問は閲覧できなくなります。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "デバッグを開始すると、次に試行されるログイン試行に関するすべての情報が収集されます。[更新]をクリックすると、より多くのデータが収集されているかどうか、[デバッグの停止]は収集されたデータをクリアして現在のデバッグ試行を停止します。"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 解答を変更したら、問題を更新する前にオプションを選択する必要があります。
+  one_or_more_grade_selected_was_provided_by_a_grade_58d46830: 選択された1つ以上の成績が、非アクティブな登録を持つ採点者によって提供されています。選択内容を現在の採点者が提供するものに更新してください。
   one_or_more_items_are_currently_being_imported_the_186fe069: 1つ以上のアイテムが現在インポート中です。利用可能になると、以下のコースに表示されます。
   one_per_line_format_name_value_79647700: "1行につき1つフォーマット: 名前=値"
   online_submission_type_annotated_document_f8b57ae1: "オンライン提出タイプ - 注釈付きドキュメント"
@@ -18075,6 +18125,7 @@ ja:
   parameters_a13374ec: パラメーター
   parent_assignment_is_not_selected_9efb4ac1: 親の課題が選択されていません
   parent_assignment_is_selected_6a2fbca8: 親の課題が選択されています
+  parent_group_not_found_in_this_context_3312dd78: このコンテキスト内に親グループが見つかりません
   parent_of_a_canvas_user_afba1624: Canvasユーザーの両親ですか？
   parent_references_not_found_prior_to_this_row_miss_31723438: "この行の前にペアレントの参照が見つかりません： %{missing}"
   parent_signup_b7c6bf0a: 親のサインアップ
@@ -18239,6 +18290,7 @@ ja:
   please_try_again_4c3d11b4: もう一度やり直してください
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 課題またはモジュールアイテムインターフェイスでツールを再選択して保存することにより、ツールへの接続を再確立してみてください。
   please_upload_files_as_a_zip_5a2c799f: "ファイルは .zip 形式でアップロードしてください"
+  please_visit_your_modules_page_for_more_informatio_846c5e32: 詳細については、*モジュールのページ*をご覧ください。
   please_wait_2b646bc2: お待ちください。
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: ファイルをアップロードして処理中です。お待ちください。
   please_wait_e6355980: お待ちください...
@@ -19020,6 +19072,7 @@ ja:
         other_services: 以下のサービスをどれでもクリックして登録
         password: パスワード
         password_for: パスワードの対象
+        permanent_expires_at: 有効期限
         pronoun: 代名詞
         pronouns: 代名詞
         purpose: 目的
@@ -21086,6 +21139,7 @@ ja:
   registration_url_60e0eaaa: "登録 URL"
   regular_style_checkbox_ee3d71c1: 通常スタイルのチェックボックス
   reinforce_student_understanding_304d18a6: 受講生の理解を深める
+  relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: リラックスして休憩してください。まだ何もすることはありません。
   release_date_for_e2de5547: "（）のリリース日： "
   release_grades_c68fbcc: 成績をリリースする
   release_notes_12ca833c: リリースノート
@@ -21113,6 +21167,7 @@ ja:
   remove_conference_title_207d32c0: "会議を削除する：%{title}"
   remove_contact_method_ca890ba3: 連絡方法を削除する
   remove_course_association_name_b760c502: "コース関連付けを削除%{name}"
+  remove_d83a966c: 削除する：
   remove_dates_9b9ba2f6: 日付を削除
   remove_designers_from_courses_42332a57: デザイナーをコースから削除
   remove_displayname_a2f31aa3: "%{displayName} を削除する"
@@ -21143,12 +21198,15 @@ ja:
   remove_outcomes_5f8b601c: 
     one: 結果を削除する
     other: 結果を削除する
-  remove_outcomes_9abcc8fd: 結果を削除しますか？
+  remove_outcomes_9abcc8fd: 
+    one: 結果を削除しますか？
+    other: 結果を削除しますか？
   remove_placement_90862c13: "%{placement}を削除する"
   remove_points_from_rubric_dcd4b585: ルービックからポイントを削除する
   remove_pronouns_5ff760ff: 代名詞を削除する
   remove_pronouns_pronoun_c8b03d78: "代名詞%{pronoun}を削除する"
   remove_recipient_name_a6b83cef: "受信者%{name}を削除する"
+  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "%{removableCount}を%{totalCount}結果から削除しますか？"
   remove_role_filter_label_a27b6797: "役割フィルタを削除する%{label}"
   remove_row_c198da5a: 行を削除
   remove_row_f9d59cba: 行を削除
@@ -21347,6 +21405,7 @@ ja:
       create_collaborations: 受講生の共同作業の作成
       create_conferences: "Web 会議の作成"
       manage_: 管理（追加/編集/削除）
+      manage_account_banks: アカウントレベルのアイテムバンクを管理する
       manage_account_memberships: アカウントに対する他の管理者の追加/削除
       manage_account_settings: "アカウント レベルの設定の管理"
       manage_admin_users: "コースに対する他の講師、コース設計者、または TA の追加/削除"
@@ -21968,6 +22027,7 @@ ja:
   select_audio_file_7d905cce: オーディオファイルを選択
   select_by_date_range_c3af0101: 日付範囲で選択する
   select_calendars_d5fa50b6: 予定表を選択する
+  select_calendars_to_retrieve_important_dates_from_26dc92b7: そこから重要な日付を取得する予定表を選択します
   select_conference_provider_58c7f7fe: 会議プロバイダーを選択する
   select_content: コンテンツの選択
   select_content_checkbox: 
@@ -22051,6 +22111,7 @@ ja:
   selected_274ce24f: 選択されました
   selected_all_courses_9cfef57f: "すべての コースを選択しました"
   selected_answer: この解答が選択されました。
+  selected_calendars_cc7f325b: 選択した予定表
   selected_content_contains_non_lti_links_f9dfd762: 選択したコンテンツはLTIリンクではありません。
   selected_content_is_not_an_lti_link_11780d96: 選択したコンテンツはLTIリンクではありません。
   selected_course_course_a581f834: "選択コース%{course}"
@@ -23005,6 +23066,7 @@ ja:
       青写真コースとの関連付けと同期化を行った後で、アカウント管理者が自動的に
       コースを公開できるようにするオプションのチェックボックスを表示します
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: Canvasグローバルナビゲーションに最近アクセスしたページのリストを表示します
+  show_accessibility_checker_notifications_while_edi_a7cb6449: 編集中にアクセシビリティチェッカー通知を表示します。
   show_account_navigation_menu_d97270a9: アカウントナビゲーションメニューを表示する
   show_admin_navigation_menu_92fb579f: アドミニストレーションナビゲーションメニューを表示する
   show_all_artifacts_34b91a83: すべての成果物を表示
@@ -23235,6 +23297,8 @@ ja:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: このページのいくつかのカンファレンスが、ステータスの取得中に、エラーのために非表示になります。
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "一部のカスタム列は読み取り専用なため変更できませんでした。 これらの列の変更は無視されました。"
   some_module_items_could_not_be_published_e4be3c0: 一部のモジュールアイテムを公開できませんでした
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: 選択した結果の一部は、このアカウントのコンテンツに沿ってアラインされているため、削除できません。アラインメントなしで結果の削除を続行しますか？
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: 選択した結果の一部は、このコースのコンテンツに沿ってアラインされているため、削除できません。アラインメントなしで結果の削除を続行しますか？
   some_settings_have_been_administratively_locked_9e3ee880: 一部の設定は管理上の理由でロックされています。
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: 一部の設定は、課題が閉じられた採点期間にあるため、無効となっています。
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: 採点できない提出があります。これら提出の採点変更は無視されました。
@@ -23503,6 +23567,7 @@ ja:
   student_context_card_ad59967e: 受講生コンテクストカード
   student_context_cards_376d2072: 受講生コンテクストカード
   student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: "学生コンテクストカードは、管理者がアカウントに対して有効でなければなりません。コース - 管理/更新が有効になっていません。ユーザーは引き続き成績表からコンテキストカードを表示できます。"
+  student_context_cards_must_be_enabled_for_an_accou_9b5c635: 学生コンテクストカードは、管理者がアカウントに対して有効でなければなりません。この権限が有効になっていない場合でも、ユーザーは成績表を通じてコンテクストカードを表示できます。
   student_context_cards_must_be_enabled_for_an_accou_d996afdc: "学生コンテクストカードは、管理者がアカウントに対して有効でなければなりません。コースを管理する場合：管理者 - 管理/更新が有効になっていません。ユーザーは引き続き成績表からコンテキストカードを表示できます。"
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: 受講生コンテクストカードは、管理者がアカウントに対して有効でなければなりません。この権限が有効になっていない場合でも、ユーザーはグレードブックを通じて受講生コンテクストカードを表示できます。
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: 受講生コンテクストカードは、管理者がアカウントに対して有効でなければなりません。
@@ -24219,6 +24284,7 @@ ja:
   the_courses_delete_permission_affects_viewing_the__b8744b4c: "コース - 削除権限は、手動で作成されたコースにのみ表示される[このコースを完全に削除]ボタンの表示に影響します。"
   the_courses_publish_permission_allows_the_user_to__30694e34: "コース - 公開権限により、ユーザーはモジュールを含まないコースを公開することができます。モジュールコンテンツを公開/非公開にするには、コースコンテンツ - 追加/編集/削除が有効にされていなければなりません。"
   the_courses_reset_permission_allows_users_to_reset_29dbc267: "コース - リセット許可は、SISデータ - 管理パーミッションを持っているかどうかに関わらず、ユーザーがSIS管理コースのコースコンテンツをリセットできるようにします。"
+  the_csv_header_row_is_invalid_a8ec1787: CSVのヘッダー行が無効です。
   the_date_is_not_valid_b6285fb5: 日付が無効です！
   the_discussion_entry_was_successfully_created_7cddf67b: ディスカッションエントリが正常に作成されました。
   the_discussion_topic_was_successfully_deleted_d8b93b70: ディスカッショントピックは正常に削除されました。
@@ -24320,6 +24386,12 @@ ja:
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "ユーザ %{current_user_name} の最近のスコアと結果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "このコースの次に利用可能な予約は～です*%{date}*"
   the_original_quizzes_interface_fcda53bc: オリジナルのクイズインターフェイス
+  the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
+    one: 選択した成果は、このアカウントのコンテンツに沿ってに沿ってアラインされているため、削除することはできません。
+    other: 選択した成果は、このアカウントのコンテンツに沿ってに沿ってアラインされているため、削除することはできません。
+  the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
+    one: 選択した結果は、このコースのコンテンツに沿ってアラインされているため、削除できません。
+    other: 選択した結果は、このコースのコンテンツに沿ってアラインされているため、削除できません。
   the_preceding_content_is_partner_provided_d753928c: 上記のコンテンツはパートナーが提供しています
   the_previous_sis_batch_was_aborted_d7d89955: 以前のSISバッチは中止されました
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 熟達スコアの計算は管理者によって設定され、このアカウントのすべてのコースに適用されます。
@@ -24457,6 +24529,7 @@ ja:
   there_was_an_error_setting_usage_rights_53739e1d: 使用権を設定する際にエラーが発生しました。
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: 課題の日付の保存ジョブの開始時にエラーが発生しました
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: 類似検出サービスに送信中にエラーが発生しました。サポートに連絡する前に、ファイルを再提出するよう試みてください
+  there_was_an_error_submitting_your_attempt_fdbe9259: 企図を送信する際にエラーが発生しました。
   there_was_an_error_updating_this_assignment_please_59fc608d: この課題の更新中にエラーがありました。ページを更新して再試行してください
   there_was_an_error_uploading_the_image_932fc4ce: 画像のアップロード中にエラーが発生しました
   there_was_an_error_uploading_your_file_please_try__ce458566: ファイル読み込み中にエラーがありました。再度試してください。
@@ -24521,6 +24594,7 @@ ja:
   this_assignment_is_complete_5e096a06: この課題は完了しています！
   this_assignment_is_currently_being_moderated_ffd280f2: この課題は、現在モデレートされています
   this_assignment_is_currently_muted_that_means_stud_94d63139: この割課題は現在ミュートされています。つまり、受講者は成績やフィードバックを見ることができません。今すぐミュートを解除しますか？
+  this_assignment_is_currently_unavailable_because_y_129792e0: 講師が設定した前提条件をまだ完了していないため、この課題は現在利用できません。
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: この課題は削除されました。合計の計算で考慮されません。
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: この課題は免除されました。合計の計算で考慮されません。
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: この課題は、この受講生の締切られた採点期間にあります
@@ -24630,6 +24704,7 @@ ja:
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: この成績は、現在この受講生に対して選択されています。
   this_is_the_default_email_address_f3c421fb: これは、デフォルトのメールアドレスです
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "これは新しい機能プレビュー UI です。現在は読取専用です。古い UI に戻るには、ボタンをクリックします。これで、「新しい機能フラグ」機能が無効になり、ページが更新されます。"
+  this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: このページでは、コメントを残したり、講師のフィードバックを見たりすることができます。
   this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: これは、ホームが完成したときに着陸する場所です。
   this_is_your_course_landing_page_33d445ec: これは、あなたのコースのランディングページです！
   this_is_your_course_landing_page_f87a920d: これは、あなたのコースのランディングページです！
@@ -25027,6 +25102,7 @@ ja:
   to_access_the_account_settings_tab_account_level_s_9676d44b: "[アカウント設定]タブにアクセスするには、[アカウントレベルの設定 - 管理]が有効にされていなければなりません。"
   to_access_the_assignments_index_page_course_conten_49d884f2: "課題のインデックスページにアクセスするには、[コース内容 - 表示]が有効にされていなければなりません。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "課題のインデックスページにアクセスするには、コース内容 - 表示が有効有効にされていなければなりません。課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
+  to_access_the_courses_link_in_account_navigation_c_4f4a7ffc: "アカウントナビゲーションの[コース]リンクにアクセスするには、[コース - 表示リスト]も有効にされていなければなりません。"
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "アカウントナビゲーションのコースリンクにアクセスするには、[コース - 表示リスト]が有効にされていなければなりません。"
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
       アカウントナビゲーションの[コース]リンクにアクセスするには、[コース - ビュー]リストが有効にされていなければなりません。
@@ -25146,6 +25222,7 @@ ja:
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "セクションをクロスリストするには、コースセクション - 追加/編集/削除も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
   to_cross_list_a_section_courses_manage_update_and__40dfb8f8: "セクションを相互リストするには、[コース - 管理/更新]と[コースセクションの管理 - 編集]も有効にされていなければなりません。"
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "セクションを相互リストするには、コースセクション管理 - 編集も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
+  to_cross_list_a_section_manage_course_sections_edi_ac3d2abb: "セクションを相互リストするには、コースセクション管理 - 編集も有効にされていなければなりません。"
   to_cross_list_a_section_manage_courses_admin_manag_7992434e: "セクションを相互リストするには、[コースを管理：管理者 - 管理/更新]および[コースセクションの管理 - 編集]も有効でなければなりません。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "セクションをクロスリストするには、コース - 追加/編集/削除も有効にされていなければなりません。"
   to_cross_list_sections_course_sections_edit_and_co_6db155a6: "セクションを相互リストするには、[コースセクション編集]と[コース - 管理/編集]もが有効にされていなければなりません。"
@@ -25224,6 +25301,7 @@ ja:
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "ページインデックスページのロック設定を編集するには、ページ - 更新、Blueprint コース - 追加/編集/関連付け/、およびコース管理：管理者 - 管理 / 更新。"
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "コース SIS ID を編集するには、[コース - 管理/更新]と[SIS データ - 管理]も有効にされていなければなりません。"
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "コースSISIDを編集するには、[コース管理：管理者 - 管理/更新]および[SISデータ-管理]も有効でなければなりません。"
+  to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。"
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       ユーザーの詳細を編集、ログインの詳細を変更、またはユーザーのパスワードを変更するには、ユーザー - ログインの詳細の管理も有効にされていなければなりません。
       ユーザーページビューを表示するには、統計表示も有効にされていなければなりません。
@@ -25269,6 +25347,7 @@ ja:
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: "関連するコースを管理するには、コース - 表示リストとコースの管理 - 追加も有効でなければなりません。"
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "コース設定で Blueprint コースの設定を編集するには、コース - 追加/編集/関連/削除も有効にされていなければなりません。"
   to_manage_course_announcements_discussions_moderat_5f02f46e: "コースアナウンスを管理するには、ディスカッション - 調整も有効にされていなければなりません。"
+  to_manage_course_content_course_content_add_edit_d_10b420f7: "コースコンテンツを管理するには、[コースの内容 - 追加/編集/削除]も有効にされていなければなりません。"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "コースコンテンツを管理するには、コースの内容 - 追加/編集/削除が有効にされていなければなりません。"
   to_manage_course_content_courses_manage_update_and_843edf8a: "コースコンテンツを管理するには、[コース - 管理/更新]と[コースの内容 - 追加/編集/削除]が有効にされていなければなりません。"
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "コースコンテンツを管理するには、[コース管理：管理者 - 管理/更新]および[コース内容 - 追加/編集/削除]が有効にされていなければなりません。[ホームページの選択]および[コース設定のチェックリスト]ボタンを表示するには、[コース管理]：管理者 - 管理/更新]および[コース内容 - 表示]も有効でなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
@@ -25388,6 +25467,7 @@ ja:
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "特定の Canvas ユーザに送信されたすべてのお知らせを表示するには、検索するユーザと日付範囲を選択してください。"
   to_view_announcements_announcements_view_must_also_75f652df: "アナウンスを表示するには、アナウンス - 表示も有効にされていなければなりません。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
+  to_view_choose_home_page_and_course_setup_checklis_84797b4f: "[ホームページを選択]と[コース設定チェックリスト]ボタンを表示するには、[コースコンテンツ - 表示]も有効にされていなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "[ホームページの選択]および[コース設定のチェックリスト]ボタンを表示するには、[コース管理]：管理者 - 管理/更新]および[コース内容 - 表示]も有効でなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
   to_view_choose_home_page_and_course_setup_checklis_ff2436d4: "[ホームページを選択]と[コース設定チェックリスト]ボタンを表示するには、「コース - 管理/更新」と「コースコンテンツ - 表示]も有効にされていなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
@@ -25418,6 +25498,7 @@ ja:
   to_view_feature_previews_for_an_account_feature_pr_805e5c46: "アカウントの[機能プレビュー]を表示するには、[機能プレビュー - 有効/無効]も有効ににされていなければなりません。"
   to_view_grades_in_a_course_courses_manage_update_a_91a2448: "コースで成績を表示するには、[コース - 管理/更新]と[成績 - 表示]も有効にされていなければなりません。"
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。"
+  to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: "コースで成績を表示するには、[成績 - すべての成績を表示]も有効にされていなければなりません。"
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "コースの成績を表示するには、[コース管理：管理者-管理/更新]および[成績 - すべての成績を表示]も有効でなければなりません。"
   to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "グループを表示するには、[ユーザー - 表示リスト]も有効でなければなりません。"
   to_view_last_activity_and_total_activity_informati_473265d8: "コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
@@ -25710,6 +25791,9 @@ ja:
   unable_to_load_this_control_543a8271: このコントロールを読み込めません
   unable_to_read_file_2d04b0c: ファイルが読めません
   unable_to_remove_app_4293cb53: アプリを削除できません
+  unable_to_remove_outcomes_f682e68f: 
+    one: 結果を削除できません
+    other: 結果を削除できません
   unable_to_save_new_discussion_topic_99239f3f: 新しいディスカッショントピックを保存できません
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "%{context_name}のユーザーにメッセージを送信できません"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: この課題は、少なくとも1人の受講生の終了後の採点期間に終了する予定であるため、デフォルトの成績を設定することができません
@@ -25741,8 +25825,8 @@ ja:
        エディタインスタンスを必要とするにもかかわらず、このインスタンスがその内部リストに追加されていないことから、レガシー RCE が初期化に失敗する場合があります。
   underline_all_links_description: |-
       下線のあるリンクは、ナビゲーションメニュー、ダッシュボード、およびページサイドバーのハイパーリンクを
-      *下線付きテキスト*として表示します。この機能オプションは、Rich Content Editor 内のユーザー作成
-      のコンテンツリンクには適用されません。これはすべてのユーザーのリンクに常に下線を引きます。
+      *下線付きテキストとして表示します*。この機能オプションは、
+      Rich Content Editor 内のユーザー作成のコンテンツリンクには適用されません。これはすべてのユーザーのリンクに常に下線を引きます。
   underline_links_e7cf9b4f: リンクにアンダーラインを引く
   undo_a7be8fef: アンドゥーする
   undo_remove_course_association_name_68eb4037: "コースの関連付けを取り消す%{name}"
@@ -26615,6 +26699,7 @@ ja:
   view_grades_8d3bae6c: 成績を表示
   view_grades_for_name_45aeb2f2: "～の成績を表示%{name}"
   view_grading_history_e64bb8fe: 採点履歴の表示
+  view_important_dates_173c7e1b: 重要な日付を表示する
   view_in_speedgrader_773b9d81: "SpeedGrader で表示"
   view_learning_analytics_beta_1c98a397: 学習分析を表示（ベータ）
   view_login_ids_for_users_142bbe7a: ユーザーのログインIDを表示する
@@ -27157,6 +27242,9 @@ ja:
   you_have_changed_the_progression_requirements_for__6772bc89: アクティブなコースの進捗要件を変更しました。このモジュールをすでに進めている受講生、またはこのモジュールに依存している他のモジュールを進めている受講生がいる可能性があります。
   you_have_completed_a_peer_review_for_name_4dd2264b: "%{name}のピアレビューを完了しました"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "%{person}名分のピアレビューを完了しました。ありがとうございました"
+  you_have_count_calendars_left_f0cbcac4: 
+    one: "予定表が%{count}残っています"
+    other: "予定表が%{count}残っています"
   you_have_count_submissions_to_grade_6c5b511a: "採点する提出が %{count} あります"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: この受講生に無効な成績を入力しました。値と採点タイプを確認して、もう一度やり直してください。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*このクイズの問題は変更されています。*これらの変更内容は、クイズを保存するまで、受講生には表示されません。"

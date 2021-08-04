@@ -2,7 +2,7 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile`
 
-ARG RUBY=2.6-p6.0.4
+ARG RUBY=2.7
 
 FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
@@ -34,7 +34,6 @@ ARG USER_ID
 RUN if [ -n "$USER_ID" ]; then usermod -u "${USER_ID}" docker \
         && chown --from=9999 docker /usr/src/nginx /usr/src/app -R; fi
 
-# When removing bionic/18.04/ruby 2.6 support remove the conditional package installs
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
@@ -57,9 +56,8 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        automake \
        git \
        build-essential \
-  && ([ $(lsb_release -rs) = "18.04" ] || apt-get install -qqy --no-install-recommends \
        python2 \
-       python-is-python2) \
+       python-is-python2 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 

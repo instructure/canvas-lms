@@ -21,6 +21,8 @@
 
 // Base styles
 
+@use "sass:math";
+
 .alert {
   padding: direction-sides($ic-sp $ic-sp*3 $ic-sp $ic-sp);
   background-color: $ic-bg-light-alert;
@@ -80,7 +82,7 @@
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
   box-sizing: border-box;
-  padding: direction-sides($ic-sp/2 40px $ic-sp/2 $ic-sp*4);
+  padding: direction-sides($ic-sp*0.5 40px $ic-sp*0.5 $ic-sp*4);
   margin: 0 auto;
   width: 475px;
   min-height: 20px;
@@ -94,7 +96,7 @@
 
   .close_link {
     position: absolute;
-    #{direction(right)}: $ic-sp/3;
+    #{direction(right)}: math.div($ic-sp, 3);
     top: 50%;
     margin-top: -12px;
     text-decoration: none;
@@ -168,7 +170,7 @@
 }
 
 .ic-flash__text {
-  margin: $ic-sp/2 0;
+  margin: $ic-sp*0.5 0;
   &:first-of-type { margin-top: 0; }
   &:last-child { margin-bottom: 0; }
 }
@@ -185,7 +187,7 @@ a.Button--flash {
 // masquerading or using student view. In the new UI, it gives
 // Canvas the appearance of being inside a 3px frame.
 .ic-alert-masquerade-student-view {
-  padding: $ic-sp/2 $ic-sp;
+  padding: $ic-sp*0.5 $ic-sp;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -217,7 +219,7 @@ body.is-masquerading-or-student-view {
 
 .ic-alert-masquerade-student-view-module {
   flex: 1;
-  padding: 0 $ic-sp/2;
+  padding: 0 $ic-sp*0.5;
   &:first-of-type { padding-#{direction(left)}: 0; }
   &:last-of-type {
     padding-#{direction(right)}: 0;
@@ -269,8 +271,8 @@ $ic-notification-border-thickness: 2px;
     }
     .ic-notification__title {
       display: block;
-      @include fontSize($ic-font-size--medium)
-      margin: 0 0 $ic-sp/2;
+      @include fontSize($ic-font-size--medium);
+      margin: 0 0 $ic-sp*0.5;
     }
   }
 }
@@ -293,7 +295,7 @@ $ic-notification-border-thickness: 2px;
 }
 
 .ic-notification__title {
-  margin-#{direction(right)}: $ic-sp/3;
+  margin-#{direction(right)}: math.div($ic-sp, 3);
   @include fontSize($ic-font-size--small);
   display: inline;
   font-weight: bold;

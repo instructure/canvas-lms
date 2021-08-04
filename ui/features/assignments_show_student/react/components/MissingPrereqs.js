@@ -29,7 +29,7 @@ function modulesPage(moduleUrl) {
 
   // xsslint safeString.identifier encodedUrl
   return I18n.t('Please visit your *modules page* for more information.', {
-    wrappers: [`<a target="_blank" href="${encodedUrl}">$1</a>`]
+    wrappers: [`<a data-testid="modules-link" target="_blank" href="${encodedUrl}">$1</a>`]
   })
 }
 

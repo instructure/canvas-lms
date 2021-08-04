@@ -170,6 +170,14 @@ describe Assignment do
     end
 
     describe 'update_cached_due_dates' do
+      it 'invokes DueDateCacher if anonymous_grading is changed' do
+        attrs = assignment_valid_attributes.merge(anonymous_grading: true)
+        assignment = @course.assignments.create!(attrs)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(anonymous_grading: false)
+      end
+
       it 'invokes DueDateCacher if due_at is changed' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
@@ -636,6 +644,32 @@ describe Assignment do
 
     it 'excludes users that do not have a moderation grader record for the assignment' do
       expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key @teacher.id
+    end
+  end
+
+  describe '#instructor_states_by_provisional_grade_id' do
+    before(:once) do
+      @teacher1 = User.create!
+      @teacher2 = User.create!
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2)
+      @course.enroll_teacher(@teacher1, enrollment_state: :active)
+      @course.enroll_teacher(@teacher2, enrollment_state: :active)
+      @assignment.create_moderation_grader(@teacher1, occupy_slot: true)
+      @assignment.create_moderation_grader(@teacher2, occupy_slot: true)
+      @submission = @assignment.submissions.first
+      @provisional_grade1 = @submission.find_or_create_provisional_grade!(@teacher1, score: 1)
+      @provisional_grade2 = @submission.find_or_create_provisional_grade!(@teacher2, score: 2)
+      @teacher2.enrollments.first.destroy
+    end
+
+    it 'sets active to a provisional grade from an user with active enrollment' do
+      key = @provisional_grade1.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq true
+    end
+
+    it 'sets deleted to a provisional grade from an user with inactive enrollment' do
+      key = @provisional_grade2.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq false
     end
   end
 

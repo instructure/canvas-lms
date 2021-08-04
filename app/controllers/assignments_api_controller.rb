@@ -744,6 +744,10 @@ class AssignmentsApiController < ApplicationController
       new_assignment.assignment_group = target_assignment.assignment_group
     end
 
+    # Specify the updating user to ensure that audit events are created
+    # for anonymous or moderated assignments (we need to do it before the
+    # insert_at since that could save the record)
+    new_assignment.updating_user = @current_user
     new_assignment.insert_at(target_assignment.position + 1)
     new_assignment.save!
     positions_in_group = Assignment.active.where(

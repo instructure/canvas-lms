@@ -37,7 +37,7 @@ import useModal from '@canvas/outcomes/react/hooks/useModal'
 const ManagementHeader = ({handleFileDrop}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
-  const {isMobileView} = useCanvasContext()
+  const {isMobileView, canManage, canImport} = useCanvasContext()
   const showImportModal = () => showImportOutcomesModal({onFileDrop: handleFileDrop})
 
   return (
@@ -47,7 +47,7 @@ const ManagementHeader = ({handleFileDrop}) => {
           <h2 className="title">{I18n.t('Outcomes')}</h2>
         </View>
         <View as="div">
-          {isMobileView ? (
+          {isMobileView && (canManage || canImport) ? (
             <Menu
               trigger={
                 <Button renderIcon={IconOutcomesLine} margin="x-small">
@@ -55,30 +55,50 @@ const ManagementHeader = ({handleFileDrop}) => {
                 </Button>
               }
             >
-              <Menu.Item onSelect={showImportModal}>
-                <IconImportLine size="x-small" />
-                <View padding="0 small">{I18n.t('Import')}</View>
-              </Menu.Item>
-              <Menu.Item onSelect={openCreateOutcomeModal}>
-                <IconPlusSolid size="x-small" />
-                <View padding="0 small">{I18n.t('Create')}</View>
-              </Menu.Item>
-              <Menu.Item onSelect={openFindOutcomeModal}>
-                <IconSearchLine size="x-small" />
-                <View padding="0 small">{I18n.t('Find')}</View>
-              </Menu.Item>
+              {canImport && (
+                <Menu.Item onSelect={showImportModal}>
+                  <IconImportLine size="x-small" />
+                  <View padding="0 small">{I18n.t('Import')}</View>
+                </Menu.Item>
+              )}
+              {canManage && (
+                <Menu.Item onSelect={openCreateOutcomeModal}>
+                  <IconPlusSolid size="x-small" />
+                  <View padding="0 small">{I18n.t('Create')}</View>
+                </Menu.Item>
+              )}
+              {canManage && (
+                <Menu.Item onSelect={openFindOutcomeModal}>
+                  <IconSearchLine size="x-small" />
+                  <View padding="0 small">{I18n.t('Find')}</View>
+                </Menu.Item>
+              )}
             </Menu>
           ) : (
             <>
-              <Button onClick={showImportModal} renderIcon={IconImportLine} margin="x-small">
-                {I18n.t('Import')}
-              </Button>
-              <Button onClick={openCreateOutcomeModal} renderIcon={IconPlusSolid} margin="x-small">
-                {I18n.t('Create')}
-              </Button>
-              <Button onClick={openFindOutcomeModal} renderIcon={IconSearchLine} margin="x-small">
-                {I18n.t('Find')}
-              </Button>
+              {canImport && (
+                <Button onClick={showImportModal} renderIcon={IconImportLine} margin="x-small">
+                  {I18n.t('Import')}
+                </Button>
+              )}
+              {canManage && (
+                <>
+                  <Button
+                    onClick={openCreateOutcomeModal}
+                    renderIcon={IconPlusSolid}
+                    margin="x-small"
+                  >
+                    {I18n.t('Create')}
+                  </Button>
+                  <Button
+                    onClick={openFindOutcomeModal}
+                    renderIcon={IconSearchLine}
+                    margin="x-small"
+                  >
+                    {I18n.t('Find')}
+                  </Button>
+                </>
+              )}
             </>
           )}
         </View>

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "deprecated/bootstrap/mixins";
 @import "vendor/bootstrap/button-groups";
 @import "components/autocomplete";
@@ -653,7 +655,7 @@ body.responsive_awareness .conversations__filter {
     }
 
     body.responsive_awareness & {
-      margin: 0 0 0 $ic-sp / 3;
+      margin: 0 0 0 math.div($ic-sp, 3);
       display: inline-block;
     }
   }

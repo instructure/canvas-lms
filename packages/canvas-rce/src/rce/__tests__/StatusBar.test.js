@@ -23,19 +23,22 @@ import {queryHelpers} from '@testing-library/dom'
 import keycode from 'keycode'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
 
+function defaultProps(props = {}) {
+  return {
+    onToggleHtml: () => {},
+    path: [],
+    wordCount: 0,
+    editorView: WYSIWYG_VIEW,
+    onResize: () => {},
+    onKBShortcutModalOpen: () => {},
+    onA11yChecker: () => {},
+    ...props
+  }
+}
+
 function renderStatusBar(overrideProps) {
-  return render(
-    <StatusBar
-      onToggleHtml={() => {}}
-      path={[]}
-      wordCount={0}
-      editorView={WYSIWYG_VIEW}
-      onResize={() => {}}
-      onKBShortcutModalOpen={() => {}}
-      onA11yChecker={() => {}}
-      {...overrideProps}
-    />
-  )
+  const props = defaultProps()
+  return render(<StatusBar {...props} {...overrideProps} />)
 }
 
 async function findDescribedByText(container) {
@@ -122,6 +125,52 @@ describe('RCE StatusBar', () => {
       const editbtn = queryHelpers.queryByAttribute('data-btn-id', container, 'rce-edit-btn')
       fireEvent.click(editbtn)
       expect(onChangeView).toHaveBeenCalledWith(RAW_HTML_EDITOR_VIEW)
+    })
+
+    it('a11y checker start with no notifications if flag is disabled', () => {
+      const props = defaultProps({
+        use_rce_a11y_checker_notifications: false
+      })
+      const {getByTitle} = renderStatusBar(props)
+      const a11yButton = getByTitle('Accessibility Checker')
+      const sibling = a11yButton.parentElement.children[1]
+      expect(sibling.id.includes('Badge')).toBeFalsy()
+    })
+
+    it('a11y checker start with no notifications if flag is enabled', () => {
+      const props = defaultProps({
+        use_rce_a11y_checker_notifications: true
+      })
+      const {getByTitle} = renderStatusBar(props)
+      const a11yButton = getByTitle('Accessibility Checker')
+      const sibling = a11yButton.parentElement.children[1]
+      expect(sibling.id.includes('Badge')).toBeFalsy()
+    })
+
+    it('a11y checker start set a notification count if flag is enabled', () => {
+      const props = defaultProps({
+        use_rce_a11y_checker_notifications: true,
+        a11yErrorsCount: 5
+      })
+      const {rerender, getByTitle} = renderStatusBar(props)
+      const a11yButton = getByTitle('Accessibility Checker')
+      const notificationBadge = a11yButton.parentElement.children[1]
+      expect(notificationBadge.id.includes('Badge')).toBeTruthy()
+      expect(notificationBadge.textContent).toEqual('5')
+      rerender(<StatusBar {...props} a11yErrorsCount={10} />)
+      expect(notificationBadge.textContent).toEqual('10')
+    })
+
+    it('a11y checker set max notifications count if flag is enabled', () => {
+      const props = defaultProps({
+        use_rce_a11y_checker_notifications: true,
+        a11yErrorsCount: 999
+      })
+      const {getByTitle} = renderStatusBar(props)
+      const a11yButton = getByTitle('Accessibility Checker')
+      const notificationBadge = a11yButton.parentElement.children[1]
+      expect(notificationBadge.id.includes('Badge')).toBeTruthy()
+      expect(notificationBadge.textContent).toEqual('99 +')
     })
   })
 

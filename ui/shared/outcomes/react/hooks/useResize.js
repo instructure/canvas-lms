@@ -19,7 +19,7 @@
 import {useCallback, useRef} from 'react'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
-const useResize = ({minWidth = 300, margin = 8} = {}) => {
+const useResize = ({minWidth = 100, margin = 8} = {}) => {
   const containerRef = useRef(null)
   const delimiterRef = useRef(null)
   const leftColumnRef = useRef(null)

@@ -56,4 +56,16 @@ describe('PostToolbar', () => {
 
     expect(getByText('Go to Reply')).toBeTruthy()
   })
+
+  it('should not render go to reply button when isIsolatedView prop is true', () => {
+    window.ENV.isolated_view = true
+    const {queryByText} = render(
+      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView>
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(queryByText('Go to Reply')).toBeNull()
+  })
 })

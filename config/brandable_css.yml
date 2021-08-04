@@ -8,6 +8,12 @@ paths:
   output_dir: public/dist/brandable_css
   browsers_yml: config/browsers.yml
 
+indices:
+  handlebars:
+    path: public/dist/brandable_css/brandable_css_handlebars_index.json
+    bundles: 'jst/**'
+    keysz: 2
+
 manifest_key_seperator: $$$$$$$$$$$
 
 variants:

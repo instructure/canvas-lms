@@ -61,6 +61,16 @@ function createCache() {
   return new InMemoryCache({
     addTypename: true,
     dataIdFromObject: object => {
+      const problematicTypes = ['Rubric', 'RubricRating', 'RubricCriterion', 'LearningOutcome']
+      if (object.id && problematicTypes.includes(object.__typename)) {
+        // The problematic types have GraphQL queries written that include "id: _id"
+        // (assigning the database ID, `_id`, to `id`). Because of this, `id` is not
+        // guaranteed to be globally unique for these types, and so we'll always
+        // include the typename in the cache key to ensure uniqueness.
+        const id = object._id || object.id
+        return object.__typename + id
+      }
+
       if (object.id) {
         return object.id
       } else if (object._id && object.__typename) {

@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {getAutoTrack} from '../../../../media_player_iframe_content/react/CanvasMediaPlayer'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
+import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_media_attempt'
 import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -32,7 +35,6 @@ import {
   MediaCaptureStrings,
   SelectStrings
 } from '../../helpers/UploadMediaTranslations'
-import {getRCSAuthenticationHeaders, getRCSOriginFromHost} from '@instructure/canvas-rce'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -61,18 +63,22 @@ export default class MediaAttempt extends React.Component {
   }
 
   onComplete = (err, data) => {
-    this.props.updateUploadingFiles(true)
-    if (data.mediaObject.embedded_iframe_url) {
-      this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
-    }
-    this.props.createSubmissionDraft({
-      variables: {
-        id: this.props.submission.id,
-        activeSubmissionType: 'media_recording',
-        attempt: this.props.submission.attempt || 1,
-        mediaId: data.mediaObject.media_object.media_id
+    if (err) {
+      this.context.setOnFailure(I18n.t('There was an error submitting your attempt.'))
+    } else {
+      this.props.updateUploadingFiles(true)
+      if (data.mediaObject.embedded_iframe_url) {
+        this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
       }
-    })
+      this.props.createSubmissionDraft({
+        variables: {
+          id: this.props.submission.id,
+          activeSubmissionType: 'media_recording',
+          attempt: this.props.submission.attempt || 1,
+          mediaId: data.mediaObject.media_object.media_id
+        }
+      })
+    }
   }
 
   onDismiss = () => {
@@ -105,7 +111,7 @@ export default class MediaAttempt extends React.Component {
       language: track.locale
     }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.state.iframeURL
-
+    const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
     return (
       <Flex direction="column" alignItems="center">
         <Flex.Item data-testid="media-recording" width="100%">
@@ -134,6 +140,7 @@ export default class MediaAttempt extends React.Component {
               tracks={mediaTracks}
               sources={mediaObject.mediaSources}
               captionPosition="bottom"
+              autoShowCaption={autoCCTrack}
             />
           )}
         </Flex.Item>
@@ -178,9 +185,7 @@ export default class MediaAttempt extends React.Component {
         onDismiss={this.onDismiss}
         rcsConfig={{
           contextId: this.props.assignment.env.courseId,
-          contextType: 'course',
-          origin: getRCSOriginFromHost(ENV.RICH_CONTENT_APP_HOST),
-          headers: getRCSAuthenticationHeaders(ENV.JWT)
+          contextType: 'course'
         }}
         open={this.state.mediaModalOpen}
         tabs={{embed: false, record: true, upload: true}}
@@ -210,7 +215,7 @@ export default class MediaAttempt extends React.Component {
       return <LoadingIndicator />
     }
 
-    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+    if (isSubmitted(this.props.submission)) {
       return this.renderSubmission()
     }
 
@@ -221,3 +226,5 @@ export default class MediaAttempt extends React.Component {
     return this.renderMediaUpload()
   }
 }
+
+MediaAttempt.contextType = AlertManagerContext

@@ -78,8 +78,13 @@ describe "Learning Outcome exporting" do
 
     it 'exports a single group and all its contents' do
       @context = @course
+      source_group = outcome_group_model(title: 'source group')
       group1 = outcome_group_model(title: 'alpha')
-      group2 = outcome_group_model(outcome_group_id: group1.id, title: 'subgroup')
+      group2 = outcome_group_model(
+        outcome_group_id: group1.id,
+        title: 'subgroup',
+        source_outcome_group_id: source_group.id
+      )
       outcome1 = outcome_model(outcome_group: group2, title: 'thing1')
       outcome2 = outcome_model(outcome_group: group2, title: 'thing2')
       outcome_model(title: 'thing3')
@@ -101,6 +106,8 @@ describe "Learning Outcome exporting" do
       expect(group_titles.count).to eq 1
       expect(group_titles[0].text).to eq group2.title
       # ... with its contents
+      source_outcome_group_id = doc.xpath('/learningOutcomes/learningOutcomeGroup/source_outcome_group_id/text()')
+      expect(source_outcome_group_id[0].text).to eq source_group.id.to_s
       outcome_titles = doc.xpath('/learningOutcomes/learningOutcomeGroup/learningOutcomes/learningOutcome/title/text()')
       expect(outcome_titles.map(&:text)).to match_array [outcome1.title, outcome2.title]
     end

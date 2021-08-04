@@ -17,7 +17,7 @@
  */
 
 .toolbar {
-  padding: $contentBoxPadding / 2;
+  padding: $contentBoxPadding * 0.5;
   @include fontSize($ic-font-size--small);
   line-height: $baseLineHeight;
   .header { @include fontSize($ic-font-size--medium); }
@@ -31,7 +31,7 @@
   #section-tabs-header {
     @include fontSize($ic-font-size--small);
     font-weight: bold;
-    margin: 0 0 $ic-sp/2;
+    margin: 0 0 $ic-sp*0.5;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -64,7 +64,7 @@
         display: block;
         text-decoration: none;
         border-radius: $baseBorderRadius;
-        padding: ($ic-sp - 4) 0 ($ic-sp - 4) ($ic-sp / 2);
+        padding: ($ic-sp - 4) 0 ($ic-sp - 4) ($ic-sp * 0.5);
         overflow-wrap: break-word;
         word-wrap: break-word;
         hyphens: auto;
@@ -107,7 +107,7 @@
     border-radius: 0px;
     font-weight: bold;
     color: $ic-color-dark;
-    padding-#{direction(left)}: ($ic-sp / 2 - 2);
+    padding-#{direction(left)}: ($ic-sp * 0.5 - 2);
 
     .nav-badge {
       background: $ic-color-light;

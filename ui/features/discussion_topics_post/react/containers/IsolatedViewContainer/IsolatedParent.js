@@ -17,6 +17,7 @@
  */
 
 import {BackButton} from '../../components/BackButton/BackButton'
+import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -36,7 +37,7 @@ export const IsolatedParent = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
@@ -57,7 +58,7 @@ export const IsolatedParent = props => {
             props.onToggleRating()
           }
         }}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -84,11 +85,6 @@ export const IsolatedParent = props => {
     )
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
     <>
       {props.discussionEntry.parent && (
@@ -112,11 +108,12 @@ export const IsolatedParent = props => {
           paddingBottom: '0.375rem'
         }}
       >
-        <Highlight isHighlighted={highlightEntry}>
+        <Highlight isHighlighted={props.isHighlighted}>
           <Flex>
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
                 discussionEntry={props.discussionEntry}
+                isIsolatedView
                 threadActions={threadActions}
                 isEditing={isEditing}
                 onCancel={() => {
@@ -135,12 +132,8 @@ export const IsolatedParent = props => {
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}
-                  onToggleUnread={() => {
-                    if (props.onToggleUnread) {
-                      props.onToggleUnread()
-                    }
-                  }}
-                  onDelete={props.onDelete}
+                  onToggleUnread={props.onToggleUnread}
+                  onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
                   onEdit={
                     props.discussionEntry.permissions?.update
                       ? () => {
@@ -148,9 +141,12 @@ export const IsolatedParent = props => {
                         }
                       : null
                   }
-                  onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-                  goToParent={() => {}}
-                  goToTopic={() => {}}
+                  goToTopic={props.goToTopic}
+                  onOpenInSpeedGrader={
+                    props.discussionTopic.permissions?.speedGrader
+                      ? props.onOpenInSpeedGrader
+                      : null
+                  }
                 />
               </Flex.Item>
             )}
@@ -163,6 +159,7 @@ export const IsolatedParent = props => {
 }
 
 IsolatedParent.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
@@ -172,5 +169,7 @@ IsolatedParent.propTypes = {
   children: PropTypes.node,
   onOpenIsolatedView: PropTypes.func,
   RCEOpen: PropTypes.bool,
-  setRCEOpen: PropTypes.func
+  setRCEOpen: PropTypes.func,
+  isHighlighted: PropTypes.bool,
+  goToTopic: PropTypes.func
 }

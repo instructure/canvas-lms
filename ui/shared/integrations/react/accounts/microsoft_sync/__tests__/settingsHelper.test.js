@@ -16,14 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {doUpdateSettings, validateTenant, clearMessages} from '../lib/settingsHelper'
+import {
+  doUpdateSettings,
+  sliceSyncSettings,
+  getTenantErrorMessages,
+  getSuffixErrorMessages,
+  SYNC_SETTINGS
+} from '../lib/settingsHelper'
+import {defaultState} from '../lib/settingsReducer'
 import fetchMock from 'fetch-mock'
 
 describe('MicrosoftSyncAccountSettings settingsHelper', () => {
   describe('doUpdateSettings', () => {
-    const enabled = true
-    const tenant = 'testtenant.com'
-    const loginAttr = 'email'
+    const expectedBody = {
+      microsoft_sync_tenant: 'testtenant.com',
+      microsoft_sync_enabled: true,
+      microsoft_sync_login_attribute: 'email',
+      microsoft_sync_login_attribute_suffix: '@example.com',
+      microsoft_sync_remote_attribute: 'mail'
+    }
 
     let oldEnv
     beforeAll(() => {
@@ -45,29 +56,39 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     })
 
     it('calls to the correct URL', async () => {
-      await doUpdateSettings(enabled, tenant, loginAttr)
+      await doUpdateSettings(expectedBody)
 
       expect(fetchMock.called()).toBeTruthy()
       expect(fetchMock.lastCall()[0]).toBe(`/api/v1/${ENV.CONTEXT_BASE_URL}`)
     })
 
-    it('call with the correct body format', async () => {
-      await doUpdateSettings(enabled, tenant, loginAttr)
+    it('calls with the correct body format', async () => {
+      await doUpdateSettings({
+        ...expectedBody
+      })
 
       expect(fetchMock.called()).toBeTruthy()
       expect(JSON.parse(fetchMock.lastCall()[1].body)).toStrictEqual({
         account: {
           settings: {
-            microsoft_sync_enabled: enabled,
-            microsoft_sync_tenant: tenant,
-            microsoft_sync_login_attribute: loginAttr
+            ...expectedBody
           }
         }
       })
     })
   })
 
-  describe('validateTenant', () => {
+  describe('sliceSyncSettings', () => {
+    it('returns only sync settings', () => {
+      expect(Object.keys(sliceSyncSettings(defaultState))).toEqual(SYNC_SETTINGS)
+    })
+
+    it('returns an empty object if no valid settings are found', () => {
+      expect(Object.keys(sliceSyncSettings({foo: 'bar'}))).toHaveLength(0)
+    })
+  })
+
+  describe('getTenantErrorMessages', () => {
     const createState = tenant => {
       return {
         tenantErrorMessages: [],
@@ -76,38 +97,44 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     }
 
     it('invalidates a blank tenant', () => {
-      const result = validateTenant(createState(''))
+      const errors = getTenantErrorMessages(createState(''))
 
-      expect(result.tenantErrorMessages.length).toBe(1)
-      expect(result.tenantErrorMessages[0].text).toBe(
+      expect(errors.length).toBe(1)
+      expect(errors[0].text).toBe(
         'To toggle Microsoft Teams Sync you need to input a tenant domain.'
       )
     })
 
     it('invalidates a tenant with an invalid domain name', () => {
-      const result = validateTenant(createState('purpleoranges.com$!'))
+      const errors = getTenantErrorMessages(createState('purpleoranges.com$!'))
 
-      expect(result.tenantErrorMessages.length).toBe(1)
-      expect(result.tenantErrorMessages[0].text).toBe(
+      expect(errors.length).toBe(1)
+      expect(errors[0].text).toBe(
         'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
       )
     })
 
     it('validates a valid tenant', () => {
-      const result = validateTenant(createState('canvastest2.onmicrosoft.com'))
-      expect(result.tenantErrorMessages.length).toBe(0)
+      const errors = getTenantErrorMessages(createState('canvastest2.onmicrosoft.com'))
+      expect(errors.length).toBe(0)
     })
   })
 
-  describe('clearMessages', () => {
-    it('clears messages', () => {
-      const updatedState = clearMessages({
-        errorMessage: "I'm an error message",
-        successMessage: "I'm a success message!"
-      })
+  describe('getSuffixErrorMessages', () => {
+    it('invalidates suffixes that are longer than 255 characters', () => {
+      const suffix = 'a'.repeat(256)
 
-      expect(updatedState.errorMessage).toBeFalsy()
-      expect(updatedState.successMessage).toBeFalsy()
+      const errors = getSuffixErrorMessages({microsoft_sync_login_attribute_suffix: suffix})
+
+      expect(errors.length).toBe(1)
+    })
+
+    it('invalidates suffixes that have whitespace in them', () => {
+      const suffix = '\t hello there my dear friend'
+
+      const errors = getSuffixErrorMessages({microsoft_sync_login_attribute_suffix: suffix})
+
+      expect(errors.length).toBe(1)
     })
   })
 })

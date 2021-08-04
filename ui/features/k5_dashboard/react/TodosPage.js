@@ -24,6 +24,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import EmptyTodos from './EmptyTodos'
 
 import Todo, {getBaseDueAt} from './Todo'
 
@@ -96,9 +97,13 @@ export const TodosPage = ({timeZone, visible}) => {
         renderCustomSkeleton={todoSkeleton}
         skeletonsCount={5}
       >
-        {todos?.map(todo => (
-          <Todo key={`todo-assignment-${todo.assignment?.id}`} timeZone={timeZone} {...todo} />
-        ))}
+        {todos?.length > 0 ? (
+          todos.map(todo => (
+            <Todo key={`todo-assignment-${todo.assignment?.id}`} timeZone={timeZone} {...todo} />
+          ))
+        ) : (
+          <EmptyTodos />
+        )}
       </LoadingWrapper>
     </section>
   )

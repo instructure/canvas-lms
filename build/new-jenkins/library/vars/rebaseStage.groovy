@@ -30,7 +30,7 @@ def call() {
   def branch = env.GERRIT_BRANCH
   _rebase(branch, COMMIT_HISTORY)
   if ( branch ==~ /dev\/.*/ ) {
-    _rebase('master', commitHistory)
+    _rebase('master', COMMIT_HISTORY)
   }
 
   if (!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(CHANGED_FILES, 'origin/master')) {

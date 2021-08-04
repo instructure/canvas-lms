@@ -40,7 +40,8 @@ export default {
   args: {
     outcomes: outcomesGenerator(1, 5),
     isOpen: true,
-    onCloseHandler: () => {}
+    onCloseHandler: () => {},
+    onCleanupHandler: () => {}
   }
 }
 

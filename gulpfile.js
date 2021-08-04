@@ -84,8 +84,8 @@ gulp.task('rev', () => {
     .pipe(gulpPlugins.rev.manifest())
     .pipe(gulp.dest(DIST))
     .pipe(
-      gulp.src(['packages/slickgrid/src/images/*.gif'], {
-        base: 'packages/slickgrid/src/images'
+      gulp.src(['packages/slickgrid/images/*.gif'], {
+        base: 'packages/slickgrid/images'
       }).pipe(gulp.dest(`${DIST}/images/slickgrid`))
     )
 })

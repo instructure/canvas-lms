@@ -1695,7 +1695,26 @@ describe CoursesController do
         bundle = assigns[:js_bundles].select { |b| b.include? :announcements }
         expect(bundle.size).to eq 1
       end
+
+      it "sets COURSE.has_syllabus_body to true when syllabus exists" do
+        @course.syllabus_body = "Welcome"
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_truthy
+      end
+
+      it "sets COURSE.has_syllabus_body to false when syllabus does not exist" do
+        @course.syllabus_body = nil
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_falsey
+      end
     end
+
 
     it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
       @course.enable_feature!(:student_outcome_gradebook)

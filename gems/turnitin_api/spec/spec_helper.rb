@@ -21,9 +21,14 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'turnitin_api'
 require 'webmock/rspec'
 
-
-WebMock.disable_net_connect!(allow_localhost: true)
-
+RSpec.configure do |config|
+  config.before do
+    WebMock.disable_net_connect!(allow_localhost: true)
+  end
+  config.after do
+    WebMock.allow_net_connect!
+  end
+end
 
 def fixture(*file)
   File.new(File.join(File.expand_path("../fixtures", __FILE__), *file))

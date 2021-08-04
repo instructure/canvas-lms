@@ -38,19 +38,17 @@ $(document).ready(() => {
     return false
   })
 
-  if ($.filePreviewsEnabled()) {
-    $('.modal_preview_link').live('click', function() {
-      // overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
-      $('<div style="padding:0; overflow:hidden;">')
-        .dialog({
-          title: I18n.t('preview_title', 'Preview of %{title}', {
-            title: $(this).data('dialog-title')
-          }),
-          width: $(document).width() * 0.95,
-          height: $(document).height() * 0.75
-        })
-        .loadDocPreview($.extend({height: '100%'}, $(this).data()))
-      return false
-    })
-  }
+  $('.modal_preview_link').live('click', function() {
+    // overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
+    $('<div style="padding:0; overflow:hidden;">')
+      .dialog({
+        title: I18n.t('preview_title', 'Preview of %{title}', {
+          title: $(this).data('dialog-title')
+        }),
+        width: $(document).width() * 0.95,
+        height: $(document).height() * 0.75
+      })
+      .loadDocPreview($.extend({height: '100%'}, $(this).data()))
+    return false
+  })
 })

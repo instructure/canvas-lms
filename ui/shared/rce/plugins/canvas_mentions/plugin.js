@@ -19,22 +19,41 @@
 // To get the right "tinymce" global object
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
+import {makeMarkerEditable} from './contentEditable'
+import {onKeyDown, onSetContent, onMouseDown} from './events'
+import {MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
 
-function onInputChange() {
-  const tinySelection = tinymce.activeEditor.selection
+function onInputChange(_e, ed = false) {
+  // editor objects are explicitly passed in unit tests
+  const editor = ed || tinymce.activeEditor
+  const tinySelection = editor.selection
 
   if (mentionWasInitiated(tinySelection.getSel())) {
-    console.log('Mount the mentions component!')
+    // Insert a "marker" node so we can find the cursor position
+    // TODO: Add ARIA attributes to this span
+    // xsslint safeString.identifier MARKER_ID
+    editor.execCommand(
+      'mceInsertContent',
+      false,
+      `<span id="${MARKER_ID}" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="" aria-activedescendant=""></span>`
+    )
+
+    // Make the mentions marker editable for A11y
+    makeMarkerEditable(editor, MARKER_SELECTOR)
+
+    // TODO: Render the mentions component at that position
   }
 }
 
 export const pluginDefinition = {
   init(editor) {
     // TODO: Remove console log
-    console.log('@mentions plugin loaded')
     editor.on('input', onInputChange)
+    editor.on('SetContent', onSetContent)
+    editor.on('KeyDown', onKeyDown)
+    editor.on('MouseDown', onMouseDown)
   }
 }
 

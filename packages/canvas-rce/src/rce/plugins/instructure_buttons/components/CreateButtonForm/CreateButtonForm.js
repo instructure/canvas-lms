@@ -26,7 +26,7 @@ import {ShapeSection} from './ShapeSection'
 import {ColorSection} from './ColorSection'
 import {ImageSection} from './ImageSection'
 
-export const CreateButtonForm = () => {
+export const CreateButtonForm = ({editor}) => {
   const [settings, dispatch] = useReducer(
     (state, changes) => ({...state, ...changes}),
     DEFAULT_SETTINGS
@@ -37,7 +37,7 @@ export const CreateButtonForm = () => {
       <PreviewSection settings={settings} />
       <ShapeSection settings={settings} onChange={dispatch} />
       <ColorSection settings={settings} onChange={dispatch} />
-      <ImageSection settings={settings} onChange={dispatch} />
+      <ImageSection editor={editor} settings={settings} onChange={dispatch} />
     </View>
   )
 }

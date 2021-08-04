@@ -159,6 +159,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
           {gradesIssuedByOthers.map(grade => (
             <RadioInput
+              disabled={!ENV.instructor_selectable_states[grade.provisional_grade_id]}
               key={grade.provisional_grade_id}
               value={grade.provisional_grade_id}
               label={this.renderRadioInputLabel(grade)}

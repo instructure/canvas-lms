@@ -20,13 +20,13 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
-  gem 'rails', '6.0.3.7'
+  gem 'rails', '6.0.4'
     gem 'tzinfo', '1.2.7'
-  gem 'switchman', '2.0.13'
+  gem 'switchman', '2.1.5'
     gem 'guardrail', '2.0.1'
   gem 'switchman-inst-jobs', '3.1.2'
 else
-  gem 'rails', '6.1.3.2'
+  gem 'rails', '6.1.4'
     gem 'tzinfo', '2.0.4'
   gem 'switchman', '3.0.5'
     gem 'guardrail', '3.0.0'
@@ -69,6 +69,7 @@ gem 'encrypted_cookie_store-instructure', '1.2.11', require: 'encrypted_cookie_s
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.13.1', require: false
 gem 'gepub', '1.0.13'
+gem 'apollo-federation', '1.1.5'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.3'
 gem 'hashery', '2.1.2', require: false
@@ -81,11 +82,11 @@ gem 'i18nliner', '0.1.2'
 gem 'icalendar', '2.7.0', require: false
 gem 'diplomat', '2.5.1', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
-gem 'inst_statsd', '2.1.6'
+gem 'inst_statsd', '2.2.0'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '2.3.1'
+gem 'inst-jobs', '2.3.2'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.0'

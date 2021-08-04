@@ -175,13 +175,13 @@ $ic-token-padding: 3px 15px;
     cursor: text;
     overflow: hidden;
     vertical-align: middle;
-    padding: $contentBoxPadding/4;
+    padding: $contentBoxPadding*0.25;
     transition: border linear 0.2s, box-shadow linear 0.2s;
 
   a.browser {
     position: absolute;
-    top: $ic-sp/2;
-    #{direction(right)}: $ic-sp/2;
+    top: $ic-sp*0.5;
+    #{direction(right)}: $ic-sp*0.5;
     cursor: pointer;
     text-align: direction(right);
   }
@@ -189,7 +189,7 @@ $ic-token-padding: 3px 15px;
   > span {
     float: direction(left);
     color: $ic-color-medium-lighter;
-    padding: $contentBoxPadding/2;
+    padding: $contentBoxPadding*0.5;
   }
 
   > div {

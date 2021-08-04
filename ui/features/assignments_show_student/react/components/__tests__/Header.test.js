@@ -203,6 +203,35 @@ it('renders "N/A" for the currently selected attempt if it has no grade', async 
   expect(container).toHaveTextContent(/Attempt 7 Score:\s*N\/A/)
 })
 
+it('renders "Offline Score" when the student is graded before submitting', async () => {
+  const lastSubmittedSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '147',
+      enteredGrade: '147',
+      attempt: 0
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 0,
+      grade: '131',
+      enteredGrade: '131'
+    }
+  })
+
+  const {container} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+
+  expect(container).toHaveTextContent(/Offline Score:\s*131\/150/)
+})
+
 it('will not render the grade if the last submitted submission is excused', async () => {
   const lastSubmittedSubmission = await mockSubmission({
     Submission: {

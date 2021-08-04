@@ -29,8 +29,7 @@ import {
 export const accountMocks = ({
   childGroupsCount = 10,
   outcomesCount = 2,
-  accountId = '1',
-  canEdit = true
+  accountId = '1'
 } = {}) => [
   {
     request: {
@@ -48,21 +47,17 @@ export const accountMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
-            description: `Root account group`,
             title: `Root account folder`,
-            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: '1',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
-                description: `Account folder description ${i}`,
                 _id: (100 + i).toString(),
                 outcomesCount,
                 childGroupsCount,
                 title: `Account folder ${i}`,
-                canEdit
               }))
             }
           }
@@ -75,8 +70,7 @@ export const accountMocks = ({
 export const courseMocks = ({
   childGroupsCount = 1,
   outcomesCount = 2,
-  courseId = '2',
-  canEdit = true
+  courseId = '2'
 } = {}) => [
   {
     request: {
@@ -94,21 +88,17 @@ export const courseMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
-            description: `Root course group`,
             title: `Root course folder`,
-            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: '2',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
-                description: `Course folder description ${i}`,
                 _id: (200 + i).toString(),
                 outcomesCount: 2,
                 childGroupsCount: 10,
                 title: `Course folder ${i}`,
-                canEdit
               }))
             }
           }
@@ -122,8 +112,7 @@ export const groupMocks = ({
   groupId,
   childGroupsCount = 1,
   outcomesCount = 2,
-  childGroupOffset = 300,
-  canEdit = true
+  childGroupOffset = 300
 } = {}) => [
   {
     request: {
@@ -144,12 +133,10 @@ export const groupMocks = ({
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
-              description: `Group ${groupId} folder description ${i}`,
               _id: (childGroupOffset + i).toString(),
               outcomesCount: 2,
               childGroupsCount: 5,
               title: `Group ${groupId} folder ${i}`,
-              canEdit
             }))
           }
         }
@@ -166,7 +153,6 @@ export const outcomeGroup = {
       2
     ),
   outcomesCount: 15,
-  canEdit: true,
   outcomes: {
     pageInfo: {
       hasNextPage: false,
@@ -290,10 +276,8 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: true,
@@ -302,24 +286,20 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
-                canUnlink: true,
                 id: '1',
                 node: {
                   _id: '1',
                   description: '',
-                  displayName: '',
                   title: `Outcome 1 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
               },
               {
-                canUnlink: true,
                 id: '2',
                 node: {
                   _id: '2',
                   description: '',
-                  displayName: '',
                   title: `Outcome 2 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
                 },
@@ -348,10 +328,8 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: true,
@@ -360,24 +338,20 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
-                canUnlink: true,
                 id: '1',
                 node: {
                   _id: '1',
                   description: '',
-                  displayName: '',
                   title: `Outcome 1 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
               },
               {
-                canUnlink: true,
                 id: '3',
                 node: {
                   _id: '3',
                   description: '',
-                  displayName: '',
                   title: `Outcome 3 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
                 },
@@ -407,10 +381,8 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -419,12 +391,10 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
-                canUnlink: true,
                 id: '5',
                 node: {
                   _id: '5',
                   description: '',
-                  displayName: '',
                   isImported: false,
                   friendlyDescription: null,
                   title: `Outcome 5 - Group ${groupId}`,
@@ -433,12 +403,10 @@ export const groupDetailMocks = ({
                 __typename: 'ContentTag'
               },
               {
-                canUnlink: true,
                 id: '6',
                 node: {
                   _id: '6',
                   description: '',
-                  displayName: '',
                   title: `Outcome 6 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
                 },
@@ -469,7 +437,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 2,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: true,
@@ -535,7 +502,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 2,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -601,7 +567,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 1,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -637,7 +602,6 @@ export const groupDetailMocks = ({
 
 export const findOutcomesMocks = ({
   groupId = '100',
-  canEdit = true,
   isImported = true,
   outcomeIsImported = true,
   contextType = 'Account',
@@ -658,10 +622,8 @@ export const findOutcomesMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 25,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -670,12 +632,10 @@ export const findOutcomesMocks = ({
             },
             edges: [
               {
-                canUnlink: true,
                 id: '5',
                 node: {
                   _id: '5',
                   description: '',
-                  displayName: '',
                   isImported,
                   title: `Outcome 5 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
@@ -683,12 +643,10 @@ export const findOutcomesMocks = ({
                 __typename: 'ContentTag'
               },
               {
-                canUnlink: true,
                 id: '6',
                 node: {
                   _id: '6',
                   description: '',
-                  displayName: '',
                   isImported,
                   title: `Outcome 6 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
@@ -718,10 +676,8 @@ export const findOutcomesMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 15,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -730,12 +686,10 @@ export const findOutcomesMocks = ({
             },
             edges: [
               {
-                canUnlink: true,
                 id: '5',
                 node: {
                   _id: '5',
                   description: '',
-                  displayName: '',
                   isImported,
                   title: `Outcome 5 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
@@ -743,12 +697,10 @@ export const findOutcomesMocks = ({
                 __typename: 'ContentTag'
               },
               {
-                canUnlink: true,
                 id: '6',
                 node: {
                   _id: '6',
                   description: '',
-                  displayName: '',
                   isImported,
                   title: `Outcome 6 - Group ${groupId}`,
                   __typename: 'LearningOutcome'
@@ -949,13 +901,14 @@ export const deleteOutcomeMock = ({
   failResponse = false,
   failAlignedContentMutation = false,
   failMutation = false,
-  failMutationNoErrMsg = false
+  failMutationNoErrMsg = false,
+  partialSuccess = false
 } = {}) => {
   const successfulResponse = {
     data: {
       deleteOutcomeLinks: {
-        deletedOutcomeLinkIds: ids[0],
         __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids,
         errors: []
       }
     }
@@ -1020,6 +973,22 @@ export const deleteOutcomeMock = ({
     }
   }
 
+  const partialSuccessResponse = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids.filter((_, idx) => idx !== 0),
+        errors: [
+          {
+            attribute: ids[0],
+            message: 'Could not find associated outcome in this context',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
   let result = successfulResponse
   if (failResponse) {
     result = failedResponse
@@ -1029,13 +998,17 @@ export const deleteOutcomeMock = ({
     result = failedMutation
   } else if (failMutationNoErrMsg) {
     result = failedMutationNoErrMsg
+  } else if (partialSuccess) {
+    result = partialSuccessResponse
   }
 
   return {
     request: {
       query: DELETE_OUTCOME_LINKS,
       variables: {
-        ids
+        input: {
+          ids
+        }
       }
     },
     result

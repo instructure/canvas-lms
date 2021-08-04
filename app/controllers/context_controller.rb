@@ -274,17 +274,8 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      if params[:id] !~ Api::ID_REGEX
-        # TODO: stop generating an error report and fix the bad input
+      raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
 
-        env_stuff = Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
-        Canvas::Errors.capture('invalid_user_id', {
-          message: "invalid user_id in ContextController::roster_user",
-          current_user_id: @current_user.id,
-          current_user_name: @current_user.sortable_name
-        }.merge(env_stuff))
-        raise ActiveRecord::RecordNotFound
-      end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)

@@ -77,6 +77,21 @@ describe Types::UserType do
     end
   end
 
+  context "shortName" do
+    before(:once) do
+      @student.update! short_name: 'new display name'
+    end
+
+    it "is displayed if set" do
+      expect(user_type.resolve("shortName")).to eq 'new display name'
+    end
+
+    it "returns full name if shortname is not set" do
+      @student.update! short_name: nil
+      expect(user_type.resolve("shortName")).to eq @student.name
+    end
+  end
+
   context "avatarUrl" do
     before(:once) do
       @student.update! avatar_image_url: 'not-a-fallback-avatar.png'

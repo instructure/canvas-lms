@@ -33,50 +33,80 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {outcomeShape} from './shapes'
 
-const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler}) => {
+const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) => {
   const {isCourse} = useCanvasContext()
   const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
   const nonRemovableLinkIds = Object.keys(outcomes).filter(linkId => !outcomes[linkId].canUnlink)
   const removableCount = removableLinkIds.length
   const nonRemovableCount = nonRemovableLinkIds.length
   const totalCount = removableCount + nonRemovableCount
+  const [deleteOutcomeLinks] = useMutation(DELETE_OUTCOME_LINKS)
 
-  // Temp until OUT-4517 is closed
-  const outcomeLinkId = totalCount === 1 ? Object.keys(outcomes)[0] : removableLinkIds[0]
+  const onRemoveOutcomesHandler = () => {
+    ;(async () => {
+      try {
+        const result = await deleteOutcomeLinks({
+          variables: {
+            input: {
+              ids: removableLinkIds
+            }
+          }
+        })
 
-  const [deleteOutcomeLinks] = useMutation(DELETE_OUTCOME_LINKS, {
-    onCompleted: _data => {
-      if (_data.deleteOutcomeLinks?.deletedOutcomeLinkIds.length === 0)
-        throw new Error(_data.deleteOutcomeLinks?.errors?.[0]?.message)
+        const deletedOutcomeLinkIds = result.data?.deleteOutcomeLinks?.deletedOutcomeLinkIds
+        const errorMessage = result.data?.deleteOutcomeLinks?.errors?.[0]?.message
+        if (deletedOutcomeLinkIds?.length === 0) throw new Error(errorMessage)
+        if (deletedOutcomeLinkIds?.length !== removableCount) throw new Error()
 
-      showFlashAlert({
-        message: isCourse
-          ? I18n.t('This outcome was successfully removed from this course.')
-          : I18n.t('This outcome was successfully removed from this account.'),
-        type: 'success'
-      })
-    },
-    onError: _err => {
-      _err.message = _err.message.match(/cannot be deleted because it is aligned to content/)
-        ? I18n.t('Outcome cannot be removed because it is aligned to content')
-        : _err.message
-      showFlashAlert({
-        message: _err.message
-          ? I18n.t('An error occurred while removing the outcome: %{message}', {
-              message: _err.message
-            })
-          : I18n.t('An error occurred while removing the outcome.'),
-        type: 'error'
-      })
-    },
-    variables: {
-      ids: [outcomeLinkId]
-    }
-  })
-
-  const onRemoveOutcomeHandler = () => {
-    deleteOutcomeLinks()
-    onCloseHandler()
+        showFlashAlert({
+          message: isCourse
+            ? I18n.t(
+                {
+                  one: 'This outcome was successfully removed from this course.',
+                  other: '%{count} outcomes were successfully removed from this course.'
+                },
+                {
+                  count: removableCount
+                }
+              )
+            : I18n.t(
+                {
+                  one: 'This outcome was successfully removed from this account.',
+                  other: '%{count} outcomes were successfully removed from this account.'
+                },
+                {
+                  count: removableCount
+                }
+              ),
+          type: 'success'
+        })
+      } catch (err) {
+        showFlashAlert({
+          message: err.message
+            ? I18n.t(
+                {
+                  one: 'An error occurred while removing the outcome: %{errorMessage}.',
+                  other: 'An error occurred while removing %{count} outcomes: %{errorMessage}.'
+                },
+                {
+                  errorMessage: err.message,
+                  count: removableCount
+                }
+              )
+            : I18n.t(
+                {
+                  one: 'An error occurred while removing the outcome.',
+                  other: 'An error occurred while removing %{count} outcomes.'
+                },
+                {
+                  count: removableCount
+                }
+              ),
+          type: 'error'
+        })
+      }
+    })()
+    onCleanupHandler()
   }
 
   const generateOutcomesList = outcomeLinkIds => (
@@ -95,7 +125,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler}) => {
       <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
         {I18n.t('Cancel')}
       </Button>
-      <Button type="button" color="danger" margin="0 x-small 0 0" onClick={onRemoveOutcomeHandler}>
+      <Button type="button" color="danger" margin="0 x-small 0 0" onClick={onRemoveOutcomesHandler}>
         {I18n.t(
           {
             one: 'Remove Outcome',
@@ -229,7 +259,8 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler}) => {
 OutcomeRemoveModal.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onCleanupHandler: PropTypes.func.isRequired
 }
 
 export default OutcomeRemoveModal

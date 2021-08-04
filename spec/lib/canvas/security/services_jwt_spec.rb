@@ -22,19 +22,6 @@ require_dependency "canvas/security/services_jwt"
 
 module Canvas::Security
   describe ServicesJwt do
-    def build_wrapped_token(user_id, real_user_id: nil, encoding_secret: fake_signing_secret)
-      payload = { sub: user_id }
-      payload[:masq_sub] = real_user_id if real_user_id
-      crypted_token = ServicesJwt.generate(payload, false)
-      payload = {
-        iss: "some other service",
-        user_token: crypted_token
-      }
-      wrapper_token = Canvas::Security.create_jwt(payload, nil, encoding_secret)
-      # because it will come over base64 encoded from any other service
-      Canvas::Security.base64_encode(wrapper_token)
-    end
-
     describe "under normal circumstances" do
       include_context "JWT setup"
 

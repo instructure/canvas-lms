@@ -99,9 +99,13 @@ export default async function saveMediaRecording(file, rcsConfig, done, onProgre
   try {
     window.addEventListener('beforeunload', handleUnloadWhileUploading)
 
+    // this works w/o rcsConfig.origin and headers because the api path
+    // is the same for the RCS as Canvas. Doing it this way means
+    // saveMediaRecording can be called w/o having to import anything
+    // from @instructure/canvas-rce
     const mediaServerSession = await axios({
       method: 'POST',
-      url: `${rcsConfig.origin}/api/v1/services/kaltura_session?include_upload_config=1`,
+      url: `${rcsConfig.origin || ''}/api/v1/services/kaltura_session?include_upload_config=1`,
       headers: rcsConfig.headers
     })
     if (onProgress) {
@@ -157,9 +161,12 @@ export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig) 
   const update_promise = new Promise((resolve, reject) => {
     Promise.all(file_promises)
       .then(closed_captions => {
+        const url = rcsConfig.origin
+          ? `${rcsConfig.origin}/api/media_objects/${media_object_id}/media_tracks`
+          : `/api/v1/media_objects/${media_object_id}/media_tracks`
         axios({
           method: rcsConfig.method || 'PUT',
-          url: `${rcsConfig.origin}/api/media_objects/${media_object_id}/media_tracks`,
+          url,
           headers: rcsConfig.headers,
           data: closed_captions
         })

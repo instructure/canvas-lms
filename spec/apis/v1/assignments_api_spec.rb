@@ -1609,6 +1609,61 @@ describe AssignmentsApiController, type: :request do
         { :expected_status => 400 })
     end
 
+    it "creates audit events for the duplicated assignment if it is auditable" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
+    it "creates audit events even if assignments are inserted in the middle of the assignment group" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+      @course.assignments.create!(title: "placeholder so duplicated assignment isn't last")
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
     context "Quizzes.Next course copy retry" do
       let(:assignment) do
         @course.assignments.create(
@@ -3883,6 +3938,68 @@ describe AssignmentsApiController, type: :request do
 
           api_update_assignment_call(@course, @assignment, @params)
           expect(@assignment.assignment_overrides.active.count).to eq 0
+        end
+      end
+
+      describe "for a group assignment with group overrides" do
+        let(:old_group_category) do
+          category = @course.group_categories.create!(name: "old")
+          category.create_groups(1)
+          category
+        end
+        let(:old_group) { old_group_category.groups.first }
+
+        let(:new_group_category) do
+          category = @course.group_categories.create!(name: "new")
+          category.create_groups(1)
+          category
+        end
+        let(:new_group) { new_group_category.groups.first }
+
+        it "removes overrides for groups in the old group category when changing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                due_at: nil,
+                group_id: new_group.id,
+                title: "group override"
+              }
+            ],
+            group_category_id: new_group_category.id,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["Group", new_group.id]
+          ]
+        end
+
+        it "removes overrides for groups in the old group category when removing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                course_section_id: @course.course_sections.first.id,
+                due_at: nil,
+                title: "section override instead"
+              }
+            ],
+            group_category_id: nil,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["CourseSection", @course.course_sections.first.id]
+          ]
         end
       end
     end

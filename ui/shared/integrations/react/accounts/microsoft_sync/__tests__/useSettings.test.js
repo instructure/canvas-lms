@@ -33,7 +33,7 @@ describe('useGetSettings', () => {
   let previousEnv
   beforeEach(() => {
     useFetchApi.mockClear()
-    previousEnv = {...ENV}
+    previousEnv = ENV
   })
 
   afterEach(() => {
@@ -73,6 +73,8 @@ describe('useGetSettings', () => {
         microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
         last_saved_microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
         microsoft_sync_login_attribute: 'email',
+        microsoft_sync_login_attribute_suffix: '@example.com',
+        microsoft_sync_remote_attribute: 'mailNickname',
         selectedAttribute: 'email',
         loading: false
       }

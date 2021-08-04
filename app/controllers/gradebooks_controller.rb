@@ -860,6 +860,7 @@ class GradebooksController < ApplicationController
           settings_url: speed_grader_settings_course_gradebook_path,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
+          instructor_selectable_states: @assignment.instructor_selectable_states_by_provisional_grade_id,
           final_grader_id: @assignment.final_grader_id,
           grading_role: grading_role_for_user,
           grading_type: @assignment.grading_type,

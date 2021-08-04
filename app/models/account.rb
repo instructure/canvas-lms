@@ -254,6 +254,8 @@ class Account < ActiveRecord::Base
   add_setting :microsoft_sync_enabled, :root_only => true, :boolean => true, :default => false
   add_setting :microsoft_sync_tenant, :root_only => true
   add_setting :microsoft_sync_login_attribute, :root_only => true
+  add_setting :microsoft_sync_login_attribute_suffix, :root_only => true
+  add_setting :microsoft_sync_remote_attribute, :root_only => true
 
   # Help link settings
   add_setting :custom_help_links, :root_only => true
@@ -787,11 +789,13 @@ class Account < ActiveRecord::Base
 
     if @invalidations.present?
       shard.activate do
-        @invalidations.each do |key|
-          Rails.cache.delete([key, self.global_id].cache_key)
+        self.class.connection.after_transaction_commit do
+          @invalidations.each do |key|
+            Rails.cache.delete([key, self.global_id].cache_key)
+          end
+          Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
+            invalidate_inherited_caches(self, @invalidations)
         end
-        Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
-          invalidate_inherited_caches(self, @invalidations)
       end
     end
   end
@@ -995,10 +999,11 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+    @account_chain ||= Account.account_chain(self).freeze
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+    @account_chain
   end
 
   def account_chain_ids
@@ -1275,6 +1280,7 @@ class Account < ActiveRecord::Base
     #################### Begin legacy permission block #########################
     given do |user|
       result = false
+      next false if user&.fake_student?
 
       if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
@@ -1294,6 +1300,8 @@ class Account < ActiveRecord::Base
     # any logged in user with no active enrollments (i.e. FFT)
     # combined with root account setting that is enabled for Users with no enrollments
     given do |user|
+      next false if user&.fake_student?
+
       user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
         !root_account.site_admin? &&
         !root_account.enrollments.active.where(user_id: user).exists? &&
@@ -1356,7 +1364,7 @@ class Account < ActiveRecord::Base
   end
 
   def reload(*)
-    @account_chain = nil
+    @account_chain = @account_chain_with_site_admin = nil
     super
   end
 

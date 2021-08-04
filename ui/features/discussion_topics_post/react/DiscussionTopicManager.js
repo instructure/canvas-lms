@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
+import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const getOptimisticResponse = text => {
   return {
@@ -57,7 +58,7 @@ const getOptimisticResponse = text => {
           id: 'PLACEHOLDER',
           _id: ENV.current_user.id,
           avatarUrl: ENV.current_user.avatar_image_url,
-          name: ENV.current_user.display_name,
+          displayName: ENV.current_user.display_name,
           courseRoles: [],
           __typename: 'User'
         },
@@ -101,10 +102,36 @@ const DiscussionTopicManager = props => {
     setPageNumber
   }
 
+  const goToTopic = () => {
+    setSearchTerm('')
+    closeIsolatedView()
+    setIsTopicHighlighted(true)
+  }
+
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
+
+  // Highlight State
+  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
+  const [highlightEntryId, setHighlightEntryId] = useState(null)
+
+  useEffect(() => {
+    if (isTopicHighlighted) {
+      setTimeout(() => {
+        setIsTopicHighlighted(false)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [isTopicHighlighted])
+
+  useEffect(() => {
+    if (highlightEntryId) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [highlightEntryId])
 
   const openIsolatedView = (discussionEntryId, withRCE) => {
     setIsolatedEntryId(discussionEntryId)
@@ -174,8 +201,10 @@ const DiscussionTopicManager = props => {
       />
     )
   }
+
   return (
     <SearchContext.Provider value={searchContext}>
+      <DiscussionPostToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {
@@ -187,6 +216,7 @@ const DiscussionTopicManager = props => {
             optimisticResponse: getOptimisticResponse(text)
           })
         }}
+        isHighlighted={isTopicHighlighted}
       />
       {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
       (searchTerm || filter === 'unread') ? (
@@ -194,7 +224,11 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          openIsolatedView={openIsolatedView}
+          onOpenIsolatedView={(discussionEntryId, withRCE, highlightId) => {
+            setHighlightEntryId(highlightId)
+            openIsolatedView(discussionEntryId, withRCE)
+          }}
+          goToTopic={goToTopic}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (
@@ -206,6 +240,9 @@ const DiscussionTopicManager = props => {
           setRCEOpen={setEditorExpanded}
           onClose={closeIsolatedView}
           onOpenIsolatedView={openIsolatedView}
+          goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
+          setHighlightEntryId={setHighlightEntryId}
         />
       )}
     </SearchContext.Provider>

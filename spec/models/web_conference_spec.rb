@@ -27,10 +27,36 @@ describe WebConference do
 
   def stub_plugins
     allow(WebConference).to receive(:plugins).and_return(
-        [web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
-         web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
-         web_conference_plugin_mock("broken_plugin", {:foor => :bar})]
+      [
+        web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+        web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
+        web_conference_plugin_mock("broken_plugin", {:foor => :bar})
+      ]
     )
+  end
+
+  describe ".enabled_plugin_conference_names" do
+    it "returns the enabled plugins" do
+      expect(WebConference.enabled_plugin_conference_names).to match_array(["Big blue button", "Wimba"])
+    end
+  end
+
+  describe '.conference_tab_name' do
+    context 'when there are plugins enabled' do
+      it 'returns the plugin names' do
+        expect(WebConference.conference_tab_name).to eq("Big blue button Wimba (Formerly Conferences)")
+      end
+    end
+
+    context 'when there are no enabled' do
+      before do
+        allow(WebConference).to receive(:plugins).and_return([])
+      end
+
+      it "returns Conferences" do
+        expect(WebConference.conference_tab_name).to eq("Conferences")
+      end
+    end
   end
 
   context "broken_plugin" do

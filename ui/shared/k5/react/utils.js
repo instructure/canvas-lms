@@ -53,6 +53,7 @@ export const fetchGrades = (userId = 'self') =>
         currentGradingPeriodId: enrollment.current_grading_period_id,
         currentGradingPeriodTitle: enrollment.current_grading_period_title,
         enrollmentType: enrollment.type,
+        finalGradesHidden: course.hide_final_grades,
         gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
         hasGradingPeriods,
         score: hasGradingPeriods

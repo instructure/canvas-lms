@@ -50,6 +50,7 @@ module CC::Importer::Canvas
           item[:linked_resource_type] = get_node_val(item_node, 'content_type')
           item[:linked_resource_id] = get_node_val(item_node, 'identifierref')
           item[:linked_resource_global_id] = get_node_val(item_node, 'global_identifierref')
+          item[:lti_resource_link_lookup_uuid] = get_node_val(item_node, 'lti_resource_link_lookup_uuid')
 
           mod[:items] << item
         end

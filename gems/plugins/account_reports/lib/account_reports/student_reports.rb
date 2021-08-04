@@ -343,7 +343,7 @@ module AccountReports
       columns << 'access_tokens.user_id'
       columns << 'users.sortable_name'
       columns << 'access_tokens.token_hint'
-      columns << 'access_tokens.expires_at'
+      columns << 'access_tokens.permanent_expires_at'
       columns << 'access_tokens.last_used_at'
       columns << 'access_tokens.developer_key_id'
 
@@ -363,7 +363,7 @@ module AccountReports
           row << token[:user_id]
           row << token[:sortable_name]
           row << token[:token_hint]
-          row << (token[:expires_at] ? default_timezone_format(token[:expires_at]) : 'never')
+          row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : 'never')
           row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : 'never')
           row << token[:developer_key_id]
           row << dev_key.name

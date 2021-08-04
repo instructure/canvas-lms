@@ -41,7 +41,6 @@ import {View} from '@instructure/ui-view'
 import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
-  addReplyToSubentries,
   addReplyToDiscussion,
   resolveAuthorRoles
 } from '../../utils'
@@ -52,7 +51,7 @@ export const mockThreads = {
   discussionEntry: {
     id: '432',
     author: {
-      name: 'Jeffrey Johnson',
+      displayName: 'Jeffrey Johnson',
       avatarUrl: 'someURL'
     },
     createdAt: '2021-02-08T13:36:05-07:00',
@@ -90,15 +89,7 @@ export const DiscussionThreadContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(
-      cache,
-      props.discussionEntry._id,
-      PER_PAGE,
-      sort,
-      newDiscussionEntry,
-      window.ENV?.course_id
-    )
+    addReplyToDiscussionEntry(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -177,14 +168,14 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry._id, true)
+            props.onOpenIsolatedView(props.discussionEntry._id, true)
           }
         }}
       />
@@ -199,7 +190,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry.id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={toggleRating}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -221,7 +212,7 @@ export const DiscussionThreadContainer = props => {
         )}
         onClick={() => {
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry._id, false)
+            props.onOpenIsolatedView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -252,12 +243,13 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onOpenInSpeedGrader = () => {
-    window.location.assign(
+    window.open(
       getSpeedGraderUrl(
         ENV.course_id,
         props.discussionTopic.assignment._id,
         props.discussionEntry.author._id
-      )
+      ),
+      '_blank'
     )
   }
 
@@ -306,6 +298,7 @@ export const DiscussionThreadContainer = props => {
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
                 discussionEntry={props.discussionEntry}
+                onOpenIsolatedView={props.onOpenIsolatedView}
                 threadActions={threadActions}
                 isEditing={isEditing}
                 onCancel={() => {
@@ -315,7 +308,8 @@ export const DiscussionThreadContainer = props => {
                 discussionRoles={resolveAuthorRoles(
                   props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
                     !!props?.discussionTopic?.author?.id &&
-                    !!props?.discussionEntry?.author?.id,
+                    !!props?.discussionEntry?.author?.id &&
+                    props?.discussionEntry?.author !== null,
                   props?.discussionEntry?.author?.courseRoles
                 )}
               />
@@ -345,11 +339,7 @@ export const DiscussionThreadContainer = props => {
                           window.scrollTo(0, topOffset - 44)
                         }
                   }
-                  goToTopic={() => {
-                    setTimeout(() => {
-                      window.scrollTo(0, 0)
-                    })
-                  }}
+                  goToTopic={props.goToTopic}
                 />
               </Flex.Item>
             )}
@@ -412,7 +402,8 @@ DiscussionThreadContainer.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRef: PropTypes.object,
-  openIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -426,7 +417,7 @@ const DiscussionSubentries = props => {
   const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    perPage: PER_PAGE,
+    first: PER_PAGE,
     sort,
     courseID: window.ENV?.course_id
   }

@@ -1,4 +1,7 @@
 {
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "Käytä Pretty-tekstieditoria"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "Helppokäyttöisyyden tarkistus"
     },
@@ -10,6 +13,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "Lisää CC/alaotsikko"
+    },
+    "add_image_60b2de07": {
+        "message": "Lisää kuva"
     },
     "add_to_do_7537af64": {
         "message": "Lisää tehtäväluetteloon"
@@ -37,6 +43,9 @@
     },
     "all_4321c3a1": {
         "message": "Kaikki"
+    },
+    "all_apps_a50dea49": {
+        "message": "Kaikki sovellukset"
     },
     "all_day_fb42c4fc": {
         "message": "Koko päivän"
@@ -119,6 +128,9 @@
     "attributes_963ba262": {
         "message": "Määritteet"
     },
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "Ääni- ja videonauhoituksia ei tueta, valitse eri selain."
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Äänisoitin kohteelle { title }"
     },
@@ -134,6 +146,27 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Tehtävähistoriasi alku"
     },
+    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+        "message": "Alla on esimerkki siitä, kuinka opiskelijat näkevät aikataulunsa"
+    },
+    "button_color_608a0242": {
+        "message": "Painikkeen väri"
+    },
+    "button_outline_cf14f071": {
+        "message": "Painikkeen ääriviiva"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Painikkeen ääriviivan koko"
+    },
+    "button_shape_dbecb573": {
+        "message": "Painikkeen muoto"
+    },
+    "button_size_20f5fce1": {
+        "message": "Painikkeen koko"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Painikkeet ja kuvakkeet"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -143,9 +176,6 @@
     "calendar_event_89aadc1c": {
         "message": "Kalenteritapahtuma"
     },
-    "cancel_caeb1e68": {
-        "message": "Peruuta"
-    },
     "canvas_planner_98ed106": {
         "message": "Canvas-kalenteri"
     },
@@ -154,6 +184,9 @@
     },
     "choose_usage_rights_33683854": {
         "message": "Valitse käyttöoikeudet..."
+    },
+    "circle_484abe63": {
+        "message": "Ympyrä"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "rengasta järjestämätön luettelo"
@@ -166,6 +199,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Tyhjennä valittu tiedosto: { filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "Napsauta ja valitse shift ja napsautus, niin saat html-editorin esiin."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Upota { imageName } napsauttamalla"
@@ -197,6 +233,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Piilota kutistamalla { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Väri { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Tietokone"
     },
@@ -221,11 +260,17 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# mahdollisuudet}\n    one {# mahdollisuus}\n  other {# mahdollisuudet}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {Piilota # puuttuva kohde}\n  other {Piilota # puuttuvat kohteet}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# kohdetta ladattu}\n  other {# kohteita ladattu}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
         "message": "{ count, plural,\n    one {Näytä # valmis kohde}\n  other {Näytä # valmiit kohteet}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+        "message": "{ count, plural,\n    one {Näytä # puuttuva kohde}\n  other {Näytä # puuttuvat kohteet}\n}"
     },
     "course_8a63b4a3": {
         "message": "Kurssi"
@@ -253,6 +298,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } TEHTÄVÄ"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "Luo painike ja kuvake"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons -lisenssi:"
@@ -416,6 +464,9 @@
     "error_loading_grades_e0b38f4d": {
         "message": "Virhe arvosanoja ladattaessa"
     },
+    "error_loading_items_5218438e": {
+        "message": "Virhe ladattaessa kohteita"
+    },
     "error_loading_more_items_3f109d9f": {
         "message": "Virhe ladattaessa lisää kohteita"
     },
@@ -424,6 +475,9 @@
     },
     "excused_cf8792eb": {
         "message": "Annettu anteeksi"
+    },
+    "expand_preview_by_default_2abbf9f8": {
+        "message": "Laajenna esikatselu oletuksena"
     },
     "expand_to_see_types_f5d29352": {
         "message": "Laajenna nähdäksesi { types }"
@@ -436,6 +490,21 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Erittäin suuri"
+    },
+    "extra_small_9ae33252": {
+        "message": "Erittäin pieni"
+    },
+    "failed_peeking_into_your_future_e95b9306": {
+        "message": "Tulevaisuuteesi katsominen epäonnistui"
+    },
+    "failed_peeking_into_your_past_5bec2323": {
+        "message": "Menneisyyteesi katsominen epäonnistui"
+    },
+    "failed_saving_changes_on_name_1e100ad": {
+        "message": "Muutosten tallentaminen kohteeseen { name } epäonnistui."
+    },
+    "failed_to_delete_name_bdd7b810": {
+        "message": "Kohteen { name } poistaminen epäonnistui."
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "Tehtävän poistaminen epäonnistui"
@@ -554,6 +623,24 @@
     "height_69b03e15": {
         "message": "Korkeus"
     },
+    "hexagon_d8468e0d": {
+        "message": "Kuusikulmio"
+    },
+    "hide_description_bfb5502e": {
+        "message": "Piilota kuvaus"
+    },
+    "hide_title_description_caf092ef": {
+        "message": "Piilota kohteen { title } kuvaus"
+    },
+    "home_351838cd": {
+        "message": "Aloitussivu"
+    },
+    "html_code_editor_fd967a44": {
+        "message": "html-koodieditori"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML-editori"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Olen hankkinut luvan käyttää tätä tiedostoa."
     },
@@ -601,6 +688,12 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } suoritettu { items, plural,\n     =1 {kohde}\n  other {kohdetta}\n}"
+    },
+    "jump_to_navigation_toolbar_2952cd8b": {
+        "message": "Siirry navigointityökalupalkkiin"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Siirry tähän päivään"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Pikanäppäimet"
@@ -704,6 +797,9 @@
     "my_grades_98834476": {
         "message": "Omat arvosanat"
     },
+    "my_images_427f9b0c": {
+        "message": "Omat kuvat"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Siirry valikon tai työkalupalkin läpi"
     },
@@ -737,6 +833,9 @@
     "no_grade_3b4d7f3e": {
         "message": "Ei arvosanaa"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Tälle tiedostolle ei ole saatavissa esikatselua."
+    },
     "no_results_940393cf": {
         "message": "Ei tuloksia."
     },
@@ -745,6 +844,12 @@
     },
     "no_results_found_for_term_1564c08e": {
         "message": "Tuloksia ei löytynyt kohteelle { term }."
+    },
+    "none_3b5e34d2": {
+        "message": "Ei mitään"
+    },
+    "nothing_due_this_week_d45c9ef9": {
+        "message": "Ei mitään erääntyvää tällä viikolla"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Ei mitään toistaiseksi"
@@ -770,11 +875,17 @@
     "numpoints_points_8621a43b": {
         "message": "{ numPoints } pistettä"
     },
+    "octagon_e48be9f": {
+        "message": "Kahdeksankulmio"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "* Vain viimeisiin arvostelujakso näkyvissä."
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Avaa tämä näppäimistön pikakuvakkeiden valintaruutu"
+    },
+    "open_title_application_fd624fc5": {
+        "message": "Avoin { title }-sovellus"
     },
     "opportunities_popup_f6703842": {
         "message": "mahdollisuuksien ponnahdusikkuna"
@@ -824,8 +935,17 @@
     "preformatted_d0670862": {
         "message": "Esimuotoiltu"
     },
+    "pretty_html_editor_28748756": {
+        "message": "Pretty-tekstieditori"
+    },
     "preview_53003fd2": {
         "message": "Esikatsele"
+    },
+    "preview_in_overlay_ed772c46": {
+        "message": "Esikatselu asettelussa"
+    },
+    "preview_inline_9787330": {
+        "message": "Esikatselu inline-tilassa"
     },
     "previous_month_bb1e3c84": {
         "message": "Edellinen kuukausi"
@@ -860,6 +980,9 @@
     "record_upload_media_5fdce166": {
         "message": "Nauhoita/lataa mediaa"
     },
+    "redo_363c58b7": {
+        "message": "Suorita uudelleen"
+    },
     "reminder_date_4564d12d": {
         "message": "Muistutus: { date }"
     },
@@ -868,6 +991,9 @@
     },
     "replies_4a8577c8": {
         "message": "Vastausta"
+    },
+    "resize_ec83d538": {
+        "message": "Muuta kokoa"
     },
     "restore_auto_save_deccd84b": {
         "message": "Palautetetaanko automaattinen tallennus?"
@@ -878,8 +1004,17 @@
     "right_to_left_9cfb092a": {
         "message": "Oikealta-Vasemmalle"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."
+    },
     "save_11a80ec3": {
         "message": "Tallenna"
+    },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Tallennetut painikkeet ja kuvakkeet"
+    },
+    "schedule_preview_3bcda153": {
+        "message": "Aikataulun esikatselu"
     },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Vieritä nähdäksesi historiasi!"
@@ -898,6 +1033,9 @@
     },
     "selected_274ce24f": {
         "message": "Valittu"
+    },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "Shift-O avaa Pretty-tekstieditorin."
     },
     "show_all_ae37d610": {
         "message": "Näytä kaikki"
@@ -947,8 +1085,14 @@
     "sort_by_e75f9e3e": {
         "message": "Lajitteluperuste"
     },
+    "square_511eb3b3": {
+        "message": "Neliö"
+    },
     "square_unordered_list_b15ce93b": {
         "message": "järjestä järjestämätön luettelo"
+    },
+    "star_8d156e09": {
+        "message": "Tähti"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } - { endDate }"
@@ -986,6 +1130,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tuetut tiedostotyypit: SRT tai WebVTT"
     },
+    "switch_to_the_html_editor_146dfffd": {
+        "message": "Vaihda tekstieditoriin"
+    },
+    "switch_to_the_rich_text_editor_63c1ecf6": {
+        "message": "Vaihda tekstimuotoilueditoriin"
+    },
     "syllabus_f191f65b": {
         "message": "Opinto-ohjelma"
     },
@@ -1010,8 +1160,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materiaali on poikkeuksen (esim. Fair Use, oikeus lainata tai muiden sovellettavien tekijänoikeuslakien) alainen"
     },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Kun painat Shift-O, tekstieditori avautuu."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Tälle kohteelle ei ole osoitettu pisteitä"
+    },
+    "there_is_nothing_planned_for_today_e09bfc8c": {
+        "message": "Tälle päivälle ei ole mitään suunniteltuna."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Vaikka videollasi on oikea otsikko selaimessa, sen päivitys tietokannassa epäonnistui."
@@ -1046,6 +1202,9 @@
     "today_at_date_8ac30d6": {
         "message": "Tänään kohteessa { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "Vaihda { summary } ryhmää"
+    },
     "tomorrow_9a6c9a00": {
         "message": "Huomenna"
     },
@@ -1060,6 +1219,9 @@
     },
     "tray_839df38a": {
         "message": "Alusta"
+    },
+    "triangle_6072304e": {
+        "message": "Kolmio"
     },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "käytä kuvan asetuksia kirjoittamalla Control F9. { text }"
@@ -1094,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Lataa/Tallennusväline"
     },
+    "uploading_closed_captions_subtitles_failed_bc093f3": {
+        "message": "Suljettujen tekstitysten lataus epäonnistui."
+    },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "aakkosellinen järjestetty isojen kirjainten lista"
     },
@@ -1111,6 +1276,15 @@
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
+    },
+    "use_arrow_keys_to_select_a_shape_c8eb57ed": {
+        "message": "Valitse nuolipainikkeet valitaksesi muodon."
+    },
+    "use_arrow_keys_to_select_a_size_699a19f4": {
+        "message": "Valitse nuolipainikkeet valitaksesi koon."
+    },
+    "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
+        "message": "Valitse nuolipainikkeet ääriviivan koon."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Näytönlukijat käyttävät kuvaamaan kuvan sisältöä"
@@ -1145,8 +1319,26 @@
     "view_ba339f93": {
         "message": "Tarkastele"
     },
+    "view_description_30446afc": {
+        "message": "Näytä kuvaus"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Näytä näppäimistön pikakuvakkeet"
+    },
+    "view_next_week_7f61f755": {
+        "message": "Näytä seuraava viikko"
+    },
+    "view_predefined_colors_92f5db39": {
+        "message": "Näytä ennalta määritetyt värit"
+    },
+    "view_previous_week_6f83849f": {
+        "message": "Näytä edellinen viikko"
+    },
+    "view_title_description_67940918": {
+        "message": "Näytä kohteen { title } kuvaus"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "Viikkoaikataulun selaus"
     },
     "width_492fec76": {
         "message": "Leveys"

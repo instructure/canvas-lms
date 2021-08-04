@@ -24,7 +24,9 @@ module SectionTabHelper
     manage_admin_users
     manage_assignments
     manage_content
-    manage_files
+    manage_files_add
+    manage_files_edit
+    manage_files_delete
     manage_grades
     manage_students
     moderate_forum

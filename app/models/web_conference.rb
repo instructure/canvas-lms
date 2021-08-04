@@ -538,6 +538,18 @@ class WebConference < ActiveRecord::Base
     Canvas::Plugin.all_for_tag(:web_conferencing)
   end
 
+  def self.enabled_plugin_conference_names
+    WebConference.plugin_types.map { |wt| wt["name"] }
+  end
+
+  def self.conference_tab_name
+    if (names = WebConference.enabled_plugin_conference_names).any?
+      t("%{conference_type_names} (Formerly Conferences)", conference_type_names: names.join(" "))
+    else
+      t('#tabs.conferences', "Conferences")
+    end
+  end
+
   def self.plugin_types
     plugins.map{ |plugin|
       next unless plugin.enabled? &&

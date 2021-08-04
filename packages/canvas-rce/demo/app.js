@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
-import CanvasRce from '../src/rce/CanvasRce'
+import RCE from '../src/rce/RCE'
 import DemoOptions from './DemoOptions'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -183,18 +183,20 @@ function Demo() {
   return (
     <>
       <main className="main" id="content">
-        <CanvasRce
+        <RCE
           ref={rceRef}
           language={lang}
           textareaId="textarea3"
           defaultContent="hello RCE"
           readOnly={readonly}
-          height={350}
+          editorOptions={{
+            height: 350,
+            toolbar,
+            menu,
+            plugins
+          }}
           highContrastCSS={[]}
           rcsProps={rcsProps}
-          toolbar={toolbar}
-          menu={menu}
-          plugins={plugins}
           onInitted={editor => {
             setCurrentContent(editor.getContent())
           }}

@@ -250,4 +250,42 @@ describe('UrlEntry', () => {
       expect(getByText('http://www.google.com')).toBeInTheDocument()
     })
   })
+
+  describe('graded', () => {
+    it('renders a link to the submitted url when graded post-submission', async () => {
+      const props = await makeProps({
+        Submission: {
+          attachment: {_id: '1'},
+          state: 'graded',
+          attempt: 1,
+          url: 'http://www.google.com'
+        }
+      })
+      const {getByText} = render(<UrlEntry {...props} />)
+
+      expect(getByText('http://www.google.com')).toBeInTheDocument()
+    })
+
+    it('renders the URL input when graded pre-submission', async () => {
+      const props = await makeProps({
+        Submission: {
+          state: 'graded',
+          attempt: 0
+        }
+      })
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [{}]
+        }
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <UrlEntry {...props} />
+        </MockedProvider>
+      )
+
+      expect(getByTestId('url-entry')).toBeInTheDocument()
+    })
+  })
 })

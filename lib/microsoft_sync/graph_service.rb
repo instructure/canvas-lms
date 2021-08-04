@@ -35,8 +35,8 @@ module MicrosoftSync
     attr_reader :http
     delegate :request, :expand_options, :get_paginated_list, :run_batch, :quote_value, to: :http
 
-    def initialize(tenant)
-      @http = GraphServiceHttp.new(tenant)
+    def initialize(tenant, extra_statsd_tags)
+      @http = GraphServiceHttp.new(tenant, extra_statsd_tags)
     end
 
     # ENDPOINTS:
@@ -54,23 +54,8 @@ module MicrosoftSync
 
     # === Groups: ===
 
-    def update_group(group_id, params, write_quota=1)
-      request(:patch, "groups/#{group_id}", quota: [1, write_quota], body: params)
-    end
-
-    def add_users_to_group(group_id, members: [], owners: [])
-      check_group_users_args(members, owners)
-
-      body = {}
-      unless members.empty?
-        body['members@odata.bind'] = members.map{|m| DIRECTORY_OBJECT_PREFIX + m}
-      end
-      unless owners.empty?
-        body['owners@odata.bind'] = owners.map{|o| DIRECTORY_OBJECT_PREFIX + o}
-      end
-
-      # Irregular write cost of adding members, about users_added/3, according to Microsoft.
-      update_group(group_id, body, ((members.length + owners.length) / 3.0).ceil)
+    def update_group(group_id, params)
+      request(:patch, "groups/#{group_id}", quota: [1, 1], body: params)
     end
 
     # Used for debugging. Example:
@@ -130,13 +115,25 @@ module MicrosoftSync
     # Returns nil if all added, or a hash with a list of :members and/or :owners that already
     # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
     def add_users_to_group_ignore_duplicates(group_id, members: [], owners: [])
-      add_users_to_group(group_id, members: members, owners: owners)
+      check_group_users_args(members, owners)
 
-      nil
-    rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response.body =~ /One or more added object references already exist/i
+      body = {}
+      unless members.empty?
+        body['members@odata.bind'] = members.map{|m| DIRECTORY_OBJECT_PREFIX + m}
+      end
+      unless owners.empty?
+        body['owners@odata.bind'] = owners.map{|o| DIRECTORY_OBJECT_PREFIX + o}
+      end
 
-      add_users_to_group_via_batch(group_id, members, owners)
+      # Irregular write cost of adding members, about users_added/3, according to Microsoft.
+      write_quota = ((members.length + owners.length) / 3.0).ceil
+      response = request(:patch, "groups/#{group_id}", quota: [1, write_quota], body: body) do |resp|
+        :duplicates if resp.code == 400 && resp.body =~ /One or more added object references already exist/i
+      end
+
+      if response == :duplicates
+        add_users_to_group_via_batch(group_id, members, owners)
+      end
     end
 
     # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
@@ -150,15 +147,8 @@ module MicrosoftSync
     end
 
     # === Teams ===
-    def get_team(team_id, options={})
-      request(:get, "teams/#{team_id}", query: expand_options(**options))
-    end
-
     def team_exists?(team_id)
-      get_team(team_id)
-      true
-    rescue MicrosoftSync::Errors::HTTPNotFound
-      false
+      request(:get, "teams/#{team_id}") { |resp| :not_found if resp.code == 404 } != :not_found
     end
 
     def create_education_class_team(group_id)
@@ -168,15 +158,17 @@ module MicrosoftSync
         "group@odata.bind" =>
           "https://graph.microsoft.com/v1.0/groups(#{quote_value(group_id)})"
       }
-      request(:post, 'teams', body: body)
-    rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response.body =~ /must have one or more owners in order to create a Team/i
 
-      raise MicrosoftSync::Errors::GroupHasNoOwners
-    rescue MicrosoftSync::Errors::HTTPConflict => e
-      raise unless e.response.body =~ /group is already provisioned/i
+      # Use block form instead of rescuing HTTP exceptions so they use statsd "expected" counters
+      response = request(:post, 'teams', body: body) do |resp|
+        if resp.code == 400 && resp.body =~ /have one or more owners in order to create a Team/i
+          MicrosoftSync::Errors::GroupHasNoOwners.new
+        elsif resp.code == 409 && resp.body =~ /group is already provisioned/i
+          MicrosoftSync::Errors::TeamAlreadyExists.new
+        end
+      end
 
-      raise MicrosoftSync::Errors::TeamAlreadyExists
+      raise response if response.is_a?(Exception)
     end
 
     # === Users ===

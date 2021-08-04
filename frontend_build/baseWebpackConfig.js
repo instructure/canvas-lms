@@ -249,7 +249,13 @@ module.exports = {
       {
         test: /\.handlebars$/,
         include: [path.resolve(__dirname, '../ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
-        loaders: ['i18nLinerHandlebars']
+        loaders: [{
+          loader: 'i18nLinerHandlebars',
+          options: {
+            // brandable_css assets are not available in test
+            injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
+          }
+        }]
       },
       {
         test: /\.hbs$/,
