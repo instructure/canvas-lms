@@ -71,6 +71,32 @@ describe "Discussion Topic Show" do
       module1.add_item(:id => item2.id, :type => 'discussion_topic')
       get "/courses/#{@course.id}/discussion_topics/#{item2.id}"
       expect(f("a[aria-label='Previous Module Item']")).to be_present
-    end  
+    end
+
+    context "isolated view" do
+      before :once do
+        Account.site_admin.enable_feature!(:isolated_view)
+      end
+
+      it "loads older replies" do
+        parent_reply = @topic.discussion_entries.create!(
+          user: @teacher, message: 'I am the parent entry'
+        )
+        (1..6).each do |number|
+          @topic.discussion_entries.create!(
+            user: @teacher,
+            message: "child reply number #{number}",
+            parent_entry: parent_reply
+          )
+        end
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        fj("button:contains('6 replies')").click
+        wait_for_ajaximations
+        fj("button:contains('Show older replies')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('child reply number 1')")).to be_present
+      end
+    end
   end
 end
