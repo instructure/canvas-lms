@@ -407,10 +407,14 @@ ul.user_list div.enrollment_type.pending {
   .course-visibility-row,
   .course-conclude-at-row,
   .course-participation-row,
-  .language-row {
+  .language-row,
+  .friendly-name-row {
     align-items: flex-start;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+  .friendly-name-row .form-label {
+    padding-top: 0.65rem;
   }
 }
 

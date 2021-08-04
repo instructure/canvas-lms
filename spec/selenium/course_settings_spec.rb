@@ -35,8 +35,7 @@ describe "course settings" do
 
   context "k5 courses" do
     before(:each) do
-      @account.settings[:enable_as_k5_account] = {value: true}
-      @account.save!
+      @account.enable_as_k5_account!
     end
 
     it "should show a Back to Subject button that sends the user to the course home path" do
@@ -73,8 +72,7 @@ describe "course settings" do
 
   context "considering homeroom courses" do
     before(:each) do
-      @account.settings[:enable_as_k5_account] = {value: true}
-      @account.save!
+      @account.enable_as_k5_account!
       @course.homeroom_course = true
       @course.save!
     end
@@ -228,8 +226,7 @@ describe "course settings" do
     end
 
     it "should check if it is a k5 course should not show the fields" do
-      @account.settings[:enable_as_k5_account] = {value: true}
-      @account.save!
+      @account.enable_as_k5_account!
       get "/courses/#{@course.id}/settings"
 
       more_options_link = f('.course_form_more_options_link')
@@ -408,8 +405,7 @@ describe "course settings" do
     end
 
     it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
-      @account.settings[:enable_as_k5_account] = {value: true}
-      @account.save!
+      @account.enable_as_k5_account!
       course_with_teacher_logged_in(:active_all => true)
       get "/courses/#{@course.id}/settings"
       expect(f("#course_status_form")).to be_present

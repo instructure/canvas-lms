@@ -89,8 +89,7 @@ describe CoursesController do
     describe "homeroom courses" do
       before :once do
         @account = Account.default
-        @account.settings[:enable_as_k5_account] = {value: true}
-        @account.save!
+        @account.enable_as_k5_account!
 
         @teacher1 = user_factory(active_all: true, account: @account)
         @student1 = user_factory(active_all: true, account: @account)
@@ -819,8 +818,7 @@ describe CoursesController do
     end
 
     it "should only set course color js_env vars for elementary courses" do
-      @course.account.settings[:enable_as_k5_account] = {value: true}
-      @course.account.save!
+      @course.account.enable_as_k5_account!
       @course.course_color = "#BAD"
       @course.save!
 

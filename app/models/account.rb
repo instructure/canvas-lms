@@ -450,6 +450,11 @@ class Account < ActiveRecord::Base
     enable_as_k5_account[:value]
   end
 
+  def enable_as_k5_account!
+    self.settings[:enable_as_k5_account] = {value: true}
+    self.save!
+  end
+
   def open_registration?
     !!settings[:open_registration] && canvas_authentication?
   end

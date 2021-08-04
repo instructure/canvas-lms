@@ -16,9 +16,9 @@
   # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% provide :page_title, @context.name %>
+<% provide :page_title, @context.nickname_for(@current_user) %>
 
-<h1 class='screenreader-only'><%= @context.name %></h1>
+<h1 class='screenreader-only'><%= @context.nickname_for(@current_user) %></h1>
 
 <% unless @context.elementary_subject_course? %>
   <% provide :right_side do %>

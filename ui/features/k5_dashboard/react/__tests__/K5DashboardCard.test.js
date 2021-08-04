@@ -38,7 +38,7 @@ const defaultContext = {
 const defaultProps = {
   id: 'test',
   href: '/courses/test',
-  originalName: 'test course'
+  shortName: 'test course'
 }
 
 describe('DashboardCardHeaderHero', () => {

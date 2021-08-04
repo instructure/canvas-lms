@@ -510,8 +510,7 @@ describe TabsController, type: :request do
     describe 'canvas for elementary' do
       before(:once) do
         course_with_teacher(:active_all => true)
-        @course.account.settings[:enable_as_k5_account] = {value: true}
-        @course.account.save!
+        @course.account.enable_as_k5_account!
       end
 
       it 'should list a select subset of tabs if it is an elementary course and has the include[]=course_subject_tabs param' do

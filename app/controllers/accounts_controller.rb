@@ -759,7 +759,8 @@ class AccountsController < ApplicationController
     end
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
-      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id)) }
+      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
+      prefer_friendly_name: false) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)

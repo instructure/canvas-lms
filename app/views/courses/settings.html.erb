@@ -155,6 +155,21 @@
           <% end %>
         </div>
       </div>
+      <% if @context.elementary_enabled? %>
+        <div class="form-row friendly-name-row">
+          <div class="form-label nobr"><%= f.blabel :friendly_name, :en => "Friendly Name" %></div>
+          <div class="tall-row">
+            <% if can_rename_course %>
+              <%= f.text_field :friendly_name, :maxlength => '255' %>
+            <% else %>
+              <span id="course_friendly_name"><%= @context.friendly_name %></span>
+            <% end %>
+            <div class="aside palign">
+              <%= t("If provided, this name will be used in preference to the course's actual name on the dashboard and in notifications.") %>
+            </div>
+          </div>
+        </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></div>
         <div class="nobr">

@@ -402,10 +402,10 @@ describe('K-5 Dashboard', () => {
     })
 
     it('shows course cards, excluding homerooms and subjects with pending invites', async () => {
-      const {findByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
-      expect(await findByText('Economics 101')).toBeInTheDocument()
-      expect(queryByText('Home Room')).not.toBeInTheDocument()
-      expect(queryByText('The Maths')).not.toBeInTheDocument()
+      const {findByLabelText, queryByLabelText} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByLabelText('Economics 101')).toBeInTheDocument()
+      expect(queryByLabelText('Home Room')).not.toBeInTheDocument()
+      expect(queryByLabelText('The Maths')).not.toBeInTheDocument()
     })
 
     it('shows latest announcement from each homeroom', async () => {

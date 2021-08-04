@@ -239,7 +239,7 @@ AssignmentLinks.propTypes = {
 const K5DashboardCard = ({
   href,
   id,
-  originalName,
+  shortName,
   courseColor,
   connectDragSource = c => c,
   connectDropTarget = c => c,
@@ -284,7 +284,7 @@ const K5DashboardCard = ({
         minHeight: `${CARD_SIZE_PX}px`,
         minWidth: `${CARD_SIZE_PX}px`
       }}
-      aria-label={originalName}
+      aria-label={shortName}
       data-testid="k5-dashboard-card"
     >
       <DashboardCardHeaderHero
@@ -318,9 +318,9 @@ const K5DashboardCard = ({
                 textTransform: 'uppercase',
                 whiteSpace: 'nowrap'
               }}
-              title={originalName}
+              title={shortName}
             >
-              {originalName}
+              {shortName}
             </div>
           </Link>
         </Heading>
@@ -328,7 +328,7 @@ const K5DashboardCard = ({
           <AssignmentLinks
             id={id}
             color={backgroundColor}
-            courseName={originalName}
+            courseName={shortName}
             numDueToday={assignmentsDueToday}
             numMissing={assignmentsMissing}
             numSubmittedToday={assignmentsCompletedForToday}
@@ -352,7 +352,8 @@ K5DashboardCard.displayName = 'K5DashboardCard'
 K5DashboardCard.propTypes = {
   href: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  originalName: PropTypes.string.isRequired,
+  shortName: PropTypes.string.isRequired,
+  originalName: PropTypes.string,
   backgroundColor: PropTypes.string,
   courseColor: PropTypes.string,
   connectDragSource: PropTypes.func,

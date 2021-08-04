@@ -6238,6 +6238,22 @@ describe Course, "#apply_nickname_for!" do
     @course.apply_nickname_for!(nil)
     expect(@course.name).to eq 'some terrible name'
   end
+
+  it "prefers the subject name if present and k5 is enabled" do
+    @course.friendly_name = "drama"
+    @course.save!
+
+    @course.apply_nickname_for!(@user)
+    expect(@course.name).to eq 'nickname'
+
+    @course.account.enable_as_k5_account!
+
+    @course.apply_nickname_for!(@user)
+    expect(@course.name).to eq 'drama'
+
+    @course.apply_nickname_for!(nil)
+    expect(@course.name).to eq 'some terrible name'
+  end
 end
 
 describe Course, "#image" do

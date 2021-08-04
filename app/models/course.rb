@@ -2583,7 +2583,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course, :course_color
+      :homeroom_course, :course_color, :alt_name
     ]
   end
 
@@ -3307,6 +3307,7 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :course_color
+  add_setting :alt_name
 
   def elementary_enabled?
     account.enable_as_k5_account?
@@ -3318,6 +3319,14 @@ class Course < ActiveRecord::Base
 
   def elementary_subject_course?
     !homeroom_course? && elementary_enabled?
+  end
+
+  def friendly_name
+    elementary_enabled? ? alt_name.presence : nil
+  end
+
+  def friendly_name=(name)
+    self.alt_name = name
   end
 
   def lock_all_announcements?
@@ -3658,7 +3667,8 @@ class Course < ActiveRecord::Base
     !!defined?(@preloaded_nickname)
   end
 
-  def nickname_for(user, fallback = :name)
+  def nickname_for(user, fallback = :name, prefer_friendly_name: true)
+    return friendly_name if prefer_friendly_name && friendly_name.present?
     nickname = preloaded_nickname? ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
@@ -3670,7 +3680,7 @@ class Course < ActiveRecord::Base
   end
 
   def apply_nickname_for!(user)
-    @nickname = nickname_for(user, nil)
+    @nickname = user && nickname_for(user, nil)
   end
 
   def self.preload_menu_data_for(courses, user, preload_favorites: false)
