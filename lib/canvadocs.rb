@@ -300,20 +300,29 @@ module Canvadocs
     end
 
     def peer_review_user_filter(submission, current_user, enrollments)
-      assessors = User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
-      users_for_filter = assessors.push(current_user)
+      # Submitter, instructors, and admins should always see assessors' annotations.
+      is_instructor = submission.course.participating_instructors.include?(current_user)
+      is_admin = submission.course.account_membership_allows(current_user)
+      users_for_filter = if current_user == submission.user || is_instructor || is_admin
+        User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+      else
+        []
+      end
+
+      # The current user's annotations should always be visible.
+      users_for_filter.push(current_user)
 
       # When the submission is for a Student Annotation assignment, the
-      # annotations are the submission, so show the annotations to reviewers.
-      if assessors.include?(current_user) && submission.submission_type == "student_annotation"
+      # annotations are the submission, so add the submitter.
+      if submission.submission_type == "student_annotation"
         users_for_filter.push(submission.user)
       end
 
-      users_for_filter.map do |assessor|
+      users_for_filter.map do |user|
         user_filter_entry(
-          assessor,
+          user,
           submission,
-          role: canvadocs_user_role(submission.assignment.course, assessor, enrollments),
+          role: canvadocs_user_role(submission.assignment.course, user, enrollments),
           anonymize: submission.assignment.anonymous_peer_reviews?
         )
       end
