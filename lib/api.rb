@@ -114,10 +114,12 @@ module Api
                       },
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
-                      'lti_context_id' => 'users.lti_context_id',
-                      'lti_user_id' => 'users.lti_context_id',
+                      'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_1_1_id' => 'users.lti_context_id',
+                      'lti_1_3_id' => 'users.lti_id',
                       'uuid' => 'users.uuid' }.freeze,
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.uuid'].freeze,
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
         :scope => 'pseudonyms.account_id',
         :joins => :pseudonym }.freeze,
     'accounts' =>

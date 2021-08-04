@@ -20,6 +20,11 @@ The following objects support SIS IDs in the API:
  * `sis_term_id`
  * `sis_user_id`
 
+Some objects support LTI IDs:
+ * `lti_context_id` (for accounts, assignments, courses, and users)
+ * `lti_1_1_id` (for users, an alias of `lti_context_id`, which is sent in LTI 1.1 launches as `user_id`)
+ * `lti_1_3_id` (for users, a separate value from `lti_context_id`, sent in LTI 1.3 launches as `sub`)
+
 Additionally, some objects support special IDs:
 
  * Users support `self` to mean the current user.
