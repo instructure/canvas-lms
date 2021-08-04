@@ -169,5 +169,52 @@
       "parent_state": "allowed_on"
     },
     "beta": true
+  },
+  "pendingEnforcementOnFeature": {
+    "feature": "feature7",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement On",
+    "description": "This feature has pending enforcement on",
+    "enable_at": "2021-08-23",
+    "pending_enforcement": true ,
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    }
+  },
+  "pendingEnforcementOffFeature": {
+    "feature": "feature8",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement Off",
+    "description": "This feature has pending enforcement off",
+    "enable_at": "2021-08-23",
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    }
   }
 }

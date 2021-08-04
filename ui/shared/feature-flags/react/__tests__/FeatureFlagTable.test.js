@@ -17,7 +17,7 @@
 //  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, act, fireEvent} from '@testing-library/react'
 
 import FeatureFlagTable from '../FeatureFlagTable'
 import sampleData from './sampleData.json'
@@ -26,11 +26,21 @@ const rows = [
   sampleData.allowedOnFeature,
   sampleData.allowedFeature,
   sampleData.onFeature,
-  sampleData.offFeature
+  sampleData.offFeature,
+  sampleData.pendingEnforcementOnFeature,
+  sampleData.pendingEnforcementOffFeature
 ]
 const title = 'Section 123'
 
 describe('feature_flags::FeatureFlagTable', () => {
+  beforeEach(() => {
+    window.ENV = {FEATURES: {feature_flag_filters: true}}
+  })
+
+  afterEach(() => {
+    window.ENV = {}
+  })
+
   it('Shows the title', () => {
     const {getByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
 
@@ -51,5 +61,26 @@ describe('feature_flags::FeatureFlagTable', () => {
 
     expect(queryByText('This does great feature1y things')).not.toBeInTheDocument()
     expect(queryByText('This does great feature4y things')).toBeInTheDocument()
+  })
+
+  it('Includes the enable_at date if pending_enforcement is enabled', () => {
+    const {getByText} = render(<FeatureFlagTable rows={rows} title={title} />)
+    const featureToggle = getByText('Feature with Pending Enforcement On')
+    act(() => {
+      fireEvent.click(featureToggle)
+    })
+    expect(getByText('Pending Enforcement')).toBeInTheDocument()
+    expect(getByText('Aug 23, 2021')).toBeInTheDocument()
+    expect(getByText('This feature has pending enforcement on')).toBeInTheDocument()
+  })
+
+  it('does not show the enable_at date if pending_enforcement is disabled', () => {
+    const {getByText, queryByText} = render(<FeatureFlagTable rows={rows} title={title} />)
+    const featureToggle = getByText('Feature with Pending Enforcement Off')
+    act(() => {
+      fireEvent.click(featureToggle)
+    })
+    expect(queryByText('Aug 23, 2021')).not.toBeInTheDocument()
+    expect(getByText('This feature has pending enforcement off')).toBeInTheDocument()
   })
 })

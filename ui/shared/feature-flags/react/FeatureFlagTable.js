@@ -23,11 +23,14 @@ import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import {Pill} from '@instructure/ui-pill'
 import FeatureFlagButton from './FeatureFlagButton'
+import tz from '@canvas/timezone'
+import {Text} from '@instructure/ui-text'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
 function FeatureFlagTable({title, rows, disableDefaults}) {
   rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
+  const feature_flag_filters = ENV.FEATURES?.feature_flag_filters
   return (
     <>
       <Heading as="h2" level="h3" data-testid="ff-table-heading">
@@ -58,13 +61,11 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                           variant="primary"
                           margin="0 0 0 x-small"
                           text={
-                            ENV.FEATURES?.feature_flag_filters
-                              ? I18n.t('Active Development')
-                              : I18n.t('Beta')
+                            feature_flag_filters ? I18n.t('Active Development') : I18n.t('Beta')
                           }
                         />
                       ) : null}
-                      {feature.pending_enforcement && ENV.FEATURES?.feature_flag_filters ? (
+                      {feature.pending_enforcement && feature_flag_filters ? (
                         <Pill
                           variant="warning"
                           margin="0 0 0 x-small"
@@ -75,6 +76,9 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                   }
                   defaultExpanded={feature.autoexpand}
                 >
+                  {feature_flag_filters && feature.pending_enforcement && feature.enable_at && (
+                    <Text weight="bold">{tz.format(feature.enable_at, 'date.formats.medium')}</Text>
+                  )}
                   <div dangerouslySetInnerHTML={{__html: feature.description}} />
                 </ToggleDetails>
               </Cell>
