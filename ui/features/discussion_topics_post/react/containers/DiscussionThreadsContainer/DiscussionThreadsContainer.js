@@ -90,7 +90,7 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <View as="div" margin="small none none none">
+    <View as="div">
       {searchTerm && <SearchResultsCount resultsFound={discussionTopic.searchEntryCount} />}
       {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (

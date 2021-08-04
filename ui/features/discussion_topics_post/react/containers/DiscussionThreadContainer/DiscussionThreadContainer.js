@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  addReplyToDiscussionEntry,
+  getSpeedGraderUrl,
+  updateDiscussionTopicRepliesCount
+} from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import {
@@ -24,6 +29,7 @@ import {
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
@@ -32,21 +38,15 @@ import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
+import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
+import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {
-  getSpeedGraderUrl,
-  addReplyToDiscussionEntry,
-  updateDiscussionTopicRepliesCount,
-  resolveAuthorRoles
-} from '../../utils'
-import theme from '@instructure/canvas-theme'
-import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
   discussionEntry: {
@@ -79,7 +79,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const {sort, searchTerm} = useContext(SearchContext)
+  const {searchTerm, sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -300,57 +300,73 @@ export const DiscussionThreadContainer = props => {
     <>
       <Highlight isHighlighted={highlightEntry}>
         <div style={{marginLeft: marginDepth}} ref={threadRef}>
-          <Flex>
+          <Flex padding="medium medium small medium">
             <Flex.Item shouldShrink shouldGrow>
-              <PostMessageContainer
-                discussionEntry={props.discussionEntry}
-                onOpenIsolatedView={props.onOpenIsolatedView}
-                threadActions={threadActions}
+              <PostContainer
+                isTopic={false}
+                postUtilities={
+                  !props.discussionEntry.deleted ? (
+                    <ThreadActions
+                      id={props.discussionEntry.id}
+                      isUnread={!props.discussionEntry.read}
+                      onToggleUnread={toggleUnread}
+                      onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                      onEdit={
+                        props.discussionEntry.permissions?.update
+                          ? () => {
+                              setIsEditing(true)
+                            }
+                          : null
+                      }
+                      onOpenInSpeedGrader={
+                        props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
+                      }
+                      goToParent={
+                        props.depth === 0
+                          ? null
+                          : () => {
+                              const topOffset = props.parentRef.current.offsetTop
+                              window.scrollTo(0, topOffset - 44)
+                            }
+                      }
+                      goToTopic={props.goToTopic}
+                    />
+                  ) : null
+                }
+                author={props.discussionEntry.author}
+                message={props.discussionEntry.message}
                 isEditing={isEditing}
-                onCancel={() => {
-                  setIsEditing(false)
-                }}
                 onSave={onUpdate}
-                padding="small 0 small medium"
-                discussionRoles={resolveAuthorRoles(
-                  props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
-                    !!props?.discussionTopic?.author?.id &&
-                    !!props?.discussionEntry?.author?.id &&
-                    props?.discussionEntry?.author !== null,
-                  props?.discussionEntry?.author?.courseRoles
+                onCancel={() => setIsEditing(false)}
+                isIsolatedView={false}
+                editor={props.discussionEntry.editor}
+                isUnread={!props.discussionEntry.read}
+                isForcedRead={props.discussionEntry.forcedReadState}
+                timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                  props.discussionEntry.createdAt
                 )}
-              />
+                editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                  props.discussionEntry.updatedAt
+                )}
+                lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                  props.discussionEntry.lastReply?.createdAt
+                )}
+                deleted={props.discussionEntry.deleted}
+              >
+                {threadActions.length > 0 && (
+                  <View as="div" padding="x-small none none">
+                    <ThreadingToolbar
+                      searchTerm={searchTerm}
+                      discussionEntry={props.discussionEntry}
+                      onOpenIsolatedView={props.onOpenIsolatedView}
+                      isIsolatedView={false}
+                    >
+                      {threadActions}
+                    </ThreadingToolbar>
+                  </View>
+                )}
+              </PostContainer>
             </Flex.Item>
-            {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch" padding="small 0 0 0">
-                <ThreadActions
-                  id={props.discussionEntry.id}
-                  isUnread={!props.discussionEntry.read}
-                  onToggleUnread={toggleUnread}
-                  onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                  onEdit={
-                    props.discussionEntry.permissions?.update
-                      ? () => {
-                          setIsEditing(true)
-                        }
-                      : null
-                  }
-                  onOpenInSpeedGrader={
-                    props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
-                  }
-                  goToParent={
-                    props.depth === 0
-                      ? null
-                      : () => {
-                          const topOffset = props.parentRef.current.offsetTop
-                          window.scrollTo(0, topOffset - 44)
-                        }
-                  }
-                  goToTopic={props.goToTopic}
-                  isSearch={!!searchTerm}
-                />
-              </Flex.Item>
-            )}
           </Flex>
         </div>
       </Highlight>

@@ -125,6 +125,7 @@ DiscussionEntry.args = {
   message:
     "End? No, the journey doesn't end here. Death is just another path, one that we all must take. The grey rain-curtain of this world rolls back, and all turns to silver glass, and then you see it. White shores, and beyond, a far green country under a swift sunrise.",
   isEditing: false,
+  isUnread: true,
   isIsolatedView: false,
   editor: User.mock({_id: '5', displayName: 'Pippin'}),
   timingDisplay: 'Jan 1 4:20pm',
