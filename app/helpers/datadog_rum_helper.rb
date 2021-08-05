@@ -67,7 +67,7 @@ module DatadogRumHelper
   end
 
   def sample_rate
-    datadog_rum_config[:sample_rate_percentage].to_f / 100
+    datadog_rum_config[:sample_rate_percentage, failsafe: 0.0].to_f / 100
   end
 
   def datadog_rum_config
@@ -76,7 +76,7 @@ module DatadogRumHelper
 
   def complete_config?
     %i[client_token application_id sample_rate_percentage].all? do |key|
-      datadog_rum_config[key].present?
+      datadog_rum_config[key, failsafe: nil].present?
     end
   end
 end
