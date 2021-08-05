@@ -494,12 +494,8 @@ class CalendarEventsApiController < ApplicationController
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
-    if Account.site_admin.feature_enabled?(:calendar_conferences)
-      if params_for_create.key?(:web_conference)
-        web_conference = find_or_initialize_conference(@context, params_for_create[:web_conference])
-        return unless authorize_user_for_conference(@current_user, web_conference)
-        params_for_create[:web_conference] = web_conference
-      end
+    if Account.site_admin.feature_enabled?(:calendar_conferences) && params_for_create.key?(:web_conference)
+      params_for_create[:web_conference] = find_or_initialize_conference(@context, params_for_create[:web_conference])
     end
 
     @event = @context.calendar_events.build(params_for_create)
@@ -516,6 +512,8 @@ class CalendarEventsApiController < ApplicationController
       else
         events = [@event]
       end
+
+      return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render :json => {
@@ -1397,6 +1395,11 @@ class CalendarEventsApiController < ApplicationController
         new_child_event[:end_at] = Time.zone.parse(child_event[:end_at]) + offset unless child_event[:end_at].blank?
         new_child_event
       end
+    end
+
+    if Account.site_admin.feature_enabled?(:calendar_conferences) && event_attributes.key?(:web_conference)
+      override_params = { :user_settings => { :scheduled_date => event_attributes[:start_at] } }
+      event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
     end
 
     event_attributes
