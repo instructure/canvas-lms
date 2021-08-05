@@ -148,7 +148,11 @@ describe('DiscussionTopicContainer', () => {
         assignment: Assignment.mock({onlyVisibleToOverrides: true})
       })
     })
-    expect(await container.findByTestId('differentiated-alert')).toBeTruthy()
+    expect(
+      container.getByText(
+        'Note: for differentiated group topics, some threads may not have any students assigned.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('non-readAsAdmin does not see Diff. Group Assignments alert', async () => {
