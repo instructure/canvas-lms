@@ -89,65 +89,70 @@ export const DiscussionEdit = props => {
             mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({mobile: true, desktop: true})}
+          props={{
+            mobile: {
+              direction: 'column',
+              display: 'block',
+              marginCancel: 'xx-small',
+              marginReply: 'xx-small'
+            },
+            desktop: {
+              direction: 'row',
+              display: 'inline-block',
+              marginCancel: '0 0 0 0',
+              marginReply: '0 0 0 small'
+            }
+          }}
+          render={(responsiveProps, matches) => {
+            const rceButtons = [
+              <View as="div" padding={responsiveProps.marginCancel}>
+                <Button
+                  onClick={() => {
+                    if (props.onCancel) {
+                      props.onCancel()
+                    }
+                  }}
+                  display={responsiveProps.display}
+                  color="secondary"
+                  data-testid="DiscussionEdit-cancel"
+                  key="rce-cancel-button"
+                >
+                  <Text size="medium">{I18n.t('Cancel')}</Text>
+                </Button>
+              </View>,
+              <View as="div" padding={responsiveProps.marginReply}>
+                <Button
+                  onClick={() => {
+                    if (props.onSubmit) {
+                      props.onSubmit(rceContent)
+                    }
+                  }}
+                  display={responsiveProps.display}
+                  color="primary"
+                  data-testid="DiscussionEdit-submit"
+                  key="rce-reply-button"
+                >
+                  <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
+                </Button>
+              </View>
+            ]
+            return matches.includes('mobile') ? (
+              <View as="div" padding={undefined}>
+                {rceButtons.reverse()}
+              </View>
+            ) : (
+              <Flex>
+                <Flex.Item shouldGrow textAlign="end">
+                  {rceButtons}
+                </Flex.Item>
+              </Flex>
+            )
+          }}
+        />
       </View>
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({mobile: true, desktop: true})}
-        props={{
-          mobile: {
-            direction: 'column-reverse',
-            display: 'block',
-            marginCancel: 'small 0 0 0',
-            marginReply: '0 0 0 0'
-          },
-          desktop: {
-            direction: 'row',
-            display: 'inline-block',
-            marginCancel: '0 0 0 0',
-            marginReply: '0 0 0 small'
-          }
-        }}
-        render={responsiveProps => (
-          <Flex margin="small none none none" direction={responsiveProps.direction}>
-            <Flex.Item
-              shouldGrow
-              shouldShrink
-              textAlign="end"
-              overflowY="hidden"
-              overflowX="hidden"
-            >
-              <Button
-                onClick={() => {
-                  if (props.onCancel) {
-                    props.onCancel()
-                  }
-                }}
-                margin={responsiveProps.marginCancel}
-                display={responsiveProps.display}
-                color="secondary"
-                data-testid="DiscussionEdit-cancel"
-              >
-                <Text size="medium">{I18n.t('Cancel')}</Text>
-              </Button>
-            </Flex.Item>
-            <Flex.Item shouldShrink textAlign="end" overflowY="hidden" overflowX="hidden">
-              <Button
-                onClick={() => {
-                  if (props.onSubmit) {
-                    props.onSubmit(rceContent)
-                  }
-                }}
-                display={responsiveProps.display}
-                color="primary"
-                margin={responsiveProps.marginReply}
-                data-testid="DiscussionEdit-submit"
-              >
-                <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')} </Text>
-              </Button>
-            </Flex.Item>
-          </Flex>
-        )}
-      />
     </div>
   )
 }
