@@ -128,16 +128,13 @@ export default function MicrosoftSyncAccountSettings() {
 
               <Table.Cell>
                 <LoginAttributeSelector
-                  attributeChangedHandler={(event, {value}) =>
+                  attributeChangedHandler={(event, {value}) => {
                     dispatch({
                       type: reducerActions.updateAttribute,
-                      payload: {
-                        microsoft_sync_login_attribute: event.target.id,
-                        selectedAttribute: value
-                      }
+                      payload: {microsoft_sync_login_attribute: value}
                     })
-                  }
-                  selectedLoginAttribute={state.selectedAttribute}
+                  }}
+                  selectedLoginAttribute={state.microsoft_sync_login_attribute}
                 />
               </Table.Cell>
             </Table.Row>
