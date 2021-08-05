@@ -60,6 +60,12 @@ describe AuthenticationProvider::OpenIDConnect do
       expect(token).to receive(:get).with('moar').and_return(double(parsed: { 'not_in_id_token' => 'myid', 'sub' => '2' }))
       expect(connect.unique_id(token)).to be_nil
     end
+
+    it "returns nil if the id_token is missing" do
+      connect = described_class.new
+      uid = connect.unique_id(double(params: {'id_token' => nil}, options: {}))
+      expect(uid).to be_nil
+    end
   end
 
   describe "#user_logout_url" do
