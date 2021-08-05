@@ -75,7 +75,6 @@ describe('useGetSettings', () => {
         microsoft_sync_login_attribute: 'email',
         microsoft_sync_login_attribute_suffix: '@example.com',
         microsoft_sync_remote_attribute: 'mailNickname',
-        selectedAttribute: 'email',
         loading: false
       }
       useFetchApi.mockImplementationOnce(({success, loading}) => {
