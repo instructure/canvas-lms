@@ -39,6 +39,10 @@ describe('GroupMoveModal', () => {
     groupTitle: 'Account folder 0',
     parentGroupId: '0',
     onCloseHandler: onCloseHandlerMock,
+    rootGroup: {
+      id: '0',
+      title: 'Root account folder'
+    },
     ...props
   })
 
@@ -104,22 +108,10 @@ describe('GroupMoveModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('disables the move button when the selected group is equal to the group to be moved', async () => {
-    const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 0'))
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Move').closest('button')).toBeDisabled()
-  })
-
   it('disables the move button when the selected parent group is equal to the parent of the group to be moved', async () => {
     const {getByText} = render(
       <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />
     )
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     await act(async () => jest.runAllTimers())
@@ -129,11 +121,17 @@ describe('GroupMoveModal', () => {
   it('enables the move button when a valid group is selected', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps({groupId: '100'})} />)
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('Move').closest('button')).not.toBeDisabled()
+    expect(getByText('Move').closest('button')).toBeEnabled()
+  })
+
+  it('selects the rootGroup by default and enables the submit button if the group can be moved', async () => {
+    const {getByText} = render(
+      <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />
+    )
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Move').closest('button')).toBeEnabled()
   })
 
   it('shows successful flash message when moving a group succeeds', async () => {
@@ -148,8 +146,6 @@ describe('GroupMoveModal', () => {
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -173,8 +169,6 @@ describe('GroupMoveModal', () => {
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -198,8 +192,6 @@ describe('GroupMoveModal', () => {
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -223,8 +215,6 @@ describe('GroupMoveModal', () => {
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -235,34 +225,11 @@ describe('GroupMoveModal', () => {
     })
   })
 
-  it('doesnt show child groups of groupId even if it is loaded before (clear cache)', async () => {
-    const RANDOM_GROUP_ID = '102'
-    const GROUP_ID = '100'
-
-    let r = render(
-      <GroupMoveModal {...defaultProps({parentGroupId: '101', groupId: RANDOM_GROUP_ID})} />,
-      {
-        mocks: [...smallOutcomeTree()]
-      }
-    )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(r.getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(r.getByText('Account folder 0'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(r.queryByText('Group 100 folder 0')).toBeInTheDocument()
-    r.unmount()
-
-    r = render(<GroupMoveModal {...defaultProps({parentGroupId: '101', groupId: GROUP_ID})} />, {
+  it('filters out groupId from the options', async () => {
+    const {queryByText} = render(<GroupMoveModal {...defaultProps({groupId: '100'})} />, {
       mocks: [...smallOutcomeTree()]
     })
-
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(r.getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(r.getByText('Account folder 0'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(r.queryByText('Group 100 folder 0')).not.toBeInTheDocument()
+    expect(queryByText('Account folder 0')).not.toBeInTheDocument()
   })
 
   it('calls onSuccess after move', async () => {
@@ -278,8 +245,6 @@ describe('GroupMoveModal', () => {
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))

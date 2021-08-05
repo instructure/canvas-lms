@@ -315,6 +315,7 @@ const OutcomeManagementPanel = () => {
                   id: selectedParentGroupId
                 })
               }}
+              rootGroup={collections[rootId]}
             />
           )}
           {selectedOutcome && (
@@ -338,6 +339,7 @@ const OutcomeManagementPanel = () => {
                 onCleanupHandler={onCloseOutcomeMoveModal}
                 onGroupCreated={addNewGroup}
                 onSuccess={onSuccessMoveOutcomes}
+                rootGroup={collections[rootId]}
               />
             </>
           )}
@@ -372,6 +374,7 @@ const OutcomeManagementPanel = () => {
             onCloseHandler={closeOutcomesMoveModal}
             onCleanupHandler={onCloseOutcomesMoveModal}
             onSuccess={onSuccessMoveOutcomes}
+            rootGroup={collections[rootId]}
           />
         </>
       )}

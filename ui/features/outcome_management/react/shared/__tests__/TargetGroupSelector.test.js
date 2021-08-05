@@ -40,11 +40,10 @@ describe('TargetGroupSelector', () => {
   let onGroupCreatedMock
 
   const defaultProps = (props = {}) => ({
-    groupId: '100',
     parentGroupId: '1',
     setTargetGroup: setTargetGroupMock,
     onGroupCreated: onGroupCreatedMock,
-    modalName: 'groupMoveModal',
+    targetGroupId: '1',
     ...props
   })
 
@@ -61,15 +60,10 @@ describe('TargetGroupSelector', () => {
 
   const render = (
     children,
-    {
-      contextType = 'Account',
-      contextId = '1',
-      rootOutcomeGroup = {id: '100'},
-      mocks = accountMocks({childGroupsCount: 0})
-    } = {}
+    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
   ) => {
     return realRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -136,7 +130,7 @@ describe('TargetGroupSelector', () => {
   it('displays a flash alert when a child group fails to load', async () => {
     const mocks = [
       ...accountMocks({childGroupsCount: 2}),
-      ...groupMocks({groupId: 100, childGroupOffset: 400})
+      ...groupMocks({groupId: '100', childGroupOffset: 400})
     ]
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {mocks})
     await act(async () => jest.runAllTimers())
@@ -160,11 +154,11 @@ describe('TargetGroupSelector', () => {
   describe('when the create new group link is expanded', () => {
     it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
       const newGroup = {
-        id: 101,
+        id: '101',
         title: 'Group 101',
         description: '',
         isRootGroup: false,
-        parent_outcome_group: {id: 100}
+        parent_outcome_group: {id: '1'}
       }
       addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200, data: newGroup}))
       const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
@@ -174,7 +168,7 @@ describe('TargetGroupSelector', () => {
       fireEvent.click(getByText('Create New Group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(onGroupCreatedMock).toHaveBeenCalledWith(newGroup)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
@@ -192,7 +186,7 @@ describe('TargetGroupSelector', () => {
       fireEvent.click(getByText('Create New Group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
@@ -209,7 +203,7 @@ describe('TargetGroupSelector', () => {
       fireEvent.click(getByText('Create New Group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',

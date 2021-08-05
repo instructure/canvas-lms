@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
@@ -51,8 +51,14 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const [selectedGroupId, setSelectedGroupId] = useState(null)
-  const {addNewGroup} = useManageOutcomes('OutcomeManagementPanel')
+  const {addNewGroup, rootId, collections} = useManageOutcomes('OutcomeManagementPanel')
+  const [targetGroup, setTargetGroup] = useState(null)
+
+  useEffect(() => {
+    if (rootId && collections[rootId] && !targetGroup) {
+      setTargetGroup(collections[rootId])
+    }
+  }, [collections, rootId, targetGroup])
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -70,7 +76,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   }
 
   const handleSetTargetGroup = ({targetGroup}) => {
-    setSelectedGroupId(targetGroup?.id)
+    setTargetGroup(targetGroup)
   }
 
   const onCreateOutcomeHandler = () => {
@@ -79,7 +85,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {
             input: {
-              groupId: selectedGroupId,
+              groupId: targetGroup.id,
               title,
               displayName,
               description
@@ -201,10 +207,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
               {isMobileView ? I18n.t('Select a location') : I18n.t('Location')}
             </Text>
             <TargetGroupSelector
-              groupId={selectedGroupId}
               setTargetGroup={handleSetTargetGroup}
               onGroupCreated={addNewGroup}
-              modalName="CreateOutcomeModal"
             />
           </View>
         </Modal.Body>
@@ -217,7 +221,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             color="primary"
             margin="0 x-small 0 0"
             interaction={
-              !invalidTitle && !invalidDisplayName && selectedGroupId ? 'enabled' : 'disabled'
+              !invalidTitle && !invalidDisplayName && targetGroup ? 'enabled' : 'disabled'
             }
             onClick={onCreateOutcomeHandler}
           >

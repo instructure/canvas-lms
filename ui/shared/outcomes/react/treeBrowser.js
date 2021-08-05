@@ -425,19 +425,18 @@ export const useFindOutcomeModal = open => {
   }
 }
 
-export const useTargetGroupSelector = (groupId, collection) => {
+export const useTargetGroupSelector = groupId => {
   const {
     error,
     isLoading,
     collections,
     rootId,
-    clearCache,
     queryCollections: treeBrowserQueryCollection,
     addNewGroup,
     selectedGroupId,
     selectedParentGroupId,
     loadedGroups
-  } = useManageOutcomes(collection)
+  } = useManageOutcomes('OutcomeManagementPanel')
 
   const queryCollections = ({id, parentGroupId, shouldLoad}) => {
     // Do not query for more collections if the groupId is the same as the id passed
@@ -445,19 +444,6 @@ export const useTargetGroupSelector = (groupId, collection) => {
       treeBrowserQueryCollection({id, parentGroupId, shouldLoad})
     }
   }
-
-  // This will prevent to show child groups if the group id is the same as the
-  // id passed
-  // This will happen when user wants to move group A, load group B children,
-  // closes the move modal and opens group B to be moved.
-  // We won't query group b children, but this will be on cache, so to prevent
-  // of showing, we clear the cache
-  useEffect(() => {
-    return () => {
-      clearCache()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return {
     error,

@@ -38,7 +38,8 @@ const GroupSelectionDrillDown = ({
   rootId,
   selectedGroupId,
   onCollectionClick,
-  loadedGroups
+  loadedGroups,
+  movingGroupId
 }) => {
   const [highlighted, setHighlighted] = useState(SELECTED_GROUP_INDEX)
   const [selected, setSelected] = useState(collections[selectedGroupId || rootId])
@@ -49,7 +50,7 @@ const GroupSelectionDrillDown = ({
     setHighlighted(SELECTED_GROUP_INDEX)
   }, [collections, rootId, selectedGroupId])
 
-  const options = selected.collections.map(id => collections[id])
+  const options = selected.collections.filter(id => id !== movingGroupId).map(id => collections[id])
 
   const handleKeyDown = event => {
     let index = highlighted
@@ -124,7 +125,8 @@ GroupSelectionDrillDown.propTypes = {
   rootId: PropTypes.string.isRequired,
   selectedGroupId: PropTypes.string,
   onCollectionClick: PropTypes.func.isRequired,
-  loadedGroups: PropTypes.array.isRequired
+  loadedGroups: PropTypes.array.isRequired,
+  movingGroupId: PropTypes.string
 }
 
 export default GroupSelectionDrillDown

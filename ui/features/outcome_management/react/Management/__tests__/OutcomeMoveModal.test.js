@@ -52,6 +52,10 @@ describe('OutcomeMoveModal', () => {
     onCloseHandler: onCloseHandlerMock,
     onCleanupHandler: onCleanupHandlerMock,
     outcomes: generateOutcomes(1),
+    rootGroup: {
+      id: '0',
+      title: 'Root account folder'
+    },
     ...props
   })
 
@@ -126,12 +130,18 @@ describe('OutcomeMoveModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('enables the move button when a valid group is selected', async () => {
+  it('enables the move button by default', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
+    expect(getByText('Move').closest('button')).toBeEnabled()
+  })
+
+  it('enables the move button when a child group is selected', async () => {
+    const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
+      mocks: [...smallOutcomeTree('Account')]
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runAllTimers())
@@ -146,8 +156,6 @@ describe('OutcomeMoveModal', () => {
         mocks: [...smallOutcomeTree('Account'), moveOutcomeMock()]
       }
     )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -177,8 +185,6 @@ describe('OutcomeMoveModal', () => {
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -203,8 +209,6 @@ describe('OutcomeMoveModal', () => {
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -228,8 +232,6 @@ describe('OutcomeMoveModal', () => {
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -252,8 +254,6 @@ describe('OutcomeMoveModal', () => {
         ]
       }
     )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())

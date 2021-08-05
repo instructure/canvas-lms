@@ -35,9 +35,10 @@ const OutcomeMoveModal = ({
   onCloseHandler,
   onCleanupHandler,
   onGroupCreated,
-  onSuccess
+  onSuccess,
+  rootGroup
 }) => {
-  const [targetGroup, setTargetGroup] = useState(null)
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
   const [targetAncestorsIds, setTargetAncestorsIds] = useState([])
   const count = Object.keys(outcomes).length
   const outcomeTitle = Object.values(outcomes)[0]?.title
@@ -180,6 +181,7 @@ OutcomeMoveModal.propTypes = {
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
   onGroupCreated: PropTypes.func.isRequired,
+  rootGroup: PropTypes.object.isRequired,
   onSuccess: PropTypes.func
 }
 

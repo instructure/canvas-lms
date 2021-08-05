@@ -22,7 +22,6 @@ import I18n from 'i18n!MoveOutcomesModal'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import TreeBrowser from '../Management/TreeBrowser'
 import AddContentItem from './AddContentItem'
 import GroupSelectionDrillDown from './GroupSelectionDrillDown'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -44,12 +43,10 @@ const getAncestorsIds = (targetGroup, collections) => {
 
 const TargetGroupSelector = ({
   groupId,
-  parentGroupId,
   setTargetGroup,
-  onGroupCreated,
-  modalName
+  onGroupCreated
 }) => {
-  const {contextType, contextId, rootOutcomeGroup, isMobileView, isCourse} = useCanvasContext()
+  const {contextType, contextId, isCourse} = useCanvasContext()
   const {
     error,
     isLoading,
@@ -59,7 +56,7 @@ const TargetGroupSelector = ({
     addNewGroup,
     selectedGroupId,
     loadedGroups
-  } = useTargetGroupSelector(groupId, modalName)
+  } = useTargetGroupSelector(groupId)
 
   const onCreateGroupHandler = async groupName => {
     try {
@@ -69,14 +66,11 @@ const TargetGroupSelector = ({
       // the FlashAlert and change this to add the newly created group to the Tree browser
       // or the new responsive designs. The FlashAlert is merely for verification that
       // the save to the API was successful.
-      const newParentGroupId =
-        isMobileView && selectedGroupId ? selectedGroupId : rootOutcomeGroup.id
+      const newParentGroupId = selectedGroupId || rootId
       const newGroup = await addOutcomeGroup(contextType, contextId, newParentGroupId, groupName)
       addNewGroup(newGroup.data)
       onGroupCreated(newGroup.data) // NOTE: This updates the TreeBrowser on the LHS of the Manage screen
-      if (isMobileView) {
-        queryCollections({id: newGroup.data.id, parentGroupId: newParentGroupId, shouldLoad: false})
-      }
+      queryCollections({id: newGroup.data.id, parentGroupId: newParentGroupId, shouldLoad: false})
       showFlashAlert({
         message: I18n.t('"%{groupName}" has been created.', {groupName}),
         type: 'success'
@@ -97,18 +91,11 @@ const TargetGroupSelector = ({
   }
 
   const onCollectionClick = (_, selectedCollection) => {
-    if (isMobileView) {
-      queryCollections(selectedCollection)
-    }
+    queryCollections(selectedCollection)
     const selectedGroupObject = collections[selectedCollection.id]
-    const targetGroup =
-      groupId && (groupId === selectedGroupObject.id || selectedGroupObject.id === parentGroupId)
-        ? null
-        : selectedGroupObject
-
     setTargetGroup({
-      targetGroup,
-      targetAncestorsIds: getAncestorsIds(targetGroup, collections)
+      targetGroup: selectedGroupObject,
+      targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections)
     })
   }
 
@@ -126,29 +113,25 @@ const TargetGroupSelector = ({
         </Text>
       ) : (
         <>
-          {isMobileView ? (
-            <GroupSelectionDrillDown
-              onCollectionClick={onCollectionClick}
-              collections={collections}
-              selectedGroupId={selectedGroupId}
-              rootId={rootId}
-              loadedGroups={loadedGroups}
-            />
-          ) : (
-            <TreeBrowser
-              onCollectionToggle={queryCollections}
-              onCollectionClick={onCollectionClick}
-              collections={collections}
-              rootId={rootId}
-              showRootCollection
+          <GroupSelectionDrillDown
+            onCollectionClick={onCollectionClick}
+            collections={collections}
+            selectedGroupId={selectedGroupId}
+            rootId={rootId}
+            movingGroupId={groupId}
+            loadedGroups={loadedGroups}
+          />
+          {loadedGroups.includes(selectedGroupId || rootId) && (
+            <AddContentItem
+              labelInstructions={I18n.t('Create New Group')}
+              onSaveHandler={name => {
+                const parentId = selectedGroupId || rootId
+                onCreateGroupHandler(name, parentId)
+              }}
+              textInputInstructions={I18n.t('Enter new group name')}
+              showIcon
             />
           )}
-          <AddContentItem
-            labelInstructions={I18n.t('Create New Group')}
-            onSaveHandler={onCreateGroupHandler}
-            textInputInstructions={I18n.t('Enter new group name')}
-            showIcon
-          />
         </>
       )}
     </View>
@@ -157,11 +140,8 @@ const TargetGroupSelector = ({
 
 TargetGroupSelector.propTypes = {
   groupId: PropTypes.string,
-  parentGroupId: PropTypes.string,
   setTargetGroup: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired,
-  modalName: PropTypes.oneOf(['CreateOutcomeModal', 'groupMoveModal', 'outcomeMoveModal'])
-    .isRequired
+  onGroupCreated: PropTypes.func.isRequired
 }
 
 export default TargetGroupSelector

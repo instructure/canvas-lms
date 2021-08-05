@@ -35,10 +35,13 @@ const GroupMoveModal = ({
   isOpen,
   onCloseHandler,
   onGroupCreated,
-  onSuccess
+  onSuccess,
+  rootGroup
 }) => {
-  const [targetGroup, setTargetGroup] = useState(null)
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
   const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
+  const disableGroupMove =
+    !targetGroup || targetGroup?.id === parentGroupId || targetGroup?.id === groupId
 
   const onMoveGroupHandler = () => {
     ;(async () => {
@@ -98,11 +101,9 @@ const GroupMoveModal = ({
           </Text>
           <TargetGroupSelector
             groupId={groupId}
-            parentGroupId={parentGroupId}
             // eslint-disable-next-line no-shadow
             setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
             onGroupCreated={onGroupCreated}
-            modalName="groupMoveModal"
           />
         </View>
       </Modal.Body>
@@ -114,7 +115,7 @@ const GroupMoveModal = ({
           type="button"
           color="primary"
           margin="0 x-small 0 0"
-          disabled={!targetGroup}
+          disabled={disableGroupMove}
           onClick={onMoveGroupHandler}
         >
           {I18n.t('Move')}
@@ -131,7 +132,8 @@ GroupMoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onGroupCreated: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired
+  onSuccess: PropTypes.func.isRequired,
+  rootGroup: PropTypes.object.isRequired
 }
 
 GroupMoveModal.defaultProps = {
