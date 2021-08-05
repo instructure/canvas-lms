@@ -114,6 +114,18 @@ describe('MicrosoftSyncAccountSettings', () => {
       expect(container).toBeTruthy()
       expect(container.error).toBeFalsy()
     })
+
+    it('loads the login attribute selector with the value from the API', async () => {
+      const container = setup(({loading, success}) => {
+        loading(false)
+        success({
+          microsoft_sync_tenant: 'testtenant.com',
+          microsoft_sync_login_attribute: 'sis_user_id',
+          microsoft_sync_enabled: true
+        })
+      })
+      expect(getLoginAttributeSelector(container).title).toMatch(/sis user id/i)
+    })
   })
 
   describe('error handling', () => {

@@ -46,8 +46,9 @@ module MicrosoftSync
       users_uluvs =
         case login_attribute
         when 'email' then find_by_email
-        when 'preferred_username' then find_by_preferred_username
-        when 'sis_user_id' then find_by_sis_user_id
+        when 'preferred_username' then find_by_active_pseudonyms_field(:unique_id)
+        when 'sis_user_id' then find_by_active_pseudonyms_field(:sis_user_id)
+        when 'integration_id' then find_by_active_pseudonyms_field(:integration_id)
         else raise InvalidOrMissingLoginAttributeConfig
         end
 
@@ -68,16 +69,12 @@ module MicrosoftSync
         .pluck(:user_id, :path)
     end
 
-    def find_by_preferred_username
-      find_active_pseudonyms.pluck(:user_id, :unique_id)
-    end
-
-    def find_by_sis_user_id
-      find_active_pseudonyms.pluck(:user_id, :sis_user_id)
-    end
-
-    def find_active_pseudonyms
-      root_account.pseudonyms.active.where(user_id: user_ids).order(position: :asc)
+    def find_by_active_pseudonyms_field(field)
+      root_account.pseudonyms
+        .active.where(user_id: user_ids)
+        .where.not(field => nil)
+        .order(position: :asc)
+        .pluck(:user_id, field)
     end
 
     def login_attribute
