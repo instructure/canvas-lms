@@ -1525,6 +1525,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
+  rescue_from ActiveRecord::StaleObjectError, with: :rescue_expected_error_type
   # Canvas exceptions
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
