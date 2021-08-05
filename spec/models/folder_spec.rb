@@ -497,6 +497,36 @@ describe Folder do
     end
   end
 
+  describe ".buttons_and_icons_folder" do
+    let_once(:course) { Course.create! }
+
+    subject { Folder.buttons_and_icons_folder(course) }
+
+    context "when a 'Buttons and Icons' folder does not yet exist" do
+      it "creates a folder with BUTTONS_AND_ICONS_UNIQUE_TYPE unique type when one does not exist" do
+        expect {
+          subject
+        }.to change {
+          course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
+        }.from(0).to(1)
+      end
+
+      it "creates a folder with a default name of 'Buttons and Icons'" do
+        expect(subject.name).to eq "Buttons and Icons"
+      end
+    end
+
+    context "when a 'Buttons and Icons' folder already exists" do
+      before(:each) do
+        @existing_folder = Folder.buttons_and_icons_folder(course)
+      end
+
+      it "returns, rather than creates, the existing BUTTONS_AND_ICONS_UNIQUE_TYPE folder" do
+        expect(subject).to eq @existing_folder
+      end
+    end
+  end
+
   describe "#for_student_annotation_documents?" do
     before(:once) do
       @course = Course.create!

@@ -27,6 +27,8 @@ import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 
 export default function ThemeEditorSidebar(props) {
   const [selected, setSelected] = useState('tab-panel-edit')
+  // xsslint safeString.identifier customCssLink
+  const customCssLink = I18n.t('#community.admin_custom_js_css')
 
   function changeTab(_ev, {id}) {
     setSelected(id)
@@ -72,9 +74,7 @@ export default function ThemeEditorSidebar(props) {
                     __html: I18n.t(
                       'Before implementing custom CSS or Javascript, please refer to *our documentation*.',
                       {
-                        wrappers: [
-                          '<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253" target="_blank">$1</a>'
-                        ]
+                        wrappers: ['<a href="' + customCssLink + '" target="_blank">$1</a>']
                       }
                     )
                   }}

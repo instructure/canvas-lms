@@ -1,6 +1,7 @@
 {
     "migration_id":"URN:X-WEBCT-VISTA_V2:790EA1350A10681DE0440003BA07D9B4",
     "title":"Occipital condyles",
+    "description": "<p>this is a description</p>",
     "quiz_type":"assignment",
     "due_date":"1247497200000",
     "grading":

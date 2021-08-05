@@ -16,7 +16,7 @@
   <h2>Resources</h2>
   <a <%= "class='current'" if options[:all_resources] %> href="all_resources.html">All Resources Reference</a>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>
-    <% next if resource.include?('Plagiarism Detection')
+    <% next if resource.include?('Plagiarism')
        link = url_for("#{topicize resource}.html")
        klass = []
        klass << "current" if resource == options[:object] %>
@@ -52,7 +52,7 @@
     <li><h4>Plagiarism Detection Platform</h4>
       <a href="<%= url_for("file.plagiarism_platform.html") %>" class="<%= 'current' if options[:object] == 'file.plagiarism_platform.html' %>">Overview</a>
       <% options[:resources].each do |(resource, controllers)| %>
-        <% next if resource.exclude?('Plagiarism Detection')
+        <% next if resource.exclude?('Plagiarism')
            link = url_for("#{topicize resource}.html")
            klass = "current" if resource == options[:object] %>
         <a class="<%= klass %>" href="<%= link %>"><%= resource %></a>

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable react/prefer-es6-class */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -22,6 +24,9 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!student_groups'
 import {Spinner} from '@instructure/ui-spinner'
+import {Button} from '@instructure/ui-buttons'
+import {IconAddLine} from '@instructure/ui-icons'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection.coffee'
 import ContextGroupCollection from '../backbone/collections/ContextGroupCollection'
 import BackboneState from './mixins/BackboneState'
@@ -34,11 +39,11 @@ import 'jqueryui/dialog'
 const StudentView = createReactClass({
   displayName: 'StudentView',
   mixins: [BackboneState],
+  panelRef: null,
 
   getInitialState() {
     return {
       filter: '',
-      loading: false,
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'}
       }),
@@ -54,7 +59,7 @@ const StudentView = createReactClass({
       width: 700,
       'fix-dialog-buttons': false,
 
-      close: e => {
+      close: _e => {
         ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
       }
@@ -88,7 +93,7 @@ const StudentView = createReactClass({
       width: 700,
       'fix-dialog-buttons': false,
 
-      close: e => {
+      close: _e => {
         ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
       }
@@ -142,12 +147,7 @@ const StudentView = createReactClass({
   },
 
   _loadMore(collection) {
-    if (!collection.loadedAll && !collection.fetchingNextPage) {
-      this.setState({loading: true})
-      collection.fetch({page: 'next'}).done((resp, err) => {
-        this.setState({loading: false})
-      })
-    }
+    if (!collection.loadedAll && !collection.fetchingNextPage) collection.fetch({page: 'next'})
   },
 
   _extendAttribute(model, attribute, hash) {
@@ -187,7 +187,8 @@ const StudentView = createReactClass({
     const dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`, 'DELETE', {}, () =>
       this._onLeave(group)
     )
-    $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd)
+    // eslint-disable-next-line react/no-find-dom-node
+    $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
   },
 
   _onJoin(group) {
@@ -216,7 +217,8 @@ const StudentView = createReactClass({
           join: false
         })
     )
-    $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd)
+    // eslint-disable-next-line react/no-find-dom-node
+    $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
   },
 
   _filter(group) {
@@ -234,17 +236,22 @@ const StudentView = createReactClass({
 
   render() {
     const filteredGroups = this.state.groupCollection.toJSON().filter(this._filter)
+    const {filter, groupCollection} = this.state
+    const loading =
+      groupCollection.fetchingNextPage || (filter.length > 0 && !groupCollection.loadedAll)
+
     let newGroupButton = null
     if (ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE) {
       newGroupButton = (
-        <button
-          aria-label={I18n.t('Add new group')}
-          className="btn btn-primary add_group_link"
+        <Button
+          color="primary"
+          renderIcon={IconAddLine}
           onClick={this.openNewGroupDialog}
+          data-test-id="add-group-button"
         >
-          <i className="icon-plus" />
-          &nbsp;{I18n.t('Group')}
-        </button>
+          <PresentationContent>{I18n.t('Group')}</PresentationContent>
+          <ScreenReaderContent>{I18n.t('Add new group')}</ScreenReaderContent>
+        </Button>
       )
     }
 
@@ -266,22 +273,27 @@ const StudentView = createReactClass({
             </li>
           </ul>
           <div className="pull-right group-categories-actions">{newGroupButton}</div>
-          <div className="roster-tab tab-panel" ref="panel">
+          <div
+            className="roster-tab tab-panel"
+            ref={ref => {
+              this.panelRef = ref
+            }}
+          >
             <Filter onChange={e => this.setState({filter: e.target.value})} />
-            {this.state.loading ? (
-              <div className="spinner-container">
-                <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
-              </div>
-            ) : null}
             <PaginatedGroupList
               loading={this.state.groupCollection.fetchingNextPage}
               groups={filteredGroups}
-              filter={this.state.filter}
+              filter={filter}
               loadMore={() => this._loadMore(this.state.groupCollection)}
               onLeave={this.leave}
               onJoin={this.join}
               onManage={this.manage}
             />
+            {loading && (
+              <div className="spinner-container">
+                <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
+              </div>
+            )}
           </div>
         </div>
       </div>

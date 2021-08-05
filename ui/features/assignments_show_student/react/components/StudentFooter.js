@@ -22,35 +22,26 @@ import React from 'react'
 import theme from '@instructure/canvas-theme'
 
 function buildFooterStyle() {
-  // The following padding calculation and accompanying comments are blatantly
-  // stolen from the TeacherFooter component
-  let padding
-  try {
-    // assuming some knowledge about canvas' DOM here, but
-    // is necessary to make the footer justify itself on the page
-    // the way we want
-    padding = window
-      .getComputedStyle(document.getElementById('content'))
-      .getPropertyValue('padding-right')
-  } catch (_ignore) {
-    padding = '24px' // because I know that's what it is :)
-  }
-
   return {
     backgroundColor: theme.variables.colors.white,
-    borderColor: theme.variables.colors.borderMedium,
-    paddingRight: padding,
-    paddingLeft: padding
+    borderColor: theme.variables.colors.borderMedium
   }
 }
 
 const StudentFooter = ({buttons}) => (
   <div data-testid="student-footer" id="assignments-student-footer" style={buildFooterStyle()}>
-    <Flex alignItems="center" height="100%" margin="0" justifyItems="end">
-      {buttons.map(button => (
-        <Flex.Item key={button.key} padding="auto small">
-          {button.element}
-        </Flex.Item>
+    <Flex alignItems="center" height="100%" margin="0" justifyItems="space-between">
+      {['left', 'right'].map(align => (
+        <Flex key={align} alignItems="center" height="100%" margin="0" justifyItems="end">
+          {buttons.length === 0 && <></>}
+          {buttons
+            .filter(button => button.align === align)
+            .map(button => (
+              <Flex.Item key={button.key} padding="auto small">
+                {button.element}
+              </Flex.Item>
+            ))}
+        </Flex>
       ))}
     </Flex>
   </div>

@@ -21,13 +21,20 @@ import React from 'react'
 import {DeletedPostMessage} from '../DeletedPostMessage'
 
 const setup = () => {
-  return render(<DeletedPostMessage deleterName="Foo Bar" timingDisplay="Jan 1 2000" />)
+  return render(
+    <DeletedPostMessage
+      deleterName="Rick Sanchez"
+      timingDisplay="Jan 1 1:00pm"
+      deletedTimingDisplay="Feb 2 2:00pm"
+    />
+  )
 }
 
 describe('DeletedPostMessage', () => {
   it('displays deletion info', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Deleted by Foo Bar')).toBeTruthy()
-    expect(queryByText('Jan 1 2000')).toBeTruthy()
+    const container = setup()
+    expect(container.getByText('Deleted by Rick Sanchez')).toBeInTheDocument()
+    expect(container.getByText('Deleted Feb 2 2:00pm')).toBeInTheDocument()
+    expect(container.getByText('Created Jan 1 1:00pm')).toBeInTheDocument()
   })
 })

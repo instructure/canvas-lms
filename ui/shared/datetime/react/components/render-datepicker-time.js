@@ -35,10 +35,10 @@ const STRINGS = {
     return I18n.t('datepicker.titles.am_pm', 'am/pm')
   },
   get AM() {
-    return I18n.t('#time.am')
+    return I18n.t('#time.am', 'am')
   },
   get PM() {
-    return I18n.t('#time.pm')
+    return I18n.t('#time.pm', 'pm')
   },
   get doneButton() {
     return I18n.t('#buttons.done', 'Done')

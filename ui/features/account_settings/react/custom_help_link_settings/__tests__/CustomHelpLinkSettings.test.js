@@ -39,7 +39,7 @@ function makeProps(overrides = {}) {
       available_to: ['user', 'student', 'teacher', 'admin'],
       text: 'Search the Canvas Guides',
       subtext: 'Find answers to common questions',
-      url: 'https://community.canvaslms.com/t5/Canvas/ct-p/canvas',
+      url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
       type: 'default',
       is_featured: false,
       is_new: false,
@@ -172,7 +172,7 @@ describe('<CustomHelpLinkSettings/>', () => {
       })
     })
 
-    it('calls flashScreenreaderAlert when appropriate', async function() {
+    it('calls flashScreenreaderAlert when appropriate', async function () {
       const rendered = render(<CustomHelpLinkSettings {...makeProps()} />)
 
       // flash message when transitions to invalid

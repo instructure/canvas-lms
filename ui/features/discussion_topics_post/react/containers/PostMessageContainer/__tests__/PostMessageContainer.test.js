@@ -72,14 +72,15 @@ describe('PostMessageContainer', () => {
         editor: null
       })
     )
-    expect(container.queryByText(/Edited/)).toBeNull()
+    expect(container.queryByText(/Edited by/)).toBeNull()
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   it('displays deletion info if delete', () => {
-    const {queryByText} = setup(defaultProps({deleted: true}))
-    expect(queryByText('Deleted by Hank Mccoy')).toBeTruthy()
-    expect(queryByText('Feb 8 8:35pm')).toBeTruthy()
+    const {getByText} = setup(defaultProps({deleted: true}))
+    expect(getByText('Deleted by Hank Mccoy')).toBeInTheDocument()
+    expect(getByText('Created Feb 8 8:35pm')).toBeInTheDocument()
+    expect(getByText('Deleted Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('displays discussion entry message', () => {

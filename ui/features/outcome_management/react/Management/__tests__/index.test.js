@@ -26,8 +26,10 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   accountMocks,
   courseMocks,
+  deleteOutcomeMock,
   groupDetailMocks,
-  groupMocks
+  groupMocks,
+  updateOutcomeGroupMock
 } from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -38,14 +40,36 @@ jest.useFakeTimers()
 describe('OutcomeManagementPanel', () => {
   let cache
   let showFlashAlertSpy
+  let defaultMocks
+  let groupDetailDefaultProps
 
   beforeEach(() => {
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+
     window.ENV = {
       PERMISSIONS: {
         manage_outcomes: true
       }
+    }
+
+    defaultMocks = [
+      ...courseMocks({childGroupsCount: 2}),
+      ...groupMocks({groupId: '200'}),
+      ...groupDetailMocks({
+        title: 'Course folder 0',
+        description: 'Course folder 0 group description',
+        groupId: '200',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false
+      })
+    ]
+
+    groupDetailDefaultProps = {
+      contextType: 'Course',
+      contextId: '2',
+      mocks: defaultMocks
     }
   })
 
@@ -53,16 +77,6 @@ describe('OutcomeManagementPanel', () => {
     jest.clearAllMocks()
     window.ENV = null
   })
-
-  const groupDetailDefaultProps = {
-    contextType: 'Course',
-    contextId: '2',
-    mocks: [
-      ...courseMocks({childGroupsCount: 2}),
-      ...groupMocks({groupId: '200'}),
-      ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2'})
-    ]
-  }
 
   const render = (
     children,
@@ -199,9 +213,9 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Group 200 Outcomes')).toBeInTheDocument()
-    expect(getByText('Outcome 1 - Group 200')).toBeInTheDocument()
-    expect(getByText('Outcome 2 - Group 200')).toBeInTheDocument()
+    expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
+    expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    expect(getByText('Outcome 2 - Course folder 0')).toBeInTheDocument()
   })
 
   it('shows remove group modal if remove option from group menu is selected', async () => {
@@ -227,82 +241,48 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
   })
 
-  describe('Moving a group', () => {
-    it('shows move group modal if move option from group menu is selected', async () => {
-      const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
-    })
-
-    it('shows successful flash message when moving a group succeeds', async () => {
+  describe('Removing a group', () => {
+    it('Show parent group in the RHS', async () => {
       // API mock
-      jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
+      jest.spyOn(api, 'removeOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
 
-      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
+      const {getByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({
+            title: 'Course folder 0',
+            groupId: '200',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          ...groupMocks({groupId: '300', childGroupOffset: 400}),
+          ...groupDetailMocks({
+            groupId: '300',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          })
+        ]
       })
       await act(async () => jest.runOnlyPendingTimers())
       // OutcomeManagementPanel Group Tree Browser
       fireEvent.click(getByText('Course folder 0'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText('Course folder 0 Outcomes')).not.toBeInTheDocument()
       // OutcomeManagementPanel Outcome Group Kebab Menu
       fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      fireEvent.click(within(getByRole('menu')).getByText('Remove'))
       await act(async () => jest.runOnlyPendingTimers())
-      // Move Modal
-      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      // Remove Modal
+      fireEvent.click(getByText('Remove Group'))
       await act(async () => jest.runAllTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // moveOutcomeGroup API call & success flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Group 200" has been moved to "Course folder 1".',
-        type: 'success'
-      })
-    })
-
-    it('shows error flash message when moving a group fails', async () => {
-      // API mock
-      jest
-        .spyOn(api, 'moveOutcomeGroup')
-        .mockImplementation(() => Promise.reject(new Error('Network error')))
-
-      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Group Tree Browser
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Outcome Group Kebab Menu
-      fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(within(getByRole('menu')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // Move Modal
-      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // moveOutcomeGroup API call & error flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred moving group "Group 200": Network error',
-        type: 'error'
-      })
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
     })
   })
 
@@ -386,6 +366,25 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
   })
 
+  it('Removes outcome from the list', async () => {
+    const {queryByText, getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps,
+      mocks: [...defaultMocks, deleteOutcomeMock({ids: ['1']})]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    expect(queryByText('2 Outcomes')).toBeInTheDocument()
+    fireEvent.click(getAllByText('Select outcome')[0])
+    fireEvent.click(getByRole('button', {name: /remove/i}))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Remove Outcome'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+    expect(queryByText('1 Outcome')).toBeInTheDocument()
+  })
+
   it('clears selected outcome when move outcome modal is closed', async () => {
     const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -397,7 +396,7 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(within(getByRole('menu')).getByText('Move'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Cancel'))
-    expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
+    expect(queryByText('Move "Outcome 1 - Course folder 0"')).not.toBeInTheDocument()
   })
 
   it('hides the Outcome Menu if the user doesnt have permission to edit the outcome', async () => {
@@ -423,7 +422,7 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 Outcomes')).toBeInTheDocument()
     fireEvent.change(getByLabelText('Search field'), {target: {value: 'no matched results'}})
     await act(async () => jest.advanceTimersByTime(500))
     expect(getByLabelText('Search field')).toBeEnabled()
@@ -437,27 +436,29 @@ describe('OutcomeManagementPanel', () => {
         ...courseMocks({childGroupsCount: 2}),
         ...groupMocks({groupId: '200'}),
         ...groupDetailMocks({
+          title: 'Course folder 0',
           groupId: '200',
           contextType: 'Course',
           contextId: '2',
-          searchQuery: 'Outcome 1'
+          searchQuery: 'Outcome 1',
+          withMorePage: false
         })
       ]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
     const searchInput = getByLabelText('Search field')
     fireEvent.change(searchInput, {target: {value: 'Outcome'}})
     await act(async () => jest.advanceTimersByTime(100))
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 Outcomes')).toBeInTheDocument()
     fireEvent.change(searchInput, {target: {value: 'Outcome '}})
     await act(async () => jest.advanceTimersByTime(300))
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 Outcomes')).toBeInTheDocument()
     fireEvent.change(searchInput, {target: {value: 'Outcome 1'}})
     await act(async () => jest.advanceTimersByTime(500))
-    expect(getByText('1 "Group 200" Outcome')).toBeInTheDocument()
+    expect(getByText('1 Outcome')).toBeInTheDocument()
   })
 
   describe('Bulk remove outcomes', () => {
@@ -473,6 +474,28 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(getByRole('button', {name: /remove/i}))
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('Remove Outcomes?')).toBeInTheDocument()
+    })
+
+    it('outcome names are passed to the remove modal when using bulk remove', async () => {
+      const {getByText, getAllByText, getByRole, getByTestId, getAllByTestId} = render(
+        <OutcomeManagementPanel />,
+        {
+          ...groupDetailDefaultProps
+        }
+      )
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      const itemOneTitle = getAllByTestId('outcome-management-item-title')[0].textContent
+      const itemTwoTitle = getAllByTestId('outcome-management-item-title')[1].textContent
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      fireEvent.click(getByRole('button', {name: /remove/i}))
+      await act(async () => jest.runOnlyPendingTimers())
+      const removeModal = getByTestId('outcome-management-remove-modal')
+      expect(within(removeModal).getByText('Remove Outcomes?')).toBeInTheDocument()
+      expect(within(removeModal).getByText(itemOneTitle)).toBeInTheDocument()
+      expect(within(removeModal).getByText(itemTwoTitle)).toBeInTheDocument()
     })
   })
 
@@ -515,6 +538,56 @@ describe('OutcomeManagementPanel', () => {
     })
   })
 
+  describe('Moving a group', () => {
+    it('show parent group in the RHS when moving a group succeeds', async () => {
+      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({
+            groupId: '200',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          ...groupMocks({groupId: '300', childGroupOffset: 400}),
+          ...groupDetailMocks({
+            groupId: '300',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          updateOutcomeGroupMock({
+            id: '300',
+            parentOutcomeGroupId: '201',
+            title: null,
+            description: null,
+            vendorGuid: null
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('2 Outcomes')).toBeInTheDocument()
+    })
+  })
+
   describe('can_manage permissions are false', () => {
     beforeEach(() => {
       window.ENV = {
@@ -530,5 +603,59 @@ describe('OutcomeManagementPanel', () => {
       })
       expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
+  })
+
+  it('shows move group modal if move option from group menu is selected', async () => {
+    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Move'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
+  })
+
+  it('shows edit group modal if edit option from group menu is selected', async () => {
+    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByText('Edit Group')).toBeInTheDocument()
+  })
+
+  it('shows selected group title within edit group modal', async () => {
+    const {getByText, getByRole, getByTestId} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    const editModal = getByTestId('outcome-management-edit-modal')
+    expect(within(editModal).getByDisplayValue('Course folder 0')).toBeInTheDocument()
+  })
+
+  it('shows selected group description within edit group modal', async () => {
+    const {getByText, getByRole, getByTestId} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    const editModal = getByTestId('outcome-management-edit-modal')
+    expect(within(editModal).getByText('Group Description 4')).toBeInTheDocument()
   })
 })

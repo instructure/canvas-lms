@@ -428,6 +428,11 @@ export default function CanvasContentTray(props) {
                     contentSubtype={filterSettings.contentSubtype}
                     sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
                     searchString={filterSettings.searchString}
+                    source={props.source}
+                    jwt={props.jwt}
+                    host={props.host}
+                    refreshToken={props.refreshToken}
+                    context={{type: props.contextType, id: props.contextId}}
                     {...contentProps}
                   />
                 </ErrorBoundary>

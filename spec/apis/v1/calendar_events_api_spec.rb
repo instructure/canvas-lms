@@ -2452,6 +2452,17 @@ describe CalendarEventsApiController, type: :request do
         links = Api.parse_pagination_links(response.headers['Link'])
         expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
       end
+
+      it "returns important dates over multiple shards" do
+        Account.site_admin.enable_feature! :important_dates
+        @e0.update important_dates: true
+        @e1.update important_dates: true
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&important_dates=1",
+                        controller: 'calendar_events_api', action: 'index', format: 'json',
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, important_dates: 1)
+        expect(json.size).to eq 2
+        expect(json.map { |e| e['id'] }).to match_array([@e0.id, @e1.id])
+      end
     end
 
     context 'important dates' do

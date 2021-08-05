@@ -245,6 +245,18 @@ the `ext_lti_assignment_id` send in various launches and webhooks.
 ```
 "9ae4170c-6b64-444d-9246-0b7dedd5f560"
 ```
+## com.instructure.Assignment.allowedFileExtensions
+A comma separated list of the file extensions that are allowed for submitting to this
+assignment. If there are no limits on what files can be uploaded, an empty string will be
+returned. If the assignment does not allow file uploads as a submission type, then no
+substitution will be performed.
+
+**Availability**: *when the tool is used to upload a file as an assignment submission*  
+**Launch Parameter**: *com_instructure_assignment_allowed_file_extensions*  
+
+```
+"docx,pdf,txt"
+```
 ## com.instructure.OriginalityReport.id
 The Canvas id of the Originality Report associated
 with the launch.

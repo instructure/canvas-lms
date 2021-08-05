@@ -166,6 +166,7 @@ module CanvasRails
     }
 
     config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
+    config.i18n.load_path << Rails.root.join('config', 'locales', 'community.csv')
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'

@@ -22,15 +22,40 @@ import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import LoadingWrapper from './LoadingWrapper'
+import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 import ImportantInfo, {ImportantInfoShape, ImportantInfoEditHeader} from './ImportantInfo'
 
-const ImportantInfoLayout = ({isLoading, importantInfos}) => {
+const ImportantInfoLayout = ({isLoading, importantInfos, courseId}) => {
   const sectionHeading = <Heading level="h2">{I18n.t('Important Info')}</Heading>
 
+  const renderImportantInfoLoadingContainer = skeletons => (
+    <div>
+      {skeletons.length > 0 && (
+        <LoadingSkeleton
+          screenReaderLabel={I18n.t('Loading section header')}
+          height="1.75rem"
+          width="9rem"
+          margin="medium 0 0"
+        />
+      )}
+      {skeletons}
+    </div>
+  )
+
   return (
-    <>
-      {(isLoading || importantInfos.length > 0) &&
+    <LoadingWrapper
+      id={`important-info-${courseId || 'dashboard'}`}
+      isLoading={isLoading}
+      skeletonsNum={importantInfos?.length}
+      screenReaderLabel={I18n.t('Loading important info')}
+      renderSkeletonsContainer={renderImportantInfoLoadingContainer}
+      height="8em"
+      width="100%"
+      margin="medium 0 0"
+    >
+      {importantInfos.length > 0 &&
         (importantInfos.length === 1 ? (
           <ImportantInfoEditHeader margin="medium 0 0" {...importantInfos[0]}>
             {sectionHeading}
@@ -40,27 +65,22 @@ const ImportantInfoLayout = ({isLoading, importantInfos}) => {
             {sectionHeading}
           </View>
         ))}
-
-      {isLoading ? (
-        <ImportantInfo isLoading />
-      ) : (
-        importantInfos.map((info, i) => (
-          <ImportantInfo
-            key={`important-info-${info.courseId}`}
-            isLoading={false}
-            showTitle={importantInfos.length > 1}
-            titleMargin={i === 0 ? 'small 0 0' : 'medium 0 0'}
-            infoDetails={info}
-          />
-        ))
-      )}
-    </>
+      {importantInfos?.map((info, i) => (
+        <ImportantInfo
+          key={`important-info-${info.courseId}`}
+          showTitle={importantInfos.length > 1}
+          titleMargin={i === 0 ? 'small 0 0' : 'medium 0 0'}
+          infoDetails={info}
+        />
+      ))}
+    </LoadingWrapper>
   )
 }
 
 ImportantInfoLayout.propTypes = {
   isLoading: PropTypes.bool.isRequired,
-  importantInfos: PropTypes.arrayOf(PropTypes.shape(ImportantInfoShape)).isRequired
+  importantInfos: PropTypes.arrayOf(PropTypes.shape(ImportantInfoShape)).isRequired,
+  courseId: PropTypes.string
 }
 
 export default ImportantInfoLayout

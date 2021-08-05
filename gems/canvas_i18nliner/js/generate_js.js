@@ -17,6 +17,7 @@
  */
 
 var I18nliner = require("i18nliner").default;
+var TranslateCall = require("i18nliner/dist/lib/extractors/translate_call").default;
 var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 var mkdirp = require("mkdirp");
@@ -50,12 +51,29 @@ GenerateJs.prototype = Object.create(Check.prototype);
 GenerateJs.prototype.constructor = GenerateJs;
 
 GenerateJs.prototype.run = function() {
+  var translationsWas = TranslateCall.prototype.translations
+  TranslateCall.prototype.translations = function() {
+    var key = this.key;
+    var defaultValue = this.defaultValue;
+  
+    if (typeof defaultValue === 'string' || !defaultValue)
+      return [[key, defaultValue]];
+  
+    var translations = [];
+    for (var k in defaultValue) {
+      if (defaultValue.hasOwnProperty(k)) {
+        translations.push([key + "." + k, defaultValue[k]]);
+      }
+    }
+    return translations;
+  };
   var success = Check.prototype.run.call(this);
   if (!success) return false;
   var keysByScope = this.translations.keysByScope();
   this.outputFile = './' + (this.options.outputFile || "config/locales/generated/js_bundles.json");
   mkdirp.sync(this.outputFile.replace(/\/[^\/]+$/, ''));
   fs.writeFileSync(this.outputFile, JSON.stringify(keysByScope));
+  TranslateCall.prototype.translations = translationsWas
   return true;
 };
 

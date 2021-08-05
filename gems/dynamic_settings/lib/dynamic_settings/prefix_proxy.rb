@@ -73,7 +73,10 @@ module DynamicSettings
     #   defaults to value supplied to the constructor.
     # @return [String]
     # @return [nil] When no value was found
-    def fetch(key, ttl: @default_ttl)
+    def fetch(key, ttl: @default_ttl, **kwargs)
+      unknown_kwargs = kwargs.keys - [:failsafe]
+      raise ArgumentError, "unknown keyword(s): #{unknown_kwargs.map(&:inspect).join(', ')}" unless unknown_kwargs.empty?
+
       keys = [
         full_key(key),
         [tree, service, environment, prefix, key].compact.join("/"),
@@ -139,16 +142,17 @@ module DynamicSettings
       DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
       nil
     rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
-      raise unless cache.respond_to?(:fetch_without_expiration)
-
-      cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
-        if val
-          DynamicSettings.on_fallback_recovery(e)
-          val
-        else
-          raise
+      if cache.respond_to?(:fetch_without_expiration)
+        cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
+          if val
+            DynamicSettings.on_fallback_recovery(e)
+            return val
+          end
         end
       end
+
+      return kwargs[:failsafe] if kwargs.key?(:failsafe)
+      raise
     end
     alias [] fetch
 

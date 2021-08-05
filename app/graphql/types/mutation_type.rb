@@ -94,6 +94,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_outcome_links, mutation: Mutations::DeleteOutcomeLinks
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup
   field :create_learning_outcome_group, mutation: Mutations::CreateLearningOutcomeGroup
+  field :update_isolated_view_deeply_nested_alert, mutation: Mutations::UpdateIsolatedViewDeeplyNestedAlert
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

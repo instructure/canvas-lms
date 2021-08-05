@@ -107,7 +107,7 @@ class AssignmentsController < ApplicationController
     if submission
       graphql_submisison_id = CanvasSchema.id_from_object(
         submission,
-        CanvasSchema.resolve_type(submission, nil),
+        CanvasSchema.resolve_type(nil, submission, nil),
         nil
       )
     end
@@ -220,6 +220,8 @@ class AssignmentsController < ApplicationController
           js_env({ SUBMISSION_ID: submission.id })
         end
 
+        @first_annotation_submission = !submission&.has_submission? && @assignment.annotated_document?
+        js_env({ FIRST_ANNOTATION_SUBMISSION: @first_annotation_submission })
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]

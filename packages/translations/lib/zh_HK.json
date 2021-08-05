@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "上傳/錄製媒體"
     },
+    "uploading_19e8a4e7": {
+        "message": "正在上傳"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "上傳隱藏圖片說明/字幕失敗。"
     },

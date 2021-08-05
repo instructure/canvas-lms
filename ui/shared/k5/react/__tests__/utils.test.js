@@ -133,6 +133,7 @@ describe('fetchGrades', () => {
       {
         current_grading_period_id: '1',
         current_grading_period_title: 'The first one',
+        totals_for_all_grading_periods_option: false,
         current_period_computed_current_score: 80,
         current_period_computed_current_grade: 'B-',
         computed_current_score: 89,
@@ -175,7 +176,10 @@ describe('fetchGrades', () => {
         hasGradingPeriods: true,
         score: 80,
         grade: 'B-',
-        isHomeroom: false
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: false,
+        totalGradeForAllGradingPeriods: null,
+        totalScoreForAllGradingPeriods: null
       }
     ])
   })
@@ -195,7 +199,61 @@ describe('fetchGrades', () => {
         hasGradingPeriods: false,
         score: 89,
         grade: 'B+',
-        isHomeroom: false
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: false,
+        totalGradeForAllGradingPeriods: null,
+        totalScoreForAllGradingPeriods: null
+      }
+    ])
+  })
+
+  it('populates totalGradeForAllGradingPeriods and totalScoreForAllGradingPeriods if totals option is true', async () => {
+    fetchMock.get(
+      GRADES_URL,
+      JSON.stringify([
+        {
+          ...defaultCourse,
+          enrollments: [
+            {
+              current_grading_period_id: '1',
+              current_grading_period_title: 'The first one',
+              totals_for_all_grading_periods_option: true,
+              current_period_computed_current_score: 80,
+              current_period_computed_current_grade: 'B-',
+              computed_current_score: 89,
+              computed_current_grade: 'B+'
+            }
+          ]
+        }
+      ])
+    )
+
+    const courseGrades = await fetchGrades()
+    expect(courseGrades).toEqual([
+      {
+        courseId: '1',
+        courseName: 'Intro to Everything',
+        courseImage: 'https://course.img',
+        courseColor: '#ace',
+        currentGradingPeriodId: '1',
+        currentGradingPeriodTitle: 'The first one',
+        gradingPeriods: [
+          {
+            id: '1',
+            title: 'The first one'
+          },
+          {
+            id: '2',
+            title: 'The second one'
+          }
+        ],
+        hasGradingPeriods: true,
+        score: 80,
+        grade: 'B-',
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: true,
+        totalGradeForAllGradingPeriods: 'B+',
+        totalScoreForAllGradingPeriods: 89
       }
     ])
   })

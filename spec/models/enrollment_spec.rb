@@ -3478,6 +3478,7 @@ describe Enrollment do
 
   describe '#sync_microsoft_group' do
     let(:course) { course_factory }
+    let(:enrollment_type) { 'StudentEnrollment' }
 
     before :each do
       MicrosoftSync::Group.create!(course: course)
@@ -3486,7 +3487,7 @@ describe Enrollment do
     # enroll user without running callbacks like update_user_account_associations,
     # so that the only jobs getting enqueued are the MSFT sync group type
     def enroll_user
-      course.enroll_user(user_factory, 'StudentViewEnrollment', skip_touch_user: true)
+      course.enroll_user(user_factory, enrollment_type, skip_touch_user: true)
     end
 
     context 'when feature flag is off' do
@@ -3495,7 +3496,7 @@ describe Enrollment do
       end
 
       it 'does not enqueue a job' do
-        expect { enroll_user }.not_to change { Delayed::Job.count }
+        expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
       end
     end
 
@@ -3511,7 +3512,7 @@ describe Enrollment do
         end
 
         it 'does not enqueue a job' do
-          expect { enroll_user }.not_to change { Delayed::Job.count }
+          expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
         end
       end
 
@@ -3522,12 +3523,20 @@ describe Enrollment do
         end
 
         it 'should enqueue a job' do
-          expect { enroll_user }.to change { Delayed::Job.count }.by 1
+          expect { enroll_user }.to change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }.by 1
         end
 
         it 'calls MicrosoftSync::Group#enqueue_future_partial_sync' do
           expect_any_instance_of(MicrosoftSync::Group).to receive(:enqueue_future_partial_sync)
           enroll_user
+        end
+
+        context 'when the enrollment is a StudentViewEnrollment' do
+          let(:enrollment_type) { 'StudentViewEnrollment' }
+
+          it 'should not enqueue a job' do
+            expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
+          end
         end
       end
     end

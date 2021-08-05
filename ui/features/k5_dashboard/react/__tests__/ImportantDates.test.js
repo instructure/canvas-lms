@@ -45,6 +45,7 @@ describe('ImportantDates', () => {
   afterEach(() => {
     fetchMock.restore()
     destroyContainer()
+    localStorage.clear()
   })
 
   it('renders some loading skeletons only while loading', async () => {

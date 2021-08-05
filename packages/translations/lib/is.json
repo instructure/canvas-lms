@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Hlaða/taka upp margmiðlunarefni"
     },
+    "uploading_19e8a4e7": {
+        "message": "Hleður upp"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "Upphleðsla textaþýðingar mistókst."
     },

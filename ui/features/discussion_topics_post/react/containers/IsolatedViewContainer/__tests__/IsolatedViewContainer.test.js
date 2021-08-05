@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {graphql} from 'msw'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
@@ -108,7 +108,7 @@ describe('IsolatedViewContainer', () => {
   it('should go to root reply when clicking Go To Parent', async () => {
     server.use(
       graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res.once(
+        return res(
           ctx.data({
             legacyNode: DiscussionEntry.mock({
               discussionSubentriesConnection: {
@@ -173,19 +173,20 @@ describe('IsolatedViewContainer', () => {
   it('should not render a back button', async () => {
     server.use(
       graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res.once(
+        return res(
           ctx.data({
             legacyNode: DiscussionEntry.mock({parent: null})
           })
         )
       })
     )
+
     const {findByText, queryByTestId} = setup(defaultProps())
     expect(await findByText('This is the parent reply')).toBeInTheDocument()
     expect(queryByTestId('back-button')).toBeNull()
   })
 
-  it('allows fetching more discussion entries', async () => {
+  it('allows fetching older discussion entries', async () => {
     const {findByText, queryByText} = setup(defaultProps())
 
     const showOlderRepliesButton = await findByText('Show older replies')
@@ -205,7 +206,7 @@ describe('IsolatedViewContainer', () => {
                     message: '<p>Get riggity riggity wrecked son</p>'
                   })
                 ],
-                pageInfo: PageInfo.mock(),
+                pageInfo: PageInfo.mock({hasPreviousPage: false}),
                 __typename: 'DiscussionSubentriesConnection'
               }
             })
@@ -216,7 +217,91 @@ describe('IsolatedViewContainer', () => {
 
     fireEvent.click(showOlderRepliesButton)
 
+    await waitFor(() => expect(queryByText('Show older replies')).toBeNull())
+
     expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+  })
+
+  it('allows fetching newer discussion entries', async () => {
+    const {findByText, queryByText} = setup(defaultProps({relativeEntryId: '10'}))
+
+    const showNewerRepliesButton = await findByText('Show newer replies')
+    expect(showNewerRepliesButton).toBeInTheDocument()
+    expect(queryByText('Get riggity riggity wrecked son')).toBe(null)
+
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    id: '1337',
+                    _id: '1337',
+                    message: '<p>Get riggity riggity wrecked son</p>'
+                  })
+                ],
+                pageInfo: PageInfo.mock({hasNextPage: false}),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    fireEvent.click(showNewerRepliesButton)
+
+    await waitFor(() => expect(queryByText('Show newer replies')).toBeNull())
+
+    expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+  })
+
+  it('should not show "Show older replies" button initially if hasPreviousPage is false', async () => {
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    id: '1337',
+                    _id: '1337',
+                    message: '<p>Get riggity riggity wrecked son</p>'
+                  })
+                ],
+                pageInfo: PageInfo.mock({hasPreviousPage: false}),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    const {findByText, queryByText} = setup(defaultProps())
+
+    await waitFor(() => expect(queryByText('Show older replies')).toBeNull())
+
+    expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+  })
+
+  it('should call query with relative id params', async () => {
+    const {findByText} = setup(defaultProps({relativeEntryId: '10'}))
+
+    expect(await findByText('This is the search result child reply')).toBeInTheDocument()
+  })
+
+  it('show newer button should be visible when relativeEntryId is present', async () => {
+    const {queryByText} = setup(defaultProps({relativeEntryId: '10'}))
+    await waitFor(() => expect(queryByText('Show newer replies')).toBeInTheDocument())
+  })
+
+  it('show newer button should not be visible when reativeEntryId is not present', async () => {
+    const {queryByText} = setup(defaultProps({relativeEntryId: null}))
+    await waitFor(() => expect(queryByText('Show newer replies')).toBeNull())
   })
 
   it('calls the onOpenIsolatedView callback when clicking View Replies', async () => {

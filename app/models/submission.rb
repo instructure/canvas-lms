@@ -62,7 +62,7 @@ class Submission < ActiveRecord::Base
     }.freeze
   }.freeze
 
-  SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry].freeze
+  SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry external_tool].freeze
 
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
@@ -2713,11 +2713,11 @@ class Submission < ActiveRecord::Base
           comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
           if comment.present?
             comment = {
-                :comment => comment[:text_comment],
-                :author => grader,
-                :hidden => assignment.muted?,
+              comment: comment[:text_comment],
+              author: grader,
+              hidden: assignment.post_manually? && !submission.posted?
             }.merge(
-                comment
+              comment
             ).with_indifferent_access
 
             if file_ids = user_data[:file_ids]

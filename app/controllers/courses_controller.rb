@@ -1433,7 +1433,6 @@ class CoursesController < ApplicationController
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
-      course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_permissions = {
         can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
@@ -1467,8 +1466,7 @@ class CoursesController < ApplicationController
         COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_COLORS_ENABLED: @context.elementary_enabled?,
-        COURSE_IMAGES_ENABLED: course_card_images_enabled,
-        use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
+        use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
         STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect{|term| term[:enrollment_type]=="StudentEnrollment"}&.slice(:start_at,:end_at),
         DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at,:end_at),
@@ -2108,7 +2106,8 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    name: @context.name,
                    long_name: "#{@context.name} - #{@context.short_name}",
-                   image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
+                   image_url: @context.image,
+                   banner_image_url: @context.elementary_subject_course? ? @context.banner_image : nil,
                    color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
@@ -2222,10 +2221,13 @@ class CoursesController < ApplicationController
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
           js_env(
-              CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
-              PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) },
-              STUDENT_PLANNER_ENABLED: planner_enabled?,
-              TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
+            CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+            PERMISSIONS: {
+              manage: @context.grants_right?(@current_user, session, :manage),
+              read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin)
+            },
+            STUDENT_PLANNER_ENABLED: planner_enabled?,
+            TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
           )
 
           js_bundle :k5_course, :context_modules
@@ -2690,6 +2692,10 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course image url and course image
   #   ID are both set to nil
   #
+  # @argument course[remove_banner_image] [Boolean]
+  #   If this option is set to true, the course banner image url and course
+  #   banner image ID are both set to nil
+  #
   # @argument course[blueprint] [Boolean]
   #   Sets the course as a blueprint course.
   #
@@ -2914,34 +2920,8 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:course][:image_url] && params[:course][:image_id]
-        respond_to do |format|
-          format.json { render :json => {message: "You cannot provide both an image_url and a image_id."}, :status => :bad_request }
-          return
-        end
-      end
-
-      if params[:course][:image_url]
-        @course.image_url = params[:course][:image_url]
-        @course.image_id = nil
-      end
-
-      if params[:course][:image_id]
-        if @course.attachments.active.where(id: params[:course][:image_id]).exists?
-          @course.image_id = params[:course][:image_id]
-          @course.image_url = nil
-        else
-          respond_to do |format|
-            format.json { render :json => {message: "The image_id is not a valid course file id."}, :status => :bad_request }
-            return
-          end
-        end
-      end
-
-      if params[:course][:remove_image]
-        @course.image_url = nil
-        @course.image_id = nil
-      end
+      update_image(params, "image")
+      update_image(params, "banner_image")
 
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
@@ -3017,6 +2997,37 @@ class CoursesController < ApplicationController
       else
         render_update_failure
       end
+    end
+  end
+
+  def update_image(params, setting_name)
+    if params[:course][:"#{setting_name}_url"] && params[:course][:"#{setting_name}_id"]
+      respond_to do |format|
+        format.json { render :json => {message: "You cannot provide both an #{setting_name}_url and a #{setting_name}_id."}, :status => :bad_request }
+        return
+      end
+    end
+
+    if params[:course][:"#{setting_name}_url"]
+      @course.send("#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
+      @course.send("#{setting_name}_id=", nil)
+    end
+
+    if params[:course][:"#{setting_name}_id"]
+      if @course.attachments.active.where(id: params[:course][:"#{setting_name}_id"]).exists?
+        @course.send("#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
+        @course.send("#{setting_name}_url=", nil)
+      else
+        respond_to do |format|
+          format.json { render :json => {message: "The image_id is not a valid course file id."}, :status => :bad_request }
+          return
+        end
+      end
+    end
+
+    if params[:course][:"remove_#{setting_name}"]
+      @course.send("#{setting_name}_url=", nil)
+      @course.send("#{setting_name}_id=", nil)
     end
   end
 

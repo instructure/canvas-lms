@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
@@ -29,15 +29,19 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
+import {showImportConfirmBox} from './ImportConfirmBox'
 import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
+import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {isMobileView, isCourse} = useCanvasContext()
+  const [showOutcomesView, setShowOutcomesView] = useState(false)
+  const [scrollContainer, setScrollContainer] = useState(null)
   const {
     rootId,
     isLoading,
@@ -61,6 +65,20 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
 
+  const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
+
+  const onAddAllHandler = () => {
+    if (isCourse && !isConfirmBoxOpen) {
+      openConfirmBox()
+      // NOTE: Temp until OUT-4333 is merged
+      showImportConfirmBox({
+        count: 51,
+        onImportHandler: () => {},
+        onCloseHandler: closeConfirmBox
+      })
+    }
+  }
+
   const findOutcomesView = (
     <FindOutcomesView
       collection={collections[selectedGroupId]}
@@ -69,14 +87,16 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
-      onAddAllHandler={() => {}}
+      disableAddAllButton={isConfirmBoxOpen}
+      onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
+      mobileScrollContainer={scrollContainer}
     />
   )
 
   const renderGroupNavigation = (
-    <View as="div" padding={isMobileView ? 'x-small 0 0 0' : '0'}>
+    <View as="div" padding={isMobileView ? 'small small x-small' : '0'}>
       {isLoading ? (
         <div style={{textAlign: 'center', paddingTop: '2rem'}}>
           <Spinner renderTitle={I18n.t('Loading')} size="large" />
@@ -97,6 +117,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
           collections={collections}
           rootId={rootId}
           loadedGroups={loadedGroups}
+          setShowOutcomesView={setShowOutcomesView}
         />
       ) : (
         <TreeBrowser onCollectionToggle={toggleGroupId} collections={collections} rootId={rootId} />
@@ -111,6 +132,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       shouldReturnFocus
       size="fullscreen"
       label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (
@@ -162,7 +184,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               overflowX="auto"
               elementRef={setRightColumnRef}
             >
-              {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
+              {selectedGroupId && selectedGroupId !== ACCOUNT_FOLDER_ID ? (
                 findOutcomesView
               ) : (
                 <FindOutcomesBillboard />
@@ -170,8 +192,20 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             </Flex.Item>
           </Flex>
         ) : (
-          renderGroupNavigation
-          // TODO Add in `findOutcomesView` with OUT-4483
+          <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
+            <div
+              style={{
+                flex: '1 0 24rem',
+                position: 'relative',
+                overflow: 'auto',
+                height: '100%'
+              }}
+              ref={setScrollContainer}
+            >
+              {renderGroupNavigation}
+              {showOutcomesView ? findOutcomesView : isLoading ? null : <FindOutcomesBillboard />}
+            </div>
+          </div>
         )}
       </Modal.Body>
       <Modal.Footer>

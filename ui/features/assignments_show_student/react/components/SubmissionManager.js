@@ -34,7 +34,13 @@ import {
   totalAllowedAttempts
 } from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
-import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
+import {
+  IconCheckSolid,
+  IconEndSolid,
+  IconRefreshSolid,
+  IconArrowOpenStartSolid,
+  IconArrowOpenEndSolid
+} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import {Modal} from '@instructure/ui-modal'
@@ -52,6 +58,8 @@ import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
+import ModuleSequenceFooter from '@canvas/module-sequence-footer'
 
 function DraftStatus({status}) {
   const statusConfigs = {
@@ -166,13 +174,43 @@ export default class SubmissionManager extends Component {
     similarityPledgeChecked: false,
     showConfetti: false,
     submittingAssignment: false,
-    uploadingFiles: false
+    uploadingFiles: false,
+    previousModuleObject: null,
+    nextModuleObject: null
   }
+
+  moduleSequenceFooter = null
 
   componentDidMount() {
     this.setState({
       activeSubmissionType: this.getActiveSubmissionTypeFromProps()
     })
+
+    this.moduleSequenceFooter = new ModuleSequenceFooter({
+      assetType: 'Assignment',
+      assetID: ENV.ASSIGNMENT_ID,
+      courseID: ENV.COURSE_ID
+    })
+
+    this.moduleSequenceFooter
+      .fetch()
+      .promise()
+      .then(() => {
+        const {previous, next} = this.moduleSequenceFooter
+        let previousObject = null
+        let nextObject = null
+
+        if (previous?.url != null) {
+          previousObject = {url: previous.url, tooltipText: previous.tooltipText.string}
+        }
+        if (next?.url != null) {
+          nextObject = {url: next.url, tooltipText: next.tooltipText.string}
+        }
+        this.setState({
+          previousModuleObject: previousObject,
+          nextModuleObject: nextObject
+        })
+      })
   }
 
   componentDidUpdate(prevProps) {
@@ -461,7 +499,27 @@ export default class SubmissionManager extends Component {
   footerButtons() {
     return [
       {
+        key: 'previous-assignment',
+        align: 'left',
+        shouldRender: _context => this.state.previousModuleObject != null,
+        render: _context => {
+          return (
+            <Tooltip tip={this.state.previousModuleObject.tooltipText}>
+              <Button
+                data-testid="previous-assignment-btn"
+                margin="0 small 0 0"
+                color="secondary"
+                href={this.state.previousModuleObject.url}
+              >
+                <IconArrowOpenStartSolid /> {I18n.t('Previous')}
+              </Button>
+            </Tooltip>
+          )
+        }
+      },
+      {
         key: 'draft-status',
+        align: 'right',
         shouldRender: context =>
           context.isLatestAttempt &&
           this.props.submission.state === 'unsubmitted' &&
@@ -471,6 +529,7 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'cancel-draft',
+        align: 'right',
         shouldRender: context =>
           this.props.submission === context.latestSubmission &&
           context.latestSubmission.state === 'unsubmitted' &&
@@ -490,6 +549,7 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'back-to-draft',
+        align: 'right',
         shouldRender: context =>
           this.props.submission !== context.latestSubmission &&
           context.latestSubmission.state === 'unsubmitted',
@@ -508,6 +568,7 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'new-attempt',
+        align: 'right',
         shouldRender: context => this.shouldRenderNewAttempt(context),
         render: context => {
           return (
@@ -523,13 +584,34 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'mark-as-done',
+        align: 'right',
         shouldRender: _context => window.ENV.CONTEXT_MODULE_ITEM != null,
         render: _context => this.renderMarkAsDoneButton()
       },
       {
         key: 'submit',
+        align: 'right',
         shouldRender: context => this.shouldRenderSubmit(context),
         render: _context => this.renderSubmitButton()
+      },
+      {
+        key: 'next-assignment',
+        align: 'right',
+        shouldRender: _context => this.state.nextModuleObject != null,
+        render: _context => {
+          return (
+            <Tooltip tip={this.state.nextModuleObject.tooltipText}>
+              <Button
+                data-testid="next-assignment-btn"
+                margin="0 0 0 x-small"
+                color="secondary"
+                href={this.state.nextModuleObject.url}
+              >
+                {I18n.t('Next')} <IconArrowOpenEndSolid />
+              </Button>
+            </Tooltip>
+          )
+        }
       }
     ]
   }
@@ -539,6 +621,7 @@ export default class SubmissionManager extends Component {
       .filter(button => button.shouldRender(context))
       .map(button => ({
         element: button.render(context),
+        align: button.align,
         key: button.key
       }))
 
@@ -598,7 +681,7 @@ export default class SubmissionManager extends Component {
                 !activeTypeMeetsCriteria
               }
               color="primary"
-              margin="auto auto auto small"
+              margin="auto 0 auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}
             >
               {I18n.t('Submit Assignment')}

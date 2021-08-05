@@ -32,6 +32,11 @@ import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {graphql} from 'msw'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
 describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
@@ -43,6 +48,16 @@ describe('DiscussionThreadContainer', () => {
     window.ENV = {
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
 
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -101,37 +116,6 @@ describe('DiscussionThreadContainer', () => {
   it('should render reply button if reply permission is true', () => {
     const {queryByTestId} = setup(defaultProps())
     expect(queryByTestId('threading-toolbar-reply')).toBeTruthy()
-  })
-
-  it('should render expand when nested replies are present', () => {
-    const {getByTestId} = setup(defaultProps())
-    expect(getByTestId('expand-button')).toBeTruthy()
-  })
-
-  it('should expand replies when expand button is clicked', () => {
-    const {getByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-  })
-
-  it('should collapse replies when expand button is clicked', async () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('expand-button'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
-  })
-
-  it('should collapse replies when collapse button is clicked', () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('collapse-replies'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
   })
 
   describe('delete permission', () => {
@@ -273,19 +257,60 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
-  describe('Pluralization', () => {
+  describe('Expand-Button', () => {
+    it('should render expand when nested replies are present', () => {
+      const {getByTestId} = setup(defaultProps())
+      expect(getByTestId('expand-button')).toBeTruthy()
+    })
+
+    it('should expand replies when expand button is clicked', () => {
+      const {getByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+    })
+
+    it('should collapse replies when expand button is clicked', async () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('expand-button'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
+    it('should collapse replies when collapse button is clicked', () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('collapse-replies'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
     it('pluralizes reply message correctly when there is only a single reply', async () => {
-      const {getByText} = setup(defaultProps())
-      expect(getByText('1 reply, 1 unread')).toBeTruthy()
+      const {getAllByText} = setup(defaultProps())
+      expect(getAllByText('1 reply, 1 unread').length).toBe(2)
     })
 
     it('pluralizes replies message correctly when there are multiple replies', async () => {
-      const {getByText} = setup(
+      const {getAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
         })
       )
-      expect(getByText('2 replies, 1 unread')).toBeTruthy()
+      expect(getAllByText('2 replies, 1 unread')).toBeTruthy()
+    })
+
+    it('does not display unread count if it is 0', async () => {
+      const {queryAllByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+        })
+      )
+      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 })

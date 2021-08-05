@@ -20,6 +20,23 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
 const setup = props => {
   return render(<DiscussionPostToolbar {...props} />)
 }
@@ -92,16 +109,6 @@ describe('DiscussionPostToolbar', () => {
       const button = getByTestId('sortButton')
       button.click()
       expect(onSortClickMock.mock.calls.length).toBe(1)
-    })
-  })
-
-  describe('Back to Top Button', () => {
-    it('should call onChange when toggle is changed', () => {
-      window.scrollTo = jest.fn()
-      const {getByTestId} = setup()
-      const button = getByTestId('topButton')
-      button.click()
-      expect(window.scrollTo.mock.calls.length).toBe(1)
     })
   })
 })

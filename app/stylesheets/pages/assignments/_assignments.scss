@@ -221,7 +221,11 @@
         .comment {
           margin-#{direction(left)}: 10px;
           .signature {
-            color: #888888;
+            @if $use_high_contrast {
+              color: #737373;
+            } @else {
+              color: #888888;
+            }
             font-size: 0.8em;
             text-align: direction(right);
           }

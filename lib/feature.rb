@@ -20,7 +20,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
-           :root_opt_in, :enable_at, :beta,
+           :root_opt_in, :enable_at, :beta, :pending_enforcement,
            :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
@@ -95,6 +95,7 @@ class Feature
   #                           # will be inherited in "off" state by root accounts
   #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
   #     beta: false,          # 'beta' tag shown in UI
+  #     pending_enforcement: false, # 'pending enforcement' tag shown in UI
   #     release_notes_url: 'http://example.com/',
   #
   #     # allow overriding feature definitions on a per-environment basis

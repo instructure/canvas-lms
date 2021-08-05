@@ -259,6 +259,7 @@ class Course < ActiveRecord::Base
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
+  validate :validate_banner_image
   validate :validate_default_view
   validate :validate_template
   validate :validate_not_on_siteadmin
@@ -450,6 +451,24 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def validate_banner_image
+    if self.banner_image_url.present? && self.banner_image_id.present?
+      self.errors.add(:banner_image, t("banner_image_url and banner_image_id cannot both be set."))
+      false
+    elsif self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)
+      true
+    elsif self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url)
+      true
+    else
+      if self.banner_image_id.present?
+        self.errors.add(:banner_image_id, t("banner_image_id is not a valid ID"))
+      elsif self.banner_image_url.present?
+        self.errors.add(:banner_image_url, t("banner_image_url is not a valid URL"))
+      end
+      false
+    end
+  end
+
   def validate_course_image
     if self.image_url.present? && self.image_id.present?
       self.errors.add(:image, t("image_url and image_id cannot both be set."))
@@ -513,6 +532,16 @@ class Course < ActiveRecord::Base
       end
     elsif self.image_url
       self.image_url
+    end
+  end
+
+  def banner_image
+    @banner_image ||= if self.banner_image_id.present?
+      self.shard.activate do
+        self.attachments.active.where(id: self.banner_image_id).take&.public_download_url(1.week)
+      end
+    elsif self.banner_image_url
+      self.banner_image_url
     end
   end
 
@@ -1576,10 +1605,6 @@ class Course < ActiveRecord::Base
       fetch_on_enrollments("has_active_observer_enrollment", user) { enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? } }
     can :read_grades
 
-    # we need to look into removing teacherless and the permission checks
-    given { |user| available? && !template? && self.teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
-    can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
-
     # Active admins (Teacher/TA/Designer)
     #################### Begin legacy permission block #########################
     given do |user|
@@ -1872,14 +1897,6 @@ class Course < ActiveRecord::Base
 
     @membership_allows ||= {}
     @membership_allows[[user.id, permission]] ||= self.cached_account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
-  end
-
-  def teacherless?
-    # TODO: I need a better test for teacherless courses... in the mean time we'll just do this
-    return false
-    @teacherless_course ||= Rails.cache.fetch(['teacherless_course', self].cache_key) do
-      !self.sis_source_id && self.teacher_enrollments.empty?
-    end
   end
 
   def grade_publishing_status_translation(status, message)
@@ -3272,6 +3289,8 @@ class Course < ActiveRecord::Base
   add_setting :newquizzes_engine_selected
   add_setting :image_id
   add_setting :image_url
+  add_setting :banner_image_id
+  add_setting :banner_image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false

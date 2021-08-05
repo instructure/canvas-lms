@@ -113,7 +113,7 @@ export const FIND_GROUP_OUTCOMES = gql`
 `
 
 export const SEARCH_GROUP_OUTCOMES = gql`
-  query SearchGroupDetailQuery(
+  query SearchGroupOutcomesQuery(
     $id: ID!
     $outcomesCursor: String
     $outcomesContextId: ID!
@@ -232,21 +232,30 @@ export const MOVE_OUTCOME_LINKS = gql`
   }
 `
 
-export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
-  axios.put(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
-    group
-  )
+export const UPDATE_LEARNING_OUTCOME_GROUP = gql`
+  mutation UpdateLearningOutcomeGroup($input: UpdateLearningOutcomeGroupInput!) {
+    updateLearningOutcomeGroup(input: $input) {
+      learningOutcomeGroup {
+        _id
+        title
+        description
+        vendorGuid
+        parentOutcomeGroup {
+          _id
+          title
+        }
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
 
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
-  )
-
-export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
-  axios.put(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
-    {parent_outcome_group_id: newParentGroupId}
   )
 
 export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {

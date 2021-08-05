@@ -6247,19 +6247,36 @@ describe Course, "#image" do
   end
 
   it "returns the image_url when image_url is set" do
-    @course.image_url = "http://example.com"
+    url = "http://example.com"
+    @course.image_url = url
+    @course.banner_image_url = url
     @course.save!
-    expect(@course.image).to eq "http://example.com"
+    expect(@course.image).to eq url
+    expect(@course.banner_image).to eq url
   end
 
   it "returns the download_url for a course file if image_id is set" do
     @course.image_id = @attachment.id
+    @course.banner_image_id = @attachment.id
     @course.save!
     expect(@course.image).to eq @attachment.public_download_url
+    expect(@course.banner_image).to eq @attachment.public_download_url
   end
 
   it "returns nil if image_id and image_url are not set" do
     expect(@course.image).to be_nil
+    expect(@course.banner_image).to be_nil
+  end
+
+  it "throws an error if both image_id and image_url are set" do
+    url = "http://example.com"
+    @course.image_id = @attachment.id
+    @course.image_url = url
+    @course.banner_image_id = @attachment.id
+    @course.banner_image_url = url
+    @course.validate
+    expect(@course.errors[:image]).to include "image_url and image_id cannot both be set."
+    expect(@course.errors[:banner_image]).to include "banner_image_url and banner_image_id cannot both be set."
   end
 end
 

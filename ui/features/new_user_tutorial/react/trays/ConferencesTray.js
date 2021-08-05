@@ -27,28 +27,24 @@ const ConferencesTray = () => (
     image="/images/tutorial-tray-images/Panda_Conferences.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I create a conference in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156'
+        href: I18n.t('#community.instructor_create_conference')
       },
       {
         label: I18n.t('How do I start a conference?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074'
+        href: I18n.t('#community.instructor_start_conference')
       },
       {
         label: I18n.t('How do I conclude a conference?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606'
+        href: I18n.t('#community.instructor_conclude_conference')
       },
       {
         label: I18n.t('How do I record a conference?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840'
+        href: I18n.t('#community.instructor_record_conference')
       }
     ]}
   >

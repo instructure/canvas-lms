@@ -55,7 +55,8 @@ module RootAccountResolver
       # some models might be manipulated in migrations before the column is added;
       # check that the attribute actually exists on this instance before trying to
       # populate it
-      next unless attributes.key?('root_account_id')
+      next unless has_attribute?('root_account_id')
+
       self.root_account_id ||= resolver[self]
     end
   end

@@ -19,33 +19,53 @@
 import {BASE_SIZE, DEFAULT_OPTIONS, DEFAULT_SETTINGS, STROKE_WIDTH} from './constants'
 import {createSvgElement} from './utils'
 import {buildShape} from './shape'
+import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from './text'
 
 export function buildSvg(settings, options = DEFAULT_OPTIONS) {
   settings = {...DEFAULT_SETTINGS, ...settings}
-
-  const wrapper = buildSvgWrapper(settings)
+  const mainContainer = buildSvgContainer(settings)
+  const shapeWrapper = buildSvgWrapper(settings)
 
   if (options.isPreview) {
     const checkerboard = buildCheckerboard()
-    wrapper.appendChild(checkerboard)
+    shapeWrapper.appendChild(checkerboard)
   }
 
   const g = buildGroup(settings, options)
   const shape = buildShape(settings)
   g.appendChild(shape)
+  shapeWrapper.appendChild(g)
+  mainContainer.appendChild(shapeWrapper)
 
-  wrapper.appendChild(g)
+  const textBackground = buildTextBackground(settings)
+  if (textBackground) mainContainer.appendChild(textBackground)
 
-  return wrapper
+  const text = buildText(settings)
+  if (text) mainContainer.appendChild(text)
+
+  return mainContainer
 }
 
-export function buildSvgWrapper({size}) {
-  const base = BASE_SIZE[size]
+export function buildSvgWrapper(settings) {
+  const base = BASE_SIZE[settings.size]
   return createSvgElement('svg', {
     fill: 'none',
     height: `${base}px`,
     viewBox: `0 0 ${base} ${base}`,
-    width: `${base}px`
+    width: `${base}px`,
+    x: Math.floor((getContainerWidth(settings) - base) * 0.5)
+  })
+}
+
+export function buildSvgContainer(settings) {
+  const containerWidth = getContainerWidth(settings)
+  const containerHeight = getContainerHeight(settings)
+  return createSvgElement('svg', {
+    fill: 'none',
+    width: `${containerWidth}px`,
+    height: `${containerHeight}px`,
+    viewBox: `0 0 ${containerWidth} ${containerHeight}`,
+    xmlns: 'http://www.w3.org/2000/svg'
   })
 }
 

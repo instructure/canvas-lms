@@ -326,9 +326,18 @@ ul.user_list div.enrollment_type.pending {
     & > div:nth-of-type(2) {
       flex: 4;
     }
-    .form-label label {
-      font-weight: bold;
+    & > div {
+      padding-#{direction(right)}: 10px;
     }
+    .form-label {
+      & label {
+        font-weight: bold;
+      }
+      & .form-label-info {
+        margin-top: $ic-sp*0.25;
+      }
+    }
+
     @media screen and (max-width: 900px) {
       &.form-row > div {
         // At smaller sizes, expand the label to be
@@ -343,9 +352,6 @@ ul.user_list div.enrollment_type.pending {
       .syllabus-visibility {
         display: block;
       }
-      .panel-border {
-        width: unset;
-      }
     }
     .checkbox-flex-container {
       // Because we are wrapping, we need to force the
@@ -354,9 +360,6 @@ ul.user_list div.enrollment_type.pending {
       input {
         margin-#{direction(right)}: 0.25rem;
       }
-    }
-    div {
-      padding-#{direction(right)}: 10px;
     }
   }
   .tall-row {
@@ -372,10 +375,6 @@ ul.user_list div.enrollment_type.pending {
   #course_locale,
   #course_default_wiki_editing_roles {
     vertical-align: baseline;
-  }
-  #course_locale {
-    max-width: 360px;
-    width: 100%;
   }
   .palign {
     line-height: 100%;
@@ -394,6 +393,14 @@ ul.user_list div.enrollment_type.pending {
   i.date-warning {
     padding: direction-sides(8px 0 0 8px);
     color: $btnWarningBackground;
+  }
+  select {
+    width: 350px;
+    max-width: 100%;
+  }
+  input[type="text"], textarea {
+    width: 332px;
+    max-width: 100%;
   }
 
   // A few small exceptions
@@ -446,7 +453,8 @@ td.center-text {
   border-radius: 10px;
   border: 1px solid #ccc;
   padding: 15px;
-  width: 300px;
+  width: 322px;
+  max-width: 100%;
 }
 
 .master_course_restrictions {

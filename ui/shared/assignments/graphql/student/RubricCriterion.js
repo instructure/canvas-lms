@@ -23,7 +23,7 @@ import {RubricRating} from './RubricRating'
 export const RubricCriterion = {
   fragment: gql`
     fragment RubricCriterion on RubricCriterion {
-      id: _id
+      _id
       criterion_use_range: criterionUseRange
       description
       ignore_for_scoring: ignoreForScoring
@@ -45,11 +45,9 @@ export const RubricCriterion = {
     criterion_use_range: bool.isRequired,
     description: string.isRequired,
     ignore_for_scoring: bool,
+    learning_outcome_id: string,
     long_description: string,
     mastery_points: number,
-    outcome: shape({
-      _id: string.isRequired
-    }),
     points: number,
     ratings: arrayOf(RubricRating.shape)
   })

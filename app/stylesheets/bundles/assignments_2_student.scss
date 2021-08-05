@@ -33,8 +33,6 @@ $student-view-banner-height: 50px;
 }
 
 #assignments-student-footer {
-  position: fixed;
-  bottom: 0;
   height: $student-footer-height;
   #{direction(right)}: 0;
   width: 100%;
@@ -72,4 +70,14 @@ body.is-masquerading-or-student-view {
   #content-wrapper {
     padding-bottom: $student-footer-height + $student-view-banner-height;
   }
+}
+
+.webcam-countdown-container {
+  position: absolute;
+  inset: 0;
+
+  font-size: 10rem;
+  color: $ic-color-light;
+  line-height: 1;
+  text-shadow: $ic-color-dark 3px 3px 10px;
 }

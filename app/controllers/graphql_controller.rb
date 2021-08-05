@@ -25,9 +25,29 @@ CanvasSchema.graphql_definition
 class GraphQLController < ApplicationController
   include Api::V1
 
+  before_action :require_inst_access_token_auth, only: :subgraph_execute
   before_action :require_user, if: :require_auth?
 
+  # This action is for use only with the federated API Gateway. See
+  # `app/graphql/README.md` for details.
+  def subgraph_execute
+    result = execute_on(CanvasSchema.for_federation)
+    render json: result
+  end
+
   def execute
+    result = execute_on(CanvasSchema)
+    render json: result
+  end
+
+  def graphiql
+    @page_title = "GraphiQL"
+    render :graphiql, layout: 'bare'
+  end
+
+  private
+
+  def execute_on(schema)
     query = params[:query]
     variables = params[:variables] || {}
     context = {
@@ -47,22 +67,12 @@ class GraphQLController < ApplicationController
         )
       ]
     }
-    result = nil
 
     overall_timeout = Setting.get('graphql_overall_timeout', '60').to_i.seconds
     Timeout.timeout(overall_timeout) do
-      result = CanvasSchema.execute(query, variables: variables, context: context)
+      schema.execute(query, variables: variables, context: context)
     end
-
-    render json: result
   end
-
-  def graphiql
-    @page_title = "GraphiQL"
-    render :graphiql, layout: 'bare'
-  end
-
-  private
 
   def require_auth?
     if action_name == 'execute'
@@ -70,5 +80,14 @@ class GraphQLController < ApplicationController
     end
 
     true
+  end
+
+  def require_inst_access_token_auth
+    unless @authenticated_with_inst_access_token
+      render(
+        json: {error: "InstAccess token auth required"},
+        status: 401
+      )
+    end
   end
 end

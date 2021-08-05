@@ -80,6 +80,9 @@
   "announcements_a4b8ed4a": {
     "message": "Announcements"
   },
+  "apply_781a2546": {
+    "message": "Apply"
+  },
   "apps_54d24a47": {
     "message": "Apps"
   },
@@ -146,8 +149,14 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginning of Your To-Do History"
   },
+  "below_81d4dceb": {
+    "message": "Below"
+  },
   "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
     "message": "Below is an example of how students will see their schedule"
+  },
+  "bottom_third_5f5fec1d": {
+    "message": "Bottom Third"
   },
   "button_color_608a0242": {
     "message": "Button Color"
@@ -778,6 +787,9 @@
   "medium_5a8e9ead": {
     "message": "Medium"
   },
+  "middle_27dc1d5": {
+    "message": "Middle"
+  },
   "miscellaneous_e9818229": {
     "message": "Miscellaneous"
   },
@@ -1150,6 +1162,18 @@
   "text_7f4593da": {
     "message": "Text"
   },
+  "text_background_color_16e61c3f": {
+    "message": "Text Background Color"
+  },
+  "text_color_acf75eb6": {
+    "message": "Text Color"
+  },
+  "text_position_8df8c162": {
+    "message": "Text Position"
+  },
+  "text_size_887c2f6": {
+    "message": "Text Size"
+  },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "The date and time this to do is due"
   },
@@ -1287,6 +1311,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Use arrow keys to select a size."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Use arrow keys to select a text position."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Use arrow keys to select a text size."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Use arrow keys to select an outline size."

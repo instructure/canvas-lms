@@ -25,17 +25,37 @@ import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TargetGroupSelector from '../shared/TargetGroupSelector'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
+import {useMutation} from 'react-apollo'
 
-const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHandler}) => {
+const GroupMoveModal = ({
+  groupId,
+  groupTitle,
+  parentGroupId,
+  isOpen,
+  onCloseHandler,
+  onGroupCreated,
+  onSuccess
+}) => {
   const [targetGroup, setTargetGroup] = useState(null)
-  const {contextType, contextId} = useCanvasContext()
+  const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
 
   const onMoveGroupHandler = () => {
     ;(async () => {
       try {
-        await moveOutcomeGroup(contextType, contextId, groupId, targetGroup.id)
+        const result = await moveOutcomeGroup({
+          variables: {
+            input: {
+              id: groupId,
+              parentOutcomeGroupId: targetGroup.id
+            }
+          }
+        })
+
+        const movedOutcomeGroup = result.data?.updateLearningOutcomeGroup?.learningOutcomeGroup
+        const errorMessage = result.data?.updateLearningOutcomeGroup?.errors?.[0]?.message
+        if (!movedOutcomeGroup) throw new Error(errorMessage)
+
         showFlashAlert({
           message: I18n.t('"%{groupTitle}" has been moved to "%{newGroupTitle}".', {
             groupTitle,
@@ -43,6 +63,7 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
           }),
           type: 'success'
         })
+        onSuccess()
       } catch (err) {
         showFlashAlert({
           message: err.message
@@ -79,6 +100,8 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
             groupId={groupId}
             parentGroupId={parentGroupId}
             setTargetGroup={setTargetGroup}
+            onGroupCreated={onGroupCreated}
+            modalName="groupMoveModal"
           />
         </View>
       </Modal.Body>
@@ -105,7 +128,14 @@ GroupMoveModal.propTypes = {
   groupTitle: PropTypes.string.isRequired,
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onGroupCreated: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired
+}
+
+GroupMoveModal.defaultProps = {
+  onSuccess: () => {},
+  onGroupCreated: () => {}
 }
 
 export default GroupMoveModal

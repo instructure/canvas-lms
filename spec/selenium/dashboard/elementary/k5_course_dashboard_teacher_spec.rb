@@ -86,6 +86,13 @@ describe "teacher k5 course dashboard" do
       expect(manage_button).to be_displayed
     end
 
+    it 'has an empty state graphic when there is no subject home content' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(empty_subject_home).to be_displayed
+      expect(manage_home_button).to be_displayed
+    end
+
     it 'opens the course setting path when manage subject button is clicked' do
       get "/courses/#{@subject_course.id}#home"
 
@@ -166,7 +173,7 @@ describe "teacher k5 course dashboard" do
       pink_color = '#DF6B91'
 
       expect(element_value_for_attr(selected_color_input, "value")).to eq(pink_color)
-      expect(hex_value_for_color(course_color_preview)).to eq(pink_color)
+      expect(hex_value_for_color(course_color_preview, 'background-color')).to eq(pink_color)
     end
 
     it 'allows for hex color to be input', ignore_js_errors: true do
@@ -177,7 +184,7 @@ describe "teacher k5 course dashboard" do
       input_color_hex_value(new_color)
       wait_for_new_page_load(submit_form('#course_form'))
 
-      expect(hex_value_for_color(course_color_preview)).to eq(new_color)
+      expect(hex_value_for_color(course_color_preview, 'background-color')).to eq(new_color)
     end
 
     it 'shows the course color selection on the course header' do
@@ -186,7 +193,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}#home"
 
-      expect(hex_value_for_color(dashboard_header)).to eq(new_color)
+      expect(hex_value_for_color(dashboard_header, 'background-color')).to eq(new_color)
     end
   end
 

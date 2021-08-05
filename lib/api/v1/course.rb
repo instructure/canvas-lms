@@ -52,6 +52,9 @@ module Api::V1::Course
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
+    settings[:banner_image_url] = course.banner_image_url
+    settings[:banner_image_id] = course.banner_image_id
+    settings[:banner_image] = course.banner_image
     settings[:course_color] = course.course_color
 
     settings
@@ -144,7 +147,7 @@ module Api::V1::Course
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
 
-      hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
+      hash['image_download_url'] = course.image if includes.include?('course_image')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
       if course.root_account.feature_enabled?(:course_templates)

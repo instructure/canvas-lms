@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Carica/Registra file multimediali"
     },
+    "uploading_19e8a4e7": {
+        "message": "Caricamento"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "Caricamento didascalie/sottotitoli chiusi non riuscito."
     },

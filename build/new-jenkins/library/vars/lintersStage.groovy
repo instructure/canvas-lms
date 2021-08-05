@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['code', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['code', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -84,6 +84,26 @@ def webpackStage(stages) {
       name: 'webpack',
       command: './build/new-jenkins/linters/run-gergich-webpack.sh'
     )
+  }
+}
+
+def featureFlagStage(stages, buildConfig) {
+  { ->
+    extendedStage('Linters - feature-flag')
+      .nodeRequirements(container: 'feature-flag')
+      .obeysAllowStages(false)
+      .required(filesChangedStage.hasFeatureFlagFiles(buildConfig))
+      .queue(stages) {
+        slackSend(
+          channel: configuration.getString('feature-flag-report-channel'),
+          color: 'warning',
+          message: "${env.GERRIT_CHANGE_URL} is changing a feature flag."
+        )
+
+        node('master') {
+          gerrit.addReviewers(Arrays.asList(configuration.getString('feature-flag-report-emails').split(',')))
+        }
+      }
   }
 }
 

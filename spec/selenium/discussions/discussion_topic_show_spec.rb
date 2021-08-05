@@ -53,5 +53,50 @@ describe "Discussion Topic Show" do
       expect(fj("span:contains('Send To...')")).to be_present
       expect(fj("span:contains('Copy To...')")).to be_present
     end
+
+    it "has a module progression section when applicable" do
+      module1 = @course.context_modules.create!(:name => "module1")
+      item1 = @course.assignments.create!(
+        :name => "First Item",
+        :submission_types => ["online_text_entry"],
+        :points_possible => 20
+      )
+      module1.add_item(:id => item1.id, :type => 'assignment')
+      item2 = @course.discussion_topics.create!(
+        title: 'Second Item',
+        discussion_type: 'threaded',
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher
+      )
+      module1.add_item(:id => item2.id, :type => 'discussion_topic')
+      get "/courses/#{@course.id}/discussion_topics/#{item2.id}"
+      expect(f("a[aria-label='Previous Module Item']")).to be_present
+    end
+
+    context "isolated view" do
+      before :once do
+        Account.site_admin.enable_feature!(:isolated_view)
+      end
+
+      it "loads older replies" do
+        parent_reply = @topic.discussion_entries.create!(
+          user: @teacher, message: 'I am the parent entry'
+        )
+        (1..6).each do |number|
+          @topic.discussion_entries.create!(
+            user: @teacher,
+            message: "child reply number #{number}",
+            parent_entry: parent_reply
+          )
+        end
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        fj("button:contains('6 replies')").click
+        wait_for_ajaximations
+        fj("button:contains('Show older replies')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('child reply number 1')")).to be_present
+      end
+    end
   end
 end

@@ -30,8 +30,11 @@ describe MicrosoftSync::UsersUluvsFinder do
     context 'when microsoft sync is not configured' do
       let(:user_ids) { [1] }
 
-      it 'raise an error' do
-        expect { subject }.to raise_error(MicrosoftSync::InvalidOrMissingLoginAttributeConfig)
+      it 'raises a descriptive GracefulCancelError' do
+        klass = MicrosoftSync::InvalidOrMissingLoginAttributeConfig
+        public_message = 'Invalid or missing "login attribute" config in account'
+
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, public_message)
       end
     end
 
@@ -82,48 +85,47 @@ describe MicrosoftSync::UsersUluvsFinder do
         end
       end
 
-      context 'when the login_attribute=preferred_username' do
-        let(:preferred_username) { 'preferred_username@example.com' }
-        let(:user) do
-          user_with_pseudonym(username: preferred_username)
-        end
+      shared_examples_for 'when the login attribute is set' do |login_attribute, description|
         let(:user_ids) { [user.id] }
 
         before do
-          3.times.each { pseudonym(user) }
-
-          root_account.settings[:microsoft_sync_login_attribute] = 'preferred_username'
+          root_account.settings[:microsoft_sync_login_attribute] = login_attribute
           root_account.save!
         end
 
-        it 'returns an array mapping the user id with uluv' do
+        it "returns an array mapping #{description} to uluv" do
           users_uluvs = subject.to_h
 
           expect(users_uluvs.size).to eq 1
-          expect(users_uluvs[user.id]).to eq preferred_username
+          expect(users_uluvs[user.id]).to eq expected_uluv
         end
       end
 
+      context 'when the login_attribute=preferred_username' do
+        let(:expected_uluv) { 'preferred_username@example.com' }
+        let(:user) { user_with_pseudonym(username: expected_uluv) }
+
+        before { 3.times { pseudonym(user) } }
+
+        it_behaves_like 'when the login attribute is set', 'preferred_username', 'login name'
+      end
+
       context 'when the login_attribute=sis_user_id' do
-        let(:sis_user_id) { '1021616' }
-        let(:user) do
-          user_with_pseudonym(sis_user_id: sis_user_id)
-        end
-        let(:user_ids) { [user.id] }
+        let(:expected_uluv) { '1021616' }
+        let(:user) { user_with_pseudonym(sis_user_id: expected_uluv) }
 
-        before do
-          (1..3).each { |i| pseudonym(user, sis_user_id: "#{sis_user_id}#{i}") }
+        before { (1..3).each { |i| pseudonym(user, sis_user_id: "#{expected_uluv}#{i}") } }
 
-          root_account.settings[:microsoft_sync_login_attribute] = 'sis_user_id'
-          root_account.save!
-        end
+        it_behaves_like 'when the login attribute is set', 'sis_user_id', 'SIS id'
+      end
 
-        it 'returns an array mapping the user id with uluv' do
-          users_uluvs = subject.to_h
+      context 'when the login_attribute=integration_id' do
+        let(:expected_uluv) { 'abcdef' }
+        let(:user) { user_with_pseudonym(integration_id: expected_uluv) }
 
-          expect(users_uluvs.size).to eq 1
-          expect(users_uluvs[user.id]).to eq sis_user_id
-        end
+        before { (1..3).each { |i| pseudonym(user, integration_id: "#{expected_uluv}#{i}") } }
+
+        it_behaves_like 'when the login attribute is set', 'integration_id', 'integration id'
       end
 
       context 'when the login_attribute=invalid' do
@@ -134,8 +136,20 @@ describe MicrosoftSync::UsersUluvsFinder do
           root_account.save!
         end
 
-        it 'raise an error' do
+        it 'raises an error' do
           expect { subject }.to raise_error(MicrosoftSync::InvalidOrMissingLoginAttributeConfig)
+        end
+      end
+
+      context "when pseudonyms have a null value for the lookup field" do
+        let(:user1) { user_with_pseudonym(sis_user_id: 'somesisid') }
+        let(:user2) { user_with_pseudonym }
+        let(:user_ids) { [user1.id, user2.id] }
+
+        it "skips those pseudonyms" do
+          root_account.settings[:microsoft_sync_login_attribute] = 'sis_user_id'
+          root_account.save!
+          expect(subject).to eq([[user1.id, 'somesisid']])
         end
       end
     end

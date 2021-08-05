@@ -28,28 +28,24 @@ const RubricsTray = () => (
     image="/images/tutorial-tray-images/Panda_Teacher.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I add a rubric in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842'
+        href: I18n.t('#community.instructor_add_rubric_course')
       },
       {
         label: I18n.t('How do I manage rubrics in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017'
+        href: I18n.t('#community.instructor_manage_rubrics')
       },
       {
         label: I18n.t('How do I align an outcome with a rubric in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130'
+        href: I18n.t('#community.instructor_align_outcome_rubric')
       },
       {
         label: I18n.t('How do I add a rubric to an assignment?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058'
+        href: I18n.t('#community.instructor_add_rubric_assignment')
       }
     ]}
   >

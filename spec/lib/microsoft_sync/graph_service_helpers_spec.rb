@@ -222,10 +222,9 @@ describe MicrosoftSync::GraphServiceHelpers do
             '/users returned users with unexpected mailNickname values ["a", "b"], ' \
             'asked for ["c", "d"]'
           )
-          expect(err.public_message).to eq(
+          expect(err).to be_a_microsoft_sync_public_error(
             'Unexpected response from Microsoft API. This is likely a bug. Please contact support.'
           )
-          expect(err).to be_a(MicrosoftSync::Errors::PublicError)
         end
       end
     end

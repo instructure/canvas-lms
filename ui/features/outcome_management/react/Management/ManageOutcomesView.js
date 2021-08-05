@@ -18,18 +18,22 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import I18n from 'i18n!OutcomeManagement'
+import {isRTL} from '@canvas/i18n/rtlHelper'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
-import I18n from 'i18n!OutcomeManagement'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import OutcomeGroupHeader from './OutcomeGroupHeader'
+import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
+import OutcomeGroupHeader from './OutcomeGroupHeader'
 import ManageOutcomeItem from './ManageOutcomeItem'
 import OutcomeSearchBar from './OutcomeSearchBar'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import InfiniteScroll from '@canvas/infinite-scroll'
-import {Flex} from '@instructure/ui-flex'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import SVGWrapper from '@canvas/svg-wrapper'
 
 const ManageOutcomesView = ({
   outcomeGroup,
@@ -45,11 +49,11 @@ const ManageOutcomesView = ({
   scrollContainer,
   isRootGroup
 }) => {
+  const {canManage} = useCanvasContext()
   const groupTitle = outcomeGroup?.title
   const groupDescription = outcomeGroup?.description
   const outcomes = outcomeGroup?.outcomes
-  const numOutcomes = outcomeGroup?.outcomesCount
-  const {canManage} = useCanvasContext()
+  const outcomesCount = outcomeGroup?.outcomesCount
 
   if (loading && !outcomeGroup) {
     return (
@@ -78,7 +82,7 @@ const ManageOutcomesView = ({
         />
         <View as="div" padding="medium 0 xx-small" margin="x-small 0 0">
           <OutcomeSearchBar
-            enabled={numOutcomes > 0 || searchString.length > 0}
+            enabled={outcomesCount > 0 || searchString.length > 0}
             placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
             searchString={searchString}
             onChangeHandler={onSearchChangeHandler}
@@ -86,41 +90,93 @@ const ManageOutcomesView = ({
           />
         </View>
         <View as="div" padding="small 0" borderWidth="0 0 small">
-          <Heading level="h4">
-            <Flex>
-              <Flex.Item shouldShrink>
-                <div style={{overflowWrap: 'break-word', padding: '0.375rem 0'}}>
-                  {I18n.t(
-                    {
-                      one: '1 "%{groupTitle}" Outcome',
-                      other: '%{count} "%{groupTitle}" Outcomes'
-                    },
-                    {
-                      count: numOutcomes,
-                      groupTitle: addZeroWidthSpace(groupTitle)
-                    }
-                  )}
-                </div>
-              </Flex.Item>
-              <Flex.Item size="2.5rem">
-                {searchString && loading && (
-                  <Spinner
-                    renderTitle={I18n.t('Loading')}
-                    size="x-small"
-                    margin="0 0 0 x-small"
-                    data-testid="search-loading"
-                  />
+          <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
+            <Flex.Item size="50%" shouldGrow>
+              <Heading level="h4">
+                {searchString ? (
+                  <Flex>
+                    <Flex.Item shouldShrink>
+                      <div
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          padding: '0.375rem 0'
+                        }}
+                      >
+                        <View data-testid="group-name-ltr">
+                          {isRTL() ? searchString : groupTitle}
+                        </View>
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            transform: 'scale(0.6)',
+                            height: '1em'
+                          }}
+                        >
+                          <IconArrowOpenEndSolid title={I18n.t('search results for')} />
+                        </div>
+                        <View data-testid="search-string-ltr">
+                          {isRTL() ? groupTitle : searchString}
+                        </View>
+                      </div>
+                    </Flex.Item>
+                    <Flex.Item size="2.5rem">
+                      {loading && (
+                        <Spinner
+                          renderTitle={I18n.t('Loading')}
+                          size="x-small"
+                          margin="0 0 0 x-small"
+                          data-testid="search-loading"
+                        />
+                      )}
+                    </Flex.Item>
+                  </Flex>
+                ) : (
+                  <View as="div" padding="x-small medium x-small 0">
+                    <Text wrap="break-word">
+                      {I18n.t('All %{groupTitle} Outcomes', {
+                        groupTitle: addZeroWidthSpace(groupTitle)
+                      })}
+                    </Text>
+                  </View>
                 )}
-              </Flex.Item>
-            </Flex>
-          </Heading>
+              </Heading>
+            </Flex.Item>
+            <Flex.Item as="div" padding="xx-small 0">
+              <Text size="medium">
+                {I18n.t(
+                  {
+                    one: '%{count} Outcome',
+                    other: '%{count} Outcomes'
+                  },
+                  {
+                    count: outcomesCount || 0
+                  }
+                )}
+              </Text>
+            </Flex.Item>
+          </Flex>
         </View>
         <View as="div" data-testid="outcome-items-list">
-          {outcomes?.edges?.length === 0 && searchString && !loading && (
-            <View as="div" textAlign="center" margin="small 0 0">
-              <Text color="secondary">{I18n.t('The search returned no results')}</Text>
-            </View>
-          )}
+          {outcomes?.edges?.length === 0 &&
+            !loading &&
+            (searchString ? (
+              <View as="div" textAlign="center" margin="small 0 0">
+                <Text color="primary">{I18n.t('The search returned no results.')}</Text>
+              </View>
+            ) : (
+              <View as="div" textAlign="center" margin="large 0 0">
+                <PresentationContent>
+                  <div data-testid="no-outcomes-svg">
+                    <SVGWrapper url="/images/outcomes/no_outcomes.svg" />
+                  </div>
+                </PresentationContent>
+                <View as="div" padding="small 0 0">
+                  <Text color="primary">{I18n.t('There are no outcomes in this group.')}</Text>
+                </View>
+              </View>
+            ))}
           {outcomes?.edges?.map(
             ({canUnlink, id: linkId, node: {_id, title, description, canEdit}}) => (
               <ManageOutcomeItem

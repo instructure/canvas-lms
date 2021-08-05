@@ -27,18 +27,16 @@ const SyllabusTray = () => (
     image="/images/tutorial-tray-images/Panda_Syllabus.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use the Syllabus as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638'
+        href: I18n.t('#community.instructor_use_syllabus')
       },
       {
         label: I18n.t('How do I edit the Syllabus description in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178'
+        href: I18n.t('#community.instructor_edit_syllabus')
       }
     ]}
   >

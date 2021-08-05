@@ -34,6 +34,9 @@ const defaultCourses = [
     enrollmentType: 'student',
     score: 50,
     grade: 'F',
+    showTotalsForAllGradingPeriods: true,
+    totalScoreForAllGradingPeriods: 89,
+    totalGradeForAllGradingPeriods: 'B+',
     gradingPeriods: [
       {
         id: '1',
@@ -50,6 +53,9 @@ const defaultCourses = [
     enrollmentType: 'student',
     score: 90,
     grade: 'A-',
+    showTotalsForAllGradingPeriods: true,
+    totalScoreForAllGradingPeriods: null,
+    totalGradeForAllGradingPeriods: null,
     gradingPeriods: [
       {
         id: '1',
@@ -80,6 +86,9 @@ const defaultCourses = [
     enrollmentType: 'student',
     score: 75,
     grade: 'C',
+    showTotalsForAllGradingPeriods: false,
+    totalScoreForAllGradingPeriods: null,
+    totalGradeForAllGradingPeriods: null,
     gradingPeriods: [
       {
         id: '2',
@@ -199,6 +208,13 @@ describe('GradesPage', () => {
     expect(queryByText('A-')).not.toBeInTheDocument()
     expect(getByText('Not Graded')).toBeInTheDocument()
     expect(queryByText('C')).not.toBeInTheDocument()
+
+    act(() => getByRole('button', {name: 'Select Grading Period'}).click())
+    act(() => getByText('All Grading Periods').click())
+
+    expect(getByText('B+')).toBeInTheDocument()
+    expect(getByText('Not Graded')).toBeInTheDocument()
+    expect(getByText('--')).toBeInTheDocument()
   })
 
   it('displays scores if grades are not available', async () => {
@@ -271,6 +287,9 @@ describe('overrideCourseGradingPeriods', () => {
         enrollmentType: 'student',
         score: 75,
         grade: 'C',
+        showTotalsForAllGradingPeriods: false,
+        totalScoreForAllGradingPeriods: null,
+        totalGradeForAllGradingPeriods: null,
         gradingPeriods: [
           {
             id: '2',
@@ -297,6 +316,10 @@ describe('overrideCourseGradingPeriods', () => {
         enrollmentType: 'student',
         score: 80,
         grade: 'B-',
+        showTotalsForAllGradingPeriods: true,
+        showingAllGradingPeriods: false,
+        totalScoreForAllGradingPeriods: 89,
+        totalGradeForAllGradingPeriods: 'B+',
         gradingPeriods: [
           {
             id: '1',
@@ -313,6 +336,10 @@ describe('overrideCourseGradingPeriods', () => {
         enrollmentType: 'student',
         score: null,
         grade: null,
+        showTotalsForAllGradingPeriods: true,
+        showingAllGradingPeriods: false,
+        totalScoreForAllGradingPeriods: null,
+        totalGradeForAllGradingPeriods: null,
         gradingPeriods: [
           {
             id: '1',

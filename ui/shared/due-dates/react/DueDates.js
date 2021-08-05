@@ -514,6 +514,7 @@ export default class DueDates extends React.Component {
               this.setState({importantDates: event.target.checked})
             }}
             disabled={disabled}
+            inline
           />
         </div>
       )

@@ -267,6 +267,7 @@ export default class AddExternalToolButton extends React.Component {
             handleInstall={this.handleLti2ToolInstalled}
             registrationUrl={this.state.lti2RegistrationUrl}
             hideComponent={!this.state.isLti2}
+            toolName={I18n.t('Register Tool')}
           >
             <div className="ReactModal__Footer">
               <div id="footer-close-button" className="ReactModal__Footer-Actions">

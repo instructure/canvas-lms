@@ -160,7 +160,7 @@ class ApplicationController < ActionController::Base
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
           current_user_roles: @current_user&.roles(@domain_root_account),
-          current_user_types: @current_user.try{|u| u.account_users.active.map(&:readable_type)},
+          current_user_types: @current_user.try{|u| u.account_users.active.map { |au| au.role.name }},
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
@@ -233,11 +233,11 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing,
-    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates
+    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
-    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users
+    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -2455,7 +2455,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:'community_link.basics_browser_requirements')))
   end
 
   def browser_supported?

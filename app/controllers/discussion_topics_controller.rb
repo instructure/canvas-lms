@@ -646,7 +646,8 @@ class DiscussionTopicsController < ApplicationController
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
-               isolated_view: Account.site_admin.feature_enabled?(:isolated_view)
+               isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
+               should_show_deeply_nested_alert: @current_user.should_show_deeply_nested_alert?
              })
       js_bundle :discussion_topics_post
       css_bundle :discussions_index

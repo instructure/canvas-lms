@@ -20,7 +20,7 @@
 
 module Interfaces
   module TimestampInterface
-  include Interfaces::BaseInterface
+    include Interfaces::BaseInterface
 
     graphql_name "Timestamped"
 

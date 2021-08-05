@@ -57,7 +57,7 @@ const BackboneState = {
     }
   },
 
-  componentWillUpdate(nextProps, nextState) {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
     // stop listening to backbone objects in state that aren't in nextState
     this._listen(this._off, this.state, nextState)
   },

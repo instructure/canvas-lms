@@ -37,7 +37,8 @@ const StaffContactInfoLayout = ({isLoading, staff}) => {
       <LoadingWrapper
         id="staff"
         isLoading={isLoading}
-        skeletonsCount={2}
+        skeletonsNum={staff.length}
+        defaultSkeletonsNum={2}
         width="100%"
         height="4em"
         margin="small 0"

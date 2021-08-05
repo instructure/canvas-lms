@@ -86,33 +86,26 @@ describe EnrollmentTerm do
   end
 
   it "should handle the translated Default Term names correctly" do
-    begin
-      account_model
-      term = @account.default_enrollment_term
+    account_model
+    term = @account.default_enrollment_term
 
-      translations = {
-        :test_locale => {
-          :account => {
-            :default_term_name => "mreT tluafeD"
-          }
+    translations = {
+      test_locale: {
+        account: {
+          default_term_name: "mreT tluafeD"
         }
       }
-      I18n.backend.stub(translations) do
-        begin
-          old_locale = I18n.locale
-          I18n.config.available_locales_set << :test_locale
-          I18n.locale = :test_locale
+    }
 
-          expect(term.name).to eq "mreT tluafeD"
-          expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
-          term.name = "mreT tluafeD"
-          term.save!
-          expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
-          expect(term.name).to eq "mreT tluafeD"
-        ensure
-          I18n.locale = old_locale
-        end
-      end
+    I18n.backend.stub(translations) do
+      I18n.locale = :test_locale
+
+      expect(term.name).to eq "mreT tluafeD"
+      expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
+      term.name = "mreT tluafeD"
+      term.save!
+      expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
+      expect(term.name).to eq "mreT tluafeD"
     end
   end
 

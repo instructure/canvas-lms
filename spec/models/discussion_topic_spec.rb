@@ -212,6 +212,12 @@ describe DiscussionTopic do
     expect(d.discussion_type).to eq 'side_comment'
   end
 
+  it 'should default to threaded type with react_discussions_post' do
+    @course.enable_feature!('react_discussions_post')
+    topic = @course.discussion_topics.create!(message: 'test')
+    expect(topic.discussion_type).to eq 'threaded'
+  end
+
   it "should require a valid discussion_type" do
     @topic = @course.discussion_topics.build(:message => 'test', :discussion_type => "gesundheit")
     expect(@topic.save).to eq false

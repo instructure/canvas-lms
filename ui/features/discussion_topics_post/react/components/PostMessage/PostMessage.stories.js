@@ -20,6 +20,7 @@ import React from 'react'
 
 import {ThreadingToolbar} from '../ThreadingToolbar/ThreadingToolbar'
 import {PostMessage} from './PostMessage'
+import {User} from '../../../graphql/User'
 
 export default {
   title: 'Examples/Discussion Posts/Components/PostMessage',
@@ -28,56 +29,20 @@ export default {
 }
 
 const Template = args => (
-  <PostMessage
-    authorName="Posty Postersen"
-    timingDisplay="Jan 25 1:00pm"
-    message="Posts are fun"
-    {...args}
-  />
+  <PostMessage author={User.mock()} title="This is a title" message="Posts are fun" {...args} />
 )
 
 export const Default = Template.bind({})
 Default.args = {}
-
-export const AuthorPost = Template.bind({})
-AuthorPost.args = {
-  discussionRoles: ['Author']
-}
 
 export const LargePost = Template.bind({})
 LargePost.args = {
   message: 'This is the post that never ends. It goes on and on my friends. '.repeat(10)
 }
 
-export const AvatarPost = Template.bind({})
-AvatarPost.args = {
-  avatarUrl: 'https://www.gravatar.com/avatar/'
-}
-
-export const UnreadPost = Template.bind({})
-UnreadPost.args = {
-  isUnread: true
-}
-
-export const AuthorAndTeacherRoles = Template.bind({})
-AuthorAndTeacherRoles.args = {
-  discussionRoles: ['Author', 'TeacherEnrollment']
-}
-
-export const AllRoles = Template.bind({})
-AllRoles.args = {
-  discussionRoles: ['Author', 'TeacherEnrollment', 'TaEnrollment']
-}
-
-export const AllRolesAndLongName = Template.bind({})
-AllRolesAndLongName.args = {
-  discussionRoles: ['Author', 'TeacherEnrollment', 'TaEnrollment'],
-  authorName: 'Bernd Clemens Diedrich Emmerich Ottovordemgentschenfelde',
-  lastReplyAtDisplayText: 'May 17 11:18am'
-}
-
 export const WithChildren = Template.bind({})
 WithChildren.args = {
+  title: '',
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={Function.prototype} />

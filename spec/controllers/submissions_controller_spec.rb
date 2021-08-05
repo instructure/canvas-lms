@@ -303,6 +303,19 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eq 'http://www.google.com'
     end
 
+    it "prevents submitting non-accepted submission types when not called via the API" do
+      course_with_student_logged_in(active_all: true)
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url")
+      post 'create', params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        submission: {submission_type: "online_text_entry", body: "definitely a URL"}
+      }
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "Assignment does not accept this submission type"
+    end
+
     it 'accepts eula agreement timestamp when api submission' do
       timestamp = Time.zone.now.to_i.to_s
       course_with_student_logged_in(:active_all => true)

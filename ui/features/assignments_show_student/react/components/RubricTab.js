@@ -20,7 +20,7 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import I18n from 'i18n!assignments_2'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
-import React, {useMemo, useState} from 'react'
+import React, {useState} from 'react'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
@@ -35,33 +35,6 @@ const ENROLLMENT_STRINGS = {
   TaEnrollment: I18n.t('TA')
 }
 
-function transformRubricData(rubric) {
-  const rubricCopy = JSON.parse(JSON.stringify(rubric))
-  rubricCopy.criteria.forEach(criterion => {
-    if (criterion.outcome) {
-      criterion.learning_outcome_id = criterion.outcome._id
-    }
-    delete criterion.outcome
-  })
-  return rubricCopy
-}
-
-function transformRubricAssessmentData(rubricAssessment) {
-  const assessmentCopy = JSON.parse(JSON.stringify(rubricAssessment))
-  assessmentCopy.data.forEach(rating => {
-    // The Rubric component looks for the "id" field instead of "_id" (which
-    // the query returns) to determine the selected rating, so add it in.
-    // We don't want to change the component since it's also used by other
-    // non-GraphQL pages.
-    rating.id = rating._id
-    rating.criterion_id = rating.criterion ? rating.criterion.id : null
-    rating.learning_outcome_id = rating.outcome ? rating.outcome._id : null
-    delete rating.criterion
-    delete rating.outcome
-  })
-  return assessmentCopy
-}
-
 function formatAssessor(assessor) {
   if (!assessor?.name) {
     return I18n.t('Anonymous')
@@ -72,19 +45,11 @@ function formatAssessor(assessor) {
 }
 
 export default function RubricTab(props) {
-  // We need to hoist the learning_outcome_id up one level to match the expected
-  // props in the `<RubricComponent>`. Memoize this so we don't need to do it on
-  // every render
-  const rubric = useMemo(() => transformRubricData(props.rubric), [props.rubric])
-  const assessments = useMemo(
-    () => props.assessments?.map(assessment => transformRubricAssessmentData(assessment)),
-    [props.assessments]
-  )
-  const [displayedAssessmentId, setDisplayedAssessmentId] = useState(assessments?.[0]?._id)
+  const [displayedAssessmentId, setDisplayedAssessmentId] = useState(props.assessments?.[0]?._id)
 
   // This will always be undefined if there are no assessments, or the displayed
   // assessments if any assessments are present
-  const displayedAssessment = assessments?.find(
+  const displayedAssessment = props.assessments?.find(
     assessment => assessment._id === displayedAssessmentId
   )
 
@@ -96,14 +61,14 @@ export default function RubricTab(props) {
           fluidWidth
           summary={<Text weight="bold">{I18n.t('View Rubric')}</Text>}
         >
-          {!!assessments?.length && (
+          {!!props.assessments?.length && (
             <div style={{marginBottom: '22px', width: '325px'}}>
               <CanvasSelect
                 label={I18n.t('Select Grader')}
                 value={displayedAssessment._id}
                 onChange={(e, optionValue) => setDisplayedAssessmentId(optionValue)}
               >
-                {assessments.map(assessment => (
+                {props.assessments.map(assessment => (
                   <CanvasSelect.Option
                     key={assessment._id}
                     value={assessment._id}
@@ -118,8 +83,8 @@ export default function RubricTab(props) {
 
           <RubricComponent
             customRatings={props.proficiencyRatings}
-            rubric={rubric}
-            rubricAssessment={fillAssessment(rubric, displayedAssessment || {})}
+            rubric={props.rubric}
+            rubricAssessment={fillAssessment(props.rubric, displayedAssessment || {})}
             rubricAssociation={props.rubricAssociation}
           />
         </ToggleDetails>

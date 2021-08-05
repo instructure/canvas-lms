@@ -95,7 +95,9 @@ export const TodosPage = ({timeZone, visible}) => {
         id="homeroom-todos"
         isLoading={loading}
         renderCustomSkeleton={todoSkeleton}
-        skeletonsCount={5}
+        skeletonsNum={todos?.length}
+        defaultSkeletonsNum={5}
+        allowZeroSkeletons={false}
       >
         {todos?.length > 0 ? (
           todos.map(todo => (

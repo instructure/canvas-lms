@@ -48,7 +48,8 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSISName: ENV.SIS_NAME,
       postToSIS:
         this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
-      datePickerFormat: this.event.allDay ? 'medium_with_weekday' : 'full_with_weekday'
+      datePickerFormat: this.event.allDay ? 'medium_with_weekday' : 'full_with_weekday',
+      important_dates: this.event.important_dates
     })
     this.currentContextInfo = null
     if (this.event.override) {
@@ -136,6 +137,10 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     this.$el
       .find('.assignment_group')
       .html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
+    // Only show important date checkbox if selected context is k5 subject and the feature is enabled
+    this.$el
+      .find('#important_dates')
+      .toggle(this.currentContextInfo.k5_subject && ENV.FEATURES?.important_dates)
 
     // Update the edit and more options links with the new context
     this.$el.attr('action', this.currentContextInfo.create_assignment_url)
@@ -173,10 +178,12 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     const data = super.getFormData(...arguments)
     if (data.assignment != null) {
       data.assignment.due_at = this.unfudgedDate(data.assignment.due_at)
+      data.assignment.important_dates = this.$el
+        .find('#calendar_event_important_dates')
+        .prop('checked')
     } else {
       data.assignment_override.due_at = this.unfudgedDate(data.assignment_override.due_at)
     }
-
     return data
   }
 

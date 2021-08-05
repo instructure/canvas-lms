@@ -225,6 +225,37 @@ describe "Folders API", type: :request do
     end
   end
 
+  describe "#buttons_and_icons_folder" do
+    it "creates a buttons and icons folder for the course" do
+      expect {
+        api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/folders/buttons_and_icons",
+          @folders_path_options.merge(action: "buttons_and_icons_folder", course_id: @course.id.to_param).except(:id),
+          {}
+        )
+      }.to change {
+        @course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
+      }.from(0).to(1)
+    end
+
+    it "returns the existing buttons and icons folder for the course" do
+      existing_folder = Folder.buttons_and_icons_folder(@course)
+
+      json = api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/folders/buttons_and_icons",
+        @folders_path_options.merge(action: "buttons_and_icons_folder", course_id: @course.id.to_param).except(:id),
+        {}
+      )
+
+      aggregate_failures do
+        expect(json["id"]).to eq existing_folder.id
+        expect(@course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count).to be 1
+      end
+    end
+  end
+
   describe "#media_folder" do
     it "should create a media folder for a course" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.

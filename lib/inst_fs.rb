@@ -166,8 +166,12 @@ module InstFS
       data[file_name] = file_object
 
       begin
+        retries ||= 0
         response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
-      rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
+      rescue Timeout::Error
+        retry if (retries += 1) < 2
+        raise InstFS::ServiceError, "unable to communicate with instfs"
+      rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
       end
       if response.class == Net::HTTPCreated

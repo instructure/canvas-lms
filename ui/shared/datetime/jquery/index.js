@@ -126,11 +126,11 @@ $.fn.datepicker = function (options) {
           if (event.type === 'change' && val && $ampm.length && !$ampm.val()) {
             let ampmVal
             if (parseInt(val, 10) === 0) {
-              ampmVal = I18n.t('#time.am')
+              ampmVal = I18n.t('#time.am', 'am')
               val = '12'
               $this.val(val)
             } else {
-              ampmVal = I18n.t('#time.pm')
+              ampmVal = I18n.t('#time.pm', 'pm')
             }
             $ampm.val(ampmVal)
             cur.input.data('time-ampm', ampmVal)

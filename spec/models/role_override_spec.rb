@@ -598,7 +598,7 @@ describe RoleOverride do
       end
 
       it 'is available to account admins, account memberships, teachers, and designers' do
-        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment)
       end
     end
 
@@ -610,7 +610,7 @@ describe RoleOverride do
       end
 
       it 'is available to account admins, account memberships, teachers, and designers' do
-        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment)
       end
     end
 

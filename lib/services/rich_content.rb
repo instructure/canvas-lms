@@ -51,13 +51,9 @@ module Services
       def service_settings
         settings = Canvas::DynamicSettings.find('rich-content-service', default_ttl: 5.minutes)
         {
-          RICH_CONTENT_APP_HOST: settings['app-host'],
-          RICH_CONTENT_SKIP_SIDEBAR: settings['skip-sidebar']
+          RICH_CONTENT_APP_HOST: settings['app-host', failsafe: 'error'],
+          RICH_CONTENT_SKIP_SIDEBAR: settings['skip-sidebar', failsafe: nil]
         }
-      rescue Diplomat::KeyNotFound,
-             Canvas::DynamicSettings::ConsulError => e
-        Canvas::Errors.capture_exception(:rce_flag, e)
-        { RICH_CONTENT_APP_HOST: 'error' }
       end
     end
   end

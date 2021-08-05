@@ -154,6 +154,41 @@ const sisDataImportPermissions = generateActionTemplates(
   []
 )
 
+const accountBankPermissions = generateActionTemplates(
+  'manage_account_banks',
+  [
+    {
+      title: I18n.t('Item Banks'),
+      description: I18n.t('Allows user to view all item banks in the account.')
+    },
+    {
+      description: I18n.t('Allows user to view all item banks in a course.')
+    }
+  ],
+  [
+    {
+      title: I18n.t('Item Banks'),
+      description: I18n.t(
+        'If this permission is not enabled, users can view item banks created by them, shared with them from another user, or shared indirectly via the course where they are enrolled with an instructor role.'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Item Banks'),
+      description: I18n.t('Allows user to view all item banks in a course.')
+    }
+  ],
+  [
+    {
+      title: I18n.t('Item Banks'),
+      description: I18n.t(
+        'If this permission is not enabled, users can view item banks created by them, shared with them from another user, or shared indirectly via the course where they are enrolled with an instructor role.'
+      )
+    }
+  ]
+)
+
 const adminsLevelPermissions = generateActionTemplates(
   'manage_account_memberships',
   [
@@ -2123,7 +2158,7 @@ const courseManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission.'
+        'The Courses - Reset permission resets course content for both manually created and SIS-managed courses. (For SIS-managed courses, the SIS Data - manage permission does not apply.)'
       )
     },
     {
@@ -2189,7 +2224,7 @@ const courseManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission.'
+        'The Courses - Reset permission resets course content for both manually created and SIS-managed courses. (For SIS-managed courses, the SIS Data - manage permission does not apply.)'
       )
     },
     {
@@ -4388,6 +4423,7 @@ const usersViewLoginPermissions = generateActionTemplates(
 
 export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
   ...deepMergeAll([
+    accountBankPermissions.ACCOUNT,
     accountLevelPermissions.ACCOUNT,
     adminsLevelPermissions.ACCOUNT,
     allowCourseAdminActions.ACCOUNT,
@@ -4464,6 +4500,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
 
 export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
   ...deepMergeAll([
+    accountBankPermissions.COURSE,
     accountLevelPermissions.COURSE,
     adminsLevelPermissions.COURSE,
     alertPermissions.COURSE,

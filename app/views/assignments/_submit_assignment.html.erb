@@ -45,6 +45,9 @@
   <% end %>
   <div class="content" id="submit_assignment_tabs">
     <ul>
+      <% if @assignment.submission_types && @assignment.annotated_document? %>
+        <li><a href="#submit_annotated_document_form" class="submit_annotated_document_option"><%= t 'Student Annotation' %></a></li>
+      <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
         <li><a href="#submit_online_upload_form" class="submit_online_upload_option"><%= t 'links.submit.file_upload', "File Upload" %></a></li>
       <% end %>
@@ -53,9 +56,6 @@
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
-      <% end %>
-      <% if @assignment.submission_types && @assignment.annotated_document? %>
-        <li><a href="#submit_annotated_document_form" class="submit_annotated_document_option"><%= t 'Student Annotation' %></a></li>
       <% end %>
       <% if show_google_docs %>
         <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>

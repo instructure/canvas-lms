@@ -41,10 +41,6 @@ const theme = {
 
 const visitZoomUrl = 'https://zoom.com/meeting/schedule'
 const visitMeetUrl = 'https://meet.google.com/_meet'
-const learnMeetUrl =
-  'https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649'
-const learnTeamsUrl =
-  'https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340'
 
 function ConferenceProvider({imageSource, title, text, responsiveSize}) {
   const skinny = responsiveSize === 'medium'
@@ -121,7 +117,9 @@ const Meet = props => (
           'to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.'
         )
       ],
-      <Link href={learnMeetUrl}>{I18n.t('Learn how to use Google Meet in Canvas')}</Link>
+      <Link href={I18n.t('#community.admin_hangouts_meet_lti')}>
+        {I18n.t('Learn how to use Google Meet in Canvas')}
+      </Link>
     ]}
   />
 )
@@ -135,7 +133,9 @@ const Teams = props => (
       I18n.t(
         'If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more.'
       ),
-      <Link href={learnTeamsUrl}>{I18n.t('Learn how to use Microsoft Teams in Canvas')}</Link>
+      <Link href={I18n.t('#community.admin_teams_meetings')}>
+        {I18n.t('Learn how to use Microsoft Teams in Canvas')}
+      </Link>
     ]}
   />
 )

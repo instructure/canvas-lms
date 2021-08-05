@@ -96,12 +96,8 @@ class FeatureFlag < ActiveRecord::Base
       # this should catch a programatic/console user if one is acting
       # outside the request/response cycle
       acting_user = @current_user || Canvas.infer_user
-      prior_state = if operation == :create
-        'nonexistant'
-      else
-        self.state_in_database
-      end
-      post_state = (operation == :destroy ? 'removed' : self.state)
+      prior_state = prior_flag_state(operation)
+      post_state = post_flag_state(operation)
       Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
     end
   end
@@ -114,6 +110,18 @@ class FeatureFlag < ActiveRecord::Base
     audit_log_update(operation: :destroy)
   end
   private
+
+  def prior_flag_state(operation)
+    operation == :create ? "created, prior default:#{self.send(:default_for_flag)}" : self.state_in_database
+  end
+
+  def post_flag_state(operation)
+    operation == :destroy ? "removed, new default: #{self.send(:default_for_flag)}" : self.state
+  end
+
+  def default_for_flag
+    Feature.definitions[self.feature]&.state || 'undefined'
+  end
 
   def valid_state
     unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)

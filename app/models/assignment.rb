@@ -3675,6 +3675,14 @@ class Assignment < ActiveRecord::Base
     (final_grader_id.nil? || final_grader_id == grader.id) && context.grants_right?(grader, :manage_grades)
   end
 
+  def accepts_submission_type?(submission_type)
+    if submission_type == "basic_lti_launch"
+      submission_types =~ /online|external_tool/
+    else
+      submission_types_array.include?(submission_type)
+    end
+  end
+
   private
 
   def set_muted

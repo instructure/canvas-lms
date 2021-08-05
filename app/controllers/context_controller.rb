@@ -178,7 +178,6 @@ class ContextController < ApplicationController
           completed: @context.completed?,
           soft_concluded: @context.soft_concluded?,
           concluded: @context.concluded?,
-          teacherless: @context.teacherless?,
           available: @context.available?,
           pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
           hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)

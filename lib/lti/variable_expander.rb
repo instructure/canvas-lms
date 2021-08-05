@@ -84,6 +84,7 @@ module Lti
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
+    FILE_UPLOAD_GUARD = -> { !!@assignment && @assignment.submission_types.split(',').include?('online_upload') }
     COLLABORATION_GUARD = -> { @collaboration }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
@@ -262,6 +263,21 @@ module Lti
                        end,
                        LTI_ASSIGN_ID,
                        default_name: 'com_instructure_assignment_lti_id'
+
+    # A comma separated list of the file extensions that are allowed for submitting to this
+    # assignment. If there are no limits on what files can be uploaded, an empty string will be
+    # returned. If the assignment does not allow file uploads as a submission type, then no
+    # substitution will be performed.
+    #
+    # @launch_parameter com_instructure_originality_report_id
+    # @example
+    #   ```
+    #   "docx,pdf,txt"
+    #   ```
+    register_expansion 'com.instructure.Assignment.allowedFileExtensions', [],
+                       -> { @assignment.allowed_extensions.join(',') },
+                       FILE_UPLOAD_GUARD,
+                       default_name: 'com_instructure_assignment_allowed_file_extensions'
 
     # The Canvas id of the Originality Report associated
     # with the launch.

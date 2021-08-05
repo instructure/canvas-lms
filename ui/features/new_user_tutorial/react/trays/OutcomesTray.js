@@ -28,35 +28,30 @@ const HomeTray = () => (
     image="/images/tutorial-tray-images/Panda_Teacher.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use the outcomes page in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645'
+        href: I18n.t('#community.instructor_use_outcomes')
       },
       {
         label: I18n.t('How do I create an outcome for a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862'
+        href: I18n.t('#community.instructor_create_outcome')
       },
       {
         label: I18n.t('How do I create outcome groups for a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128'
+        href: I18n.t('#community.instructor_create_outcome_group')
       },
       {
         label: I18n.t('How do I import outcomes for a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702'
+        href: I18n.t('#community.instructor_import_outcomes')
       },
       {
         label: I18n.t(
           'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?'
         ),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775'
+        href: I18n.t('#community.instructor_use_mastery_gradebook')
       }
     ]}
   >

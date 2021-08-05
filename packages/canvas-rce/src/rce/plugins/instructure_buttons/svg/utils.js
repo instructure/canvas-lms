@@ -23,3 +23,38 @@ export function createSvgElement(tag, attributes = {}) {
   })
   return element
 }
+
+export function splitTextIntoLines(text, maxChars) {
+  if (!text.trim() || maxChars <= 0) {
+    return []
+  }
+  const lines = []
+  const words = text.split(' ')
+  while (words.length) {
+    let newLineNeeded = false
+    let line = ''
+    let word
+    while (!newLineNeeded && (word = words.shift())) {
+      word = word.trim()
+      const newLength = (line + word).length
+      if (word.length >= maxChars + 1) {
+        // if a single word doesn't fit in a line
+        const start = word.substring(0, maxChars - 1)
+        const end = word.substring(maxChars - 1)
+        line += start + '-'
+        words.unshift(end)
+        newLineNeeded = line.length >= maxChars
+      } else if (newLength) {
+        // if a new word can be added in current line
+        line += word.trim() + ' '
+        newLineNeeded = line.length >= maxChars
+      } else {
+        // if a new word can't be added in current line
+        newLineNeeded = true
+      }
+    }
+    line = line.trim()
+    lines.push(line)
+  }
+  return lines
+}

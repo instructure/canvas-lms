@@ -106,7 +106,7 @@ module Api::V1::PlannerItem
     end.tap do |hash|
       if (context = item.try(:context) || item.try(:course))
         hash[:context_name] = context.try(:nickname_for, @user) || context.name
-        if context.is_a?(::Course) && context.feature_enabled?(:course_card_images)
+        if context.is_a?(::Course)
           hash[:context_image] = context.image
         end
       end

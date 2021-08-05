@@ -25,12 +25,19 @@ import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icon
 import {Select} from '@instructure/ui-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {isRTL} from '@canvas/i18n/rtlHelper'
+import {ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 
 const BACK_OPTION = 'back'
 const VIEW_OPTION = 'view'
 const LOADING_OPTION = 'loading'
 
-const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGroups}) => {
+const GroupActionDrillDown = ({
+  onCollectionClick,
+  collections,
+  rootId,
+  loadedGroups,
+  setShowOutcomesView
+}) => {
   const [selectedGroupId, setSelectedGroupId] = useState(rootId)
   const [highlightedOptionId, setHighlightedOptionId] = useState('')
   const [highlightAction, setHighlightAction] = useState(false)
@@ -44,6 +51,12 @@ const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGro
     setIsLoading(hasOpenedGroup && !loadedGroups.includes(selectedGroupId))
   }, [hasOpenedGroup, loadedGroups, selectedGroupId])
 
+  useEffect(() => {
+    return () => {
+      setShowOutcomesView(false)
+    }
+  }, [setShowOutcomesView])
+
   const handleHighlightOption = (_event, {id}) => {
     setHighlightAction(false)
     setHighlightedOptionId(id)
@@ -51,10 +64,15 @@ const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGro
 
   const handleSelect = (_event, {id}) => {
     if (id === VIEW_OPTION) {
-      // TODO: Implement in OUT-4483
+      setShowOutcomesView(true)
+      setIsShowingOptions(false)
     } else if (id === BACK_OPTION) {
       const parentGroupId = collections[selectedGroupId].parentGroupId
+      setShowOutcomesView(false)
       setSelectedGroupId(parentGroupId)
+      if (parentGroupId !== rootId) {
+        onCollectionClick({id: parentGroupId})
+      }
       showFlashAlert({
         message: I18n.t(`Group "%{groupName}" entered.`, {
           groupName: collections[parentGroupId].name
@@ -66,6 +84,7 @@ const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGro
       setSelectedGroupId(id)
       onCollectionClick({id})
       setHighlightAction(true)
+      setShowOutcomesView(false)
     }
   }
 
@@ -98,8 +117,13 @@ const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGro
       isShowingOptions={isShowingOptions}
       assistiveText={I18n.t('Use arrow keys to navigate options')}
       placeholder={I18n.t('Select an outcome group')}
-      width="320px"
-      inputValue={isShowingOptions ? '' : I18n.t('Select an outcome group')}
+      inputValue={
+        isShowingOptions
+          ? ''
+          : selectedGroupId !== rootId
+          ? collections[selectedGroupId].name
+          : I18n.t('Select an outcome group')
+      }
       renderLabel={I18n.t('Groups')}
       onRequestShowOptions={() => setIsShowingOptions(true)}
       onRequestHideOptions={() => setIsShowingOptions(false)}
@@ -117,23 +141,29 @@ const GroupActionDrillDown = ({onCollectionClick, collections, rootId, loadedGro
       )}
       {hasOpenedGroup && (
         <Select.Group renderLabel={collections[selectedGroupId].name}>
-          <Select.Option id={VIEW_OPTION} isHighlighted={isActionLinkHighlighted}>
-            <div
-              style={{
-                ...margin,
-                color: isActionLinkHighlighted ? '' : '#008EE2'
-              }}
-            >
-              {I18n.t(
-                {
-                  one: 'View 1 Outcome',
-                  other: 'View %{count} Outcomes'
-                },
-                {
-                  count: collections[selectedGroupId].outcomesCount
-                }
-              )}
-            </div>
+          <Select.Option
+            id={VIEW_OPTION}
+            isDisabled={selectedGroupId === ACCOUNT_FOLDER_ID}
+            isHighlighted={selectedGroupId !== ACCOUNT_FOLDER_ID ? isActionLinkHighlighted : false}
+          >
+            {selectedGroupId !== ACCOUNT_FOLDER_ID && (
+              <div
+                style={{
+                  ...margin,
+                  color: isActionLinkHighlighted ? '' : '#008EE2'
+                }}
+              >
+                {I18n.t(
+                  {
+                    one: 'View 1 Outcome',
+                    other: 'View %{count} Outcomes'
+                  },
+                  {
+                    count: collections[selectedGroupId].outcomesCount
+                  }
+                )}
+              </div>
+            )}
           </Select.Option>
         </Select.Group>
       )}
@@ -146,7 +176,8 @@ GroupActionDrillDown.propTypes = {
   onCollectionClick: PropTypes.func.isRequired,
   rootId: PropTypes.string.isRequired,
   collections: PropTypes.object.isRequired,
-  loadedGroups: PropTypes.arrayOf(PropTypes.string).isRequired
+  loadedGroups: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setShowOutcomesView: PropTypes.func.isRequired
 }
 
 export default GroupActionDrillDown

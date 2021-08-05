@@ -26,6 +26,9 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    field :discussion_topic_id, ID, null: false
+    field :parent_id, ID, null: true
+    field :root_entry_id, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :rating, Boolean, null: true
@@ -38,7 +41,26 @@ module Types
 
     field :message, String, null: true
     def message
-      object.deleted? ? nil : object.message
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry).then do |parent|
+          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
+            parent.quoted_reply_html + object.message
+          end
+        end
+      else
+        object.message
+      end
+    end
+
+    field :reply_preview, String, null:true
+    def reply_preview
+      if Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:user).then do
+          object.quoted_reply_html
+        end
+      end
     end
 
     field :read, Boolean, null: false
@@ -72,6 +94,8 @@ module Types
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
     def root_entry_participant_counts
+      return nil unless object.root_entry_id.nil?
+
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
@@ -108,6 +132,8 @@ module Types
 
     field :last_reply, Types::DiscussionEntryType, null: true
     def last_reply
+      return nil unless object.root_entry_id.nil?
+
       load_association(:last_discussion_subentry)
     end
 

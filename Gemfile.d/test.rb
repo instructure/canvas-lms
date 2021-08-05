@@ -31,13 +31,13 @@ group :test do
   gem 'puma', '5.2.2', require: false
 
   gem 'db-query-matchers', '0.10.0'
-  gem 'rspec', '3.9.0'
+  gem 'rspec', '3.10.0'
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '4.0.1'
   gem 'rspec-collection_matchers', '1.2.0'
-  gem 'rspec-support', '3.9.2'
-  gem 'rspec-expectations', '3.9.0'
-  gem 'rspec-mocks', '3.9.1'
+  gem 'rspec-support', '3.10.2'
+  gem 'rspec-expectations', '3.10.1'
+  gem 'rspec-mocks', '3.10.2'
   gem 'shoulda-matchers', '4.3.0'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
@@ -52,7 +52,6 @@ group :test do
   gem 'selenium-webdriver', '3.142.7', require: false
     gem 'childprocess', '3.0.0', require: false
   gem 'webdrivers', '4.2.0', require: false
-  gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
   gem 'testrailtagging', '0.3.8.7', require: false
 
   gem 'webmock', '3.8.2', require: false
@@ -74,5 +73,5 @@ group :test do
   gem 'axe-core-selenium', '4.1.0', require: false
   gem 'axe-core-rspec', '4.1.0', require: false
   gem 'axe-core-api', '4.1.0', require:false
-  gem 'stormbreaker', '0.0.2', require: false
+  gem 'stormbreaker', '0.0.3', require: false
 end

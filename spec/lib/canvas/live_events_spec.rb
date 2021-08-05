@@ -1482,7 +1482,8 @@ describe Canvas::LiveEvents do
       # post-transaction callbacks won't happen in specs, so do this manually
       Canvas::LiveEventsCallbacks.after_update(context_module_progression, context_module_progression.changes)
 
-      job = Delayed::Job.where(strand: "course_progress_#{context_module_progression.global_id}").take
+      strand = "course_progress_course_#{context_module_progression.context_module.global_context_id}_user_#{context_module_progression.global_user_id}"
+      job = Delayed::Job.where(strand: strand).take
       expect(job).not_to be_nil
       expect(job.run_at).to be > Time.now
       expect(job.max_concurrent).to eq 1

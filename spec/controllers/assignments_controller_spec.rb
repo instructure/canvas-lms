@@ -553,7 +553,7 @@ describe AssignmentsController do
   end
 
   describe "GET 'show'" do
-    it "should return 404 on non-existant assignment" do
+    it "should return 404 on non-existent assignment" do
       user_session(@student)
 
       get 'show', params: {course_id: @course.id, id: Assignment.maximum(:id) + 100}
@@ -903,6 +903,45 @@ describe AssignmentsController do
 
       expect(response).to be_successful
       expect(assigns(:user_has_google_drive)).to be true
+    end
+
+    it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
+      user_session(@student)
+      attachment = attachment_model(content_type: "application/pdf", display_name: "file.pdf", user: @teacher)
+      assignment = @course.assignments.create!(
+        title: "annotate",
+        annotatable_attachment: attachment,
+        submission_types: "student_annotation"
+      )
+      get :show, params: { course_id: @course.id, id: assignment.id }
+      expect(assigns(:first_annotation_submission)).to be true
+      expect(assigns.dig(:js_env, :FIRST_ANNOTATION_SUBMISSION)).to be true
+    end
+
+    it "sets first_annotation_submission to false if the assignment is not annotatable" do
+      user_session(@student)
+      assignment = @course.assignments.create!(title: "text", submission_types: "text_entry")
+      get :show, params: { course_id: @course.id, id: assignment.id }
+      expect(assigns(:first_annotation_submission)).to be false
+      expect(assigns.dig(:js_env, :FIRST_ANNOTATION_SUBMISSION)).to be false
+    end
+
+    it "sets first_annotation_submission to false if the student has already submitted" do
+      user_session(@student)
+      attachment = attachment_model(content_type: "application/pdf", display_name: "file.pdf", user: @teacher)
+      assignment = @course.assignments.create!(
+        title: "annotate",
+        annotatable_attachment: attachment,
+        submission_types: "student_annotation"
+      )
+      assignment.submit_homework(
+        @student,
+        submission_type: "student_annotation",
+        annotatable_attachment_id: attachment.id
+      )
+      get :show, params: { course_id: @course.id, id: assignment.id }
+      expect(assigns(:first_annotation_submission)).to be false
+      expect(assigns.dig(:js_env, :FIRST_ANNOTATION_SUBMISSION)).to be false
     end
 
     context "page views enabled" do

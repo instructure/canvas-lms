@@ -59,7 +59,7 @@
             <% end %>
           </a>
         <% end %>
-        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
+        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
         <% if show_moderation_link %>
           <a
             href='<%= course_assignment_moderate_url(@context, @assignment) %>'
@@ -104,7 +104,7 @@
       </div>
       <div class='assignment-buttons'>
         <%= render "shared/mark_as_done" %>
-        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
+        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
     </div>
     <%= render "student_assignment_overview" %>

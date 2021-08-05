@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Laste opp/ spille inn medier"
     },
+    "uploading_19e8a4e7": {
+        "message": "Laster opp"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "Opplasting at teksting/underteksting mislyktes."
     },

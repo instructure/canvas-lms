@@ -41,13 +41,13 @@ module DynamicSettings
       end
 
       it 'must return the value for the specified key' do
-        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
-        allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return('qux')
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return('qux')
         expect(proxy.fetch('baz')).to eq 'qux'
       end
 
       it 'must fetch the value from consul using the prefix and supplied key' do
-        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
+        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return(nil)
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).ordered.and_return(nil)
         proxy.fetch('baz')
@@ -55,8 +55,8 @@ module DynamicSettings
 
       it "logs the query when enabled" do
         proxy.query_logging = true
-        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
-        allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).ordered.and_return('qux')
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).and_return('qux')
         expect(DynamicSettings.logger).to receive(:debug) do |log_message|
           expect(log_message).to match("CONSUL")
           expect(log_message).to match("status:OK")
@@ -94,6 +94,12 @@ module DynamicSettings
       it "must raise an exception when consul can't be reached and no previous value is found" do
         expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
         expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
+      end
+
+      it "returns the failsafe value when consul can't be reached and no previous value is found" do
+        expect(Diplomat::Kv).to receive(:get_all).twice.and_raise(Diplomat::KeyNotFound)
+        expect(proxy.fetch('baz', failsafe: nil)).to be_nil
+        expect(proxy.fetch('baz', failsafe: 'a')).to eq 'a'
       end
 
       it "falls back to global settings" do

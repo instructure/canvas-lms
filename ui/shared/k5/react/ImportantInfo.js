@@ -26,7 +26,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconCoursesLine} from '@instructure/ui-icons'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import LoadingWrapper from './LoadingWrapper'
 
 export const ImportantInfoShape = {
   courseId: PropTypes.string.isRequired,
@@ -64,16 +63,9 @@ ImportantInfoEditHeader.propTypes = {
   margin: PropTypes.string
 }
 
-const ImportantInfo = ({isLoading, showTitle = false, titleMargin, infoDetails}) => {
+const ImportantInfo = ({showTitle = false, titleMargin, infoDetails}) => {
   return (
-    <LoadingWrapper
-      id="important-info"
-      isLoading={isLoading}
-      height="8em"
-      width="100%"
-      margin="small 0 0"
-      screenReaderLabel={I18n.t('Loading important info')}
-    >
+    <>
       {showTitle && infoDetails && (
         <ImportantInfoEditHeader
           canEdit={infoDetails.canEdit}
@@ -94,12 +86,11 @@ const ImportantInfo = ({isLoading, showTitle = false, titleMargin, infoDetails})
         /* html sanitized by server */
         dangerouslySetInnerHTML={{__html: apiUserContent.convert(infoDetails?.content)}}
       />
-    </LoadingWrapper>
+    </>
   )
 }
 
 ImportantInfo.propTypes = {
-  isLoading: PropTypes.bool.isRequired,
   showTitle: PropTypes.bool,
   titleMargin: PropTypes.string,
   infoDetails: PropTypes.shape(ImportantInfoShape)

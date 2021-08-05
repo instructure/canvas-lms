@@ -41,39 +41,48 @@ describe('<PreviewSection />', () => {
         height="218px"
         viewBox="0 0 218 218"
         width="218px"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <pattern
-          height="16"
-          id="checkerboard"
-          patternUnits="userSpaceOnUse"
-          width="16"
+        <svg
+          fill="none"
+          height="218px"
+          viewBox="0 0 218 218"
+          width="218px"
           x="0"
-          y="0"
         >
-          <rect
-            fill="#d9d9d9"
-            height="8"
-            width="8"
+          <pattern
+            height="16"
+            id="checkerboard"
+            patternUnits="userSpaceOnUse"
+            width="16"
             x="0"
             y="0"
-          />
-          <rect
-            fill="#d9d9d9"
-            height="8"
-            width="8"
-            x="8"
-            y="8"
-          />
-        </pattern>
-        <g
-          fill="url(#checkerboard)"
-          stroke="#0f0"
-          stroke-width="4"
-        >
-          <path
-            d="M109 8L210 210H8L109 8Z"
-          />
-        </g>
+          >
+            <rect
+              fill="#d9d9d9"
+              height="8"
+              width="8"
+              x="0"
+              y="0"
+            />
+            <rect
+              fill="#d9d9d9"
+              height="8"
+              width="8"
+              x="8"
+              y="8"
+            />
+          </pattern>
+          <g
+            fill="url(#checkerboard)"
+            stroke="#0f0"
+            stroke-width="4"
+          >
+            <path
+              d="M109 8L210 210H8L109 8Z"
+            />
+          </g>
+        </svg>
       </svg>
     `)
   })

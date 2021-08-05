@@ -26,6 +26,7 @@ import {
   // saveMediaRecording,
   mediaUploadComplete,
   uploadPreflight,
+  uploadToButtonsAndIconsFolder,
   uploadToMediaFolder
 } from '../actions/upload'
 import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
@@ -54,6 +55,8 @@ export default function propsFromDispatch(dispatch) {
     toggleFlickrForm: () => dispatch(openOrCloseFlickrForm()),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
+    startButtonsAndIconsUpload: fileMetaProps =>
+      dispatch(uploadToButtonsAndIconsFolder(fileMetaProps)),
     startMediaUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
     createMediaServerSession: () => dispatch(createMediaServerSession()),

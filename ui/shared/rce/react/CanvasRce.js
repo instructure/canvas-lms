@@ -99,6 +99,9 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       ltiTools={window.INST?.editorButtons}
+      maxInitRenderedRCEs={
+        window.ENV?.FEATURES?.rce_limit_init_render_on_page ? props.maxInitRenderedRCEs : -1
+      }
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
@@ -129,6 +132,12 @@ CanvasRce.propTypes = {
   editorOptions: object,
   // height of the RCE. If a number, in px
   height: oneOfType([number, string]),
+  // if the rce_limit_init_render_on_page flag is on, this
+  // is the maximum number of RCEs that will render on page load.
+  // Any more than this will be deferred until it is nearly
+  // scrolled into view.
+  // if isNaN or <=0, render them all
+  maxInitRenderedRCEs: number,
   // name:value pairs of attributes to add to the textarea
   // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
@@ -148,6 +157,7 @@ CanvasRce.propTypes = {
 CanvasRce.defaultProps = {
   autosave: true,
   editorOptions: {},
+  maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
   textareaClassName: 'input-block-level',

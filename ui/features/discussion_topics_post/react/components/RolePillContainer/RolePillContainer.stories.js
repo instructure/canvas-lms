@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {RolePillContainer, MOCK_ROLE_PILLS} from './RolePillContainer'
+import {RolePillContainer} from './RolePillContainer'
 
 export default {
   title: 'Examples/Discussion Posts/Components/Role Pill Container',
@@ -28,7 +28,7 @@ export default {
 const Template = args => <RolePillContainer {...args} />
 
 export const Default = Template.bind({})
-Default.args = {...MOCK_ROLE_PILLS}
+Default.args = {discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment']}
 
 export const SingleAuthorRole = Template.bind({})
 SingleAuthorRole.args = {discussionRoles: ['Author']}

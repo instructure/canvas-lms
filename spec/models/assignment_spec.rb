@@ -9898,6 +9898,39 @@ describe Assignment do
     end
   end
 
+  describe "#accepts_submission_type?" do
+    let(:assignment) { @course.assignments.create! }
+
+    context "when the submission_type is 'basic_lti_launch'" do
+      it "returns true if the assignment accepts external_tool submissions" do
+        assignment.update!(submission_types: "external_tool")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns true if the assignment accepts online uploads" do
+        assignment.update!(submission_types: "online_text_entry")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns false if the assignment accepts neither external_tool nor online-type submissions" do
+        assignment.update!(submission_types: "on_paper")
+        expect(assignment).not_to be_accepts_submission_type("basic_lti_launch")
+      end
+    end
+
+    context "when the submission_type is a non-LTI type" do
+      it "returns true if the specified type is contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).to be_accepts_submission_type("online_upload")
+      end
+
+      it "returns false if the specified type is not contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).not_to be_accepts_submission_type("online_text_entry")
+      end
+    end
+  end
+
   def setup_assignment_with_group
     assignment_model(:group_category => "Study Groups", :course => @course)
     @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)

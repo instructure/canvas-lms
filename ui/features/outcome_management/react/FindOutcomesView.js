@@ -40,9 +40,11 @@ const FindOutcomesView = ({
   loading,
   loadMore,
   searchString,
+  disableAddAllButton,
   onChangeHandler,
   onClearHandler,
-  onAddAllHandler
+  onAddAllHandler,
+  mobileScrollContainer
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -65,7 +67,15 @@ const FindOutcomesView = ({
       >
         <Flex.Item
           as="div"
-          padding={isMobileView ? 'x-small 0' : isRootGroup ? '0' : 'x-small medium x-small 0'}
+          padding={
+            isMobileView
+              ? 'x-small 0'
+              : isRootGroup
+              ? 'x-small 0'
+              : searchString.length === 0
+              ? 'x-small medium x-small 0'
+              : 'x-small 0'
+          }
         >
           <Text size="medium">
             {I18n.t(
@@ -79,11 +89,11 @@ const FindOutcomesView = ({
             )}
           </Text>
         </Flex.Item>
-        {!isRootGroup && (
+        {searchString.length === 0 && !isRootGroup && (
           <Flex.Item>
             <Button
               margin="x-small 0"
-              interaction={enabled && !searchString ? 'enabled' : 'disabled'}
+              interaction={enabled && !disableAddAllButton ? 'enabled' : 'disabled'}
               onClick={onAddAllHandler}
             >
               {I18n.t('Add All Outcomes')}
@@ -96,13 +106,15 @@ const FindOutcomesView = ({
 
   const searchAndSelectContainer = (
     <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
-      <View as="div" padding={isMobileView ? 'x-small 0 0' : 'small 0 0'}>
-        <Heading level="h2" as="h3">
-          <Text wrap="break-word" weight={isMobileView ? 'bold' : 'normal'}>
-            {addZeroWidthSpace(groupTitle)}
-          </Text>
-        </Heading>
-      </View>
+      {!isMobileView && (
+        <View as="div" padding={isMobileView ? 'x-small 0 0' : 'small 0 0'}>
+          <Heading level="h2" as="h3">
+            <Text wrap="break-word" weight={isMobileView ? 'bold' : 'normal'}>
+              {addZeroWidthSpace(groupTitle)}
+            </Text>
+          </Heading>
+        </View>
+      )}
       <View as="div" padding={isMobileView ? 'x-small 0' : 'large 0 medium'}>
         <OutcomeSearchBar
           enabled={enabled || searchString.length > 0}
@@ -185,24 +197,25 @@ const FindOutcomesView = ({
       as="div"
       height="100%"
       minWidth="300px"
-      padding={!isMobileView ? '0 x-large 0 medium' : '0'}
+      padding={isMobileView ? '0 small' : '0 x-large 0 medium'}
       data-testid="find-outcome-container"
     >
-      <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+      <div
+        style={
+          isMobileView
+            ? {}
+            : {height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}
+        }
+      >
         {!isMobileView && searchAndSelectContainer}
         <div
-          style={{
-            flex: '1 0 24rem',
-            overflow: 'auto',
-            position: 'relative',
-            padding: isMobileView ? '0 .5rem' : '0'
-          }}
+          style={isMobileView ? {} : {flex: '1 0 24rem', position: 'relative', overflow: 'auto'}}
           ref={setScrollContainer}
         >
           <InfiniteScroll
             hasMore={outcomes?.pageInfo?.hasNextPage}
             loadMore={loadMore}
-            scrollContainer={scrollContainer}
+            scrollContainer={mobileScrollContainer || scrollContainer}
             loader={
               <Flex
                 as="div"
@@ -229,7 +242,7 @@ const FindOutcomesView = ({
             <View as="div" data-testid="find-outcome-items-list">
               {outcomes?.edges?.length === 0 && searchString && !loading && (
                 <View as="div" textAlign="center" margin="small 0 0">
-                  <Text color="secondary">{I18n.t('The search returned no results')}</Text>
+                  <Text color="primary">{I18n.t('The search returned no results.')}</Text>
                 </View>
               )}
 
@@ -276,11 +289,17 @@ FindOutcomesView.propTypes = {
     })
   }),
   searchString: PropTypes.string.isRequired,
+  disableAddAllButton: PropTypes.bool,
   onChangeHandler: PropTypes.func.isRequired,
   onClearHandler: PropTypes.func.isRequired,
   onAddAllHandler: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  loadMore: PropTypes.func.isRequired
+  loadMore: PropTypes.func.isRequired,
+  mobileScrollContainer: PropTypes.instanceOf(Element)
+}
+
+FindOutcomesView.defaultProps = {
+  mobileScrollContainer: null
 }
 
 export default FindOutcomesView
