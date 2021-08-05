@@ -30,7 +30,12 @@ module Canvas
     # before we start bootstrapping other things in the app.
     def self.bootstrap!
       settings = ConfigFile.load("consul")
+
       if settings.present?
+        settings[:retry_limit] = Setting.get('consul_retry_count', 1).to_i
+        settings[:retry_base] = Setting.get('consul_retry_base_interval', 1.4).to_f
+        settings[:circuit_breaker] = ::DynamicSettings::CircuitBreaker.new(Setting.get('consul_circuit_breaker_interval', 60).to_f)
+
         begin
           ::DynamicSettings.config = settings
         rescue Diplomat::KeyNotFound, Diplomat::PathNotFound, Diplomat::UnknownStatus
@@ -53,6 +58,7 @@ module Canvas
       # this got pulled out into a local gem
       ::DynamicSettings.cache = LocalCache
       ::DynamicSettings.fallback_recovery_lambda = ->(e){ Canvas::Errors.capture_exception(:consul, e, :warn) }
+      ::DynamicSettings.retry_lambda = ->(e){ Canvas::Errors.capture_exception(:consul, e, :warn) }
       ::DynamicSettings.logger = Rails.logger
     end
   end

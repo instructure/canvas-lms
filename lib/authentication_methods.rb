@@ -100,11 +100,6 @@ module AuthenticationMethods
       # and for some normal use cases (old token, access token),
       # so we can return and move on
       return
-    rescue Diplomat::KeyNotFound => exception
-      # Something went wrong in the Network
-      # these are indications of infrastructure or data problems
-      # so we should log them for resolution, but recover gracefully
-      Canvas::Errors.capture_exception(:jwt_check, exception, :warn)
     end
   end
 
