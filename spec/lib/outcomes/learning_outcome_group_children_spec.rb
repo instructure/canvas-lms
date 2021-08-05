@@ -92,6 +92,11 @@ describe Outcomes::LearningOutcomeGroupChildren do
       expect(subject.total_outcomes(g6.id)).to eq 3
     end
 
+    it 'counts content tags rather than distinct outcomes' do
+      g0.add_outcome(o8)
+      expect(subject.total_outcomes(g0.id)).to eq 13
+    end
+
     it 'caches the total outcomes if FF is on' do
       enable_cache do
         expect(ContentTag).to receive(:active).and_call_original.once
