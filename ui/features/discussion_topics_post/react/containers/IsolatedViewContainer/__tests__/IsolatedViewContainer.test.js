@@ -29,6 +29,11 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
@@ -52,6 +57,16 @@ describe('IsolatedViewContainer', () => {
       },
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
   })
 
   afterEach(() => {

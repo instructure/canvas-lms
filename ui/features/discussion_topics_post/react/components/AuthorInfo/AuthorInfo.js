@@ -59,8 +59,8 @@ export const AuthorInfo = props => {
               <div
                 style={{
                   float: 'left',
-                  marginLeft: '-24px',
-                  marginTop: props.author ? '13px' : '2px'
+                  marginLeft: props.isIsolatedView ? '-16px' : '-24px',
+                  marginTop: props.author ? '11px' : '2px'
                 }}
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}

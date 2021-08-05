@@ -16,21 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import {BackButton} from '../../components/BackButton/BackButton'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
+import I18n from 'i18n!discussion_posts'
+import {isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
-import theme from '@instructure/canvas-theme'
+import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {Alert} from '@instructure/ui-alerts'
 import {UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
+import {View} from '@instructure/ui-view'
 
 export const IsolatedParent = props => {
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
@@ -91,94 +96,120 @@ export const IsolatedParent = props => {
   }
 
   return (
-    <>
-      {props.discussionEntry.parent && (
-        <div
-          style={{
-            paddingLeft: theme.variables.spacing.xSmall,
-            paddingRight: theme.variables.spacing.xSmall,
-            paddingBottom: theme.variables.spacing.xSmall
-          }}
-        >
-          <BackButton
-            onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
-          />
-        </div>
-      )}
-      {props.discussionEntry.parent && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
-        <Alert
-          variant="warning"
-          renderCloseButtonLabel="Close"
-          margin="small"
-          onDismiss={() => {
-            updateIsolatedViewDeeplyNestedAlert({
-              variables: {
-                isolatedViewDeeplyNestedAlert: false
-              }
-            })
-
-            ENV.should_show_deeply_nested_alert = false
-          }}
-        >
-          Deeply nested replies are no longer supported. Your reply will appear on the parent level.
-          Consider including a reply preview.
-        </Alert>
-      )}
-      <div
-        style={{
-          marginLeft: theme.variables.spacing.medium,
-          paddingRight: theme.variables.spacing.small,
-          paddingBottom: theme.variables.spacing.xxSmall
-        }}
-      >
-        <Highlight isHighlighted={props.isHighlighted}>
-          <Flex>
-            <Flex.Item shouldShrink shouldGrow>
-              <PostMessageContainer
-                discussionEntry={props.discussionEntry}
-                isIsolatedView
-                threadActions={threadActions}
-                isEditing={isEditing}
-                padding="small 0 medium small"
-                onCancel={() => {
-                  setIsEditing(false)
-                }}
-                onSave={message => {
-                  if (props.onSave) {
-                    props.onSave(props.discussionEntry, message)
-                    setIsEditing(false)
-                  }
-                }}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'small'
+        },
+        desktop: {
+          textSize: 'medium'
+        }
+      }}
+      render={responsiveProps => (
+        <>
+          {props.discussionEntry.parent && (
+            <View as="div" padding="small none none small">
+              <BackButton
+                onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
               />
-            </Flex.Item>
-            {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch" padding="small 0 0 0">
-                <ThreadActions
-                  id={props.discussionEntry.id}
-                  isUnread={!props.discussionEntry.read}
-                  onToggleUnread={props.onToggleUnread}
-                  onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
-                  onEdit={
-                    props.discussionEntry.permissions?.update
-                      ? () => {
-                          setIsEditing(true)
+            </View>
+          )}
+          {props.discussionEntry.parent && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+            <Alert
+              variant="warning"
+              renderCloseButtonLabel="Close"
+              margin="small"
+              onDismiss={() => {
+                updateIsolatedViewDeeplyNestedAlert({
+                  variables: {
+                    isolatedViewDeeplyNestedAlert: false
+                  }
+                })
+
+                ENV.should_show_deeply_nested_alert = false
+              }}
+            >
+              <Text size={responsiveProps.textSize}>
+                {I18n.t(
+                  'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+                )}
+              </Text>
+            </Alert>
+          )}
+          <View as="div" padding="x-small">
+            <Highlight isHighlighted={props.isHighlighted}>
+              <Flex padding="small">
+                <Flex.Item shouldShrink shouldGrow>
+                  <PostContainer
+                    isTopic={false}
+                    postUtilities={
+                      <ThreadActions
+                        id={props.discussionEntry.id}
+                        isUnread={!props.discussionEntry.read}
+                        onToggleUnread={props.onToggleUnread}
+                        onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
+                        onEdit={
+                          props.discussionEntry.permissions?.update
+                            ? () => {
+                                setIsEditing(true)
+                              }
+                            : null
                         }
-                      : null
-                  }
-                  goToTopic={props.goToTopic}
-                  onOpenInSpeedGrader={
-                    props.discussionTopic.permissions?.speedGrader
-                      ? props.onOpenInSpeedGrader
-                      : null
-                  }
-                />
-              </Flex.Item>
-            )}
-          </Flex>
-          {props.children}
-        </Highlight>
-      </div>
-    </>
+                        goToTopic={props.goToTopic}
+                        onOpenInSpeedGrader={
+                          props.discussionTopic.permissions?.speedGrader
+                            ? props.onOpenInSpeedGrader
+                            : null
+                        }
+                      />
+                    }
+                    author={props.discussionEntry.author}
+                    message={props.discussionEntry.message}
+                    isEditing={isEditing}
+                    onSave={message => {
+                      if (props.onSave) {
+                        props.onSave(props.discussionEntry, message)
+                        setIsEditing(false)
+                      }
+                    }}
+                    onCancel={() => setIsEditing(false)}
+                    isIsolatedView
+                    editor={props.discussionEntry.editor}
+                    isUnread={!props.discussionEntry.read}
+                    isForcedRead={props.discussionEntry.forcedReadState}
+                    timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.createdAt
+                    )}
+                    editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.updatedAt
+                    )}
+                    lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.lastReply?.createdAt
+                    )}
+                    deleted={props.discussionEntry.deleted}
+                    isTopicAuthor={isTopicAuthor(
+                      props.discussionTopic.author,
+                      props.discussionEntry.author
+                    )}
+                  >
+                    {threadActions.length > 0 && (
+                      <View as="div" padding="x-small none none">
+                        <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>
+                          {threadActions}
+                        </ThreadingToolbar>
+                      </View>
+                    )}
+                  </PostContainer>
+                </Flex.Item>
+              </Flex>
+              {props.children}
+            </Highlight>
+          </View>
+        </>
+      )}
+    />
   )
 }
 

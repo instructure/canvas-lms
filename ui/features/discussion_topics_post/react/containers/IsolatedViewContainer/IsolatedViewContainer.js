@@ -307,7 +307,7 @@ export const IsolatedViewContainer = props => {
     >
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
-          <Heading margin="medium medium medium" theme={{h2FontWeight: 700}}>
+          <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
             Thread
           </Heading>
         </Flex.Item>
@@ -349,8 +349,8 @@ export const IsolatedViewContainer = props => {
                 display="block"
                 background="primary"
                 borderWidth="none none none none"
-                padding="none none small none"
-                margin="none none x-small none"
+                padding="none small small"
+                margin="none none x-small"
               >
                 <DiscussionEdit
                   onSubmit={text => {
@@ -364,39 +364,42 @@ export const IsolatedViewContainer = props => {
             )}
           </IsolatedParent>
           {!props.RCEOpen && (
-            <IsolatedThreadsContainer
-              discussionTopic={props.discussionTopic}
-              discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
-              onToggleRating={toggleRating}
-              onToggleUnread={toggleUnread}
-              onDelete={onDelete}
-              markAsRead={markAsRead}
-              onOpenInSpeedGrader={onOpenInSpeedGrader}
-              showOlderReplies={() => {
-                setFetchingMoreOlderReplies(true)
-                fetchOlderEntries()
-              }}
-              showNewerReplies={() => {
-                setFetchingMoreNewerReplies(true)
-                fetchNewerEntries()
-              }}
-              onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
-                props.setHighlightEntryId(highlightEntryId)
-                props.onOpenIsolatedView(discussionEntryId, withRCE)
-              }}
-              goToTopic={props.goToTopic}
-              highlightEntryId={props.highlightEntryId}
-              hasMoreOlderReplies={
-                isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                  ?.pageInfo?.hasPreviousPage
-              }
-              hasMoreNewerReplies={
-                isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
-                  ?.pageInfo?.hasNextPage && !!props.relativeEntryId
-              }
-              fetchingMoreOlderReplies={fetchingMoreOlderReplies}
-              fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-            />
+            <View as="div" borderWidth="medium none none none" padding="medium none none">
+              <IsolatedThreadsContainer
+                discussionTopic={props.discussionTopic}
+                discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
+                onToggleRating={toggleRating}
+                onToggleUnread={toggleUnread}
+                onDelete={onDelete}
+                markAsRead={markAsRead}
+                onOpenInSpeedGrader={onOpenInSpeedGrader}
+                showOlderReplies={() => {
+                  setFetchingMoreOlderReplies(true)
+                  fetchOlderEntries()
+                }}
+                showNewerReplies={() => {
+                  setFetchingMoreNewerReplies(true)
+                  fetchNewerEntries()
+                }}
+                onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
+                  props.setHighlightEntryId(highlightEntryId)
+                  props.onOpenIsolatedView(discussionEntryId, withRCE)
+                }}
+                goToTopic={props.goToTopic}
+                highlightEntryId={props.highlightEntryId}
+                hasMoreOlderReplies={
+                  isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                    ?.pageInfo?.hasPreviousPage
+                }
+                hasMoreNewerReplies={
+                  isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
+                    ?.pageInfo?.hasNextPage && !!props.relativeEntryId
+                }
+                fetchingMoreOlderReplies={fetchingMoreOlderReplies}
+                fetching
+                MoreNewerReplies={fetchingMoreNewerReplies}
+              />
+            </View>
           )}
         </>
       )}

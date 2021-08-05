@@ -33,6 +33,11 @@ jest.mock('../../../utils/constants', () => ({
   AUTO_MARK_AS_READ_DELAY: 0
 }))
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
 describe('IsolatedThreadsContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
@@ -53,6 +58,16 @@ describe('IsolatedThreadsContainer', () => {
       },
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
   })
 
   afterEach(() => {

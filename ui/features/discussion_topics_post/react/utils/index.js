@@ -141,3 +141,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
   }
   return querySizes
 }
+
+export const isTopicAuthor = (topicAuthor, entryAuthor) => {
+  return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
+}
