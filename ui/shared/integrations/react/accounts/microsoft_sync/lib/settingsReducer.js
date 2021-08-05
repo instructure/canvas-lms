@@ -86,8 +86,6 @@ export const reducerActions = {
  * The Microsoft tenant this account wants to use
  * @property {'email'|'preferred_username'|'sis_user_id'} microsoft_sync_login_attribute
  * The attribute to use for mapping Canvas users to Microsoft users.
- * @property {string} selectedAttribute
- * The attribute the user has selected, in their language
  * @property {string} successMessage
  * A success message that should be displayed after successfully updating
  * settings
@@ -110,7 +108,6 @@ export const defaultState = {
   microsoft_sync_tenant: '',
   last_saved_microsoft_sync_tenant: '',
   microsoft_sync_login_attribute: 'email',
-  selectedAttribute: 'email',
   successMessage: ''
 }
 
@@ -133,12 +130,9 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       }
     }
     case reducerActions.updateAttribute: {
-      // Gotta keep track of both the actual login attribute and the selected one
-      // cause of i18n.
       return {
         ...state,
-        microsoft_sync_login_attribute: payload.microsoft_sync_login_attribute,
-        selectedAttribute: payload.selectedAttribute
+        microsoft_sync_login_attribute: payload.microsoft_sync_login_attribute
       }
     }
     case reducerActions.updateSuffix: {
