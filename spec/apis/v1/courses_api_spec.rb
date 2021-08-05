@@ -810,6 +810,107 @@ describe CoursesController, type: :request do
 
   end
 
+  describe "bulk_user_progress" do
+    let(:course) { Course.create!(:workflow_state => 'available') }
+
+    let(:item1) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: 'published') }
+
+    let(:item2) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: 'published') }
+
+    let(:designer) { designer_in_course(course: course, active_all: true).user }
+
+    let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+
+    it 'denies access to a caller without rights to view course grades' do
+      api_call_as_user(designer, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                       { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                         :format => 'json'}, {}, {}, { expected_status: 401})
+    end
+
+    it 'returns an exception when the specified course has no modules' do
+      api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                       { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                         :format => 'json'}, {}, {}, { expected_status: 400})
+    end
+
+    describe 'when the course has a context module' do
+      let(:context_module) { course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}") }
+
+      let(:content_tag1) { context_module.add_item(:id => item1.id, :type => 'assignment') }
+
+      let(:content_tag2) { context_module.add_item(:id => item2.id, :type => 'assignment') }
+
+      it 'returns an exception when the module has no requirements' do
+        api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                         { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                           :format => 'json'}, {}, {}, { expected_status: 400})
+      end
+
+      describe 'and the context module has completion requirements' do
+        before do
+          context_module.completion_requirements = { "none" => "none", content_tag1.id => { :type => "must_view" }, content_tag2.id => { :type => "must_view" } }
+          context_module.save!
+        end
+
+        it 'returns an empty response when no users are enrolled as students' do
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json' }, {}, {}, { expected_status: 200 })
+          expect(json).to be_empty
+        end
+
+        it 'returns a json representation of enrolled users and their progress to a user with rights to view course grades' do
+          # Enroll two students
+          student1 = student_in_course(course: course, active_all: true)
+          student2 = student_in_course(course: course, active_all: true)
+
+          # Have one of the students complete the course
+          student1_progress = CourseProgress.new(course, student1.user)
+          student1_progress.current_position # results in progression being written
+
+          student1_progression = student1_progress.module_progressions.first
+          student1_progression.requirements_met = student1_progress.requirements
+          student1_progression.save!
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json' }, {}, {}, { expected_status: 200 })
+
+          expect(json.map { |s| s.slice('id', 'progress') }).to match_array [
+            { 'id' => student1.user_id, 'progress' =>
+              { 'requirement_count' => 2,
+                'requirement_completed_count' => 2,
+                'next_requirement_url' => nil,
+                'completed_at' => student1_progression.completed_at } },
+            { 'id' => student2.user_id, 'progress' =>
+              { 'requirement_count' => 2,
+                'requirement_completed_count' => 0,
+                'next_requirement_url' => nil,
+                'completed_at' => nil } }
+          ]
+        end
+
+        it 'should paginate the list of user progress' do
+          student_in_course(course: course, active_all: true)
+          student_in_course(course: course, active_all: true)
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json', :per_page => 1 }, {}, {}, { expected_status: 200 })
+
+          expect(json.length).to equal 1
+
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json', :per_page => 1, :page => 2 }, {}, {}, { expected_status: 200 })
+
+          expect(json.length).to equal 1
+        end
+      end
+    end
+  end
+
   it 'should paginate the course list' do
     json = api_call(:get, "/api/v1/courses.json?per_page=1",
             { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })

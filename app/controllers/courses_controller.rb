@@ -3303,6 +3303,71 @@ class CoursesController < ApplicationController
     render json: @context.rights_status(@current_user, session, *permissions)
   end
 
+  # @API Get bulk user progress
+  # Returns progress information for all users enrolled in the given course.
+  #
+  # You must be a user who has permission to view all grades in the course (such as a teacher or administrator).
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/bulk_user_progress \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   [
+  #     {
+  #       "id": 1,
+  #       "display_name": "Test Student 1",
+  #       "avatar_image_url": "https://<canvas>/images/messages/avatar-50.png",
+  #       "html_url": "https://<canvas>/courses/1/users/1",
+  #       "pronouns": null,
+  #       "progress": {
+  #         "requirement_count": 2,
+  #         "requirement_completed_count": 1,
+  #         "next_requirement_url": "https://<canvas>/courses/<course_id>/modules/items/<item_id>",
+  #         "completed_at": null
+  #       }
+  #     },
+  #     {
+  #       "id": 2,
+  #       "display_name": "Test Student 2",
+  #       "avatar_image_url": "https://<canvas>/images/messages/avatar-50.png",
+  #       "html_url": "https://<canvas>/courses/1/users/2",
+  #       "pronouns": null,
+  #       "progress": {
+  #         "requirement_count": 2,
+  #         "requirement_completed_count": 2,
+  #         "next_requirement_url": null,
+  #         "completed_at": "2021-08-10T16:26:08Z"
+  #       }
+  #     }
+  #   ]
+  def bulk_user_progress
+    get_context
+    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :view_all_grades)
+
+
+    unless @context.module_based?
+      return render :json => {
+        error: { message: 'No progress available because this course is not module based (meaning, it does not have modules and module completion requirements).' }
+      }, :status => :bad_request
+    end
+
+    # NOTE: Similar to #user_progress, this endpoint should remain on the primary db
+    users = Api.paginate(UserSearch.scope_for(@context, @current_user, :enrollment_type => %w(Student)), self, api_v1_course_bulk_user_progress_url)
+    cmps = ContextModuleProgression.where(user_id: users.map(&:id))
+      .joins(:context_module)
+      .where(context_modules: { context: @context, context_type: 'Course' })
+    cmps_by_user = cmps.group_by(&:user_id)
+
+    progress = users.map do |user|
+      progressions = {}
+      progressions[@context.id] = cmps_by_user[user.id] || []
+      user_display_json(user, @context).merge(:progress => CourseProgress.new(@context, user, read_only: true, preloaded_progressions: progressions).to_json)
+    end
+
+    render :json => progress.to_json, :status => :ok
+  end
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
