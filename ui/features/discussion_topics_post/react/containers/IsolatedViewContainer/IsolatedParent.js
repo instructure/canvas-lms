@@ -28,8 +28,14 @@ import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import {Alert} from '@instructure/ui-alerts'
+import {UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT} from '../../../graphql/Mutations'
+import {useMutation} from 'react-apollo'
 
 export const IsolatedParent = props => {
+  const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
+    UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
+  )
   const [isEditing, setIsEditing] = useState(false)
   const threadActions = []
 
@@ -98,6 +104,25 @@ export const IsolatedParent = props => {
             onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
           />
         </div>
+      )}
+      {props.discussionEntry.parent && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+        <Alert
+          variant="warning"
+          renderCloseButtonLabel="Close"
+          margin="small"
+          onDismiss={() => {
+            updateIsolatedViewDeeplyNestedAlert({
+              variables: {
+                isolatedViewDeeplyNestedAlert: false
+              }
+            })
+
+            ENV.should_show_deeply_nested_alert = false
+          }}
+        >
+          Deeply nested replies are no longer supported. Your reply will appear on the parent level.
+          Consider including a reply preview.
+        </Alert>
       )}
       <div
         style={{

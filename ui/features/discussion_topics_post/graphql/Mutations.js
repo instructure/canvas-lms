@@ -212,3 +212,16 @@ export const UPDATE_DISCUSSION_READ_STATE = gql`
   }
   ${Discussion.fragment}
 `
+
+export const UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT = gql`
+  mutation UpdateIsolatedViewDeeplyNestedAlert($isolatedViewDeeplyNestedAlert: Boolean!) {
+    updateIsolatedViewDeeplyNestedAlert(
+      input: {isolatedViewDeeplyNestedAlert: $isolatedViewDeeplyNestedAlert}
+    ) {
+      user {
+        ...User
+      }
+    }
+  }
+  ${User.fragment}
+`

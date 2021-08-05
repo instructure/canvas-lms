@@ -126,4 +126,30 @@ describe('IsolatedParent', () => {
       expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
+
+  it('should render deeply nested alert', () => {
+    window.ENV = {
+      should_show_deeply_nested_alert: true
+    }
+    const {queryByText} = setup(defaultProps({overrides: {RCEOpen: true}}))
+
+    expect(
+      queryByText(
+        'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+      )
+    ).toBeTruthy()
+  })
+
+  it('should not render deeply nested alert', () => {
+    window.ENV = {
+      should_show_deeply_nested_alert: false
+    }
+    const {queryByText} = setup(defaultProps())
+
+    expect(
+      queryByText(
+        'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+      )
+    ).toBeFalsy()
+  })
 })
