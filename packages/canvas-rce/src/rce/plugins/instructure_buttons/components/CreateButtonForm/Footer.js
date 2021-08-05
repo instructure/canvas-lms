@@ -16,48 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
-import {StoreConsumer} from '../../../shared/StoreContext'
-import {buildSvg} from '../../svg'
 
-export const Footer = ({settings}) => {
-  const [uploadInProgress, setUploadInProgress] = useState(false)
-
-  return (
-    <StoreConsumer>
-      {storeProps => (
-        <View as="div" padding="0 small">
-          <Flex justifyItems="end">
-            <Flex.Item>
-              <Button
-                disabled={uploadInProgress}
-                color="primary"
-                onClick={() => {
-                  const svg = buildSvg(settings, {isPreview: false})
-                  setUploadInProgress(true)
-
-                  storeProps
-                    .startButtonsAndIconsUpload({name: 'placeholder_name.svg', domElement: svg})
-                    .then(() => {
-                      setUploadInProgress(false)
-                    })
-                    .catch(() => {
-                      setUploadInProgress(false)
-                    })
-                }}
-              >
-                {formatMessage('Apply')}
-              </Button>
-            </Flex.Item>
-          </Flex>
-        </View>
-      )}
-    </StoreConsumer>
-  )
-}
+export const Footer = ({disabled, onCancel, onSubmit}) => (
+  <View as="div" padding="0 small">
+    <Flex justifyItems="end">
+      <Flex.Item margin="0 small 0 0">
+        <Button disabled={disabled} onClick={onCancel}>
+          {formatMessage('Cancel')}
+        </Button>
+      </Flex.Item>
+      <Flex.Item>
+        <Button disabled={disabled} color="primary" onClick={onSubmit}>
+          {formatMessage('Apply')}
+        </Button>
+      </Flex.Item>
+    </Flex>
+  </View>
+)

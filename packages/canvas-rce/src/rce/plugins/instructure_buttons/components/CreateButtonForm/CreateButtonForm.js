@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer} from 'react'
+import React, {useReducer, useState} from 'react'
 
 import {View} from '@instructure/ui-view'
 
+import {useStoreProps} from '../../../shared/StoreContext'
+
 import {DEFAULT_SETTINGS} from '../../svg/constants'
+import {buildSvg} from '../../svg'
 import {PreviewSection} from './PreviewSection'
 import {ShapeSection} from './ShapeSection'
 import {ColorSection} from './ColorSection'
@@ -28,11 +31,33 @@ import {Footer} from './Footer'
 import {ImageSection} from './ImageSection'
 import {TextSection} from './TextSection'
 
-export const CreateButtonForm = ({editor}) => {
+export const CreateButtonForm = ({editor, onClose}) => {
   const [settings, dispatch] = useReducer(
     (state, changes) => ({...state, ...changes}),
     DEFAULT_SETTINGS
   )
+
+  const [status, setStatus] = useState('idle')
+
+  const storeProps = useStoreProps()
+
+  const handleSubmit = () => {
+    setStatus('loading')
+
+    storeProps
+      .startButtonsAndIconsUpload({
+        name: settings.name,
+        domElement: buildSvg(settings, {isPreview: false})
+      })
+      .then(writeButtonToRCE)
+      .then(onClose)
+      .catch(() => setStatus('error'))
+  }
+
+  const writeButtonToRCE = ({url}) => {
+    const img = editor.dom.createHTML('img', {src: url, alt: settings.alt})
+    editor.insertContent(img)
+  }
 
   return (
     <View as="div">
@@ -41,7 +66,7 @@ export const CreateButtonForm = ({editor}) => {
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
       <ImageSection editor={editor} settings={settings} onChange={dispatch} />
-      <Footer settings={settings} />
+      <Footer disabled={status === 'loading'} onCancel={onClose} onSubmit={handleSubmit} />
     </View>
   )
 }

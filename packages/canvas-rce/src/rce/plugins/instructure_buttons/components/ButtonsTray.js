@@ -63,7 +63,11 @@ export function ButtonsTray({editor, onUnmount, type}) {
         </Flex.Item>
 
         <Flex.Item as="content" padding="small">
-          {type === 'create' ? <CreateButtonForm editor={editor} /> : <SavedButtonList />}
+          {type === 'create' ? (
+            <CreateButtonForm editor={editor} onClose={() => setIsOpen(false)} />
+          ) : (
+            <SavedButtonList />
+          )}
         </Flex.Item>
       </Flex>
     </Tray>
