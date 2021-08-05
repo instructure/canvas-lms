@@ -360,11 +360,23 @@ describe Types::DiscussionType do
   context "course discussion" do
     let_once(:discussion) { graded_discussion_topic }
     include_examples "DiscussionType"
+
+    describe 'mentionable users connection' do
+      it 'finds lists the user' do
+        expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.users.map(&:id).map(&:to_s))
+      end
+    end
   end
 
   context "group discussion" do
     let_once(:discussion) { group_discussion_assignment.child_topics.take }
     include_examples "DiscussionType"
+
+    describe 'mentionable users connection' do
+      it 'finds lists the user' do
+        expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.participating_users_in_context.map(&:id).map(&:to_s))
+      end
+    end
   end
 
   context "announcement" do

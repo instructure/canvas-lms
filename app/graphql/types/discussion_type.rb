@@ -204,6 +204,16 @@ module Types
       end
     end
 
+    field :mentionable_users_connection, Types::MessageableUserType.connection_type, null: true do
+      argument :search_term, String, required: false
+    end
+    def mentionable_users_connection(search_term: nil)
+      Loaders::MentionableUserLoader.for(
+        current_user: current_user,
+        search_term: search_term
+      ).load(object)
+    end
+
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
       return [] if object.initial_post_required?(current_user, session)
       Loaders::DiscussionEntryLoader.for(
