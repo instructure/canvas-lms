@@ -118,8 +118,6 @@ describe('K5Announcement', () => {
   it('shows the posted date if passed', () => {
     const date = '2021-05-14T17:06:21-06:00'
     const {getByText} = render(<K5Announcement {...getProps({postedDate: date})} />)
-    expect(
-      getByText(`Posted on ${tz.format(date, 'date.formats.full_with_weekday')}`)
-    ).toBeInTheDocument()
+    expect(getByText(tz.format(date, 'date.formats.date_at_time'))).toBeInTheDocument()
   })
 })

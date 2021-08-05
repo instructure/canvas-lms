@@ -350,9 +350,7 @@ describe('K-5 Subject Course', () => {
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://address/to/hw.pdf')
       expect(
-        getByText(
-          `Posted on ${tz.format('2021-05-14T17:06:21-06:00', 'date.formats.full_with_weekday')}`
-        )
+        getByText(tz.format('2021-05-14T17:06:21-06:00', 'date.formats.date_at_time'))
       ).toBeInTheDocument()
     })
 

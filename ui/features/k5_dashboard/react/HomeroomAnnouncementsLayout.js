@@ -71,6 +71,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
                   message={homeroom.announcement.message}
                   url={homeroom.announcement.url}
                   attachment={homeroom.announcement.attachment}
+                  postedDate={homeroom.announcement.postedDate}
                   published={homeroom.published}
                   showCourseDetails
                 />

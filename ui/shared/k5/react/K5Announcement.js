@@ -65,11 +65,23 @@ export default function K5Announcement({
   )
 
   const renderAnnouncementTitle = () => (
-    <Heading level="h3" margin="x-small 0 0">
-      <Link href={url} isWithinText={false}>
-        {title}
-      </Link>
-    </Heading>
+    <Flex wrap="wrap" alignItems="end">
+      <Flex.Item align="start" shouldGrow shoulShrink margin="x-small x-small 0 0">
+        <Heading level="h3">
+          <Link href={url} isWithinText={false}>
+            {title}
+          </Link>
+        </Heading>
+      </Flex.Item>
+      {postedDate && (
+        <Flex.Item align="end" margin="x-small 0 0">
+          {/* condensed makes it the same as default for h3 */}
+          <Text as="div" size="small" lineHeight="condensed">
+            {tz.format(postedDate, 'date.formats.date_at_time')}
+          </Text>
+        </Flex.Item>
+      )}
+    </Flex>
   )
 
   return (
@@ -93,13 +105,6 @@ export default function K5Announcement({
         {showCourseDetails
           ? renderAnnouncementTitle()
           : renderWithEditButton(renderAnnouncementTitle())}
-        {postedDate && (
-          <Text as="div" size="small" color="secondary">
-            {I18n.t('Posted on %{date}', {
-              date: tz.format(postedDate, 'date.formats.full_with_weekday')
-            })}
-          </Text>
-        )}
         <div
           className="user_content"
           /* html sanitized by server */
