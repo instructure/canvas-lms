@@ -35,10 +35,24 @@ export function AssignmentDetails({...props}) {
 
   const singleDueDate = useMemo(
     () => (
-      <Flex.Item padding="x-small" shouldGrow align="start">
-        <Text weight="normal" size="small">
-          {props.dueAtDisplayText}
-        </Text>
+      <Flex.Item padding="xx-small" shouldGrow align="start">
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({mobile: true, desktop: true})}
+          props={{
+            mobile: {
+              textSize: 'x-small'
+            },
+            desktop: {
+              textSize: 'small'
+            }
+          }}
+          render={responsiveProps => (
+            <Text weight="normal" size={responsiveProps.textSize}>
+              {props.dueAtDisplayText}
+            </Text>
+          )}
+        />
       </Flex.Item>
     ),
     [props.dueAtDisplayText]
