@@ -86,19 +86,19 @@ describe('Mention Dropdown', () => {
 
   describe('Callbacks', () => {
     it('should call onActiveDescendantChange when user changes', () => {
-      const onActiveDescendantChangeMock = jest.fn()
+      const onFocusedUserChangeMock = jest.fn()
       const {getAllByTestId} = setup({
-        onActiveDescendantChange: onActiveDescendantChangeMock
+        onFocusedUserChange: onFocusedUserChangeMock
       })
       // Each render has this callback fire twice use to how useEffect works
       // with our state
-      expect(onActiveDescendantChangeMock.mock.calls.length).toBe(2)
+      expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
 
       const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[3].querySelector('li'))
 
       // Expect 2 re-renders per click totalling 4
-      expect(onActiveDescendantChangeMock.mock.calls.length).toBe(4)
+      expect(onFocusedUserChangeMock.mock.calls.length).toBe(4)
     })
   })
 

@@ -18,7 +18,7 @@
 
 import {makeBodyEditable} from '../contentEditable'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onActiveDescendantChange} from '../events'
+import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onFocusedUserChange} from '../events'
 import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
@@ -238,7 +238,14 @@ describe('events', () => {
           expectedValue = 'Enter'
           expectedMessageType = 'mentions.SelectionEvent'
 
-          onActiveDescendantChange('#foo', editor)
+          onFocusedUserChange(
+            {
+              ariaActiveDescendantId: '#foo',
+              name: 'Test User',
+              id: '12345'
+            },
+            editor
+          )
         })
 
         examplesForMentionsEvents()
@@ -371,13 +378,17 @@ describe('events', () => {
     })
   })
 
-  describe('onActiveDescendantChange()', () => {
-    let activeDescendant
+  describe('onFocusedUserChange()', () => {
+    let focusedUser
 
-    const subject = () => onActiveDescendantChange(activeDescendant, editor)
+    const subject = () => onFocusedUserChange(focusedUser, editor)
 
     beforeEach(() => {
-      activeDescendant = '#foo'
+      focusedUser = {
+        ariaActiveDescendantId: '#foo',
+        name: 'Test User',
+        id: '12345'
+      }
 
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
@@ -397,14 +408,38 @@ describe('events', () => {
       ).toEqual('#foo')
     })
 
-    describe('when the active descendant is blank', () => {
-      beforeEach(() => (activeDescendant = undefined))
+    it('sets the data-userId attribute', () => {
+      subject()
+      expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-userId')).toEqual('12345')
+    })
+
+    it('sets the data-displayName attribute', () => {
+      subject()
+      expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
+        'Test User'
+      )
+    })
+
+    describe('when the focused user is blank', () => {
+      beforeEach(() => (focusedUser = undefined))
 
       it('sets the active descendant attribute to an empty string', () => {
         subject()
         expect(
           editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
         ).toEqual('')
+      })
+
+      it('sets the data-displayname attribute to an empty string', () => {
+        subject()
+        expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
+          ''
+        )
+      })
+
+      it('sets the data-userId attribute to an empty string', () => {
+        subject()
+        expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-userId')).toEqual('')
       })
     })
   })

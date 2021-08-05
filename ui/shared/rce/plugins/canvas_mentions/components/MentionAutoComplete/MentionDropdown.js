@@ -72,7 +72,7 @@ const MentionMockUsers = [
   }
 ]
 
-const MentionUIManager = ({mentionData, onActiveDescendantChange, editor}) => {
+const MentionUIManager = ({mentionData, onFocusedUserChange, editor}) => {
   // Setup State
   const [menitonCordinates, setMenitonCordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -178,12 +178,15 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange, editor}) => {
   // Keep Focus User and active decendant always up to date
   useEffect(() => {
     if (focusedUser) {
-      onActiveDescendantChange(ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id))
+      onFocusedUserChange({
+        ...focusedUser,
+        ariaActiveDescendantId: ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id)
+      })
     } else {
-      onActiveDescendantChange(null)
+      onFocusedUserChange(null)
     }
     focusedUserRef.current = focusedUser
-  }, [editor.id, focusedUser, onActiveDescendantChange])
+  }, [editor.id, focusedUser, onFocusedUserChange])
 
   // Window listeners handler
   useLayoutEffect(() => {
@@ -223,7 +226,7 @@ export default MentionUIManager
 MentionUIManager.propTypes = {
   mentionData: PropTypes.array,
   rceRef: PropTypes.object,
-  onActiveDescendantChange: PropTypes.func,
+  onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
   onSelect: PropTypes.func,
   editor: PropTypes.object
@@ -231,7 +234,7 @@ MentionUIManager.propTypes = {
 
 MentionUIManager.defaultProps = {
   mentionData: MentionMockUsers,
-  onActiveDescendantChange: () => {},
+  onFocusedUserChange: () => {},
   onExited: () => {},
   onSelect: () => {}
 }

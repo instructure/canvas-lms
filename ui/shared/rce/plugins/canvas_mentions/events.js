@@ -105,7 +105,7 @@ export const onSetContent = e => {
       ReactDom.render(
         <MentionDropdown
           rceRef={editor.getBody()}
-          onActiveDescendantChange={onActiveDescendantChange}
+          onFocusedUserChange={onFocusedUserChange}
           onExited={onMentionsExit}
           editor={editor}
         />,
@@ -206,12 +206,13 @@ export const onMouseDown = e => {
  * @param String activeDescendant
  * @param Editor ed
  */
-export const onActiveDescendantChange = (activeDescendant, ed) => {
+export const onFocusedUserChange = (focusedUser, ed) => {
   const editor = ed || tinymce.activeEditor
+  const markerEl = editor.dom.select(MARKER_SELECTOR)[0]
 
-  editor.dom
-    .select(MARKER_SELECTOR)[0]
-    ?.setAttribute('aria-activedescendant', activeDescendant || '')
+  markerEl?.setAttribute('aria-activedescendant', focusedUser?.ariaActiveDescendantId || '')
+  markerEl?.setAttribute('data-displayname', focusedUser?.name || '')
+  markerEl?.setAttribute('data-userId', focusedUser?.id || '')
 }
 
 const onMentionsExit = ed => {
