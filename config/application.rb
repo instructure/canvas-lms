@@ -159,10 +159,10 @@ module CanvasRails
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: -> (*) {
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation"]
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
     config.middleware.use Rack::Brotli, if: -> (*) {
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli"]
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
     config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
