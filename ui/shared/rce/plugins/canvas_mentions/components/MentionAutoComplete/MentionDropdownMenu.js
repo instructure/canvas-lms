@@ -20,6 +20,7 @@ import React, {useMemo} from 'react'
 import MentionDropdownOption from './MentionDropdownOption'
 import {View} from '@instructure/ui-view'
 import {usePopper} from 'react-popper'
+import {ARIA_ID_TEMPLATES} from '../../constants'
 
 const MentionDropdownMenu = ({
   onSelect,
@@ -27,8 +28,7 @@ const MentionDropdownMenu = ({
   show,
   coordiantes,
   selectedUser,
-  popupId,
-  generateItemAria
+  instanceId
 }) => {
   // Variables
   const directionality = tinyMCE.activeEditor.getParam('directionality')
@@ -64,16 +64,16 @@ const MentionDropdownMenu = ({
           onSelect={() => {
             onSelect({
               ...user,
-              elementId: `${popupId}-mention-popup-${user.id}`
+              elementId: ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)
             })
           }}
           isSelected={selectedUser === user.id}
-          key={`${popupId}-mention-popup-${user.id}`}
-          id={generateItemAria(user.id)}
+          key={user.id}
+          id={ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)}
         />
       )
     })
-  }, [generateItemAria, mentionOptions, onSelect, popupId, selectedUser])
+  }, [mentionOptions, onSelect, instanceId, selectedUser])
 
   // Don't show if menu is empty
   if (!show || mentionOptions?.length === 0) {
@@ -102,7 +102,7 @@ const MentionDropdownMenu = ({
       >
         <ul
           aria-label="Mentionable Users"
-          id={`${popupId}-mention-popup`}
+          id={ARIA_ID_TEMPLATES.ariaControlTemplate(instanceId)}
           role="listbox"
           style={{
             paddingInlineStart: '0px',
@@ -126,9 +126,9 @@ MentionDropdownMenu.proptypes = {
    */
   mentionOptions: PropTypes.array,
   /**
-   * Unique popup ID supplied for ARIA support
+   * Unique ID supplied for ARIA support
    */
-  popupId: PropTypes.string,
+  instanceId: PropTypes.string,
   /**
    * Bool that controls visibility of menu
    */
@@ -144,10 +144,5 @@ MentionDropdownMenu.proptypes = {
   /**
    * ID of selected user
    */
-  selectedUser: PropTypes.string,
-  generateItemAria: PropTypes.func
-}
-
-MentionDropdownMenu.defaultProps = {
-  generateItemAria: id => `${id}`
+  selectedUser: PropTypes.string
 }

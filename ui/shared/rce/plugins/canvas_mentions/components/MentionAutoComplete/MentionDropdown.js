@@ -18,9 +18,9 @@
 import React, {useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo} from 'react'
 import MentionDropdownMenu from './MentionDropdownMenu'
 import PropTypes from 'prop-types'
-import {nanoid} from 'nanoid'
 import getPosition from './getPosition'
 import {
+  ARIA_ID_TEMPLATES,
   MARKER_ID,
   TRUSTED_MESSAGE_ORIGIN,
   NAVIGATION_MESSAGE,
@@ -72,7 +72,7 @@ const MentionMockUsers = [
   }
 ]
 
-const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
+const MentionUIManager = ({mentionData, onActiveDescendantChange, editor}) => {
   // Setup State
   const [menitonCordinates, setMenitonCordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -80,7 +80,6 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
-  const uniqueInstanceId = useRef(nanoid())
 
   const filteredOptions = useMemo(() => {
     return mentionData?.filter(o => {
@@ -169,11 +168,6 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
     }
   }
 
-  // Used to generate unique ID's for each Menu Item for ARIA compatibility
-  const generateMenuItemId = id => {
-    return `${uniqueInstanceId.current}-mention-popup-${id}`
-  }
-
   // Make us maintain a focused user when open
   useEffect(() => {
     if (!filteredOptions.includes(focusedUser)) {
@@ -184,12 +178,12 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
   // Keep Focus User and active decendant always up to date
   useEffect(() => {
     if (focusedUser) {
-      onActiveDescendantChange(generateMenuItemId(focusedUser.id))
+      onActiveDescendantChange(ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id))
     } else {
       onActiveDescendantChange(null)
     }
     focusedUserRef.current = focusedUser
-  }, [focusedUser, onActiveDescendantChange])
+  }, [editor.id, focusedUser, onActiveDescendantChange])
 
   // Window listeners handler
   useLayoutEffect(() => {
@@ -212,12 +206,11 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
 
   return (
     <MentionDropdownMenu
-      popupId={uniqueInstanceId.current}
+      instanceId={editor.id}
       mentionOptions={filteredOptions}
       show
       coordiantes={menitonCordinates}
       selectedUser={focusedUser?.id}
-      generateItemAria={generateMenuItemId}
       onSelect={user => {
         setFocusedUser(user)
       }}
@@ -232,7 +225,8 @@ MentionUIManager.propTypes = {
   rceRef: PropTypes.object,
   onActiveDescendantChange: PropTypes.func,
   onExited: PropTypes.func,
-  onSelect: PropTypes.func
+  onSelect: PropTypes.func,
+  editor: PropTypes.object
 }
 
 MentionUIManager.defaultProps = {

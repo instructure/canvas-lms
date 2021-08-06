@@ -107,6 +107,7 @@ export const onSetContent = e => {
           rceRef={editor.getBody()}
           onActiveDescendantChange={onActiveDescendantChange}
           onExited={onMentionsExit}
+          editor={editor}
         />,
         elm
       )

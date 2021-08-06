@@ -21,11 +21,19 @@ import MentionDropdown from '../MentionDropdown'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import tinymce from 'tinymce'
 import getPosition from '../getPosition'
+import {ARIA_ID_TEMPLATES} from '../../../constants'
+import {nanoid} from 'nanoid'
 
 jest.mock('../getPosition')
 
+const mockedEditor = {
+  editor: {
+    id: nanoid()
+  }
+}
+
 const setup = props => {
-  return render(<MentionDropdown {...props} />)
+  return render(<MentionDropdown editor={mockedEditor} {...props} />)
 }
 
 describe('Mention Dropdown', () => {
@@ -91,6 +99,21 @@ describe('Mention Dropdown', () => {
 
       // Expect 2 re-renders per click totalling 4
       expect(onActiveDescendantChangeMock.mock.calls.length).toBe(4)
+    })
+  })
+
+  describe('accessibility', () => {
+    it('should call ARIA_ID_TEMPALTE and pass to callback', () => {
+      const onActiveDescendantChangeMock = jest.fn()
+      const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
+      const {getAllByTestId} = setup({
+        onActiveDescendantChange: onActiveDescendantChangeMock
+      })
+
+      const menuItems = getAllByTestId('mention-dropdown-item')
+      fireEvent.click(menuItems[1].querySelector('li'))
+
+      expect(spy).toHaveBeenCalled()
     })
   })
 })

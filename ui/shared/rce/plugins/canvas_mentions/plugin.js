@@ -21,7 +21,7 @@ import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
 import {makeMarkerEditable} from './contentEditable'
 import {onKeyDown, onKeyUp, onSetContent, onMouseDown} from './events'
-import {MARKER_SELECTOR, MARKER_ID} from './constants'
+import {ARIA_ID_TEMPLATES, MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
 
@@ -36,11 +36,12 @@ function onInputChange(_e, ed = false) {
     editor.execCommand(
       'mceInsertContent',
       false,
-      `<span id="${MARKER_ID}" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="" aria-activedescendant=""></span>`
+      `<span id="${MARKER_ID}" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="${ARIA_ID_TEMPLATES.ariaControlTemplate(
+        editor.id
+      )}" aria-activedescendant=""></span>`
     )
 
-    // Make the mentions marker editable for A11y
-    makeMarkerEditable(editor, MARKER_SELECTOR)
+    makeMarkerEditable(editor, MARKER_SELECTOR) // Make the mentions marker editable for A11y
   }
 }
 
