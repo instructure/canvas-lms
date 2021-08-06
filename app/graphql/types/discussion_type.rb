@@ -172,8 +172,8 @@ module Types
       argument :sort_order, DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
     end
-    def entries_total_pages(**args)
-      get_entry_page_count(args)
+    def entries_total_pages(**kwargs)
+      get_entry_page_count(**kwargs)
     end
 
     field :root_entries_total_pages, Integer, null: true do
@@ -182,14 +182,12 @@ module Types
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
     end
-    def root_entries_total_pages(**args)
-      args[:root_entries] = true
-      get_entry_page_count(args)
+    def root_entries_total_pages(**kwargs)
+      get_entry_page_count(root_entries: true, **kwargs)
     end
 
-    def get_entry_page_count(**args)
-      per_page = args.delete(:per_page)
-      get_entries(args).then do |entries|
+    def get_entry_page_count(per_page:, **kwargs)
+      get_entries(**kwargs).then do |entries|
         (entries.count.to_f / per_page).ceil
       end
     end
@@ -198,8 +196,8 @@ module Types
       argument :search_term, String, required: false
       argument :filter, DiscussionFilterType, required: false
     end
-    def search_entry_count(**args)
-      get_entries(args).then do |entries|
+    def search_entry_count(**kwargs)
+      get_entries(**kwargs).then do |entries|
         entries.count
       end
     end
@@ -214,15 +212,9 @@ module Types
       ).load(object)
     end
 
-    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
+    def get_entries(**kwargs)
       return [] if object.initial_post_required?(current_user, session)
-      Loaders::DiscussionEntryLoader.for(
-        current_user: current_user,
-        search_term: search_term,
-        filter: filter,
-        sort_order: sort_order,
-        root_entries: root_entries
-      ).load(object)
+      Loaders::DiscussionEntryLoader.for(current_user: current_user, **kwargs).load(object)
     end
   end
 end
