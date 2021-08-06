@@ -485,6 +485,25 @@ describe Mutations::ImportOutcomes do
         outcomes: ["0 Group D outcome"]
       }], @course.root_outcome_group)
     end
+
+    it "imports outcomes that belongs to root folders" do
+      outcome_model(
+        title: "Root group outcome",
+        outcome_group: Account.default.root_outcome_group,
+        context: Account.default
+      )
+
+      # force the creation of root outcome group in the course
+      @course.root_outcome_group
+
+      expect {
+        exec(outcome_id: get_outcome_id("Root group outcome"))
+      }.to not_change(LearningOutcomeGroup, :count)
+        .and change(ContentTag, :count).by(1)
+        .and change {
+          @course.root_outcome_group.child_outcome_links.map(&:content).map(&:title)
+        }.from([]).to(["Root group outcome"])
+    end
   end
 
   context "passing groupId" do

@@ -144,7 +144,18 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         progress.fail
         return
       end
-      target_group = make_group_structure(source_outcome_group, target_context, progress)
+
+      # If root outcome group
+      target_group = if source_outcome_group.learning_outcome_group_id.nil?
+        # dont mimic source group structure, but import the outcome to the root outcome group
+        # later (OUT-4684) we'll be able to import group/outcomes to a specific group
+        # So we'll probably need to change here as well
+        target_context.root_outcome_group
+      else
+        # build the group structure
+        make_group_structure(source_outcome_group, target_context, progress)
+      end
+
       target_group.add_outcome(LearningOutcome.find(outcome_id))
     end
 
