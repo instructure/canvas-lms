@@ -44,12 +44,14 @@ export const AuthorInfo = props => {
         mobile: {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
-          nameAndRoleDirection: 'column'
+          nameAndRoleDirection: 'column',
+          badgeMarginLeft: '-16px'
         },
         desktop: {
           authorNameTextSize: 'medium',
           timestampTextSize: 'small',
-          nameAndRoleDirection: 'row'
+          nameAndRoleDirection: 'row',
+          badgeMarginLeft: '-24px'
         }
       }}
       render={responsiveProps => (
@@ -59,7 +61,7 @@ export const AuthorInfo = props => {
               <div
                 style={{
                   float: 'left',
-                  marginLeft: props.isIsolatedView ? '-16px' : '-24px',
+                  marginLeft: responsiveProps.badgeMarginLeft,
                   marginTop: props.author ? '11px' : '2px'
                 }}
                 data-testid="is-unread"

@@ -36,7 +36,7 @@ export function ThreadingToolbar({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          itemSpacing: '0 small medium 0',
+          itemSpacing: '0 small 0 0',
           textSize: 'small'
         },
         desktop: {

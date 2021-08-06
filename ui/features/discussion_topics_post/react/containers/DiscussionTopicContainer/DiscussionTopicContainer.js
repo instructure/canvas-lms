@@ -251,6 +251,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           assignmentDetails: {
             margin: '0'
           },
+          border: {
+            width: 'small 0',
+            radius: 'none'
+          },
+          container: {
+            padding: '0 xx-small'
+          },
           replyButton: {
             display: 'block'
           },
@@ -265,6 +272,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           assignmentDetails: {
             margin: '0 0 small 0'
+          },
+          border: {
+            width: 'small',
+            radius: 'medium'
+          },
+          container: {
+            padding: '0 medium'
           },
           replyButton: {
             display: 'inline-block'
@@ -312,13 +326,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Flex.Item>
                   <View
                     as="div"
-                    borderWidth="small"
-                    borderRadius="medium"
+                    borderWidth={responsiveProps.border.width}
+                    borderRadius={responsiveProps.border.radius}
                     borderStyle="solid"
                     borderColor="primary"
-                    padding="small 0"
+                    padding="xx-small 0 small"
                   >
-                    <Flex direction="column" padding="0 medium 0">
+                    <Flex direction="column" padding={responsiveProps.container.padding}>
                       {isGraded(props.discussionTopic.assignment) && (
                         <Flex.Item
                           shouldShrink

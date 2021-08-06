@@ -19,7 +19,8 @@
 import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
-  updateDiscussionTopicRepliesCount
+  updateDiscussionTopicRepliesCount,
+  responsiveQuerySizes
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
@@ -42,6 +43,8 @@ import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
+import {Responsive} from '@instructure/ui-responsive'
+
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
@@ -297,126 +300,142 @@ export const DiscussionThreadContainer = props => {
   const highlightEntry = false
 
   return (
-    <>
-      <Highlight isHighlighted={highlightEntry}>
-        <div style={{marginLeft: marginDepth}} ref={threadRef}>
-          <Flex padding="medium medium small medium">
-            <Flex.Item shouldShrink shouldGrow>
-              <PostContainer
-                isTopic={false}
-                postUtilities={
-                  !props.discussionEntry.deleted ? (
-                    <ThreadActions
-                      id={props.discussionEntry.id}
-                      isUnread={!props.discussionEntry.read}
-                      onToggleUnread={toggleUnread}
-                      onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                      onEdit={
-                        props.discussionEntry.permissions?.update
-                          ? () => {
-                              setIsEditing(true)
-                            }
-                          : null
-                      }
-                      onOpenInSpeedGrader={
-                        props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
-                      }
-                      goToParent={
-                        props.depth === 0
-                          ? null
-                          : () => {
-                              const topOffset = props.parentRef.current.offsetTop
-                              window.scrollTo(0, topOffset - 44)
-                            }
-                      }
-                      goToTopic={props.goToTopic}
-                    />
-                  ) : null
-                }
-                author={props.discussionEntry.author}
-                message={props.discussionEntry.message}
-                isEditing={isEditing}
-                onSave={onUpdate}
-                onCancel={() => setIsEditing(false)}
-                isIsolatedView={false}
-                editor={props.discussionEntry.editor}
-                isUnread={!props.discussionEntry.read}
-                isForcedRead={props.discussionEntry.forcedReadState}
-                timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                  props.discussionEntry.createdAt
-                )}
-                editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                  props.discussionEntry.updatedAt
-                )}
-                lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
-                  props.discussionEntry.lastReply?.createdAt
-                )}
-                deleted={props.discussionEntry.deleted}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          padding: 'medium xx-small small'
+        },
+        desktop: {
+          padding: 'medium medium small'
+        }
+      }}
+      render={responsiveProps => (
+        <>
+          <Highlight isHighlighted={highlightEntry}>
+            <div style={{marginLeft: marginDepth}} ref={threadRef}>
+              <Flex padding={responsiveProps.padding}>
+                <Flex.Item shouldShrink shouldGrow>
+                  <PostContainer
+                    isTopic={false}
+                    postUtilities={
+                      !props.discussionEntry.deleted ? (
+                        <ThreadActions
+                          id={props.discussionEntry.id}
+                          isUnread={!props.discussionEntry.read}
+                          onToggleUnread={toggleUnread}
+                          onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                          onEdit={
+                            props.discussionEntry.permissions?.update
+                              ? () => {
+                                  setIsEditing(true)
+                                }
+                              : null
+                          }
+                          onOpenInSpeedGrader={
+                            props.discussionTopic.permissions?.speedGrader
+                              ? onOpenInSpeedGrader
+                              : null
+                          }
+                          goToParent={
+                            props.depth === 0
+                              ? null
+                              : () => {
+                                  const topOffset = props.parentRef.current.offsetTop
+                                  window.scrollTo(0, topOffset - 44)
+                                }
+                          }
+                          goToTopic={props.goToTopic}
+                        />
+                      ) : null
+                    }
+                    author={props.discussionEntry.author}
+                    message={props.discussionEntry.message}
+                    isEditing={isEditing}
+                    onSave={onUpdate}
+                    onCancel={() => setIsEditing(false)}
+                    isIsolatedView={false}
+                    editor={props.discussionEntry.editor}
+                    isUnread={!props.discussionEntry.read}
+                    isForcedRead={props.discussionEntry.forcedReadState}
+                    timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.createdAt
+                    )}
+                    editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.updatedAt
+                    )}
+                    lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.lastReply?.createdAt
+                    )}
+                    deleted={props.discussionEntry.deleted}
+                  >
+                    {threadActions.length > 0 && (
+                      <View as="div" padding="x-small none none">
+                        <ThreadingToolbar
+                          searchTerm={searchTerm}
+                          discussionEntry={props.discussionEntry}
+                          onOpenIsolatedView={props.onOpenIsolatedView}
+                          isIsolatedView={false}
+                        >
+                          {threadActions}
+                        </ThreadingToolbar>
+                      </View>
+                    )}
+                  </PostContainer>
+                </Flex.Item>
+              </Flex>
+            </div>
+          </Highlight>
+          <div style={{marginLeft: replyMarginDepth}}>
+            {editorExpanded && !ENV.isolated_view && (
+              <View
+                display="block"
+                background="primary"
+                borderWidth="none none small none"
+                padding="none none small none"
+                margin="none none x-small none"
               >
-                {threadActions.length > 0 && (
-                  <View as="div" padding="x-small none none">
-                    <ThreadingToolbar
-                      searchTerm={searchTerm}
-                      discussionEntry={props.discussionEntry}
-                      onOpenIsolatedView={props.onOpenIsolatedView}
-                      isIsolatedView={false}
-                    >
-                      {threadActions}
-                    </ThreadingToolbar>
-                  </View>
-                )}
-              </PostContainer>
-            </Flex.Item>
-          </Flex>
-        </div>
-      </Highlight>
-      <div style={{marginLeft: replyMarginDepth}}>
-        {editorExpanded && !ENV.isolated_view && (
-          <View
-            display="block"
-            background="primary"
-            borderWidth="none none small none"
-            padding="none none small none"
-            margin="none none x-small none"
-          >
-            <DiscussionEdit
-              onSubmit={text => {
-                onReplySubmit(text)
-              }}
-              onCancel={() => setEditorExpanded(false)}
+                <DiscussionEdit
+                  onSubmit={text => {
+                    onReplySubmit(text)
+                  }}
+                  onCancel={() => setEditorExpanded(false)}
+                />
+              </View>
+            )}
+          </div>
+          {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
+            <DiscussionSubentries
+              discussionTopic={props.discussionTopic}
+              discussionEntryId={props.discussionEntry._id}
+              depth={props.depth + 1}
+              markAsRead={props.markAsRead}
+              parentRef={threadRef}
             />
-          </View>
-        )}
-      </div>
-      {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
-        <DiscussionSubentries
-          discussionTopic={props.discussionTopic}
-          discussionEntryId={props.discussionEntry._id}
-          depth={props.depth + 1}
-          markAsRead={props.markAsRead}
-          parentRef={threadRef}
-        />
+          )}
+          {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
+            <View
+              as="div"
+              margin="none none none xx-large"
+              width="100%"
+              key={`discussion-thread-collapse-${props.discussionEntry.id}`}
+            >
+              <View
+                background="primary"
+                borderWidth="none none small none"
+                padding="none none small none"
+                display="block"
+                width="100%"
+                margin="none none medium none"
+              >
+                <CollapseReplies onClick={() => setExpandReplies(false)} />
+              </View>
+            </View>
+          )}
+        </>
       )}
-      {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
-        <View
-          as="div"
-          margin="none none none xx-large"
-          width="100%"
-          key={`discussion-thread-collapse-${props.discussionEntry.id}`}
-        >
-          <View
-            background="primary"
-            borderWidth="none none small none"
-            padding="none none small none"
-            display="block"
-            width="100%"
-            margin="none none medium none"
-          >
-            <CollapseReplies onClick={() => setExpandReplies(false)} />
-          </View>
-        </View>
-      )}
-    </>
+    />
   )
 }
 
