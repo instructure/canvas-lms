@@ -21,6 +21,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
+import {updateDiscussionTopicEntryCounts} from '../../utils/index'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
@@ -38,7 +39,14 @@ export const DiscussionThreadsContainer = props => {
 
   const AUTO_MARK_AS_READ_DELAY = 3000
 
+  const updateCache = (cache, result) => {
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length
+    })
+  }
+
   const [updateDiscussionEntriesReadState] = useMutation(UPDATE_DISCUSSION_ENTRIES_READ_STATE, {
+    update: updateCache,
     onCompleted: () => {
       setOnSuccess(I18n.t('The replies were successfully updated'))
     },
@@ -50,10 +58,11 @@ export const DiscussionThreadsContainer = props => {
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
-        const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = discussionTopic.discussionEntriesConnection.nodes.filter(entry =>
-          entryIds.includes(entry._id)
+        let entryIds = Array.from(discussionEntriesToUpdate)
+        const entries = discussionTopic.discussionEntriesConnection.nodes.filter(
+          entry => entryIds.includes(entry._id) && entry.read === false
         )
+        entryIds = entries.map(entry => entry._id)
         entries.forEach(entry => (entry.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({

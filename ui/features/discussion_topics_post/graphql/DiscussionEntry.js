@@ -56,12 +56,6 @@ export const DiscussionEntry = {
           repliesCount
         }
       }
-      discussionTopic {
-        entryCounts {
-          unreadCount
-          repliesCount
-        }
-      }
       parentId
     }
     ${DiscussionEntryPermissions.fragment}
@@ -95,12 +89,6 @@ export const DiscussionEntry = {
     rootEntry: shape({
       id: string,
       rootEntryParticipantCounts: shape({
-        unreadCount: number,
-        repliesCount: number
-      })
-    }),
-    discussionTopic: shape({
-      entryCounts: shape({
         unreadCount: number,
         repliesCount: number
       })
@@ -141,14 +129,6 @@ export const DiscussionEntry = {
     },
     rootEntryId = '77',
     rootEntry = null,
-    discussionTopic = {
-      entryCounts: {
-        unreadCount: 2,
-        repliesCount: 56,
-        __typename: 'DiscussionEntryCounts'
-      },
-      __typename: 'Discussion'
-    },
     parentId = '77'
   } = {}) => ({
     id,
@@ -172,7 +152,6 @@ export const DiscussionEntry = {
     discussionSubentriesConnection,
     rootEntryId,
     rootEntry,
-    discussionTopic,
     parentId,
     __typename: 'DiscussionEntry'
   })

@@ -19,7 +19,7 @@
 import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
-  updateDiscussionTopicRepliesCount,
+  updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
   isTopicAuthor
 } from '../../utils'
@@ -99,7 +99,7 @@ export const DiscussionThreadContainer = props => {
       courseID: window.ENV?.course_id
     }
 
-    updateDiscussionTopicRepliesCount(cache, props.discussionTopic.id)
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
@@ -140,7 +140,23 @@ export const DiscussionThreadContainer = props => {
     }
   })
 
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    if (
+      props.discussionEntry.read !==
+      result.data.updateDiscussionEntryParticipant.discussionEntry.read
+    ) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange
+      })
+    }
+  }
+
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    update: updateDiscussionEntryParticipantCache,
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null

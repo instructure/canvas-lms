@@ -24,7 +24,7 @@ import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
-import {isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {isTopicAuthor, updateDiscussionTopicEntryCounts, responsiveQuerySizes} from '../../utils'
 import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect, useRef} from 'react'
@@ -45,7 +45,14 @@ export const IsolatedThreadsContainer = props => {
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
+  const updateCache = (cache, result) => {
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length
+    })
+  }
+
   const [updateDiscussionEntriesReadState] = useMutation(UPDATE_DISCUSSION_ENTRIES_READ_STATE, {
+    update: updateCache,
     onCompleted: () => {
       setOnSuccess(I18n.t('The replies were successfully updated'))
     },
@@ -57,10 +64,11 @@ export const IsolatedThreadsContainer = props => {
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
-        const entryIds = Array.from(discussionEntriesToUpdate)
+        let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
-          entry => entryIds.includes(entry._id)
+          entry => entryIds.includes(entry._id) && entry.read === false
         )
+        entryIds = entries.map(entry => entry._id)
         entries.forEach(entry => (entry.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({

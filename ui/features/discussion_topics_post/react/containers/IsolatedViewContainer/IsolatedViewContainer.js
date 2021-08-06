@@ -17,7 +17,7 @@
  */
 
 import {
-  updateDiscussionTopicRepliesCount,
+  updateDiscussionTopicEntryCounts,
   addReplyToDiscussionEntry,
   getSpeedGraderUrl
 } from '../../utils'
@@ -61,7 +61,7 @@ export const IsolatedViewContainer = props => {
       includeRelativeEntry: !!props?.relativeEntryId
     }
 
-    updateDiscussionTopicRepliesCount(cache, props.discussionTopic.id)
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
@@ -104,7 +104,26 @@ export const IsolatedViewContainer = props => {
     onError: () => setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
   })
 
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    const entry = [
+      ...isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes,
+      ...isolatedEntryNewerDirection.data.legacyNode.discussionSubentriesConnection.nodes
+    ].find(
+      oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
+    )
+    if (entry && entry.read !== result.data.updateDiscussionEntryParticipant.discussionEntry.read) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange
+      })
+    }
+  }
+
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    update: updateDiscussionEntryParticipantCache,
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
@@ -130,16 +149,6 @@ export const IsolatedViewContainer = props => {
       variables: {
         discussionEntryId: discussionEntry._id,
         read: !discussionEntry.read,
-        forcedReadState: discussionEntry.read || null
-      }
-    })
-  }
-
-  const markAsRead = discussionEntry => {
-    updateDiscussionEntryParticipant({
-      variables: {
-        discussionEntryId: discussionEntry._id,
-        read: true,
         forcedReadState: discussionEntry.read || null
       }
     })
@@ -392,7 +401,6 @@ export const IsolatedViewContainer = props => {
                 onToggleRating={toggleRating}
                 onToggleUnread={toggleUnread}
                 onDelete={onDelete}
-                markAsRead={markAsRead}
                 onOpenInSpeedGrader={onOpenInSpeedGrader}
                 showOlderReplies={() => {
                   setFetchingMoreOlderReplies(true)
