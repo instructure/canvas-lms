@@ -22,8 +22,8 @@ import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
-import React from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import React, {createRef} from 'react'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -47,6 +47,8 @@ class UrlEntry extends React.Component {
     valid: false
   }
 
+  _urlInputRef = createRef()
+
   componentDidUpdate(prevProps) {
     if (
       this.props.submission?.submissionDraft?.url &&
@@ -62,6 +64,10 @@ class UrlEntry extends React.Component {
       this.updateInputState()
     }
     window.addEventListener('message', this.handleLTIURLs)
+
+    if (!isSubmitted(this.props.submission)) {
+      this._urlInputRef.current.focus()
+    }
   }
 
   updateInputState = () => {
@@ -166,6 +172,8 @@ class UrlEntry extends React.Component {
                   onBlur={this.handleBlur}
                   onChange={this.handleChange}
                   messages={this.state.messages}
+                  ref={this._urlInputRef}
+                  data-testid="url-input"
                 />
               </Flex.Item>
               <Flex.Item>

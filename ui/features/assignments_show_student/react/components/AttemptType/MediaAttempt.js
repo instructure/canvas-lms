@@ -26,7 +26,7 @@ import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_media_attempt'
 import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
-import React from 'react'
+import React, {createRef} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import UploadMedia from '@instructure/canvas-media'
@@ -60,6 +60,18 @@ export default class MediaAttempt extends React.Component {
   state = {
     mediaModalOpen: false,
     iframeURL: ''
+  }
+
+  _mediaUploadRef = createRef()
+
+  componentDidMount() {
+    if (
+      !this.props.uploadingFiles &&
+      !isSubmitted(this.props.submission) &&
+      !this.props.submission.submissionDraft?.mediaObject?._id
+    ) {
+      this._mediaUploadRef.current.focus()
+    }
   }
 
   onComplete = (err, data) => {
@@ -202,6 +214,7 @@ export default class MediaAttempt extends React.Component {
             data-testid="media-modal-launch-button"
             variant="primary"
             onClick={() => this.setState({mediaModalOpen: true})}
+            ref={this._mediaUploadRef}
           >
             {I18n.t('Record/Upload')}
           </Button>

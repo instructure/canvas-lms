@@ -102,6 +102,19 @@ describe('FileUpload', () => {
     expect(emptyRender).toHaveTextContent('Drag a file here')
   })
 
+  it('moves focus to file drop box after render', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const inputFileDrop = getByTestId('input-file-drop')
+
+    expect(inputFileDrop).toHaveFocus()
+  })
+
   it('renders the submission draft files if there are any', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({

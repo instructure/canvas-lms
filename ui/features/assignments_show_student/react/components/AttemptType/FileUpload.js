@@ -62,6 +62,9 @@ export default class FileUpload extends Component {
   componentDidMount() {
     this._isMounted = true
     window.addEventListener('message', this.handleLTIFiles)
+    if (document.getElementById('inputFileDrop')) {
+      document.getElementById('inputFileDrop').focus()
+    }
   }
 
   componentWillUnmount() {
