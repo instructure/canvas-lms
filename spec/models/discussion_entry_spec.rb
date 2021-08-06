@@ -123,11 +123,17 @@ describe DiscussionEntry do
     let(:student) { student_in_course(active_all: true) }
 
     it "should mark include_reply_preview as true" do
-      entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
+      entry = topic.discussion_entries.create!(user: student.user, include_reply_preview: false)
       entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
       entry.save!
       expect(entry.include_reply_preview).to be true
       expect(entry.message).to eql("<p>only this should stay</p>")
+    end
+
+    it 'should not show the message when deleted' do
+      entry = topic.discussion_entries.create!(user: student.user, message: "this is a message")
+      entry.destroy
+      expect(entry.quoted_reply_html).not_to include("this is a message")
     end
   end
 

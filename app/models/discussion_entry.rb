@@ -201,7 +201,7 @@ class DiscussionEntry < ActiveRecord::Base
         <span>
           <strong>#{user.short_name}</strong> #{created_at.iso8601}
         </span>
-        #{message}
+        #{self.deleted? ? nil : message}
       </blockquote>
     </div>"
   end
