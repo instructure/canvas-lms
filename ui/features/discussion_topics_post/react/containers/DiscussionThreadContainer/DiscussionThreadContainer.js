@@ -92,7 +92,7 @@ export const DiscussionThreadContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
-      discussionEntryID: newDiscussionEntry.parent.id,
+      discussionEntryID: newDiscussionEntry.parentId,
       first: PER_PAGE,
       sort,
       courseID: window.ENV?.course_id

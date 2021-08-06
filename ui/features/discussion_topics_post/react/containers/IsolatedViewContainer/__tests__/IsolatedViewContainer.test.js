@@ -190,7 +190,7 @@ describe('IsolatedViewContainer', () => {
       graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
         return res(
           ctx.data({
-            legacyNode: DiscussionEntry.mock({parent: null})
+            legacyNode: DiscussionEntry.mock({parentId: null})
           })
         )
       })

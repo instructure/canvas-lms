@@ -53,7 +53,7 @@ export const IsolatedViewContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
-      discussionEntryID: newDiscussionEntry.parent.id,
+      discussionEntryID: newDiscussionEntry.parentId,
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
@@ -70,8 +70,8 @@ export const IsolatedViewContainer = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
-      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.parent.id) {
-        props.onOpenIsolatedView(data.createDiscussionEntry.discussionEntry.parent.id, false)
+      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.parentId) {
+        props.onOpenIsolatedView(data.createDiscussionEntry.discussionEntry.parentId, false)
       }
     },
     onError: () =>

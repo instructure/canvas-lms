@@ -109,14 +109,14 @@ export const IsolatedParent = props => {
       }}
       render={responsiveProps => (
         <>
-          {props.discussionEntry.parent && (
+          {props.discussionEntry.parentId && (
             <View as="div" padding="small none none small">
               <BackButton
-                onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
+                onClick={() => props.onOpenIsolatedView(props.discussionEntry.parentId, false)}
               />
             </View>
           )}
-          {props.discussionEntry.parent && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+          {props.discussionEntry.parentId && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
             <Alert
               variant="warning"
               renderCloseButtonLabel="Close"
