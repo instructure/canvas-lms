@@ -248,9 +248,7 @@ describe('useFetchApi', () => {
   it('reports forceResult when specified, without calling fetch', () => {
     const success = jest.fn()
     const meta = jest.fn()
-    renderHook(() =>
-      useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}})
-    )
+    renderHook(() => useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}}))
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     expect(meta).not.toHaveBeenCalled()
   })
@@ -463,6 +461,85 @@ describe('useFetchApi', () => {
       renderHook(() => useFetchApi({path, loading, success, meta, error, fetchAllPages: true}))
       await loadingDone
       expect(success).toHaveBeenCalledWith([1, 2, 3, 4, 5])
+    })
+  })
+
+  describe('fetchNumPages param', () => {
+    const path = '/api'
+
+    beforeEach(() => {
+      fetchMock
+        .mock(path, {headers: {link: `<${path}?page=2>;rel="next"`}, body: ['a']})
+        .mock(`${path}?page=2`, {headers: {link: `<${path}?page=3>;rel="next"`}, body: ['b']})
+        .mock(`${path}?page=3`, {headers: {link: `<${path}?page=4>;rel="next"`}, body: ['c']})
+        .mock(`${path}?page=4`, {headers: {link: `<${path}?page=5>;rel="next"`}, body: ['d']})
+        .mock(`${path}?page=5`, ['e'])
+    })
+
+    it('fetches n pages if fetchNumPages is passed', async () => {
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+
+      renderHook(() => useFetchApi({path, loading, success, meta, error, fetchNumPages: 3}))
+      await loadingDone
+
+      expect(error).not.toHaveBeenCalled()
+
+      expect(loading).toHaveBeenCalledTimes(2)
+      expect(loading).toHaveBeenNthCalledWith(1, true)
+      expect(loading).toHaveBeenNthCalledWith(2, false)
+
+      expect(success).toHaveBeenCalledTimes(3)
+      expect(success).toHaveBeenNthCalledWith(1, ['a'])
+      expect(success).toHaveBeenNthCalledWith(2, ['a', 'b'])
+      expect(success).toHaveBeenNthCalledWith(3, ['a', 'b', 'c'])
+    })
+
+    it('works if there are fewer pages than fetchNumPages', async () => {
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+
+      renderHook(() => useFetchApi({path, loading, success, meta, error, fetchNumPages: 10}))
+      await loadingDone
+
+      expect(fetchMock.done()).toBe(true)
+      expect(error).not.toHaveBeenCalled()
+
+      expect(success).toHaveBeenCalledTimes(5)
+      expect(success).toHaveBeenNthCalledWith(1, ['a'])
+      expect(success).toHaveBeenNthCalledWith(2, ['a', 'b'])
+      expect(success).toHaveBeenNthCalledWith(3, ['a', 'b', 'c'])
+      expect(success).toHaveBeenNthCalledWith(4, ['a', 'b', 'c', 'd'])
+      expect(success).toHaveBeenNthCalledWith(5, ['a', 'b', 'c', 'd', 'e'])
+    })
+
+    it('gets overridden by fetchAllPages', async () => {
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+
+      renderHook(() =>
+        useFetchApi({
+          path,
+          loading,
+          success,
+          meta,
+          error,
+          fetchAllPages: true,
+          fetchNumPages: 1
+        })
+      )
+      await loadingDone
+
+      expect(fetchMock.done()).toBe(true)
+      expect(error).not.toHaveBeenCalled()
+      expect(success).toHaveBeenCalledTimes(5)
+      expect(success).toHaveBeenNthCalledWith(5, ['a', 'b', 'c', 'd', 'e'])
     })
   })
 })

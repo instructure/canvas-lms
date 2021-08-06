@@ -25,7 +25,12 @@ import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
 import {MOCK_TODOS} from './mocks'
-import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {
+  MOCK_ASSIGNMENTS,
+  MOCK_CARDS,
+  MOCK_EVENTS,
+  MOCK_OBSERVER_ENROLLMENTS
+} from '@canvas/k5/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
@@ -33,7 +38,8 @@ const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_d
 
 const currentUser = {
   id: '1',
-  display_name: 'Geoffrey Jellineck'
+  display_name: 'Geoffrey Jellineck',
+  avatar_image_url: 'http://avatar'
 }
 const cardSummary = [
   {
@@ -179,7 +185,8 @@ const defaultProps = {
   hideGradesTabForStudents: false,
   showImportantDates: true,
   selectedContextCodes: ['course_1', 'course_3'],
-  selectedContextsLimit: 2
+  selectedContextsLimit: 2,
+  parentSupportEnabled: true
 }
 
 beforeAll(() => {
@@ -298,6 +305,13 @@ beforeEach(() => {
     /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
     JSON.stringify({status: 'ok'})
   )
+  fetchMock.get(
+    encodeURI(
+      '/api/v1/users/self/enrollments?type[]=ObserverEnrollment&include[]=avatar_url&include[]=observed_users&per_page=100'
+    ),
+    MOCK_OBSERVER_ENROLLMENTS
+  )
+
   global.ENV = defaultEnv
 })
 
@@ -743,6 +757,17 @@ describe('K-5 Dashboard', () => {
     it('loads important dates on the grades tab', async () => {
       const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
       await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+    })
+  })
+
+  describe('Parent Support', () => {
+    it('shows picker when user is an observer', async () => {
+      const {findByRole} = render(
+        <K5Dashboard {...defaultProps} currentUserRoles={['user', 'observer', 'teacher']} />
+      )
+      const select = await findByRole('combobox', {name: 'Select a student to view'})
+      expect(select).toBeInTheDocument()
+      expect(select.value).toBe('Geoffrey Jellineck')
     })
   })
 })
