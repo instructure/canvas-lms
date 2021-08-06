@@ -17,11 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require 'inst_access'
-require_relative './inst_access_support'
 
-configure_inst_access = proc do
-  InstAccessSupport.configure_inst_access!
+class InstAccessSupport
+  def self.configure_inst_access!
+    conf = ConfigFile.load("inst_access_signature")
+    if conf
+      InstAccess.configure(
+        signing_key: Base64.decode64(conf[:private_key]),
+        encryption_key: Base64.decode64(conf[:encryption_public_key])
+      )
+    end
+  end
 end
-
-Rails.configuration.after_initialize(&configure_inst_access)
-Canvas::Reloader.on_reload(&configure_inst_access)
