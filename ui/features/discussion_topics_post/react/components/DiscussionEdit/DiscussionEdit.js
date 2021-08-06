@@ -97,18 +97,20 @@ export const DiscussionEdit = props => {
               direction: 'column',
               display: 'block',
               marginCancel: 'xx-small',
-              marginReply: 'xx-small'
+              marginReply: 'xx-small',
+              viewAs: 'div'
             },
             desktop: {
               direction: 'row',
               display: 'inline-block',
               marginCancel: '0 0 0 0',
-              marginReply: '0 0 0 small'
+              marginReply: '0 0 0 small',
+              viewAs: 'span'
             }
           }}
           render={(responsiveProps, matches) => {
             const rceButtons = [
-              <View as="div" padding={responsiveProps.marginCancel}>
+              <View as={responsiveProps.viewAs} padding={responsiveProps.marginCancel}>
                 <Button
                   onClick={() => {
                     if (props.onCancel) {
@@ -123,7 +125,7 @@ export const DiscussionEdit = props => {
                   <Text size="medium">{I18n.t('Cancel')}</Text>
                 </Button>
               </View>,
-              <View as="div" padding={responsiveProps.marginReply}>
+              <View as={responsiveProps.viewAs} padding={responsiveProps.marginReply}>
                 <Button
                   onClick={() => {
                     if (props.onSubmit) {
