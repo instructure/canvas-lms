@@ -125,6 +125,7 @@ describe Types::DiscussionEntryType do
 
   it 'returns the current user permissions' do
     student_in_course(active_all: true)
+    discussion_entry.update(depth: 4)
     type = GraphQLTypeTester.new(discussion_entry, current_user: @student)
 
     permissions.each do |permission|
