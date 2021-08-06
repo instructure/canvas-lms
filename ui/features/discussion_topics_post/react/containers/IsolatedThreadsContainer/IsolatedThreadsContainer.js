@@ -168,8 +168,6 @@ export default IsolatedThreadsContainer
 
 const IsolatedThreadContainer = props => {
   const threadActions = []
-  const entry = props.discussionEntry
-
   const [isEditing, setIsEditing] = useState(false)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
@@ -216,44 +214,47 @@ const IsolatedThreadContainer = props => {
   const onUpdate = newMessage => {
     updateDiscussionEntry({
       variables: {
-        discussionEntryId: entry._id,
+        discussionEntryId: props.discussionEntry._id,
         message: newMessage
       }
     })
   }
 
-  if (entry.permissions.reply) {
+  if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
-        key={`reply-${entry.id}`}
-        authorName={entry.author.displayName}
-        delimiterKey={`reply-delimiter-${entry.id}`}
-        onClick={() => props.onOpenIsolatedView(entry.id, true)}
+        key={`reply-${props.discussionEntry.id}`}
+        authorName={props.discussionEntry.author.displayName}
+        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, true)}
       />
     )
   }
-  if (entry.permissions.viewRating && (entry.permissions.rate || entry.ratingSum > 0)) {
+  if (
+    props.discussionEntry.permissions.viewRating &&
+    (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
+  ) {
     threadActions.push(
       <ThreadingToolbar.Like
-        key={`like-${entry.id}`}
-        delimiterKey={`like-delimiter-${entry.id}`}
+        key={`like-${props.discussionEntry.id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.onToggleRating(props.discussionEntry)}
-        authorName={entry.author.displayName}
-        isLiked={entry.rating}
-        likeCount={entry.ratingSum || 0}
-        interaction={entry.permissions.rate ? 'enabled' : 'disabled'}
+        authorName={props.discussionEntry.author.displayName}
+        isLiked={props.discussionEntry.rating}
+        likeCount={props.discussionEntry.ratingSum || 0}
+        interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
     )
   }
 
-  if (entry.subentriesCount) {
+  if (props.discussionEntry.subentriesCount) {
     threadActions.push(
       <ThreadingToolbar.Expansion
-        key={`expand-${entry.id}`}
-        delimiterKey={`expand-delimiter-${entry.id}`}
+        key={`expand-${props.discussionEntry.id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenIsolatedView(entry.id, false)}
+        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, false)}
       />
     )
   }
@@ -268,12 +269,16 @@ const IsolatedThreadContainer = props => {
                 isTopic={false}
                 postUtilities={
                   <ThreadActions
-                    id={entry.id}
-                    isUnread={!entry.read}
-                    onToggleUnread={() => props.onToggleUnread(entry)}
-                    onDelete={entry.permissions?.delete ? () => props.onDelete(entry) : null}
+                    id={props.discussionEntry.id}
+                    isUnread={!props.discussionEntry.read}
+                    onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
+                    onDelete={
+                      props.discussionEntry.permissions?.delete
+                        ? () => props.onDelete(props.discussionEntry)
+                        : null
+                    }
                     onEdit={
-                      entry.permissions?.update
+                      props.discussionEntry.permissions?.update
                         ? () => {
                             setIsEditing(true)
                           }
@@ -281,11 +286,15 @@ const IsolatedThreadContainer = props => {
                     }
                     onOpenInSpeedGrader={
                       props.discussionTopic.permissions?.speedGrader
-                        ? () => props.onOpenInSpeedGrader(entry)
+                        ? () => props.onOpenInSpeedGrader(props.discussionEntry)
                         : null
                     }
                     goToParent={() => {
-                      props.onOpenIsolatedView(entry.rootEntry.id, false, entry.rootEntry.id)
+                      props.onOpenIsolatedView(
+                        props.discussionEntry.rootEntry.id,
+                        false,
+                        props.discussionEntry.rootEntry.id
+                      )
                     }}
                     goToTopic={props.goToTopic}
                   />
