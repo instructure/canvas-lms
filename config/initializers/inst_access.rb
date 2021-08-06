@@ -19,11 +19,11 @@
 require 'inst_access'
 
 configure_inst_access = proc do
-  creds = Rails.application.credentials.inst_access
-  if creds
+  conf = ConfigFile.load("inst_access_signature")
+  if conf
     InstAccess.configure(
-      signing_key: creds[:signing_key],
-      encryption_key: creds[:encryption_key]
+      signing_key: conf[:private_key],
+      encryption_key: conf[:encryption_public_key]
     )
   end
 end
