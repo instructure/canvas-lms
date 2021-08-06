@@ -44,3 +44,8 @@ auto_show_cc:
     language (if available) when playing canvas media.
   applies_to: User
   autoexpand: true
+k5_parent_support:
+  state: hidden
+  display_name: 'Canvas for Elementary: Parent Support'
+  description: Enables support for observers within Canvas for Elementary.
+  applies_to: SiteAdmin
