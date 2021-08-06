@@ -396,8 +396,7 @@ export const IsolatedViewContainer = props => {
                     ?.pageInfo?.hasNextPage && !!props.relativeEntryId
                 }
                 fetchingMoreOlderReplies={fetchingMoreOlderReplies}
-                fetching
-                MoreNewerReplies={fetchingMoreNewerReplies}
+                fetchingMoreNewerReplies={fetchingMoreNewerReplies}
               />
             </View>
           )}
