@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import formatMessage from '../../../../../format-message'
 
 export const Footer = ({disabled, onCancel, onSubmit}) => (
-  <View as="div" padding="0 small">
+  <View as="footer" padding="0 small">
     <Flex justifyItems="end">
       <Flex.Item margin="0 small 0 0">
         <Button disabled={disabled} onClick={onCancel}>

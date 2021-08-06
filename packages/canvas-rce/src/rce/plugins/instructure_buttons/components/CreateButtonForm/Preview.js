@@ -16,21 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {ToggleGroup} from '@instructure/ui-toggle-details'
-import formatMessage from '../../../../../format-message'
+import React, {useEffect, useRef} from 'react'
 
-export function Group({children, summary, ...props}) {
+import {View} from '@instructure/ui-view'
+
+import {buildSvg} from '../../svg'
+
+export const Preview = ({settings}) => {
+  const wrapper = useRef(null)
+
+  useEffect(() => {
+    const svg = buildSvg(settings, {isPreview: true})
+    appendSvg(svg, wrapper.current)
+  }, [settings])
+
   return (
-    <ToggleGroup
-      background="default"
-      border={false}
-      padding="small small 0"
-      summary={summary}
-      toggleLabel={formatMessage('Toggle {summary} group', {summary})}
-      {...props}
-    >
-      {children}
-    </ToggleGroup>
+    <View as="div">
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center'
+        }}
+        ref={wrapper}
+      />
+    </View>
   )
+}
+
+/**
+ * Remove the node contents and append the svg element.
+ */
+function appendSvg(svg, node) {
+  if (!node) return
+  while (node.firstChild) {
+    node.removeChild(node.lastChild)
+  }
+  node.appendChild(svg)
 }

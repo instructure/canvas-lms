@@ -83,7 +83,7 @@ describe('<CreateButtonForm />', () => {
               </g>
             </svg>
           </svg>,
-          "name": "placeholder_name.svg",
+          "name": "untitled.svg",
         },
       ]
     `)

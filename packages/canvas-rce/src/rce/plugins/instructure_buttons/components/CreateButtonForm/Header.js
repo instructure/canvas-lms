@@ -16,42 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
+import {TextInput} from '@instructure/ui-text-input'
 
-import {buildSvg} from '../../svg'
+import formatMessage from '../../../../../format-message'
+import {Preview} from './Preview'
 
-export const PreviewSection = ({settings}) => {
-  const wrapper = useRef(null)
-
-  useEffect(() => {
-    const svg = buildSvg(settings, {isPreview: true})
-    appendSvg(svg, wrapper.current)
-  }, [settings])
-
+export const Header = ({settings, onChange}) => {
   return (
-    <Flex as="section" direction="column">
-      <Flex.Item padding="0 small small">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center'
+    <Flex as="header" direction="column" padding="0 small 0">
+      <Flex.Item padding="small">
+        <Preview settings={settings} />
+      </Flex.Item>
+      <Flex.Item padding="small">
+        <TextInput
+          id="button-name"
+          renderLabel={formatMessage('Name')}
+          placeholder={formatMessage('untitled')}
+          onChange={e => {
+            const name = e.target.value
+            onChange({name})
           }}
-          ref={wrapper}
+          value={settings.name}
         />
       </Flex.Item>
     </Flex>
   )
-}
-
-/**
- * Remove the node contents and append the svg element.
- */
-function appendSvg(svg, node) {
-  if (!node) return
-  while (node.firstChild) {
-    node.removeChild(node.lastChild)
-  }
-  node.appendChild(svg)
 }

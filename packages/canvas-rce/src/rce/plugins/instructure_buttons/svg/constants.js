@@ -17,7 +17,7 @@
  */
 
 export const DEFAULT_SETTINGS = {
-  name: 'placeholder_name.svg',
+  name: '',
   alt: '',
   shape: 'square',
   size: 'small',

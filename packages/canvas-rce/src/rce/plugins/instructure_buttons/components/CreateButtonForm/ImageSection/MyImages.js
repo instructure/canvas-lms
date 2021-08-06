@@ -42,7 +42,7 @@ export const MyImages = props => {
   }
 
   return (
-    <View as="div" id="buttons-tray-images-section" padding="small 0">
+    <View as="div" id="buttons-tray-images-section" padding="small">
       <Button onClick={() => setIsModalOpen(true)} renderIcon={IconAddLine}>
         {formatMessage('Add Image')}
       </Button>

@@ -24,12 +24,14 @@ import {useStoreProps} from '../../../shared/StoreContext'
 
 import {DEFAULT_SETTINGS} from '../../svg/constants'
 import {buildSvg} from '../../svg'
-import {PreviewSection} from './PreviewSection'
+import formatMessage from '../../../../../format-message'
+
+import {Header} from './Header'
 import {ShapeSection} from './ShapeSection'
 import {ColorSection} from './ColorSection'
-import {Footer} from './Footer'
-import {ImageSection} from './ImageSection'
 import {TextSection} from './TextSection'
+import {ImageSection} from './ImageSection'
+import {Footer} from './Footer'
 
 export const CreateButtonForm = ({editor, onClose}) => {
   const [settings, dispatch] = useReducer(
@@ -46,7 +48,7 @@ export const CreateButtonForm = ({editor, onClose}) => {
 
     storeProps
       .startButtonsAndIconsUpload({
-        name: settings.name,
+        name: `${settings.name || formatMessage('untitled')}.svg`,
         domElement: buildSvg(settings, {isPreview: false})
       })
       .then(writeButtonToRCE)
@@ -61,7 +63,7 @@ export const CreateButtonForm = ({editor, onClose}) => {
 
   return (
     <View as="div">
-      <PreviewSection settings={settings} />
+      <Header settings={settings} onChange={dispatch} />
       <ShapeSection settings={settings} onChange={dispatch} />
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
