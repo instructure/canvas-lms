@@ -31,7 +31,7 @@ const MentionDropdownMenu = ({
   instanceId
 }) => {
   // Variables
-  const directionality = tinyMCE.activeEditor.getParam('directionality')
+  const directionality = tinyMCE?.activeEditor?.getParam('directionality')
 
   // Setup Popper
   const virtualReference = useMemo(() => {

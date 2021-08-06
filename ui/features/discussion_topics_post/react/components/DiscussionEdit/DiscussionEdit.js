@@ -110,7 +110,11 @@ export const DiscussionEdit = props => {
           }}
           render={(responsiveProps, matches) => {
             const rceButtons = [
-              <View as={responsiveProps.viewAs} padding={responsiveProps.marginCancel}>
+              <View
+                as={responsiveProps.viewAs}
+                padding={responsiveProps.marginCancel}
+                key="cancelButton"
+              >
                 <Button
                   onClick={() => {
                     if (props.onCancel) {
@@ -125,7 +129,11 @@ export const DiscussionEdit = props => {
                   <Text size="medium">{I18n.t('Cancel')}</Text>
                 </Button>
               </View>,
-              <View as={responsiveProps.viewAs} padding={responsiveProps.marginReply}>
+              <View
+                as={responsiveProps.viewAs}
+                padding={responsiveProps.marginReply}
+                key="replyButton"
+              >
                 <Button
                   onClick={() => {
                     if (props.onSubmit) {
@@ -142,11 +150,11 @@ export const DiscussionEdit = props => {
               </View>
             ]
             return matches.includes('mobile') ? (
-              <View as="div" padding={undefined}>
+              <View as="div" padding={undefined} key="mobileButtons">
                 {rceButtons.reverse()}
               </View>
             ) : (
-              <Flex>
+              <Flex key="nonMobileButtons">
                 <Flex.Item shouldGrow textAlign="end">
                   {rceButtons}
                 </Flex.Item>

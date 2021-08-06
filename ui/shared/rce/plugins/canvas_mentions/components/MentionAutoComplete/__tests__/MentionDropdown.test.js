@@ -130,21 +130,6 @@ describe('Mention Dropdown', () => {
       // Expect 2 re-renders per click totalling 4
       expect(onFocusedUserChangeMock.mock.calls.length).toBe(4)
     })
-
-    it('should call onSelect when user changes', async () => {
-      const onSelectMock = jest.fn()
-      const {getAllByTestId} = setup({
-        onSelect: onSelectMock
-      })
-
-      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
-
-      const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
-      fireEvent.click(menuItems[3].querySelector('li'))
-
-      // Should expect callback to return 1 click
-      expect(onSelectMock.mock.calls.length).toBe(1)
-    })
   })
 
   describe('accessibility', () => {

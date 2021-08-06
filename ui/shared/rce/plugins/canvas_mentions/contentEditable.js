@@ -44,14 +44,5 @@ export function makeBodyEditable(editor, targetSelector) {
   const marker = editor.dom.select(targetSelector)[0]
   if (!marker) return
 
-  // Remove the marker ID from the span, but leave its contents.
-  //
-  // The scenario here is that the user "cancelled" the mention
-  // and the text they typed should be displayed as normal
-  Array.from(marker.attributes).forEach(a => marker.removeAttribute(a.name))
-
   editor.selection.moveToBookmark(bookmark)
-  // TODO: only do this if exited with a selection (or let the component do this)
-  // marker.classList.add('mention')
-  // marker.classList.add('mceNonEditable')
 }

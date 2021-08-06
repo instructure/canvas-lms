@@ -89,11 +89,6 @@ describe('contentEditable', () => {
       expect(editor.getBody().getAttribute('contenteditable')).toEqual('true')
     })
 
-    it('removes all attributes from the marker', () => {
-      subject()
-      expect(screen.getByText('wes').attributes.length).toEqual(0)
-    })
-
     it('gets the current cursor position', () => {
       subject()
       expect(editor.selection.getBookmark).toHaveBeenCalled()

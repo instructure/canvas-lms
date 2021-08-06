@@ -28,7 +28,7 @@ import I18n from 'i18n!mentions'
 
 const client = createClient()
 
-const MentionsUI = ({rceRef, onActiveDescendantChange, onExited, onSelect, editor}) => {
+const MentionsUI = ({rceRef, onFocusedUserChange, onExited, onSelect, editor}) => {
   return (
     <ApolloProvider client={client}>
       <ErrorBoundary
@@ -39,7 +39,7 @@ const MentionsUI = ({rceRef, onActiveDescendantChange, onExited, onSelect, edito
         <AlertManager>
           <MentionDropdown
             rceRef={rceRef}
-            onActiveDescendantChange={onActiveDescendantChange}
+            onFocusedUserChange={onFocusedUserChange}
             onExited={onExited}
             onSelect={onSelect}
             editor={editor}
@@ -54,14 +54,14 @@ export default MentionsUI
 
 MentionsUI.propTypes = {
   rceRef: PropTypes.object,
-  onActiveDescendantChange: PropTypes.func,
+  onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
   onSelect: PropTypes.func,
   editor: PropTypes.object
 }
 
 MentionsUI.defaultProps = {
-  onActiveDescendantChange: () => {},
+  onFocusedUserChange: () => {},
   onExited: () => {},
   onSelect: () => {}
 }

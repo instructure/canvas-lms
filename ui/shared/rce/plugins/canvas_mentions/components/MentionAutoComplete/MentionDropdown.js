@@ -32,12 +32,13 @@ import {
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
 import {useQuery} from '@apollo/react-hooks'
 
-const MentionUIManager = ({editor, onFocusedUserChange, onSelect}) => {
+const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => {
   // Setup State
   const [mentionCoordinates, setMentionCoordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
   const [inputText, setInputText] = useState('')
   const [debouncedInputText, setDebouncedInputText] = useState('')
+  const [shouldExit, setShouldExit] = useState(false)
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
@@ -197,6 +198,13 @@ const MentionUIManager = ({editor, onFocusedUserChange, onSelect}) => {
     getXYPosition()
   }, [getXYPosition])
 
+  // Used to closing menu and selecting user after click
+  useEffect(() => {
+    if (shouldExit) {
+      onExited(editor, true)
+    }
+  }, [editor, onExited, shouldExit])
+
   return (
     <MentionDropdownMenu
       instanceId={editor.id}
@@ -206,7 +214,7 @@ const MentionUIManager = ({editor, onFocusedUserChange, onSelect}) => {
       selectedUser={focusedUser?.id}
       onSelect={user => {
         setFocusedUser(user)
-        onSelect()
+        setShouldExit(true)
       }}
     />
   )

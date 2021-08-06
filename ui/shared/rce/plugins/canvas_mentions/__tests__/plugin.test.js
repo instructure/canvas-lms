@@ -21,6 +21,7 @@ import * as plugin from '../plugin'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import {screen} from '@testing-library/dom'
 import {KEY_CODES} from '../constants'
+import {onFocusedUserChange} from '../events'
 
 const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
@@ -153,12 +154,15 @@ describe('pluginDefinition', () => {
     const subject = () => editor.fire('SetContent', {content: insertionContent, target: editor})
 
     beforeEach(() => {
+      onFocusedUserChange({name: 'wes', id: 1})
+
       insertionContent = '<h1>Hello!</h1>'
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
+          <span id="mention-menu"></span>
         </div>`
       )
       editor.selection.select(editor.dom.select('#test')[0])
@@ -238,6 +242,7 @@ describe('pluginDefinition', () => {
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
           </span>
         </div>`
       )
@@ -286,17 +291,6 @@ describe('pluginDefinition', () => {
         examplesForMentionEvents()
       })
 
-      describe('and the key pressed was "enter"', () => {
-        beforeEach(() => {
-          which = KEY_CODES.enter
-          global.postMessage = jest.fn()
-
-          editor.dom.select('#mentions-marker')[0]?.setAttribute('aria-activedescendant', '#foo')
-        })
-
-        examplesForMentionEvents()
-      })
-
       describe('with the key down for a "backspace" deleting the trigger character', () => {
         beforeEach(() => {
           which = 8
@@ -319,7 +313,17 @@ describe('pluginDefinition', () => {
       })
 
       describe('whith the key down for an "enter"', () => {
-        beforeEach(() => (which = 13))
+        beforeEach(() => {
+          which = 13
+          editor.setContent(
+            `<div data-testid="fake-body" contenteditable="false">
+              <span id="test"> @
+                <span id="mentions-marker" contenteditable="true" aria-activedescendant="test" data-userid="123" data-displayname="Test">wes</span>
+                <span id="mention-menu"></span>
+              </span>
+            </div>`
+          )
+        })
 
         sharedExamplesForEventHandlers(subject)
       })
@@ -337,6 +341,7 @@ describe('pluginDefinition', () => {
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
           </span>
         </div>`
       )
