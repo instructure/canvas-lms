@@ -77,7 +77,8 @@ const getOptimisticResponse = text => {
         },
         rootEntry: null,
         discussionTopic: null,
-        parentId: 'PLACEHOLDER'
+        parentId: 'PLACEHOLDER',
+        __typename: 'DiscussionEntry'
       },
       errors: null,
       __typename: 'CreateDiscussionEntryPayload'
