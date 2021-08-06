@@ -75,17 +75,19 @@
           <div class="gradebook-filter-container" id="student-group-filter-container"></div>
         <% end %>
 
-        <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
-          <% placeholder = t('Search…') %>
-          <input
-            type="text"
-            class="search-query"
-            placeholder="<%= placeholder %>"
-            aria-label="<%= placeholder %>"
-            aria-disabled="true"
-            disabled
-          >
-        </div>
+        <% unless Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
+          <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
+            <% placeholder = t('Search…') %>
+            <input
+              type="text"
+              class="search-query"
+              placeholder="<%= placeholder %>"
+              aria-label="<%= placeholder %>"
+              aria-disabled="true"
+              disabled
+            >
+          </div>
+        <% end %>
 
         <div class="gradebook_menu">
           <span id="gradebook-settings-modal-button-container"></span>
@@ -93,6 +95,9 @@
         </div>
       </div>
     </div>
+    <% if Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
+      <div id="gradebook-secondary-toolbar"></div>
+    <% end %>
     <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
       <div id="gradebook_grid"></div>
     </div>

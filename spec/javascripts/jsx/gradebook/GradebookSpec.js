@@ -38,7 +38,11 @@ import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicat
 import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi.js'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants.js'
-import {darken, statusColors, defaultColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
+import {
+  darken,
+  statusColors,
+  defaultColors
+} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
 import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu.js'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
@@ -181,7 +185,7 @@ QUnit.module('Gradebook#gotCustomColumnDataChunk', {
   }
 })
 
-test('updates students with custom column data', function() {
+test('updates students with custom column data', function () {
   const data = [
     {user_id: '1101', content: 'example'},
     {user_id: '1102', content: 'sample'}
@@ -191,7 +195,7 @@ test('updates students with custom column data', function() {
   equal(this.gradebook.students[1102].custom_col_2401, 'sample')
 })
 
-test('invalidates rows for related students', function() {
+test('invalidates rows for related students', function () {
   const data = [
     {user_id: '1101', content: 'example'},
     {user_id: '1102', content: 'sample'}
@@ -202,14 +206,14 @@ test('invalidates rows for related students', function() {
   deepEqual(studentIds, ['1101', '1102'], 'both students had custom column data')
 })
 
-test('ignores students without custom column data', function() {
+test('ignores students without custom column data', function () {
   const data = [{user_id: '1102', content: 'sample'}]
   this.gradebook.gotCustomColumnDataChunk('2401', data)
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args
   deepEqual(studentIds, ['1102'], 'only the student 1102 had custom column data')
 })
 
-test('invalidates rows after updating students', function() {
+test('invalidates rows after updating students', function () {
   const data = [
     {user_id: '1101', content: 'example'},
     {user_id: '1102', content: 'sample'}
@@ -338,7 +342,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
   }
 })
 
-test('calculates grades using properties from the gradebook', function() {
+test('calculates grades using properties from the gradebook', function () {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
@@ -353,7 +357,7 @@ test('calculates grades using properties from the gradebook', function() {
   equal(args[4], gradebook.gradingPeriodSet)
 })
 
-test('scopes effective due dates to the user', function() {
+test('scopes effective due dates to the user', function () {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
@@ -369,7 +373,7 @@ test('scopes effective due dates to the user', function() {
   })
 })
 
-test('calculates grades without grading period data when grading period set is null', function() {
+test('calculates grades without grading period data when grading period set is null', function () {
   const gradebook = this.createGradebook({
     gradingPeriodSet: null
   })
@@ -387,7 +391,7 @@ test('calculates grades without grading period data when grading period set is n
   equal(typeof args[4], 'undefined')
 })
 
-test('calculates grades without grading period data when effective due dates are not defined', function() {
+test('calculates grades without grading period data when effective due dates are not defined', function () {
   const gradebook = this.createGradebook({
     effectiveDueDates: null
   })
@@ -405,7 +409,7 @@ test('calculates grades without grading period data when effective due dates are
   equal(typeof args[5], 'undefined')
 })
 
-test('stores the current grade on the student if not viewing ungraded as zero', function() {
+test('stores the current grade on the student if not viewing ungraded as zero', function () {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -417,7 +421,7 @@ test('stores the current grade on the student if not viewing ungraded as zero', 
   equal(student.total_grade, this.exampleGrades.current)
 })
 
-test('stores the final grade on the student if viewing ungraded as zero', function() {
+test('stores the final grade on the student if viewing ungraded as zero', function () {
   const gradebook = this.createGradebook()
   gradebook.courseFeatures.allowViewUngradedAsZero = true
   gradebook.gridDisplaySettings.viewUngradedAsZero = true
@@ -431,7 +435,7 @@ test('stores the final grade on the student if viewing ungraded as zero', functi
   equal(student.total_grade, this.exampleGrades.final)
 })
 
-test('stores the current grade from the selected grading period if not viewing ungraded as zero', function() {
+test('stores the current grade from the selected grading period if not viewing ungraded as zero', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodId = '701'
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
@@ -445,7 +449,7 @@ test('stores the current grade from the selected grading period if not viewing u
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
 })
 
-test('stores the final grade from the selected grading period if viewing ungraded as zero', function() {
+test('stores the final grade from the selected grading period if viewing ungraded as zero', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodId = '701'
   gradebook.courseFeatures.allowViewUngradedAsZero = true
@@ -461,7 +465,7 @@ test('stores the final grade from the selected grading period if viewing ungrade
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
 })
 
-test('does not repeat the calculation if cached and preferCachedGrades is true', function() {
+test('does not repeat the calculation if cached and preferCachedGrades is true', function () {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
@@ -477,7 +481,7 @@ test('does not repeat the calculation if cached and preferCachedGrades is true',
   strictEqual(CourseGradeCalculator.calculate.callCount, 1)
 })
 
-test('does perform the calculation if preferCachedGrades is true and no cached value exists', function() {
+test('does perform the calculation if preferCachedGrades is true and no cached value exists', function () {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
@@ -491,7 +495,7 @@ test('does perform the calculation if preferCachedGrades is true and no cached v
   strictEqual(CourseGradeCalculator.calculate.callCount, 1)
 })
 
-test('does not calculate when the student is not loaded', function() {
+test('does not calculate when the student is not loaded', function () {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
@@ -502,7 +506,7 @@ test('does not calculate when the student is not loaded', function() {
   notOk(CourseGradeCalculator.calculate.called)
 })
 
-test('does not calculate when the student is not initialized', function() {
+test('does not calculate when the student is not initialized', function () {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
@@ -531,12 +535,12 @@ test('substitutes falsy args with empty string', () => {
   deepEqual(natcompare.strings.getCall(0).args, ['', ''])
 })
 
-test('returns 1 if nullsLast is true and only first item is null', function() {
+test('returns 1 if nullsLast is true and only first item is null', function () {
   const gradebook = createGradebook()
   equal(gradebook.localeSort(null, 'fred', {nullsLast: true}), 1)
 })
 
-test('returns -1 if nullsLast is true and only second item is null', function() {
+test('returns -1 if nullsLast is true and only second item is null', function () {
   const gradebook = createGradebook()
   equal(gradebook.localeSort('fred', null, {nullsLast: true}), -1)
 })
@@ -553,19 +557,19 @@ QUnit.module('Gradebook#gradeSort by an assignment', {
   }
 })
 
-test('sorts by score', function() {
+test('sorts by score', function () {
   const comparison = this.gradebook.gradeSort(this.studentA, this.studentB, 'assignment_201', true)
   // a positive value indicates reversing the order of inputs
   strictEqual(comparison, 4, 'studentA with the higher score is ordered second')
 })
 
-test('optionally sorts in descending order', function() {
+test('optionally sorts in descending order', function () {
   const comparison = this.gradebook.gradeSort(this.studentA, this.studentB, 'assignment_201', false)
   // a negative value indicates preserving the order of inputs
   equal(comparison, -4, 'studentA with the higher score is ordered first')
 })
 
-test('returns -1 when sorted by sortable name where scores are the same', function() {
+test('returns -1 when sorted by sortable name where scores are the same', function () {
   const score = 10
   this.studentA.assignment_201.score = score
   this.studentB.assignment_201.score = score
@@ -573,7 +577,7 @@ test('returns -1 when sorted by sortable name where scores are the same', functi
   strictEqual(comparison, -1)
 })
 
-test('returns 1 when sorted by sortable name descending where scores are the same and sorting by descending', function() {
+test('returns 1 when sorted by sortable name descending where scores are the same and sorting by descending', function () {
   const score = 10
   this.studentA.assignment_201.score = score
   this.studentB.assignment_201.score = score
@@ -581,7 +585,7 @@ test('returns 1 when sorted by sortable name descending where scores are the sam
   strictEqual(comparison, 1)
 })
 
-test('returns -1 when sorted by id where scores and sortable names are the same', function() {
+test('returns -1 when sorted by id where scores and sortable names are the same', function () {
   const score = 10
   this.studentA.assignment_201.score = score
   this.studentB.assignment_201.score = score
@@ -592,7 +596,7 @@ test('returns -1 when sorted by id where scores and sortable names are the same'
   strictEqual(comparison, -1)
 })
 
-test('returns 1 when descending sorted by id where where scores and sortable names are the same and sorting by descending', function() {
+test('returns 1 when descending sorted by id where where scores and sortable names are the same and sorting by descending', function () {
   const score = 10
   this.studentA.assignment_201.score = score
   this.studentB.assignment_201.score = score
@@ -610,14 +614,14 @@ QUnit.module('Gradebook#gradeSort by an assignment group', {
   }
 })
 
-test('always sorts by percent', function() {
+test('always sorts by percent', function () {
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', true)
   // a negative value indicates preserving the order of inputs
   equal(round(comparison, 1), -0.1, 'studentB with the higher percent is ordered second')
 })
 
-test('optionally sorts in descending order', function() {
+test('optionally sorts in descending order', function () {
   const gradebook = createGradebook({show_total_grade_as_points: true})
   const comparison = gradebook.gradeSort(
     this.studentA,
@@ -629,7 +633,7 @@ test('optionally sorts in descending order', function() {
   equal(round(comparison, 1), 0.1, 'studentB with the higher percent is ordered first')
 })
 
-test('sorts grades with no points possible at lowest priority', function() {
+test('sorts grades with no points possible at lowest priority', function () {
   this.studentA.assignment_group_301.possible = 0
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', true)
@@ -637,7 +641,7 @@ test('sorts grades with no points possible at lowest priority', function() {
   equal(comparison, 1, 'studentA with no points possible is ordered second')
 })
 
-test('sorts grades with no points possible at lowest priority in descending order', function() {
+test('sorts grades with no points possible at lowest priority in descending order', function () {
   this.studentA.assignment_group_301.possible = 0
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(
@@ -657,14 +661,14 @@ QUnit.module('Gradebook#gradeSort by "total_grade"', {
   }
 })
 
-test('sorts by percent when not showing total grade as points', function() {
+test('sorts by percent when not showing total grade as points', function () {
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true)
   // a negative value indicates preserving the order of inputs
   equal(round(comparison, 1), -0.1, 'studentB with the higher percent is ordered second')
 })
 
-test('sorts percent grades with no points possible at lowest priority', function() {
+test('sorts percent grades with no points possible at lowest priority', function () {
   this.studentA.total_grade.possible = 0
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true)
@@ -672,7 +676,7 @@ test('sorts percent grades with no points possible at lowest priority', function
   equal(comparison, 1, 'studentA with no points possible is ordered second')
 })
 
-test('sorts percent grades with no points possible at lowest priority in descending order', function() {
+test('sorts percent grades with no points possible at lowest priority in descending order', function () {
   this.studentA.total_grade.possible = 0
   const gradebook = createGradebook({show_total_grade_as_points: false})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', false)
@@ -680,14 +684,14 @@ test('sorts percent grades with no points possible at lowest priority in descend
   equal(comparison, 1, 'studentA with no points possible is ordered second')
 })
 
-test('sorts by score when showing total grade as points', function() {
+test('sorts by score when showing total grade as points', function () {
   const gradebook = createGradebook({show_total_grade_as_points: true})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true)
   // a positive value indicates reversing the order of inputs
   equal(comparison, 4, 'studentA with the higher score is ordered second')
 })
 
-test('optionally sorts in descending order', function() {
+test('optionally sorts in descending order', function () {
   const gradebook = createGradebook({show_total_grade_as_points: true})
   const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', false)
   // a negative value indicates preserving the order of inputs
@@ -704,27 +708,27 @@ QUnit.module('Gradebook#hideAggregateColumns', {
   }
 })
 
-test('returns false if there are no grading periods', function() {
+test('returns false if there are no grading periods', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodSet = null
   notOk(gradebook.hideAggregateColumns())
 })
 
-test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function() {
+test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodSet = null
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
   notOk(gradebook.hideAggregateColumns())
 })
 
-test('returns false if "All Grading Periods" is not selected', function() {
+test('returns false if "All Grading Periods" is not selected', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodId = '701'
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   notOk(gradebook.hideAggregateColumns())
 })
 
-test('returns true if "All Grading Periods" is selected', function() {
+test('returns true if "All Grading Periods" is selected', function () {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
   ok(gradebook.hideAggregateColumns())
@@ -733,7 +737,7 @@ test('returns true if "All Grading Periods" is selected', function() {
 test(
   'returns false if "All Grading Periods" is selected and the grading period set has' +
     '"Display Totals for All Grading Periods option" enabled',
-  function() {
+  function () {
     const gradebook = this.createGradebook()
     gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
     gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = true
@@ -759,7 +763,7 @@ QUnit.module('Gradebook#makeColumnSortFn', {
   }
 })
 
-test('wraps compareAssignmentPositions when called with a sortType of assignment_group', function() {
+test('wraps compareAssignmentPositions when called with a sortType of assignment_group', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('assignment_group', 'ascending'))
   const expectedArgs = [this.gradebook.compareAssignmentPositions, 'ascending']
 
@@ -767,7 +771,7 @@ test('wraps compareAssignmentPositions when called with a sortType of assignment
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
-test('wraps compareAssignmentPositions when called with a sortType of alpha', function() {
+test('wraps compareAssignmentPositions when called with a sortType of alpha', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('alpha', 'descending'))
   const expectedArgs = [this.gradebook.compareAssignmentPositions, 'descending']
 
@@ -775,7 +779,7 @@ test('wraps compareAssignmentPositions when called with a sortType of alpha', fu
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
-test('wraps compareAssignmentNames when called with a sortType of name', function() {
+test('wraps compareAssignmentNames when called with a sortType of name', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('name', 'ascending'))
   const expectedArgs = [this.gradebook.compareAssignmentNames, 'ascending']
 
@@ -783,7 +787,7 @@ test('wraps compareAssignmentNames when called with a sortType of name', functio
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
-test('wraps compareAssignmentDueDates when called with a sortType of due_date', function() {
+test('wraps compareAssignmentDueDates when called with a sortType of due_date', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('due_date', 'descending'))
   const expectedArgs = [compareAssignmentDueDates, 'descending']
 
@@ -791,7 +795,7 @@ test('wraps compareAssignmentDueDates when called with a sortType of due_date', 
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
-test('wraps compareAssignmentPointsPossible when called with a sortType of points', function() {
+test('wraps compareAssignmentPointsPossible when called with a sortType of points', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('points', 'ascending'))
   const expectedArgs = [this.gradebook.compareAssignmentPointsPossible, 'ascending']
 
@@ -799,7 +803,7 @@ test('wraps compareAssignmentPointsPossible when called with a sortType of point
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
-test('wraps compareAssignmentModulePositions when called with a sortType of module_position', function() {
+test('wraps compareAssignmentModulePositions when called with a sortType of module_position', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('module_position', 'ascending'))
   const expectedArgs = [this.gradebook.compareAssignmentModulePositions, 'ascending']
 
@@ -896,42 +900,42 @@ QUnit.module('Gradebook#rowFilter', {
   }
 })
 
-test('returns true when search term matches the student name', function() {
+test('returns true when search term matches the student name', function () {
   this.gradebook.userFilterTerm = 'charlie Xi'
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns true when search term matches the student login id', function() {
+test('returns true when search term matches the student login id', function () {
   this.gradebook.userFilterTerm = 'example.com'
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns true when search term matches the student short name', function() {
+test('returns true when search term matches the student short name', function () {
   this.gradebook.userFilterTerm = 'chuck'
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns true when search term matches the student sortable name', function() {
+test('returns true when search term matches the student sortable name', function () {
   this.gradebook.userFilterTerm = 'Xi, Charlie'
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns true when search term matches the student sis id', function() {
+test('returns true when search term matches the student sis id', function () {
   this.gradebook.userFilterTerm = '123456789'
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns false when search term does not match', function() {
+test('returns false when search term does not match', function () {
   this.gradebook.userFilterTerm = 'Betty'
   strictEqual(this.gradebook.rowFilter(this.student), false)
 })
 
-test('returns true when not filtering by a search term', function() {
+test('returns true when not filtering by a search term', function () {
   this.gradebook.userFilterTerm = ''
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
 
-test('returns true when search term is not defined', function() {
+test('returns true when search term is not defined', function () {
   this.gradebook.userFilterTerm = null
   strictEqual(this.gradebook.rowFilter(this.student), true)
 })
@@ -1011,25 +1015,25 @@ QUnit.module('Gradebook#compareAssignmentNames', {
   }
 })
 
-test('returns -1 if the name field comes first alphabetically in the first record', function() {
+test('returns -1 if the name field comes first alphabetically in the first record', function () {
   strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.secondRecord), -1)
 })
 
-test('returns 0 if the name field is the same in both records', function() {
+test('returns 0 if the name field is the same in both records', function () {
   strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.firstRecord), 0)
 })
 
-test('returns 1 if the name field comes later alphabetically in the first record', function() {
+test('returns 1 if the name field comes later alphabetically in the first record', function () {
   strictEqual(this.gradebook.compareAssignmentNames(this.secondRecord, this.firstRecord), 1)
 })
 
-test('comparison is case-sensitive between alpha and Alpha', function() {
+test('comparison is case-sensitive between alpha and Alpha', function () {
   const thirdRecord = this.getRecord('Alpha')
 
   strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.firstRecord), 1)
 })
 
-test('comparison does not group uppercase letters together', function() {
+test('comparison does not group uppercase letters together', function () {
   const thirdRecord = this.getRecord('Omega')
 
   strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.secondRecord), 1)
@@ -1043,18 +1047,18 @@ QUnit.module('Gradebook#compareAssignmentPointsPossible', {
   }
 })
 
-test('returns a negative number if the points_possible field is smaller in the first record', function() {
+test('returns a negative number if the points_possible field is smaller in the first record', function () {
   strictEqual(
     this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord),
     -1
   )
 })
 
-test('returns 0 if the points_possible field is the same in both records', function() {
+test('returns 0 if the points_possible field is the same in both records', function () {
   strictEqual(this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0)
 })
 
-test('returns a positive number if the points_possible field is greater in the first record', function() {
+test('returns a positive number if the points_possible field is greater in the first record', function () {
   strictEqual(
     this.gradebook.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord),
     1
@@ -1081,35 +1085,35 @@ QUnit.module('Gradebook#compareAssignmentModulePositions - when both records hav
   }
 })
 
-test("returns a negative number if the position of the first record's module comes first", function() {
+test("returns a negative number if the position of the first record's module comes first", function () {
   const firstRecord = this.createRecord('1', 1)
   const secondRecord = this.createRecord('2', 1)
 
   ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) < 0)
 })
 
-test("returns a positive number if the position of the first record's module comes later", function() {
+test("returns a positive number if the position of the first record's module comes later", function () {
   const firstRecord = this.createRecord('2', 1)
   const secondRecord = this.createRecord('1', 1)
 
   ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) > 0)
 })
 
-test('returns a negative number if within the same module the position of the first record comes first', function() {
+test('returns a negative number if within the same module the position of the first record comes first', function () {
   const firstRecord = this.createRecord('1', 1)
   const secondRecord = this.createRecord('1', 2)
 
   ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) < 0)
 })
 
-test('returns a positive number if within the same module the position of the first record comes later', function() {
+test('returns a positive number if within the same module the position of the first record comes later', function () {
   const firstRecord = this.createRecord('1', 2)
   const secondRecord = this.createRecord('1', 1)
 
   ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) > 0)
 })
 
-test('returns a zero if both records are in the same module at the same position', function() {
+test('returns a zero if both records are in the same module at the same position', function () {
   const firstRecord = this.createRecord('1', 1)
   const secondRecord = this.createRecord('1', 1)
 
@@ -1135,11 +1139,11 @@ QUnit.module('Gradebook#compareAssignmentModulePositions - when only one record 
   }
 })
 
-test('returns a negative number when the first record has module information but the second does not', function() {
+test('returns a negative number when the first record has module information but the second does not', function () {
   ok(this.gradebook.compareAssignmentModulePositions(this.firstRecord, this.secondRecord) < 0)
 })
 
-test('returns a positive number when the first record has no module information but the second does', function() {
+test('returns a positive number when the first record has no module information but the second does', function () {
   ok(this.gradebook.compareAssignmentModulePositions(this.secondRecord, this.firstRecord) > 0)
 })
 
@@ -1177,13 +1181,13 @@ QUnit.module('Gradebook#compareAssignmentModulePositions - when neither record h
   }
 })
 
-test('calls compareAssignmentPositions', function() {
+test('calls compareAssignmentPositions', function () {
   strictEqual(this.gradebook.compareAssignmentPositions.callCount, 1)
   deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[0], this.firstRecord)
   deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[1], this.secondRecord)
 })
 
-test('returns the result of compareAssignmentPositions', function() {
+test('returns the result of compareAssignmentPositions', function () {
   strictEqual(this.comparisonResult, -1)
 })
 
@@ -1607,27 +1611,27 @@ QUnit.module('Gradebook#isDefaultSortOrder', {
   }
 })
 
-test('returns false if called with due_date', function() {
+test('returns false if called with due_date', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('due_date'), false)
 })
 
-test('returns false if called with name', function() {
+test('returns false if called with name', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('name'), false)
 })
 
-test('returns false if called with points', function() {
+test('returns false if called with points', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('points'), false)
 })
 
-test('returns false if called with points', function() {
+test('returns false if called with points', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('custom'), false)
 })
 
-test('returns false if called with module_position', function() {
+test('returns false if called with module_position', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('module_position'), false)
 })
 
-test('returns true if called with anything else', function() {
+test('returns true if called with anything else', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('alpha'), true)
   strictEqual(this.gradebook.isDefaultSortOrder('assignment_group'), true)
 })
@@ -1638,45 +1642,45 @@ QUnit.module('Gradebook#isInvalidSort', {
   }
 })
 
-test('returns false if sorting by any valid criterion', function() {
+test('returns false if sorting by any valid criterion', function () {
   this.gradebook.setColumnOrder({sortType: 'name', direction: 'ascending'})
 
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-test('returns true if sorting by module position but there are no modules in the course any more', function() {
+test('returns true if sorting by module position but there are no modules in the course any more', function () {
   this.gradebook.setColumnOrder({sortType: 'module_position', direction: 'ascending'})
   this.gradebook.courseContent.contextModules = []
 
   strictEqual(this.gradebook.isInvalidSort(), true)
 })
 
-test('returns false if sorting by module position and there are modules in the course', function() {
+test('returns false if sorting by module position and there are modules in the course', function () {
   this.gradebook.setColumnOrder({sortType: 'module_position', direction: 'ascending'})
   this.gradebook.courseContent.contextModules = [{id: '1', name: 'Module 1', position: 1}]
 
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-test('returns true if sorting by custom but there is no custom column order stored', function() {
+test('returns true if sorting by custom but there is no custom column order stored', function () {
   this.gradebook.gradebookColumnOrderSettings = {sortType: 'custom'}
 
   strictEqual(this.gradebook.isInvalidSort(), true)
 })
 
-test('returns false if sorting by custom and there is a custom column order stored', function() {
+test('returns false if sorting by custom and there is a custom column order stored', function () {
   this.gradebook.gradebookColumnOrderSettings = {sortType: 'custom', customOrder: [1, 2, 3]}
 
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-QUnit.module('Gradebook#renderSearchFilter', {
+QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: true)', {
   setup() {
     setFixtureHtml($fixtures)
-    this.gradebook = createGradebook()
+    this.gradebook = createGradebook({enhanced_gradebook_filters: true})
     this.gradebook.setStudentsLoaded(true)
     this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderSearchFilter()
+    this.gradebook.renderSearchFilter([])
   },
 
   teardown() {
@@ -1684,13 +1688,40 @@ QUnit.module('Gradebook#renderSearchFilter', {
   }
 })
 
-test('binds an InputFilterView to the search filter markup', function() {
+test('does not render old set up/search field', function () {
+  this.gradebook.renderSearchFilter([])
+  const input = document.querySelector('#search-filter-container input')
+  strictEqual(input.disabled, false, 'input is not disabled')
+  strictEqual(input.getAttribute('aria-disabled'), null, 'input is not aria-disabled')
+})
+
+test('renders Student Names label', function () {
+  this.gradebook.renderSearchFilter([])
+  const toolbar = document.querySelector('#gradebook-secondary-toolbar')
+  ok(toolbar.textContent.includes('Student Names'))
+})
+
+QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: false)', {
+  setup() {
+    setFixtureHtml($fixtures)
+    this.gradebook = createGradebook({enhanced_gradebook_filters: false})
+    this.gradebook.setStudentsLoaded(true)
+    this.gradebook.setSubmissionsLoaded(true)
+    this.gradebook.renderSearchFilter([])
+  },
+
+  teardown() {
+    $fixtures.innerHTML = ''
+  }
+})
+
+test('binds an InputFilterView to the search filter markup', function () {
   equal(this.gradebook.userFilter.constructor.name, 'InputFilterView')
 })
 
-test('does not create a new InputFilterView when already bound', function() {
+test('does not create a new InputFilterView when already bound', function () {
   const userFilter = this.gradebook.userFilter
-  this.gradebook.renderSearchFilter()
+  this.gradebook.renderSearchFilter([])
   strictEqual(this.gradebook.userFilter, userFilter)
 })
 
@@ -1700,17 +1731,17 @@ test('enables the input when students and submissions are loaded', () => {
   strictEqual(input.getAttribute('aria-disabled'), 'false', 'input is not aria-disabled')
 })
 
-test('disables the input when students are not loaded', function() {
+test('disables the input when students are not loaded', function () {
   this.gradebook.setStudentsLoaded(false)
-  this.gradebook.renderSearchFilter()
+  this.gradebook.renderSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
 })
 
-test('disables the input when submissions are not loaded', function() {
+test('disables the input when submissions are not loaded', function () {
   this.gradebook.setSubmissionsLoaded(false)
-  this.gradebook.renderSearchFilter()
+  this.gradebook.renderSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
@@ -1722,12 +1753,12 @@ QUnit.module('Gradebook#weightedGroups', {
   }
 })
 
-test('returns true when group_weighting_scheme is "percent"', function() {
+test('returns true when group_weighting_scheme is "percent"', function () {
   this.gradebook.options.group_weighting_scheme = 'percent'
   equal(this.gradebook.weightedGroups(), true)
 })
 
-test('returns false when group_weighting_scheme is not "percent"', function() {
+test('returns false when group_weighting_scheme is not "percent"', function () {
   this.gradebook.options.group_weighting_scheme = 'points'
   equal(this.gradebook.weightedGroups(), false)
   this.gradebook.options.group_weighting_scheme = null
@@ -1740,25 +1771,25 @@ QUnit.module('Gradebook#weightedGrades', {
   }
 })
 
-test('returns true when group_weighting_scheme is "percent"', function() {
+test('returns true when group_weighting_scheme is "percent"', function () {
   this.gradebook.options.group_weighting_scheme = 'percent'
   this.gradebook.gradingPeriodSet = {weighted: false}
   equal(this.gradebook.weightedGrades(), true)
 })
 
-test('returns true when the gradingPeriodSet is weighted', function() {
+test('returns true when the gradingPeriodSet is weighted', function () {
   this.gradebook.options.group_weighting_scheme = 'points'
   this.gradebook.gradingPeriodSet = {weighted: true}
   equal(this.gradebook.weightedGrades(), true)
 })
 
-test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not weighted', function() {
+test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not weighted', function () {
   this.gradebook.options.group_weighting_scheme = 'points'
   this.gradebook.gradingPeriodSet = {weighted: false}
   equal(this.gradebook.weightedGrades(), false)
 })
 
-test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not defined', function() {
+test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not defined', function () {
   this.gradebook.options.group_weighting_scheme = 'points'
   this.gradebook.gradingPeriodSet = {weighted: null}
   equal(this.gradebook.weightedGrades(), false)
@@ -1838,9 +1869,8 @@ QUnit.module('Gradebook', () => {
       test('includes both "total grade" column ids when updating column headers', () => {
         gradebook.courseSettings.setAllowFinalGradeOverride(true)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
-        const [
-          columnIds
-        ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+        const [columnIds] =
+          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
         deepEqual(columnIds, ['total_grade', 'total_grade_override'])
       })
     })
@@ -1849,9 +1879,8 @@ QUnit.module('Gradebook', () => {
       test('includes only the "total grade" column id when updating column headers', () => {
         gradebook.courseSettings.setAllowFinalGradeOverride(false)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
-        const [
-          columnIds
-        ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+        const [columnIds] =
+          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
         deepEqual(columnIds, ['total_grade'])
       })
     })
@@ -1876,7 +1905,7 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
   }
 })
 
-test('when user is ignoring warnings, immediately toggles the total grade display', function() {
+test('when user is ignoring warnings, immediately toggles the total grade display', function () {
   UserSettings.contextSet('warned_about_totals_display', true)
 
   this.gradebook.togglePointsOrPercentTotals()
@@ -1884,7 +1913,7 @@ test('when user is ignoring warnings, immediately toggles the total grade displa
   equal(this.gradebook.switchTotalDisplay.callCount, 1, 'toggles the total grade display')
 })
 
-test('when user is ignoring warnings and a callback is given, immediately invokes callback', function() {
+test('when user is ignoring warnings and a callback is given, immediately invokes callback', function () {
   const callback = sinon.stub()
   UserSettings.contextSet('warned_about_totals_display', true)
 
@@ -1893,7 +1922,7 @@ test('when user is ignoring warnings and a callback is given, immediately invoke
   equal(callback.callCount, 1)
 })
 
-test('when user is not ignoring warnings, return a dialog', function() {
+test('when user is not ignoring warnings, return a dialog', function () {
   UserSettings.contextSet('warned_about_totals_display', false)
 
   const dialog = this.gradebook.togglePointsOrPercentTotals()
@@ -1907,11 +1936,8 @@ test('when user is not ignoring warnings, return a dialog', function() {
   dialog.cancel()
 })
 
-test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function() {
-  sandbox
-    .stub(UserSettings, 'contextGet')
-    .withArgs('warned_about_totals_display')
-    .returns(false)
+test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function () {
+  sandbox.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false)
   const dialog = this.gradebook.togglePointsOrPercentTotals()
 
   equal(dialog.options.save, this.gradebook.switchTotalDisplay)
@@ -1919,12 +1945,9 @@ test('when user is not ignoring warnings, the dialog has a save property which i
   dialog.cancel()
 })
 
-test('when user is not ignoring warnings, the dialog has a onClose property which is the callback function', function() {
+test('when user is not ignoring warnings, the dialog has a onClose property which is the callback function', function () {
   const callback = sinon.stub()
-  sandbox
-    .stub(UserSettings, 'contextGet')
-    .withArgs('warned_about_totals_display')
-    .returns(false)
+  sandbox.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false)
   const dialog = this.gradebook.togglePointsOrPercentTotals(callback)
 
   equal(dialog.options.onClose, callback)
@@ -2021,17 +2044,17 @@ QUnit.module('#listHiddenAssignments', hooks => {
     gradebook.setSubmissionsLoaded(true)
   })
 
-  test('includes assignments when submission is postable', function() {
+  test('includes assignments when submission is postable', function () {
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
     ok(hiddenAssignments.find(assignment => assignment.id === gradedAssignment.id))
   })
 
-  test('excludes "not_graded" assignments even when submission is postable', function() {
+  test('excludes "not_graded" assignments even when submission is postable', function () {
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
     notOk(hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id))
   })
 
-  test('ignores assignments excluded by the current set of filters', function() {
+  test('ignores assignments excluded by the current set of filters', function () {
     gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
 
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
@@ -2054,20 +2077,20 @@ QUnit.module('Gradebook#showNotesColumn', {
   }
 })
 
-test('loads the notes if they have not yet been loaded', function() {
+test('loads the notes if they have not yet been loaded', function () {
   this.gradebook.teacherNotesNotYetLoaded = true
   this.gradebook.showNotesColumn()
   strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 1)
 })
 
-test('loads the notes using the teacher notes column id', function() {
+test('loads the notes using the teacher notes column id', function () {
   this.gradebook.teacherNotesNotYetLoaded = true
   this.gradebook.showNotesColumn()
   const [columnId] = this.gradebook.dataLoader.loadCustomColumnData.lastCall.args
   strictEqual(columnId, '2401')
 })
 
-test('does not load the notes if they are already loaded', function() {
+test('does not load the notes if they are already loaded', function () {
   this.gradebook.teacherNotesNotYetLoaded = false
   this.gradebook.showNotesColumn()
   strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 0)
@@ -2176,7 +2199,7 @@ QUnit.module('Gradebook#getColumnSortSettingsViewOptionsMenuProps', {
   }
 })
 
-test('includes all required properties', function() {
+test('includes all required properties', function () {
   const props = this.getProps()
 
   equal(typeof props.criterion, 'string', 'props include "criterion"')
@@ -2203,57 +2226,57 @@ test('includes all required properties', function() {
   )
 })
 
-test('sets criterion to the sort field', function() {
+test('sets criterion to the sort field', function () {
   strictEqual(this.getProps().criterion, 'due_date')
   strictEqual(this.getProps('name').criterion, 'name')
 })
 
-test('sets criterion to "default" when isDefaultSortOrder returns true', function() {
+test('sets criterion to "default" when isDefaultSortOrder returns true', function () {
   strictEqual(this.getProps('assignment_group').criterion, 'default')
 })
 
-test('sets the direction', function() {
+test('sets the direction', function () {
   strictEqual(this.getProps(undefined, 'ascending').direction, 'ascending')
   strictEqual(this.getProps(undefined, 'descending').direction, 'descending')
 })
 
-test('sets disabled to true when assignments have not been loaded yet', function() {
+test('sets disabled to true when assignments have not been loaded yet', function () {
   strictEqual(this.getProps().disabled, true)
 })
 
-test('sets disabled to false when assignments have been loaded', function() {
+test('sets disabled to false when assignments have been loaded', function () {
   this.gradebook.setAssignmentsLoaded()
 
   strictEqual(this.getProps().disabled, false)
 })
 
-test('sets modulesEnabled to true when there are modules in the current course', function() {
+test('sets modulesEnabled to true when there are modules in the current course', function () {
   this.gradebook.setContextModules([{id: '1', name: 'Module 1', position: 1}])
 
   strictEqual(this.getProps().modulesEnabled, true)
 })
 
-test('sets modulesEnabled to false when there are no modules in the current course', function() {
+test('sets modulesEnabled to false when there are no modules in the current course', function () {
   this.gradebook.setContextModules([])
 
   strictEqual(this.getProps().modulesEnabled, false)
 })
 
-test('sets onSortByNameAscending to a function that sorts columns by name ascending', function() {
+test('sets onSortByNameAscending to a function that sorts columns by name ascending', function () {
   this.getProps().onSortByNameAscending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('name', 'ascending'))
 })
 
-test('sets onSortByNameDescending to a function that sorts columns by name descending', function() {
+test('sets onSortByNameDescending to a function that sorts columns by name descending', function () {
   this.getProps().onSortByNameDescending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('name', 'descending'))
 })
 
-test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', function() {
+test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', function () {
   this.getProps().onSortByDueDateAscending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2263,7 +2286,7 @@ test('sets onSortByDueDateAscending to a function that sorts columns by due date
   )
 })
 
-test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', function() {
+test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', function () {
   this.getProps().onSortByDueDateDescending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2273,7 +2296,7 @@ test('sets onSortByDueDateDescending to a function that sorts columns by due dat
   )
 })
 
-test('sets onSortByPointsAscending to a function that sorts columns by points ascending', function() {
+test('sets onSortByPointsAscending to a function that sorts columns by points ascending', function () {
   this.getProps().onSortByPointsAscending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2283,7 +2306,7 @@ test('sets onSortByPointsAscending to a function that sorts columns by points as
   )
 })
 
-test('sets onSortByPointsDescending to a function that sorts columns by points descending', function() {
+test('sets onSortByPointsDescending to a function that sorts columns by points descending', function () {
   this.getProps().onSortByPointsDescending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2293,7 +2316,7 @@ test('sets onSortByPointsDescending to a function that sorts columns by points d
   )
 })
 
-test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', function() {
+test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', function () {
   this.getProps().onSortByModuleAscending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2303,7 +2326,7 @@ test('sets onSortByModuleAscending to a function that sorts columns by module po
   )
 })
 
-test('sets onSortByModuleDescending to a function that sorts columns by module position descending', function() {
+test('sets onSortByModuleDescending to a function that sorts columns by module position descending', function () {
   this.getProps().onSortByModuleDescending()
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1)
@@ -2330,7 +2353,7 @@ QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
   }
 })
 
-test('includes available filters', function() {
+test('includes available filters', function () {
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, [
     'assignmentGroups',
@@ -2341,55 +2364,55 @@ test('includes available filters', function() {
   ])
 })
 
-test('available filters exclude assignment groups when only one exists', function() {
+test('available filters exclude assignment groups when only one exists', function () {
   this.gradebook.setAssignmentGroups({301: {name: 'Assignments'}})
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['gradingPeriods', 'modules', 'sections', 'studentGroups'])
 })
 
-test('available filters exclude assignment groups when not loaded', function() {
+test('available filters exclude assignment groups when not loaded', function () {
   this.gradebook.setAssignmentGroups(undefined)
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['gradingPeriods', 'modules', 'sections', 'studentGroups'])
 })
 
-test('available filters exclude grading periods when no grading period set exists', function() {
+test('available filters exclude grading periods when no grading period set exists', function () {
   this.gradebook.gradingPeriodSet = null
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['assignmentGroups', 'modules', 'sections', 'studentGroups'])
 })
 
-test('available filters exclude modules when none exist', function() {
+test('available filters exclude modules when none exist', function () {
   this.gradebook.setContextModules([])
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'sections', 'studentGroups'])
 })
 
-test('available filters exclude sections when only one exists', function() {
+test('available filters exclude sections when only one exists', function () {
   this.gradebook.sections_enabled = false
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'modules', 'studentGroups'])
 })
 
-test('available filters exclude student groups when none exist', function() {
+test('available filters exclude student groups when none exist', function () {
   this.gradebook.studentGroupsEnabled = false
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'])
 })
 
-test('includes selected filters', function() {
+test('includes selected filters', function () {
   this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods', 'modules'])
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   deepEqual(props.selected, ['gradingPeriods', 'modules'])
 })
 
-test('onSelect sets the selected filters', function() {
+test('onSelect sets the selected filters', function () {
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   props.onSelect(['gradingPeriods', 'sections'])
   deepEqual(this.gradebook.listSelectedViewOptionsFilters(), ['gradingPeriods', 'sections'])
 })
 
-test('onSelect renders the view options menu after setting the selected filters', function() {
+test('onSelect renders the view options menu after setting the selected filters', function () {
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated')
@@ -2397,7 +2420,7 @@ test('onSelect renders the view options menu after setting the selected filters'
   props.onSelect(['gradingPeriods', 'sections'])
 })
 
-test('onSelect renders the filters after setting the selected filters', function() {
+test('onSelect renders the filters after setting the selected filters', function () {
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   this.gradebook.renderFilters.callsFake(() => {
     strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated')
@@ -2405,7 +2428,7 @@ test('onSelect renders the filters after setting the selected filters', function
   props.onSelect(['gradingPeriods', 'sections'])
 })
 
-test('onSelect saves settings after setting the selected filters', function() {
+test('onSelect saves settings after setting the selected filters', function () {
   const props = this.gradebook.getFilterSettingsViewOptionsMenuProps()
   this.gradebook.saveSettings.callsFake(() => {
     strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated')
@@ -2480,12 +2503,12 @@ QUnit.module('Gradebook#createTeacherNotes', {
   }
 })
 
-test('sets teacherNotesUpdating to true before sending the api request', function() {
+test('sets teacherNotesUpdating to true before sending the api request', function () {
   this.gradebook.createTeacherNotes()
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
-test('sets contextModulesLoaded to false if there are modules', function() {
+test('sets contextModulesLoaded to false if there are modules', function () {
   const {contextModulesLoaded} = createGradebook({
     context_id: '1201',
     has_modules: true
@@ -2493,7 +2516,7 @@ test('sets contextModulesLoaded to false if there are modules', function() {
   equal(contextModulesLoaded, false)
 })
 
-test('sets contextModulesLoaded to true if there are no modules', function() {
+test('sets contextModulesLoaded to true if there are no modules', function () {
   const {contextModulesLoaded} = createGradebook({
     context_id: '1201',
     has_modules: false
@@ -2501,35 +2524,35 @@ test('sets contextModulesLoaded to true if there are no modules', function() {
   equal(contextModulesLoaded, true)
 })
 
-test('re-renders the view options menu after setting teacherNotesUpdating', function() {
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
   })
   this.gradebook.createTeacherNotes()
 })
 
-test('calls GradebookApi.createTeacherNotesColumn', function() {
+test('calls GradebookApi.createTeacherNotesColumn', function () {
   this.gradebook.createTeacherNotes()
   equal(GradebookApi.createTeacherNotesColumn.callCount, 1)
   const [courseId] = GradebookApi.createTeacherNotesColumn.getCall(0).args
   equal(courseId, '1201', 'the only parameter is the course id')
 })
 
-test('updates teacher notes with response data after request resolves', function() {
+test('updates teacher notes with response data after request resolves', function () {
   const column = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({data: column})
   equal(this.gradebook.getTeacherNotesColumn(), column)
 })
 
-test('updates custom columns with response data after request resolves', function() {
+test('updates custom columns with response data after request resolves', function () {
   const column = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({data: column})
   deepEqual(this.gradebook.gradebookContent.customColumns, [column])
 })
 
-test('shows the notes column after request resolves', function() {
+test('shows the notes column after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2537,7 +2560,7 @@ test('shows the notes column after request resolves', function() {
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
 })
 
-test('sets teacherNotesUpdating to false after request resolves', function() {
+test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2545,7 +2568,7 @@ test('sets teacherNotesUpdating to false after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request resolves', function() {
+test('re-renders the view options menu after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2553,20 +2576,20 @@ test('re-renders the view options menu after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('displays a flash error after request rejects', function() {
+test('displays a flash error after request rejects', function () {
   sandbox.stub($, 'flashError')
   this.gradebook.createTeacherNotes()
   this.promise.catchFn(new Error('FAIL'))
   equal($.flashError.callCount, 1)
 })
 
-test('sets teacherNotesUpdating to false after request rejects', function() {
+test('sets teacherNotesUpdating to false after request rejects', function () {
   this.gradebook.createTeacherNotes()
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request rejects', function() {
+test('re-renders the view options menu after request rejects', function () {
   this.gradebook.createTeacherNotes()
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
@@ -2610,19 +2633,19 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
   }
 })
 
-test('sets teacherNotesUpdating to true before sending the api request', function() {
+test('sets teacherNotesUpdating to true before sending the api request', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
-test('re-renders the view options menu after setting teacherNotesUpdating', function() {
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
   })
   this.gradebook.setTeacherNotesHidden(false)
 })
 
-test('calls GradebookApi.updateTeacherNotesColumn', function() {
+test('calls GradebookApi.updateTeacherNotesColumn', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(GradebookApi.updateTeacherNotesColumn.callCount, 1)
   const [courseId, columnId, attr] = GradebookApi.updateTeacherNotesColumn.getCall(0).args
@@ -2631,7 +2654,7 @@ test('calls GradebookApi.updateTeacherNotesColumn', function() {
   equal(attr.hidden, false, 'attr.hidden is true')
 })
 
-test('shows the notes column after request resolves', function() {
+test('shows the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(this.gradebook.getTeacherNotesColumn().hidden, true)
   this.promise.thenFn({
@@ -2640,7 +2663,7 @@ test('shows the notes column after request resolves', function() {
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
 })
 
-test('reorders custom columns after request resolves', function() {
+test('reorders custom columns after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(this.gradebook.reorderCustomColumns.callCount, 0)
   this.promise.thenFn({
@@ -2649,7 +2672,7 @@ test('reorders custom columns after request resolves', function() {
   equal(this.gradebook.reorderCustomColumns.callCount, 1)
 })
 
-test('reorders custom columns using the column ids', function() {
+test('reorders custom columns using the column ids', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2658,7 +2681,7 @@ test('reorders custom columns using the column ids', function() {
   deepEqual(columnIds, ['2401', '2402'])
 })
 
-test('sets teacherNotesUpdating to false after request resolves', function() {
+test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2666,7 +2689,7 @@ test('sets teacherNotesUpdating to false after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request resolves', function() {
+test('re-renders the view options menu after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
@@ -2674,20 +2697,20 @@ test('re-renders the view options menu after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('displays a flash message after request rejects', function() {
+test('displays a flash message after request rejects', function () {
   sandbox.stub($, 'flashError')
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.catchFn(new Error('FAIL'))
   equal($.flashError.callCount, 1)
 })
 
-test('sets teacherNotesUpdating to false after request rejects', function() {
+test('sets teacherNotesUpdating to false after request rejects', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request rejects', function() {
+test('re-renders the view options menu after request rejects', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
@@ -2728,19 +2751,19 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
   }
 })
 
-test('sets teacherNotesUpdating to true before sending the api request', function() {
+test('sets teacherNotesUpdating to true before sending the api request', function () {
   this.gradebook.setTeacherNotesHidden(true)
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
-test('re-renders the view options menu after setting teacherNotesUpdating', function() {
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
   })
   this.gradebook.setTeacherNotesHidden(true)
 })
 
-test('calls GradebookApi.updateTeacherNotesColumn', function() {
+test('calls GradebookApi.updateTeacherNotesColumn', function () {
   this.gradebook.setTeacherNotesHidden(true)
   equal(GradebookApi.updateTeacherNotesColumn.callCount, 1)
   const [courseId, columnId, attr] = GradebookApi.updateTeacherNotesColumn.getCall(0).args
@@ -2749,7 +2772,7 @@ test('calls GradebookApi.updateTeacherNotesColumn', function() {
   equal(attr.hidden, true, 'attr.hidden is true')
 })
 
-test('hides the notes column after request resolves', function() {
+test('hides the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
   this.promise.thenFn({
@@ -2758,7 +2781,7 @@ test('hides the notes column after request resolves', function() {
   equal(this.gradebook.getTeacherNotesColumn().hidden, true)
 })
 
-test('sets teacherNotesUpdating to false after request resolves', function() {
+test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
@@ -2766,7 +2789,7 @@ test('sets teacherNotesUpdating to false after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request resolves', function() {
+test('re-renders the view options menu after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.thenFn({
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
@@ -2774,20 +2797,20 @@ test('re-renders the view options menu after request resolves', function() {
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('displays a flash message after request rejects', function() {
+test('displays a flash message after request rejects', function () {
   sandbox.stub($, 'flashError')
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.catchFn(new Error('FAIL'))
   equal($.flashError.callCount, 1)
 })
 
-test('sets teacherNotesUpdating to false after request rejects', function() {
+test('sets teacherNotesUpdating to false after request rejects', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
 
-test('re-renders the view options menu after request rejects', function() {
+test('re-renders the view options menu after request rejects', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.catchFn(new Error('FAIL'))
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
@@ -2812,31 +2835,31 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
   }
 })
 
-test('renders the section filter when not already rendered', function() {
+test('renders the section filter when not already rendered', function () {
   this.gradebook.updateSectionFilterVisibility()
   ok(this.container.children.length > 0, 'section menu was rendered')
 })
 
-test('does not render when only one section exists', function() {
+test('does not render when only one section exists', function () {
   this.gradebook.sections_enabled = false
   this.gradebook.updateSectionFilterVisibility()
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
-test('does not render when filter is not selected', function() {
+test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateSectionFilterVisibility()
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
-test('renders the filter with a list of sections', function() {
+test('renders the filter with a list of sections', function () {
   this.gradebook.updateSectionFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
   filter.clickToExpand()
   deepEqual(filter.optionLabels.slice(1), ['Freshmen / First-Year', 'Sophomores'])
 })
 
-test('sets the filter to show the saved "filter rows by" setting', function() {
+test('sets the filter to show the saved "filter rows by" setting', function () {
   this.gradebook.setFilterRowsBySetting('sectionId', '2002')
   this.gradebook.updateSectionFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
@@ -2844,14 +2867,14 @@ test('sets the filter to show the saved "filter rows by" setting', function() {
   equal(filter.selectedItemLabel, 'Sophomores')
 })
 
-test('sets the filter as disabled when students are not loaded', function() {
+test('sets the filter as disabled when students are not loaded', function () {
   this.gradebook.updateSectionFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
   filter.clickToExpand()
   strictEqual(filter.isDisabled, true)
 })
 
-test('sets the filter as not disabled when students are loaded', function() {
+test('sets the filter as not disabled when students are loaded', function () {
   this.gradebook.setStudentsLoaded(true)
   this.gradebook.updateSectionFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
@@ -2859,7 +2882,7 @@ test('sets the filter as not disabled when students are loaded', function() {
   strictEqual(filter.isDisabled, false)
 })
 
-test('updates the disabled state of the rendered filter', function() {
+test('updates the disabled state of the rendered filter', function () {
   this.gradebook.updateSectionFilterVisibility()
   this.gradebook.setStudentsLoaded(true)
   this.gradebook.updateSectionFilterVisibility()
@@ -2868,13 +2891,13 @@ test('updates the disabled state of the rendered filter', function() {
   strictEqual(filter.isDisabled, false)
 })
 
-test('renders only one section filter when updated', function() {
+test('renders only one section filter when updated', function () {
   this.gradebook.updateSectionFilterVisibility()
   this.gradebook.updateSectionFilterVisibility()
   strictEqual(this.container.children.length, 1)
 })
 
-test('removes the filter when the "view section filter" option is turned off', function() {
+test('removes the filter when the "view section filter" option is turned off', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateSectionFilterVisibility()
   strictEqual(this.container.children.length, 0)
@@ -2899,28 +2922,28 @@ QUnit.module('Gradebook#updateCurrentSection', {
   }
 })
 
-test('updates the filter setting with the given section id', function() {
+test('updates the filter setting with the given section id', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001')
 })
 
-test('sets the selected section on the post grades store', function() {
+test('sets the selected section on the post grades store', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.postGradesStore.setSelectedSection.callCount, 1)
 })
 
-test('includes the selected section when updating the post grades store', function() {
+test('includes the selected section when updating the post grades store', function () {
   this.gradebook.updateCurrentSection('2001')
   const [sectionId] = this.gradebook.postGradesStore.setSelectedSection.firstCall.args
   strictEqual(sectionId, '2001')
 })
 
-test('re-renders the section filter', function() {
+test('re-renders the section filter', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.updateSectionFilterVisibility.callCount, 1)
 })
 
-test('re-renders the section filter after setting the selected section', function() {
+test('re-renders the section filter after setting the selected section', function () {
   this.gradebook.updateSectionFilterVisibility.callsFake(() => {
     strictEqual(
       this.gradebook.getFilterRowsBySetting('sectionId'),
@@ -2931,12 +2954,12 @@ test('re-renders the section filter after setting the selected section', functio
   this.gradebook.updateCurrentSection('2001')
 })
 
-test('saves settings', function() {
+test('saves settings', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('saves settings after updating the filter setting', function() {
+test('saves settings after updating the filter setting', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(
     this.gradebook.getFilterRowsBySetting('sectionId'),
@@ -2945,7 +2968,7 @@ test('saves settings after updating the filter setting', function() {
   )
 })
 
-test('has no effect when the section has not changed', function() {
+test('has no effect when the section has not changed', function () {
   this.gradebook.setFilterRowsBySetting('sectionId', '2001')
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called')
@@ -2956,7 +2979,7 @@ test('has no effect when the section has not changed', function() {
   )
 })
 
-test('reloads student data after saving settings', function() {
+test('reloads student data after saving settings', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.dataLoader.reloadStudentDataForSectionFilterChange.callCount, 1)
 })
@@ -3000,31 +3023,31 @@ QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   }
 })
 
-test('renders the grading period filter when not already rendered', function() {
+test('renders the grading period filter when not already rendered', function () {
   this.gradebook.updateGradingPeriodFilterVisibility()
   ok(this.container.children.length > 0, 'grading period menu was rendered')
 })
 
-test('does not render when a grading period set does not exist', function() {
+test('does not render when a grading period set does not exist', function () {
   this.gradebook.gradingPeriodSet = null
   this.gradebook.updateGradingPeriodFilterVisibility()
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
-test('does not render when filter is not selected', function() {
+test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateGradingPeriodFilterVisibility()
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
-test('renders the filter with a list of grading periods', function() {
+test('renders the filter with a list of grading periods', function () {
   this.gradebook.updateGradingPeriodFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
   filter.clickToExpand()
   deepEqual(filter.optionLabels.slice(1), ['Grading Period 1', 'Grading Period 2'])
 })
 
-test('sets the filter to show the selected grading period', function() {
+test('sets the filter to show the selected grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
   this.gradebook.setCurrentGradingPeriod()
   this.gradebook.updateGradingPeriodFilterVisibility()
@@ -3033,7 +3056,7 @@ test('sets the filter to show the selected grading period', function() {
   equal(filter.selectedItemLabel, 'Grading Period 2')
 })
 
-test('renders only one grading period filter when updated', function() {
+test('renders only one grading period filter when updated', function () {
   this.gradebook.updateGradingPeriodFilterVisibility()
   this.gradebook.updateGradingPeriodFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
@@ -3041,7 +3064,7 @@ test('renders only one grading period filter when updated', function() {
   strictEqual(this.container.children.length, 1)
 })
 
-test('removes the filter when the "view grading period filter" option is turned off', function() {
+test('removes the filter when the "view grading period filter" option is turned off', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateGradingPeriodFilterVisibility()
   strictEqual(this.container.children.length, 0)
@@ -3065,18 +3088,18 @@ QUnit.module('Gradebook#updateModulesFilterVisibility', {
   }
 })
 
-test('renders the module select when not already rendered', function() {
+test('renders the module select when not already rendered', function () {
   this.gradebook.updateModulesFilterVisibility()
   ok(this.container.children.length > 0, 'something was rendered')
 })
 
-test('does not render when modules do not exist', function() {
+test('does not render when modules do not exist', function () {
   this.gradebook.setContextModules(undefined)
   this.gradebook.updateModulesFilterVisibility()
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
-test('does not render when filter is not selected', function() {
+test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateModulesFilterVisibility()
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
@@ -3100,19 +3123,19 @@ QUnit.module('Gradebook#updateAssignmentGroupFilterVisibility', {
   }
 })
 
-test('renders the assignment group select when not already rendered', function() {
+test('renders the assignment group select when not already rendered', function () {
   const countBefore = this.container.children.length
   this.gradebook.updateAssignmentGroupFilterVisibility()
   ok(this.container.children.length > countBefore, 'something was rendered')
 })
 
-test('does not render when there is only one assignment group', function() {
+test('does not render when there is only one assignment group', function () {
   this.gradebook.setAssignmentGroups([{id: '1', name: 'Assignments', position: 1}])
   this.gradebook.updateAssignmentGroupFilterVisibility()
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
-test('does not render when filter is not selected', function() {
+test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['modules'])
   this.gradebook.updateAssignmentGroupFilterVisibility()
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
@@ -3255,7 +3278,7 @@ QUnit.module('Menus', {
   }
 })
 
-test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function() {
+test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
   this.gradebook.renderViewOptionsMenu()
   const buttonText = document
     .querySelector('[data-component="ViewOptionsMenu"] Button')
@@ -3263,13 +3286,13 @@ test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function() {
   equal(buttonText, 'View')
 })
 
-test('ActionMenu is rendered on renderActionMenu', function() {
+test('ActionMenu is rendered on renderActionMenu', function () {
   this.gradebook.renderActionMenu()
   const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim()
   equal(buttonText, 'Actions')
 })
 
-test('GradebookMenu is rendered on renderGradebookMenu', function() {
+test('GradebookMenu is rendered on renderGradebookMenu', function () {
   this.gradebook.options.assignmentOrOutcome = 'assignment'
   this.gradebook.renderGradebookMenu()
   const buttonText = document
@@ -3278,7 +3301,7 @@ test('GradebookMenu is rendered on renderGradebookMenu', function() {
   equal(buttonText, 'Gradebook')
 })
 
-test('StatusesModal is mounted on renderStatusesModal', function() {
+test('StatusesModal is mounted on renderStatusesModal', function () {
   const clock = sinon.useFakeTimers()
   const statusModal = this.gradebook.renderStatusesModal()
   statusModal.open()
@@ -3301,7 +3324,7 @@ QUnit.module('setupGrading', {
   }
 })
 
-test('sets assignment visibility for the given students', function() {
+test('sets assignment visibility for the given students', function () {
   this.gradebook.setupGrading(this.students)
   strictEqual(
     this.gradebook.setAssignmentVisibility.callCount,
@@ -3312,7 +3335,7 @@ test('sets assignment visibility for the given students', function() {
   deepEqual(studentIds, ['1101', '1102'], 'both students were updated')
 })
 
-test('invalidates student rows for the given students', function() {
+test('invalidates student rows for the given students', function () {
   this.gradebook.setupGrading(this.students)
   strictEqual(
     this.gradebook.invalidateRowsForStudentIds.callCount,
@@ -3323,7 +3346,7 @@ test('invalidates student rows for the given students', function() {
   deepEqual(studentIds, ['1101', '1102'], 'both students were updated')
 })
 
-test('invalidates student rows after setting assignment visibility', function() {
+test('invalidates student rows after setting assignment visibility', function () {
   this.gradebook.invalidateRowsForStudentIds.callsFake(() => {
     strictEqual(
       this.gradebook.setAssignmentVisibility.callCount,
@@ -3369,24 +3392,24 @@ QUnit.module('Gradebook#updateStudentRow', {
   }
 })
 
-test('updates the associated row with the given student', function() {
+test('updates the associated row with the given student', function () {
   const student = {id: '1102', name: 'Adam Jones'}
   this.gradebook.updateStudentRow(student)
   strictEqual(this.gradebook.gridData.rows[1], student)
 })
 
-test('invalidates the associated grid row', function() {
+test('invalidates the associated grid row', function () {
   this.gradebook.updateStudentRow({id: '1102', name: 'Adam Jones'})
   strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 1)
 })
 
-test('includes the row index when invalidating the grid row', function() {
+test('includes the row index when invalidating the grid row', function () {
   this.gradebook.updateStudentRow({id: '1102', name: 'Adam Jones'})
   const [row] = this.gradebook.gradebookGrid.invalidateRow.lastCall.args
   strictEqual(row, 1)
 })
 
-test('does not update rows when the given student is not already included', function() {
+test('does not update rows when the given student is not already included', function () {
   this.gradebook.updateStudentRow({id: '1104', name: 'Dana Smith'})
   equal(typeof this.gradebook.gridData.rows[-1], 'undefined')
   deepEqual(
@@ -3395,7 +3418,7 @@ test('does not update rows when the given student is not already included', func
   )
 })
 
-test('does not invalidate rows when the given student is not already included', function() {
+test('does not invalidate rows when the given student is not already included', function () {
   this.gradebook.updateStudentRow({id: '1104', name: 'Dana Smith'})
   strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 0)
 })
@@ -3406,7 +3429,7 @@ QUnit.module('sortByStudentColumn', {
   }
 })
 
-test('sorts the gradebook rows', function() {
+test('sorts the gradebook rows', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'Z'},
     {id: '4', sortable_name: 'A'}
@@ -3418,7 +3441,7 @@ test('sorts the gradebook rows', function() {
   strictEqual(secondRow.id, '3')
 })
 
-test('sorts the gradebook rows descending', function() {
+test('sorts the gradebook rows descending', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'A'},
     {id: '4', sortable_name: 'Z'}
@@ -3430,7 +3453,7 @@ test('sorts the gradebook rows descending', function() {
   strictEqual(secondRow.id, '3')
 })
 
-test('sort gradebook rows by id when sortable names are the same', function() {
+test('sort gradebook rows by id when sortable names are the same', function () {
   this.gradebook.gridData.rows = [
     {id: '4', sortable_name: 'Same Name'},
     {id: '3', sortable_name: 'Same Name'}
@@ -3442,7 +3465,7 @@ test('sort gradebook rows by id when sortable names are the same', function() {
   strictEqual(secondRow.id, '4')
 })
 
-test('descending sort gradebook rows by id sortable names are the same and direction is descending', function() {
+test('descending sort gradebook rows by id sortable names are the same and direction is descending', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'Same Name'},
     {id: '4', sortable_name: 'Same Name'}
@@ -3460,7 +3483,7 @@ QUnit.module('sortByCustomColumn', {
   }
 })
 
-test('sorts the gradebook rows', function() {
+test('sorts the gradebook rows', function () {
   this.gradebook.gridData.rows = [
     {id: '3', custom_col_501: 'Z'},
     {id: '4', custom_col_501: 'A'}
@@ -3472,7 +3495,7 @@ test('sorts the gradebook rows', function() {
   strictEqual(secondRow.custom_col_501, 'Z')
 })
 
-test('sorts the gradebook rows descending', function() {
+test('sorts the gradebook rows descending', function () {
   this.gradebook.gridData.rows = [
     {id: '4', custom_col_501: 'A'},
     {id: '3', custom_col_501: 'Z'}
@@ -3484,7 +3507,7 @@ test('sorts the gradebook rows descending', function() {
   strictEqual(secondRow.custom_col_501, 'A')
 })
 
-test('sort gradebook rows by sortable_name when setting key is the same', function() {
+test('sort gradebook rows by sortable_name when setting key is the same', function () {
   this.gradebook.gridData.rows = [
     {id: '4', sortable_name: 'Jones, Adam', custom_col_501: '42'},
     {id: '3', sortable_name: 'Ford, Betty', custom_col_501: '42'}
@@ -3496,7 +3519,7 @@ test('sort gradebook rows by sortable_name when setting key is the same', functi
   strictEqual(secondRow.sortable_name, 'Jones, Adam')
 })
 
-test('descending sort gradebook rows by sortable_name when setting key is the same and direction is descending', function() {
+test('descending sort gradebook rows by sortable_name when setting key is the same and direction is descending', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'Ford, Betty', custom_col_501: '42'},
     {id: '4', sortable_name: 'Jones, Adam', custom_col_501: '42'}
@@ -3508,7 +3531,7 @@ test('descending sort gradebook rows by sortable_name when setting key is the sa
   strictEqual(secondRow.sortable_name, 'Ford, Betty')
 })
 
-test('sort gradebook rows by id when setting key and sortable name are the same', function() {
+test('sort gradebook rows by id when setting key and sortable name are the same', function () {
   this.gradebook.gridData.rows = [
     {id: '4', sortable_name: 'Same Name', custom_col_501: '42'},
     {id: '3', sortable_name: 'Same Name', custom_col_501: '42'}
@@ -3520,7 +3543,7 @@ test('sort gradebook rows by id when setting key and sortable name are the same'
   strictEqual(secondRow.id, '4')
 })
 
-test('descending sort gradebook rows by id when setting key and sortable name are the same and direction is descending', function() {
+test('descending sort gradebook rows by id when setting key and sortable name are the same and direction is descending', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'Same Name', custom_col_501: '42'},
     {id: '4', sortable_name: 'Same Name', custom_col_501: '42'}
@@ -3546,23 +3569,23 @@ QUnit.module('sortByAssignmentColumn', {
   }
 })
 
-test('sorts the gradebook rows', function() {
+test('sorts the gradebook rows', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
   equal(this.gradebook.sortRowsBy.callCount, 1)
 })
 
-test('sorts using gradeSort when the settingKey is "grade"', function() {
+test('sorts using gradeSort when the settingKey is "grade"', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
   equal(this.gradebook.gradeSort.callCount, 1)
 })
 
-test('sorts by grade using the columnId', function() {
+test('sorts by grade using the columnId', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
   const field = this.gradebook.gradeSort.getCall(0).args[2]
   equal(field, 'assignment_201')
 })
 
-test('optionally sorts by grade in ascending order', function() {
+test('optionally sorts by grade in ascending order', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3570,7 +3593,7 @@ test('optionally sorts by grade in ascending order', function() {
   equal(ascending, true, 'ascending is explicitly true')
 })
 
-test('optionally sorts by grade in descending order', function() {
+test('optionally sorts by grade in descending order', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'descending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3578,13 +3601,13 @@ test('optionally sorts by grade in descending order', function() {
   equal(ascending, false, 'ascending is explicitly false')
 })
 
-test('optionally sorts by missing in ascending order', function() {
+test('optionally sorts by missing in ascending order', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'missing', 'ascending')
   const columnId = this.gradebook.missingSort.getCall(0).args
   equal(columnId, 'assignment_201')
 })
 
-test('optionally sorts by late in ascending order', function() {
+test('optionally sorts by late in ascending order', function () {
   this.gradebook.sortByAssignmentColumn('assignment_201', 'late', 'ascending')
   const columnId = this.gradebook.lateSort.getCall(0).args
   equal(columnId, 'assignment_201')
@@ -3602,23 +3625,23 @@ QUnit.module('sortByAssignmentGroupColumn', {
   }
 })
 
-test('sorts the gradebook rows', function() {
+test('sorts the gradebook rows', function () {
   this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
   equal(this.gradebook.sortRowsBy.callCount, 1)
 })
 
-test('sorts by grade using gradeSort', function() {
+test('sorts by grade using gradeSort', function () {
   this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
   equal(this.gradebook.gradeSort.callCount, 1)
 })
 
-test('sorts by grade using the columnId', function() {
+test('sorts by grade using the columnId', function () {
   this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
   const field = this.gradebook.gradeSort.getCall(0).args[2]
   equal(field, 'assignment_group_301')
 })
 
-test('optionally sorts by grade in ascending order', function() {
+test('optionally sorts by grade in ascending order', function () {
   this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3626,7 +3649,7 @@ test('optionally sorts by grade in ascending order', function() {
   equal(ascending, true, 'ascending is explicitly true')
 })
 
-test('optionally sorts by grade in descending order', function() {
+test('optionally sorts by grade in descending order', function () {
   this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'descending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3646,23 +3669,23 @@ QUnit.module('sortByTotalGradeColumn', {
   }
 })
 
-test('sorts the gradebook rows', function() {
+test('sorts the gradebook rows', function () {
   this.gradebook.sortByTotalGradeColumn('ascending')
   equal(this.gradebook.sortRowsBy.callCount, 1)
 })
 
-test('sorts by grade using gradeSort', function() {
+test('sorts by grade using gradeSort', function () {
   this.gradebook.sortByTotalGradeColumn('ascending')
   equal(this.gradebook.gradeSort.callCount, 1)
 })
 
-test('sorts by "total_grade"', function() {
+test('sorts by "total_grade"', function () {
   this.gradebook.sortByTotalGradeColumn('ascending')
   const field = this.gradebook.gradeSort.getCall(0).args[2]
   equal(field, 'total_grade')
 })
 
-test('optionally sorts by grade in ascending order', function() {
+test('optionally sorts by grade in ascending order', function () {
   this.gradebook.sortByTotalGradeColumn('ascending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3670,7 +3693,7 @@ test('optionally sorts by grade in ascending order', function() {
   equal(ascending, true, 'ascending is explicitly true')
 })
 
-test('optionally sorts by grade in descending order', function() {
+test('optionally sorts by grade in descending order', function () {
   this.gradebook.sortByTotalGradeColumn('descending')
   const [studentA, studentB /* field */, , ascending] = this.gradebook.gradeSort.getCall(0).args
   equal(studentA, this.studentA, 'student A is in first position')
@@ -3695,13 +3718,13 @@ QUnit.module('Gradebook#sortGridRows', {
   }
 })
 
-test('sorts by the student column by default', function() {
+test('sorts by the student column by default', function () {
   sandbox.stub(this.gradebook, 'sortByStudentColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByStudentColumn.callCount, 1)
 })
 
-test('uses the saved sort setting for student column sorting', function() {
+test('uses the saved sort setting for student column sorting', function () {
   this.gradebook.setSortRowsBySetting('student_name', 'sortable_name', 'ascending')
   sandbox.stub(this.gradebook, 'sortByStudentColumn')
   this.gradebook.sortGridRows()
@@ -3711,14 +3734,14 @@ test('uses the saved sort setting for student column sorting', function() {
   equal(direction, 'ascending', 'parameter 2 is the sort direction')
 })
 
-test('optionally sorts by a custom column', function() {
+test('optionally sorts by a custom column', function () {
   this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending')
   sandbox.stub(this.gradebook, 'sortByCustomColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByCustomColumn.callCount, 1)
 })
 
-test('uses the saved sort setting for custom column sorting', function() {
+test('uses the saved sort setting for custom column sorting', function () {
   this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending')
   sandbox.stub(this.gradebook, 'sortByCustomColumn')
   this.gradebook.sortGridRows()
@@ -3728,14 +3751,14 @@ test('uses the saved sort setting for custom column sorting', function() {
   equal(direction, 'ascending', 'parameter 2 is the sort direction')
 })
 
-test('optionally sorts by an assignment column', function() {
+test('optionally sorts by an assignment column', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1)
 })
 
-test('uses the saved sort setting for assignment sorting', function() {
+test('uses the saved sort setting for assignment sorting', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentColumn')
   this.gradebook.sortGridRows()
@@ -3746,34 +3769,33 @@ test('uses the saved sort setting for assignment sorting', function() {
   equal(direction, 'ascending', 'parameter 3 is the sort direction')
 })
 
-test('optionally sorts by an assignment group column', function() {
+test('optionally sorts by an assignment group column', function () {
   this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentGroupColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByAssignmentGroupColumn.callCount, 1)
 })
 
-test('uses the saved sort setting for assignment group sorting', function() {
+test('uses the saved sort setting for assignment group sorting', function () {
   this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentGroupColumn')
   this.gradebook.sortGridRows()
 
-  const [columnId, settingKey, direction] = this.gradebook.sortByAssignmentGroupColumn.getCall(
-    0
-  ).args
+  const [columnId, settingKey, direction] =
+    this.gradebook.sortByAssignmentGroupColumn.getCall(0).args
   equal(columnId, 'assignment_group_301', 'parameter 1 is the sort columnId')
   equal(settingKey, 'grade', 'parameter 2 is the sort settingKey')
   equal(direction, 'ascending', 'parameter 3 is the sort direction')
 })
 
-test('optionally sorts by the total grade column', function() {
+test('optionally sorts by the total grade column', function () {
   this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByTotalGradeColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByTotalGradeColumn.callCount, 1)
 })
 
-test('uses the saved sort setting for total grade sorting', function() {
+test('uses the saved sort setting for total grade sorting', function () {
   this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending')
   sandbox.stub(this.gradebook, 'sortByTotalGradeColumn')
   this.gradebook.sortGridRows()
@@ -3782,21 +3804,21 @@ test('uses the saved sort setting for total grade sorting', function() {
   equal(direction, 'ascending', 'the only parameter is the sort direction')
 })
 
-test('optionally sorts by missing', function() {
+test('optionally sorts by missing', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'missing', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1)
 })
 
-test('optionally sorts by late', function() {
+test('optionally sorts by late', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'late', 'ascending')
   sandbox.stub(this.gradebook, 'sortByAssignmentColumn')
   this.gradebook.sortGridRows()
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1)
 })
 
-test('updates the column headers after sorting', function() {
+test('updates the column headers after sorting', function () {
   sandbox.stub(this.gradebook, 'sortByStudentColumn')
   sandbox.stub(this.gradebook, 'updateColumnHeaders').callsFake(() => {
     equal(this.gradebook.sortByStudentColumn.callCount, 1, 'sorting method was called first')
@@ -3867,7 +3889,7 @@ QUnit.module('Gradebook#filterAssignments', {
   }
 })
 
-test('excludes "not_graded" assignments', function() {
+test('excludes "not_graded" assignments', function () {
   const assignments = this.gradebook.filterAssignments(this.assignments)
   strictEqual(
     assignments.findIndex(assignment => assignment.id === '2303'),
@@ -3875,7 +3897,7 @@ test('excludes "not_graded" assignments', function() {
   )
 })
 
-test('excludes "unpublished" assignments when "showUnpublishedAssignments" is false', function() {
+test('excludes "unpublished" assignments when "showUnpublishedAssignments" is false', function () {
   this.gradebook.gridDisplaySettings.showUnpublishedAssignments = false
   const assignments = this.gradebook.filterAssignments(this.assignments)
   strictEqual(
@@ -3884,7 +3906,7 @@ test('excludes "unpublished" assignments when "showUnpublishedAssignments" is fa
   )
 })
 
-test('includes "unpublished" assignments when "showUnpublishedAssignments" is true', function() {
+test('includes "unpublished" assignments when "showUnpublishedAssignments" is true', function () {
   this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
   const assignments = this.gradebook.filterAssignments(this.assignments)
   notEqual(
@@ -3893,7 +3915,7 @@ test('includes "unpublished" assignments when "showUnpublishedAssignments" is tr
   )
 })
 
-test('excludes "attendance" assignments when "show_attendance" is false', function() {
+test('excludes "attendance" assignments when "show_attendance" is false', function () {
   this.gradebook.show_attendance = false
   const assignments = this.gradebook.filterAssignments(this.assignments)
   strictEqual(
@@ -3902,7 +3924,7 @@ test('excludes "attendance" assignments when "show_attendance" is false', functi
   )
 })
 
-test('includes "attendance" assignments when "show_attendance" is true', function() {
+test('includes "attendance" assignments when "show_attendance" is true', function () {
   this.gradebook.show_attendance = true
   const assignments = this.gradebook.filterAssignments(this.assignments)
   notEqual(
@@ -3911,59 +3933,59 @@ test('includes "attendance" assignments when "show_attendance" is true', functio
   )
 })
 
-test('includes assignments from all grading periods when not filtering by grading period', function() {
+test('includes assignments from all grading periods when not filtering by grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0') // value indicates "All Grading Periods"
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
-test('excludes assignments from other grading periods when filtering by a grading period', function() {
+test('excludes assignments from other grading periods when filtering by a grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
   this.gradebook.setCurrentGradingPeriod()
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301'])
 })
 
-test('includes assignments from all grading periods grading period set has not been assigned', function() {
+test('includes assignments from all grading periods grading period set has not been assigned', function () {
   this.gradebook.gradingPeriodSet = null
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
-test('includes assignments from all modules when not filtering by module', function() {
+test('includes assignments from all modules when not filtering by module', function () {
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '0') // All Modules
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
-test('excludes assignments from other modules when filtering by a module', function() {
+test('excludes assignments from other modules when filtering by a module', function () {
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301'])
 })
 
-test('does not filter assignments when filtering by a module that was deleted', function() {
+test('does not filter assignments when filtering by a module that was deleted', function () {
   this.gradebook.courseContent.contextModules = []
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
-test('includes assignments from all assignment groups when not filtering by assignment group', function() {
+test('includes assignments from all assignment groups when not filtering by assignment group', function () {
   this.gradebook.setFilterColumnsBySetting('assignmentGroupId', '0') // All Modules
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
-test('excludes assignments from other assignment groups when filtering by an assignment group', function() {
+test('excludes assignments from other assignment groups when filtering by an assignment group', function () {
   this.gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2302'])
 })
 
-QUnit.module('Gradebook Grid Events', function(suiteHooks) {
-  suiteHooks.beforeEach(function() {
+QUnit.module('Gradebook Grid Events', function (suiteHooks) {
+  suiteHooks.beforeEach(function () {
     setFixtureHtml($fixtures)
 
     $fixtures.innerHTML += `
@@ -3986,12 +4008,12 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     this.gradebook.setHeaderComponentRef('student', this.studentColumnHeader)
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(function () {
     this.gradebook.destroy()
     $fixtures.innerHTML = ''
   })
 
-  this.triggerEvent = function(eventName, event, location) {
+  this.triggerEvent = function (eventName, event, location) {
     return this.gradebook.gradebookGrid.gridSupport.events[eventName].trigger(event, location)
   }
 
@@ -4001,7 +4023,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     }
   })
 
-  test('sets focus on the student grades link when a "student" body cell becomes active', function() {
+  test('sets focus on the student grades link when a "student" body cell becomes active', function () {
     const clock = sinon.useFakeTimers()
     sandbox
       .stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
@@ -4012,7 +4034,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     clock.restore()
   })
 
-  test('does nothing when a "student" body cell without a student grades link becomes active', function() {
+  test('does nothing when a "student" body cell without a student grades link becomes active', function () {
     const clock = sinon.useFakeTimers()
     const previousActiveElement = document.activeElement
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name'
@@ -4025,7 +4047,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     clock.restore()
   })
 
-  test('does not change focus when a "student" header cell becomes active', function() {
+  test('does not change focus when a "student" header cell becomes active', function () {
     const clock = sinon.useFakeTimers()
     this.triggerEvent('onActiveLocationChanged', {}, {columnId: 'student', region: 'header'})
     clock.tick(0)
@@ -4033,7 +4055,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     clock.restore()
   })
 
-  test('does not change focus when body cells of other columns become active', function() {
+  test('does not change focus when body cells of other columns become active', function () {
     const clock = sinon.useFakeTimers()
     this.triggerEvent('onActiveLocationChanged', {}, {columnId: 'total_grade', region: 'body'})
     clock.tick(0)
@@ -4043,30 +4065,30 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onKeyDown')
 
-  test('calls handleKeyDown on the column header component associated with the event location', function() {
+  test('calls handleKeyDown on the column header component associated with the event location', function () {
     this.triggerEvent('onKeyDown', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 1)
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onKeyDown', {}, {columnId: 'student', region: 'body'})
     strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 0)
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onKeyDown', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 0)
   })
 
-  test('includes the event when calling handleKeyDown', function() {
+  test('includes the event when calling handleKeyDown', function () {
     const event = {}
     this.triggerEvent('onKeyDown', event, {columnId: 'student', region: 'header'})
     const {args} = this.studentColumnHeader.handleKeyDown.lastCall
     equal(args[0], event)
   })
 
-  test('returns the return value of the handled event', function() {
+  test('returns the return value of the handled event', function () {
     this.studentColumnHeader.handleKeyDown.returns(false)
     const returnValue = this.triggerEvent('onKeyDown', {}, {columnId: 'student', region: 'header'})
     strictEqual(returnValue, false)
@@ -4074,17 +4096,17 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onNavigatePrev')
 
-  test('calls focusAtStart on the column header component associated with the event location', function() {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     this.triggerEvent('onNavigatePrev', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1)
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onNavigatePrev', {}, {columnId: 'student', region: 'body'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onNavigatePrev', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
@@ -4092,17 +4114,17 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onNavigateNext')
 
-  test('calls focusAtStart on the column header component associated with the event location', function() {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     this.triggerEvent('onNavigateNext', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1)
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onNavigateNext', {}, {columnId: 'student', region: 'body'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onNavigateNext', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
@@ -4110,17 +4132,17 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onNavigateLeft')
 
-  test('calls focusAtStart on the column header component associated with the event location', function() {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     this.triggerEvent('onNavigateLeft', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1)
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onNavigateLeft', {}, {columnId: 'student', region: 'body'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onNavigateLeft', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
@@ -4128,17 +4150,17 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onNavigateRight')
 
-  test('calls focusAtStart on the column header component associated with the event location', function() {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     this.triggerEvent('onNavigateRight', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1)
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onNavigateRight', {}, {columnId: 'student', region: 'body'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onNavigateRight', {}, {columnId: 'student', region: 'header'})
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0)
@@ -4146,7 +4168,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   QUnit.module('onNavigateUp')
 
-  test('calls focusAtStart on the column header component associated with the event location', function() {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     const clock = sinon.useFakeTimers()
     this.triggerEvent('onNavigateUp', {}, {columnId: 'student', region: 'header'})
     clock.tick(0)
@@ -4154,7 +4176,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     clock.restore()
   })
 
-  test('does nothing when the location region is not "header"', function() {
+  test('does nothing when the location region is not "header"', function () {
     const clock = sinon.useFakeTimers()
     this.triggerEvent('onNavigateUp', {}, {columnId: 'student', region: 'body'})
     clock.tick(0)
@@ -4162,7 +4184,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
     clock.restore()
   })
 
-  test('does nothing when no component is referenced for the given column', function() {
+  test('does nothing when no component is referenced for the given column', function () {
     const clock = sinon.useFakeTimers()
     this.gradebook.removeHeaderComponentRef('student')
     this.triggerEvent('onNavigateUp', {}, {columnId: 'student', region: 'header'})
@@ -4360,12 +4382,12 @@ QUnit.module('Gradebook#updateColumnHeaders', {
   }
 })
 
-test('uses Grid Support to update the column headers', function() {
+test('uses Grid Support to update the column headers', function () {
   this.gradebook.updateColumnHeaders()
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
-test('takes an optional array of column ids', function() {
+test('takes an optional array of column ids', function () {
   this.gradebook.updateColumnHeaders(['2301', '2401'])
   const {args} = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.firstCall
   deepEqual(args[0], ['2301', '2401'])
@@ -4398,24 +4420,24 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
   }
 })
 
-test('updates cells for each column', function() {
+test('updates cells for each column', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101'])
   strictEqual(this.gradebook.gradebookGrid.grid.updateCell.callCount, 4, 'called once per column')
 })
 
-test('includes the row index of the student when updating', function() {
+test('includes the row index of the student when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1102'])
   const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [1, 1, 1, 1], 'each call specified row 1 (student 1102)')
 })
 
-test('includes the index of each column when updating', function() {
+test('includes the index of each column when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102'])
   const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]) // get the first arg of each call
   deepEqual(rows, [0, 1, 2, 3, 0, 1, 2, 3])
 })
 
-test('updates row cells for each student', function() {
+test('updates row cells for each student', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102'])
   strictEqual(
     this.gradebook.gradebookGrid.grid.updateCell.callCount,
@@ -4424,7 +4446,7 @@ test('updates row cells for each student', function() {
   )
 })
 
-test('has no effect when the grid has not been initialized', function() {
+test('has no effect when the grid has not been initialized', function () {
   this.gradebook.gradebookGrid.grid = null
   this.gradebook.updateRowCellsForStudentIds(['1101'])
   ok(true, 'no error was thrown')
@@ -4439,7 +4461,7 @@ QUnit.module('Gradebook#invalidateRowsForStudentIds', {
   }
 })
 
-test('invalidates each student row', function() {
+test('invalidates each student row', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
   strictEqual(
     this.gradebook.gradebookGrid.invalidateRow.callCount,
@@ -4448,13 +4470,13 @@ test('invalidates each student row', function() {
   )
 })
 
-test('includes the row index of the student when invalidating', function() {
+test('includes the row index of the student when invalidating', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
   const rows = _.map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [0, 1])
 })
 
-test('re-renders the grid after invalidating', function() {
+test('re-renders the grid after invalidating', function () {
   this.gradebook.gradebookGrid.render.callsFake(() => {
     strictEqual(
       this.gradebook.gradebookGrid.invalidateRow.callCount,
@@ -4465,7 +4487,7 @@ test('re-renders the grid after invalidating', function() {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
 })
 
-test('does not invalidate rows for students not included', function() {
+test('does not invalidate rows for students not included', function () {
   this.gradebook.invalidateRowsForStudentIds(['1102'])
   strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 1, 'called once')
   strictEqual(
@@ -4475,7 +4497,7 @@ test('does not invalidate rows for students not included', function() {
   )
 })
 
-test('has no effect when the grid has not been initialized', function() {
+test('has no effect when the grid has not been initialized', function () {
   this.gradebook.gradebookGrid.grid = null
   this.gradebook.invalidateRowsForStudentIds(['1101'])
   ok(true, 'no error was thrown')
@@ -4638,7 +4660,7 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       deepEqual(Object.keys(students), ['1102'])
     })
 
-    test('includes test students', function() {
+    test('includes test students', function () {
       gradebook.gotChunkOfStudents(allStudents)
 
       const testStudent = {
@@ -4717,13 +4739,13 @@ QUnit.module('Gradebook#sortRowsWithFunction', {
   }
 })
 
-test('returns two objects in the rows collection', function() {
+test('returns two objects in the rows collection', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn)
 
   equal(this.gradebook.gridData.rows.length, 2)
 })
 
-test('sorts with a passed in function', function() {
+test('sorts with a passed in function', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn)
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -4731,7 +4753,7 @@ test('sorts with a passed in function', function() {
   equal(secondRow.id, '3', 'when fn is false, order second')
 })
 
-test('sorts by descending when asc is false', function() {
+test('sorts by descending when asc is false', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn, {asc: false})
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -4739,7 +4761,7 @@ test('sorts by descending when asc is false', function() {
   equal(secondRow.id, '4', 'when fn is true, order second')
 })
 
-test('relies on localeSort when rows have equal sorting criteria results', function() {
+test('relies on localeSort when rows have equal sorting criteria results', function () {
   const value = 0
   this.gradebook.gridData.rows[0].someProperty = value
   this.gradebook.gridData.rows[1].someProperty = value
@@ -4750,7 +4772,7 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
   equal(secondRow.sortable_name, 'Z Lastington', 'Z Lastington sorts second')
 })
 
-test('relies on idSort when rows have equal sorting criteria and the same sortable name', function() {
+test('relies on idSort when rows have equal sorting criteria and the same sortable name', function () {
   const value = 0
   this.gradebook.gridData.rows[0].someProperty = value
   this.gradebook.gridData.rows[1].someProperty = value
@@ -4764,7 +4786,7 @@ test('relies on idSort when rows have equal sorting criteria and the same sortab
   equal(secondRow.id, '4', 'higher id sorts second')
 })
 
-test('relies on descending idSort when rows have equal sorting criteria and the same sortable name', function() {
+test('relies on descending idSort when rows have equal sorting criteria and the same sortable name', function () {
   const value = 0
   this.gradebook.gridData.rows[0].someProperty = value
   this.gradebook.gridData.rows[1].someProperty = value
@@ -4788,7 +4810,7 @@ QUnit.module('Gradebook#missingSort', {
   }
 })
 
-test('sorts by missing', function() {
+test('sorts by missing', function () {
   this.gradebook.missingSort('assignment_201')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -4796,7 +4818,7 @@ test('sorts by missing', function() {
   equal(secondRow.id, '3', 'when missing is false, order second')
 })
 
-test('relies on localeSort when rows have equal sorting criteria results', function() {
+test('relies on localeSort when rows have equal sorting criteria results', function () {
   this.gradebook.gridData.rows = [
     {id: '1', sortable_name: 'Z Last Graded', assignment_201: {missing: false}},
     {id: '3', sortable_name: 'Z Last Missing', assignment_201: {missing: true}},
@@ -4812,7 +4834,7 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
   equal(fourthRow.sortable_name, 'Z Last Graded', 'Z Last Graded sorts fourth')
 })
 
-test('relies on id sorting when rows have equal sorting criteria results and same sortable name', function() {
+test('relies on id sorting when rows have equal sorting criteria results and same sortable name', function () {
   this.gradebook.gridData.rows = [
     {id: '2', sortable_name: 'Student Name', assignment_201: {missing: true}},
     {id: '3', sortable_name: 'Student Name', assignment_201: {missing: true}},
@@ -4828,7 +4850,7 @@ test('relies on id sorting when rows have equal sorting criteria results and sam
   equal(fourthRow.id, '4')
 })
 
-test('when no submission is found, it is missing', function() {
+test('when no submission is found, it is missing', function () {
   // Since SubmissionStateMap always creates an assignment key even when there
   // is no corresponding submission, the correct way to test this is to have a
   // key for the assignment with a missing criteria key
@@ -4853,7 +4875,7 @@ QUnit.module('Gradebook#lateSort', {
   }
 })
 
-test('sorts by late', function() {
+test('sorts by late', function () {
   this.gradebook.lateSort('assignment_201')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -4861,7 +4883,7 @@ test('sorts by late', function() {
   equal(secondRow.id, '3', 'when late is false, order second')
 })
 
-test('relies on localeSort when rows have equal sorting criteria results', function() {
+test('relies on localeSort when rows have equal sorting criteria results', function () {
   this.gradebook.gridData.rows = [
     {id: '1', sortable_name: 'Z Last Not Late', assignment_201: {late: false}},
     {id: '3', sortable_name: 'Z Last Late', assignment_201: {late: true}},
@@ -4877,7 +4899,7 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
   equal(fourthRow.sortable_name, 'Z Last Not Late', 'Z Last Not Late sorts fourth')
 })
 
-test('relies on id sort when rows have equal sorting criteria results and the same sortable name', function() {
+test('relies on id sort when rows have equal sorting criteria results and the same sortable name', function () {
   this.gradebook.gridData.rows = [
     {id: '4', sortable_name: 'Student Name', assignment_201: {late: true}},
     {id: '3', sortable_name: 'Student Name', assignment_201: {late: true}},
@@ -4893,7 +4915,7 @@ test('relies on id sort when rows have equal sorting criteria results and the sa
   equal(fourthRow.id, '4')
 })
 
-test('when no submission is found, it is not late', function() {
+test('when no submission is found, it is not late', function () {
   // Since SubmissionStateMap always creates an assignment key even when there
   // is no corresponding submission, the correct way to test this is to have a
   // key for the assignment with a missing criteria key (e.g. `late`)
@@ -4969,7 +4991,7 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
   }
 })
 
-test('changes the value of @getSelectedEnrollmentFilters', function() {
+test('changes the value of @getSelectedEnrollmentFilters', function () {
   studentRowHeaderConstants.enrollmentFilterKeys.forEach(key => {
     const previousValue = this.gradebook.getSelectedEnrollmentFilters().includes(key)
     this.gradebook.toggleEnrollmentFilter(key, true)
@@ -4978,25 +5000,24 @@ test('changes the value of @getSelectedEnrollmentFilters', function() {
   })
 })
 
-test('saves settings', function() {
+test('saves settings', function () {
   this.gradebook.toggleEnrollmentFilter('inactive')
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('updates the student column header', function() {
+test('updates the student column header', function () {
   this.gradebook.toggleEnrollmentFilter('inactive')
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
-test('includes the "student" column id when updating column headers', function() {
+test('includes the "student" column id when updating column headers', function () {
   this.gradebook.toggleEnrollmentFilter('inactive')
-  const [
-    columnIds
-  ] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+  const [columnIds] =
+    this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
   deepEqual(columnIds, ['student'])
 })
 
-test('reloads student data after saving settings', function() {
+test('reloads student data after saving settings', function () {
   this.gradebook.toggleEnrollmentFilter('inactive')
   strictEqual(this.gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
 })
@@ -5131,9 +5152,8 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
     test('updates the column header with the assignment column id', () => {
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
-      const [
-        columnIds
-      ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+      const [columnIds] =
+        gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
       deepEqual(columnIds, ['assignment_2301'])
     })
 
@@ -5387,7 +5407,7 @@ QUnit.module('Gradebook React Header Component References', {
   }
 })
 
-test('#setHeaderComponentRef stores a reference by a column id', function() {
+test('#setHeaderComponentRef stores a reference by a column id', function () {
   const studentRef = {column: 'student'}
   const totalGradeRef = {column: 'total_grade'}
   this.gradebook.setHeaderComponentRef('student', studentRef)
@@ -5396,14 +5416,14 @@ test('#setHeaderComponentRef stores a reference by a column id', function() {
   equal(this.gradebook.getHeaderComponentRef('total_grade'), totalGradeRef)
 })
 
-test('#setHeaderComponentRef replaces an existing reference', function() {
+test('#setHeaderComponentRef replaces an existing reference', function () {
   const ref = {column: 'student'}
   this.gradebook.setHeaderComponentRef('student', {column: 'previous'})
   this.gradebook.setHeaderComponentRef('student', ref)
   equal(this.gradebook.getHeaderComponentRef('student'), ref)
 })
 
-test('#removeHeaderComponentRef removes an existing reference', function() {
+test('#removeHeaderComponentRef removes an existing reference', function () {
   const ref = {column: 'student'}
   this.gradebook.setHeaderComponentRef('student', ref)
   this.gradebook.removeHeaderComponentRef('student')
@@ -5639,12 +5659,12 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
   }
 })
 
-test('updates the filter setting with the given grading period id', function() {
+test('updates the filter setting with the given grading period id', function () {
   this.gradebook.updateCurrentGradingPeriod('1401')
   strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401')
 })
 
-test('saves settings after updating the filter setting', function() {
+test('saves settings after updating the filter setting', function () {
   this.gradebook.updateCurrentGradingPeriod('1401')
   strictEqual(
     this.gradebook.getFilterColumnsBySetting('gradingPeriodId'),
@@ -5653,26 +5673,26 @@ test('saves settings after updating the filter setting', function() {
   )
 })
 
-test('resets grading after updating the filter setting', function() {
+test('resets grading after updating the filter setting', function () {
   this.gradebook.updateCurrentGradingPeriod('1401')
   strictEqual(this.gradebook.resetGrading.callCount, 1)
 })
 
-test('sorts grid grows after resetting grading', function() {
+test('sorts grid grows after resetting grading', function () {
   this.gradebook.sortGridRows.callsFake(() => {
     strictEqual(this.gradebook.resetGrading.callCount, 1, 'grading was already reset')
   })
   this.gradebook.updateCurrentGradingPeriod('1401')
 })
 
-test('sets assignment warnings after resetting grading', function() {
+test('sets assignment warnings after resetting grading', function () {
   this.gradebook.updateFilteredContentInfo.callsFake(() => {
     strictEqual(this.gradebook.resetGrading.callCount, 1, 'grading was already reset')
   })
   this.gradebook.updateCurrentGradingPeriod('1401')
 })
 
-test('updates columns and menus after settings assignment warnings', function() {
+test('updates columns and menus after settings assignment warnings', function () {
   this.gradebook.updateColumnsAndRenderViewOptionsMenu.callsFake(() => {
     strictEqual(
       this.gradebook.updateFilteredContentInfo.callCount,
@@ -5683,7 +5703,7 @@ test('updates columns and menus after settings assignment warnings', function() 
   this.gradebook.updateCurrentGradingPeriod('1401')
 })
 
-test('has no effect when the grading period has not changed', function() {
+test('has no effect when the grading period has not changed', function () {
   this.gradebook.updateCurrentGradingPeriod('1402')
   strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called')
   strictEqual(this.gradebook.resetGrading.callCount, 0, 'resetGrading was not called')
@@ -5699,7 +5719,7 @@ test('has no effect when the grading period has not changed', function() {
   )
 })
 
-test('renders the action menu', function() {
+test('renders the action menu', function () {
   this.gradebook.updateCurrentGradingPeriod('1401')
   strictEqual(this.gradebook.renderActionMenu.callCount, 1)
 })
@@ -5735,12 +5755,12 @@ QUnit.module('Gradebook#updateCurrentModule', {
   }
 })
 
-test('updates the filter setting with the given module id', function() {
+test('updates the filter setting with the given module id', function () {
   this.gradebook.updateCurrentModule('1')
   strictEqual(this.gradebook.getFilterColumnsBySetting('contextModuleId'), '1')
 })
 
-test('saves settings with the new filter setting', function() {
+test('saves settings with the new filter setting', function () {
   this.gradebook.updateCurrentModule('1')
 
   strictEqual(
@@ -5749,7 +5769,7 @@ test('saves settings with the new filter setting', function() {
   )
 })
 
-test('saves settings after updating the filter setting', function() {
+test('saves settings after updating the filter setting', function () {
   this.gradebook.updateCurrentModule('1')
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
@@ -5761,7 +5781,7 @@ test('saves settings after updating the filter setting', function() {
   )
 })
 
-test('sets assignment warnings after updating the filter setting', function() {
+test('sets assignment warnings after updating the filter setting', function () {
   this.gradebook.updateCurrentModule('1')
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
@@ -5773,13 +5793,12 @@ test('sets assignment warnings after updating the filter setting', function() {
   )
 })
 
-test('updates columns and menus after setting assignment warnings', function() {
+test('updates columns and menus after setting assignment warnings', function () {
   this.gradebook.updateCurrentModule('1')
 
   const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-  const updateColumnsAndMenusCallId = this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(
-    0
-  ).callId
+  const updateColumnsAndMenusCallId =
+    this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId
 
   ok(
     updateFilteredContentInfoCallId < updateColumnsAndMenusCallId,
@@ -5787,7 +5806,7 @@ test('updates columns and menus after setting assignment warnings', function() {
   )
 })
 
-test('has no effect when the module has not changed', function() {
+test('has no effect when the module has not changed', function () {
   this.gradebook.updateCurrentModule('2')
   strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called')
   strictEqual(
@@ -5818,8 +5837,8 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
       }
     })
     this.gradebook.setAssignmentGroups({
-      '1': {id: '1', name: 'First'},
-      '2': {id: '2', name: 'Second'}
+      1: {id: '1', name: 'First'},
+      2: {id: '2', name: 'Second'}
     })
     sinon.spy(this.gradebook, 'setFilterColumnsBySetting')
     sandbox.spy($, 'ajaxJSON')
@@ -5832,12 +5851,12 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
   }
 })
 
-test('updates the filter setting with the given assignment group id', function() {
+test('updates the filter setting with the given assignment group id', function () {
   this.gradebook.updateCurrentAssignmentGroup('1')
   strictEqual(this.gradebook.getFilterColumnsBySetting('assignmentGroupId'), '1')
 })
 
-test('saves settings with the new filter setting', function() {
+test('saves settings with the new filter setting', function () {
   this.gradebook.updateCurrentAssignmentGroup('1')
 
   strictEqual(
@@ -5846,7 +5865,7 @@ test('saves settings with the new filter setting', function() {
   )
 })
 
-test('saves settings after updating the filter setting', function() {
+test('saves settings after updating the filter setting', function () {
   this.gradebook.updateCurrentAssignmentGroup('1')
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
@@ -5858,7 +5877,7 @@ test('saves settings after updating the filter setting', function() {
   )
 })
 
-test('sets assignment warnings after updating the filter setting', function() {
+test('sets assignment warnings after updating the filter setting', function () {
   this.gradebook.updateCurrentAssignmentGroup('1')
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
@@ -5870,13 +5889,12 @@ test('sets assignment warnings after updating the filter setting', function() {
   )
 })
 
-test('updates columns and menus after setting assignment warnings', function() {
+test('updates columns and menus after setting assignment warnings', function () {
   this.gradebook.updateCurrentAssignmentGroup('1')
 
   const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-  const updateColumnsAndMenusCallId = this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(
-    0
-  ).callId
+  const updateColumnsAndMenusCallId =
+    this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId
 
   ok(
     updateFilteredContentInfoCallId < updateColumnsAndMenusCallId,
@@ -5884,7 +5902,7 @@ test('updates columns and menus after setting assignment warnings', function() {
   )
 })
 
-test('has no effect when the assignment group has not changed', function() {
+test('has no effect when the assignment group has not changed', function () {
   this.gradebook.updateCurrentAssignmentGroup('2')
   strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called')
   strictEqual(
@@ -6035,6 +6053,7 @@ QUnit.module('Gradebook', () => {
       setFixtureHtml($fixtures)
       currentFilters = ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
       gradebook = createGradebook({
+        enhanced_gradebook_filters: false,
         grading_period_set: {
           id: '1501',
           grading_periods: [
@@ -6060,8 +6079,8 @@ QUnit.module('Gradebook', () => {
         }
       })
       gradebook.setAssignmentGroups({
-        '1': {id: '1', name: 'Assignment Group #1'},
-        '2': {id: '2', name: 'Assignment Group #2'}
+        1: {id: '1', name: 'Assignment Group #1'},
+        2: {id: '2', name: 'Assignment Group #2'}
       })
       gradebook.setContextModules([
         {id: '1', name: 'Module 1', position: 1},
@@ -6273,35 +6292,35 @@ QUnit.module('Gradebook#isFilteringColumnsByGradingPeriod', {
   }
 })
 
-test('returns true when the "filter columns by" setting includes a grading period', function() {
+test('returns true when the "filter columns by" setting includes a grading period', function () {
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), true)
 })
 
-test('returns false when the "filter columns by" setting includes the "all grading periods" value ("0")', function() {
+test('returns false when the "filter columns by" setting includes the "all grading periods" value ("0")', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
   this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
-test('returns false when the "filter columns by" setting does not include a grading period', function() {
+test('returns false when the "filter columns by" setting does not include a grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
   this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
-test('returns false when the "filter columns by" setting does not include a valid grading period', function() {
+test('returns false when the "filter columns by" setting does not include a valid grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '799')
   this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
-test('returns false when no grading period set exists', function() {
+test('returns false when no grading period set exists', function () {
   this.gradebook.gradingPeriodSet = null
   this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
-test('returns true when the "filter columns by" setting is null and the current_grading_period_id is set', function() {
+test('returns true when the "filter columns by" setting is null and the current_grading_period_id is set', function () {
   this.gradebook.options.current_grading_period_id = '701'
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
   this.gradebook.setCurrentGradingPeriod()
@@ -6321,35 +6340,34 @@ QUnit.module('Gradebook#setSelectedPrimaryInfo', {
   }
 })
 
-test('updates the selectedPrimaryInfo in the grid display settings', function() {
+test('updates the selectedPrimaryInfo in the grid display settings', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', true)
 
   strictEqual(this.gradebook.gridDisplaySettings.selectedPrimaryInfo, 'last_first')
 })
 
-test('saves the new grid display settings', function() {
+test('saves the new grid display settings', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', true)
 
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('re-renders the grid unless asked not to do it', function() {
+test('re-renders the grid unless asked not to do it', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false)
 
   strictEqual(this.gradebook.buildRows.callCount, 1)
 })
 
-test('updates the student column header', function() {
+test('updates the student column header', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false)
 
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
-test('includes the "student" column id when updating column headers', function() {
+test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false)
-  const [
-    columnIds
-  ] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+  const [columnIds] =
+    this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
   deepEqual(columnIds, ['student'])
 })
 
@@ -6366,35 +6384,34 @@ QUnit.module('Gradebook#setSelectedSecondaryInfo', {
   }
 })
 
-test('updates the selectedSecondaryInfo in the grid display settings', function() {
+test('updates the selectedSecondaryInfo in the grid display settings', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', true)
 
   strictEqual(this.gradebook.gridDisplaySettings.selectedSecondaryInfo, 'last_first')
 })
 
-test('saves the new grid display settings', function() {
+test('saves the new grid display settings', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', true)
 
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('re-renders the grid unless asked not to do it', function() {
+test('re-renders the grid unless asked not to do it', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false)
 
   strictEqual(this.gradebook.buildRows.callCount, 1)
 })
 
-test('updates the student column header', function() {
+test('updates the student column header', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false)
 
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
-test('includes the "student" column id when updating column headers', function() {
+test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false)
-  const [
-    columnIds
-  ] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+  const [columnIds] =
+    this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
   deepEqual(columnIds, ['student'])
 })
 
@@ -6408,23 +6425,23 @@ QUnit.module('Gradebook#setSortRowsBySetting', {
   }
 })
 
-test('updates the sort column in the grid display settings', function() {
+test('updates the sort column in the grid display settings', function () {
   strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.columnId, 'assignment_1')
 })
 
-test('updates the sort setting key in the grid display settings', function() {
+test('updates the sort setting key in the grid display settings', function () {
   strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.settingKey, 'grade')
 })
 
-test('updates the sort direction in the grid display settings', function() {
+test('updates the sort direction in the grid display settings', function () {
   strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.direction, 'descending')
 })
 
-test('saves the new grid display settings', function() {
+test('saves the new grid display settings', function () {
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('re-sorts the grid rows', function() {
+test('re-sorts the grid rows', function () {
   strictEqual(this.gradebook.sortGridRows.callCount, 1)
 })
 
@@ -6486,31 +6503,31 @@ QUnit.module('Gradebook#onGridBlur', {
   }
 })
 
-test('closes grid details tray when open', function() {
+test('closes grid details tray when open', function () {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.onGridBlur({target: document.body})
   strictEqual(this.gradebook.gridDisplaySettings.submissionTray.open, false)
 })
 
-test('does not close grid details tray when not open', function() {
+test('does not close grid details tray when not open', function () {
   const closeSubmissionTrayStub = sandbox.stub(this.gradebook, 'closeSubmissionTray')
   this.gradebook.setSubmissionTrayState(false, '1101', '2301')
   this.gradebook.onGridBlur({target: document.body})
   strictEqual(closeSubmissionTrayStub.callCount, 0)
 })
 
-test('blurs the grid when clicking off grid cells', function() {
+test('blurs the grid when clicking off grid cells', function () {
   this.gradebook.onGridBlur({target: document.body})
   strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 1)
 })
 
-test('does not blur the grid when clicking on the active cell', function() {
+test('does not blur the grid when clicking on the active cell', function () {
   const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode()
   this.gradebook.onGridBlur({target: $activeNode})
   strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 0)
 })
 
-test('does not blur the grid when clicking on another grid cell', function() {
+test('does not blur the grid when clicking on another grid cell', function () {
   const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode()
   this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', {cell: 1, row: 0})
   this.gradebook.onGridBlur({target: $activeNode})
@@ -7050,14 +7067,14 @@ QUnit.module('Gradebook#renderSubmissionTray', {
   }
 })
 
-test('shows a submission tray on the page when rendering an open tray', async function() {
+test('shows a submission tray on the page when rendering an open tray', async function () {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
   await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   ok(document.querySelector('[aria-label="Submission tray"]'))
 })
 
-test('does not show a submission tray on the page when rendering a closed tray', function() {
+test('does not show a submission tray on the page when rendering a closed tray', function () {
   const clock = sinon.useFakeTimers()
   this.gradebook.setSubmissionTrayState(false, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
@@ -7066,7 +7083,7 @@ test('does not show a submission tray on the page when rendering a closed tray',
   clock.restore()
 })
 
-test('shows a submission tray when the related submission has not loaded for the student', async function() {
+test('shows a submission tray when the related submission has not loaded for the student', async function () {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.student('1101').assignment_2301 = undefined
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
@@ -7074,7 +7091,7 @@ test('shows a submission tray when the related submission has not loaded for the
   ok(document.querySelector('[aria-label="Submission tray"]'))
 })
 
-test('calls getSubmissionTrayProps with the student', async function() {
+test('calls getSubmissionTrayProps with the student', async function () {
   sinon.spy(this.gradebook, 'getSubmissionTrayProps')
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
@@ -7489,20 +7506,20 @@ QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {
   }
 })
 
-test('unloads comments for the submission', function() {
+test('unloads comments for the submission', function () {
   sandbox.stub(this.gradebook, 'unloadSubmissionComments')
   this.gradebook.updateRowAndRenderSubmissionTray('1')
 
   strictEqual(this.gradebook.unloadSubmissionComments.callCount, 1)
 })
 
-test('updates the row cell for the given student id', function() {
+test('updates the row cell for the given student id', function () {
   this.gradebook.updateRowAndRenderSubmissionTray('1')
   strictEqual(this.gradebook.updateRowCellsForStudentIds.callCount, 1)
   deepEqual(this.gradebook.updateRowCellsForStudentIds.getCall(0).args[0], ['1'])
 })
 
-test('renders the submission tray', function() {
+test('renders the submission tray', function () {
   this.gradebook.updateRowAndRenderSubmissionTray('1')
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 1)
 })
@@ -7520,14 +7537,14 @@ QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
   }
 })
 
-test('sets the tray state to open if it was closed', function() {
+test('sets the tray state to open if it was closed', function () {
   const openState = {before: this.gradebook.getSubmissionTrayState().open}
   this.gradebook.toggleSubmissionTrayOpen('1', '2')
   openState.after = this.gradebook.getSubmissionTrayState().open
   deepEqual(openState, {before: false, after: true})
 })
 
-test('sets the tray state to closed if it was open', function() {
+test('sets the tray state to closed if it was open', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2')
   const openState = {before: this.gradebook.getSubmissionTrayState().open}
   this.gradebook.toggleSubmissionTrayOpen('1', '2')
@@ -7535,7 +7552,7 @@ test('sets the tray state to closed if it was open', function() {
   deepEqual(openState, {before: true, after: false})
 })
 
-test('sets the studentId and assignmentId state for the tray', function() {
+test('sets the studentId and assignmentId state for the tray', function () {
   this.gradebook.toggleSubmissionTrayOpen('1', '2')
   const {studentId, assignmentId} = this.gradebook.getSubmissionTrayState()
   deepEqual({studentId, assignmentId}, {studentId: '1', assignmentId: '2'})
@@ -7563,14 +7580,14 @@ QUnit.module('Gradebook#closeSubmissionTray', {
   }
 })
 
-test('sets the state of the tray to closed', function() {
+test('sets the state of the tray to closed', function () {
   const openState = {before: this.gradebook.getSubmissionTrayState().open}
   this.gradebook.closeSubmissionTray()
   openState.after = this.gradebook.getSubmissionTrayState().open
   deepEqual(openState, {before: true, after: false})
 })
 
-test('calls updateRowAndRenderSubmissionTray with the student id for the active row', function() {
+test('calls updateRowAndRenderSubmissionTray with the student id for the active row', function () {
   this.gradebook.closeSubmissionTray()
   strictEqual(this.gradebook.updateRowAndRenderSubmissionTray.callCount, 1)
   strictEqual(
@@ -7579,7 +7596,7 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
   )
 })
 
-test('puts the active grid cell back into "editing" mode', function() {
+test('puts the active grid cell back into "editing" mode', function () {
   sandbox.stub(this.gradebook.gradebookGrid.gridSupport.helper, 'beginEdit')
   this.gradebook.closeSubmissionTray()
   strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.beginEdit.callCount, 1)
@@ -7597,7 +7614,7 @@ QUnit.module('Gradebook#setSubmissionTrayState', {
   }
 })
 
-test('sets the state of the submission tray', function() {
+test('sets the state of the submission tray', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2')
   const expected = {
     open: true,
@@ -7612,12 +7629,12 @@ test('sets the state of the submission tray', function() {
   deepEqual(this.gradebook.gridDisplaySettings.submissionTray, expected)
 })
 
-test('puts cell in view mode when tray is opened', function() {
+test('puts cell in view mode when tray is opened', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2')
   strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 1)
 })
 
-test('does not put cell in view mode when tray is closed', function() {
+test('does not put cell in view mode when tray is closed', function () {
   this.gradebook.setSubmissionTrayState(false, '1', '2')
   strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 0)
 })
@@ -7628,7 +7645,7 @@ QUnit.module('Gradebook#getSubmissionTrayState', {
   }
 })
 
-test('returns the state of the submission tray', function() {
+test('returns the state of the submission tray', function () {
   const expected = {
     open: false,
     studentId: null,
@@ -7642,7 +7659,7 @@ test('returns the state of the submission tray', function() {
   deepEqual(this.gradebook.getSubmissionTrayState(), expected)
 })
 
-test('returns the state of the submission tray when accessed directly', function() {
+test('returns the state of the submission tray when accessed directly', function () {
   this.gradebook.gridDisplaySettings.submissionTray.open = true
   this.gradebook.gridDisplaySettings.submissionTray.studentId = '1'
   this.gradebook.gridDisplaySettings.submissionTray.assignmentId = '2'
@@ -7740,7 +7757,7 @@ QUnit.module('Gradebook#setLatePolicy', {
   }
 })
 
-test('sets the late policy state', function() {
+test('sets the late policy state', function () {
   const latePolicy = {lateSubmissionInterval: 'day'}
   this.gradebook.setLatePolicy(latePolicy)
   deepEqual(this.gradebook.courseContent.latePolicy, latePolicy)
@@ -7805,7 +7822,7 @@ QUnit.module('Gradebook#applyLatePolicy', {
   }
 })
 
-test('does not affect submissions in closed grading periods', function() {
+test('does not affect submissions in closed grading periods', function () {
   this.gradebook.applyLatePolicy()
   notOk(
     this.latePolicyApplicator.calledWith(
@@ -7817,7 +7834,7 @@ test('does not affect submissions in closed grading periods', function() {
   )
 })
 
-test('does not grade submissions for concluded students', function() {
+test('does not grade submissions for concluded students', function () {
   sinon.stub(this.gradebook, 'calculateStudentGrade')
   this.gradebook.applyLatePolicy()
   const gradesCalculated = this.gradebook.calculateStudentGrade.calledWith(
@@ -7827,7 +7844,7 @@ test('does not grade submissions for concluded students', function() {
   this.gradebook.calculateStudentGrade.restore()
 })
 
-test('affects submissions that are not in a grading period', function() {
+test('affects submissions that are not in a grading period', function () {
   this.gradebook.applyLatePolicy()
   ok(
     this.latePolicyApplicator.calledWith(
@@ -7839,7 +7856,7 @@ test('affects submissions that are not in a grading period', function() {
   )
 })
 
-test('affects submissions that are in not-closed grading periods', function() {
+test('affects submissions that are in not-closed grading periods', function () {
   this.gradebook.applyLatePolicy()
   ok(
     this.latePolicyApplicator.calledWith(
@@ -8422,47 +8439,47 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
   }
 })
 
-test('stores the pending grade info before sending the request', function() {
+test('stores the pending grade info before sending the request', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   strictEqual(this.gradebook.submissionIsUpdating(this.submission), true)
 })
 
-test('includes "grade" when storing the pending grade info', function() {
+test('includes "grade" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
   equal(pendingGradeInfo.grade, 'A')
 })
 
-test('includes "score" when storing the pending grade info', function() {
+test('includes "score" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
   strictEqual(pendingGradeInfo.score, 9.5)
 })
 
-test('includes "excused" when storing the pending grade info', function() {
+test('includes "excused" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
   strictEqual(pendingGradeInfo.excused, false)
 })
 
-test('includes "valid" when storing the pending grade info', function() {
+test('includes "valid" when storing the pending grade info', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   const pendingGradeInfo = this.gradebook.getPendingGradeInfo(this.submission)
   strictEqual(pendingGradeInfo.valid, true)
 })
 
-test('renders the tray before sending the request', function() {
+test('renders the tray before sending the request', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 1)
 })
 
-test('on success the pending grade info is removed', function() {
+test('on success the pending grade info is removed', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   sandbox.stub(this.gradebook, 'updateSubmissionsFromExternal')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
@@ -8470,7 +8487,7 @@ test('on success the pending grade info is removed', function() {
   strictEqual(this.gradebook.getPendingGradeInfo(this.submission), null)
 })
 
-test('on success the tray has been rendered a second time', function() {
+test('on success the tray has been rendered a second time', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   sandbox.stub(this.gradebook, 'updateSubmissionsFromExternal')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
@@ -8478,7 +8495,7 @@ test('on success the tray has been rendered a second time', function() {
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 2)
 })
 
-test('on failure the pending grade info is removed', function() {
+test('on failure the pending grade info is removed', function () {
   // without a retry strategy, clearing the request data is the only way to
   // revert to a stable state
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
@@ -8488,7 +8505,7 @@ test('on failure the pending grade info is removed', function() {
   })
 })
 
-test('on failure the student row is updated', function() {
+test('on failure the student row is updated', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   sinon.spy(this.gradebook, 'updateRowCellsForStudentIds')
@@ -8497,7 +8514,7 @@ test('on failure the student row is updated', function() {
   })
 })
 
-test('includes the student id when updating its row on failure', function() {
+test('includes the student id when updating its row on failure', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   sinon.spy(this.gradebook, 'updateRowCellsForStudentIds')
@@ -8507,7 +8524,7 @@ test('includes the student id when updating its row on failure', function() {
   })
 })
 
-test('on failure the submission has been rendered a second time', function() {
+test('on failure the submission has been rendered a second time', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   return this.promise.catchFn(new Error('A failure')).catch(() => {
@@ -8515,7 +8532,7 @@ test('on failure the submission has been rendered a second time', function() {
   })
 })
 
-test('on failure a flash error is triggered', function() {
+test('on failure a flash error is triggered', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   sandbox.stub($, 'flashError')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
@@ -8530,11 +8547,11 @@ QUnit.module('#getSubmissionComments', {
   }
 })
 
-test('is empty', function() {
+test('is empty', function () {
   deepEqual(this.gradebook.getSubmissionComments(), [])
 })
 
-test('gets comments', function() {
+test('gets comments', function () {
   const comments = ['a comment']
   this.gradebook.setSubmissionComments(comments)
   deepEqual(this.gradebook.getSubmissionComments(), comments)
@@ -8546,7 +8563,7 @@ QUnit.module('#setSubmissionComments', {
   }
 })
 
-test('sets comments on gridDisplaySettings.submissionTray', function() {
+test('sets comments on gridDisplaySettings.submissionTray', function () {
   const comments = ['a comment']
   this.gradebook.setSubmissionComments(comments)
   deepEqual(this.gradebook.gridDisplaySettings.submissionTray.comments, comments)
@@ -8558,38 +8575,38 @@ QUnit.module('#updateSubmissionComments', {
   }
 })
 
-test('calls renderSubmissionTray', function() {
+test('calls renderSubmissionTray', function () {
   const renderSubmissionTrayStub = sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionComments([])
   strictEqual(renderSubmissionTrayStub.callCount, 1)
 })
 
-test('sets the edited comment ID to null', function() {
+test('sets the edited comment ID to null', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.setEditedCommentId('5')
   this.gradebook.updateSubmissionComments([])
   strictEqual(this.gradebook.getSubmissionTrayState().editedCommentId, null)
 })
 
-test('calls setSubmissionComments', function() {
+test('calls setSubmissionComments', function () {
   const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments')
   this.gradebook.unloadSubmissionComments()
   strictEqual(setSubmissionCommentsStub.callCount, 1)
 })
 
-test('calls setSubmissionComments', function() {
+test('calls setSubmissionComments', function () {
   const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments')
   this.gradebook.unloadSubmissionComments()
   strictEqual(setSubmissionCommentsStub.callCount, 1)
 })
 
-test('calls setSubmissionComments with an empty collection of comments', function() {
+test('calls setSubmissionComments with an empty collection of comments', function () {
   const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments')
   this.gradebook.unloadSubmissionComments()
   deepEqual(setSubmissionCommentsStub.firstCall.args[0], [])
 })
 
-test('calls setSubmissionCommentsLoaded', function() {
+test('calls setSubmissionCommentsLoaded', function () {
   const setSubmissionCommentsLoadedStub = sandbox.stub(
     this.gradebook,
     'setSubmissionCommentsLoaded'
@@ -8598,7 +8615,7 @@ test('calls setSubmissionCommentsLoaded', function() {
   strictEqual(setSubmissionCommentsLoadedStub.callCount, 1)
 })
 
-test('calls setSubmissionCommentsLoaded with an empty collection of comments', function() {
+test('calls setSubmissionCommentsLoaded with an empty collection of comments', function () {
   const setSubmissionCommentsLoadedStub = sandbox.stub(
     this.gradebook,
     'setSubmissionCommentsLoaded'
@@ -8833,7 +8850,7 @@ QUnit.module('#apiDeleteSubmissionComment', {
   }
 })
 
-test('calls the success function on a successful call', function() {
+test('calls the success function on a successful call', function () {
   const url = '/submission_comments/42'
 
   moxios.stubRequest(url, {status: 200, response: []})
@@ -8845,7 +8862,7 @@ test('calls the success function on a successful call', function() {
   })
 })
 
-test('calls showFlashSuccess on a successful call', function() {
+test('calls showFlashSuccess on a successful call', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   const url = '/submission_comments/42'
   moxios.stubRequest(url, {status: 200, response: []})
@@ -8857,7 +8874,7 @@ test('calls showFlashSuccess on a successful call', function() {
   })
 })
 
-test('calls the success function on an unsuccessful call', function() {
+test('calls the success function on an unsuccessful call', function () {
   sinon.stub(this.gradebook, 'renderSubmissionTray')
   const url = '/submission_comments/42'
   moxios.stubRequest(url, {status: 401, response: []})
@@ -8869,7 +8886,7 @@ test('calls the success function on an unsuccessful call', function() {
   })
 })
 
-test('calls removeSubmissionComment on success', function() {
+test('calls removeSubmissionComment on success', function () {
   const url = '/submission_comments/42'
 
   moxios.stubRequest(url, {status: 200, response: []})
@@ -8902,14 +8919,14 @@ QUnit.module('#removeSubmissionComment', {
   }
 })
 
-test('removes matching comment id', function() {
+test('removes matching comment id', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.setSubmissionComments(this.comments())
   this.gradebook.removeSubmissionComment('42')
   deepEqual(this.gradebook.getSubmissionComments(), [])
 })
 
-test('removes none if no matching comment id', function() {
+test('removes none if no matching comment id', function () {
   sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.setSubmissionComments([{id: '84'}])
   this.gradebook.removeSubmissionComment('42')

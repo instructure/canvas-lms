@@ -84,6 +84,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import StudentSearchInput from './components/StudentSearchInput'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -157,9 +158,8 @@ class Gradebook {
     this.setupGrading = this.setupGrading.bind(this)
     this.resetGrading = this.resetGrading.bind(this)
     this.getSubmission = this.getSubmission.bind(this)
-    this.updateEffectiveDueDatesFromSubmissions = this.updateEffectiveDueDatesFromSubmissions.bind(
-      this
-    )
+    this.updateEffectiveDueDatesFromSubmissions =
+      this.updateEffectiveDueDatesFromSubmissions.bind(this)
 
     // Student Data & Lifecycle Methods
     this.updateStudentIds = this.updateStudentIds.bind(this)
@@ -223,9 +223,8 @@ class Gradebook {
     this.initHeader = this.initHeader.bind(this)
     this.renderGradebookMenus = this.renderGradebookMenus.bind(this)
     this.renderGradebookMenu = this.renderGradebookMenu.bind(this)
-    this.getFilterSettingsViewOptionsMenuProps = this.getFilterSettingsViewOptionsMenuProps.bind(
-      this
-    )
+    this.getFilterSettingsViewOptionsMenuProps =
+      this.getFilterSettingsViewOptionsMenuProps.bind(this)
     this.updateFilterSettings = this.updateFilterSettings.bind(this)
     this.renderViewOptionsMenu = this.renderViewOptionsMenu.bind(this)
     this.getActionMenuProps = this.getActionMenuProps.bind(this)
@@ -293,12 +292,10 @@ class Gradebook {
 
     // # Gradebook Bulk UI Update Methods
     this.updateColumns = this.updateColumns.bind(this)
-    this.updateColumnsAndRenderViewOptionsMenu = this.updateColumnsAndRenderViewOptionsMenu.bind(
-      this
-    )
-    this.updateColumnsAndRenderGradebookSettingsModal = this.updateColumnsAndRenderGradebookSettingsModal.bind(
-      this
-    )
+    this.updateColumnsAndRenderViewOptionsMenu =
+      this.updateColumnsAndRenderViewOptionsMenu.bind(this)
+    this.updateColumnsAndRenderGradebookSettingsModal =
+      this.updateColumnsAndRenderGradebookSettingsModal.bind(this)
     // # React Header Component Ref Methods
     this.setHeaderComponentRef = this.setHeaderComponentRef.bind(this)
     this.getHeaderComponentRef = this.getHeaderComponentRef.bind(this)
@@ -424,9 +421,8 @@ class Gradebook {
     this.setTeacherNotesHidden = this.setTeacherNotesHidden.bind(this)
     this.apiUpdateSubmission = this.apiUpdateSubmission.bind(this)
     this.gradeSubmission = this.gradeSubmission.bind(this)
-    this.updateSubmissionAndRenderSubmissionTray = this.updateSubmissionAndRenderSubmissionTray.bind(
-      this
-    )
+    this.updateSubmissionAndRenderSubmissionTray =
+      this.updateSubmissionAndRenderSubmissionTray.bind(this)
     this.renderAnonymousSpeedGraderAlert = this.renderAnonymousSpeedGraderAlert.bind(this)
     this.showAnonymousSpeedGraderAlertForURL = this.showAnonymousSpeedGraderAlertForURL.bind(this)
     this.hideAnonymousSpeedGraderAlert = this.hideAnonymousSpeedGraderAlert.bind(this)
@@ -795,9 +791,8 @@ class Gradebook {
     })
 
     Object.keys(gradingPeriodAssignments).forEach(periodId => {
-      this.contentLoadStates.assignmentsLoaded.gradingPeriod[
-        periodId
-      ] = this.contentLoadStates.assignmentsLoaded.all
+      this.contentLoadStates.assignmentsLoaded.gradingPeriod[periodId] =
+        this.contentLoadStates.assignmentsLoaded.all
     })
 
     this.setGradingPeriodAssignmentsLoaded(true)
@@ -1438,9 +1433,8 @@ class Gradebook {
     }
     return _.filter(allSubmissions, submission => {
       let ref1
-      const studentPeriodInfo = this.effectiveDueDates[submission.assignment_id]?.[
-        submission.user_id
-      ]
+      const studentPeriodInfo =
+        this.effectiveDueDates[submission.assignment_id]?.[submission.user_id]
       return studentPeriodInfo && studentPeriodInfo.grading_period_id === this.gradingPeriodId
     })
   }
@@ -2061,7 +2055,7 @@ class Gradebook {
     if (this.contentLoadStates.contextModulesLoaded) {
       this.updateModulesFilterVisibility()
     }
-    return this.renderSearchFilter()
+    this.renderSearchFilter(this.courseContent.students.listStudents())
   }
 
   renderGridColor() {
@@ -2199,20 +2193,29 @@ class Gradebook {
     return this.buildRows()
   }
 
-  renderSearchFilter() {
-    if (!this.userFilter) {
-      const opts = {el: '#search-filter-container input'}
-      if (this.options.remove_gradebook_student_search_delay_enabled) {
-        opts.onInputDelay = 0
+  renderSearchFilter(students) {
+    if (this.options.enhanced_gradebook_filters) {
+      const mountPoint = document.getElementById('gradebook-secondary-toolbar')
+      const props = {
+        readonly: students.length === 0,
+        onChange: this.onUserFilterInput
       }
+      renderComponent(StudentSearchInput, mountPoint, props)
+    } else {
+      if (!this.userFilter) {
+        const opts = {el: '#search-filter-container input'}
+        if (this.options.remove_gradebook_student_search_delay_enabled) {
+          opts.onInputDelay = 0
+        }
 
-      this.userFilter = new InputFilterView(opts)
-      this.userFilter.on('input', this.onUserFilterInput)
+        this.userFilter = new InputFilterView(opts)
+        this.userFilter.on('input', this.onUserFilterInput)
+      }
+      const disabled =
+        !this.contentLoadStates.studentsLoaded || !this.contentLoadStates.submissionsLoaded
+      this.userFilter.el.disabled = disabled
+      this.userFilter.el.setAttribute('aria-disabled', disabled)
     }
-    const disabled =
-      !this.contentLoadStates.studentsLoaded || !this.contentLoadStates.submissionsLoaded
-    this.userFilter.el.disabled = disabled
-    return this.userFilter.el.setAttribute('aria-disabled', disabled)
   }
 
   setVisibleGridColumns() {
@@ -3481,8 +3484,8 @@ class Gradebook {
 
   toggleUnpublishedAssignments() {
     const toggleableAction = () => {
-      this.gridDisplaySettings.showUnpublishedAssignments = !this.gridDisplaySettings
-        .showUnpublishedAssignments
+      this.gridDisplaySettings.showUnpublishedAssignments =
+        !this.gridDisplaySettings.showUnpublishedAssignments
       return this.updateColumnsAndRenderViewOptionsMenu()
     }
     toggleableAction()

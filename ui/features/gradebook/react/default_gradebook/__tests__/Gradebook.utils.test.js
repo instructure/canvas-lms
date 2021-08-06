@@ -77,21 +77,21 @@ describe('onGridKeyDown', () => {
     expect(event.originalEvent.skipSlickGridDefaults).toStrictEqual(true)
   })
 
-  it('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function() {
+  it('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function () {
     const event = {which: 27, originalEvent: {}}
     onGridKeyDown(event, {grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
   })
 
-  it('does not skip SlickGrid default behavior when pressing "enter" on other cells', function() {
+  it('does not skip SlickGrid default behavior when pressing "enter" on other cells', function () {
     const event = {which: 27, originalEvent: {}}
     onGridKeyDown(event, {grid, cell: 1, row: 0}) // 1 is the index of the 'assignment' column
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
   })
 
-  it('does not skip SlickGrid default behavior when pressing "enter" off the grid', function() {
+  it('does not skip SlickGrid default behavior when pressing "enter" off the grid', function () {
     const event = {which: 27, originalEvent: {}}
     onGridKeyDown(event, {grid: this.grid, cell: undefined, row: undefined})
     // skipSlickGridDefaults is not applied
