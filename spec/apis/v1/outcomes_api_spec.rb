@@ -37,20 +37,21 @@ describe "Outcomes API", type: :request do
 
   def outcome_json(outcome=@outcome, presets={})
     retval = {
-      "id"                 => presets[:id]                 || outcome.id,
-      "context_id"         => presets[:context_id]         || outcome.context_id,
-      "context_type"       => presets[:context_type]       || outcome.context_type,
-      "title"              => presets[:title]              || outcome.title,
-      "display_name"       => presets[:display_name]       || outcome.display_name,
-      "url"                => presets[:url]                || api_v1_outcome_path(:id => outcome.id),
-      "vendor_guid"        => presets[:vendor_guid]        || outcome.vendor_guid,
-      "can_edit"           => presets[:can_edit]           || true,
-      "description"        => presets[:description]        || outcome.description,
-      "assessed"           => presets[:assessed]           || outcome.assessed?,
-      "calculation_method" => presets[:calculation_method] || outcome.calculation_method,
-      "mastery_points"     => outcome.mastery_points,
-      "points_possible"    => outcome.points_possible,
-      "ratings"            => outcome.rubric_criterion[:ratings].map(&:stringify_keys)
+      "id"                   => presets[:id]                         || outcome.id,
+      "context_id"           => presets[:context_id]                 || outcome.context_id,
+      "context_type"         => presets[:context_type]               || outcome.context_type,
+      "title"                => presets[:title]                      || outcome.title,
+      "display_name"         => presets[:display_name]               || outcome.display_name,
+      "friendly_description" => presets[:friendly_description]       || nil,
+      "url"                  => presets[:url]                        || api_v1_outcome_path(:id => outcome.id),
+      "vendor_guid"          => presets[:vendor_guid]                || outcome.vendor_guid,
+      "can_edit"             => presets[:can_edit]                   || true,
+      "description"          => presets[:description]                || outcome.description,
+      "assessed"             => presets[:assessed]                   || outcome.assessed?,
+      "calculation_method"   => presets[:calculation_method]         || outcome.calculation_method,
+      "mastery_points"       => outcome.mastery_points,
+      "points_possible"      => outcome.points_possible,
+      "ratings"              => outcome.rubric_criterion[:ratings].map(&:stringify_keys)
     }
 
     retval['has_updateable_rubrics'] = if presets[:has_updateable_rubrics].nil?
@@ -229,6 +230,7 @@ describe "Outcomes API", type: :request do
           "calculation_method" => "decaying_average",
           "title" => @outcome.title,
           "display_name" => nil,
+          "friendly_description" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "vendor_guid" => "vendorguid9000",
           "can_edit" => true,
@@ -265,6 +267,7 @@ describe "Outcomes API", type: :request do
           "context_type" => "Account",
           "title" => @outcome.title,
           "display_name" => nil,
+          "friendly_description" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "vendor_guid" => "vendorguid9000",
           "can_edit" => true,
@@ -510,6 +513,7 @@ describe "Outcomes API", type: :request do
           "vendor_guid" => "vendorguid9000",
           "title" => "New Title",
           "display_name" => nil,
+          "friendly_description" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "can_edit" => true,
           "has_updateable_rubrics" => false,
