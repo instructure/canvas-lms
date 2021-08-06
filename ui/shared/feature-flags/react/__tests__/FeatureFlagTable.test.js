@@ -25,6 +25,7 @@ import sampleData from './sampleData.json'
 const rows = [
   sampleData.allowedOnFeature,
   sampleData.allowedFeature,
+  sampleData.betaFeature,
   sampleData.onFeature,
   sampleData.offFeature,
   sampleData.pendingEnforcementOnFeature,
@@ -50,10 +51,11 @@ describe('feature_flags::FeatureFlagTable', () => {
   it('Sorts the features', () => {
     const {getAllByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
 
-    expect(getAllByTestId('ff-table-row')[0]).toHaveTextContent('Feature 1')
-    expect(getAllByTestId('ff-table-row')[1]).toHaveTextContent('Feature 2')
-    expect(getAllByTestId('ff-table-row')[2]).toHaveTextContent('Feature 3')
-    expect(getAllByTestId('ff-table-row')[3]).toHaveTextContent('Feature 4')
+    expect(getAllByTestId('ff-table-row')[0]).toHaveTextContent('Beta Feature')
+    expect(getAllByTestId('ff-table-row')[1]).toHaveTextContent('Feature 1')
+    expect(getAllByTestId('ff-table-row')[2]).toHaveTextContent('Feature 2')
+    expect(getAllByTestId('ff-table-row')[3]).toHaveTextContent('Feature 3')
+    expect(getAllByTestId('ff-table-row')[4]).toHaveTextContent('Feature 4')
   })
 
   it('Includes the descriptions, respecting autoexpand', () => {
@@ -82,5 +84,19 @@ describe('feature_flags::FeatureFlagTable', () => {
     })
     expect(queryByText('Aug 23, 2021')).not.toBeInTheDocument()
     expect(getByText('This feature has pending enforcement off')).toBeInTheDocument()
+  })
+
+  it('includes tooltips for active development and pending enforcement', () => {
+    const {getByText} = render(<FeatureFlagTable rows={rows} title={title} />)
+    expect(
+      getByText(
+        'Features in active development — opting in includes ongoing updates outside the regular release schedule'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        'Features no longer in active development that include a date when they will be turned on by default'
+      )
+    ).toBeInTheDocument()
   })
 })
