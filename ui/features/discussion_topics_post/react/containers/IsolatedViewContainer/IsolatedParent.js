@@ -112,7 +112,13 @@ export const IsolatedParent = props => {
           {props.discussionEntry.parentId && (
             <View as="div" padding="small none none small">
               <BackButton
-                onClick={() => props.onOpenIsolatedView(props.discussionEntry.parentId, false)}
+                onClick={() =>
+                  props.onOpenIsolatedView(
+                    props.discussionEntry.parentId,
+                    props.discussionEntry.rootEntryId,
+                    false
+                  )
+                }
               />
             </View>
           )}

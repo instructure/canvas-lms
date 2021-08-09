@@ -106,7 +106,7 @@ describe('PostToolbar', () => {
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', false, '1'))
+    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '77', false, '1'))
   })
 
   it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
@@ -123,7 +123,7 @@ describe('PostToolbar', () => {
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('1', false, '1'))
+    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '77', false, '1'))
   })
 
   describe('Mobile', () => {

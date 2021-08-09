@@ -48,6 +48,7 @@ export const DiscussionEntry = {
       permissions {
         ...DiscussionEntryPermissions
       }
+      rootEntryId
       rootEntry {
         id
         rootEntryParticipantCounts {
@@ -90,6 +91,7 @@ export const DiscussionEntry = {
       createdAt: string
     }),
     permissions: DiscussionEntryPermissions.shape,
+    rootEntryId: string,
     rootEntry: shape({
       id: string,
       rootEntryParticipantCounts: shape({
@@ -137,6 +139,7 @@ export const DiscussionEntry = {
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionSubentriesConnection'
     },
+    rootEntryId = '77',
     rootEntry = null,
     discussionTopic = {
       entryCounts: {
@@ -167,6 +170,7 @@ export const DiscussionEntry = {
     lastReply,
     permissions,
     discussionSubentriesConnection,
+    rootEntryId,
     rootEntry,
     discussionTopic,
     parentId,

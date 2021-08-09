@@ -57,8 +57,8 @@ export const IsolatedThreadsContainer = props => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionEntry.discussionSubentriesConnection.nodes.filter(entry =>
-          entryIds.includes(entry._id)
+        const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
+          entry => entryIds.includes(entry._id)
         )
         entries.forEach(entry => (entry.read = true))
         setDiscussionEntriesToUpdate(new Set())
@@ -110,7 +110,7 @@ export const IsolatedThreadsContainer = props => {
           )}
         </View>
       )}
-      {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
+      {props.discussionEntry?.discussionSubentriesConnection?.nodes?.map(entry => (
         <IsolatedThreadContainer
           discussionTopic={props.discussionTopic}
           discussionEntry={entry}
@@ -228,9 +228,8 @@ const IsolatedThreadContainer = props => {
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() =>
           props.onOpenIsolatedView(
-            props.discussionEntry?.rootEntry?.id
-              ? props.discussionEntry.rootEntry.id
-              : props.discussionEntry.id,
+            props.discussionEntry.id,
+            props.discussionEntry.rootEntryId,
             true
           )
         }
@@ -261,7 +260,7 @@ const IsolatedThreadContainer = props => {
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, false)}
+        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, null, false)}
       />
     )
   }
@@ -298,6 +297,7 @@ const IsolatedThreadContainer = props => {
                     }
                     goToParent={() => {
                       props.onOpenIsolatedView(
+                        props.discussionEntry.rootEntry.id,
                         props.discussionEntry.rootEntry.id,
                         false,
                         props.discussionEntry.rootEntry.id

@@ -56,7 +56,12 @@ export function ThreadingToolbar({...props}) {
               const isolatedId = props.discussionEntry.rootEntry
                 ? props.discussionEntry.rootEntry.id
                 : props.discussionEntry.id
-              props.onOpenIsolatedView(isolatedId, false, props.discussionEntry._id)
+              props.onOpenIsolatedView(
+                isolatedId,
+                props.discussionEntry.rootEntryId,
+                false,
+                props.discussionEntry._id
+              )
             }}
           >
             <Text weight="bold" size={responsiveProps.textSize}>

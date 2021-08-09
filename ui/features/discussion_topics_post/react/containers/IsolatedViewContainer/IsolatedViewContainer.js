@@ -53,7 +53,7 @@ export const IsolatedViewContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
-      discussionEntryID: newDiscussionEntry.parentId,
+      discussionEntryID: newDiscussionEntry.rootEntryId,
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
@@ -70,8 +70,12 @@ export const IsolatedViewContainer = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
-      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.parentId) {
-        props.onOpenIsolatedView(data.createDiscussionEntry.discussionEntry.parentId, false)
+      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.rootEntryId) {
+        props.onOpenIsolatedView(
+          data.createDiscussionEntry.discussionEntry.rootEntryId,
+          data.createDiscussionEntry.discussionEntry.rootEntryId,
+          false
+        )
       }
     },
     onError: () =>
@@ -172,11 +176,11 @@ export const IsolatedViewContainer = props => {
     )
   }
 
-  const onReplySubmit = (message, discussionEntry) => {
+  const onReplySubmit = (message, replyId) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: discussionEntry.id,
+        parentEntryId: replyId,
         message
       }
     })
@@ -284,6 +288,19 @@ export const IsolatedViewContainer = props => {
     })
   }
 
+  const replyPreview = (nodes, previewId) => {
+    if (!nodes) return ''
+    let preview = ''
+    nodes.every(reply => {
+      if (reply._id === previewId) {
+        preview = reply.replyPreview
+        return false
+      }
+      return true
+    })
+    return preview
+  }
+
   return (
     <Tray
       data-testid="isolated-view-container"
@@ -354,11 +371,15 @@ export const IsolatedViewContainer = props => {
               >
                 <DiscussionEdit
                   onSubmit={text => {
-                    onReplySubmit(text, isolatedEntryOlderDirection.data.legacyNode)
+                    onReplySubmit(text, props.replyId)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  replyPreview={isolatedEntryOlderDirection.data?.legacyNode?.replyPreview}
+                  replyPreview={replyPreview(
+                    isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                      .nodes,
+                    props.replyId
+                  )}
                 />
               </View>
             )}
@@ -381,9 +402,9 @@ export const IsolatedViewContainer = props => {
                   setFetchingMoreNewerReplies(true)
                   fetchNewerEntries()
                 }}
-                onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
+                onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, highlightEntryId) => {
                   props.setHighlightEntryId(highlightEntryId)
-                  props.onOpenIsolatedView(discussionEntryId, withRCE)
+                  props.onOpenIsolatedView(discussionEntryId, rootEntryId, withRCE)
                 }}
                 goToTopic={props.goToTopic}
                 highlightEntryId={props.highlightEntryId}
@@ -416,6 +437,7 @@ IsolatedViewContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
+  replyId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string
 }

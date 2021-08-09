@@ -186,7 +186,11 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            props.onOpenIsolatedView(props.discussionEntry._id, true)
+            props.onOpenIsolatedView(
+              props.discussionEntry._id,
+              props.discussionEntry.rootEntryid,
+              true
+            )
           }
         }}
       />
@@ -222,7 +226,11 @@ export const DiscussionThreadContainer = props => {
         }
         onClick={() => {
           if (ENV.isolated_view) {
-            props.onOpenIsolatedView(props.discussionEntry._id, false)
+            props.onOpenIsolatedView(
+              props.discussionEntry._id,
+              props.discussionEntry.rootEntryId,
+              false
+            )
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -482,7 +490,7 @@ const DiscussionSubentries = props => {
     return <LoadingIndicator />
   }
 
-  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
+  return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
