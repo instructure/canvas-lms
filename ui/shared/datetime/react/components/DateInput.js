@@ -232,10 +232,12 @@ export default function CanvasDateInput({
   }
 
   function handleBlur() {
-    const newDate = tz.parse(inputValue)
-    syncInput(newDate ? moment.tz(newDate, timezone) : null)
+    const errorsExist = internalMessages.filter(m => m.type === 'error').length > 0
+    const inputEmpty = inputValue.trim().length === 0
+    const newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
+
+    syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
     onSelectedDateChange(newDate)
-    if (!newDate) syncInput(priorSelectedMoment.current)
   }
 
   function handleKeyDown(e) {

@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import tz from 'timezone'
-import timezone, { configure as configureTimezone } from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
 import anchorage from 'timezone/America/Anchorage'
