@@ -809,6 +809,16 @@ module UsefulFindInBatches
     activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
   end
 
+  def in_batches_needs_temp_table?
+    order_values.any? ||
+      group_values.any? ||
+      select_values.to_s =~ /DISTINCT/i ||
+      distinct_value ||
+      in_batches_select_values_necessitate_temp_table?
+  end
+
+  private
+
   def infer_in_batches_strategy
     strategy ||= :copy if in_batches_can_use_copy?
     strategy ||= :cursor if in_batches_can_use_cursor?
@@ -816,22 +826,12 @@ module UsefulFindInBatches
     strategy || :id
   end
 
-  private
-
   def in_batches_can_use_copy?
     connection.open_transactions == 0 && eager_load_values.empty? && !ActiveRecord::Base.in_migration
   end
 
   def in_batches_can_use_cursor?
     eager_load_values.empty? && (GuardRail.environment == :secondary || connection.readonly?)
-  end
-
-  def in_batches_needs_temp_table?
-    order_values.any? ||
-      group_values.any? ||
-      select_values.to_s =~ /DISTINCT/i ||
-      distinct_value ||
-      in_batches_select_values_necessitate_temp_table?
   end
 
   def in_batches_select_values_necessitate_temp_table?
@@ -1077,7 +1077,7 @@ module UsefulBatchEnumerator
   end
 
   def delete_all
-    if @strategy.nil? && (strategy = @relation.infer_in_batches_strategy) == :id
+    if @strategy.nil? && !@relation.in_batches_needs_temp_table?
       sum = 0
       loop do
         current = @relation.limit(@of).delete_all
