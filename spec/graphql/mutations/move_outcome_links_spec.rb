@@ -24,6 +24,7 @@ require_relative "../graphql_spec_helper"
 describe Mutations::MoveOutcomeLinks do
   include GraphQLSpecHelper
   before(:once) do
+    @site_admin = site_admin_user
     course_with_teacher
     @context = @course
     @source_group = outcome_group_model()
@@ -34,6 +35,12 @@ describe Mutations::MoveOutcomeLinks do
     @group_without_permission = outcome_group_model(context: @other_account)
     @outcome_other_context = outcome_model(context: @other_account)
     @outcome_other_context_link = @other_account.root_outcome_group.child_outcome_links.first
+
+    # global groups
+    @global_source = LearningOutcomeGroup.create!(title: 'source')
+    @global_destination = LearningOutcomeGroup.create!(title: 'destination')
+    outcome_model(outcome_group: @global_source, global: true)
+    @global_link = @global_source.child_outcome_links.first
   end
 
   before do
@@ -124,6 +131,22 @@ describe Mutations::MoveOutcomeLinks do
     expect(context[:group]).to eql(@destination_group)
   end
 
+  describe "global groups" do
+    it "allows global links to be moved" do
+      execute_query(
+        mutation_str(
+          group_id: @global_destination.id,
+          outcome_link_ids: [@global_link.id]
+        ),
+        {
+          current_user: @site_admin
+        }
+      )
+      @global_link.reload
+      expect(@global_link.associated_asset).to eql(@global_destination)
+    end
+  end
+
   context "errors" do
     it "validates required attributes" do
       response = execute_query(mutation_str, {})
@@ -145,6 +168,21 @@ describe Mutations::MoveOutcomeLinks do
 
     it "validates when user doesn't have permission to manage the group" do
       response = execute_query(mutation_str(group_id: @group_without_permission.id, outcome_link_ids: []), {})
+      expect(response.dig("errors")[0]["message"]).to eql(
+        "Insufficient permission"
+      )
+    end
+
+    it "validates when user doesn't have permission to manage global outcomes" do
+      response = execute_query(
+        mutation_str(
+          group_id: @global_destination.id,
+          outcome_link_ids: [@global_link.id]
+        ),
+        {
+          current_user: @teacher
+        }
+      )
       expect(response.dig("errors")[0]["message"]).to eql(
         "Insufficient permission"
       )
