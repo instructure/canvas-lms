@@ -31,6 +31,7 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {graphql} from 'msw'
+import {User} from '../../../../graphql/User'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -134,6 +135,23 @@ describe('DiscussionThreadContainer', () => {
 
       const deletes = queryAllByText('Delete')
       expect(deletes.length).toBe(1)
+    })
+  })
+
+  describe('Roles', () => {
+    it('does not display author role if not the author', async () => {
+      const {queryByTestId} = setup(defaultProps())
+      expect(queryByTestId('pill-Author')).toBeFalsy()
+    })
+
+    it('displays author role if the post is from the author', async () => {
+      const new_prop = defaultProps({
+        discussionOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})},
+        discussionEntryOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})}
+      })
+      const {queryByTestId} = setup(new_prop)
+
+      expect(queryByTestId('pill-Author')).toBeTruthy()
     })
   })
 

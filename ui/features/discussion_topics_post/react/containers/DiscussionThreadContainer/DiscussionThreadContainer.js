@@ -20,7 +20,8 @@ import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
   updateDiscussionTopicRepliesCount,
-  responsiveQuerySizes
+  responsiveQuerySizes,
+  isTopicAuthor
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
@@ -369,6 +370,10 @@ export const DiscussionThreadContainer = props => {
                       props.discussionEntry.lastReply?.createdAt
                     )}
                     deleted={props.discussionEntry.deleted}
+                    isTopicAuthor={isTopicAuthor(
+                      props.discussionTopic.author,
+                      props.discussionEntry.author
+                    )}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
