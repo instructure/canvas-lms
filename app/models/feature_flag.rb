@@ -52,9 +52,7 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def enabled?
-    status = state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: status.to_s})
-    status
+    state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
   end
 
   def can_override?

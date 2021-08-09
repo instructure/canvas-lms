@@ -24,16 +24,16 @@ module FeatureFlags
   end
 
   def feature_enabled?(feature)
-    if id&.zero?
-      InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
-      return false
-    end
-
-    flag = lookup_feature_flag(feature)
-    return flag.enabled? if flag
-
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
-    false
+    # This method is doing a bit more than initially appears. 🤞 this helps you in your
+    # future travels, fellow spelunker.
+    #
+    # persist_result - takes the feature state, logs it to Datadog, then returns it.
+    #
+    # The feature state is determined by three different cases:
+    #   1. the context's id is zero, in which case it should always be false
+    #   2. feature lookup fails, in which case it should always be false
+    #   3. feature lookup succeeds, in which case it should be the evaluation of enabled?
+    persist_result(feature, !id&.zero? && !!lookup_feature_flag(feature)&.enabled?)
   end
 
   def feature_allowed?(feature)
@@ -189,6 +189,12 @@ module FeatureFlags
     )
       retval
     end
+  end
+
+  private
+  def persist_result(feature, result)
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: result.to_s})
+    result
   end
 end
 

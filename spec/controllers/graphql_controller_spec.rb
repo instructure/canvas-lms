@@ -79,6 +79,7 @@ describe GraphQLController do
 
     context "data dog metrics" do
       it "reports data dog metrics if requested" do
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         expect(InstStatsd::Statsd).to receive(:increment).with("graphql.ASDF.count", tags: anything)
         request.headers["GraphQL-Metrics"] = "true"
         post :execute, params: {query: 'query ASDF { course(id: "1") { id } }'}
