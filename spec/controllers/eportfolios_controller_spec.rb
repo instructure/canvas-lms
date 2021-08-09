@@ -77,10 +77,10 @@ describe EportfoliosController do
       end
 
       it "exposes the feature state for rich content service to js_env" do
-        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return({
-          'app-host' => 'rce.docker',
-          'cdn-host' => 'rce.docker'
-        })
+        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
+          DynamicSettings::FallbackProxy.new('app-host' => 'rce.docker',
+            'cdn-host' => 'rce.docker')
+        )
         get 'user_index'
         expect(response).to be_successful
       end

@@ -195,7 +195,7 @@ class RequestThrottle
   end
 
   def self.dynamic_settings
-    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml'] || '') || {}
+    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml', failsafe: ''] || '') || {}
   end
 
   def rate_limit_exceeded
