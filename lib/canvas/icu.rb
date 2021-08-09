@@ -24,7 +24,7 @@ module Canvas::ICU
     end
 
     def self.collation_key(string)
-      string.downcase
+      string&.downcase
     end
 
     def self.compare(a, b)

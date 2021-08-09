@@ -117,14 +117,14 @@ class User < ActiveRecord::Base
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
-  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
-  has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order('submissions.updated_at DESC') }
+  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order(updated_at: :desc) }, class_name: 'Submission', dependent: :destroy
+  has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order(updated_at: :desc) }
   has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").ordered }
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order(:display_name).preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
   has_many :mentions, inverse_of: :user
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
@@ -132,14 +132,14 @@ class User < ActiveRecord::Base
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context
   has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: :context, inverse_of: :context, class_name: 'Folder'
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order(:name) }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: 'dashboard').order('created_at DESC') }, class_name: 'Message', dependent: :destroy
   has_many :collaborations, -> { order('created_at DESC') }
   has_many :user_services, -> { order('created_at') }, dependent: :destroy
-  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context, inverse_of: :context
+  has_many :rubric_associations, -> { preload(:rubric).order(created_at: :desc) }, as: :context, inverse_of: :context
   has_many :rubrics
   has_many :context_rubrics, :as => :context, :inverse_of => :context, :class_name => 'Rubric'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }
