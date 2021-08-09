@@ -55,7 +55,8 @@ export const outcomeShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
   mastery_points: PropTypes.number.isRequired,
   points_possible: PropTypes.number.isRequired,
-  display_name: PropTypes.string
+  display_name: PropTypes.string,
+  friendly_description: PropTypes.string
 })
 
 export const outcomeLinkShape = PropTypes.shape({
