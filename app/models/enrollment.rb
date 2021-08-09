@@ -1476,9 +1476,9 @@ class Enrollment < ActiveRecord::Base
 
     # running in an n_strand to handle situations where a SIS import could
     # update a ton of enrollments from "deleted" to "completed".
-    delay_if_production(n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
-        priority: Delayed::LOW_PRIORITY).
-      restore_submissions_and_scores_now
+    delay_if_production(n_strand: ["Enrollment#restore_submissions_and_scores", root_account.global_id],
+                        priority: Delayed::LOW_PRIORITY)
+      .restore_submissions_and_scores_now
   end
 
   def restore_submissions_and_scores_now
