@@ -72,7 +72,7 @@ const MentionMockUsers = [
   }
 ]
 
-const MentionUIManager = ({mentionData, onFocusedUserChange, editor}) => {
+const MentionUIManager = ({editor, mentionData, onFocusedUserChange, onSelect}) => {
   // Setup State
   const [menitonCordinates, setMenitonCordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -216,6 +216,7 @@ const MentionUIManager = ({mentionData, onFocusedUserChange, editor}) => {
       selectedUser={focusedUser?.id}
       onSelect={user => {
         setFocusedUser(user)
+        onSelect()
       }}
     />
   )
