@@ -17,6 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Dir[File.join(File.dirname(__FILE__), '../gems/plugins/*')].each do |plugin_dir|
+Dir[root_path.join('gems/plugins/*')].each do |plugin_dir|
   gem(File.basename(plugin_dir), path: plugin_dir)
 end

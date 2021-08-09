@@ -12,13 +12,17 @@
 # these gems to prevent regression, and the indentation serves to alert us to the relationship between the gem and canvas-lms
 source 'https://rubygems.org/'
 
+# ensure we don't get confused if we're inside a symlink, and that
+# symlink changes; we want the gems in our current directory,
+# not a directory _named_ what our current directory is
+root_path = Pathname.new(__FILE__).realpath.join("..")
 
-Dir[File.join(File.dirname(__FILE__), 'gems/plugins/*/Gemfile.d/_before.rb')].each do |file|
+Dir[root_path.join('gems/plugins/*/Gemfile.d/_before.rb')].each do |file|
   eval(File.read(file), nil, file)
 end
 
-require File.expand_path("../config/canvas_rails_switcher", __FILE__)
+require_relative "config/canvas_rails_switcher"
 
-Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
+Dir.glob(root_path.join("Gemfile.d/*.rb")).sort.each do |file|
   eval(File.read(file), nil, file)
 end
