@@ -496,6 +496,39 @@ describe('getAssignmentGrades', () => {
     const totals = getAssignmentGrades(data)
     expect(totals[0].unread).toBeTruthy()
   })
+
+  it('sets hasComments appropriately', () => {
+    const data = [
+      {
+        id: '49',
+        assignments: [
+          {
+            id: 149,
+            submission: {
+              submission_comments: [
+                {
+                  id: 1
+                }
+              ]
+            }
+          },
+          {
+            id: 150,
+            submission: {
+              submission_comments: []
+            }
+          },
+          {
+            id: 151
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals.find(({id}) => id === 149).hasComments).toBe(true)
+    expect(totals.find(({id}) => id === 150).hasComments).toBe(false)
+    expect(totals.find(({id}) => id === 151).hasComments).toBe(false)
+  })
 })
 
 describe('getAccountsFromEnrollments', () => {

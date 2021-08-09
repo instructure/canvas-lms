@@ -120,7 +120,12 @@ export const MOCK_ASSIGNMENT_GROUPS = [
           excused: false,
           missing: false,
           read_state: 'read',
-          grading_period_id: '2'
+          grading_period_id: '2',
+          submission_comments: [
+            {
+              id: '1'
+            }
+          ]
         }
       }
     ]

@@ -32,7 +32,7 @@ const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
 )
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
+  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1'
 
@@ -127,6 +127,14 @@ describe('GradesPage', () => {
       expect(getByText('View Gradebook')).toBeInTheDocument()
       expect(gradebookButton.href).toContain('/courses/12/gradebook')
       expect(queryByText('Assignment')).not.toBeInTheDocument()
+    })
+
+    it('shows view feedback link', async () => {
+      const {queryByText, getByRole} = render(<GradesPage {...getProps()} />)
+      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
+      const link = getByRole('link', {name: 'View feedback'})
+      expect(link).toBeInTheDocument()
+      expect(link.href).toBe('http://localhost/wwii-report/submissions/1')
     })
 
     describe('totals', () => {

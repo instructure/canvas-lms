@@ -217,7 +217,8 @@ export const getAssignmentGrades = data =>
         unread: a.submission?.read_state === 'unread',
         late: a.submission?.late,
         excused: a.submission?.excused,
-        missing: a.submission?.missing
+        missing: a.submission?.missing,
+        hasComments: !!a.submission?.submission_comments?.length
       }))
     )
     .flat(1)
