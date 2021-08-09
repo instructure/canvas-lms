@@ -62,14 +62,14 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
 # install pulsar stuff
-ENV PULSAR_VERSION=2.6.1
-ENV PULSAR_CLIENT_SHA512=90fdb6e3ad85c9204f2b20a9077684f667f84be32df0952f8823ccee501c9d64a4c8131cab38a295a4cb66e2b63211afcc24f32130ded47e9da8f334ec6053f5
-ENV PULSAR_CLIENT_DEV_SHA512=d0cc58c0032cb35d4325769ab35018b5ed823bc9294d75edfb56e62a96861be4194d6546107af0d5f541a778cdc26274aac9cb7b5ced110521467f89696b2209
+ENV PULSAR_VERSION=2.8.0
+ENV PULSAR_CLIENT_SHA512=56570e10d6935ecf319501ebe80d2ff7c9f344cba6e1c2cfd9ea6883730d3abd14c1a3037e800ca5296830ead8c6d8df066cb4f403de2362aec9c1662fa011df
+ENV PULSAR_CLIENT_DEV_SHA512=fc3b5ecb0a69c0fbebd177fbb9c8c22273a81df48430f9175f79bc5b8e379744b83de394e1e8752b93cd96896721a8b4ddb4b4ed50c5019e000dd5c7901b8578
 # pulsar installs 4 versions of this library, but we only need
 # one, so at the end we remove the others to minimize the image size
 RUN cd "$(mktemp -d)" && \
-    curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client.deb' && \
-    curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client-dev.deb' && \
+    curl -SLO 'https://mirror.cogentco.com/pub/apache/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client.deb' && \
+    curl -SLO 'https://mirror.cogentco.com/pub/apache/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client-dev.deb' && \
     echo $PULSAR_CLIENT_SHA512 '*apache-pulsar-client.deb' | shasum -a 512 -c -s - && \
     echo $PULSAR_CLIENT_DEV_SHA512 '*apache-pulsar-client-dev.deb' | shasum -a 512 -c -s - && \
     apt install ./apache-pulsar-client*.deb && \
