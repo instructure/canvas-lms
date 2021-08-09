@@ -20,7 +20,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
-  if (!!searchArea && !!searchTerm && !isIsolatedView) {
+  // eslint-disable-next-line no-constant-condition
+  if (false && !!searchArea && !!searchTerm && !isIsolatedView) {
     const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
     return searchArea.replace(
       searchExpression,
