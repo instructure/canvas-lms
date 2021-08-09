@@ -26,7 +26,7 @@ describe Loaders::DiscussionEntryLoader do
     student_in_course(active_all: true)
     @student.update(name: 'Student')
     @de1 = @discussion.discussion_entries.create!(message: 'peekaboo', user: @teacher, created_at: Time.zone.now)
-    @de2 = @discussion.discussion_entries.create!(message: 'hello', user: @student, created_at: Time.zone.now - 1.day)
+    @de2 = @discussion.discussion_entries.create!(message: "can't touch this.", user: @student, created_at: Time.zone.now - 1.day)
     @de3 = @discussion.discussion_entries.create!(message: 'goodbye', user: @teacher, created_at: Time.zone.now - 2.days)
     @de4 = @discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: @de2.id)
     @de3.destroy
@@ -130,6 +130,17 @@ describe Loaders::DiscussionEntryLoader do
   end
 
   context 'allows search discussion entries' do
+    it "finds [can't touch this] with search_term of [']" do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(
+          current_user: @teacher,
+          search_term: "'"
+        ).load(@discussion).then { |discussion_entries|
+          expect(discussion_entries).to match [@de2]
+        }
+      end
+    end
+
     it 'by message body' do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
