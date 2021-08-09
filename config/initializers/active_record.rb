@@ -1090,10 +1090,22 @@ module UsefulBatchEnumerator
     @relation.in_batches(strategy: strategy, load: false, **@kwargs, &:delete_all)
   end
 
-  def update_all(*args)
-    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
-      relation.update_all(*args)
+  def update_all(updates)
+    sum = 0
+    if @strategy.nil? && !@relation.in_batches_needs_temp_table? && relation_has_condition_on_updates?(updates)
+      loop do
+        current = @relation.limit(@of).update_all(updates)
+        sum += current
+        break unless current == @of
+      end
+      return sum
     end
+
+
+    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
+      sum += relation.update_all(updates)
+    end
+    sum
   end
 
   def destroy_all
@@ -1115,6 +1127,17 @@ module UsefulBatchEnumerator
       .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
       yield relation.pluck(*args)
     end
+  end
+
+  private
+
+  def relation_has_condition_on_updates?(updates)
+    return false unless updates.is_a?(Hash)
+
+    # is the column we're updating mentioned in the where clause?
+    common_attrs = @relation.send(:_substitute_values, updates).map(&:first) &
+      @relation.where_clause.send(:predicates).map { |pred| pred.is_a?(Arel::Nodes::Binary) && pred.left }.compact
+    !common_attrs.empty?
   end
 end
 ActiveRecord::Batches::BatchEnumerator.prepend(UsefulBatchEnumerator)

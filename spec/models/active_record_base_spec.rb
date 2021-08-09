@@ -603,6 +603,22 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "#in_batches.update_all" do
+    it "just does a single query, instead of an ordered select and then update" do
+      u = User.create!(name: 'abcdefg')
+      expect(User.connection).to receive(:exec_query).once.and_call_original
+      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multiple queries if the updated column isn't mentioned in the where clause" do
+      u = User.create!(name: 'abcdefg')
+      expect(User.connection).to receive(:exec_query).at_least(2).and_call_original
+      expect(User.in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+  end
+
   describe "add_index" do
     it "should raise an error on too long of name" do
       name = 'some_really_long_name_' * 10
