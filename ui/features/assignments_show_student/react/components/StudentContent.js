@@ -36,6 +36,7 @@ import {Text} from '@instructure/ui-text'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
+import VisualOnFocusMessage from './VisualOnFocusMessage'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
@@ -129,6 +130,13 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return (
       <>
         {renderAttemptsAndAvailability({assignment, submission})}
+        {assignment.submissionTypes.includes('student_annotation') && (
+          <VisualOnFocusMessage
+            message={I18n.t(
+              'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+            )}
+          />
+        )}
         <AssignmentToggleDetails description={assignment.description} />
         {assignment.rubric && (
           <Suspense fallback={<LoadingIndicator />}>

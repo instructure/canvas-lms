@@ -119,6 +119,15 @@
   <div class="clear"></div>
 
   <% description = @assignment.description.present? ? public_user_content(@assignment.description) : t("No additional details were added for this assignment.") %>
+
+  <% if @assignment.annotated_document? %>
+    <div class="accessibility_warning">
+      <span id="accessibility_warning" class="screenreader-only" tabindex="0">
+        <%= I18n.t('Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.') %>
+      </span>
+    </div>
+  <% end %>
+
   <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "" %>"><%= description %></div>
 
   <% if can_do(@context, @current_user, :read_as_admin) %>
