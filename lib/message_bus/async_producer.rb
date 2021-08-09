@@ -110,16 +110,6 @@ module MessageBus
       end
     end
 
-    private
-    def rescuable_pulsar_errors
-      [
-        ::Pulsar::Error::AlreadyClosed,
-        ::Pulsar::Error::ConnectError,
-        ::Pulsar::Error::ServiceUnitNotReady,
-        ::Pulsar::Error::Timeout
-      ]
-    end
-
     def process_one_queue_item
       work_tuple = @queue.pop
       return :stop if work_tuple == :stop
@@ -138,7 +128,7 @@ module MessageBus
           # if this is NOT one of the known error types from pulsar
           # then we actually need to know about it with a full ":error"
           # level in sentry.
-          err_level = rescuable_pulsar_errors.include?(e.class) ? :warn : :error
+          err_level = ::MessageBus.rescuable_pulsar_errors.include?(e.class) ? :warn : :error
           CanvasErrors.capture_exception(:message_bus, e, err_level)
           status = :error
         ensure
@@ -153,7 +143,7 @@ module MessageBus
       begin
         producer = MessageBus.producer_for(namespace, topic_name)
         producer.send(message)
-      rescue *rescuable_pulsar_errors => e
+      rescue *::MessageBus.rescuable_pulsar_errors => e
         # We'll retry this exactly one time.  Sometimes
         # when a pulsar broker restarts, we have connections
         # that already knew about that broker get into a state where
