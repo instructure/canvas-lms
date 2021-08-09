@@ -67,10 +67,6 @@ class MissingPolicyApplicator
         workflow_state: "graded"
       )
 
-      if Account.site_admin.feature_enabled?(:fix_missing_policy_grade_change_records)
-        submissions.reload.each { |sub| sub.grade_change_audit(force_audit: true) }
-      end
-
       if assignment.course.root_account.feature_enabled?(:missing_policy_applicator_emits_live_events)
         Canvas::LiveEvents.delay_if_production.submissions_bulk_updated(submissions)
       end
