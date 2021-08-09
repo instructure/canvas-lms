@@ -24,8 +24,14 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {findOutcomesMocks, groupMocks, importGroupMocks} from '@canvas/outcomes/mocks/Management'
+import {
+  findOutcomesMocks,
+  groupMocks,
+  importGroupMocks,
+  importOutcomeMocks
+} from '@canvas/outcomes/mocks/Management'
 
+jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers()
 
 describe('FindOutcomesModal', () => {
@@ -33,7 +39,20 @@ describe('FindOutcomesModal', () => {
   let onCloseHandlerMock
   let showFlashAlertSpy
   let isMobileView
-
+  const courseImportMocks = [
+    ...findModalMocks(),
+    ...groupMocks({groupId: '100'}),
+    ...findOutcomesMocks({
+      groupId: '300',
+      isImported: false,
+      contextType: 'Course',
+      outcomesCount: 51
+    })
+  ]
+  const clickEl = async el => {
+    fireEvent.click(el)
+    await act(async () => jest.runAllTimers())
+  }
   const defaultProps = (props = {}) => ({
     open: true,
     onCloseHandler: onCloseHandlerMock,
@@ -288,185 +307,498 @@ describe('FindOutcomesModal', () => {
       expect(queryByText('Groups')).not.toBeInTheDocument()
     })
 
-    it('imports outcomes without ConfirmationBox if Add All Outcomes button is clicked in Account context', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Account',
-        mocks: [
-          ...findModalMocks(),
-          ...groupMocks({
-            groupId: '100',
-            childGroupsCount: 1,
-            outcomesCount: 25,
-            childGroupOffset: 300
-          }),
-          ...findOutcomesMocks({groupId: '300'}),
-          ...importGroupMocks({groupId: '300'})
-        ]
+    describe('group import', () => {
+      it('imports group without ConfirmationBox if Add All Outcomes button is clicked in Account context', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({groupId: '300'}),
+            ...importGroupMocks({groupId: '300'})
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(
+          getAllByText('The outcome group was successfully imported into this account.')[0]
+        ).toBeInTheDocument()
       })
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Group 100 folder 0'))
-      await act(async () => jest.runAllTimers())
-      const AddAllButton = getByText('Add All Outcomes').closest('button')
-      expect(AddAllButton).toBeEnabled()
-      fireEvent.click(AddAllButton)
-      await act(async () => jest.runAllTimers())
-      expect(
-        getAllByText('The outcome group was successfully imported into this account')[0]
-      ).toBeInTheDocument()
-    })
 
-    it('imports outcomes without ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes <= 50', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course',
-        mocks: [
-          ...findModalMocks({
-            groupId: '100',
-            isImported: true,
-            outcomeIsImported: true,
-            contextType: 'Course',
-            contextId: '1',
-            searchQuery: ''
-          }),
-          ...groupMocks({
-            groupId: '100',
-            childGroupsCount: 1,
-            outcomesCount: 25,
-            childGroupOffset: 300
-          }),
-          ...findOutcomesMocks({
-            groupId: '300',
-            isImported: true,
-            outcomeIsImported: true,
-            contextType: 'Course',
-            contextId: '1',
-            searchQuery: '',
-            outcomesCount: 50
-          }),
-          ...importGroupMocks({
-            groupId: '300',
-            progressId: '111',
-            targetContextId: '1',
-            targetContextType: 'Course'
-          })
-        ]
+      it('imports group without ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes <= 50', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({
+              groupId: '300',
+              isImported: false,
+              contextType: 'Course',
+              outcomesCount: 50
+            }),
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(
+          getAllByText('The outcome group was successfully imported into this course.')[0]
+        ).toBeInTheDocument()
       })
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Group 100 folder 0'))
-      await act(async () => jest.runAllTimers())
-      const AddAllButton = getByText('Add All Outcomes').closest('button')
-      expect(AddAllButton).toBeEnabled()
-      fireEvent.click(AddAllButton)
-      await act(async () => jest.runAllTimers())
-      expect(
-        getAllByText('The outcome group was successfully imported into this course')[0]
-      ).toBeInTheDocument()
-    })
 
-    it('imports outcomes with ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes > 50', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course',
-        mocks: [
-          ...findModalMocks({
-            groupId: '100',
-            isImported: true,
-            outcomeIsImported: true,
-            contextType: 'Course',
-            contextId: '1',
-            searchQuery: ''
-          }),
-          ...groupMocks({
-            groupId: '100',
-            childGroupsCount: 1,
-            outcomesCount: 25,
-            childGroupOffset: 300
-          }),
-          ...findOutcomesMocks({
-            groupId: '300',
-            isImported: true,
-            outcomeIsImported: true,
-            contextType: 'Course',
-            contextId: '1',
-            searchQuery: '',
-            outcomesCount: 51
-          }),
-          ...importGroupMocks({
-            groupId: '300',
-            progressId: '111',
-            targetContextId: '1',
-            targetContextType: 'Course'
-          })
-        ]
+      it('disables Add All Outcomes button during/after group import', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddAllButton = getByText('Add All Outcomes').closest('button')
+        expect(AddAllButton).toBeEnabled()
+        await clickEl(AddAllButton)
+        fireEvent.click(getByText('Import Anyway'))
+        expect(AddAllButton).toBeDisabled()
+        await act(async () => jest.runAllTimers())
+        expect(AddAllButton).toBeDisabled()
       })
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Group 100 folder 0'))
-      await act(async () => jest.runAllTimers())
-      const AddAllButton = getByText('Add All Outcomes').closest('button')
-      expect(AddAllButton).toBeEnabled()
-      fireEvent.click(AddAllButton)
-      await act(async () => jest.runAllTimers())
-      expect(
-        getAllByText('You are about to add 51 outcomes to this course.')[0]
-      ).toBeInTheDocument()
-      fireEvent.click(getByText('Import Anyway'))
-      await act(async () => jest.runAllTimers())
-      expect(
-        getAllByText('The outcome group was successfully imported into this course')[0]
-      ).toBeInTheDocument()
-    })
-  })
 
-  describe('mobileView', () => {
-    beforeEach(() => {
-      isMobileView = true
-    })
-    itBehavesLikeAModal()
-    itBehavesLikeATreeBrowser()
+      it('enables Add All Outcomes button if group import fails', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course',
+              failResponse: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddAllButton = getByText('Add All Outcomes').closest('button')
+        await clickEl(AddAllButton)
+        await clickEl(getByText('Import Anyway'))
+        expect(AddAllButton).toBeEnabled()
+      })
 
-    it('renders the action drilldown', async () => {
-      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      expect(getByText('Groups')).toBeInTheDocument()
+      it('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        expect(getAllByText('Add').length).toBe(2)
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        fireEvent.click(getByText('Import Anyway'))
+        expect(getAllByText('Loading').length).toBe(2)
+      })
+
+      it('changes button text of individual outcomes from Add to Added after group import completes', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        expect(getAllByText('Add').length).toBe(2)
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await clickEl(getByText('Import Anyway'))
+        expect(getAllByText('Added').length).toBe(2)
+      })
+
+      it('displays ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes > 50', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(
+          getAllByText('You are about to add 51 outcomes to this course.')[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash confirmation with proper message if group import to Course succeeds', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await clickEl(getByText('Import Anyway'))
+        expect(
+          getAllByText('The outcome group was successfully imported into this course.')[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash confirmation with proper message if group import to Account succeeds', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({groupId: '300'}),
+            ...importGroupMocks({groupId: '300'})
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(
+          getAllByText('The outcome group was successfully imported into this account.')[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash alert with custom error message if group import fails', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course',
+              failResponse: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await clickEl(getByText('Import Anyway'))
+        expect(
+          getAllByText(
+            'An error occurred while importing this group: GraphQL error: Network error.'
+          )[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash alert with generic error message if group import fails and no error message', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course',
+              failMutationNoErrMsg: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await clickEl(getByText('Import Anyway'))
+        expect(getAllByText('An error occurred while importing this group.')[0]).toBeInTheDocument()
+      })
     })
 
-    it('does not render the TreeBrowser', async () => {
-      const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      const treeBrowser = queryByTestId('groupsColumnRef')
-      expect(treeBrowser).not.toBeInTheDocument()
+    describe('individual outcome import', () => {
+      it('replaces Add button of outcome with loading spinner during outcome import', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        fireEvent.click(getAllByText('Add')[0].closest('button'))
+        expect(getByText('Loading')).toBeInTheDocument()
+      })
+
+      it('changes button text of outcome from Add to Added after outcome import completes', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getAllByText('Add')[0].closest('button'))
+        expect(getByText('Added')).toBeInTheDocument()
+      })
+
+      it('enables Add button if outcome import fails', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account',
+              failResponse: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const addButton = getAllByText('Add')[0].closest('button')
+        await clickEl(addButton)
+        expect(addButton).toBeEnabled()
+      })
+
+      it('imports Account outcome to a Course', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddButton = getAllByText('Add')[0].closest('button')
+        expect(AddButton).toBeEnabled()
+        await clickEl(AddButton)
+        expect(getByText('Added')).toBeInTheDocument()
+        expect(getByText('Added').closest('button')).toBeDisabled()
+      })
+
+      it('imports Account outcome to a Sub-account', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({
+              groupId: '300',
+              isImported: false,
+              contextType: 'Account',
+              outcomesGroupContextId: '2',
+              outcomesCount: 51
+            }),
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              sourceContextId: '2',
+              sourceContextType: 'Account'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddButton = getAllByText('Add')[0].closest('button')
+        expect(AddButton).toBeEnabled()
+        await clickEl(AddButton)
+        expect(getByText('Added')).toBeInTheDocument()
+        expect(getByText('Added').closest('button')).toBeDisabled()
+      })
+
+      it('imports Global outcome to an Account', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({
+              groupId: '300',
+              isImported: false,
+              contextType: 'Account',
+              outcomesGroupContextId: null,
+              outcomesGroupContextType: null,
+              outcomesCount: 51
+            }),
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              sourceContextId: null,
+              sourceContextType: null
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddButton = getAllByText('Add')[0].closest('button')
+        expect(AddButton).toBeEnabled()
+        await clickEl(AddButton)
+        expect(getByText('Added')).toBeInTheDocument()
+        expect(getByText('Added').closest('button')).toBeDisabled()
+      })
+
+      it('displays flash alert with custom error message if outcome import fails', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account',
+              failResponse: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getAllByText('Add')[0].closest('button'))
+        expect(
+          getAllByText(
+            'An error occurred while importing this outcome: GraphQL error: Network error.'
+          )[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash alert with generic error message if outcome import fails and no error message', async () => {
+        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importOutcomeMocks({
+              outcomeId: '5',
+              targetContextType: 'Course',
+              sourceContextId: '1',
+              sourceContextType: 'Account',
+              failMutationNoErrMsg: true
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getAllByText('Add')[0].closest('button'))
+        expect(
+          getAllByText('An error occurred while importing this outcome.')[0]
+        ).toBeInTheDocument()
+      })
     })
 
-    it('does not render the list of outcomes until the action link is clicked', async () => {
-      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      await fireEvent.click(queryByText('Groups'))
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('View 0 Outcomes'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
-    })
+    describe('mobileView', () => {
+      beforeEach(() => {
+        isMobileView = true
+      })
+      itBehavesLikeAModal()
+      itBehavesLikeATreeBrowser()
 
-    it('renders the billboard until an action link is clicked', async () => {
-      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      await fireEvent.click(queryByText('Groups'))
-      fireEvent.click(getByText('Account Standards'))
-      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
+      it('renders the action drilldown', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        expect(getByText('Groups')).toBeInTheDocument()
+      })
+
+      it('does not render the TreeBrowser', async () => {
+        const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        const treeBrowser = queryByTestId('groupsColumnRef')
+        expect(treeBrowser).not.toBeInTheDocument()
+      })
+
+      it('does not render the list of outcomes until the action link is clicked', async () => {
+        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        await fireEvent.click(queryByText('Groups'))
+        fireEvent.click(getByText('Account Standards'))
+        fireEvent.click(getByText('Root Account Outcome Group 0'))
+        await act(async () => jest.runAllTimers())
+        expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+        await act(async () => jest.runAllTimers())
+        fireEvent.click(getByText('View 0 Outcomes'))
+        await act(async () => jest.runAllTimers())
+        expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
+      })
+
+      it('renders the billboard until an action link is clicked', async () => {
+        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        await fireEvent.click(queryByText('Groups'))
+        fireEvent.click(getByText('Account Standards'))
+        expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
+      })
     })
   })
 })

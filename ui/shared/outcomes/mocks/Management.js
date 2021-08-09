@@ -25,8 +25,7 @@ import {
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
-  IMPORT_OUTCOMES,
-  IMPORT_OUTCOME_GROUP
+  IMPORT_OUTCOMES
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -1117,19 +1116,25 @@ export const updateOutcomeMocks = ({
   }
 ]
 
-export const importOutcomesMock = ({
+export const importOutcomeMocks = ({
+  outcomeId = '200',
+  progressId = '211',
   sourceContextId = null,
   sourceContextType = null,
   targetContextId = '1',
-  targetContextType = 'Course',
-  outcomeId = '11',
-  failResponse = false
+  targetContextType = 'Account',
+  failResponse = false,
+  failMutationNoErrMsg = false
 } = {}) => {
   const successfulResponse = {
     data: {
       importOutcomes: {
         errors: null,
-        progress: {id: '1', state: 'queued', __typename: 'Progress'},
+        progress: {
+          _id: progressId,
+          state: 'queued',
+          __typename: 'Progress'
+        },
         __typename: 'ImportOutcomesPayload'
       }
     }
@@ -1142,16 +1147,34 @@ export const importOutcomesMock = ({
     },
     errors: [
       {
-        attribute: null,
-        message: 'Mutation failed',
+        attribute: outcomeId,
+        message: 'Network error',
         __typename: 'Error'
       }
     ]
   }
 
+  const failedMutationNoErrMsg = {
+    data: {
+      importOutcomes: {
+        __typename: 'ErrorResponse',
+        progress: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
   let result = successfulResponse
   if (failResponse) {
     result = failedResponse
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
   }
 
   let input = {
@@ -1168,15 +1191,17 @@ export const importOutcomesMock = ({
     }
   }
 
-  return {
-    request: {
-      query: IMPORT_OUTCOMES,
-      variables: {
-        input
-      }
-    },
-    result
-  }
+  return [
+    {
+      request: {
+        query: IMPORT_OUTCOMES,
+        variables: {
+          input
+        }
+      },
+      result
+    }
+  ]
 }
 
 export const deleteOutcomeMock = ({
@@ -1515,6 +1540,7 @@ export const importGroupMocks = ({
       importOutcomes: {
         progress: {
           _id: progressId,
+          state: 'queued',
           __typename: 'Progress'
         },
         errors: null,
@@ -1563,7 +1589,7 @@ export const importGroupMocks = ({
   return [
     {
       request: {
-        query: IMPORT_OUTCOME_GROUP,
+        query: IMPORT_OUTCOMES,
         variables: {
           input: {
             groupId,

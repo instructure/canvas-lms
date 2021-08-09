@@ -184,7 +184,7 @@ export const IMPORT_OUTCOMES = gql`
         message
       }
       progress {
-        id
+        _id
         state
       }
     }
@@ -265,20 +265,6 @@ export const UPDATE_LEARNING_OUTCOME_GROUP = gql`
       errors {
         attribute
         message
-      }
-    }
-  }
-`
-
-export const IMPORT_OUTCOME_GROUP = gql`
-  mutation ImportOutcomes($input: ImportOutcomesInput!) {
-    importOutcomes(input: $input) {
-      errors {
-        attribute
-        message
-      }
-      progress {
-        _id
       }
     }
   }

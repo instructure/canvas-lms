@@ -37,7 +37,7 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
-import useGroupImport from '@canvas/outcomes/react/hooks/useGroupImport'
+import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {isMobileView, isCourse} = useCanvasContext()
@@ -66,20 +66,32 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
-
   const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
-  const {importGroup, importGroupsStatus} = useGroupImport()
+
+  const {
+    importOutcomes,
+    importGroupsStatus,
+    importOutcomesStatus,
+    clearGroupsStatus,
+    clearOutcomesStatus
+  } = useOutcomesImport()
+
+  const onCloseModalHandler = () => {
+    clearGroupsStatus()
+    clearOutcomesStatus()
+    onCloseHandler()
+  }
 
   const onAddAllHandler = () => {
     if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
       openConfirmBox()
       showImportConfirmBox({
         count: group.outcomesCount,
-        onImportHandler: () => importGroup(selectedGroupId),
+        onImportHandler: () => importOutcomes(selectedGroupId),
         onCloseHandler: closeConfirmBox
       })
     } else {
-      importGroup(selectedGroupId)
+      importOutcomes(selectedGroupId)
     }
   }
 
@@ -90,11 +102,14 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
-      disableAddAllButton={isConfirmBoxOpen || importGroupsStatus[selectedGroupId]}
+      disableAddAllButton={isConfirmBoxOpen}
+      importGroupStatus={importGroupsStatus[selectedGroupId]}
       onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
       mobileScrollContainer={scrollContainer}
+      importOutcomesStatus={importOutcomesStatus}
+      importOutcomeHandler={importOutcomes}
     />
   )
 
@@ -133,7 +148,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   return (
     <Modal
       open={open}
-      onDismiss={onCloseHandler}
+      onDismiss={onCloseModalHandler}
       shouldReturnFocus
       size="fullscreen"
       label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
@@ -219,7 +234,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseHandler}>
+        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseModalHandler}>
           {I18n.t('Done')}
         </Button>
       </Modal.Footer>

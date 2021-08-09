@@ -21,10 +21,14 @@ import FindOutcomesView from '../FindOutcomesView'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
-import {render as realRender, fireEvent, within, waitFor} from '@testing-library/react'
+import {render as realRender, fireEvent, within} from '@testing-library/react'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {findOutcomesMocks, importOutcomesMock} from '@canvas/outcomes/mocks/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {findOutcomesMocks} from '@canvas/outcomes/mocks/Management'
+import {
+  IMPORT_NOT_STARTED,
+  IMPORT_FAILED,
+  IMPORT_PENDING
+} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 jest.mock('@canvas/i18n/rtlHelper')
 jest.useFakeTimers()
@@ -32,10 +36,10 @@ jest.useFakeTimers()
 describe('FindOutcomesView', () => {
   let onChangeHandlerMock
   let onClearHandlerMock
-  let onAddAllHandlerMock
+  let importOutcomeHandlerMock
   let onLoadMoreHandlerMock
+  let onAddAllHandlerMock
   let cache
-  let showFlashAlertSpy
   const defaultProps = (props = {}) => ({
     collection: {
       id: '1',
@@ -70,6 +74,9 @@ describe('FindOutcomesView', () => {
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
     disableAddAllButton: false,
+    importGroupStatus: IMPORT_NOT_STARTED,
+    importOutcomesStatus: {},
+    importOutcomeHandler: importOutcomeHandlerMock,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
     ...props
@@ -79,9 +86,9 @@ describe('FindOutcomesView', () => {
     cache = createCache()
     onChangeHandlerMock = jest.fn()
     onClearHandlerMock = jest.fn()
-    onAddAllHandlerMock = jest.fn()
+    importOutcomeHandlerMock = jest.fn()
     onLoadMoreHandlerMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    onAddAllHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -197,174 +204,43 @@ describe('FindOutcomesView', () => {
     expect(onAddAllHandlerMock).toHaveBeenCalled()
   })
 
-  it('shows outcome as not added when outcome has not been imnported', () => {
+  it('enables "Add All Outcomes" button if group import failed', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_FAILED
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
+  })
+
+  it('enables "Add All Outcomes" button if group import not started', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_NOT_STARTED
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
+  })
+
+  it('disables "Add All Outcomes" button if group import is pending', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_PENDING
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  })
+
+  it('displays outcome as not added when outcome has not been imported', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
     const addButton = getAllByText('Add')[0].closest('button')
     expect(addButton).not.toBeDisabled()
-  })
-
-  describe('importing outcome when clicking + Add button', () => {
-    describe('successfully imports an outcome and add button text is changed to Added and disabled', () => {
-      it('for an Account outcome into a Course', async () => {
-        const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            importOutcomesMock({
-              sourceContextId: defaultProps().outcomesGroup.contextId,
-              sourceContextType: defaultProps().outcomesGroup.contextType
-            })
-          ]
-        })
-        const addButton = getAllByText('Add')[0].closest('button')
-        const {getByText} = within(getAllByText('Add')[0])
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(addButton).toBeDisabled()
-          expect(getByText('Added')).toBeInTheDocument()
-        })
-      })
-
-      it('for an Account outcome into an another Account (aka Sub-account)', async () => {
-        const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />, {
-          contextType: 'Account',
-          contextId: '2',
-          mocks: [
-            importOutcomesMock({
-              sourceContextId: defaultProps().outcomesGroup.contextId,
-              sourceContextType: defaultProps().outcomesGroup.contextType,
-              targetContextType: defaultProps().outcomesGroup.contextType,
-              targetContextId: '2'
-            })
-          ]
-        })
-        const addButton = getAllByText('Add')[0].closest('button')
-        const {getByText} = within(getAllByText('Add')[0])
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(addButton).toBeDisabled()
-          expect(getByText('Added')).toBeInTheDocument()
-        })
-      })
-
-      it('for a Global outcome into an Account', async () => {
-        const {getAllByText} = render(
-          <FindOutcomesView
-            {...defaultProps({
-              outcomesGroup: {...defaultProps().outcomesGroup, contextId: null, contextType: null}
-            })}
-          />,
-          {
-            contextType: 'Account',
-            mocks: [
-              importOutcomesMock({
-                targetContextType: 'Account'
-              })
-            ]
-          }
-        )
-        const addButton = getAllByText('Add')[0].closest('button')
-        const {getByText} = within(getAllByText('Add')[0])
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(addButton).toBeDisabled()
-          expect(getByText('Added')).toBeInTheDocument()
-        })
-      })
-    })
-
-    describe('fails when importing an outcome', () => {
-      it('displays flash confirmation with proper message if delete request fails for Account to Course', async () => {
-        const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            importOutcomesMock({
-              sourceContextId: defaultProps().outcomesGroup.contextId,
-              sourceContextType: defaultProps().outcomesGroup.contextType,
-              failResponse: true
-            })
-          ]
-        })
-        const addButton = getAllByText('Add')[0].closest('button')
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import. Please check your network and try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails for Account to Account (aka Sub-account)', async () => {
-        const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />, {
-          contextType: 'Account',
-          contextId: '2',
-          mocks: [
-            importOutcomesMock({
-              failResponse: true,
-              targetContextType: 'Account',
-              targetContextId: '2',
-              sourceContextId: defaultProps().outcomesGroup.contextId,
-              sourceContextType: defaultProps().outcomesGroup.contextType
-            })
-          ]
-        })
-        const addButton = getAllByText('Add')[0].closest('button')
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import. Please check your network and try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails for Global to Account', async () => {
-        const {getAllByText} = render(
-          <FindOutcomesView
-            {...defaultProps({
-              outcomesGroup: {...defaultProps().outcomesGroup, contextId: null, contextType: null}
-            })}
-          />,
-          {
-            contextType: 'Account',
-            mocks: [
-              importOutcomesMock({
-                targetContextType: 'Account',
-                failResponse: true
-              })
-            ]
-          }
-        )
-        const addButton = getAllByText('Add')[0].closest('button')
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import. Please check your network and try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('button value is + Add and is enabled', async () => {
-        const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            importOutcomesMock({
-              sourceContextId: defaultProps().outcomesGroup.contextId,
-              sourceContextType: defaultProps().outcomesGroup.contextType,
-              failResponse: true
-            })
-          ]
-        })
-        const addButton = getAllByText('Add')[0].closest('button')
-        const {getByText} = within(getAllByText('Add')[0])
-        fireEvent.click(addButton)
-        await waitFor(() => {
-          expect(getByText('Add')).toBeInTheDocument()
-          expect(addButton).not.toBeDisabled()
-        })
-      })
-    })
   })
 
   it('disables "Add All Outcomes" button if number of outcomes eq 0', () => {
