@@ -240,7 +240,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(getByText('View Feedback'))
+      fireEvent.click(getByText('Add Comment'))
       await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
     })
 
@@ -252,7 +252,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(getByText('View Feedback'))
+      fireEvent.click(getByText('Add Comment'))
       expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
     })
   })
