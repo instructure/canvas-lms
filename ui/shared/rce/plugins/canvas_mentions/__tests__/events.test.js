@@ -138,14 +138,25 @@ describe('events', () => {
     })
 
     describe('when the key is "backspace" with offset 1', () => {
+      let mountElement
+
       beforeEach(() => {
         event.which = 8
         editor.selection.setRng({endOffset: 1, startOffset: 1})
+
+        mountElement = document.createElement('span')
+        mountElement.id = 'mention-menu'
+        document.body.appendChild(mountElement)
       })
 
       it('makes the body editable', () => {
         subject()
         expect(makeBodyEditable).toHaveBeenCalled()
+      })
+
+      it('closes the MentionsMenu', () => {
+        subject()
+        expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalled()
       })
     })
 

@@ -136,6 +136,7 @@ export const onKeyDown = e => {
   // Is the current node already outside the
   // mentions marker?
   if (!inMentionsMarker(editor) || shouldRestoreFromKeyEvent(e, editor)) {
+    onMentionsExit(editor)
     makeBodyEditable(editor, MARKER_SELECTOR)
     return
   }
