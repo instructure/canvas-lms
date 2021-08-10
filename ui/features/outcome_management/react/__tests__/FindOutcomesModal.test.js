@@ -145,6 +145,7 @@ describe('FindOutcomesModal', () => {
       await clickWithinMobileSelect(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       fireEvent.click(getByText('Root Account Outcome Group 0'))
+      await act(async () => jest.runAllTimers())
       await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
       await act(async () => jest.runAllTimers())
       expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
@@ -167,7 +168,8 @@ describe('FindOutcomesModal', () => {
       await clickWithinMobileSelect(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      await clickWithinMobileSelect(queryByText('View 25 Outcomes'))
       await act(async () => jest.runAllTimers())
       expect(getByText('25 Outcomes')).toBeInTheDocument()
       const input = getByLabelText('Search field')
@@ -229,7 +231,8 @@ describe('FindOutcomesModal', () => {
       await clickWithinMobileSelect(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      await clickWithinMobileSelect(queryByText('View 25 Outcomes'))
       await act(async () => jest.runAllTimers())
       expect(getByText('25 Outcomes')).toBeInTheDocument()
       const input = getByLabelText('Search field')
@@ -279,12 +282,6 @@ describe('FindOutcomesModal', () => {
     itBehavesLikeAModal()
     itBehavesLikeATreeBrowser()
 
-    it('renders the tree browser with correct counts', async () => {
-      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      expect(getByText('10 Groups | 0 Outcomes')).toBeInTheDocument()
-    })
-
     it('does not render the action drilldown', async () => {
       const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
@@ -320,6 +317,7 @@ describe('FindOutcomesModal', () => {
       fireEvent.click(getByText('Root Account Outcome Group 0'))
       await act(async () => jest.runAllTimers())
       expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('View 0 Outcomes'))
       await act(async () => jest.runAllTimers())
       expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()

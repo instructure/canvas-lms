@@ -97,10 +97,8 @@ describe('TargetGroupSelector', () => {
     fireEvent.click(getByText('Account folder 0'))
     expect(setTargetGroupMock).toHaveBeenCalledWith({
       collections: [],
-      descriptor: '2 Groups | 2 Outcomes',
       id: '100',
       name: 'Account folder 0',
-      outcomesCount: 2,
       parentGroupId: '1',
       isRootGroup: false
     })
