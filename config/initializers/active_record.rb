@@ -817,14 +817,14 @@ module UsefulFindInBatches
       in_batches_select_values_necessitate_temp_table?
   end
 
-  private
-
   def infer_in_batches_strategy
     strategy ||= :copy if in_batches_can_use_copy?
     strategy ||= :cursor if in_batches_can_use_cursor?
     strategy ||= :temp_table if in_batches_needs_temp_table?
     strategy || :id
   end
+
+  private
 
   def in_batches_can_use_copy?
     connection.open_transactions == 0 && eager_load_values.empty? && !ActiveRecord::Base.in_migration
@@ -1077,8 +1077,8 @@ module UsefulBatchEnumerator
   end
 
   def delete_all
+    sum = 0
     if @strategy.nil? && !@relation.in_batches_needs_temp_table?
-      sum = 0
       loop do
         current = @relation.limit(@of).delete_all
         sum += current
@@ -1087,7 +1087,11 @@ module UsefulBatchEnumerator
       return sum
     end
 
-    @relation.in_batches(strategy: strategy, load: false, **@kwargs, &:delete_all)
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+      sum += relation.delete_all
+    end
+    sum
   end
 
   def update_all(updates)
@@ -1101,8 +1105,8 @@ module UsefulBatchEnumerator
       return sum
     end
 
-
-    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
       sum += relation.update_all(updates)
     end
     sum

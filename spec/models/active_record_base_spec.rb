@@ -595,11 +595,31 @@ describe ActiveRecord::Base do
   end
 
   describe "#in_batches.delete_all" do
-    it "just does a single query, instead of an ordered select and then delete" do
+    it "just does a bare delete, instead of an ordered select and then delete" do
       u = User.create!
-      expect(User.connection).to receive(:exec_query).once.and_call_original
-      expect(User.where(id: u.id).in_batches.delete_all).to eq 1
+      relation = User.where(id: u.id)
+      expect(relation).to receive(:limit).and_call_original
+      expect(relation.in_batches.delete_all).to eq 1
       expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "uses a specific strategy if asked to" do
+      u = User.create!
+      relation = User.where(id: u.id)
+      expect(relation).not_to receive(:limit)
+      expect(relation.in_batches(strategy: :cursor).delete_all).to eq 1
+      expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "infers a specific strategy if it can't do a bare delete" do
+      u = User.create!
+      User.transaction do
+        relation = User.where(id: u.id).group(:id)
+        expect(relation).to receive(:in_batches).with(no_args).and_call_original.ordered
+        expect(relation).to receive(:in_batches).with(hash_including(strategy: :temp_table)).and_call_original
+        expect(relation.in_batches.delete_all).to eq 1
+        expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 
