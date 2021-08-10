@@ -160,7 +160,7 @@ describe 'Global Navigation' do
       it 'should be called homeroom and subjects with k5 on' do
         toggle_k5_setting(@course.account)
         get "/courses/#{@course.id}"
-        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Homeroom'
+        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Home'
         expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Subjects'
       end
     end
