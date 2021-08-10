@@ -46,7 +46,7 @@ module InstAccess
     end
 
     def config
-      @config || raise(ConfigError, "InstID is not configured!")
+      @config || raise(ConfigError, "InstAccess is not configured!")
     end
   end
 end
