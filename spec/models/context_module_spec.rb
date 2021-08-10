@@ -19,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../conditional_release_spec_helper'
 
 describe ContextModule do
   def course_module
@@ -1342,6 +1343,43 @@ describe ContextModule do
       @submission.workflow_state = 'complete'
       @submission.save!
       expect(@module.evaluate_for(@student).requirements_met).to be_include({id: @tag.id, type: 'must_submit'})
+    end
+
+    context 'with conditional release' do
+      before(:once) do
+        setup_course_with_native_conditional_release
+        student_in_course(course: @course, active_all: true)
+        teacher_in_course(course: @course, active_all: true)
+      end
+
+      it 'should update completion status on grading events' do
+        @set1_assmt1.update!(points_possible: 10, submission_types: "online_text_entry")
+        @module = @course.context_modules.create!
+        @trigger_tag = @module.add_item(type: 'assignment', id: @trigger_assmt.id)
+        @set1_assmt1_tag = @module.add_item(type: 'assignment', id: @set1_assmt1.id)
+        @page = @course.wiki_pages.create!(title: 'My Page')
+        @page_tag = @module.add_item(type: 'wiki_page', id: @page.id)
+        @module.completion_requirements = [
+          { id: @trigger_tag.id, type: 'min_score', min_score: 8 },
+          { id: @set1_assmt1_tag.id, type: 'must_submit' },
+        ]
+        @module.require_sequential_progress = true
+        @module.save!
+        @module.reload.relock_progressions
+
+        # the page and the released assignment are both locked behind the trigger assignment
+        expect(@set1_assmt1.reload).to be_locked_for @student
+        expect(@page.reload).to be_locked_for @student
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+
+        # the released assignment is now available and the page is now locked behind the set assignment
+        expect(@set1_assmt1.reload).not_to be_locked_for @student
+        expect(@page.reload).to be_locked_for @student
+
+        @set1_assmt1.submit_homework(@student, body: 'hi')
+        expect(@page.reload).not_to be_locked_for @student
+      end
     end
   end
 
