@@ -17,7 +17,6 @@
  */
 
 import assert from 'assert'
-import jsdomify from 'jsdomify'
 import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
@@ -32,6 +31,7 @@ import RCEWrapper, {
 const textareaId = 'myUniqId'
 
 let React, fakeTinyMCE, editorCommandSpy, sd, editor
+let failedCount = 0
 
 // ====================
 //        HELPERS
@@ -88,11 +88,13 @@ function trayProps() {
 // to provide the default props
 function defaultProps() {
   return {
+    textareaId,
     highContrastCSS: [],
     languages: [{id: 'en', label: 'English'}],
     autosave: {enabled: false},
     ltiTools: [],
-    editorOptions: {}
+    editorOptions: {},
+    liveRegion: () => document.getElementById('flash_screenreader_holder')
   }
 }
 
@@ -102,16 +104,14 @@ describe('RCEWrapper', () => {
   // ====================
 
   beforeEach(() => {
-    jsdomify.create(`
-      <!DOCTYPE html><html dir="ltr"><head></head><body>
-      <div id="flash_screenreader_holder"/>
+    document.body.innerHTML = `
+      <div id="flash_screenreader_holder" role="alert"/>
       <div id="app">
         <textarea id="${textareaId}" />
       </div>
-      </body></html>
-    `)
+    `
+    document.documentElement.dir = 'ltr'
 
-    // I don't know why this mocha tests suite uses jsdom, but it does.
     // mock MutationObserver
     if (!global.MutationObserver) {
       global.MutationObserver = function MutationObserver(_props) {
@@ -119,7 +119,6 @@ describe('RCEWrapper', () => {
       }
     }
 
-    // must create react after jsdom setup
     requireReactDeps()
     editorCommandSpy = sinon.spy()
     editor = {
@@ -157,7 +156,11 @@ describe('RCEWrapper', () => {
         editor.content += contentToInsert
       },
       getContainer: () => {
-        return {}
+        return {
+          style: {
+            height: 300
+          }
+        }
       },
       setContent: sinon.spy(c => (editor.content = c)),
       getContent: () => editor.content,
@@ -171,7 +174,8 @@ describe('RCEWrapper', () => {
       execCommand: editorCommandSpy,
       serializer: {serialize: sinon.stub()},
       ui: {registry: {addIcon: () => {}}},
-      isDirty: () => false
+      isDirty: () => false,
+      fire: () => {}
     }
 
     fakeTinyMCE = {
@@ -192,8 +196,16 @@ describe('RCEWrapper', () => {
     sinon.spy(editor, 'insertContent')
   })
 
-  afterEach(() => {
-    jsdomify.destroy()
+  afterEach(function () {
+    if (this.currentTest.state === 'failed') {
+      ++failedCount
+    }
+    document.body.innerHTML = ''
+  })
+
+  after(() => {
+    // I don't know why, but this this suite of tests stopped exiting
+    process.exit(failedCount ? 1 : 0)
   })
 
   // ====================
@@ -355,7 +367,6 @@ describe('RCEWrapper', () => {
     describe('insertImagePlaceholder', () => {
       let globalImage
       function mockImage(props) {
-        // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
         global.Image = function () {
@@ -888,10 +899,6 @@ describe('RCEWrapper', () => {
   })
 
   describe('alert area', () => {
-    afterEach(() => {
-      jsdomify.destroy()
-    })
-
     it('adds an alert and attaches an id when addAlert is called', () => {
       const tree = createdMountedElement()
       const rce = tree.getMountedInstance()
@@ -1251,6 +1258,73 @@ describe('RCEWrapper', () => {
         'instructure_external_button_1',
         'instructure_external_button_3'
       ])
+    })
+  })
+
+  describe('limit the number or RCEs fully rendered on page load', () => {
+    let ReactDOM
+    before(() => {
+      ReactDOM = require('react-dom')
+
+      global.IntersectionObserver = function () {
+        return {
+          observe: () => {},
+          disconnect: () => {}
+        }
+      }
+    })
+    beforeEach(() => {
+      document.getElementById('app').innerHTML = `
+        <div class='rce-wrapper'>faux rendered rce</div>
+        <div class='rce-wrapper'>faux rendered rce</div>
+        <div id="here"/>
+      `
+    })
+
+    it('renders them all if no max is set', done => {
+      ReactDOM.render(
+        <RCEWrapper {...defaultProps()} tinymce={fakeTinyMCE} />,
+        document.getElementById('here'),
+        () => {
+          assert.strictEqual(document.querySelectorAll('.rce-wrapper').length, 3)
+          done()
+        }
+      )
+    })
+
+    it('renders them all if maxInitRenderedRCEs is <0', done => {
+      ReactDOM.render(
+        <RCEWrapper {...defaultProps()} tinymce={fakeTinyMCE} maxInitRenderedRCEs={-1} />,
+        document.getElementById('here'),
+        () => {
+          assert.strictEqual(document.querySelectorAll('.rce-wrapper').length, 3)
+          done()
+        }
+      )
+    })
+
+    it('limits them to maxInitRenderedRCEs value', done => {
+      ReactDOM.render(
+        <RCEWrapper {...defaultProps()} tinymce={fakeTinyMCE} maxInitRenderedRCEs={2} />,
+        document.getElementById('here'),
+        () => {
+          assert.strictEqual(document.querySelectorAll('.rce-wrapper').length, 2)
+          done()
+        }
+      )
+    })
+
+    it('copes with missing IntersectionObserver', done => {
+      delete global.IntersectionObserver
+
+      ReactDOM.render(
+        <RCEWrapper {...defaultProps()} tinymce={fakeTinyMCE} maxInitRenderedRCEs={2} />,
+        document.getElementById('here'),
+        () => {
+          assert.strictEqual(document.querySelectorAll('.rce-wrapper').length, 3)
+          done()
+        }
+      )
     })
   })
 })

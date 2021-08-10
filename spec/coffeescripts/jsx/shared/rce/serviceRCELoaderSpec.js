@@ -77,6 +77,9 @@ QUnit.module('loadOnTarget', {
             callback()
           }
         }
+      },
+      tinymceOn(eventType, callback) {
+        callback()
       }
     }
     this.rce = {renderIntoDiv: sinon.stub().callsArgWith(2, this.editor)}
@@ -94,38 +97,38 @@ QUnit.module('loadOnTarget', {
 
 // target finding
 
-test('finds a target textarea if a textarea is passed in', function() {
+test('finds a target textarea if a textarea is passed in', function () {
   equal(RCELoader.getTargetTextarea(this.$textarea), this.$textarea.get(0))
 })
 
-test('finds a target textarea if a normal div is passed in', function() {
+test('finds a target textarea if a normal div is passed in', function () {
   equal(RCELoader.getTargetTextarea(this.$div), this.$textarea.get(0))
 })
 
-test('returns the textareas parent as the renderingTarget when no custom function given', function() {
+test('returns the textareas parent as the renderingTarget when no custom function given', function () {
   equal(RCELoader.getRenderingTarget(this.$textarea.get(0)), this.$div.get(0))
 })
 
-test('returned parent has class `ic-RichContentEditor`', function() {
+test('returned parent has class `ic-RichContentEditor`', function () {
   const target = RCELoader.getRenderingTarget(this.$textarea.get(0))
   ok($(target).hasClass('ic-RichContentEditor'))
 })
 
-test('uses a custom get target function if given', function() {
+test('uses a custom get target function if given', function () {
   const customFn = () => 'someCustomTarget'
   RCELoader.loadOnTarget(this.$textarea, {getRenderingTarget: customFn}, () => {})
   ok(this.rce.renderIntoDiv.calledWith('someCustomTarget'))
 })
 // propsForRCE construction
 
-test('extracts content from the target', function() {
+test('extracts content from the target', function () {
   this.$textarea.val('some text here')
   const opts = {defaultContent: 'default text'}
   const props = RCELoader.createRCEProps(this.$textarea.get(0), opts)
   equal(props.defaultContent, 'some text here')
 })
 
-test('falls back to defaultContent if target has no content', function() {
+test('falls back to defaultContent if target has no content', function () {
   const opts = {defaultContent: 'default text'}
   const props = RCELoader.createRCEProps(this.$textarea.get(0), opts)
   equal(props.defaultContent, 'default text')
@@ -139,13 +142,13 @@ test('passes the textarea height into tinyOptions', () => {
   equal(opts.tinyOptions.height, taHeight)
 })
 
-test('adds the elements name attribute to mirroredAttrs', function() {
+test('adds the elements name attribute to mirroredAttrs', function () {
   const opts = {defaultContent: 'default text'}
   const props = RCELoader.createRCEProps(this.$textarea.get(0), opts)
   equal(props.mirroredAttrs.name, 'elementName')
 })
 
-test('adds onFocus to props', function() {
+test('adds onFocus to props', function () {
   const opts = {
     onFocus() {}
   }
@@ -153,12 +156,12 @@ test('adds onFocus to props', function() {
   equal(props.onFocus, opts.onFocus)
 })
 
-test('renders with rce', function() {
+test('renders with rce', function () {
   RCELoader.loadOnTarget(this.$div, {}, () => {})
   ok(this.rce.renderIntoDiv.calledWith(this.$div.get(0)))
 })
 
-test('yields editor to callback,', function(assert) {
+test('yields editor to callback,', function (assert) {
   const done = assert.async()
   const cb = (textarea, rce) => {
     equal(textarea, this.$textarea.get(0))
@@ -168,7 +171,7 @@ test('yields editor to callback,', function(assert) {
   RCELoader.loadOnTarget(this.$div, {}, cb)
 })
 
-test('ensures yielded editor has call and focus methods', function(assert) {
+test('ensures yielded editor has call and focus methods', function (assert) {
   const done = assert.async()
   const cb = (textarea, rce) => {
     equal(typeof rce.call, 'function')
@@ -200,7 +203,7 @@ QUnit.module('loadSidebarOnTarget', {
   }
 })
 
-test('passes host and context from ENV as props to sidebar', function() {
+test('passes host and context from ENV as props to sidebar', function () {
   const cb = sinon.spy()
   RCELoader.loadSidebarOnTarget(this.$div, cb)
   ok(this.rce.renderSidebarIntoDiv.called)
@@ -210,7 +213,7 @@ test('passes host and context from ENV as props to sidebar', function() {
   equal(props.contextId, '1')
 })
 
-test('uses user context when in account context', function() {
+test('uses user context when in account context', function () {
   ENV.context_asset_string = 'account_1'
   const cb = sinon.spy()
   RCELoader.loadSidebarOnTarget(this.$div, cb)
@@ -220,20 +223,20 @@ test('uses user context when in account context', function() {
   equal(props.contextId, '17')
 })
 
-test('yields sidebar to callback', function() {
+test('yields sidebar to callback', function () {
   const cb = sinon.spy()
   RCELoader.loadSidebarOnTarget(this.$div, cb)
   ok(cb.calledWith(this.sidebar))
 })
 
-test('ensures yielded sidebar has show and hide methods', function() {
+test('ensures yielded sidebar has show and hide methods', function () {
   const cb = () => {}
   RCELoader.loadSidebarOnTarget(this.$div, cb)
   equal(typeof this.sidebar.show, 'function')
   equal(typeof this.sidebar.hide, 'function')
 })
 
-test('provides a callback for loading a new jwt', function() {
+test('provides a callback for loading a new jwt', function () {
   const cb = sinon.spy()
   RCELoader.loadSidebarOnTarget(this.$div, cb)
   ok(this.rce.renderSidebarIntoDiv.called)
@@ -242,7 +245,7 @@ test('provides a callback for loading a new jwt', function() {
   equal(props.refreshToken, this.refreshToken)
 })
 
-test('passes brand config json url', function() {
+test('passes brand config json url', function () {
   ENV.active_brand_config_json_url = {}
   RCELoader.loadSidebarOnTarget(this.$div, () => {})
   const props = this.rce.renderSidebarIntoDiv.args[0][1]
