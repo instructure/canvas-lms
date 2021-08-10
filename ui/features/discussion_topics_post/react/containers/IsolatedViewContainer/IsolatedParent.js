@@ -141,7 +141,7 @@ export const IsolatedParent = props => {
             >
               <Text size={responsiveProps.textSize}>
                 {I18n.t(
-                  'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+                  'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
                 )}
               </Text>
             </Alert>

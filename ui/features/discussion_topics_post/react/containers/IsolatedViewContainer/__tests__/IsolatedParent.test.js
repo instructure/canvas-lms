@@ -135,7 +135,7 @@ describe('IsolatedParent', () => {
 
     expect(
       queryByText(
-        'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
       )
     ).toBeTruthy()
   })
@@ -148,7 +148,7 @@ describe('IsolatedParent', () => {
 
     expect(
       queryByText(
-        'Deeply nested replies are no longer supported. Your reply will appear on the parent level. Consider including a reply preview.'
+        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
       )
     ).toBeFalsy()
   })
