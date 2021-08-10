@@ -670,12 +670,6 @@ describe "API Authentication", type: :request do
       expect(JSON.parse(response.body).size).to eq 1
     end
 
-    it "recovers gracefully if consul is missing encryption data" do
-      allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
-      check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
-      assert_status(200)
-    end
-
     it "should allow passing the access token in the post body" do
       @me = @user
       Account.default.account_users.create!(user: @user)

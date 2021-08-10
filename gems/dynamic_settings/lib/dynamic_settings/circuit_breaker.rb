@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-#encoding:ASCII-8BIT
-#
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,19 +15,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+module DynamicSettings
+  class CircuitBreaker
+    def initialize(reset_interval = 1.minute)
+      @reset_interval = reset_interval
+    end
 
-Rack::Utils.key_space_limit = 128.kilobytes # default is 64KB
-Rack::Utils.multipart_part_limit = 256 # default is 128
+    def tripped?
+      @tripped_at && (Time.now.utc - @tripped_at) < @reset_interval
+    end
 
-module EnableRackChunking
-  def chunkable_version?(*)
-    if defined?(PactConfig)
-      false
-    elsif ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking", failsafe: true]
-      super
-    else
-      false
+    def trip
+      @tripped_at = Time.now.utc
     end
   end
 end
-Rack::Chunked.prepend(EnableRackChunking)
