@@ -54,6 +54,18 @@ describe "Discussion Topic Show" do
       expect(fj("span:contains('Copy To...')")).to be_present
     end
 
+    context "group discussions in a group context" do
+      it "loads without errors" do
+        @group_discussion_topic = group_discussion_assignment
+        get "/courses/#{@course.id}/discussion_topics/#{@group_discussion_topic.id}"
+        f("button[data-testid='groups-menu-btn']").click
+        fj("a:contains('group 1')").click
+        wait_for_ajaximations
+        expect(fj("h1:contains('topic - group 1')")).to be_present
+        expect_no_flash_message :error
+      end
+    end
+
     it "has a module progression section when applicable" do
       module1 = @course.context_modules.create!(:name => "module1")
       item1 = @course.assignments.create!(

@@ -635,11 +635,23 @@ class DiscussionTopicsController < ApplicationController
     @topic = @context.all_discussion_topics.find(params[:id])
     # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
     @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+
+    @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
+    @sequence_asset = @context_module_tag.try(:content)
+
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
+
+      if @sequence_asset
+        js_env({SEQUENCE: {
+          :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
+          :ASSET_ID => @sequence_asset.id,
+          :COURSE_ID => @sequence_asset.context.id,
+        }})
+      end
       js_env({
                course_id: params[:course_id],
                discussion_topic_id: params[:id],
@@ -723,8 +735,6 @@ class DiscussionTopicsController < ApplicationController
           format.html do
 
             @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
-            @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
-            @sequence_asset = @context_module_tag.try(:content)
 
             if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,

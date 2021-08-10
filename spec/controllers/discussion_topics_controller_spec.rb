@@ -670,6 +670,16 @@ describe DiscussionTopicsController do
         @group1.add_user(@student)
       end
 
+      it "should provide sequence in js_env when Discussions Redesign is ON" do
+        Account.default.enable_feature! :react_discussions_post
+        module1 = @course.context_modules.create!(:name => "module1")
+        module1.add_item(:id => @topic.id, :type => 'discussion_topic')
+        user_session(@teacher)
+
+        get 'show', params: {:course_id => @course.id, :id => @topic.id}
+        expect(assigns[:js_env][:SEQUENCE]).to be_truthy
+      end
+
       it "should assign groups from the topic's category" do
         user_session(@teacher)
 
