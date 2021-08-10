@@ -43,9 +43,9 @@ module Canvas::Vault
       def reset!
         @_client = nil
       end
-
-      Canvas::Reloader.on_reload { reset! }
     end
+
+    Canvas::Reloader.on_reload { reset! }
 
     def initialize
       @config = ConfigFile.load("vault_contents") || {}
