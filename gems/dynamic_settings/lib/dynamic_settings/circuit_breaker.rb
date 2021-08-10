@@ -22,6 +22,8 @@ module DynamicSettings
     end
 
     def tripped?
+      return false unless @reset_interval
+
       @tripped_at && (Time.now.utc - @tripped_at) < @reset_interval
     end
 
