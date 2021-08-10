@@ -193,7 +193,7 @@ describe('TargetGroupSelector', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred adding group "new group name": Server is busy'
+        message: 'An error occurred adding group "new group name": Server is busy.'
       })
     })
 
@@ -210,7 +210,7 @@ describe('TargetGroupSelector', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred adding group "new group name"'
+        message: 'An error occurred adding group "new group name".'
       })
     })
   })

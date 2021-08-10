@@ -208,7 +208,7 @@ describe('CreateOutcomeModal', () => {
       await act(async () => jest.runOnlyPendingTimers())
       await waitFor(() => {
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
-          message: 'Outcome "Outcome 123" was successfully created',
+          message: 'Outcome "Outcome 123" was successfully created.',
           type: 'success'
         })
       })
@@ -353,7 +353,7 @@ describe('CreateOutcomeModal', () => {
       await act(async () => jest.runOnlyPendingTimers())
       await waitFor(() => {
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
-          message: 'Outcome "Outcome 123" was successfully created',
+          message: 'Outcome "Outcome 123" was successfully created.',
           type: 'success'
         })
       })
@@ -395,7 +395,7 @@ describe('CreateOutcomeModal', () => {
         // if setFriendlyDescription mutation is called the expectation below will fail
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'Outcome "Outcome 123" was successfully created',
+            message: 'Outcome "Outcome 123" was successfully created.',
             type: 'success'
           })
         })

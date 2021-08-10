@@ -51,12 +51,12 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler, onSuccess}) => {
         err?.response?.data &&
         err?.response?.data.match(/cannot be deleted because it is aligned to content/)
           ? I18n.t(
-              'Outcome Group contains one or more Outcomes that are currently aligned to content.'
+              'Outcome Group contains one or more Outcomes that are currently aligned to content'
             )
           : err.message
       showFlashAlert({
         message: err.message
-          ? I18n.t('An error occurred while removing this group: %{message}', {
+          ? I18n.t('An error occurred while removing this group: %{message}.', {
               message: err.message
             })
           : I18n.t('An error occurred while removing this group.'),

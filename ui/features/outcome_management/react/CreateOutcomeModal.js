@@ -108,7 +108,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
         }
 
         showFlashAlert({
-          message: I18n.t('Outcome "%{title}" was successfully created', {title}),
+          message: I18n.t('Outcome "%{title}" was successfully created.', {title}),
           type: 'success'
         })
       } catch (err) {

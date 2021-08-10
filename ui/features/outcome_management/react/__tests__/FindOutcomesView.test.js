@@ -288,7 +288,7 @@ describe('FindOutcomesView', () => {
         fireEvent.click(addButton)
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import.  Please check your network and try again.',
+            message: 'This outcome failed to import. Please check your network and try again.',
             type: 'error'
           })
         })
@@ -312,7 +312,7 @@ describe('FindOutcomesView', () => {
         fireEvent.click(addButton)
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import.  Please check your network and try again.',
+            message: 'This outcome failed to import. Please check your network and try again.',
             type: 'error'
           })
         })
@@ -339,7 +339,7 @@ describe('FindOutcomesView', () => {
         fireEvent.click(addButton)
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome failed to import.  Please check your network and try again.',
+            message: 'This outcome failed to import. Please check your network and try again.',
             type: 'error'
           })
         })

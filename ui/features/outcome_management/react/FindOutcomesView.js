@@ -63,7 +63,7 @@ const FindOutcomesView = ({
     setAddedOutcome(false)
     setButtonMessage(I18n.t('Add'))
     showFlashAlert({
-      message: I18n.t('This outcome failed to import.  Please check your network and try again.'),
+      message: I18n.t('This outcome failed to import. Please check your network and try again.'),
       type: 'error'
     })
   }

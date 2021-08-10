@@ -67,11 +67,11 @@ const GroupMoveModal = ({
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}', {
+            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}.', {
                 groupTitle,
                 message: err.message
               })
-            : I18n.t('An error occurred moving group "%{groupTitle}"', {
+            : I18n.t('An error occurred moving group "%{groupTitle}".', {
                 groupTitle
               }),
           type: 'error'

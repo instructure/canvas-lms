@@ -56,11 +56,11 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred while updating group "%{groupTitle}": %{message}', {
+            ? I18n.t('An error occurred while updating group "%{groupTitle}": %{message}.', {
                 groupTitle,
                 message: err.message
               })
-            : I18n.t('An error occurred while updating group "%{groupTitle}"', {
+            : I18n.t('An error occurred while updating group "%{groupTitle}".', {
                 groupTitle
               }),
           type: 'error'

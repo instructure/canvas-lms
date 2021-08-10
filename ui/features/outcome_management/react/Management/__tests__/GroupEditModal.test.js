@@ -146,7 +146,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while updating group "Group title": GraphQL error: Network error'
+      message: 'An error occurred while updating group "Group title": GraphQL error: Network error.'
     })
   })
 
@@ -168,7 +168,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while updating group "Group title": Mutation failed'
+      message: 'An error occurred while updating group "Group title": Mutation failed.'
     })
   })
 
@@ -190,7 +190,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while updating group "Group title"'
+      message: 'An error occurred while updating group "Group title".'
     })
   })
 })

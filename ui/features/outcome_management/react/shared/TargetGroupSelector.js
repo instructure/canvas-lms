@@ -72,11 +72,11 @@ const TargetGroupSelector = ({
     } catch (err) {
       showFlashAlert({
         message: err.message
-          ? I18n.t('An error occurred adding group "%{groupName}": %{message}', {
+          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
               groupName,
               message: err.message
             })
-          : I18n.t('An error occurred adding group "%{groupName}"', {
+          : I18n.t('An error occurred adding group "%{groupName}".', {
               groupName
             }),
         type: 'error'

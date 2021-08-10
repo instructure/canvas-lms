@@ -180,7 +180,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Account folder 0": GraphQL error: Network error',
+      message: 'An error occurred moving group "Account folder 0": GraphQL error: Network error.',
       type: 'error'
     })
   })
@@ -205,7 +205,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Account folder 0": Mutation failed',
+      message: 'An error occurred moving group "Account folder 0": Mutation failed.',
       type: 'error'
     })
   })
@@ -230,7 +230,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Account folder 0"',
+      message: 'An error occurred moving group "Account folder 0".',
       type: 'error'
     })
   })
