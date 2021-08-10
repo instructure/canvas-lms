@@ -129,7 +129,7 @@ sv-x-k12:
       error: "Ett fel uppstod. Uppdatera sidan och försök igen."
       unexpectedDeleteError: "Någonting gick fel. Det går inte att ta bort just nu."
       updateSuccess: "Uppdatering klar"
-      userDeleteError: "Lärandemålgruppen innehåller en eller fler lärandemål som för närvarande är justerade till innehåll."
+      userDeleteError: "Lärandemålgruppen innehåller en eller fler lärandemål som för närvarande är kopplade till innehåll."
     length_error: "Måste vara 255 tecken eller mindre"
   OutcomeView: 
     length_error: "Måste vara 255 tecken eller mindre"
@@ -1823,7 +1823,7 @@ sv-x-k12:
   alerts_add_edit_delete_d71091c6: "Notiser – lägg till/redigera/ta bort"
   alerts_course_settings_53551794: "Notis (kursinställningar)"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Notiser måste konfigureras för institutionen. Notiser är en sällan använd funktion som designats för att skicka en notis till elever, lärare eller administratörer vid vissa tillfällen (t.ex. ingen interaktion mellan elev och lärare under 7 dagar). De kontrolleras varje dag och aviseringar skickas till eleven och/eller läraren tills problemet som utlöste aviseringen har åtgärdats."
-  align_outcomes_to_this_page_7d055196: "Justera lärandemål till den här sidan"
+  align_outcomes_to_this_page_7d055196: "Koppla lärandemål till den här sidan"
   all_4321c3a1: Alla
   all_account_types_e83c1516: "Ala kontotyper"
   all_accounts_3bafc860: "Alla konton"
@@ -1939,7 +1939,7 @@ sv-x-k12:
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Låter administratörer visa en logg med information om senast körda
       GraphQL-mutationer
-  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter justering av lärandemål för innehåll som inte ges poäng"
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter koppling av lärandemål för innehåll som inte ges poäng"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Tillåt att elevgrupper i en kurs skapas med en uppladdad CSV-fil"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillåter att skapa meddelanden för en viss sektion"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillåter att skapa diskussioner för en viss sektion"
@@ -4667,7 +4667,7 @@ sv-x-k12:
   can_show_subscription_to_data_service_data_688ce3: "Kan visa prenumeration på data från datatjänster."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Det går inte att beräkna resultat innan en uppgift har möjliga poäng"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
-      \x20             Det går inte att radera justeringar baserat på matrisassociationer.\n\
+      \x20             Det går inte att radera kopplingar baserat på matrisassociationer.\n\
       \x20             För att ta bort dessa associationer måste du ta bort raden från tillgångens matris.\"\n\
       \x20           "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan inte radera grupperingar baserat på matris-associationer. För att ta bort dessa associeringar måste du ta bort raden från matrisen."
@@ -6191,9 +6191,9 @@ sv-x-k12:
   couldn_t_generate_diff_message_a0528b20: "Det gick inte att generera diff: %{message}"
   couldn_t_update_standards_for_authority_auth_81206187: "Det gick inte att uppdatera auktoritetsstandarder %{auth}"
   count_alignments_40fbc23c: 
-    one: "%{count} justering"
-    other: "%{count} justeringar"
-    zero: "Inga justeringar"
+    one: "%{count} koppling"
+    other: "%{count} kopplingar"
+    zero: "Inga kopplingar"
   count_announcements_found_b7b055b3: "%{count} anslag hittades."
   count_apps_found_f4d86860: "%{count} appar hittades"
   count_assignments_found_17520826: 
@@ -7602,7 +7602,7 @@ sv-x-k12:
   delete_a143a2ab: "ta bort"
   delete_a6efa79d: "Ta bort"
   delete_account_name_96aee330: "Radera %{account_name}"
-  delete_alignment_f33c97d5: "Ta bort justering"
+  delete_alignment_f33c97d5: "Ta bort koppling"
   delete_announcement_title_756a9d1f: "Ta bort anslag %{title}"
   delete_assignment_5d3f3f15: "ta bort uppgift"
   delete_assignment_group_7c3b01c4: "Ta bort uppgiftsgrupp"
@@ -10910,7 +10910,7 @@ sv-x-k12:
   how_do_i_add_users_to_a_course_4a88efaf: "Hur lägger jag till ett användare i en kurs?"
   how_do_i_add_zoom_to_a_course_31300d74: "Hur lägger jag till Zoom i en kurs?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Hur anpassar jag händelser och inlämningsdatum i en kursimport?"
-  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hur justerar jag ett lärandemål med en matris i en kurs?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hur kopplar jag ett lärandemål med en matris i en kurs?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Hur laddar jag upp flera filer till en kurs?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hur ändrar jag ett kursnamn och kurskod?"
   how_do_i_change_the_course_home_page_326cee50: "Hur ändrar jag vad som ska vara startsida?"
@@ -11374,7 +11374,7 @@ sv-x-k12:
   includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderar åsidosatta kursbedömningar i bedömningsöversiktens historik."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
-  incomplete_da3c2ea2: Ofullständig
+  incomplete_da3c2ea2: "Ej fullständig"
   incompleteregistration: 
     get_started: "Kom igång"
     welcome_to_canvas: "Välkommen till Canvas!"
@@ -14519,7 +14519,7 @@ sv-x-k12:
   n_a_d5d5a207: n/a
   n_a_d6f6c42f: "Ej tillämpbart"
   n_contextscount_more_2f708db4: "+ %{n_contextsCount} mer"
-  n_count_alignments_a45bebe7: "*%{n_count}* Justeringar"
+  n_count_alignments_a45bebe7: "*%{n_count}* Kopplingar"
   n_groupweight_percentage_of_total_2ae4d996: "%{n_groupWeight_percentage} av totalsumman"
   n_number_of_times_c2e78b72: "n Antal gånger"
   n_points_possible_precision_2_st_points_bc3748df: "%{n_points_possible_precision_2_st} poäng"
@@ -15409,13 +15409,13 @@ sv-x-k12:
   out_of_pointspossible_3fb5ee20: "Av %{pointsPossible}"
   out_of_pointspossible_c163105a: "av %{pointsPossible}"
   out_of_pointspossible_pts_b2b73373: "Av %{pointsPossible} poäng"
-  outcome_alignment_to_non_scoring_content_3efa45fb: "Justering av lärandemål för innehåll som inte ges poäng"
+  outcome_alignment_to_non_scoring_content_3efa45fb: "Koppling av lärandemål för innehåll som inte ges poäng"
   outcome_cannot_be_removed_because_it_is_aligned_to_bb8b5b03: "Det går inte att ta bort lärandemålet eftersom det är kopplat till innehåll"
   outcome_da397d20: Lärandemål
   outcome_details_ce254e89: "Information om lärandemål"
   outcome_export_89229eb4: "Export av lärandemål"
   outcome_group_39fae76f: Lärandemålsgrupp
-  outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Lärandemålgruppen innehåller en eller fler lärandemål som för närvarande är justerade till innehåll."
+  outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Lärandemålgruppen innehåller en eller fler lärandemål som för närvarande är kopplade till innehåll."
   outcome_group_menu_2fffeb71: Lärandemålsgruppmeny
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Resultatgrupp med Canvas-id %{id} hittades inte"
   outcome_groups: 
@@ -21552,7 +21552,7 @@ sv-x-k12:
       Den här omuppdelningen av faktorer gör den här sidan enklare att underhålla och gör att
       vi enkelt kan göra sidan mer åtkomlig
   this_refactor_will_make_this_page_more_maintainabl_8ba354cf: "Den här omuppdelningen av faktorer gör sidan enklare att underhålla"
-  this_report_provides_all_active_eportfolios_for_th_f7432621: "Den här rapporten tillhandahåller alla aktiva e-portföljer för den aktuella institutionen.+ Du kan även välja ”Ta endast med e-portföljer från användare utan registreringar” för att minska omfånget för e-portföljsresultaten till endast de användare som inte har registreringar. Du kan även köra rapporten med ”Ta med borttagna objekt” för att endast ta med de e-portföljer som tagits bort."
+  this_report_provides_all_active_eportfolios_for_th_f7432621: "Den här rapporten tillhandahåller alla aktiva e-portföljer för den aktuella institutionen. Du kan även välja ”Ta endast med e-portföljer från användare utan registreringar” för att minska omfånget för e-portföljsresultaten till endast de användare som inte har registreringar. Du kan även köra rapporten med ”Ta med borttagna objekt” för att endast ta med de e-portföljer som tagits bort."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denna rapport visar alla läranderesultat som finns inom detta konto. Den resulterande csv-filen kommer att ha en rad per utfall, och kommer att visa detaljerna för alla associerade attribut med varje utfall."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Den här rapporten visar alla kurser under en given termin. Den resulterade csv-filen kommer att ha en rad per kurs och kommer att visa kurs-id, kurs sis-id, kortnamn för kursen, kursnamn, konto-id, sis-id för kontot, kontonamn, använt utrymme i MB, samt summa av alla filer i MB. Utrymmet som används reflekterar alla filer som använder kursens kvot. Summan av alla filer i kursen är summan av alla filer som finns i kursen oavsett vilken påverkan det har på kursens kvot."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Den här rapporten visar bedömningsperioder (och kursomdömen) för varje elev som är inskriven i en given termin. Den resulterade csv-filen kommer att ha en rad per inskrivning."
@@ -21594,7 +21594,7 @@ sv-x-k12:
   this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Detta tar bort måluppfyllelsenivån från din måluppfyllelseskala."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Detta uppdaterar alla matriser på konto- och kursnivå som är knutna till måluppfyllelseskalor och som ännu inte har bedömts."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Detta uppdaterar alla matriser på konto- och kursnivå som är knutna till måluppfyllelseskalorna och som ännu inte har bedömts."
-  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Detta uppdaterar alla matriser justerade till lärandemål inom den här kursen och som ännu inte har bedömts."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Detta uppdaterar alla matriser kopplade till lärandemål inom den här kursen och som ännu inte har bedömts."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla matriser som använder detta lärandemål som ännu inte har utvärderats"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Detta uppdaterar alla måluppfyllelseresultat som är kopplade till måluppfyllelseberäkningen på kontonivå."
   this_will_update_all_student_mastery_results_withi_934580d1: "Detta uppdaterar alla måluppfyllelseresultat för eleven i den här kursen."
@@ -22510,8 +22510,8 @@ sv-x-k12:
   ukrainian_945b00b7: Ukrainska
   unable_to_accept_update_fd53a7e2: "Kunde inte acceptera uppdateringen"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Det går inte att få tillgång till en viss elev. Gå till uppgiften i SpeedGrader?"
-  unable_to_align_some_outcomes_to_a_page_65f7d412: "Det gick inte att justera vissa lärandemål till en sida"
-  unable_to_align_some_outcomes_to_title_53467231: "Det gick inte att justera vissa lärandemål till \"%{title}\""
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Det gick inte att koppla vissa lärandemål till en sida"
+  unable_to_align_some_outcomes_to_title_53467231: "Det gick inte att koppla vissa lärandemål till \"%{title}\""
   unable_to_connect_to_google_drive_34886e7a: "Det gick inte att ansluta till Google Drive."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Det går inte att justera (curve) bedömningar eftersom denna uppgifts inlämningsdatum infaller i en stängd bedömningsperiod för minst en elev"
   unable_to_delete_assignment_abcf8d62: "Det gick inte att ta bort uppgiften"
