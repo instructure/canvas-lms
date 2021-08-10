@@ -29,31 +29,29 @@ module Canvas
     # as an initializer so that consul-based settings are available
     # before we start bootstrapping other things in the app.
     def self.bootstrap!
-      settings = ConfigFile.load("consul")
-
-      if settings.present?
-        settings[:retry_limit] = Setting.get('consul_retry_count', 1).to_i
-        settings[:retry_base] = Setting.get('consul_retry_base_interval', 1.4).to_f
-        settings[:circuit_breaker] = ::DynamicSettings::CircuitBreaker.new(Setting.get('consul_circuit_breaker_interval', 60).to_f)
-
-        begin
-          ::DynamicSettings.config = settings
-        rescue Diplomat::KeyNotFound, Diplomat::PathNotFound, Diplomat::UnknownStatus
-          Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
-        end
-      end
-
       # these used to be in an initializer, but initializing this
       # library in 2 places seems like a recipe for confusion, so
       # config/initializers/consul.rb got moved in here
-      handle_fallbacks = -> do
+      reloader = -> do
+        settings = ConfigFile.load("consul").dup
+
+        if settings.present?
+          settings[:circuit_breaker] = ::DynamicSettings::CircuitBreaker.new(settings[:circuit_breaker_interval])
+
+          begin
+            ::DynamicSettings.config = settings
+          rescue Diplomat::KeyNotFound, Diplomat::PathNotFound, Diplomat::UnknownStatus
+            Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
+          end
+        end
+
         # dumps the whole cache, even if it's a shared local redis,
         # and removes any local data loaded from yml on disk as a fallback.
         # (will reload if still present on disk)
         ::DynamicSettings.on_reload!
       end
-      handle_fallbacks.call
-      Canvas::Reloader.on_reload(&handle_fallbacks)
+      reloader.call
+      Canvas::Reloader.on_reload(&reloader)
       # dependency injection stuff from when
       # this got pulled out into a local gem
       ::DynamicSettings.cache = LocalCache
