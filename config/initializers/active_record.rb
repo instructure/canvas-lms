@@ -1030,8 +1030,9 @@ module UsefulFindInBatches
           end
         end
 
-        klass.unscoped do
-          batch_relation = klass.from(table).select("*").limit(of).preload(includes_values + preload_values)
+        base_class = klass.base_class
+        base_class.unscoped do
+          batch_relation = base_class.from(table).select("*").limit(of).preload(includes_values + preload_values)
           batch_relation = batch_relation.order(Arel.sql(connection.quote_column_name(index))) if index
           yielded_relation = batch_relation
           loop do

@@ -126,6 +126,12 @@ describe ActiveRecord::Base do
         end.not_to change(User.connection_pool.connections, :length)
         # even with :copy, a new connection should not be taken out (i.e. to satisfy an "actual" query for the pluck)
       end
+
+      it "works with polymorphic models" do
+        c = Course.create!
+        se = StudentEnrollment.create!(course: c, user: @u1)
+        expect(do_batches(StudentEnrollment.where(id: se.id))).to eq [[se]]
+      end
     end
 
     context "with temp_table" do
