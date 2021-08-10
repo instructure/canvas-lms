@@ -604,18 +604,95 @@ describe ActiveRecord::Base do
   end
 
   describe "#in_batches.update_all" do
-    it "just does a single query, instead of an ordered select and then update" do
-      u = User.create!(name: 'abcdefg')
+    before do
+      # just to keep our query count easy to manage in expectations below
+      allow(User.connection).to receive(:readonly?).and_return(false)      
+    end
+
+    let_once(:u) { User.create!(name: 'abcdefg') }
+
+    it "just does a bare update, instead of an ordered select and then update" do
+      # only the reload
       expect(User.connection).to receive(:exec_query).once.and_call_original
       expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'bob')).to eq 1
       expect(u.reload.name).to eq 'bob'
     end
 
-    it "does multiple queries if the updated column isn't mentioned in the where clause" do
-      u = User.create!(name: 'abcdefg')
-      expect(User.connection).to receive(:exec_query).at_least(2).and_call_original
+    it "does multi-stage if the updated column isn't mentioned in the where clause" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
       expect(User.in_batches.update_all(name: 'bob')).to eq 1
       expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage if the updated column isn't mentioned in the where clause (that does exist)" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(id: u.id).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage if the updated column is being assigned to the same value as the condition" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'abcdefg')).to eq 1
+      expect(u.reload.name).to eq 'abcdefg'
+    end
+
+    it "does a bare update for an array condition non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does a bare update for a negated array condition non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where.not(name: ['bob', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage for an array condition matching value" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'abcdefg')).to eq 1
+      allow(User.connection).to receive(:exec_query).and_call_original
+      expect(u.reload.name).to eq 'abcdefg'
+    end
+
+    it "does a bare update for a comparison condition non-matching value" do
+      expect(User.connection).not_to receive(:exec_query)
+      expect(User.where(updated_at: 5.minutes.ago..).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a comparison condition matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago..).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    it "does a bare update for a range condition non-matching value" do
+      expect(User.connection).not_to receive(:exec_query)
+      expect(User.where(updated_at: 5.minutes.ago..5.minutes.from_now).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a range condition matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago..5.minutes.from_now).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    # because this forms an And predicate that we don't care to handle. gotta draw the line somewhere
+    it "does a multi-stage update for an open range condition even with non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago...5.minutes.from_now).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a sub-query condition" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(name: User.select(:name).where(id: u.id)).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    it "does bare update for negated boolean condition" do
+      expect(User.connection).not_to receive(:exec_query)
+      Assignment.where.not(grader_comments_visible_to_graders: true)
+        .where.not(grader_names_visible_to_final_grader: true)
+        .in_batches.update_all(
+          grader_comments_visible_to_graders: true,
+          grader_names_visible_to_final_grader: true)
     end
   end
 

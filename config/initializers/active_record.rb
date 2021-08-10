@@ -1133,11 +1133,44 @@ module UsefulBatchEnumerator
 
   def relation_has_condition_on_updates?(updates)
     return false unless updates.is_a?(Hash)
+    return false if updates.empty?
 
     # is the column we're updating mentioned in the where clause?
-    common_attrs = @relation.send(:_substitute_values, updates).map(&:first) &
-      @relation.where_clause.send(:predicates).map { |pred| pred.is_a?(Arel::Nodes::Binary) && pred.left }.compact
-    !common_attrs.empty?
+    predicates = @relation.where_clause.send(:predicates)
+    return false if predicates.empty?
+
+    @relation.send(:_substitute_values, updates).any? do |(attr, update)|
+      found_match = false
+      predicates.any? do |pred|
+        next unless pred.is_a?(Arel::Nodes::Binary)
+        next unless pred.left == attr
+
+        found_match = true
+
+        raw_update = update.value.value_before_type_cast 
+        # we want to check exact class here, not ancestry, since we want to ignore
+        # subclasses we don't understand
+        if pred.class == Arel::Nodes::Equality
+          update != pred.right
+        elsif pred.class == Arel::Nodes::NotEqual
+          update == pred.right
+        elsif pred.class == Arel::Nodes::GreaterThanOrEqual
+          raw_update < pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::GreaterThan
+          raw_update <= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::LessThanOrEqual
+          raw_update >= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::LessThan
+          raw_update >= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::Between
+          raw_update < pred.right.left.value.value_before_type_cast || raw_update > pred.right.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::In && pred.right.is_a?(Array)
+          !pred.right.include?(update)
+        elsif pred.class == Arel::Nodes::NotIn && pred.right.is_a?(Array)
+          pred.right.include?(update)
+        end
+      end && found_match
+    end
   end
 end
 ActiveRecord::Batches::BatchEnumerator.prepend(UsefulBatchEnumerator)
