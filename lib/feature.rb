@@ -95,8 +95,12 @@ class Feature
   #                           # will be inherited in "off" state by root accounts
   #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
   #     beta: false,          # 'beta' tag shown in UI
-  #     pending_enforcement: false, # 'pending enforcement' tag shown in UI
   #     release_notes_url: 'http://example.com/',
+  #
+  #     # features that are pending_enforcement are nearing completion and will be finalized at a future date
+  #     # when marking a feature as pending_enforcement the enable_at field should also be set along with
+  #     # a beta environment enable_at date
+  #     pending_enforcement: false, # 'pending enforcement' tag shown in UI
   #
   #     # allow overriding feature definitions on a per-environment basis
   #     # valid environments are development, production, beta, test, ci
