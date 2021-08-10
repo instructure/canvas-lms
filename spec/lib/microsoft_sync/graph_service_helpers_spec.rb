@@ -149,9 +149,31 @@ describe MicrosoftSync::GraphServiceHelpers do
         subject.create_education_class(@course)
       end
     end
+
+    context 'when the course description is >= 1025 characters long' do
+      before { course_model(public_description: 'a' * 1025) }
+
+      it 'truncates the description' do
+        expect(graph_service).to \
+          receive(:create_education_class).with(hash_including(description: 'a' * 1021 + '...'))
+        subject.create_education_class(@course)
+      end
+    end
+
+    context 'when the course description is 1024 characters long' do
+      before { course_model(public_description: 'a' * 1024) }
+
+      it 'does not truncate the description' do
+        expect(graph_service).to \
+          receive(:create_education_class).with(hash_including(description: 'a' * 1024))
+        subject.create_education_class(@course)
+      end
+    end
   end
 
   describe '#update_group_with_course_data' do
+    let(:update_group) { subject.update_group_with_course_data('msgroupid', @course) }
+
     it 'maps course fields to Microsoft fields' do
       course_model(public_description: 'classic', name: 'algebra', sis_source_id: 'ALG-101')
       # force generation of lti context id (normally done lazily)
@@ -168,22 +190,37 @@ describe MicrosoftSync::GraphServiceHelpers do
         microsoft_EducationClassSisExt: {
           sisCourseId: 'ALG-101',
         }
-      ).and_return('foo')
+      )
 
-      expect(subject.update_group_with_course_data('msgroupid', @course)).to eq('foo')
+      update_group
+    end
+
+    def expect_lms_ext_properties(props)
+      expect(graph_service).to receive(:update_group).with(
+        'msgroupid',
+        hash_including(
+          microsoft_EducationClassLmsExt: hash_including(props),
+        )
+      )
     end
 
     it 'forces generation of lti_context_id if needed' do
       course_model
       expect(Lti::Asset).to receive(:opaque_identifier_for).with(@course).and_return('abcdef')
-      expect(graph_service).to receive(:update_group).with(
-        'msgroupid',
-        hash_including(
-          microsoft_EducationClassLmsExt: hash_including(ltiContextId: 'abcdef'),
-        )
-      ).and_return('foo')
+      expect_lms_ext_properties(ltiContextId: 'abcdef')
+      update_group
+    end
 
-      expect(subject.update_group_with_course_data('msgroupid', @course)).to eq('foo')
+    it 'truncates course descriptions longer than 256 characters' do
+      course_model(public_description: 'a' * 257)
+      expect_lms_ext_properties(lmsCourseDescription: 'a' * 253 + '...')
+      update_group
+    end
+
+    it 'does not truncate course descriptions of 256 characters' do
+      course_model(public_description: 'a' * 256)
+      expect_lms_ext_properties(lmsCourseDescription: 'a' * 256)
+      update_group
     end
   end
 

@@ -47,7 +47,7 @@ module MicrosoftSync
     # Returns the hash of the new course, including the 'id' key
     def create_education_class(course)
       graph_service.create_education_class(
-        description: course.public_description.presence,
+        description: course.public_description.presence&.truncate(1024),
         displayName: course.name,
         externalId: course.uuid,
         externalName: course.name,
@@ -63,7 +63,7 @@ module MicrosoftSync
           ltiContextId: course.lti_context_id || Lti::Asset.opaque_identifier_for(course),
           lmsCourseId: course.uuid,
           lmsCourseName: course.name,
-          lmsCourseDescription: course.public_description,
+          lmsCourseDescription: course.public_description&.truncate(256),
         },
         microsoft_EducationClassSisExt: {
           sisCourseId: course.sis_source_id,
