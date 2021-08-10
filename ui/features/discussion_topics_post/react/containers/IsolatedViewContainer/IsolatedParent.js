@@ -101,10 +101,12 @@ export const IsolatedParent = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small'
+          textSize: 'small',
+          padding: 'x-small'
         },
         desktop: {
-          textSize: 'medium'
+          textSize: 'medium',
+          padding: 'x-small medium'
         }
       }}
       render={responsiveProps => (
@@ -144,7 +146,7 @@ export const IsolatedParent = props => {
               </Text>
             </Alert>
           )}
-          <View as="div" padding="x-small">
+          <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
