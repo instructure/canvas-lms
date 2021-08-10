@@ -64,9 +64,20 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
-  it 'returns the quoted reply html for reply preview' do
-    Account.site_admin.enable_feature!(:isolated_view)
-    expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
+  describe 'reply preview' do
+    before do
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
+    end
+
+    it 'returns the quoted reply html for reply preview' do
+      expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
+    end
+
+    it 'returns the deleted reply html for reply preview' do
+      discussion_entry.update(editor: user_model(name: 'jim bo'))
+      discussion_entry.destroy
+      expect(discussion_entry_type.resolve("replyPreview")).to include "Deleted by jim bo"
+    end
   end
 
   it 'does not query for discussion subentries on non legacy entries' do

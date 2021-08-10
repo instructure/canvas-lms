@@ -117,7 +117,7 @@ describe DiscussionEntry do
 
   context "reply preview" do
     before :once do
-      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, name: 'captain america', short_name: 'steve')
       @entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
       @entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
       @entry.save!
@@ -129,6 +129,7 @@ describe DiscussionEntry do
       expect(@entry.include_reply_preview).to be true
       expect(@entry.message).to eql("<p>only this should stay</p>")
     end
+
     it "should mark include_reply_preview as false" do
       @entry.update({message: "<p>not a reply preview anymore</p>"})
       @entry.save!
@@ -136,10 +137,12 @@ describe DiscussionEntry do
       expect(@entry.message).to eql("<p>not a reply preview anymore</p>")
     end
 
-    it 'should not show the message when deleted' do
+    it 'should show "Deleted by <user>" when deleted' do
       entry = topic.discussion_entries.create!(user: student.user, message: "this is a message")
+      entry.editor_id = @teacher.id
       entry.destroy
       expect(entry.quoted_reply_html).not_to include("this is a message")
+      expect(entry.quoted_reply_html).to include("Deleted by steve")
     end
   end
 

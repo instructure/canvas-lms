@@ -203,7 +203,7 @@ class DiscussionEntry < ActiveRecord::Base
         <span>
           <strong>#{user.short_name}</strong> #{created_at.iso8601}
         </span>
-        #{self.deleted? ? nil : message}
+        #{self.deleted? ? "<p>#{I18n.t('Deleted by %{user}', user: editor.short_name)}</p>" : message}
       </blockquote>
     </div>"
   end

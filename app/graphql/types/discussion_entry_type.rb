@@ -54,10 +54,10 @@ module Types
       end
     end
 
-    field :reply_preview, String, null:true
+    field :reply_preview, String, null: true
     def reply_preview
       if Account.site_admin.feature_enabled?(:isolated_view)
-        load_association(:user).then do
+        Promise.all([load_association(:user), load_association(:editor)]).then do
           object.quoted_reply_html
         end
       end
