@@ -26,7 +26,7 @@ import {
   MENTION_MENU_SELECTOR,
   KEY_CODES
 } from './constants'
-import MentionDropdown from './components/MentionAutoComplete/MentionDropdown'
+import MentionsUI from './components/MentionAutoComplete/MentionsUI'
 import broadcastMessage, {
   inputChangeMessage,
   navigationMessage,
@@ -103,7 +103,7 @@ export const onSetContent = e => {
       elm.id = MENTION_MENU_ID
       document.body.appendChild(elm)
       ReactDom.render(
-        <MentionDropdown
+        <MentionsUI
           rceRef={editor.getBody()}
           onFocusedUserChange={onFocusedUserChange}
           onExited={onMentionsExit}
