@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!AddGroup'
 import {TextInput} from '@instructure/ui-text-input'
@@ -25,10 +25,21 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid, IconCheckSolid, IconPlusLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import Focus from '@canvas/outcomes/react/Focus'
 
 const AddContentItem = ({labelInstructions, textInputInstructions, showIcon, onSaveHandler}) => {
   const [title, setTitle] = useState('')
   const [expanded, setExpanded] = useState(false)
+  const [hasExpanded, setHasExpanded] = useState(false)
+  const labelRef = useRef(null)
+
+  useEffect(() => {
+    if (expanded) {
+      setHasExpanded(true)
+    } else if (hasExpanded) {
+      labelRef.current.focus()
+    }
+  }, [expanded, hasExpanded])
 
   const titleChangeHandler = (_event, value) => {
     setTitle(value)
@@ -55,16 +66,18 @@ const AddContentItem = ({labelInstructions, textInputInstructions, showIcon, onS
   }
 
   return (
-    <View as="div">
+    <View as="div" margin="xx-small none none">
       {expanded ? (
         <View as="div" padding="xx-small">
-          <TextInput
-            renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
-            placeholder={textInputInstructions}
-            display="inline-block"
-            width="12rem"
-            onChange={titleChangeHandler}
-          />
+          <Focus>
+            <TextInput
+              renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
+              placeholder={textInputInstructions}
+              display="inline-block"
+              width="12rem"
+              onChange={titleChangeHandler}
+            />
+          </Focus>
           <IconButton
             screenReaderLabel={I18n.t('Cancel')}
             display="inline-block"
@@ -90,6 +103,7 @@ const AddContentItem = ({labelInstructions, textInputInstructions, showIcon, onS
             renderIcon={showIcon ? <IconPlusLine size="x-small" /> : ''}
             onClick={e => show(e)}
             size="x-small"
+            ref={labelRef}
           >
             {labelInstructions}
           </Link>

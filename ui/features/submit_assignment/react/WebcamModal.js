@@ -21,7 +21,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {getUserMedia} from '../util/mediaUtils'
 import {IconVideoCameraOffSolid} from '@instructure/ui-icons'
 import I18n from 'i18n!webcam_modal'
-import Focus from './components/Focus'
+import Focus from '@canvas/outcomes/react/Focus'
 
 const WebcamModal = ({onSelectImage, open, onDismiss}) => {
   const videoRef = useRef(null)

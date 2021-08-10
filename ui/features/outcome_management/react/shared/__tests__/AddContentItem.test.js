@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import AddContentItem from '../AddContentItem'
 
 jest.useFakeTimers()
@@ -90,6 +90,24 @@ describe('AddContentItem', () => {
       // confirm input field was reset
       fireEvent.click(getByText(props.labelInstructions))
       expect(queryByText('new group name')).not.toBeInTheDocument()
+    })
+
+    it('focus the input automatically', async () => {
+      const props = defaultProps()
+      const {getByText, getByLabelText} = render(<AddContentItem {...props} />)
+      fireEvent.click(getByText(props.labelInstructions))
+      await act(async () => jest.runAllTimers())
+      expect(getByLabelText(props.textInputInstructions)).toHaveFocus()
+    })
+
+    it('focus the labelInstructions after unexpand', async () => {
+      const props = defaultProps()
+      const {getByText} = render(<AddContentItem {...props} />)
+      expect(getByText(props.labelInstructions)).not.toHaveFocus()
+      fireEvent.click(getByText(props.labelInstructions))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Cancel'))
+      expect(getByText(props.labelInstructions)).toHaveFocus()
     })
   })
 })

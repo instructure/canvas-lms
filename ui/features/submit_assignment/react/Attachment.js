@@ -23,7 +23,7 @@ import WebcamModal from './WebcamModal'
 import {hasMediaFeature} from '../util/mediaUtils'
 import I18n from 'i18n!attachment'
 import {direction} from '@canvas/i18n/rtlHelper'
-import Focus from './components/Focus'
+import Focus from '@canvas/outcomes/react/Focus'
 
 const LegacyFileUpload = ({index}) => {
   return (
