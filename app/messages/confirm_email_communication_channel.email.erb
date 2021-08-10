@@ -6,11 +6,12 @@
   <%= t :subject, "Confirm Email: Canvas" %>
 <% end %>
 
-<%= t :body,
-      "The email address, %{email} is being registered at %{website} for the user, %{user}.",
-      :email => asset.path,
-      :website => data.from_host || HostUrl.default_host,
-      :user => asset.user.name %>
+<%= t :body, <<-BODY, :email => asset.path, :website => data.from_host || HostUrl.default_host
+The email address: %{email} is being added to a Canvas account registered at %{website}.
+
+To prevent this address from being registered, please disregard this email.
+BODY
+%>
 
 <%= t :details, "To confirm this registration, please visit the following url:" %>
 <%= content :link %>
