@@ -28,6 +28,7 @@ import React, {Component} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {uploadFile} from '@canvas/upload-file'
 import UploadFileSVG from '../../../images/UploadFile.svg'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
@@ -44,9 +45,10 @@ function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
 }
 
-export default class FileUpload extends Component {
+class FileUpload extends Component {
   static propTypes = {
     assignment: Assignment.shape,
+    breakpoints: breakpointsShape,
     createSubmissionDraft: func,
     focusOnInit: bool.isRequired,
     submission: Submission.shape,
@@ -276,20 +278,26 @@ export default class FileUpload extends Component {
   }
 
   renderUploadBox() {
+    const {desktopOnly} = this.props.breakpoints
+
     const fileDropLabel = (
       <>
-        <ScreenReaderContent>
-          {I18n.t('Drag a file here, or click to select a file to upload')}
-        </ScreenReaderContent>
+        {desktopOnly && (
+          <ScreenReaderContent>
+            {I18n.t('Drag a file here, or click to select a file to upload')}
+          </ScreenReaderContent>
+        )}
         <Flex justifyItems="center" margin="small">
           <Flex.Item>
             <Img src={UploadFileSVG} size="large" />
           </Flex.Item>
           <Flex.Item padding="0 0 0 small">
             <Flex direction="column" textAlign="start">
-              <Flex.Item margin="0 0 small 0" overflowY="visible">
-                <Text size="x-large">{I18n.t('Drag a file here, or')}</Text>
-              </Flex.Item>
+              {desktopOnly && (
+                <Flex.Item margin="0 0 small 0" overflowY="visible">
+                  <Text size="x-large">{I18n.t('Drag a file here, or')}</Text>
+                </Flex.Item>
+              )}
               <Flex.Item>
                 <Text color="brand" size="medium">
                   {I18n.t('Choose a file to upload')}
@@ -442,3 +450,5 @@ export default class FileUpload extends Component {
 }
 
 FileUpload.contextType = AlertManagerContext
+
+export default WithBreakpoints(FileUpload)

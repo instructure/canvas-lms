@@ -100,7 +100,7 @@ describe('FileUpload', () => {
     )
     const emptyRender = getByTestId('upload-box')
 
-    expect(emptyRender).toHaveTextContent('Drag a file here')
+    expect(emptyRender).toHaveTextContent(/choose a file to upload/i)
   })
 
   it('does not move focus to file drop box after render if focusOnInit is false', async () => {

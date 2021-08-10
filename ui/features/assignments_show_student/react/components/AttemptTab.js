@@ -230,9 +230,9 @@ export default class AttemptTab extends Component {
           {I18n.t('Choose a submission type')}
         </Text>
 
-        <Flex>
+        <Flex wrap="wrap">
           {this.props.assignment.submissionTypes.map(type => (
-            <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
+            <Flex.Item as="div" key={type} margin="x-small medium x-small 0" data-testid={type}>
               <SubmissionTypeButton
                 displayName={friendlyTypeName(type)}
                 icon={iconsByType[type]}

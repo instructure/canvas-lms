@@ -603,7 +603,6 @@ export default class SubmissionManager extends Component {
                 !activeTypeMeetsCriteria
               }
               color="primary"
-              margin="auto 0 auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}
             >
               {I18n.t('Submit Assignment')}

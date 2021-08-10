@@ -22,8 +22,11 @@ import {Flex} from '@instructure/ui-flex'
 import {IconArrowOpenStartSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import theme from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import I18n from 'i18n!assignments_2_file_upload'
 
@@ -36,23 +39,78 @@ function buildFooterStyle() {
   }
 }
 
-const NextItem = ({tooltipText, url}) => (
+const NextItem = ({compact, tooltipText, url}) => (
   <Tooltip tip={tooltipText}>
     <Button data-testid="next-assignment-btn" margin="0 0 0 x-small" color="secondary" href={url}>
-      {I18n.t('Next')} <IconArrowOpenEndSolid />
+      <ScreenReaderContent>{I18n.t('Next Module')}</ScreenReaderContent>
+      {!compact && <PresentationContent>{I18n.t('Next')}</PresentationContent>}
+      <IconArrowOpenEndSolid />
     </Button>
   </Tooltip>
 )
 
-const PreviousItem = ({tooltipText, url}) => (
+const PreviousItem = ({compact, tooltipText, url}) => (
   <Tooltip tip={tooltipText}>
     <Button data-testid="previous-assignment-btn" margin="0 small 0 0" color="secondary" href={url}>
-      <IconArrowOpenStartSolid /> {I18n.t('Previous')}
+      <ScreenReaderContent>{I18n.t('Previous Module')}</ScreenReaderContent>
+      <IconArrowOpenStartSolid />
+      {!compact && <PresentationContent>{I18n.t('Previous')}</PresentationContent>}
     </Button>
   </Tooltip>
 )
 
-const StudentFooter = ({assignmentID, buttons, courseID}) => {
+const DefaultFooterLayout = ({buttons, previousItem, nextItem}) => (
+  <Flex alignItems="center" height="100%" margin="x-small" justifyItems="space-between">
+    {previousItem && (
+      <Flex.Item shouldShrink>
+        <PreviousItem {...previousItem} />
+      </Flex.Item>
+    )}
+
+    <Flex.Item shouldGrow margin="0 small">
+      <Flex justifyItems="end">
+        {buttons.map(button => (
+          <Flex.Item key={button.key} margin="auto 0 auto x-small">
+            {button.element}
+          </Flex.Item>
+        ))}
+      </Flex>
+    </Flex.Item>
+
+    {nextItem && (
+      <Flex.Item shouldShrink>
+        <NextItem {...nextItem} />
+      </Flex.Item>
+    )}
+  </Flex>
+)
+
+const VerticalFooterLayout = ({buttons, previousItem, nextItem}) => (
+  <View as="div" width="100%">
+    <Flex alignItems="center" width="100%" justifyItems="space-between">
+      <Flex.Item margin="x-small">
+        {previousItem && <PreviousItem compact {...previousItem} />}
+      </Flex.Item>
+      <Flex.Item shouldGrow shouldShrink>
+        <Flex alignItems="center" direction="column">
+          {buttons.map(button => (
+            <Flex.Item
+              key={button.key}
+              margin="xx-small auto"
+              overflowX="visible"
+              overflowY="visible"
+            >
+              {button.element}
+            </Flex.Item>
+          ))}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item margin="x-small">{nextItem && <NextItem compact {...nextItem} />}</Flex.Item>
+    </Flex>
+  </View>
+)
+
+const StudentFooter = ({assignmentID, buttons, breakpoints, courseID}) => {
   const alertContext = useContext(AlertManagerContext)
   const [previousItem, setPreviousItem] = useState(null)
   const [nextItem, setNextItem] = useState(null)
@@ -84,31 +142,16 @@ const StudentFooter = ({assignmentID, buttons, courseID}) => {
     return null
   }
 
+  const Layout = breakpoints.desktopOnly ? DefaultFooterLayout : VerticalFooterLayout
+
   return (
-    <div data-testid="student-footer" id="assignments-student-footer" style={buildFooterStyle()}>
-      <Flex alignItems="center" height="100%" margin="0" justifyItems="space-between">
-        {previousItem && (
-          <Flex.Item shouldShrink>
-            <PreviousItem {...previousItem} />
-          </Flex.Item>
-        )}
-
-        <Flex.Item shouldGrow margin="0 small">
-          <Flex justifyItems="end">
-            {buttons.map(button => (
-              <Flex.Item key={button.key} padding="auto small">
-                {button.element}
-              </Flex.Item>
-            ))}
-          </Flex>
-        </Flex.Item>
-
-        {nextItem && (
-          <Flex.Item shouldShrink>
-            <NextItem {...nextItem} />
-          </Flex.Item>
-        )}
-      </Flex>
+    <div
+      as="footer"
+      data-testid="student-footer"
+      id="assignments-student-footer"
+      style={buildFooterStyle()}
+    >
+      <Layout buttons={buttons} nextItem={nextItem} previousItem={previousItem} />
     </div>
   )
 }
@@ -120,6 +163,7 @@ const buttonPropType = PropTypes.shape({
 
 StudentFooter.propTypes = {
   assignmentID: PropTypes.string,
+  breakpoints: breakpointsShape,
   buttons: PropTypes.arrayOf(buttonPropType),
   courseID: PropTypes.string
 }
@@ -128,4 +172,4 @@ StudentFooter.defaultProps = {
   buttons: []
 }
 
-export default StudentFooter
+export default WithBreakpoints(StudentFooter)

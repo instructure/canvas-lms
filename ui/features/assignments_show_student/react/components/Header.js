@@ -241,9 +241,9 @@ class Header extends React.Component {
             )}
           </Flex>
           {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
-            <Flex alignItems="center">
+            <Flex alignItems="center" wrap="wrap">
               <Flex.Item shouldGrow>
-                <Flex>
+                <Flex wrap="wrap">
                   {this.props.allSubmissions && (
                     <Flex.Item>
                       <AttemptSelect
@@ -263,7 +263,7 @@ class Header extends React.Component {
               </Flex.Item>
 
               <Flex.Item shouldShrink>
-                <Flex as="div">
+                <Flex as="div" wrap="wrap">
                   {(this.props.submission.state === 'graded' ||
                     this.props.submission.state === 'submitted') && (
                     <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
