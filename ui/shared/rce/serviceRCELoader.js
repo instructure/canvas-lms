@@ -39,7 +39,16 @@ const RCELoader = {
 
     this.loadRCE(RCE => {
       RCE.renderIntoDiv(renderingTarget, propsForRCE, remoteEditor => {
-        remoteEditor.tinymceOn('init', () => callback(textarea, polyfill.wrapEditor(remoteEditor)))
+        if (remoteEditor.tinymceOn) {
+          // remove with rce_limit_init_render_on_page flag
+          remoteEditor.tinymceOn('init', () =>
+            callback(textarea, polyfill.wrapEditor(remoteEditor))
+          )
+        } else {
+          remoteEditor
+            .mceInstance()
+            .on('init', () => callback(textarea, polyfill.wrapEditor(remoteEditor)))
+        }
       })
     })
   },
@@ -209,7 +218,7 @@ const RCELoader = {
       ltiTools: window.INST?.editorButtons,
       autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
-      maxInitRenderedRCEs: !!window.ENV?.FEATURES?.rce_limit_init_render_on_page
+      maxInitRenderedRCEs: window.ENV?.FEATURES?.rce_limit_init_render_on_page
         ? tinyMCEInitOptions.maxInitRenderedRCEs
         : -1,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
