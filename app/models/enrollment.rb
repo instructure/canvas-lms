@@ -1452,6 +1452,10 @@ class Enrollment < ActiveRecord::Base
     ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
   end
 
+  def allows_favoriting?
+    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer?
+  end
+
   private
 
   def enrollments_exist_for_user_in_course?

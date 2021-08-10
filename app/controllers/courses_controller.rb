@@ -559,6 +559,11 @@ class CoursesController < ApplicationController
   end
   helper_method :enrollments_for_index
 
+  def show_favorites_col_for_index?(type)
+    enrollments_for_index(type).any?(&:allows_favoriting?)
+  end
+  helper_method :show_favorites_col_for_index?
+
   # @API List courses for a user
   # Returns a paginated list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #

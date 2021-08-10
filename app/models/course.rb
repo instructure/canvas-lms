@@ -952,6 +952,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def user_is_admin?(user)
+    return unless user
+
+    fetch_on_enrollments('user_is_admin', user) do
+      self.enrollments.for_user(user).active.of_admin_type.exists?
+    end
+  end
+
   def user_is_instructor?(user)
     return unless user
     fetch_on_enrollments('user_is_instructor', user) do

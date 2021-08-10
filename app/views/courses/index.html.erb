@@ -33,7 +33,7 @@
 <% @visible_groups ||= @current_user.visible_groups %>
 
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
-<% @show_star_column = true %>
+<% @show_star_column = show_favorites_col_for_index?(:current) %>
   <div class="header-bar">
     <h1><%= all_courses_title %></h1>
   </div>
@@ -62,7 +62,7 @@
   <table id="my_courses_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
+        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
         <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
@@ -78,7 +78,7 @@
   </table>
 <% end %>
 
-<% @show_star_column = true %>
+<% @show_star_column = show_favorites_col_for_index?(:past) %>
 <% unless enrollments_for_index(:past).empty? %>
   <div class="content--hasMarginTop">
     <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
@@ -86,7 +86,7 @@
   <table id="past_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
+        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
         <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
@@ -102,6 +102,7 @@
   </table>
 <% end %>
 
+<% @show_star_column = show_favorites_col_for_index?(:future) %>
 <% unless enrollments_for_index(:future).empty? %>
   <div class="content--hasMarginTop">
     <h2><%= t('headings.future_enrollments', 'Future Enrollments') %></h2>
@@ -109,7 +110,7 @@
   <table id="future_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
+        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
         <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
