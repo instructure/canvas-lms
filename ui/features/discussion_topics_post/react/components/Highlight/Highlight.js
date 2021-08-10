@@ -18,15 +18,18 @@
 
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef} from 'react'
+import React, {useLayoutEffect, useRef} from 'react'
 import theme from '@instructure/canvas-theme'
 
 export function Highlight({...props}) {
   const highlightRef = useRef()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.isHighlighted && highlightRef.current) {
-      setTimeout(() => highlightRef.current?.scrollIntoView({behavior: 'smooth'}), 0)
+      setTimeout(() => {
+        highlightRef.current?.scrollIntoView({behavior: 'smooth', block: 'center'})
+        highlightRef.current.querySelector('button').focus({preventScroll: true})
+      }, 0)
     }
   }, [props.isHighlighted, highlightRef])
 
