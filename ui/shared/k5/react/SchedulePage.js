@@ -25,8 +25,10 @@ import {
   renderWeeklyPlannerHeader,
   JumpToHeaderButton
 } from '@instructure/canvas-planner'
+import {ApplyTheme} from '@instructure/ui-themeable'
 
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
+import {plannerTheme} from '@canvas/k5/react/k5-theme'
 
 const SchedulePage = ({
   plannerEnabled,
@@ -61,16 +63,18 @@ const SchedulePage = ({
   }
 
   return (
-    <section
-      id="dashboard_page_schedule"
-      style={{
-        display: visible ? 'flex' : 'none',
-        flexDirection: 'column'
-      }}
-      aria-hidden={!visible}
-    >
-      {content}
-    </section>
+    <ApplyTheme theme={plannerTheme}>
+      <section
+        id="dashboard_page_schedule"
+        style={{
+          display: visible ? 'flex' : 'none',
+          flexDirection: 'column'
+        }}
+        aria-hidden={!visible}
+      >
+        {content}
+      </section>
+    </ApplyTheme>
   )
 }
 
