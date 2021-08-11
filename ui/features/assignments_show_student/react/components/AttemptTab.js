@@ -32,7 +32,7 @@ import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
@@ -81,7 +81,7 @@ function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
         <View as="div" margin="small 0 0">
           <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
           <Text color={foregroundColor} weight="normal" size="medium">
-            {displayName}
+            <PresentationContent>{displayName}</PresentationContent>
           </Text>
         </View>
       </Button>
