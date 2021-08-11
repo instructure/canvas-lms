@@ -16,99 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!AddGroup'
 import {TextInput} from '@instructure/ui-text-input'
-import {Link} from '@instructure/ui-link'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconXSolid, IconCheckSolid, IconPlusLine} from '@instructure/ui-icons'
+import {IconXSolid, IconCheckSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import Focus from '@canvas/outcomes/react/Focus'
 
-const AddContentItem = ({labelInstructions, textInputInstructions, showIcon, onSaveHandler}) => {
+const AddContentItem = ({
+  labelInstructions,
+  textInputInstructions,
+  onSaveHandler,
+  onHideHandler
+}) => {
   const [title, setTitle] = useState('')
-  const [expanded, setExpanded] = useState(false)
-  const [hasExpanded, setHasExpanded] = useState(false)
-  const labelRef = useRef(null)
 
-  useEffect(() => {
-    if (expanded) {
-      setHasExpanded(true)
-    } else if (hasExpanded) {
-      labelRef.current.focus()
-    }
-  }, [expanded, hasExpanded])
-
-  const titleChangeHandler = (_event, value) => {
+  const titleChangeHandler = (e, value) => {
     setTitle(value)
-  }
-
-  const cleanUp = () => {
-    setExpanded(false)
-    setTitle(null)
-  }
-
-  const onSave = () => {
-    onSaveHandler(title)
-    cleanUp()
-  }
-
-  const show = e => {
     e.stopPropagation()
-    setExpanded(true)
+  }
+
+  const save = () => {
+    onSaveHandler(title)
   }
 
   const hide = e => {
-    e.stopPropagation()
-    cleanUp()
+    onHideHandler(e)
   }
 
   return (
-    <View as="div" margin="xx-small none none">
-      {expanded ? (
-        <View as="div" padding="xx-small">
-          <Focus>
-            <TextInput
-              renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
-              placeholder={textInputInstructions}
-              display="inline-block"
-              width="12rem"
-              onChange={titleChangeHandler}
-            />
-          </Focus>
-          <IconButton
-            screenReaderLabel={I18n.t('Cancel')}
-            display="inline-block"
-            margin="0 0 0 small"
-            onClick={e => hide(e)}
-          >
-            <IconXSolid />
-          </IconButton>
-          <IconButton
-            screenReaderLabel={labelInstructions}
-            interaction={title ? 'enabled' : 'disabled'}
-            margin="0 0 0 small"
-            display="inline-block"
-            onClick={onSave}
-          >
-            <IconCheckSolid />
-          </IconButton>
-        </View>
-      ) : (
-        <View as="div">
-          <Link
-            isWithinText={false}
-            renderIcon={showIcon ? <IconPlusLine size="x-small" /> : ''}
-            onClick={e => show(e)}
-            size="x-small"
-            ref={labelRef}
-          >
-            {labelInstructions}
-          </Link>
-        </View>
-      )}
+    <View as="div" padding="xx-small">
+      <Focus>
+        <TextInput
+          renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
+          placeholder={textInputInstructions}
+          display="inline-block"
+          width="12rem"
+          onChange={titleChangeHandler}
+        />
+      </Focus>
+      <IconButton
+        screenReaderLabel={I18n.t('Cancel')}
+        display="inline-block"
+        margin="0 0 0 small"
+        onClick={hide}
+      >
+        <IconXSolid />
+      </IconButton>
+      <IconButton
+        screenReaderLabel={labelInstructions}
+        interaction={title.trim().length > 0 ? 'enabled' : 'disabled'}
+        margin="0 0 0 small"
+        display="inline-block"
+        onClick={save}
+      >
+        <IconCheckSolid />
+      </IconButton>
     </View>
   )
 }
@@ -116,8 +82,8 @@ const AddContentItem = ({labelInstructions, textInputInstructions, showIcon, onS
 AddContentItem.propTypes = {
   labelInstructions: PropTypes.string.isRequired,
   textInputInstructions: PropTypes.string.isRequired,
-  showIcon: PropTypes.bool.isRequired,
-  onSaveHandler: PropTypes.func.isRequired
+  onSaveHandler: PropTypes.func.isRequired,
+  onHideHandler: PropTypes.func.isRequired
 }
 
 export default AddContentItem

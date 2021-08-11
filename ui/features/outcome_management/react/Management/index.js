@@ -65,7 +65,8 @@ const OutcomeManagementPanel = () => {
     selectedParentGroupId,
     addNewGroup,
     removeGroup,
-    loadedGroups
+    loadedGroups,
+    createGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
   const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
@@ -219,6 +220,8 @@ const OutcomeManagementPanel = () => {
                 rootId={rootId}
                 showRootCollection
                 defaultExpandedIds={[rootId]}
+                onCreateGroup={createGroup}
+                loadedGroups={loadedGroups}
               />
             </View>
           </Flex.Item>

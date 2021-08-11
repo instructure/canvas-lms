@@ -26,6 +26,7 @@ import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
+import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
 export const ROOT_ID = '0'
 export const ACCOUNT_FOLDER_ID = '-1'
@@ -273,6 +274,30 @@ export const useManageOutcomes = collection => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const createGroup = async (groupName, parentGroupId = rootId) => {
+    try {
+      const newGroup = await addOutcomeGroup(contextType, contextId, parentGroupId, groupName)
+      addNewGroup(newGroup.data)
+      showFlashAlert({
+        message: I18n.t('"%{groupName}" has been created.', {groupName}),
+        type: 'success'
+      })
+      return newGroup.data
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
+              groupName,
+              message: err.message
+            })
+          : I18n.t('An error occurred adding group "%{groupName}".', {
+              groupName
+            }),
+        type: 'error'
+      })
+    }
+  }
+
   return {
     error,
     isLoading,
@@ -285,7 +310,8 @@ export const useManageOutcomes = collection => {
     clearCache,
     addNewGroup,
     removeGroup,
-    loadedGroups
+    loadedGroups,
+    createGroup
   }
 }
 
@@ -435,7 +461,8 @@ export const useTargetGroupSelector = groupId => {
     addNewGroup,
     selectedGroupId,
     selectedParentGroupId,
-    loadedGroups
+    loadedGroups,
+    createGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
   const queryCollections = ({id, parentGroupId, shouldLoad}) => {
@@ -454,6 +481,7 @@ export const useTargetGroupSelector = groupId => {
     addNewGroup,
     selectedGroupId,
     selectedParentGroupId,
-    loadedGroups
+    loadedGroups,
+    createGroup
   }
 }

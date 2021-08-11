@@ -660,6 +660,72 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('2 Outcomes')).toBeInTheDocument()
     })
+
+    it('shows groups created in the modal immediately on the LHS', async () => {
+      const newGroup = {
+        id: 101,
+        title: 'new group name',
+        description: '',
+        isRootGroup: false,
+        parent_outcome_group: {id: '2'}
+      }
+      jest
+        .spyOn(api, 'addOutcomeGroup')
+        .mockImplementation(() => Promise.resolve({status: 200, data: newGroup}))
+      const {getByText, getByRole, getByLabelText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({
+            groupId: '200',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          ...groupMocks({groupId: '300', childGroupOffset: 400}),
+          ...groupDetailMocks({
+            groupId: '300',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Create New Group'))
+      fireEvent.change(getByLabelText('Enter new group name'), {
+        target: {value: 'new group name'}
+      })
+      fireEvent.click(within(getByRole('dialog')).getByText('Create new group'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Cancel'))
+      expect(getByText('new group name')).toBeInTheDocument()
+    })
+
+    it('shows move group modal if move option from group menu is selected', async () => {
+      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
+    })
   })
 
   describe('Selected outcomes popover', () => {
@@ -711,19 +777,6 @@ describe('OutcomeManagementPanel', () => {
       })
       expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
-  })
-
-  it('shows move group modal if move option from group menu is selected', async () => {
-    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
-      ...groupDetailDefaultProps
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Outcome Group Menu'))
-    fireEvent.click(within(getByRole('menu')).getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
   })
 
   it('shows edit group modal if edit option from group menu is selected', async () => {

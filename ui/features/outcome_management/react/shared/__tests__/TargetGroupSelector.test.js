@@ -151,8 +151,16 @@ describe('TargetGroupSelector', () => {
     expect(getByText('Create New Group')).toBeInTheDocument()
   })
 
-  describe('when the create new group link is expanded', () => {
-    it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
+  describe('create new group button', () => {
+    it('focuses on the link after the AddContentItem unexpands', async () => {
+      const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Cancel'))
+      expect(getByText('Create New Group')).toHaveFocus()
+    })
+
+    it('calls the addOutcomeGroup api when the item is created', async () => {
       const newGroup = {
         id: '101',
         title: 'Group 101',
@@ -165,7 +173,7 @@ describe('TargetGroupSelector', () => {
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
@@ -183,7 +191,7 @@ describe('TargetGroupSelector', () => {
       addOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
@@ -200,7 +208,7 @@ describe('TargetGroupSelector', () => {
       addOutcomeGroup.mockReturnValue(Promise.reject(new Error()))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')

@@ -23,17 +23,18 @@ import AddContentItem from '../AddContentItem'
 jest.useFakeTimers()
 
 describe('AddContentItem', () => {
-  let onSaveHandler
+  let onSaveHandler, onHideHandler
   const defaultProps = (props = {}) => ({
     labelInstructions: 'Create New Group',
     textInputInstructions: 'Enter new group name',
-    showIcon: true,
     onSaveHandler,
+    onHideHandler,
     ...props
   })
 
   beforeEach(() => {
     onSaveHandler = jest.fn()
+    onHideHandler = jest.fn()
   })
 
   afterEach(() => {
@@ -46,68 +47,42 @@ describe('AddContentItem', () => {
     expect(getByText(props.labelInstructions)).toBeInTheDocument()
   })
 
-  describe('when expanded', () => {
-    it('renders textInputInstructions', () => {
-      const props = defaultProps()
-      const {getByText} = render(<AddContentItem {...props} />)
-      fireEvent.click(getByText(props.labelInstructions))
-      expect(getByText(props.textInputInstructions)).toBeInTheDocument()
-    })
+  it('focuses the input automatically', async () => {
+    const props = defaultProps()
+    const {getByLabelText} = render(<AddContentItem {...props} />)
+    await act(async () => jest.runAllTimers())
+    expect(getByLabelText(props.textInputInstructions)).toHaveFocus()
+  })
 
-    it('renders a cancel button and disabled submit button', () => {
-      const props = defaultProps()
-      const {getByText} = render(<AddContentItem {...props} />)
-      fireEvent.click(getByText(props.labelInstructions))
-      expect(getByText('Cancel')).toBeInTheDocument()
-      expect(getByText(props.textInputInstructions)).toBeInTheDocument()
-      expect(getByText(props.labelInstructions).closest('button')).toHaveAttribute('disabled')
-    })
+  it('renders textInputInstructions', () => {
+    const props = defaultProps()
+    const {getByText} = render(<AddContentItem {...props} />)
+    expect(getByText(props.textInputInstructions)).toBeInTheDocument()
+  })
 
-    it('the submit button calls the onSaveHandler and resets the input field', () => {
-      const props = defaultProps()
-      const {getByText, getByLabelText, queryByText} = render(<AddContentItem {...props} />)
-      fireEvent.click(getByText(props.labelInstructions))
-      fireEvent.change(getByLabelText(props.textInputInstructions), {
-        target: {value: 'new group name'}
-      })
-      fireEvent.click(getByText(props.labelInstructions))
-      expect(onSaveHandler).toHaveBeenCalledWith('new group name')
-      // confirm input field was reset
-      fireEvent.click(getByText(props.labelInstructions))
-      expect(queryByText('new group name')).not.toBeInTheDocument()
-    })
+  it('renders a cancel button and disabled submit button', () => {
+    const props = defaultProps()
+    const {getByText} = render(<AddContentItem {...props} />)
+    expect(getByText('Cancel')).toBeInTheDocument()
+    expect(getByText(props.textInputInstructions)).toBeInTheDocument()
+    expect(getByText(props.labelInstructions).closest('button')).toHaveAttribute('disabled')
+  })
 
-    it('the cancel button hides the expanded view and resets the input field', () => {
-      const props = defaultProps()
-      const {getByText, getByLabelText, queryByText} = render(<AddContentItem {...props} />)
-      fireEvent.click(getByText(props.labelInstructions))
-      fireEvent.change(getByLabelText(props.textInputInstructions), {
-        target: {value: 'new group name'}
-      })
-      fireEvent.click(getByText('Cancel'))
-      expect(queryByText(props.textInputInstructions)).not.toBeInTheDocument()
-      expect(onSaveHandler).not.toHaveBeenCalled()
-      // confirm input field was reset
-      fireEvent.click(getByText(props.labelInstructions))
-      expect(queryByText('new group name')).not.toBeInTheDocument()
+  it('the submit button calls the onSaveHandler', () => {
+    const props = defaultProps()
+    const {getByText, getByLabelText} = render(<AddContentItem {...props} />)
+    fireEvent.change(getByLabelText(props.textInputInstructions), {
+      target: {value: 'new group name'}
     })
+    fireEvent.click(getByText(props.labelInstructions))
+    expect(onSaveHandler).toHaveBeenCalledWith('new group name')
+  })
 
-    it('focus the input automatically', async () => {
-      const props = defaultProps()
-      const {getByText, getByLabelText} = render(<AddContentItem {...props} />)
-      fireEvent.click(getByText(props.labelInstructions))
-      await act(async () => jest.runAllTimers())
-      expect(getByLabelText(props.textInputInstructions)).toHaveFocus()
-    })
-
-    it('focus the labelInstructions after unexpand', async () => {
-      const props = defaultProps()
-      const {getByText} = render(<AddContentItem {...props} />)
-      expect(getByText(props.labelInstructions)).not.toHaveFocus()
-      fireEvent.click(getByText(props.labelInstructions))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Cancel'))
-      expect(getByText(props.labelInstructions)).toHaveFocus()
-    })
+  it('the cancel button calls the onHideHandler', () => {
+    const props = defaultProps({onHideHandler})
+    const {getByText} = render(<AddContentItem {...props} />)
+    fireEvent.click(getByText(props.labelInstructions))
+    fireEvent.click(getByText('Cancel'))
+    expect(onHideHandler).toHaveBeenCalled()
   })
 })
