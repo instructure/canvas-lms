@@ -42,11 +42,6 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     screen.getByRole('heading', {name: /buttons and icons/i})
   })
 
-  it('renders the list view', () => {
-    renderComponent({...defaults, type: 'list'})
-    screen.getByRole('heading', {name: /saved buttons and icons/i})
-  })
-
   it('closes the tray', async () => {
     const onUnmount = jest.fn()
     renderComponent({...defaults, onUnmount})
