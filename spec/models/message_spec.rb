@@ -323,18 +323,25 @@ describe Message do
                                user: @user,
                                root_account: account)
 
-
-      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
-                                                             {short_stat: "message.deliver",
-                                                              tags: {path_type: "email", notification_name: 'my_name'}})
-
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.#{@message.root_account.global_id}",
-                                                             {short_stat: "message.deliver_per_account",
-                                                              tags: {path_type: "email", root_account_id: @message.root_account.global_id}})
-
       expect(@message).to receive(:dispatch).and_return(true)
-      @message.deliver
+      expect {
+        @message.deliver
+      }.to have_incremented_statsd_stats([
+        {
+          stat: "message.deliver.email.my_name",
+          options: {
+            short_stat: "message.deliver",
+            tags: {path_type: "email", notification_name: 'my_name'}
+          }
+        },
+        {
+          stat: "message.deliver.email.#{@message.root_account.global_id}",
+          options: {
+            short_stat: "message.deliver_per_account",
+            tags: {path_type: "email", root_account_id: @message.root_account.global_id}
+          }
+        }
+      ])
     end
 
     context 'push' do

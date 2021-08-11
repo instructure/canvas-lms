@@ -195,13 +195,14 @@ describe GroupAndMembershipImporter do
     end
 
     it 'should log stat on new groups' do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      expect(InstStatsd::Statsd).to receive(:increment).with("groups.auto_create",
-                                                             tags: { split_type: 'csv',
-                                                                     root_account_id: gc1.root_account&.global_id,
-                                                                     root_account_name: gc1.root_account&.name })
-      import_csv_data(%{user_id,group_name
-                        user_4,anugroup})
+      expect {
+        import_csv_data(%{user_id,group_name
+                          user_4,anugroup})
+      }.to have_incremented_statsd_stat('groups.auto_create', tags: { 
+        split_type: 'csv',
+        root_account_id: gc1.root_account&.global_id,
+        root_account_name: gc1.root_account&.name
+      })
     end
   end
 end

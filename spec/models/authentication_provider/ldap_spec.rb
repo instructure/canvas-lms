@@ -78,56 +78,50 @@ describe AuthenticationProvider::LDAP do
 
       it "should send to statsd on success" do
         allow(@ldap).to receive(:bind_as).and_return(true)
-        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_success",
-                                      short_stat: "ldap_success",
-                                      tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
-        @aac.ldap_bind_result('user', 'pass')
+        expect {
+          @aac.ldap_bind_result('user', 'pass')
+        }.to have_incremented_statsd_stat(
+          "#{@aac.send(:statsd_prefix)}.ldap_success",
+          short_stat: "ldap_success",
+          tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id}
+        )
       end
 
       it "should send to statsd on failure" do
         allow(@ldap).to receive(:bind_as).and_return(false)
-        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_failure",
-                                                               short_stat: "ldap_failure",
-                                                               tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
-        @aac.ldap_bind_result('user', 'pass')
+        expect {
+          @aac.ldap_bind_result('user', 'pass')
+        }.to have_incremented_statsd_stat(
+          "#{@aac.send(:statsd_prefix)}.ldap_failure",
+          short_stat: "ldap_failure",
+          tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id}
+        )
       end
 
       it "should send to statsd on timeout" do
         allow(@ldap).to receive(:bind_as).and_raise(Timeout::Error)
-        satisfied = false
-        allow(InstStatsd::Statsd).to receive(:increment) do |key, data|
-          if key == "#{@aac.send(:statsd_prefix)}.ldap_timeout"
-            satisfied = true
-            expect(data).to eq({
-              short_stat: "ldap_timeout",
-              tags: {
-                account_id: Shard.global_id_for(@aac.account_id),
-                auth_provider_id: @aac.global_id
-              }
-            })
-          end
-        end
-        @aac.ldap_bind_result('user', 'pass')
-        expect(satisfied).to be_truthy
+        expect {
+          @aac.ldap_bind_result('user', 'pass')
+        }.to have_incremented_statsd_stat("#{@aac.send(:statsd_prefix)}.ldap_timeout", {
+          short_stat: "ldap_timeout",
+          tags: {
+            account_id: Shard.global_id_for(@aac.account_id),
+            auth_provider_id: @aac.global_id
+          }
+        })
       end
 
       it "should send to statsd on exception" do
         allow(@ldap).to receive(:bind_as).and_raise(StandardError)
-        satisfied = false
-        allow(InstStatsd::Statsd).to receive(:increment) do |key, data|
-          if key == "#{@aac.send(:statsd_prefix)}.ldap_error"
-            satisfied = true
-            expect(data).to eq({
-              short_stat: "ldap_error",
-              tags: {
-                account_id: Shard.global_id_for(@aac.account_id),
-                auth_provider_id: @aac.global_id
-              }
-            })
-          end
-        end
-        @aac.ldap_bind_result('user', 'pass')
-        expect(satisfied).to be_truthy
+        expect {
+          @aac.ldap_bind_result('user', 'pass')
+        }.to have_incremented_statsd_stat("#{@aac.send(:statsd_prefix)}.ldap_error", {
+          short_stat: "ldap_error",
+          tags: {
+            account_id: Shard.global_id_for(@aac.account_id),
+            auth_provider_id: @aac.global_id
+          }
+        })
       end
     end
   end

@@ -75,11 +75,12 @@ describe Mailer do
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
       expect(mail).to receive(:deliver_now)
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver",
-                                                             { short_stat: "message.deliver",
-                                                               tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } })
-      Mailer.deliver(mail)
+      expect {
+        Mailer.deliver(mail)
+      }.to have_incremented_statsd_stat('message.deliver', {
+        short_stat: "message.deliver",
+        tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' }
+      })
     end
 
     it 'calls the notification service if configured' do

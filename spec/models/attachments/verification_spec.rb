@@ -89,25 +89,34 @@ describe Attachments::Verification do
 
     it "should return false on an expired verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::TokenExpired)
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_expired")
 
-      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      result = true
+      expect {
+        result = v.valid_verifier_for_permission?("token", :read)
+      }.to have_incremented_statsd_stat("attachments.token_verifier_expired")
+      expect(result).to eq(false)
     end
 
     it "should return false on an invalid verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::InvalidToken)
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_invalid")
 
-      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      result = true
+      expect {
+        result = v.valid_verifier_for_permission?("token", :read)
+      }.to have_incremented_statsd_stat("attachments.token_verifier_invalid")
+      expect(result).to eq(false)
     end
 
     it "should return false on token id mismatch" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
         id: attachment.global_id + 1
       })
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_id_mismatch")
 
-      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      result = true
+      expect {
+        result = v.valid_verifier_for_permission?("token", :read)
+      }.to have_incremented_statsd_stat("attachments.token_verifier_id_mismatch")
+      expect(result).to eq(false)
     end
 
     it "should not let a student download an attachment that's locked" do

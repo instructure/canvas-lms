@@ -199,14 +199,26 @@ describe MicrosoftSync::GraphServiceHttp do
         end
 
         it 'increments a "retried" statsd counter' do
-          subject.request(:post, 'foo/bar', body: {hello: 'world'})
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with("microsoft_sync.graph_service.retried",
-                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-                         status_code: status_code_statsd_tag})
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with("microsoft_sync.graph_service.success",
-                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc', status_code: '200'})
+          expect {
+            subject.request(:post, 'foo/bar', body: {hello: 'world'})
+          }.to have_incremented_statsd_stats([
+            {
+              stat: "microsoft_sync.graph_service.retried",
+              options: {
+                tags: {
+                  msft_endpoint: 'post_foo',
+                  extra_tag: 'abc',
+                  status_code: status_code_statsd_tag
+                }
+              }
+            },
+            {
+              stat: "microsoft_sync.graph_service.success",
+              options: {
+                tags: {msft_endpoint: 'post_foo', extra_tag: 'abc', status_code: '200'}
+              }
+            }
+          ])
         end
 
         it 'logs the outcome of each request' do
@@ -225,15 +237,30 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:requests) { [:bad, :bad] }
 
         it 'fails and increments "retried" and "error" statsd counters' do
-          expect { subject.request(:post, 'foo/bar', body: {hello: 'world'}) }.to raise_error(error_class)
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with("microsoft_sync.graph_service.retried",
-                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-                         status_code: status_code_statsd_tag})
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with("microsoft_sync.graph_service.intermittent",
-                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-                         status_code: status_code_statsd_tag})
+          expect {
+            subject.request(:post, 'foo/bar')
+          }.to have_incremented_statsd_stats([
+            {
+              stat: "microsoft_sync.graph_service.retried",
+              options: {
+                tags: {
+                  msft_endpoint: 'post_foo',
+                  extra_tag: 'abc',
+                  status_code: status_code_statsd_tag
+                }
+              }
+            },
+            {
+              stat: "microsoft_sync.graph_service.intermittent",
+              options: {
+                tags: {
+                  msft_endpoint: 'post_foo',
+                  extra_tag: 'abc',
+                  status_code: status_code_statsd_tag
+                }
+              }
+            }
+          ]).and raise_error(error_class)
         end
 
         it 'logs the outcome of each request' do

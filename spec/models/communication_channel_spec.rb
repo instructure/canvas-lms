@@ -747,15 +747,25 @@ describe CommunicationChannel do
         cc.e164_path,
         true
       )
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.sms.one_time_password",
-                                                             { short_stat: "message.deliver",
-                                                               tags: { path_type: "sms", notification_name: 'one_time_password' } })
-
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.sms.totes_an_ID",
-                                                             { short_stat: "message.deliver_per_account",
-                                                               tags: { path_type: "sms", root_account_id: 'totes_an_ID' } })
       expect(cc).to receive(:send_otp_via_sms_gateway!).never
-      cc.send_otp!('123456', account)
+      expect {
+        cc.send_otp!('123456', account)
+      }.to have_incremented_statsd_stats([
+        {
+          stat: "message.deliver.sms.one_time_password",
+          options: {
+            short_stat: "message.deliver",
+            tags: {path_type: "sms", notification_name: 'one_time_password'}
+          }
+        },
+        {
+          stat: "message.deliver.sms.totes_an_ID",
+          options: {
+            short_stat: "message.deliver_per_account",
+            tags: {path_type: "sms", root_account_id: 'totes_an_ID'}
+          }
+        }
+      ])
     end
 
     it "sends via email if not configured" do
