@@ -20,7 +20,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
-           :root_opt_in, :enable_at, :beta, :pending_enforcement,
+           :root_opt_in, :enable_at, :beta, :type, :pending_enforcement,
            :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
@@ -133,6 +133,7 @@ class Feature
   VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
   VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
   VALID_ENVS = %i(development ci beta test production).freeze
+  VALID_TYPES = %w(feature_option setting).freeze
 
   DISABLED_FEATURE = Feature.new.freeze
 
@@ -155,6 +156,7 @@ class Feature
     raise "applies_to is required for feature #{feature}" unless attrs[:applies_to]
     raise "invalid 'state' for feature #{feature}: must be one of #{VALID_STATES}, is #{attrs[:state]}" unless VALID_STATES.include? attrs[:state]
     raise "invalid 'applies_to' for feature #{feature}: must  be one of #{VALID_APPLIES_TO}, is #{attrs[:applies_to]}" unless VALID_APPLIES_TO.include? attrs[:applies_to]
+    raise "invalid 'type' for feature #{feature}: must  be one of #{VALID_TYPES}, is #{attrs[:type]}" unless VALID_TYPES.include? attrs[:type]
   end
 
   def self.definitions
@@ -201,7 +203,7 @@ class Feature
     feature_def.applies_to_object(object)
   end
 
-  def self.applicable_features(object)
+  def self.applicable_features(object, type: nil)
     applicable_types = []
     if object.is_a?(Account)
       applicable_types << 'Account'
@@ -214,7 +216,7 @@ class Feature
     elsif object.is_a?(User)
       applicable_types << 'User'
     end
-    definitions.values.select { |fd| applicable_types.include?(fd.applies_to) }
+    definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }
   end
 
   def default_transitions(context, orig_state)

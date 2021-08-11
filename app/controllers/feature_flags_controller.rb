@@ -156,7 +156,7 @@ class FeatureFlagsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :features])
-      features = Feature.applicable_features(@context)
+      features = Feature.applicable_features(@context, type: params[:type])
       features = Api.paginate(features, self, route)
 
       skip_cache = @context.grants_right?(@current_user, session, :manage_feature_flags)

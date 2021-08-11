@@ -22,15 +22,17 @@ import {render, act, fireEvent} from '@testing-library/react'
 import FeatureFlagTable from '../FeatureFlagTable'
 import sampleData from './sampleData.json'
 
-const rows = [
-  sampleData.allowedOnFeature,
-  sampleData.allowedFeature,
-  sampleData.betaFeature,
-  sampleData.onFeature,
-  sampleData.offFeature,
-  sampleData.pendingEnforcementOnFeature,
-  sampleData.pendingEnforcementOffFeature
-]
+const rows = {
+  feature_option: [
+    sampleData.allowedOnFeature,
+    sampleData.betaFeature,
+    sampleData.onFeature,
+    sampleData.offFeature,
+    sampleData.pendingEnforcementOnFeature,
+    sampleData.pendingEnforcementOffFeature
+  ],
+  setting: [sampleData.allowedFeature]
+}
 const title = 'Section 123'
 
 describe('feature_flags::FeatureFlagTable', () => {
@@ -43,19 +45,27 @@ describe('feature_flags::FeatureFlagTable', () => {
   })
 
   it('Shows the title', () => {
-    const {getByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
+    const {getByTestId} = render(<FeatureFlagTable rows={rows} title={title} showTitle />)
 
     expect(getByTestId('ff-table-heading')).toHaveTextContent(title)
   })
 
-  it('Sorts the features', () => {
+  it('Sorts the features within groups', () => {
     const {getAllByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
 
+    // Feature option
     expect(getAllByTestId('ff-table-row')[0]).toHaveTextContent('Beta Feature')
-    expect(getAllByTestId('ff-table-row')[1]).toHaveTextContent('Feature 1')
-    expect(getAllByTestId('ff-table-row')[2]).toHaveTextContent('Feature 2')
-    expect(getAllByTestId('ff-table-row')[3]).toHaveTextContent('Feature 3')
-    expect(getAllByTestId('ff-table-row')[4]).toHaveTextContent('Feature 4')
+    expect(getAllByTestId('ff-table-row')[1]).toHaveTextContent('Feature 2')
+    expect(getAllByTestId('ff-table-row')[2]).toHaveTextContent('Feature 3')
+    expect(getAllByTestId('ff-table-row')[3]).toHaveTextContent('Feature 4')
+    expect(getAllByTestId('ff-table-row')[4]).toHaveTextContent(
+      'Feature with Pending Enforcement Off'
+    )
+    expect(getAllByTestId('ff-table-row')[5]).toHaveTextContent(
+      'Feature with Pending Enforcement On'
+    )
+    // Setting
+    expect(getAllByTestId('ff-table-row')[6]).toHaveTextContent('Feature 1')
   })
 
   it('Includes the descriptions, respecting autoexpand', () => {

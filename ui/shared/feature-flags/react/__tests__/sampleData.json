@@ -22,7 +22,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "setting"
   },
   "allowedOnFeature": {
     "feature": "feature2",
@@ -47,7 +48,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "onFeature": {
     "feature": "feature3",
@@ -72,7 +74,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "offFeature": {
     "feature": "feature4",
@@ -98,7 +101,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "allowedOnRootAccountFeature": {
     "feature": "feature5",
@@ -123,7 +127,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed_on"
-    }
+    },
+    "type": "feature_option"
   },
   "allowedOnCourseFeature": {
     "feature": "feature6",
@@ -145,7 +150,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed_on"
-    }
+    },
+    "type": "feature_option"
   },
   "betaFeature": {
     "feature": "betaFeature",
@@ -168,7 +174,8 @@
       "hidden": false,
       "parent_state": "allowed_on"
     },
-    "beta": true
+    "beta": true,
+    "type": "feature_option"
   },
   "pendingEnforcementOnFeature": {
     "feature": "feature7",
@@ -192,7 +199,8 @@
       "locked": false,
       "hidden": true,
       "parent_state": "hidden"
-    }
+    },
+    "type": "feature_option"
   },
   "pendingEnforcementOffFeature": {
     "feature": "feature8",
@@ -215,6 +223,7 @@
       "locked": false,
       "hidden": true,
       "parent_state": "hidden"
-    }
+    },
+    "type": "feature_option"
   }
 }

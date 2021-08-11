@@ -117,11 +117,42 @@ describe('feature_flags::FeatureFlags', () => {
         const filterField = await findByPlaceholderText('Filter Features')
         fireEvent.change(filterField, {target: {value: 'active'}})
         fireEvent.click(await getAllByText('Active Development')[1])
-        expect(await getAllByText('Course')[0]).toBeInTheDocument()
-        expect(await getAllByText('Beta Feature')[0]).toBeInTheDocument()
         await waitFor(() => {
+          expect(getAllByText('Course')[0]).toBeInTheDocument()
+          expect(getAllByText('Beta Feature')[0]).toBeInTheDocument()
           expect(queryByText('Account')).not.toBeInTheDocument()
           expect(queryByText('User')).not.toBeInTheDocument()
+        })
+      })
+
+      it('renders section titles for types', async () => {
+        const {queryAllByTestId} = render(
+          <div>
+            <FeatureFlags />
+            <div id="aria_alerts" role="alert" />
+          </div>
+        )
+        await waitFor(() => {
+          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Option')
+          expect(queryAllByTestId('ff-table-heading')[1]).toHaveTextContent('Setting')
+        })
+      })
+
+      it('hides section titles if no row exists in section after search', async () => {
+        const {findByPlaceholderText, getAllByText, queryAllByTestId, queryByText} = render(
+          <div>
+            <FeatureFlags />
+            <div id="aria_alerts" role="alert" />
+          </div>
+        )
+        const searchField = await findByPlaceholderText('Search')
+        fireEvent.change(searchField, {target: {value: 'Feature 4'}})
+        expect(await getAllByText('User')[0]).toBeInTheDocument()
+        await waitFor(() => {
+          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Option')
+          expect(queryByText('Setting')).not.toBeInTheDocument()
+          expect(queryByText('Account')).not.toBeInTheDocument()
+          expect(queryByText('Course')).not.toBeInTheDocument()
         })
       })
     })

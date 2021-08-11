@@ -48,6 +48,7 @@ module FeatureFlags
       [:custom_transition_proc, :after_state_change_proc, :visible_on].each do |check|
         definition[check] = wrap_hook_method(definition[check]) if definition[check]
       end
+      definition[:type] ||= 'feature_option'
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end

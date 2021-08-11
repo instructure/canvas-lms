@@ -29,26 +29,28 @@ import {Text} from '@instructure/ui-text'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
-function FeatureFlagFilterTable({title, rows, disableDefaults}) {
-  return (
-    <>
-      <Heading as="h2" level="h3" data-testid="ff-table-heading">
-        {title}
-      </Heading>
-      <Table caption={title} margin="medium 0">
+function FeatureFlagFilterTable({title, rows, disableDefaults, showTitle}) {
+  const typeTables = []
+  // render type tables
+  for (const type in rows) {
+    rows[type].sort((a, b) => a.display_name.localeCompare(b.display_name))
+    if (rows[type].length < 1) {
+      continue
+    }
+
+    typeTables.push(
+      <Table key={type} caption={title} margin="medium 0">
         <Head>
           <Row>
             <ColHeader id="display_name" width="50%">
-              {I18n.t('Feature')}
+              {type}
             </ColHeader>
-            <ColHeader id="status" width="50%">
-              {I18n.t('Status')}
-            </ColHeader>
-            <ColHeader id="state">{I18n.t('State')}</ColHeader>
+            <ColHeader id="status" width="50%" />
+            <ColHeader id="state" />
           </Row>
         </Head>
         <Body>
-          {rows.map(feature => (
+          {rows[type].map(feature => (
             <Row key={feature.feature} data-testid="ff-table-row">
               <Cell>
                 <ToggleDetails summary={feature.display_name} defaultExpanded={feature.autoexpand}>
@@ -102,15 +104,26 @@ function FeatureFlagFilterTable({title, rows, disableDefaults}) {
           ))}
         </Body>
       </Table>
+    )
+  }
+
+  return (
+    <>
+      {showTitle ? (
+        <Heading as="h2" level="h3" data-testid="ff-table-heading">
+          {title}
+        </Heading>
+      ) : null}
+      {typeTables}
     </>
   )
 }
 
-function FeatureFlagTable({title, rows, disableDefaults}) {
-  rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
+function FeatureFlagTable({title, rows, disableDefaults, showTitle}) {
   if (ENV.FEATURES?.feature_flag_filters) {
-    return FeatureFlagFilterTable({title, rows, disableDefaults})
+    return FeatureFlagFilterTable({title, rows, disableDefaults, showTitle})
   }
+  rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
   return (
     <>
       <Heading as="h2" level="h3" data-testid="ff-table-heading">
