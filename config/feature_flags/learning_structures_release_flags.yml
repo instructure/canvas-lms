@@ -49,3 +49,12 @@ k5_parent_support:
   display_name: 'Canvas for Elementary: Parent Support'
   description: Enables support for observers within Canvas for Elementary.
   applies_to: SiteAdmin
+pace_plans:
+  state: hidden
+  display_name: 'Pace Plans'
+  description: Pace Plans adds support for rolling enrollments to Canvas;
+    allowing magical distribution of due dates for students with different
+    start dates based on an instructor's defined pace. Learn more and give
+    feedback by joining the Pace Plans User Group.
+  applies_to: Account
+  beta: true

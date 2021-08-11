@@ -408,6 +408,7 @@ ul.user_list div.enrollment_type.pending {
   .course-conclude-at-row,
   .course-participation-row,
   .language-row,
+  .pace-plans-row,
   .friendly-name-row {
     align-items: flex-start;
     padding-top: 0.5rem;
@@ -469,6 +470,21 @@ td.center-text {
 
 .master_course_restrictions .ic-Checkbox-group {
   margin-#{direction(left)}: 18px;
+}
+
+.pace-plans-caution-text {
+  display: flex;
+  & i {
+    color: $ic-color-danger;
+    margin-#{direction(left)}: -0.1rem;
+    margin-#{direction(right)}: 0.3rem;
+  }
+  & p {
+    margin: 0;
+  }
+  &:not(.shown) {
+    display: none;
+  }
 }
 
 #csp_options {

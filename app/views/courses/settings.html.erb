@@ -492,6 +492,30 @@
           </div>
         </div>
       <% end %>
+      <% if @context.account.feature_enabled?(:pace_plans) %>
+        <div class="form-row pace-plans-row">
+          <div class="form-label nobr"><%= f.blabel :pace_plans, :en => "Pace Plans" %></div>
+          <div class="tall-row">
+            <div class="nobr">
+              <%= f.check_box :enable_pace_plans, :disabled => !can_manage %>
+              <%= f.label :enable_pace_plans, :en => "Enable Pace Plans" %><br/>
+            </div>
+            <div id="pace_plans_caution_text" class="aside palign pace-plans-caution-text">
+              <i class='icon-warning-borderless'></i>
+              <div>
+                <p>
+                  <%= t ("Pace Plans is in active development.")%>
+                </p>
+                <p>
+                  <%= t do %>
+                    Learn more about this feature in the <a href="<%= t(:'#community.pace_plans') %>" target="_blank">Pace Plans User Group</a>.
+                  <% end %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></div>
         <div colspan="3">

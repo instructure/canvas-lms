@@ -3304,6 +3304,8 @@ class Course < ActiveRecord::Base
   add_setting :syllabus_course_summary, :boolean => true, :default => true
   add_setting :syllabus_updated_at
 
+  add_setting :enable_pace_plans, :boolean => true, :default => false
+
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :course_color
