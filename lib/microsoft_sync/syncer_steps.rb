@@ -60,14 +60,6 @@ module MicrosoftSync
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
 
-    class MissingOwners < Errors::GracefulCancelError
-      def self.public_message
-        I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
-          'corresponding to the instructors of the Canvas course could be found on the ' \
-          'Microsoft side.'
-      end
-    end
-
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
       def self.public_message
@@ -257,7 +249,7 @@ module MicrosoftSync
     def step_execute_diff(diff, _job_state_data)
       # TODO: If there are no instructor enrollments, we actually want to
       # remove the group on the Microsoft side (INTEROP-6672)
-      raise MissingOwners if diff.local_owners.empty?
+      raise Errors::MissingOwners if diff.local_owners.empty?
 
       raise MaxMemberEnrollmentsReached if diff.max_enrollment_members_reached?
       raise MaxOwnerEnrollmentsReached if diff.max_enrollment_owners_reached?

@@ -739,6 +739,11 @@ describe MicrosoftSync::GraphService do
       {id: id, status: 400, body: {error: {code:"Request_BadRequest", message: msg}}}
     end
 
+    def last_owner_removed(id)
+      msg = "The group must have at least one owner, hence this owner cannot be removed."
+      {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: msg}}}
+    end
+
     context 'when all are successfully removed' do
       let(:batch_responses) do
         [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
@@ -793,6 +798,18 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    context 'when the last owner in a group is removed' do
+      let(:batch_responses) do
+        [succ('members_m1'), succ('members_m2'), last_owner_removed('owners_o1'), succ('owners_o2')]
+      end
+
+      it 'raises an MissingOwners' do
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(
+          MicrosoftSync::Errors::MissingOwners, /must have owners/
+        )
+      end
+    end
+
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
@@ -807,6 +824,7 @@ describe MicrosoftSync::GraphService do
       let(:endpoint_name) { 'group_remove_users' }
       let(:ignored_members_m1_response) { missing('members_m1') }
     end
+
   end
 
   describe '#team_exists?' do

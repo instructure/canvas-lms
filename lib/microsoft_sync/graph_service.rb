@@ -87,6 +87,9 @@ module MicrosoftSync
         group_remove_user_requests(group_id, members, 'members') +
         group_remove_user_requests(group_id, owners, 'owners')
       quota = [reqs.count, reqs.count]
+
+      expected_error = nil
+
       failed_req_ids = run_batch('group_remove_users', reqs, quota: quota) do |resp|
         (
           resp['status'] == 404 && resp['body'].to_s =~
@@ -95,8 +98,16 @@ module MicrosoftSync
           # This variant seems to happen right after removing a user with the UI
           resp['status'] == 400 && resp['body'].to_s =~
             /One or more removed object references do not exist for the following modified/i
+        ) || (
+          # Check for this here so run_batch doesn't increment error counters. Record
+          # the failure in expected_error and raise below.
+          resp['status'] == 400 && resp['body'].to_s =~
+            /must have at least one owner, hence this owner cannot be removed./ &&
+          (expected_error = :missing_owners)
         )
       end
+
+      raise Errors::MissingOwners if expected_error == :missing_owners
       split_request_ids_to_hash(failed_req_ids)
     end
 

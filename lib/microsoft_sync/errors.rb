@@ -107,6 +107,16 @@ module MicrosoftSync
       end
     end
 
+    # When we know the team has been created so we know there are really no teachers
+    # (or possibly, in the case of partial sync, some have been manually removed)
+    class MissingOwners < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
+          'corresponding to the instructors of the Canvas course could be found on the ' \
+          'Microsoft side.'
+      end
+    end
+
     class TeamAlreadyExists < StandardError; end
 
     # Makes public the status code but not anything about the response body.
