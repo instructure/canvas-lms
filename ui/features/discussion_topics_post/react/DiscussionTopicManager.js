@@ -160,7 +160,10 @@ const DiscussionTopicManager = props => {
     courseID: window.ENV?.course_id
   }
 
-  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
+  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
+    variables,
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
+  })
 
   const updateCache = (cache, result) => {
     try {
