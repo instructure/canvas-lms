@@ -18,16 +18,23 @@
 
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionPostToolbarContainer = props => {
-  const {filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
+  const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
+  const [currentSearchValue, setCurrentSearchValue] = useState('')
 
-  const onSearchChange = value => {
-    setSearchTerm(value)
-  }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentSearchValue !== searchTerm) {
+        setSearchTerm(currentSearchValue)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [currentSearchValue, searchTerm, setSearchTerm])
 
   const onViewFilter = (_event, value) => {
     setFilter(value.value)
@@ -60,11 +67,12 @@ export const DiscussionPostToolbarContainer = props => {
         selectedView={filter}
         sortDirection={sort}
         isCollapsedReplies
-        onSearchChange={onSearchChange}
+        onSearchChange={value => setCurrentSearchValue(value)}
         onViewFilter={onViewFilter}
         onSortClick={onSortClick}
         onCollapseRepliesToggle={() => {}}
         onTopClick={() => {}}
+        searchTerm={currentSearchValue}
       />
     </View>
   )

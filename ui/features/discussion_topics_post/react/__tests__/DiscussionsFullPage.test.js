@@ -220,9 +220,20 @@ describe('DiscussionFullPage', () => {
       const container = setup()
       expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
       fireEvent.change(await container.getByLabelText('Search entries or author'), {
-        target: {value: 'a'}
+        target: {value: 'aa'}
       })
       await waitFor(() => expect(container.queryByTestId('discussion-topic-container')).toBeNull())
+    })
+
+    it('does not hide discussion topic when single character search term is present', async () => {
+      const container = setup()
+      expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
+      fireEvent.change(await container.getByLabelText('Search entries or author'), {
+        target: {value: 'a'}
+      })
+      await waitFor(() =>
+        expect(container.queryByTestId('discussion-topic-container')).toBeTruthy()
+      )
     })
   })
 

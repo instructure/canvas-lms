@@ -18,7 +18,6 @@
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
-import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
 import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
 import I18n from 'i18n!discussions_posts'
@@ -30,11 +29,10 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
-import React, {useContext, useCallback, useMemo} from 'react'
+import React from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {SearchContext} from '../../utils/constants'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -53,7 +51,7 @@ export const getMenuConfig = props => {
 }
 
 const getClearButton = props => {
-  if (!props.searchTerm.length) return
+  if (!props.searchTerm?.length) return
 
   return (
     <IconButton
@@ -71,29 +69,14 @@ const getClearButton = props => {
 }
 
 export const DiscussionPostToolbar = props => {
-  const {searchTerm, setSearchTerm} = useContext(SearchContext)
-
-  const debouncedSave = useCallback(
-    debounce(nextValue => props.onSearchChange(nextValue), 500),
-    [] // will be created only once initially
-  )
-
-  const handleChange = event => {
-    const {value: nextValue} = event.target
-    // Even though handleChange is created on each render and executed
-    // it references the same debouncedSave that was created initially
-    setSearchTerm(nextValue)
-    debouncedSave(nextValue)
+  const clearButton = () => {
+    return getClearButton({
+      handleClear: () => {
+        props.onSearchChange('')
+      },
+      searchTerm: props.searchTerm
+    })
   }
-
-  const handleClear = useCallback(() => {
-    setSearchTerm('')
-    debouncedSave('')
-  }, [debouncedSave, setSearchTerm])
-
-  const clearButton = useMemo(() => {
-    return getClearButton({handleClear, searchTerm})
-  }, [handleClear, searchTerm])
 
   return (
     <Responsive
@@ -146,13 +129,15 @@ export const DiscussionPostToolbar = props => {
                 >
                   <TextInput
                     data-testid="search-filter"
-                    onChange={handleChange}
+                    onChange={event => {
+                      props.onSearchChange(event.target.value)
+                    }}
                     renderLabel={
                       <ScreenReaderContent>
                         {I18n.t('Search entries or author')}
                       </ScreenReaderContent>
                     }
-                    value={searchTerm}
+                    value={props.searchTerm}
                     renderBeforeInput={<IconSearchLine inline={false} />}
                     renderAfterInput={clearButton}
                     placeholder={I18n.t('Search entries or author...')}
@@ -236,7 +221,8 @@ DiscussionPostToolbar.propTypes = {
   sortDirection: PropTypes.string,
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
-  onSortClick: PropTypes.func
+  onSortClick: PropTypes.func,
+  searchTerm: PropTypes.string
 }
 
 DiscussionPostToolbar.defaultProps = {

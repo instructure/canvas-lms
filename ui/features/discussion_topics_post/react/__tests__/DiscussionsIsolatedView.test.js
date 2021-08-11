@@ -122,11 +122,21 @@ describe('DiscussionsIsolatedView', () => {
     )
   })
 
-  it('should open isolated view when go to reply button is clicked', async () => {
+  it('should not render go to reply button with single character search term', async () => {
     const container = setup()
     await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'a'}
+    })
+
+    await waitFor(() => expect(container.queryByTestId('go-to-reply')).toBeNull())
+  })
+
+  it('should open isolated view when go to reply button is clicked', async () => {
+    const container = setup()
+    await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
+    fireEvent.change(await container.findByTestId('search-filter'), {
+      target: {value: 'parent'}
     })
     const goToReply = await container.findByTestId('go-to-reply')
     fireEvent.click(goToReply)
@@ -137,7 +147,7 @@ describe('DiscussionsIsolatedView', () => {
   it('should show reply button in isolated view when search term is present', async () => {
     const container = setup()
     fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'a'}
+      target: {value: 'parent'}
     })
     const goToReply = await container.findByTestId('go-to-reply')
     fireEvent.click(goToReply)
