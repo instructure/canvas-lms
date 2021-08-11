@@ -249,56 +249,8 @@ end
 
 RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
 
-RSpec::Matchers.define_negated_matcher :not_eq, :eq
-RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
-
-RSpec::Matchers.define :encompass do |expected|
-  match do |actual|
-    if expected.is_a?(Array) && actual.is_a?(Array)
-      expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
-    elsif expected.is_a?(Hash) && actual.is_a?(Hash)
-      actual.slice(*expected.keys) == expected
-    else
-      false
-    end
-  end
-end
-
-RSpec::Matchers.define :match_ignoring_whitespace do |expected|
-  def whitespaceless(str)
-    str.gsub(/\s+/, '')
-  end
-
-  match do |actual|
-    whitespaceless(actual) == whitespaceless(expected)
-  end
-end
-
-RSpec::Matchers.define :match_path do |expected|
-  match do |actual|
-    path = URI(actual).path
-    values_match?(expected, path)
-  end
-end
-
-RSpec::Matchers.define :and_query do |expected|
-  match do |actual|
-    query = Rack::Utils.parse_query(URI(actual).query)
-
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
-    values_match?(expected_as_strings, query)
-  end
-end
-
-RSpec::Matchers.define :and_fragment do |expected|
-  match do |actual|
-    fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
-    values_match?(expected_as_strings, fragment)
-  end
-end
-
-RSpec::Matchers.define_negated_matcher :not_change, :change
+# Require all custom matchers
+Dir[Rails.root.join('spec', 'support', 'custom_matchers', '*.rb')].each {|f| require f }
 
 module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
