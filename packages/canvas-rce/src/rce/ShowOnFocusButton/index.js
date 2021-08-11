@@ -69,6 +69,7 @@ export default class ShowOnFocusButton extends Component {
       <IconButton
         data-testid="ShowOnFocusButton__button"
         color="primary"
+        aria-haspopup="dialog"
         margin={this.props.margin}
         ref={btn => {
           this.btnRef = btn
