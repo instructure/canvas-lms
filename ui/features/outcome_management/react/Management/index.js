@@ -288,7 +288,7 @@ const OutcomeManagementPanel = () => {
             onCollectionToggle={queryCollections}
             onSuccess={onSucessGroupRemove}
           />
-          {!loading && (
+          {!loading && selectedParentGroupId && (
             <GroupMoveModal
               groupId={selectedGroupId}
               groupTitle={group?.title}
