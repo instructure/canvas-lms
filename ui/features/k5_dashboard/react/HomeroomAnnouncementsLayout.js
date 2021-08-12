@@ -17,74 +17,39 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!homeroom_announcements_layout'
-import {array, bool} from 'prop-types'
+import {arrayOf, bool, shape, string} from 'prop-types'
 
 import {View} from '@instructure/ui-view'
 
-import K5Announcement from '@canvas/k5/react/K5Announcement'
-import EmptyHomeroomAnnouncement from './EmptyHomeroomAnnouncement'
-import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import K5Announcement, {
+  K5AnnouncementLoadingMask,
+  K5AnnouncementType
+} from '@canvas/k5/react/K5Announcement'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, loading}) {
-  const loadingMask = props => (
-    <div {...props}>
-      <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Homeroom Course Name')}
-        margin="medium 0 small"
-        width="20em"
-        height="1.5em"
-      />
-      <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Homeroom Announcement Title')}
-        margin="small 0"
-        width="15em"
-        height="1.5em"
-      />
-      <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Homeroom Announcement Content')}
-        margin="small 0"
-        width="100%"
-        height="8em"
-      />
-    </div>
-  )
-
   return (
     <LoadingWrapper
       id="homeroom-announcements"
       isLoading={loading}
-      renderCustomSkeleton={loadingMask}
+      renderCustomSkeleton={K5AnnouncementLoadingMask}
       skeletonsNum={homeroomAnnouncements?.filter(h => h.announcement || h.canEdit)?.length} // if there is no homeroom course set, this loading mask shouldn't appear
     >
       <View>
         {homeroomAnnouncements?.map(homeroom => {
-          if (homeroom.announcement) {
-            return (
-              <View key={homeroom.courseId}>
-                <K5Announcement
-                  courseName={homeroom.courseName}
-                  courseUrl={homeroom.courseUrl}
-                  canEdit={homeroom.canEdit}
-                  title={homeroom.announcement.title}
-                  message={homeroom.announcement.message}
-                  url={homeroom.announcement.url}
-                  attachment={homeroom.announcement.attachment}
-                  postedDate={homeroom.announcement.postedDate}
-                  published={homeroom.published}
-                  showCourseDetails
-                />
-              </View>
-            )
-          } else if (homeroom.canEdit) {
-            return (
-              <View key={homeroom.courseId}>
-                <EmptyHomeroomAnnouncement {...homeroom} />
-              </View>
-            )
-          }
-          return null
+          return (
+            <View key={homeroom.courseId}>
+              <K5Announcement
+                courseId={homeroom.courseId}
+                courseName={homeroom.courseName}
+                courseUrl={homeroom.courseUrl}
+                canEdit={homeroom.canEdit}
+                published={homeroom.published}
+                showCourseDetails
+                firstAnnouncement={homeroom.announcement}
+              />
+            </View>
+          )
         })}
       </View>
     </LoadingWrapper>
@@ -92,6 +57,15 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
 }
 
 HomeroomAnnouncementsLayout.propTypes = {
-  homeroomAnnouncements: array.isRequired,
+  homeroomAnnouncements: arrayOf(
+    shape({
+      courseId: string.isRequired,
+      courseName: string.isRequired,
+      courseUrl: string.isRequired,
+      published: bool,
+      canEdit: bool,
+      announcement: K5AnnouncementType
+    })
+  ),
   loading: bool.isRequired
 }

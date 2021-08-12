@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import EmptyHomeroomAnnouncement from '../EmptyHomeroomAnnouncement'
+import EmptyK5Announcement from '../EmptyK5Announcement'
 
-describe('EmptyHomeroomAnnouncement', () => {
+describe('EmptyK5Announcement', () => {
   const getProps = (overrides = {}) => ({
     courseName: "Mr. Smith's Homeroom 2",
     courseUrl: 'http://google.com/courseurl2',
@@ -28,21 +28,21 @@ describe('EmptyHomeroomAnnouncement', () => {
   })
 
   it('renders link to homeroom course', () => {
-    const {getByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<EmptyK5Announcement {...getProps()} />)
     const courseName = getByText("Mr. Smith's Homeroom 2")
     expect(courseName).toBeInTheDocument()
     expect(courseName.href).toBe('http://google.com/courseurl2')
   })
 
   it('shows some helpful text', () => {
-    const {getByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<EmptyK5Announcement {...getProps()} />)
     expect(
       getByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
   })
 
   it('shows a button to create a new announcement with correct url', () => {
-    const {getByRole} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+    const {getByRole} = render(<EmptyK5Announcement {...getProps()} />)
     const button = getByRole('link', {name: "Create a new announcement for Mr. Smith's Homeroom 2"})
     expect(button).toBeInTheDocument()
     expect(button.href).toBe(

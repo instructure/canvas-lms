@@ -43,7 +43,7 @@ describe('HomeroomPage', () => {
     const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} loadingAnnouncements />)
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
-    expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()
+    expect(getByText('Loading Announcement Content')).toBeInTheDocument()
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {

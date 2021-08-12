@@ -278,14 +278,23 @@ export const fetchImportantInfos = courses =>
 
 /* Turns raw announcement data from API into usable object */
 export const parseAnnouncementDetails = (announcement, course) => {
-  if (!announcement) {
-    return {
-      courseId: course.id,
-      courseName: course.shortName,
-      courseUrl: course.href,
-      canEdit: course.canManage
-    }
+  const retval = {
+    courseId: course.id,
+    courseName: course.shortName,
+    courseUrl: course.href,
+    canEdit: course.canManage,
+    published: course.published
   }
+  if (announcement) {
+    retval.announcement = transformAnnouncement(announcement)
+    retval.canEdit = announcement.permissions.update
+  }
+  return retval
+}
+
+export const transformAnnouncement = announcement => {
+  if (!announcement) return undefined
+
   let attachment
   if (announcement.attachments[0]) {
     attachment = {
@@ -294,20 +303,14 @@ export const parseAnnouncementDetails = (announcement, course) => {
       filename: announcement.attachments[0].filename
     }
   }
+
   return {
-    courseId: course.id,
-    courseName: course.shortName,
-    courseUrl: course.href,
-    canEdit: announcement.permissions.update,
-    published: course.published,
-    announcement: {
-      id: announcement.id,
-      title: announcement.title,
-      message: announcement.message,
-      url: announcement.html_url,
-      postedDate: announcement.posted_at,
-      attachment
-    }
+    id: announcement.id,
+    title: announcement.title,
+    message: announcement.message,
+    url: announcement.html_url,
+    postedDate: new Date(announcement.posted_at),
+    attachment
   }
 }
 

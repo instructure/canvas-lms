@@ -742,7 +742,9 @@ describe('parseAnnouncementDetails', () => {
       'http://localhost:3000/files/longpath'
     )
     expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
-    expect(announcementDetails.announcement.postedDate).toBe('2021-05-14T17:06:21-06:00')
+    expect(new Date(announcementDetails.announcement.postedDate)).toEqual(
+      new Date('2021-05-14T17:06:21-06:00')
+    )
   })
 
   it('handles a missing attachment', () => {

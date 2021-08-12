@@ -49,6 +49,13 @@ k5_parent_support:
   display_name: 'Canvas for Elementary: Parent Support'
   description: Enables support for observers within Canvas for Elementary.
   applies_to: SiteAdmin
+k5_homeroom_many_announcements:
+  state: hidden
+  display_name: 'Canvas for Elementary: many announcements in homeroom'
+  description: |-
+    Provide navigation to navigate between all announcements available
+    in the homeroom course.
+  applies_to: SiteAdmin
 pace_plans:
   state: hidden
   display_name: 'Pace Plans'

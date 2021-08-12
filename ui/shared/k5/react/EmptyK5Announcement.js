@@ -27,7 +27,25 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-content'
 
-export default function EmptyHomeroomAnnouncement({courseUrl, courseName}) {
+export const K5AddAnnouncementButton = ({courseUrl, courseName}) => {
+  return (
+    <Button
+      renderIcon={IconAddLine}
+      margin="small 0"
+      href={`${courseUrl}/discussion_topics/new?is_announcement=true`}
+    >
+      <AccessibleContent alt={I18n.t('Create a new announcement for %{courseName}', {courseName})}>
+        {I18n.t('Announcement')}
+      </AccessibleContent>
+    </Button>
+  )
+}
+K5AddAnnouncementButton.PropTypes = {
+  courseUrl: string.isRequired,
+  courseNAme: string.isRequired
+}
+
+export default function EmptyK5Announcement({courseUrl, courseName}) {
   return (
     <View>
       <Heading level="h3" as="h2" margin="medium 0 small">
@@ -38,17 +56,7 @@ export default function EmptyHomeroomAnnouncement({courseUrl, courseName}) {
       <Text as="div">
         {I18n.t('New announcements show up in this area. Create a new announcement now.')}
       </Text>
-      <Button
-        renderIcon={IconAddLine}
-        margin="small 0"
-        href={`${courseUrl}/discussion_topics/new?is_announcement=true`}
-      >
-        <AccessibleContent
-          alt={I18n.t('Create a new announcement for %{courseName}', {courseName})}
-        >
-          {I18n.t('Announcement')}
-        </AccessibleContent>
-      </Button>
+      <K5AddAnnouncementButton courseUrl={courseUrl} courseName={courseName} />
       <PresentationContent>
         <hr />
       </PresentationContent>
@@ -56,7 +64,7 @@ export default function EmptyHomeroomAnnouncement({courseUrl, courseName}) {
   )
 }
 
-EmptyHomeroomAnnouncement.propTypes = {
+EmptyK5Announcement.propTypes = {
   courseUrl: string.isRequired,
   courseName: string.isRequired
 }
