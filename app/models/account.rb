@@ -274,8 +274,6 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
-  # legacy account settings for allowing course creation
-  # will be handled through :manage_courses_add granular permission role override
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -1287,8 +1285,6 @@ class Account < ActiveRecord::Base
       given { |user| self.cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses_add
-      # deprecated
-      can :create_courses if permission == :manage_courses
     end
 
     given { |user| !self.cached_account_users_for(user).empty? }
@@ -1299,10 +1295,19 @@ class Account < ActiveRecord::Base
 
     #################### Begin legacy permission block #########################
     given do |user|
+      user && !root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.cached_account_users_for(user).any? do |au|
+          au.has_permission_to?(self, :manage_courses)
+        end
+    end
+    can :create_courses
+    ##################### End legacy permission block ##########################
+
+    given do |user|
       result = false
       next false if user&.fake_student?
 
-      if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
+      if user && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
@@ -1313,44 +1318,6 @@ class Account < ActiveRecord::Base
       end
 
       result
-    end
-    can :create_courses
-    ##################### End legacy permission block ##########################
-
-    # any logged in user with no active enrollments (i.e. FFT)
-    # combined with root account setting that is enabled for Users with no enrollments
-    given do |user|
-      next false if user&.fake_student?
-
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? &&
-        !root_account.enrollments.active.where(user_id: user).exists? &&
-        root_account.no_enrollments_can_create_courses?
-    end
-    can :create_courses
-
-    # grants right to manually created courses account for show user create course button
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self == manually_created_courses_account &&
-        root_account
-          .enrollments
-          .active
-          .where(user_id: user)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-    end
-    can :create_courses
-
-    # any logged in user with an active enrollment granting :manage_courses_add
-    # scope is checked against user's associated courses on the account's residing shard
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self.shard.activate do
-        Enrollment
-          .active
-          .where(user_id: user, course_id: self.associated_courses)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-      end
     end
     can :create_courses
 
