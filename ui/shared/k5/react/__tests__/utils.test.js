@@ -477,6 +477,25 @@ describe('getAccountsFromEnrollments', () => {
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)
   })
+
+  it('ignores enrollments without an account property', () => {
+    const enrollments = [
+      {
+        id: 10,
+        account: {
+          id: 1,
+          name: 'School'
+        }
+      },
+      {
+        id: 11,
+        access_restricted_by_date: true
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
+    expect(accounts[0].id).toBe(1)
+  })
 })
 
 describe('getTotalGradeStringFromEnrollments', () => {
