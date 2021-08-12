@@ -255,7 +255,7 @@ describe('PostToolbar', () => {
       })
     })
 
-    describe.skip('rubric', () => {
+    describe('rubric', () => {
       it('does not render if the callback is not provided', () => {
         const {queryByText, getByTestId} = setup()
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -263,12 +263,15 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onShowRubricMock = jest.fn()
-        const {getByTestId, getByText} = setup({onShowRubric: onShowRubricMock})
+        const onDisplayRubricMock = jest.fn()
+        const {getByTestId, getByText} = setup({
+          onDisplayRubric: onDisplayRubricMock,
+          showRubric: true
+        })
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onShowRubricMock.mock.calls.length).toBe(0)
+        expect(onDisplayRubricMock.mock.calls.length).toBe(0)
         fireEvent.click(getByText('Show Rubric'))
-        expect(onShowRubricMock.mock.calls.length).toBe(1)
+        expect(onDisplayRubricMock.mock.calls.length).toBe(1)
       })
     })
 

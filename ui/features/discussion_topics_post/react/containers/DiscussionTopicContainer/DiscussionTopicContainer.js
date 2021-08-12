@@ -55,6 +55,9 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
+import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
+import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
@@ -63,6 +66,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
+
+  if (ENV.DISCUSSION) {
+    rubricTriggers.initDialog()
+  }
 
   let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
   let dueAt = ''
@@ -425,11 +432,16 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                       )
                                   : null
                               }
-                              onShowRubric={
-                                props.discussionTopic.permissions?.showRubric ? () => {} : null
-                              }
-                              onAddRubric={
-                                props.discussionTopic.permissions?.addRubric ? () => {} : null
+                              showRubric={props.discussionTopic.permissions?.showRubric}
+                              addRubric={props.discussionTopic.permissions?.addRubric}
+                              onDisplayRubric={
+                                props.discussionTopic.permissions?.showRubric ||
+                                props.discussionTopic.permissions?.addRubric
+                                  ? () => {
+                                      rubricTriggers.openDialog()
+                                      rubricEditing.init()
+                                    }
+                                  : null
                               }
                               isPublished={props.discussionTopic.published}
                               canUnpublish={props.discussionTopic.canUnpublish}
