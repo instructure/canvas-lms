@@ -185,6 +185,9 @@
   "calendar_event_89aadc1c": {
     "message": "Calendar Event"
   },
+  "cancel_caeb1e68": {
+    "message": "Cancel"
+  },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
   },
@@ -814,6 +817,9 @@
   "my_images_427f9b0c": {
     "message": "My Images"
   },
+  "name_1aed4a1b": {
+    "message": "Name"
+  },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -1263,6 +1269,9 @@
   },
   "unpublished_dfd8801": {
     "message": "unpublished"
+  },
+  "untitled_efdc2d7d": {
+    "message": "untitled"
   },
   "upload_document_253f0478": {
     "message": "Upload Document"
