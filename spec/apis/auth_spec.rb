@@ -497,6 +497,7 @@ describe "API Authentication", type: :request do
 
         it "should not give second token if force_token_reuse" do
           @key.force_token_reuse = true
+          @key.auto_expire_tokens = false
           @key.save!
 
           json = trusted_exchange(true)
