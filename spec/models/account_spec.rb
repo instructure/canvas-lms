@@ -2304,7 +2304,7 @@ describe Account do
       create_role_override('manage_courses_delete', role, account)
       expect(
         account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
-      ).to eq %w[AccountAdmin TeacherAdmin]
+      ).to eq %w[AccountAdmin]
       expect(
         account.roles_with_enabled_permission(:manage_courses_publish).map(&:name).sort
       ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
