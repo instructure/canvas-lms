@@ -19,6 +19,167 @@
 import formatMessage from '../../format-message'
 import '../tinymce/uk_UA'
 
-const locale = {"accessibility_checker_b3af1f6c":{"message":"Перевірка доступності"},"add_8523c19b":{"message":"Додати"},"align_11050992":{"message":"Вирівняти"},"align_center_ca078feb":{"message":"Вирівняти по центру"},"align_left_e9f1f93b":{"message":"Вирівняти по лівому краю"},"align_right_9bad3ac1":{"message":"Вирівняти по правому краю"},"all_4321c3a1":{"message":"Всі"},"alphabetical_55b5b4e0":{"message":"Алфавітний"},"alt_text_611fb322":{"message":"Альтернативний текст"},"an_error_occurred_making_a_network_request_d1bda348":{"message":"Сталася помилка при виконанні запиту мережі"},"announcement_list_da155734":{"message":"Список оголошень"},"announcements_a4b8ed4a":{"message":"Оголошення"},"apps_54d24a47":{"message":"Застосунки"},"aspect_ratio_will_be_preserved_cb5fdfb8":{"message":"Співвідношення сторін збережеться"},"assignments_1e02582c":{"message":"Завдання"},"attributes_963ba262":{"message":"Атрибути"},"automatically_open_an_in_line_preview_preview_disp_ed784ffe":{"message":"Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"},"c_2001_acme_inc_283f7f80":{"message":"(c) 2001 Acme Inc."},"choose_usage_rights_33683854":{"message":"Виберіть права використання..."},"clear_2084585f":{"message":"Очистити"},"clear_selected_file_82388e50":{"message":"Очистити вибраний файл"},"click_to_embed_imagename_c41ea8df":{"message":"Натисніть на вбудоване { imageName }"},"click_to_insert_a_link_into_the_editor_c19613aa":{"message":"Натисніть, щоб вставити  посилання на редактор."},"close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6":{"message":"Закрийте меню або діалогове вікно. Що також повертає вас до області редактора"},"close_d634289d":{"message":"Закрити"},"collaborations_5c56c15f":{"message":"Сумісна робота"},"computer_1d7dfa6f":{"message":"Комп''ютер"},"content_1440204b":{"message":"Вміст"},"content_is_still_being_uploaded_if_you_continue_it_8f06d0cb":{"message":"Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."},"content_type_2cf90d95":{"message":"Тип вмісту"},"copyright_holder_66ee111":{"message":"Правовласник:"},"count_plural_one_item_loaded_other_items_loaded_857023b7":{"message":"{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"},"course_files_62deb8f8":{"message":"Файли курсу"},"course_files_a31f97fc":{"message":"Файли курсу"},"course_navigation_dd035109":{"message":"Навігація курсу"},"creative_commons_license_725584ae":{"message":"Ліцензія Creative Commons:"},"custom_6979cd81":{"message":"Звичай"},"decorative_image_3c28aa7d":{"message":"Декоративне зображення"},"decrease_indent_de6343ab":{"message":"Зменшити відступ"},"details_98a31b68":{"message":"Подробиці"},"dimensions_45ddb7b7":{"message":"Розміри"},"disable_in_line_preview_2a675175":{"message":"Вимкнути поточний попередній перегляд."},"discussions_a5f96392":{"message":"Обговорення"},"discussions_index_6c36ced":{"message":"Індекс обговорення"},"documents_81393201":{"message":"Документи"},"done_54e3d4b6":{"message":"Готово"},"drag_a_file_here_1bf656d5":{"message":"Перетягніть файл сюди"},"drag_and_drop_or_click_to_browse_your_computer_60772d6d":{"message":"Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"},"due_multiple_dates_cc0ee3f5":{"message":"Очікується: Кілька дат"},"embed_image_1080badc":{"message":"Вставити забраження"},"external_tools_6e77821":{"message":"Зовнішні інструменти"},"files_c300e900":{"message":"Файли"},"files_index_af7c662b":{"message":"Індекс файлів"},"format_4247a9c5":{"message":"Формат"},"generating_preview_45b53be0":{"message":"Генерується попередній перегляд..."},"grades_a61eba0a":{"message":"Оцінки"},"group_files_82e5dcdb":{"message":"Файли групи"},"group_navigation_99f191a":{"message":"Навігація групи"},"home_351838cd":{"message":"На домашню сторінку"},"html_editor_fb2ab713":{"message":"HTML-редактор"},"i_have_obtained_permission_to_use_this_file_6386f087":{"message":"Я отримав дозвіл на використання цього файлу."},"i_hold_the_copyright_71ee91b1":{"message":"Я володію авторським правом"},"if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5":{"message":"Якщо ви не виберете права використання, цей файл не буде опублікований після його завантаження."},"image_8ad06":{"message":"Зображення"},"images_7ce26570":{"message":"Зображення"},"increase_indent_6d550a4a":{"message":"Збільшити відступ"},"insert_593145ef":{"message":"Вставка"},"insert_equella_links_49a8dacd":{"message":"Вставити посилання Equella"},"insert_link_6dc23cae":{"message":"Вставити посилання"},"insert_math_equation_57c6e767":{"message":"Вставити математичну формулу"},"invalid_file_type_881cc9b2":{"message":"Недійсний тип файлу"},"invalid_url_cbde79f":{"message":"Невірний URL"},"keyboard_shortcuts_ed1844bd":{"message":"Гарячі клавіши"},"link_7262adec":{"message":"Посилання"},"links_14b70841":{"message":"Посилання"},"load_more_results_460f49a9":{"message":"Завантажити більше результатів"},"loading_25990131":{"message":"Завантаження..."},"loading_bde52856":{"message":"Завантаження"},"loading_failed_b3524381":{"message":"Невдале завантаження..."},"locked_762f138b":{"message":"Заблоковано"},"media_af190855":{"message":"Носій інформації"},"modules_c4325335":{"message":"Розділи"},"my_files_2f621040":{"message":"Мої файли"},"next_page_d2a39853":{"message":"Наступна Сторінка"},"no_e16d9132":{"message":"Ні"},"no_preview_is_available_for_this_file_f940114a":{"message":"Попередній перегляд  для цього файлу недоступний."},"no_results_940393cf":{"message":"Результати відсутні."},"none_3b5e34d2":{"message":"Ніхто"},"open_this_keyboard_shortcuts_dialog_9658b83a":{"message":"Вікрити діалогове вікно гарячих клавіш"},"options_3ab0ea65":{"message":"Параметри"},"pages_e5414c2c":{"message":"Сторінки"},"people_b4ebb13c":{"message":"Люди"},"preview_53003fd2":{"message":"Попередній перегляд"},"previous_page_928fc112":{"message":"Попередня сторінка"},"published_c944a23d":{"message":"опубліковано"},"quizzes_7e598f57":{"message":"Контрольні Роботи"},"record_7c9448b":{"message":"Записати"},"record_upload_media_5fdce166":{"message":"Запис/завантаження медіа"},"rich_content_editor_2708ef21":{"message":"Редактор збагаченого контенту"},"search_280d00bd":{"message":"Пошук"},"selected_274ce24f":{"message":"Обраний"},"size_b30e1077":{"message":"Розмір"},"star_8d156e09":{"message":"Помітити зіркою"},"submit_a3cc6859":{"message":"Підтвердити"},"syllabus_f191f65b":{"message":"Навчальний план"},"the_material_is_in_the_public_domain_279c39a3":{"message":"Матеріал в публічному домені"},"the_material_is_licensed_under_creative_commons_3242cb5e":{"message":"Матеріал опубліковано під ліцензією Creative Commons"},"title_ee03d132":{"message":"Назва"},"unpublished_dfd8801":{"message":"Неопублікований"},"upload_media_ce31135a":{"message":"Завантажити медіа контент"},"url_22a5f3b8":{"message":"URL"},"usage_right_ff96f3e2":{"message":"Права використання:"},"view_ba339f93":{"message":"Вигляд"},"wiki_home_9cd54d0":{"message":"Домашня сторінка Wiki"},"yes_dde87d5":{"message":"Так"}}
+const locale = {
+  "accessibility_checker_b3af1f6c": { "message": "Перевірка доступності" },
+  "add_8523c19b": { "message": "Додати" },
+  "align_11050992": { "message": "Вирівняти" },
+  "align_center_ca078feb": { "message": "Вирівняти по центру" },
+  "align_left_e9f1f93b": { "message": "Вирівняти по лівому краю" },
+  "align_right_9bad3ac1": { "message": "Вирівняти по правому краю" },
+  "all_4321c3a1": { "message": "Всі" },
+  "alphabetical_55b5b4e0": { "message": "Алфавітний" },
+  "alt_text_611fb322": { "message": "Альтернативний текст" },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Сталася помилка при виконанні запиту мережі"
+  },
+  "announcement_list_da155734": { "message": "Список оголошень" },
+  "announcements_a4b8ed4a": { "message": "Оголошення" },
+  "apply_781a2546": { "message": "Застосувати" },
+  "apps_54d24a47": { "message": "Застосунки" },
+  "aspect_ratio_will_be_preserved_cb5fdfb8": {
+    "message": "Співвідношення сторін збережеться"
+  },
+  "assignments_1e02582c": { "message": "Завдання" },
+  "attributes_963ba262": { "message": "Атрибути" },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
+  },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "choose_usage_rights_33683854": {
+    "message": "Виберіть права використання..."
+  },
+  "clear_2084585f": { "message": "Очистити" },
+  "clear_selected_file_82388e50": { "message": "Очистити вибраний файл" },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Натисніть на вбудоване { imageName }"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Натисніть, щоб вставити  посилання на редактор."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Закрийте меню або діалогове вікно. Що також повертає вас до області редактора"
+  },
+  "close_d634289d": { "message": "Закрити" },
+  "collaborations_5c56c15f": { "message": "Сумісна робота" },
+  "computer_1d7dfa6f": { "message": "Комп''ютер" },
+  "content_1440204b": { "message": "Вміст" },
+  "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+    "message": "Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."
+  },
+  "content_type_2cf90d95": { "message": "Тип вмісту" },
+  "copyright_holder_66ee111": { "message": "Правовласник:" },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+  },
+  "course_files_62deb8f8": { "message": "Файли курсу" },
+  "course_files_a31f97fc": { "message": "Файли курсу" },
+  "course_navigation_dd035109": { "message": "Навігація курсу" },
+  "creative_commons_license_725584ae": {
+    "message": "Ліцензія Creative Commons:"
+  },
+  "custom_6979cd81": { "message": "Звичай" },
+  "decorative_image_3c28aa7d": { "message": "Декоративне зображення" },
+  "decrease_indent_de6343ab": { "message": "Зменшити відступ" },
+  "details_98a31b68": { "message": "Подробиці" },
+  "dimensions_45ddb7b7": { "message": "Розміри" },
+  "disable_in_line_preview_2a675175": {
+    "message": "Вимкнути поточний попередній перегляд."
+  },
+  "discussions_a5f96392": { "message": "Обговорення" },
+  "discussions_index_6c36ced": { "message": "Індекс обговорення" },
+  "documents_81393201": { "message": "Документи" },
+  "done_54e3d4b6": { "message": "Готово" },
+  "drag_a_file_here_1bf656d5": { "message": "Перетягніть файл сюди" },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
+  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Очікується: Кілька дат" },
+  "embed_image_1080badc": { "message": "Вставити забраження" },
+  "external_tools_6e77821": { "message": "Зовнішні інструменти" },
+  "files_c300e900": { "message": "Файли" },
+  "files_index_af7c662b": { "message": "Індекс файлів" },
+  "format_4247a9c5": { "message": "Формат" },
+  "generating_preview_45b53be0": {
+    "message": "Генерується попередній перегляд..."
+  },
+  "grades_a61eba0a": { "message": "Оцінки" },
+  "group_files_82e5dcdb": { "message": "Файли групи" },
+  "group_navigation_99f191a": { "message": "Навігація групи" },
+  "home_351838cd": { "message": "На домашню сторінку" },
+  "html_editor_fb2ab713": { "message": "HTML-редактор" },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Я отримав дозвіл на використання цього файлу."
+  },
+  "i_hold_the_copyright_71ee91b1": { "message": "Я володію авторським правом" },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Якщо ви не виберете права використання, цей файл не буде опублікований після його завантаження."
+  },
+  "image_8ad06": { "message": "Зображення" },
+  "images_7ce26570": { "message": "Зображення" },
+  "increase_indent_6d550a4a": { "message": "Збільшити відступ" },
+  "insert_593145ef": { "message": "Вставка" },
+  "insert_equella_links_49a8dacd": { "message": "Вставити посилання Equella" },
+  "insert_link_6dc23cae": { "message": "Вставити посилання" },
+  "insert_math_equation_57c6e767": {
+    "message": "Вставити математичну формулу"
+  },
+  "invalid_file_type_881cc9b2": { "message": "Недійсний тип файлу" },
+  "invalid_url_cbde79f": { "message": "Невірний URL" },
+  "keyboard_shortcuts_ed1844bd": { "message": "Гарячі клавіши" },
+  "link_7262adec": { "message": "Посилання" },
+  "links_14b70841": { "message": "Посилання" },
+  "load_more_results_460f49a9": { "message": "Завантажити більше результатів" },
+  "loading_25990131": { "message": "Завантаження..." },
+  "loading_bde52856": { "message": "Завантаження" },
+  "loading_failed_b3524381": { "message": "Невдале завантаження..." },
+  "locked_762f138b": { "message": "Заблоковано" },
+  "media_af190855": { "message": "Носій інформації" },
+  "modules_c4325335": { "message": "Розділи" },
+  "my_files_2f621040": { "message": "Мої файли" },
+  "next_page_d2a39853": { "message": "Наступна Сторінка" },
+  "no_e16d9132": { "message": "Ні" },
+  "no_preview_is_available_for_this_file_f940114a": {
+    "message": "Попередній перегляд  для цього файлу недоступний."
+  },
+  "no_results_940393cf": { "message": "Результати відсутні." },
+  "none_3b5e34d2": { "message": "Ніхто" },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Вікрити діалогове вікно гарячих клавіш"
+  },
+  "options_3ab0ea65": { "message": "Параметри" },
+  "pages_e5414c2c": { "message": "Сторінки" },
+  "people_b4ebb13c": { "message": "Люди" },
+  "preview_53003fd2": { "message": "Попередній перегляд" },
+  "previous_page_928fc112": { "message": "Попередня сторінка" },
+  "published_c944a23d": { "message": "опубліковано" },
+  "quizzes_7e598f57": { "message": "Контрольні Роботи" },
+  "record_7c9448b": { "message": "Записати" },
+  "record_upload_media_5fdce166": { "message": "Запис/завантаження медіа" },
+  "rich_content_editor_2708ef21": {
+    "message": "Редактор збагаченого контенту"
+  },
+  "search_280d00bd": { "message": "Пошук" },
+  "selected_274ce24f": { "message": "Обраний" },
+  "size_b30e1077": { "message": "Розмір" },
+  "star_8d156e09": { "message": "Помітити зіркою" },
+  "submit_a3cc6859": { "message": "Підтвердити" },
+  "syllabus_f191f65b": { "message": "Навчальний план" },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Матеріал в публічному домені"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Матеріал опубліковано під ліцензією Creative Commons"
+  },
+  "title_ee03d132": { "message": "Назва" },
+  "unpublished_dfd8801": { "message": "Неопублікований" },
+  "upload_media_ce31135a": { "message": "Завантажити медіа контент" },
+  "uploading_19e8a4e7": { "message": "Завантаження" },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "Права використання:" },
+  "view_ba339f93": { "message": "Вигляд" },
+  "wiki_home_9cd54d0": { "message": "Домашня сторінка Wiki" },
+  "yes_dde87d5": { "message": "Так" }
+}
+
 
 formatMessage.addLocale({'uk-UA': locale})

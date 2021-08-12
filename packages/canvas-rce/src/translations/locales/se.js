@@ -18,6 +18,11 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {"count_plural_one_item_loaded_other_items_loaded_857023b7":{"message":"{ count, plural,\n    one {}\n    two {}\n  other {}\n}"}}
+const locale = {
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {}\n    two {}\n  other {}\n}"
+  }
+}
+
 
 formatMessage.addLocale({se: locale})
