@@ -34,6 +34,11 @@ class LocaleLoadError extends Error {
   }
 }
 
+function chromeVersion() {
+  const m = navigator.userAgent.match(new RegExp('Chrom(e|ium)/([0-9]+).'))
+  return m ? parseInt(m[2], 10) : 0
+}
+
 //
 // Intl polyfills for locale-specific output of Dates, Times, Numbers, and
 // Relative Times.
@@ -96,6 +101,21 @@ async function doPolyfill(locale, subsys) {
   // is no saved one.
   const result = reset(locale, subsys)
   if (result.source === 'polyfill') {
+    // Does the requested polyfill locale exist at all? If not, do not proceed,
+    // it breaks some browser behavior around .toLocaleDateString()  [???].
+    try {
+      await localeImports[subsys](locale)
+    } catch (e) {
+      throw new LocaleLoadError(
+        {
+          locale: navigator.language,
+          subsystem: subsys,
+          source: 'fallback'
+        },
+        e.message
+      )
+    }
+
     delete Intl[subsys]
     if (typeof polyfilledSubsystem[subsys] === 'undefined') {
       try {
@@ -110,8 +130,8 @@ async function doPolyfill(locale, subsys) {
       Intl[subsys] = polyfilledSubsystem[subsys]
     }
 
-    // Now load the specific locale... if it fails, then that locale does not
-    // exist and we have no choice but to fall back to the navigator language.
+    // Now load the specific locale... if it fails (it shouldn't because we
+    // already checked this above!!), then fall back to the navigator language.
     // Note that loading a locale onto the polyfill *is* idempotent, so it
     // won't matter if we do this multiple times.
     try {
@@ -140,7 +160,17 @@ export function loadRelativeTimeFormatPolyfill(locale) {
 // Grand cru convenience function that (maybe) polyfills everything here.
 // Returns a Promise that resolves to an array of the result objects
 // (see above) for each subsystem.
+//
+// TEMPORARY PATCH (CNVS-53338) ... these polyfillers break certain date
+// and time Intl functions in recent versions of Chrome. For now, just
+// skip.
 export function loadAllLocalePolyfills(locale) {
+  const ver = chromeVersion()
+  if (ver >= 92 && ver < 94) {
+    // eslint-disable-next-line no-console
+    console.info(`Skipping language polyfills for Chrome ${ver}`)
+    return null
+  }
   return Promise.all([
     loadDateTimeFormatPolyfill(locale),
     loadNumberFormatPolyfill(locale),

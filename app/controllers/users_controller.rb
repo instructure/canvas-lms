@@ -2431,7 +2431,7 @@ class UsersController < ApplicationController
     invited_users = []
     errored_users = []
     Array(params[:users]).each do |user_hash|
-      unless user_hash[:email].present?
+      if user_hash[:email].blank?
         errored_users << user_hash.merge(:error => "email required")
         next
       end
@@ -2444,15 +2444,35 @@ class UsersController < ApplicationController
       user.workflow_state = 'creation_pending'
 
       # check just in case
-      existing_rows = Pseudonym.active.where(:account_id => @context.root_account).joins(:user => :communication_channels).joins(:account).
-        where("communication_channels.workflow_state<>'retired' AND path_type='email' AND LOWER(path) = ?", email.downcase).
-        pluck('communication_channels.path', :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
+      user_scope =
+        Pseudonym
+          .active
+          .where(account_id: @context.root_account)
+          .joins(user: :communication_channels)
+          .joins(:account)
+          .where("communication_channels.path_type='email' AND LOWER(path) = ?", email.downcase)
+      existing_rows =
+        user_scope
+          .where("communication_channels.workflow_state<>'retired'")
+          .pluck('communication_channels.path', :user_id, 'users.uuid', :account_id, 'users.name', 'accounts.name')
 
       if existing_rows.any?
         existing_users = existing_rows.map do |address, user_id, user_uuid, account_id, user_name, account_name|
          {:address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid), :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
-        errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
+        unconfirmed_email = user_scope.where(communication_channels: { workflow_state: 'unconfirmed' })
+        errored_users <<
+          if unconfirmed_email.exists?
+            user_hash.merge(
+              errors: [{message: "The email address provided conflicts with an existing user's email that is awaiting verification. Please add the user by either SIS ID or Login ID."}],
+              existing_users: existing_users
+            )
+          else
+            user_hash.merge(
+              errors: [{message: "Matching user(s) already exist"}],
+              existing_users: existing_users
+            )
+          end
       elsif user.save
         invited_users << user_hash.merge(:id => user.id, :user_token => user.token)
       else
