@@ -45,7 +45,17 @@ module MicrosoftSync
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_education_classes(options={}, &blk)
-      get_paginated_list('education/classes', quota: [1, 0], **options, &blk)
+      check_for_expected_errors = lambda do |resp|
+        if resp.code == 400 && resp.body =~ /Education_ObjectType.*does not exist as.*property/
+          Errors::NotEducationTenant.new
+        end
+      end
+
+      get_paginated_list(
+        'education/classes', quota: [1, 0],
+        expected_error_block: check_for_expected_errors,
+        **options, &blk
+      )
     end
 
     def create_education_class(params)
@@ -178,8 +188,6 @@ module MicrosoftSync
           MicrosoftSync::Errors::TeamAlreadyExists.new
         end
       end
-
-      raise response if response.is_a?(Exception)
     end
 
     # === Users ===

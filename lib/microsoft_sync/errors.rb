@@ -117,6 +117,13 @@ module MicrosoftSync
       end
     end
 
+    class NotEducationTenant < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'The Microsoft 365 tenant provided in account settings is not an Education ' \
+          'tenant, so cannot be used with the Microsoft Teams Sync integration.'
+      end
+    end
+
     class TeamAlreadyExists < StandardError; end
 
     # Makes public the status code but not anything about the response body.

@@ -449,6 +449,25 @@ describe MicrosoftSync::GraphService do
     it_behaves_like 'a paginated list endpoint' do
       it_behaves_like 'an endpoint that uses up quota', [1, 0]
     end
+
+    context 'when the API says the tenant is not an Education tenant' do
+      let(:http_method) { :get }
+      let(:status) { 400 }
+      let(:response) do
+        {
+          status: 400,
+          body:  "{\"error\":{\"code\":\"Request_UnsupportedQuery\",\"message\":\"Property 'extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType' does not exist as a declared property or extension property.\"}"
+        }
+      end
+
+      it 'raises a graceful cancel NotEducationTenant error' do
+        klass = MicrosoftSync::Errors::NotEducationTenant
+        msg =  /not an Education tenant, so cannot be used/
+        expect {
+          service.list_education_classes
+        }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
+      end
+    end
   end
 
   describe '#create_education_class' do
