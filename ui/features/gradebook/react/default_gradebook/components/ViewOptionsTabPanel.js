@@ -17,12 +17,155 @@
  */
 
 import React from 'react'
-import {View} from '@instructure/ui-view'
 
-export default function ViewOptionsTabPanel() {
+import {bool, func, objectOf, shape, string} from 'prop-types'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {View} from '@instructure/ui-view'
+import StatusColorPanel from './StatusColorPanel'
+
+import I18n from 'i18n!gradebook'
+
+function buildAssignmentSortOptions(includeModules) {
+  const options = [
+    {criterion: 'default', direction: 'ascending', label: I18n.t('Default Order')},
+    {criterion: 'name', direction: 'ascending', label: I18n.t('Assignment Name - A-Z')},
+    {criterion: 'name', direction: 'descending', label: I18n.t('Assignment Name - Z-A')},
+    {criterion: 'due_date', direction: 'ascending', label: I18n.t('Due Date - Oldest to Newest')},
+    {criterion: 'due_date', direction: 'descending', label: I18n.t('Due Date - Newest to Oldest')},
+    {criterion: 'points', direction: 'ascending', label: I18n.t('Points - Lowest to Highest')},
+    {criterion: 'points', direction: 'descending', label: I18n.t('Points - Highest to Lowest')}
+  ]
+
+  if (includeModules) {
+    options.push(
+      {
+        criterion: 'module_position',
+        direction: 'ascending',
+        label: I18n.t('Module - First to Last')
+      },
+      {
+        criterion: 'module_position',
+        direction: 'descending',
+        label: I18n.t('Module - Last to First')
+      }
+    )
+  }
+
+  return options.map(option => ({
+    ...option,
+    value: `${option.criterion}-${option.direction}`
+  }))
+}
+
+function renderCheckbox(setting, label, key) {
+  return (
+    <Checkbox
+      checked={setting.checked}
+      onChange={event => setting.onChange(event.target.checked)}
+      id={`view-options-show-${key}`}
+      label={label}
+      value={key}
+    />
+  )
+}
+
+export default function ViewOptionsTabPanel({
+  columnSort,
+  showNotes,
+  showUnpublishedAssignments,
+  statusColors,
+  viewUngradedAsZero
+}) {
+  const sortOptions = buildAssignmentSortOptions(columnSort.modulesEnabled)
+  const selectedSortKey =
+    sortOptions.find(
+      option =>
+        option.criterion === columnSort.currentValue.criterion &&
+        option.direction === columnSort.currentValue.direction
+    ) || sortOptions[0]
+
+  const handleColumnSortSelected = (e, {value}) => {
+    const matchingSortOption = sortOptions.find(option => option.value === value)
+
+    if (matchingSortOption != null) {
+      const {criterion, direction} = matchingSortOption
+      columnSort.onChange({criterion, direction})
+    }
+  }
+
   return (
     <div id="ViewOptionsTabPanel__Container">
-      <View as="div" margin="small" />
+      <View as="div" margin="small">
+        <SimpleSelect
+          renderLabel={I18n.t('Arrange By')}
+          onChange={handleColumnSortSelected}
+          value={selectedSortKey.value}
+        >
+          {sortOptions.map(option => (
+            <SimpleSelect.Option
+              id={`sort-${option.value}`}
+              key={option.value}
+              value={option.value}
+            >
+              {option.label}
+            </SimpleSelect.Option>
+          ))}
+        </SimpleSelect>
+
+        <View as="div" margin="large 0 large">
+          <FormFieldGroup description={I18n.t('Show')} layout="stacked" rowSpacing="small">
+            {renderCheckbox(showNotes, I18n.t('Notes'), 'showNotes')}
+            {renderCheckbox(
+              showUnpublishedAssignments,
+              I18n.t('Unpublished Assignments'),
+              'showUnpublishedAssignments'
+            )}
+            {viewUngradedAsZero.allowed &&
+              renderCheckbox(
+                viewUngradedAsZero,
+                I18n.t('Preview ungraded as 0'),
+                'viewUngradedAsZero'
+              )}
+          </FormFieldGroup>
+        </View>
+
+        <FormFieldGroup description={I18n.t('Status Color')}>
+          <StatusColorPanel
+            colors={statusColors.currentValues}
+            onColorsUpdated={statusColors.onChange}
+          />
+        </FormFieldGroup>
+      </View>
     </div>
   )
+}
+
+ViewOptionsTabPanel.propTypes = {
+  columnSort: shape({
+    currentValue: shape({
+      criterion: string.isRequired,
+      direction: string.isRequired
+    }),
+    modulesEnabled: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  showNotes: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  showUnpublishedAssignments: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  statusColors: shape({
+    currentValues: objectOf(string).isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  viewUngradedAsZero: shape({
+    allowed: bool.isRequired,
+    checked: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired
 }

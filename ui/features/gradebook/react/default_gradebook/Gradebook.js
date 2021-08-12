@@ -82,7 +82,6 @@ import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import StudentSearchInput from './components/StudentSearchInput'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
@@ -99,6 +98,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import {
   compareAssignmentDueDates,
   compareAssignmentPositions,
+  confirmViewUngradedAsZero,
   ensureAssignmentVisibility,
   forEachSubmission,
   getAssignmentGroupPointsPossible,
@@ -339,7 +339,6 @@ class Gradebook {
     this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
     this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
     this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
-    this.confirmViewUngradedAsZero = this.confirmViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
     this.setAssignmentGroupsLoaded = this.setAssignmentGroupsLoaded.bind(this)
     this.setContextModulesLoaded = this.setContextModulesLoaded.bind(this)
@@ -1972,13 +1971,22 @@ class Gradebook {
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
-      onSelectViewUngradedAsZero: this.confirmViewUngradedAsZero,
+      onSelectViewUngradedAsZero: async () => {
+        confirmViewUngradedAsZero({
+          currentValue: this.gridDisplaySettings.viewUngradedAsZero,
+          onAccepted: () => {
+            this.toggleViewUngradedAsZero()
+          }
+        })
+      },
       viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero
     }
   }
 
   renderViewOptionsMenu() {
+    // TODO: if enhanced_gradebook_filters is on, don't render the menu at all
+
     const mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
     return (this.viewOptionsMenu = renderComponent(
       ViewOptionsMenu,
@@ -2077,11 +2085,36 @@ class Gradebook {
       },
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       postPolicies: this.postPolicies,
-      ref: this.gradebookSettingsModal,
-      enhancedGradebookFilters: this.options.enhanced_gradebook_filters
+      ref: this.gradebookSettingsModal
     }
+
+    if (this.options.enhanced_gradebook_filters) {
+      _.extend(props, this.gradebookSettingsModalViewOptionsProps())
+    }
+
     const $container = document.querySelector("[data-component='GradebookSettingsModal']")
     return AsyncComponents.renderGradebookSettingsModal(props, $container)
+  }
+
+  gradebookSettingsModalViewOptionsProps() {
+    const columnSortProps = this.getColumnSortSettingsViewOptionsMenuProps()
+    const {criterion, direction, modulesEnabled} = columnSortProps
+
+    const {viewUngradedAsZero, showUnpublishedAssignments} = this.gridDisplaySettings
+
+    return {
+      allowSortingByModules: modulesEnabled,
+      allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
+      // TODO: actually save the updated settings
+      onViewOptionsUpdated: () => Promise.resolve(),
+      viewOptions: {
+        columnSortSettings: {criterion, direction},
+        showNotes: this.isTeacherNotesColumnShown(),
+        showUnpublishedAssignments,
+        statusColors: this.getGridColors(),
+        viewUngradedAsZero
+      }
+    }
   }
 
   renderSettingsButton() {
@@ -3490,27 +3523,6 @@ class Gradebook {
     ) // on success, do nothing since the render happened earlier
   }
 
-  confirmViewUngradedAsZero() {
-    const showDialog = () =>
-      showConfirmationDialog({
-        body: I18n.t(
-          'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
-        ),
-        confirmText: I18n.t('OK'),
-        label: I18n.t('View Ungraded as Zero')
-      })
-
-    const confirmationPromise = this.gridDisplaySettings.viewUngradedAsZero
-      ? Promise.resolve(true)
-      : showDialog()
-
-    return confirmationPromise.then(userAccepted => {
-      if (userAccepted) {
-        this.toggleViewUngradedAsZero()
-      }
-    })
-  }
-
   toggleViewUngradedAsZero() {
     const toggleableAction = () => {
       this.gridDisplaySettings.viewUngradedAsZero = !this.gridDisplaySettings.viewUngradedAsZero
@@ -3522,7 +3534,7 @@ class Gradebook {
       this.updateAllTotalColumns()
     }
     toggleableAction()
-    this.saveSettings(
+    return this.saveSettings(
       {viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero},
       () => {},
       toggleableAction
@@ -3978,6 +3990,11 @@ class Gradebook {
     return this.gradebookContent.customColumns.find(function (column) {
       return column.teacher_notes
     })
+  }
+
+  isTeacherNotesColumnShown() {
+    const column = this.getTeacherNotesColumn()
+    return column != null && !column.hidden
   }
 
   listVisibleCustomColumns() {

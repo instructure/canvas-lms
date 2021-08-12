@@ -8975,6 +8975,153 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, false)
     })
   })
+
+  QUnit.module('when enhanced gradebook filters are enabled', () => {
+    test('sets allowSortingByModules to true if modules are enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.setContextModules([{id: '1', name: 'Module 1', position: 1}])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, true)
+    })
+
+    test('sets allowSortingByModules to false if modules are not enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, false)
+    })
+
+    test('sets allowViewUngradedAsZero to true if view ungraded as zero is enabled', () => {
+      gradebook = createGradebook({
+        allow_view_ungraded_as_zero: true,
+        enhanced_gradebook_filters: true
+      })
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, true)
+    })
+
+    test('sets allowViewUngradedAsZero to false if view ungraded as zero is not enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, false)
+    })
+
+    QUnit.module('viewOptions prop', () => {
+      const viewOptions = () => gradebookSettingsModalProps().viewOptions
+
+      test('sets columnSortSettings to the current sort criterion and direction', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.setColumnOrder({sortType: 'due_date', direction: 'descending'})
+        gradebook.renderGradebookSettingsModal()
+
+        deepEqual(viewOptions().columnSortSettings, {
+          criterion: 'due_date',
+          direction: 'descending'
+        })
+      })
+
+      test('sets showNotes to true if the notes column is shown', () => {
+        gradebook = createGradebook({
+          enhanced_gradebook_filters: true,
+          teacher_notes: {
+            id: '2401',
+            title: 'Notes',
+            position: 1,
+            teacher_notes: true,
+            hidden: false
+          }
+        })
+        gradebook.renderGradebookSettingsModal()
+
+        strictEqual(viewOptions().showNotes, true)
+      })
+
+      test('sets showNotes to false if the notes column is hidden', () => {
+        gradebook = createGradebook({
+          enhanced_gradebook_filters: true,
+          teacher_notes: {
+            id: '2401',
+            title: 'Notes',
+            position: 1,
+            teacher_notes: true,
+            hidden: true
+          }
+        })
+        gradebook.renderGradebookSettingsModal()
+
+        strictEqual(viewOptions().showNotes, false)
+      })
+
+      test('sets showNotes to false if the notes column does not exist', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showNotes, false)
+      })
+
+      test('sets showUnpublishedAssignments to true if unpublished assignments are shown', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.initShowUnpublishedAssignments('true')
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showUnpublishedAssignments, true)
+      })
+
+      test('sets showUnpublishedAssignments to false if unpublished assignments are not shown', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.initShowUnpublishedAssignments('not true')
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showUnpublishedAssignments, false)
+      })
+
+      test('sets statusColors to the current status colors', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.renderGradebookSettingsModal()
+        deepEqual(viewOptions().statusColors, statusColors())
+      })
+
+      test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
+        gradebook = createGradebook({
+          allow_view_ungraded_as_zero: true,
+          enhanced_gradebook_filters: true
+        })
+        gradebook.gridDisplaySettings.viewUngradedAsZero = true
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().viewUngradedAsZero, true)
+      })
+
+      test('sets viewUngradedAsZero to true if view ungraded as 0 is not active', () => {
+        gradebook = createGradebook({
+          allow_view_ungraded_as_zero: true,
+          enhanced_gradebook_filters: true
+        })
+        gradebook.gridDisplaySettings.viewUngradedAsZero = false
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().viewUngradedAsZero, false)
+      })
+    })
+  })
+
+  QUnit.module('when enhanced gradebook filters are not enabled', () => {
+    test('does not set allowSortingByModules', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, undefined)
+    })
+
+    test('does not set allowViewUngradedAsZero', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, undefined)
+    })
+
+    test('does not set viewOptions', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().viewOptions, undefined)
+    })
+  })
 })
 
 QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {
@@ -9672,80 +9819,6 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
     gradebook.toggleViewUngradedAsZero()
 
     strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
-  })
-})
-
-QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
-  let gradebook
-
-  const confirmationDialog = () =>
-    document.querySelector('span[role=dialog][aria-label="View Ungraded as Zero"]')
-  const acceptConfirmation = () => {
-    const okButton = [...confirmationDialog().querySelectorAll('button')].find(
-      button => button.textContent === 'OK'
-    )
-    okButton.click()
-  }
-  const denyConfirmation = () => {
-    const cancelButton = [...confirmationDialog().querySelectorAll('button')].find(
-      button => button.textContent === 'Cancel'
-    )
-    cancelButton.click()
-  }
-
-  hooks.beforeEach(() => {
-    gradebook = createGradebook({
-      grid: {
-        getColumns: () => [],
-        updateCell: sinon.stub()
-      },
-      settings: {
-        allow_view_ungraded_as_zero: 'true'
-      }
-    })
-    sinon.stub(gradebook, 'toggleViewUngradedAsZero')
-  })
-
-  test('shows a confirmation dialog if not viewing ungraded as zero', async () => {
-    const promise = gradebook.confirmViewUngradedAsZero()
-
-    ok(confirmationDialog())
-    acceptConfirmation()
-    await promise
-  })
-
-  test('does not show a confirmation dialog if already viewing ungraded as zero', async () => {
-    gradebook.gridDisplaySettings.viewUngradedAsZero = true
-    const promise = gradebook.confirmViewUngradedAsZero()
-
-    notOk(confirmationDialog())
-    await promise
-  })
-
-  QUnit.module('when the confirmation is requested and accepted', () => {
-    const confirmAndAccept = async () => {
-      const promise = gradebook.confirmViewUngradedAsZero()
-      acceptConfirmation()
-      await promise
-    }
-
-    test('calls toggleViewUngradedAsZero', async () => {
-      await confirmAndAccept()
-      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 1)
-    })
-  })
-
-  QUnit.module('when the confirmation is requested and denied', () => {
-    const confirmAndDeny = async () => {
-      const promise = gradebook.confirmViewUngradedAsZero()
-      denyConfirmation()
-      await promise
-    }
-
-    test('does not call toggleViewUngradedAsZero', async () => {
-      await confirmAndDeny()
-      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 0)
-    })
   })
 })
 

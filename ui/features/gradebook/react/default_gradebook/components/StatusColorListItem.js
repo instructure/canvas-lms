@@ -93,6 +93,7 @@ class StatusColorListItem extends React.Component {
                 show={isColorPickerShown}
                 onToggle={colorPickerOnToggle}
                 contentRef={colorPickerContentRef}
+                shouldReturnFocus
               >
                 <Popover.Trigger>
                   <Button buttonRef={colorPickerButtonRef} variant="icon" size="small">

@@ -17,11 +17,14 @@
  */
 
 import {
+  confirmViewUngradedAsZero,
   getStudentGradeForColumn,
   getGradeAsPercent,
   onGridKeyDown,
   compareAssignmentPositions
 } from '../Gradebook.utils'
+
+import {fireEvent, screen, waitFor} from '@testing-library/dom'
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -116,5 +119,50 @@ describe('compareAssignmentPositions', () => {
     const b = {object: {position: 2, assignment_group: {position: 1}}}
     const assignments = [a, b]
     expect(assignments.sort(compareAssignmentPositions)).toStrictEqual([b, a])
+  })
+})
+
+describe('confirmViewUngradedAsZero', () => {
+  let onAccepted
+
+  const confirm = currentValue => {
+    document.body.innerHTML = '<div id="confirmation_dialog_holder" />'
+    confirmViewUngradedAsZero({currentValue, onAccepted})
+  }
+
+  beforeEach(() => {
+    onAccepted = jest.fn()
+  })
+
+  describe('when initialValue is false', () => {
+    it('shows a confirmation dialog', () => {
+      confirm(false)
+      expect(
+        screen.getByText(/This setting only affects your view of student grades/)
+      ).toBeInTheDocument()
+    })
+
+    it('calls the onAccepted prop if the user accepts the confirmation', async () => {
+      confirm(false)
+      const confirmButton = await waitFor(() => screen.getByRole('button', {name: /OK/}))
+      fireEvent.click(confirmButton)
+      await waitFor(() => {
+        expect(onAccepted).toHaveBeenCalled()
+      })
+    })
+
+    it('does not call the onAccepted prop if the user does not accept the confirmation', async () => {
+      confirm(false)
+      const cancelButton = await waitFor(() => screen.getByRole('button', {name: /Cancel/}))
+      fireEvent.click(cancelButton)
+      expect(onAccepted).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when initialValue is true', () => {
+    it('calls the onAccepted prop immediately', () => {
+      confirm(true)
+      expect(onAccepted).toHaveBeenCalled()
+    })
   })
 })

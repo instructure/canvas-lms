@@ -19,6 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import I18n from 'i18n!gradebook'
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
@@ -116,4 +118,22 @@ export function compareAssignmentPositions(a, b) {
   // order first by assignment_group position and then by assignment position
   // will work when there are less than 1000000 assignments in an assignment_group
   return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
+}
+
+export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
+  const showDialog = () =>
+    showConfirmationDialog({
+      body: I18n.t(
+        'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
+      ),
+      confirmText: I18n.t('OK'),
+      label: I18n.t('View Ungraded as Zero')
+    })
+
+  // If the setting was already enabled, no need to show the confirmation
+  // dialog since we're turning it off
+  const userAccepted = currentValue || (await showDialog())
+  if (userAccepted) {
+    onAccepted()
+  }
 }
