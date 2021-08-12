@@ -19,7 +19,9 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import {render, waitFor, fireEvent, act} from '@testing-library/react'
+
 import {CreateCourseModal} from '../CreateCourseModal'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const MANAGEABLE_COURSES = [
   {
@@ -78,6 +80,7 @@ describe('CreateCourseModal', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    destroyContainer()
   })
 
   it('shows a spinner with correct title while loading accounts', async () => {
@@ -204,5 +207,23 @@ describe('CreateCourseModal', () => {
     expect(
       queryByText('Which account will this subject be associated with?')
     ).not.toBeInTheDocument()
+  })
+
+  it("doesn't break if the user has restricted enrollments", async () => {
+    fetchMock.get(ENROLLMENTS_URL, [
+      ...ENROLLMENTS,
+      {
+        id: 1033,
+        access_restricted_by_date: true
+      }
+    ])
+    const {getByLabelText, queryByText, getByText} = render(
+      <CreateCourseModal {...getProps({permissions: 'teacher'})} />
+    )
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    expect(queryByText('Unable to get accounts')).not.toBeInTheDocument()
+    act(() => getByLabelText('Which account will this subject be associated with?').click())
+    expect(getByText('Orange Elementary')).toBeInTheDocument()
+    expect(getByText('Clark HS')).toBeInTheDocument()
   })
 })
