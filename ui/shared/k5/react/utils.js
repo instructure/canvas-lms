@@ -223,6 +223,7 @@ export const getAssignmentGrades = data =>
    enrollment. */
 export const getAccountsFromEnrollments = enrollments =>
   enrollments
+    .filter(e => e.account)
     .reduce((acc, e) => {
       if (!acc.find(({id}) => id === e.account.id)) {
         acc.push({
