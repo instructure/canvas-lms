@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection.js'
-import IndexView from 'ui/features/quizzes_index/backbone/views/IndexView.js'
-import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItemGroupView.js'
-import NoQuizzesView from 'ui/features/quizzes_index/backbone/views/NoQuizzesView.js'
+import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection'
+import IndexView from 'ui/features/quizzes_index/backbone/views/IndexView'
+import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItemGroupView'
+import NoQuizzesView from 'ui/features/quizzes_index/backbone/views/NoQuizzesView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
 import ReactDOM from 'react-dom'
 
 let fixtures = null
-const indexView = function(assignments, open, surveys) {
+const indexView = function (assignments, open, surveys) {
   $('<div id="content"></div>').appendTo(fixtures)
   if (assignments == null) {
     assignments = new QuizCollection([])
@@ -111,29 +111,29 @@ test('#hasNoQuizzes if assignment and open quizzes are empty', () => {
   ok(view.options.hasNoQuizzes)
 })
 test('#hasNoQuizzes to false if has assignment quizzes', () => {
-  const assignments = new QuizCollection([{id: 1}])
+  const assignments = new QuizCollection([{id: 1, permissions: {delete: true}}])
   const open = new QuizCollection([])
   const view = indexView(assignments, open)
   ok(!view.options.hasNoQuizzes)
 })
 test('#hasNoQuizzes to false if has open quizzes', () => {
   const assignments = new QuizCollection([])
-  const open = new QuizCollection([{id: 1}])
+  const open = new QuizCollection([{id: 1, permissions: {delete: true}}])
   const view = indexView(assignments, open)
   ok(!view.options.hasNoQuizzes)
 })
 test('#hasAssignmentQuizzes if has assignment quizzes', () => {
-  const assignments = new QuizCollection([{id: 1}])
+  const assignments = new QuizCollection([{id: 1, permissions: {delete: true}}])
   const view = indexView(assignments, null, null)
   ok(view.options.hasAssignmentQuizzes)
 })
 test('#hasOpenQuizzes if has open quizzes', () => {
-  const open = new QuizCollection([{id: 1}])
+  const open = new QuizCollection([{id: 1, permissions: {delete: true}}])
   const view = indexView(null, open, null)
   ok(view.options.hasOpenQuizzes)
 })
 test('#hasSurveys if has surveys', () => {
-  const surveys = new QuizCollection([{id: 1}])
+  const surveys = new QuizCollection([{id: 1, permissions: {delete: true}}])
   const view = indexView(null, null, surveys)
   ok(view.options.hasSurveys)
 })
@@ -161,53 +161,61 @@ test('should render the view', () => {
   const assignments = new QuizCollection([
     {
       id: 1,
-      title: 'Foo Title'
+      title: 'Foo Title',
+      permissions: {delete: true}
     },
     {
       id: 2,
-      title: 'Bar Title'
+      title: 'Bar Title',
+      permissions: {delete: true}
     }
   ])
   const open = new QuizCollection([
     {
       id: 3,
-      title: 'Foo Title'
+      title: 'Foo Title',
+      permissions: {delete: true}
     },
     {
       id: 4,
-      title: 'Bar Title'
+      title: 'Bar Title',
+      permissions: {delete: true}
     }
   ])
   const view = indexView(assignments, open)
-  equal(view.$el.find('.collectionViewItems li').length, 4)
+  equal(view.$el.find('.collectionViewItems li.quiz').length, 4)
 })
 test('should filter by search term', () => {
   const assignments = new QuizCollection([
     {
       id: 1,
-      title: 'Foo Name'
+      title: 'Foo Name',
+      permissions: {delete: true}
     },
     {
       id: 2,
-      title: 'Bar Title'
+      title: 'Bar Title',
+      permissions: {delete: true}
     }
   ])
   const open = new QuizCollection([
     {
       id: 3,
-      title: 'Baz Title'
+      title: 'Baz Title',
+      permissions: {delete: true}
     },
     {
       id: 4,
-      title: 'Qux Name'
+      title: 'Qux Name',
+      permissions: {delete: true}
     }
   ])
   let view = indexView(assignments, open)
   $('#searchTerm').val('foo')
   view.filterResults()
-  equal(view.$el.find('.collectionViewItems li').length, 1)
+  equal(view.$el.find('.collectionViewItems li.quiz').length, 1)
   view = indexView(assignments, open)
   $('#searchTerm').val('name')
   view.filterResults()
-  equal(view.$el.find('.collectionViewItems li').length, 2)
+  equal(view.$el.find('.collectionViewItems li.quiz').length, 2)
 })

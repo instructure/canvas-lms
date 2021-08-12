@@ -121,7 +121,7 @@ module Types
 
       define_method(field_name) do |apply_overrides:|
         load_association(:context).then do |course|
-          if !apply_overrides && course.grants_right?(current_user, :manage_assignments)
+          if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
           else
             OverrideAssignmentLoader.for(current_user).load(assignment).then &field_name

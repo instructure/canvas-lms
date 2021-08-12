@@ -54,7 +54,7 @@ class AssignmentGroupsApiController < ApplicationController
       if assignments.any? && includes.include?('submission')
         submissions = submissions_hash(['submission'], assignments)
       end
-      includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
         stringify_json_ids: stringify_json_ids?,
         override_dates: override_dates,

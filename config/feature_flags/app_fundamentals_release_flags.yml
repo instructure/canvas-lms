@@ -34,3 +34,8 @@ allow_unconfirmed_users_in_user_list:
   applies_to: RootAccount
   display_name: Allow Unconfirmed E-mail Addresses When Adding Users
   description: This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while.
+granular_permissions_manage_assignments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Granular permissions for assignments and quizzes
+  description: Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three.

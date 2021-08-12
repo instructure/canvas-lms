@@ -17,19 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddNStrandIndex < ActiveRecord::Migration[5.2]
-  disable_ddl_transaction!
-  tag :predeploy
+class GranularManageAssignmentsPermissions < ActiveRecord::Migration[6.0]
+  tag :postdeploy
 
-  def connection
-    Delayed::Job.connection
-  end
-
-  def change
-    add_index :delayed_jobs, [:strand, :next_in_strand, :id],
-              name: 'n_strand_index',
-              where: 'strand IS NOT NULL',
-              algorithm: :concurrently,
-              if_not_exists: true
+  def up
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_assignments, :manage_assignments_add)
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_assignments, :manage_assignments_delete)
   end
 end

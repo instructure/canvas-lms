@@ -26,6 +26,7 @@
 <%
   newquizzes_engine_selected = @context.settings.dig(:engine_selected, :user_id, :newquizzes_engine_selected)
   newquizzes_engine_selected = ['true', 'false'].include?(newquizzes_engine_selected) ? newquizzes_engine_selected : nil
+  add_assignment_permission = @context.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
 %>
 <% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
@@ -233,7 +234,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select mathjax_ignore" aria-label="<%= quiz_label %>" multiple>
-          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+          <% if @context.grants_right?(@current_user, session, add_assignment_permission) %>
             <% if new_quizzes_modules_support_enabled %>
               <option value="new"><%= t :create_quiz_option, "[ Create Quiz ]" %></option>
             <% else %>
@@ -314,7 +315,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select mathjax_ignore" aria-label="<%= assignment_label %>" multiple>
-          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+          <% if @context.grants_right?(@current_user, session, add_assignment_permission) %>
             <% if new_quizzes_modules_support_enabled %>
               <option value="new"><%= t :create_assignment_option, "[ Create Assignment ]" %></option>
             <% else %>

@@ -45,7 +45,7 @@ module AssignmentOverrideApplicator
     context = result_assignment_or_quiz.context
     if context &&
       (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && # don't make a permissions call if we don't need to
-      context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
+      context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS) # faster than calling :delete rights on each assignment/quiz
 
       overridden_section_ids = result_assignment_or_quiz
         .applied_overrides.select { |o| o.set_type == "CourseSection" }

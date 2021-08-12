@@ -2589,12 +2589,19 @@ class ApplicationController < ActionController::Base
 
   ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
-    rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
+    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
+    unless @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
+      permissions[:manage_assignments_add] = permissions[:manage_assignments]
+      permissions[:manage_assignments_delete] = permissions[:manage_assignments]
+    end
     permissions[:manage] = permissions[:manage_assignments]
     permissions[:by_assignment_id] = @context.assignments.map do |assignment|
-      [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+      [assignment.id, {
+        update: assignment.user_can_update?(@current_user, session),
+        delete: assignment.grants_right?(@current_user, :delete)
+      }]
     end.to_h
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)

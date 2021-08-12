@@ -116,6 +116,8 @@ const createView = function (model, options) {
   }
   ENV.PERMISSIONS = {
     manage: options.canManage,
+    manage_assignments_add: options.canAdd || options.canManage,
+    manage_assignments_delete: options.canDelete || options.canManage,
     read_grades: options.canReadGrades
   }
 
@@ -940,28 +942,27 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('canDelete is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
-      userIsAdmin: true,
-      canManage: false
+      userIsAdmin: true
     })
 
     const json = view.toJSON()
     strictEqual(json.canDelete, true)
   })
 
-  test('canDelete is false if canManage is true and the individual assignment cannot be updated', function () {
+  test('canDelete is false if canManage is true and the individual assignment cannot be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {delete: false}
     })
 
     const json = view.toJSON()
     strictEqual(json.canDelete, false)
   })
 
-  test('canDelete is true if canManage is true and the individual assignment can be updated', function () {
+  test('canDelete is true if canManage is true and the individual assignment can be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {delete: true}
     })
 
     const json = view.toJSON()
@@ -970,7 +971,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is enabled when canDelete returns true', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {delete: true}
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), false)
@@ -978,7 +979,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is disabled when canDelete returns false', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {delete: false}
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), true)

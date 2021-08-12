@@ -459,7 +459,7 @@ class SubmissionsApiController < ApplicationController
     assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
 
     # unless teacher, filter assignments down to only assignments current user can see
-    unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+    unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades)
       assignments = assignments.select{ |a| (assignment_visibilities.fetch(a.id,[]) & student_ids).any?}
     end
 
@@ -605,7 +605,7 @@ class SubmissionsApiController < ApplicationController
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
-      if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
+      if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades) ||
            @submission.assignment_visible_to_user?(@current_user)
         includes = Array(params[:include])
         @submission.visible_to_user = includes.include?("visibility") ? @assignment.visible_to_user?(@submission.user) : true

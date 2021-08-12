@@ -70,7 +70,7 @@ module Types
         visible_enrollments = course.apply_enrollment_visibility(enrollments, current_user)
 
         # slim the scope down further because while students can see other student enrollments, they should not be able to see other student grades
-        unless course.grants_any_right?(current_user, :manage_grades, :read_as_admin, :manage_assignments)
+        unless course.grants_any_right?(current_user, :manage_grades, :read_as_admin)
           visible_enrollments = visible_enrollments.where(enrollments: { user_id: current_user[:id] })
         end
         assignment_group.scores.where(enrollment_id: visible_enrollments)

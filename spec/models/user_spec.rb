@@ -1998,7 +1998,7 @@ describe User do
       context = double
       assignments = [double, double, double]
       user = User.new
-      allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return false
+      allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return false
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)
         allow(assignment).to receive(:context).and_return(context)
@@ -2011,7 +2011,7 @@ describe User do
       context = double
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
-        allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return true
+        allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return true
         due_date1 = {:due_at => Time.now + 1.day}
         due_date2 = {:due_at => Time.now + 1.week}
         due_date3 = {:due_at => 2.weeks.from_now }

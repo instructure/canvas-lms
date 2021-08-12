@@ -94,6 +94,11 @@ class RoleOverride < ActiveRecord::Base
     :remove_observer_from_course,
     :remove_designer_from_course
   ].freeze
+  GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS = [
+    :manage_assignments,
+    :manage_assignments_add,
+    :manage_assignments_delete
+  ].freeze
 
   # immediately register stock canvas-lms permissions
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
@@ -762,9 +767,21 @@ class RoleOverride < ActiveRecord::Base
     },
 
     :manage_assignments => {
-      :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
-      :label_v2 => lambda { t("Assignments and Quizzes - add / edit / delete") },
-      :available_to => [
+      label: -> {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_assignments)
+          t("Manage / edit assignments and quizzes")
+        else
+          t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes")
+        end
+      },
+      label_v2: -> {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_assignments)
+          t("Assignments and Quizzes - manage / edit")
+        else
+          t("Assignments and Quizzes - add / edit / delete")
+        end
+      },
+      available_to: [
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
@@ -772,13 +789,57 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin',
         'AccountMembership'
       ],
-      :true_for => [
+      true_for: [
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
         'AccountAdmin'
       ],
-      :acts_as_access_token_scope => true
+      acts_as_access_token_scope: true
+    },
+    manage_assignments_add: {
+      label: -> { t("Add assignments and quizzes") },
+      label_v2: -> { t("Assignments and Quizzes - add") },
+      available_to: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      true_for: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ],
+      acts_as_access_token_scope: true,
+      group: "manage_assignments_and_quizzes",
+      group_label: -> { t("Manage Assignments and Quizzes") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
+    },
+    :manage_assignments_delete => {
+      label: -> { t("Delete assignments and quizzes") },
+      label_v2: -> { t("Assignments and Quizzes - delete") },
+      available_to: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      true_for: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ],
+      acts_as_access_token_scope: true,
+      group: "manage_assignments_and_quizzes",
+      group_label: -> { t("Manage Assignments and Quizzes") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
     },
     :manage_calendar => {
       :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
