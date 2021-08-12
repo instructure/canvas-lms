@@ -492,6 +492,7 @@ describe "API Authentication", type: :request do
         it "should give second token if not force_token_reuse" do
           json = trusted_exchange(true)
           expect(json['access_token']).to_not be_nil
+          expect(@user.access_tokens.count).to eq 2
         end
 
         it "should not give second token if force_token_reuse" do
@@ -499,7 +500,8 @@ describe "API Authentication", type: :request do
           @key.save!
 
           json = trusted_exchange(true)
-          expect(json['access_token']).to be_nil
+          expect(json['access_token']).not_to be_nil
+          expect(@user.access_tokens.count).to eq 1
         end
       end
     end
