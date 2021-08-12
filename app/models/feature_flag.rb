@@ -107,19 +107,19 @@ class FeatureFlag < ActiveRecord::Base
   def audit_log_destroy
     audit_log_update(operation: :destroy)
   end
-  private
 
   def prior_flag_state(operation)
-    operation == :create ? "created, prior default:#{self.send(:default_for_flag)}" : self.state_in_database
+    operation == :create ? self.default_for_flag : self.state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? "removed, new default: #{self.send(:default_for_flag)}" : self.state
+    operation == :destroy ? self.default_for_flag : self.state
   end
 
   def default_for_flag
     Feature.definitions[self.feature]&.state || 'undefined'
   end
+  private
 
   def valid_state
     unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)
