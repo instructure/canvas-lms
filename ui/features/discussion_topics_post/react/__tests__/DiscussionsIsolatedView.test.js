@@ -144,7 +144,7 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
   })
 
-  it('should show reply button in isolated view when search term is present', async () => {
+  it.skip('should show reply button in isolated view when search term is present', async () => {
     const container = setup()
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'parent'}
