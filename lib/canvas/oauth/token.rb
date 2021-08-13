@@ -109,7 +109,9 @@ module Canvas::Oauth
 
     def self.find_reusable_access_token(user, key, scopes, purpose, real_user: nil)
       if key.force_token_reuse
-        find_access_token(user, key, scopes, purpose, real_user: real_user)
+        access_token = find_access_token(user, key, scopes, purpose, real_user: real_user)
+        access_token&.regenerate_access_token
+        access_token
       elsif AccessToken.scopes_match?(scopes, ["userinfo"])
         find_userinfo_access_token(user, key, purpose, real_user: real_user)
       end
