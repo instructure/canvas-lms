@@ -195,6 +195,17 @@ const renderNotificationCategory = (
                         .notification.categoryDisplayName
                     }
                   </Tooltip>
+                  <ScreenReaderContent>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          notificationPreferences.channels[0].categories[notificationCategory][
+                            category
+                          ].notification.categoryDescription
+                      }}
+                      data-testid={`${formatCategoryKey(category)}_screenReader`}
+                    />
+                  </ScreenReaderContent>
                   {category === 'Grading' &&
                     renderSendScoresInEmailsToggle(
                       sendScoresInEmails,
