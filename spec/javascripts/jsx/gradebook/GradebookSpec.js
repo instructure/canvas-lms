@@ -171,6 +171,21 @@ test('custom columns remain empty when teacher notes are not provided', () => {
   deepEqual(gradebook.gradebookContent.customColumns, [])
 })
 
+QUnit.module('Gradebook#getAssignmentOrder', () => {
+  test('returns the IDs of the ordered assignments in Gradebook', () => {
+    const gradebook = createGradebook()
+    gradebook.gridData.columns.scrollable = [
+      'assignment_3',
+      'custom_col_8',
+      'assignment_2',
+      'assignment_group_1',
+      'assignment_7',
+      'total_grade'
+    ]
+    propEqual(gradebook.getAssignmentOrder(), ['3', '2', '7'])
+  })
+})
+
 QUnit.module('Gradebook#gotCustomColumnDataChunk', {
   setup() {
     this.gradebook = createGradebook()

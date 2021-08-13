@@ -241,7 +241,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resource :gradebook_csv, only: [:show]
+    resource :gradebook_csv, only: [:create]
 
     # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     get 'imports/list' => 'content_imports#index', as: :import_list

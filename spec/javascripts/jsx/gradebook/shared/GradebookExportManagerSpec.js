@@ -144,7 +144,7 @@ QUnit.module('GradebookExportManager - startExport', {
     }
 
     // Initial request to start the export
-    moxios.stubRequest(exportingUrl, {
+    moxios.stubRequest(new RegExp(exportingUrl), {
       status: 200,
       responseText: expectedExportFromServer
     })
@@ -158,21 +158,51 @@ QUnit.module('GradebookExportManager - startExport', {
   }
 })
 
+test('includes assignment_order if getAssignmentOrder returns some assignments', function () {
+  this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+  this.subject.monitorExport = (resolve, _reject) => {
+    resolve('success')
+  }
+
+  const getAssignmentOrder = () => ['1', '2', '3']
+  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
+    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+    propEqual(postData.assignment_order, ['1', '2', '3'])
+  })
+})
+
+test('does not include assignment_order if getAssignmentOrder returns no assignments', function () {
+  this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+  this.subject.monitorExport = (resolve, _reject) => {
+    resolve('success')
+  }
+
+  const getAssignmentOrder = () => []
+  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
+    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+    equal(postData.assignment_order, undefined)
+  })
+})
+
 test('returns a rejected promise if the manager has no exportingUrl set', function() {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
   this.subject.exportingUrl = undefined
 
-  return this.subject.startExport().catch(reason => {
-    equal(reason, 'No way to export gradebooks provided!')
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .catch(reason => {
+      equal(reason, 'No way to export gradebooks provided!')
+    })
 })
 
 test('returns a rejected promise if the manager already has an export going', function() {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
 
-  return this.subject.startExport().catch(reason => {
-    equal(reason, 'An export is already in progress.')
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .catch(reason => {
+      equal(reason, 'An export is already in progress.')
+    })
 })
 
 test('sets a new existing export and returns a fulfilled promise', function() {
@@ -186,19 +216,23 @@ test('sets a new existing export and returns a fulfilled promise', function() {
     resolve('success')
   }
 
-  return this.subject.startExport().then(() => {
-    deepEqual(this.subject.export, expectedExport)
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .then(() => {
+      deepEqual(this.subject.export, expectedExport)
+    })
 })
 
 test('clears any new export and returns a rejected promise if no monitoring is possible', function() {
   sandbox.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined)
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
 
-  return this.subject.startExport().catch(reason => {
-    equal(reason, 'No way to monitor gradebook exports provided!')
-    equal(this.subject.export, undefined)
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .catch(reason => {
+      equal(reason, 'No way to monitor gradebook exports provided!')
+      equal(this.subject.export, undefined)
+    })
 })
 
 test('starts polling for progress and returns a rejected promise on progress failure', function() {
@@ -214,9 +248,11 @@ test('starts polling for progress and returns a rejected promise on progress fai
     }
   })
 
-  return this.subject.startExport().catch(reason => {
-    equal(reason, 'Error exporting gradebook: Arbitrary failure')
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .catch(reason => {
+      equal(reason, 'Error exporting gradebook: Arbitrary failure')
+    })
 })
 
 test('starts polling for progress and returns a rejected promise on unknown progress status', function() {
@@ -232,9 +268,11 @@ test('starts polling for progress and returns a rejected promise on unknown prog
     }
   })
 
-  return this.subject.startExport().catch(reason => {
-    equal(reason, 'Error exporting gradebook: Pattern buffer degradation')
-  })
+  return this.subject
+    .startExport(undefined, () => [])
+    .catch(reason => {
+      equal(reason, 'Error exporting gradebook: Pattern buffer degradation')
+    })
 })
 
 test('starts polling for progress and returns a fulfilled promise on progress completion', function() {
@@ -258,13 +296,15 @@ test('starts polling for progress and returns a fulfilled promise on progress co
     }
   })
 
-  return this.subject.startExport().then(resolution => {
-    equal(this.subject.export, undefined)
+  return this.subject
+    .startExport(undefined, () => [])
+    .then(resolution => {
+      equal(this.subject.export, undefined)
 
-    const expectedResolution = {
-      attachmentUrl: 'http://completedAttachmentUrl',
-      updatedAt: '2009-01-20T17:00:00Z'
-    }
-    deepEqual(resolution, expectedResolution)
-  })
+      const expectedResolution = {
+        attachmentUrl: 'http://completedAttachmentUrl',
+        updatedAt: '2009-01-20T17:00:00Z'
+      }
+      deepEqual(resolution, expectedResolution)
+    })
 })

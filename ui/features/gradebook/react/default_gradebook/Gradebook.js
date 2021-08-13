@@ -142,6 +142,7 @@ const anonymousSpeedGraderAlertMountPoint = function () {
 
 class Gradebook {
   constructor(options1) {
+    this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
     this.addOverridesToPostGradesStore = this.addOverridesToPostGradesStore.bind(this)
@@ -1971,6 +1972,17 @@ class Gradebook {
     ))
   }
 
+  getAssignmentOrder() {
+    return this.gridData.columns.scrollable.reduce((acc, column) => {
+      const matches = column.match(/assignment_(\d+)/)
+      if (matches) {
+        const assignmentId = matches[1]
+        acc.push(assignmentId)
+      }
+      return acc
+    }, [])
+  }
+
   getActionMenuProps() {
     let attachmentData
     const focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
@@ -1991,7 +2003,8 @@ class Gradebook {
         isEnabled: this.options.publish_to_sis_enabled,
         publishToSisUrl: this.options.publish_to_sis_url
       },
-      gradingPeriodId: this.gradingPeriodId
+      gradingPeriodId: this.gradingPeriodId,
+      getAssignmentOrder: this.getAssignmentOrder
     }
     const progressData = this.options.gradebook_csv_progress
     if (this.options.gradebook_csv_progress) {

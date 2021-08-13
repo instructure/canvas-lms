@@ -24,6 +24,7 @@ import GradebookExportManager from 'ui/features/gradebook/react/shared/Gradebook
 import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
 
 const workingMenuProps = () => ({
+  getAssignmentOrder() {},
   gradebookIsEditable: true,
   contextAllowsGradebookUploads: true,
   gradebookImportUrl: 'http://gradebookImportUrl',
