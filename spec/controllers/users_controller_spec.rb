@@ -2623,6 +2623,15 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
         end
+
+        it "sets ENV.OBSERVER_LIST with self and observed users" do
+          get 'user_dashboard'
+
+          observers = assigns[:js_env][:OBSERVER_LIST]
+          expect(observers.length).to be(1)
+          expect(observers[0][:name]).to eq(@student.name)
+          expect(observers[0][:id]).to eq(@student.id)
+        end
       end
     end
 

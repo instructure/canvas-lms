@@ -37,6 +37,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 
 import K5Tabs from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
@@ -58,7 +59,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions from '@canvas/k5/react/ObserverOptions'
+import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
 
 const DASHBOARD_TABS = [
   {
@@ -138,7 +139,8 @@ export const K5Dashboard = ({
   showImportantDates,
   selectedContextCodes,
   selectedContextsLimit,
-  parentSupportEnabled
+  parentSupportEnabled,
+  observerList
 }) => {
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
@@ -266,11 +268,14 @@ export const K5Dashboard = ({
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
           {parentSupportEnabled && (
-            <ObserverOptions
-              currentUser={currentUser}
-              currentUserRoles={currentUserRoles}
-              handleChangeObservedUser={setObservedUserId}
-            />
+            <View as="div" maxWidth="16em">
+              <ObserverOptions
+                observerList={observerList}
+                currentUser={currentUser}
+                handleChangeObservedUser={setObservedUserId}
+                margin="medium 0 xx-small 0"
+              />
+            </View>
           )}
           <K5DashboardContext.Provider
             value={{
@@ -370,7 +375,8 @@ K5Dashboard.propTypes = {
   showImportantDates: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired
+  parentSupportEnabled: PropTypes.bool.isRequired,
+  observerList: ObserverListShape.isRequired
 }
 
 const mapDispatchToProps = {

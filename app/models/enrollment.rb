@@ -253,6 +253,10 @@ class Enrollment < ActiveRecord::Base
 
   scope :of_content_admins, -> { where(:type => ['TeacherEnrollment', 'DesignerEnrollment']) }
 
+  scope :of_observer_type, -> { where(:type => "ObserverEnrollment") }
+
+  scope :not_of_observer_type, -> { where.not(:type => "ObserverEnrollment") }
+
   scope :student, -> {
     select(:course_id).
         joins(:course).

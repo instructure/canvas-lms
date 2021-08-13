@@ -355,6 +355,7 @@ class CoursesController < ApplicationController
   include WebZipExportHelper
   include CoursesHelper
   include NewQuizzesFeaturesHelper
+  include ObserverEnrollmentsHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -2230,7 +2231,8 @@ class CoursesController < ApplicationController
               read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin)
             },
             STUDENT_PLANNER_ENABLED: planner_enabled?,
-            TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
+            TABS: @context.tabs_available(@current_user, course_subject_tabs: true),
+            OBSERVER_LIST: observed_users(@current_user, session, @context.id)
           )
 
           js_bundle :k5_course, :context_modules

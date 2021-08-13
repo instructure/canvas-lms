@@ -35,10 +35,10 @@ import {
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom,
   groupImportantDates,
-  parseObservedUsers
+  parseObserverList
 } from '../utils'
 
-import {MOCK_ASSIGNMENTS, MOCK_EVENTS, MOCK_OBSERVER_ENROLLMENTS} from './fixtures'
+import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
@@ -890,45 +890,22 @@ describe('groupImportantDates', () => {
   })
 })
 
-describe('parseObservedUsers', () => {
-  const currentUser = {
-    id: '13',
-    display_name: 'Zelda',
-    avatar_image_url: 'http://avatar'
-  }
-
-  it('only includes enrollments with an observed user', () => {
-    const users = parseObservedUsers(MOCK_OBSERVER_ENROLLMENTS, true, currentUser)
+describe('parseObserverList', () => {
+  it('transforms attribute names', () => {
+    const users = parseObserverList([
+      {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
+      {id: '6', name: 'Student 6'}
+    ])
     expect(users.length).toBe(2)
+    expect(users[0].id).toBe('4')
     expect(users[0].name).toBe('Student 4')
-    expect(users[1].name).toBe('Student 2')
+    expect(users[0].avatarUrl).toBe('https://url_here')
+    expect(users[1].id).toBe('6')
+    expect(users[1].name).toBe('Student 6')
   })
 
-  it('sorts by sortable name with self enrollment first', () => {
-    const users = parseObservedUsers(MOCK_OBSERVER_ENROLLMENTS, false, currentUser)
-    expect(users.length).toBe(3)
-    expect(users[0].name).toBe('Zelda')
-    expect(users[1].name).toBe('Student 4')
-    expect(users[2].name).toBe('Student 2')
-  })
-
-  it('includes id, name, and avatarUrl', () => {
-    const users = parseObservedUsers(MOCK_OBSERVER_ENROLLMENTS, true, currentUser)
-    const student2 = users[1]
-    expect(student2.id).toBe('2')
-    expect(student2.name).toBe('Student 2')
-    expect(student2.sortableName).toBe('B')
-    expect(student2.avatarUrl).toBe(
-      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
-    )
-  })
-
-  it('removes duplicate users', () => {
-    const users = parseObservedUsers(
-      [...MOCK_OBSERVER_ENROLLMENTS, ...MOCK_OBSERVER_ENROLLMENTS],
-      true,
-      currentUser
-    )
-    expect(users.length).toBe(2)
+  it('returns empty list if no observers passed', () => {
+    const users = parseObserverList([])
+    expect(users.length).toBe(0)
   })
 })

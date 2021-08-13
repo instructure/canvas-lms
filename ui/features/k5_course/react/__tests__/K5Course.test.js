@@ -31,10 +31,12 @@ import {
   MOCK_ENROLLMENTS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
+import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
 
 const currentUser = {
   id: '1',
-  display_name: 'Geoffrey Jellineck'
+  display_name: 'Geoffrey Jellineck',
+  avatar_image_url: 'http://avatar'
 }
 const defaultEnv = {
   current_user: currentUser,
@@ -83,7 +85,9 @@ const defaultProps = {
   },
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
-  hasSyllabusBody: true
+  hasSyllabusBody: true,
+  parentSupportEnabled: true,
+  observerList: MOCK_OBSERVER_LIST
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -544,6 +548,15 @@ describe('K-5 Subject Course', () => {
         const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
       })
+    })
+  })
+
+  describe('Parent Support', () => {
+    it('shows picker when user is an observer', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} />)
+      const select = getByRole('combobox', {name: 'Select a student to view'})
+      expect(select).toBeInTheDocument()
+      expect(select.value).toBe('Zelda')
     })
   })
 })

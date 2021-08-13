@@ -17,57 +17,31 @@
  */
 
 import React from 'react'
-import {render, act, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, act, fireEvent} from '@testing-library/react'
+import getCookie from 'get-cookie'
 
-import ObserverOptions from '../ObserverOptions'
-import {MOCK_OBSERVER_ENROLLMENTS} from './fixtures'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
-
-const ENROLLMENTS_URL = encodeURI(
-  '/api/v1/users/self/enrollments?type[]=ObserverEnrollment&include[]=avatar_url&include[]=observed_users&per_page=100'
-)
+import ObserverOptions, {SELECTED_OBSERVED_USER_COOKIE} from '../ObserverOptions'
+import {MOCK_OBSERVER_LIST} from './fixtures'
 
 describe('ObserverOptions', () => {
   const getProps = (overrides = {}) => ({
+    observerList: MOCK_OBSERVER_LIST,
     currentUser: {
       id: '13',
       display_name: 'Zelda',
       avatar_image_url: 'http://avatar'
     },
-    currentUserRoles: ['observer', 'student', 'user'],
     handleChangeObservedUser: jest.fn(),
     ...overrides
   })
 
-  beforeEach(() => {
-    fetchMock.get(ENROLLMENTS_URL, MOCK_OBSERVER_ENROLLMENTS)
-  })
-
   afterEach(() => {
-    fetchMock.restore()
-    destroyContainer()
-    sessionStorage.clear()
+    document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
   })
 
-  it('renders a loading skeleton just while loading enrollments', async () => {
-    const {getByText, findByRole, queryByText} = render(<ObserverOptions {...getProps()} />)
-    const skeletonText = 'Loading observed students'
-    expect(getByText(skeletonText)).toBeInTheDocument()
-    expect(await findByRole('combobox', {name: 'Select a student to view'})).toBeInTheDocument()
-    expect(queryByText(skeletonText)).not.toBeInTheDocument()
-  })
-
-  it('shows an alert if enrollments fail to load', async () => {
-    fetchMock.get(ENROLLMENTS_URL, 500, {overwriteRoutes: true})
-    const {findAllByText} = render(<ObserverOptions {...getProps()} />)
-    const alerts = await findAllByText('Unable to get observed students')
-    expect(alerts[0]).toBeInTheDocument()
-  })
-
-  it('displays students in the select', async () => {
-    const {findByRole, getByText} = render(<ObserverOptions {...getProps()} />)
-    const select = await findByRole('combobox', {name: 'Select a student to view'})
+  it('displays students in the select', () => {
+    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} />)
+    const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select).toBeInTheDocument()
     expect(select.value).toBe('Zelda')
     act(() => select.click())
@@ -84,43 +58,43 @@ describe('ObserverOptions', () => {
     expect(queryByText('Zelda')).not.toBeInTheDocument()
   })
 
-  it('calls handleChangeObservedUser and saves to sessionStorage when changing the user', async () => {
+  it('calls handleChangeObservedUser and saves cookie when changing the user', () => {
     const handleChangeObservedUser = jest.fn()
-    const {findByRole, getByText} = render(
+    const {getByRole, getByText} = render(
       <ObserverOptions {...getProps({handleChangeObservedUser})} />
     )
-    const select = await findByRole('combobox', {name: 'Select a student to view'})
+    const select = getByRole('combobox', {name: 'Select a student to view'})
     act(() => select.click())
     act(() => getByText('Student 2').click())
     expect(handleChangeObservedUser).toHaveBeenCalledWith('2')
-    expect(sessionStorage.getItem('k5_observed_user_id')).toBe('2')
+    expect(getCookie(SELECTED_OBSERVED_USER_COOKIE)).toBe('2')
   })
 
-  it('renders a label if there is only one observed student', async () => {
-    fetchMock.get(ENROLLMENTS_URL, MOCK_OBSERVER_ENROLLMENTS[2], {overwriteRoutes: true})
-    const {findByText, getByText, queryByRole} = render(
-      <ObserverOptions {...getProps({currentUserRoles: ['user', 'observer']})} />
+  it('renders a label if there is only one observed student', () => {
+    const {getByText, queryByRole} = render(
+      <ObserverOptions {...getProps({observerList: [MOCK_OBSERVER_LIST[2]]})} />
     )
-    expect(await findByText('You are observing Student 2')).toBeInTheDocument()
+    expect(getByText('You are observing Student 2')).toBeInTheDocument()
     expect(getByText('Student 2')).toBeInTheDocument()
     expect(queryByRole('combobox', {name: 'Select a student to view'})).not.toBeInTheDocument()
   })
 
-  it('does not render for non-observers', async () => {
-    fetchMock.get(ENROLLMENTS_URL, [], {overwriteRoutes: true})
-    const {getByText, queryByText, queryByRole} = render(
-      <ObserverOptions {...getProps({currentUserRoles: ['user', 'teacher']})} />
-    )
-    const skeletonText = 'Loading observed students'
-    expect(getByText(skeletonText)).toBeInTheDocument()
-    await waitFor(() => expect(queryByText('Loading observed students')).not.toBeInTheDocument())
-    expect(queryByRole('combobox', {name: 'Select a student to view'})).not.toBeInTheDocument()
+  it('does not render for non-observers', () => {
+    const {container} = render(<ObserverOptions {...getProps({observerList: []})} />)
+    expect(container).toBeEmptyDOMElement()
   })
 
-  it('automatically selects the user previously selected', async () => {
-    sessionStorage.setItem('k5_observed_user_id', '4')
-    const {findByRole} = render(<ObserverOptions {...getProps()} />)
-    const select = await findByRole('combobox', {name: 'Select a student to view'})
+  it('does not render if only user is self', () => {
+    const {container} = render(
+      <ObserverOptions {...getProps({observerList: [MOCK_OBSERVER_LIST[0]]})} />
+    )
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('automatically selects the user previously selected', () => {
+    document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+    const {getByRole} = render(<ObserverOptions {...getProps()} />)
+    const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select.value).toBe('Student 4')
   })
 })

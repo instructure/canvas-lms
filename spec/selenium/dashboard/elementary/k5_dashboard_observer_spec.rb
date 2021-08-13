@@ -36,6 +36,7 @@ describe "observer k5 dashboard" do
 
   before :each do
     user_session @observer
+    driver.manage.delete_cookie('k5_observed_user_id')
   end
 
   context 'single observed student' do

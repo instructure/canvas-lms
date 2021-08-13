@@ -1698,6 +1698,16 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_falsey
       end
+
+      it "sets ENV.OBSERVER_LIST with self and observed users" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        observers = assigns[:js_env][:OBSERVER_LIST]
+        expect(observers.length).to be(1)
+        expect(observers[0][:name]).to eq(@student.name)
+        expect(observers[0][:id]).to eq(@student.id)
+      end
     end
 
 
