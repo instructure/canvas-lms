@@ -60,7 +60,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         scope = scope.where("created_at #{condition}?", relative_entry.created_at)
       end
 
-      scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
+      # unread filter is used like search results and need to exclude deleted entries
+      scope = scope.active.unread_for_user(@current_user) if @filter == 'unread'
       scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
       fulfill(object, scope)
     end

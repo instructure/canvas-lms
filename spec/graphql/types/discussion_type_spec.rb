@@ -287,6 +287,7 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "by unread workflow state" do
+      @de.change_read_state('read', @teacher)
       result = discussion_type.resolve('discussionEntriesConnection(filter:unread) { nodes { message } }')
       expect(result.count).to be 1
       expect(result[0]).to eq @de2.message

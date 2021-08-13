@@ -374,6 +374,8 @@ class DiscussionEntry < ActiveRecord::Base
   scope :top_level_for_topics, ->(topics) { where(root_entry_id: nil, discussion_topic_id: topics) }
   scope :all_for_topics, ->(topics) { where(discussion_topic_id: topics) }
   scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
+  # when there is no discussion_entry_participant for a user, it is considered unread
+  scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ['unread', nil] }) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
