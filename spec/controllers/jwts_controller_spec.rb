@@ -105,7 +105,7 @@ describe JwtsController do
       it "returns a different jwt when refresh is called" do
         course = course_factory
         original_jwt = Canvas::Security::ServicesJwt.for_user(
-          request.env['HTTP_HOST'],
+          request.host_with_port,
           token_user
         )
         post 'refresh', params: {jwt: original_jwt}
