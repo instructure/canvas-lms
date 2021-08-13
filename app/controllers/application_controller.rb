@@ -280,7 +280,7 @@ class ApplicationController < ActionController::Base
   helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
-  def rce_js_env(domain: request.env['HTTP_HOST'])
+  def rce_js_env(domain: request.host_with_port)
     rce_env_hash = Services::RichContent.env_for(
         user: @current_user,
         domain: domain,
