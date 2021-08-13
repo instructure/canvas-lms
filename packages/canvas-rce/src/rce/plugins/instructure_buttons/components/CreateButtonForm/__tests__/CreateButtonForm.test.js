@@ -64,6 +64,9 @@ describe('<CreateButtonForm />', () => {
             width="122px"
             xmlns="http://www.w3.org/2000/svg"
           >
+            <metadata>
+              {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+            </metadata>
             <svg
               fill="none"
               height="122px"

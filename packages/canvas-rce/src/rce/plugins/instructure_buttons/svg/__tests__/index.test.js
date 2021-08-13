@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-large-snapshots */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -43,6 +44,9 @@ describe('buildSvg()', () => {
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
         <svg
           fill="none"
           height="218px"
@@ -133,6 +137,9 @@ describe('buildSvg()', () => {
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
         <svg
           fill="none"
           height="218px"

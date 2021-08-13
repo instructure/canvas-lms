@@ -18,6 +18,7 @@
 
 import {BASE_SIZE, DEFAULT_OPTIONS, DEFAULT_SETTINGS, STROKE_WIDTH} from './constants'
 import {createSvgElement} from './utils'
+import {buildMetadata} from './metadata'
 import {buildShape} from './shape'
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from './text'
 
@@ -29,6 +30,9 @@ export function buildSvg(settings, options = DEFAULT_OPTIONS) {
   if (options.isPreview) {
     const checkerboard = buildCheckerboard()
     shapeWrapper.appendChild(checkerboard)
+  } else {
+    const metadata = buildMetadata(settings)
+    mainContainer.appendChild(metadata)
   }
 
   const g = buildGroup(settings, options)
