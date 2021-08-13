@@ -15,10 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import getCookie from 'get-cookie'
 import InstAccess from '../InstAccess'
 
+jest.mock('get-cookie', () => {
+  return jest.fn().mockImplementation(cookieName => {
+    if (cookieName === '_csrf_token') {
+      return 'myVerySafeCsrfToken'
+    }
+    return null
+  })
+})
+
 describe('InstAccess', () => {
+  beforeEach(() => {
+    getCookie.mockClear()
+  })
+
   describe('initialization', () => {
     it('initializes with no token', () => {
       const ia = new InstAccess()
@@ -33,27 +46,23 @@ describe('InstAccess', () => {
 
   describe('token fetching', () => {
     it('will use a provided token if available', async () => {
-      let invocationCount = 0
-      const fakeFetch = async (uri, options) => {
-        invocationCount += 1
+      const fakeFetch = jest.fn(async (uri, options) => {
         expect(uri).toEqual('http://fake-gateway/graphql')
         expect(options.headers.authorization).toEqual('Bearer veryFakeToken')
         return {
           status: 200
         }
-      }
+      })
       const ia = new InstAccess({
         token: 'veryFakeToken',
         preferredFetch: fakeFetch
       })
       await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
-      expect(invocationCount).toEqual(1)
+      expect(fakeFetch.mock.calls.length).toEqual(1)
     })
 
     it('fetches a token (with CSRF protection) when it needs one', async () => {
-      let invocationCount = 0
-      const fakeFetch = async (uri, options) => {
-        invocationCount += 1
+      const fakeFetch = jest.fn(async (uri, options) => {
         if (uri === '/api/v1/inst_access_tokens') {
           expect(options.headers['X-CSRF-Token']).toEqual('myVerySafeCsrfToken')
           return {
@@ -68,22 +77,14 @@ describe('InstAccess', () => {
         return {
           status: 200
         }
-      }
-      const fakeDoc = {
-        cookie: '_csrf_token=myVerySafeCsrfToken;some_other_key=someOtherValue'
-      }
-      const ia = new InstAccess({
-        preferredFetch: fakeFetch,
-        preferredDocument: fakeDoc
       })
+      const ia = new InstAccess({preferredFetch: fakeFetch})
       await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
-      expect(invocationCount).toEqual(2)
+      expect(fakeFetch.mock.calls.length).toEqual(2)
     })
 
     it('refreshes token when expired', async () => {
-      let invocationCount = 0
-      const fakeFetch = async (uri, options) => {
-        invocationCount += 1
+      const fakeFetch = jest.fn(async (uri, options) => {
         if (uri === '/api/v1/inst_access_tokens') {
           expect(options.headers['X-CSRF-Token']).toEqual('myVerySafeCsrfToken')
           return {
@@ -101,18 +102,14 @@ describe('InstAccess', () => {
           statusCode = 200
         }
         return {status: statusCode}
-      }
-      const fakeDoc = {
-        cookie: '_csrf_token=myVerySafeCsrfToken;some_other_key=someOtherValue'
-      }
+      })
       const ia = new InstAccess({
         token: 'ExistingToken',
-        preferredFetch: fakeFetch,
-        preferredDocument: fakeDoc
+        preferredFetch: fakeFetch
       })
       const finalResponse = await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
       expect(finalResponse.status).toEqual(200)
-      expect(invocationCount).toEqual(3)
+      expect(fakeFetch.mock.calls.length).toEqual(3)
     })
   })
 })
