@@ -53,7 +53,7 @@ describe "student k5 course grades tab" do
       @assignment1 = create_assignment(@subject_course, "assignment 1", "assignment1 not submitted", 100)
       @assignment2 = create_dated_assignment(@subject_course, "assignment 2 missing", 1.day.ago(Time.zone.now), 15)
       @assignment3 = create_and_submit_assignment(@subject_course, "assignment 3", "assignment2 submitted", 100)
-      @assignment3.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+      @assignment3.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
     end
 
     it 'shows 3 assignments in the list' do
@@ -106,7 +106,7 @@ describe "student k5 course grades tab" do
 
     before :once do
       @assignment = create_and_submit_assignment(@subject_course, "Grading Standards Assignment", 1.day.ago(Time.zone.now), 100)
-      @assignment.grade_student(@student, grader: @teacher, score: student_score, points_deducted: 0)
+      @assignment.grade_student(@student, grader: @homeroom_teacher, score: student_score, points_deducted: 0)
     end
 
     it 'shows a different grading standard for assignments' do
@@ -163,8 +163,8 @@ describe "student k5 course grades tab" do
     end
 
     it 'can open assignments group dropdown and see assignment group-specific grades' do
-      @assignment1.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
-      @assignment2.grade_student(@student, grader: @teacher, score: "60", points_deducted: 0)
+      @assignment1.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
+      @assignment2.grade_student(@student, grader: @homeroom_teacher, score: "60", points_deducted: 0)
 
       get "/courses/#{@subject_course.id}#grades"
 
@@ -183,7 +183,7 @@ describe "student k5 course grades tab" do
       create_grading_periods('Fall Term')
       associate_course_to_term("Fall Term")
       @assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)
-      @assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+      @assignment.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
     end
 
     it 'shows the current grading period grades' do
@@ -195,7 +195,7 @@ describe "student k5 course grades tab" do
 
     it 'shows the grades for a different grading period' do
       @assignment.update!(due_at: 1.week.ago)
-      @assignment.grade_student(@student, grader: @teacher, score: "80", points_deducted: 0)
+      @assignment.grade_student(@student, grader: @homeroom_teacher, score: "80", points_deducted: 0)
 
       get "/courses/#{@subject_course.id}#grades"
 
@@ -212,7 +212,7 @@ describe "student k5 course grades tab" do
       # Doing the get first, then creating the assignment and refreshing to get around a weird Jenkins
       # quirk that seems to be refreshing the page automatically on occasion.
       assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)
-      assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
       refresh_page
 
       expect(new_grade_badge).to be_displayed

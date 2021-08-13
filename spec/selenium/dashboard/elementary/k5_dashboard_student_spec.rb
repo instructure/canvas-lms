@@ -212,7 +212,7 @@ describe "student k5 dashboard" do
     end
 
     it 'shows the grades in default percentage format' do
-      assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: math_subject_grade, points_deducted: 0)
 
       get "/#grades"
 
@@ -223,7 +223,7 @@ describe "student k5 dashboard" do
       grading_standard = create_grading_standard(@subject_course)
       @subject_course.update!(grading_standard_enabled: true, grading_standard_id: grading_standard.id)
 
-      assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: math_subject_grade, points_deducted: 0)
 
       scheme_subject_grade = "You got this"
       get "/#grades"
@@ -236,7 +236,7 @@ describe "student k5 dashboard" do
       create_grading_periods('Fall Term')
       associate_course_to_term("Fall Term")
       assignment.update!(due_at: 1.week.ago)
-      assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
 
       get "/#grades"
 
@@ -253,7 +253,7 @@ describe "student k5 dashboard" do
     end
 
     it 'show the progress bar with the appropriate progress' do
-      assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: math_subject_grade, points_deducted: 0)
 
       get "/#grades"
 

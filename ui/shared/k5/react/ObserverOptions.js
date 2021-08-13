@@ -112,6 +112,7 @@ const ObserverOptions = ({currentUser, currentUserRoles, handleChangeObservedUse
       {observedUsers?.length > 1 && (
         <View as="div" margin="medium 0 0 0" maxWidth="22em">
           <CanvasAsyncSelect
+            data-testid="observed-student-dropdown"
             inputValue={selectSearchValue}
             renderLabel={
               <ScreenReaderContent>{I18n.t('Select a student to view')}</ScreenReaderContent>
@@ -145,7 +146,7 @@ const ObserverOptions = ({currentUser, currentUserRoles, handleChangeObservedUse
           <AccessibleContent
             alt={I18n.t('You are observing %{observedUser}', {observedUser: observedUsers[0].name})}
           >
-            <Text as="div">
+            <Text as="div" data-testid="observed-student-label">
               {selectAvatar} {observedUsers[0].name}
             </Text>
           </AccessibleContent>
