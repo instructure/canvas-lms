@@ -734,6 +734,20 @@ describe RubricsController do
       end
     end
 
+    it "returns 404 if rubric is deleted" do
+      rubric = Rubric.create!(user: @teacher, context: Account.default)
+      RubricAssociation.create!(
+        rubric: rubric,
+        context: @course,
+        purpose: :bookmark,
+        association_object: @course
+      )
+      rubric.destroy
+      assert_page_not_found do
+        get 'show', params: {id: rubric.id, course_id: @course.id}
+      end
+    end
+
     describe "with a valid rubric" do
       before do
         @r = Rubric.create! user: @teacher, context: Account.default
