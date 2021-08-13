@@ -236,6 +236,8 @@ class Course < ActiveRecord::Base
 
   has_many :comment_bank_items, inverse_of: :course
 
+  has_many :pace_plans
+
   prepend Profile::Association
 
   before_save :assign_uuid
