@@ -36,8 +36,9 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope.reorder("created_at #{@sort_order}")
       scope = scope.where(parent_id: nil) if @root_entries
       if @search_term.present?
-        scope = scope.where.not(:workflow_state => 'deleted')
-        scope = scope.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
+        # search results cannot look at the messages from deleted
+        # discussion_entries, so they need to be excluded.
+        scope = scope.active.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
           .or(scope.joins(:user).where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(@search_term)))
       end
 

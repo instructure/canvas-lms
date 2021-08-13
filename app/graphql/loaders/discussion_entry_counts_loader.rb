@@ -25,14 +25,6 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
     @current_user = current_user
   end
 
-  def join_sql
-    <<~SQL
-      LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON
-        discussion_entries.id = discussion_entry_participants.discussion_entry_id
-        AND discussion_entry_participants.user_id = '#{@current_user.id}'
-    SQL
-  end
-
   def counts_sql(id_string)
     <<~SQL
       #{id_string},
@@ -45,7 +37,7 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
 
   def perform(objects)
     object_id = object_id_string(objects.first)
-    counts = DiscussionEntry.joins(join_sql)
+    counts = DiscussionEntry.joins(DiscussionEntry.participant_join_sql(@current_user))
       .where(discussion_entries: object_specific_hash(objects))
       .group("discussion_entries.#{object_id}")
       .select(counts_sql(object_id)).index_by(&object_id.to_sym)
