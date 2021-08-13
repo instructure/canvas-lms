@@ -55,7 +55,7 @@ class JwtsController < ApplicationController
   # @returns JWT
   def create
     services_jwt = Canvas::Security::ServicesJwt.
-      for_user(request.env['HTTP_HOST'], @current_user, real_user: @real_current_user)
+      for_user(request.host_with_port, @current_user, real_user: @real_current_user)
     render json: { token: services_jwt }
   end
 
@@ -87,7 +87,7 @@ class JwtsController < ApplicationController
     end
     services_jwt = Canvas::Security::ServicesJwt.refresh_for_user(
       params[:jwt],
-      request.env['HTTP_HOST'],
+      request.host_with_port,
       @current_user,
       real_user: @real_current_user
     )

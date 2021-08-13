@@ -60,7 +60,7 @@ class InstIdsController < ApplicationController
 
     inst_id = InstID.for_user(
       @current_user.uuid,
-      canvas_domain: request.env['HTTP_HOST'],
+      canvas_domain: request.host_with_port,
       real_user_uuid: @real_current_user&.uuid,
       real_user_shard_id: @real_current_user&.shard&.id,
     )
