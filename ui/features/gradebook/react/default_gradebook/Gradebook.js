@@ -2086,7 +2086,8 @@ class Gradebook {
       },
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       postPolicies: this.postPolicies,
-      ref: this.gradebookSettingsModal
+      ref: this.gradebookSettingsModal,
+      enhancedGradebookFilters: this.options.enhanced_gradebook_filters
     }
     const $container = document.querySelector("[data-component='GradebookSettingsModal']")
     return AsyncComponents.renderGradebookSettingsModal(props, $container)
