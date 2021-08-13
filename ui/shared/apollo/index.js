@@ -50,11 +50,16 @@ function setHeadersLink() {
   })
 }
 
-function createHttpLink() {
-  return new HttpLink({
+function createHttpLink(httpLinkOptions = {}) {
+  const defaultOptions = {
     uri: '/api/graphql',
     credentials: 'same-origin'
-  })
+  }
+  const linkOpts = {
+    ...defaultOptions,
+    ...httpLinkOptions
+  }
+  return new HttpLink(linkOpts)
 }
 
 function createCache() {
@@ -84,10 +89,24 @@ function createClient(opts = {}) {
     resolvers,
     defaults
   })
+  // there are some cases where we need to override these options.
+  //  If we're using an API gateway instead of talking to canvas directly,
+  // we need to be able to inject that config.
+  // also if we need to test what the client is sending over the wire,
+  // being able to override the "fetch" method is useful.
+  // A design goal here is not to do anything "special", but just
+  // use the options that are already built into ApolloLink:
+  // https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts
+  const httpLinkOptions = opts.httpLinkOptions || {}
 
   const links =
     createClient.mockLink == null
-      ? [createConsoleErrorReportLink(), setHeadersLink(), stateLink, createHttpLink()]
+      ? [
+          createConsoleErrorReportLink(),
+          setHeadersLink(),
+          stateLink,
+          createHttpLink(httpLinkOptions)
+        ]
       : [createConsoleErrorReportLink(), stateLink, createClient.mockLink]
 
   const client = new ApolloClient({
