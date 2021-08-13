@@ -18,53 +18,49 @@
 
 import {createClient, gql} from '..'
 
-it('builds an apollo client', () => {
-  const client = createClient()
-  const props = Object.getOwnPropertyNames(client)
-  expect(props.includes('query')).toBeTruthy()
-  expect(props.includes('mutate')).toBeTruthy()
-})
-
-it('defaults to a relative URI', async () => {
-  const fakeFetch = async (uri, _options) => {
-    expect(uri).toEqual('/api/graphql')
-    return {
-      text: async () => {
-        return '{"data": { "aField": "aValue" }, "errors": []}'
-      }
-    }
-  }
+describe('host configuration', () => {
   const someQuery = gql`
     query fakeQuery {
       aField
     }
   `
-  // this passes in a fetch option to the Apollo HttpLink
-  // in the client, so instead of actually using a global "fetch"
-  // call that would invoke a network connection, we can substitute
-  // our assertion above about the uri and return some fake data
-  const client = createClient({httpLinkOptions: {fetch: fakeFetch}})
-  await client.query({query: someQuery})
-})
-
-it('accepts an alternate URI for gateway config', async () => {
-  const uriTarget = 'http://my-gateway-uri/my/graphql/path'
-  const fakeFetch = async (uri, _options) => {
-    expect(uri).toEqual(uriTarget)
-    return {
-      text: async () => {
-        return '{"data": { "aField": "aValue" }, "errors": []}'
-      }
+  const fakeResponse = {
+    text: async () => {
+      return '{"data": { "aField": "aValue" }, "errors": []}'
     }
   }
-  const someQuery = gql`
-    query fakeQuery {
-      aField
+
+  it('builds an apollo client', () => {
+    const client = createClient()
+    const props = Object.getOwnPropertyNames(client)
+    expect(props.includes('query')).toBeTruthy()
+    expect(props.includes('mutate')).toBeTruthy()
+  })
+
+  it('defaults to a relative URI', async () => {
+    const fakeFetch = async (uri, _options) => {
+      expect(uri).toEqual('/api/graphql')
+      return fakeResponse
     }
-  `
-  // this proves that if we pass in a different uri for link options
-  // as part of the client initiatlization, we will actually be sending our request
-  // to a different address.
-  const client = createClient({httpLinkOptions: {fetch: fakeFetch, uri: uriTarget}})
-  await client.query({query: someQuery})
+    // this passes in a fetch option to the Apollo HttpLink
+    // in the client, so instead of actually using a global "fetch"
+    // call that would invoke a network connection, we can substitute
+    // our assertion above about the uri and return some fake data
+    const client = createClient({httpLinkOptions: {fetch: fakeFetch}})
+    await client.query({query: someQuery})
+  })
+
+  it('accepts an alternate URI for gateway config', async () => {
+    const uriTarget = 'http://my-gateway-uri/my/graphql/path'
+    const fakeFetch = async (uri, _options) => {
+      expect(uri).toEqual(uriTarget)
+      return fakeResponse
+    }
+
+    // this proves that if we pass in a different uri for link options
+    // as part of the client initiatlization, we will actually be sending our request
+    // to a different address.
+    const client = createClient({httpLinkOptions: {fetch: fakeFetch, uri: uriTarget}})
+    await client.query({query: someQuery})
+  })
 })
