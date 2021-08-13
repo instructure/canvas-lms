@@ -44,7 +44,7 @@ import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import TodosPage from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import loadCardDashboard from '@canvas/dashboard-card'
+import loadCardDashboard, {resetDashboardCards} from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
@@ -152,6 +152,7 @@ export const K5Dashboard = ({
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
   const [observedUserId, setObservedUserId] = useState(null)
+  const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -160,26 +161,45 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
+  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
     setTrayOpen(false)
   }
 
+  const loadCardDashboardCallBack = (dc, cardsFinishedLoading, observedUser) => {
+    const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
+    setCards(activeCards)
+    setCardsSettled(cardsFinishedLoading)
+    if (cardsFinishedLoading && observedUser) {
+      setObservedUsersCards(cachedCards => ({
+        ...cachedCards,
+        [observedUser]: activeCards
+      }))
+    }
+    if (cardsFinishedLoading && activeCards?.length === 0) {
+      setLoadingAnnouncements(false)
+      setHomeroomAnnouncements([])
+      setSubjectAnnouncements([])
+    }
+  }
+
   useEffect(() => {
     if (!cards) {
-      loadCardDashboard((dc, cardsFinishedLoading) => {
-        const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
-        setCards(activeCards)
-        setCardsSettled(cardsFinishedLoading)
-        if (cardsFinishedLoading && activeCards?.length === 0) {
-          setLoadingAnnouncements(false)
-          setHomeroomAnnouncements([])
-          setSubjectAnnouncements([])
-        }
-      })
+      loadCardDashboard(loadCardDashboardCallBack)
+    } else if (observedUserId && observerMode) {
+      const cachedCards = observedUsersCards[observedUserId]
+      if (cachedCards) {
+        setCards(cachedCards) // Using cards from state if the selected user has been requested already
+      } else if (cardsSettled) {
+        // fetching cards if the user hasn't been requested and there is not a request in progress
+        setCardsSettled(false)
+        resetDashboardCards() // Only reset the dashboard cards state if there is not a request in progress
+        loadCardDashboard(loadCardDashboardCallBack, observedUserId)
+      }
     }
-  }, [cards])
+  }, [cards, observedUserId, observedUsersCards]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useFetchApi({
     path: '/api/v1/announcements',
@@ -305,6 +325,7 @@ export const K5Dashboard = ({
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
+              loadingCards={!cardsSettled}
             />
             <SchedulePage
               plannerEnabled={plannerEnabled}

@@ -757,6 +757,51 @@ describe User do
       ]
     end
 
+    describe "should filter by associated_user if provided" do
+      before(:once) do
+      @student = user_model
+      @observer = user_model
+
+      @observer_course = course_factory(:course_name => "Physics", :active_course => true)
+      @observer_course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      observer_enrollment = @observer_course.enroll_user(@user, 'ObserverEnrollment', :enrollment_state => 'active')
+      observer_enrollment.associated_user_id = @student.id
+      observer_enrollment.save!
+
+      @observer_course2 = course_factory(:course_name => "Math", :active_course => true)
+      @observer_course2.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      observer_enrollment2 = @observer_course2.enroll_user(@user, 'ObserverEnrollment', :enrollment_state => 'active')
+      observer_enrollment2.associated_user_id = @student.id
+      observer_enrollment2.save!
+
+      @teacher_course = course_factory(:course_name => "English ", :active_course => true)
+      teacher_entollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+      teacher_entollment.save!
+
+      @student_course = course_factory(:course_name => "Leadership", :active_course => true)
+      teacher_entollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+      teacher_entollment.save!
+
+      end
+
+      it "returns observed courses related to the associated_user" do
+      expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student.id)
+      .map{|c| [c.id, c.primary_enrollment_type]}).to eq [
+        [@observer_course2.id, 'ObserverEnrollment'],
+        [@observer_course.id, 'ObserverEnrollment']
+      ]
+      end
+
+      it "returns only own courses if the associated_user is the current user" do
+        expect(@observer
+        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer.id)
+        .map{|c| [c.id, c.primary_enrollment_type]}).to eq [
+          [@teacher_course.id, 'TeacherEnrollment'],
+          [@student_course.id, 'StudentEnrollment']
+        ]
+      end
+    end
+
     it "includes invitations to temporary users" do
       user1 = user_factory
       user2 = user_factory

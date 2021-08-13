@@ -23,6 +23,7 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
+import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
 
 import {MOCK_TODOS} from './mocks'
 import {
@@ -186,7 +187,7 @@ const defaultProps = {
   showImportantDates: true,
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
-  parentSupportEnabled: true,
+  parentSupportEnabled: false,
   observerList: MOCK_OBSERVER_LIST
 }
 
@@ -765,11 +766,91 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Parent Support', () => {
+    afterEach(() => {
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
+    })
+
+    beforeEach(() => {
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+    })
+
+    const getLastRequest = async () => {
+      const request = {}
+      await waitFor(() => {
+        const r = moxios.requests.mostRecent()
+        request.url = r.url
+        request.response = r.respondWith({
+          status: 200,
+          response: MOCK_CARDS
+        })
+      })
+      return request
+    }
+
     it('shows picker when user is an observer', () => {
-      const {getByRole} = render(<K5Dashboard {...defaultProps} />)
+      const {getByRole} = render(<K5Dashboard {...defaultProps} parentSupportEnabled />)
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
-      expect(select.value).toBe('Zelda')
+      expect(select.value).toBe('Student 4')
+    })
+
+    it('includes the student id when requesting dashboard cards', done => {
+      moxios.withMock(async () => {
+        const {getByRole} = render(
+          <K5Dashboard
+            {...defaultProps}
+            currentUserRoles={['user', 'observer', 'teacher']}
+            parentSupportEnabled
+          />
+        )
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          // Request with the cookie value
+          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+        })
+        done()
+      })
+    })
+
+    it('does not make a request if the user has been already requested', done => {
+      moxios.withMock(async () => {
+        const {getByRole, getByText} = render(
+          <K5Dashboard
+            {...defaultProps}
+            currentUserRoles={['user', 'observer', 'teacher']}
+            parentSupportEnabled
+          />
+        )
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          // Request with the cookie value
+          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+          act(() => select.click())
+          act(() => getByText('Student 2').click())
+          return onLoadRequest.response.then(async () => {
+            const onSelectRequest = await getLastRequest()
+            expect(onSelectRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+            act(() => select.click())
+            act(() => getByText('Student 4').click())
+            return onSelectRequest.response.then(async () => {
+              // It should not request Student 4, as it is already fetched
+              const lastRequest = await getLastRequest()
+              expect(select.value).toBe('Student 4')
+              expect(lastRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+              expect(moxios.requests.count()).toBe(3)
+            })
+          })
+        })
+        done()
+      })
     })
   })
 })

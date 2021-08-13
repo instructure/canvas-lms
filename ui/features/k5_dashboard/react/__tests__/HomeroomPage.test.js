@@ -40,14 +40,16 @@ describe('HomeroomPage', () => {
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {
-    const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} loadingAnnouncements />)
+    const {getAllByText, getByText} = render(
+      <HomeroomPage {...getProps()} loadingAnnouncements loadingCards />
+    )
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
     expect(getByText('Loading Announcement Content')).toBeInTheDocument()
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {
-    const {getAllByText} = render(<HomeroomPage {...getProps()} />)
+    const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards />)
     const cards = getAllByText('Loading Card')
     expect(cards.length).toBe(3)
     expect(cards[0]).toBeInTheDocument()
@@ -68,7 +70,7 @@ describe('HomeroomPage', () => {
           published: true
         }
       ],
-      cardsLoading: false
+      loadingCards: false
     }
     const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
     expect(queryAllByText('Loading Card').length).toBe(0)
