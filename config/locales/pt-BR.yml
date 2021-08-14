@@ -189,6 +189,7 @@ pt-BR:
   a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Um arquivo bloqueado chamado “%{name}” já existe. Por favor, insira um novo nome."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Um item bloqueado chamado “%{name}” já existe nesta localização. Por favor, insira um novo nome."
   a_message_is_required_129e1814: "Uma mensagem é necessária"
+  a_microsoft_365_group_must_have_owners_and_no_user_e06865a: "Um Grupo do Microsoft 365 deve ter proprietários, e nenhum usuário correspondente aos instrutores do curso do Canvas pode ser encontrado no lado da Microsoft."
   a_much_better_html_code_editor_for_the_rce_though__ef48b3b3: "Um editor de código HTML muito melhor para o RCE, embora seja inacessível para usuários de leitores de tela."
   a_name_for_this_set_is_required_222bad23: "Um nome para esta configuração é obrigatório"
   a_name_is_required_b5df38a9: "Um nome é obrigatório"
@@ -199,6 +200,7 @@ pt-BR:
   a_problem_occurred_adding_reviewers_57b083d9: "Ocorreu um erro ao adicionar avaliadores."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Um nível de privacidade Pública enviará as informações pessoalmente identificáveis do usuário iniciador ao provedor da ferramenta. Definir isso para Privado pode adversamente afetar as ferramentas que dependem dessas informações."
   a_redirect_uri_is_required_please_supply_one_471908db: "Um redirect_uri é obrigatório, forneça uma."
+  a_role_name_is_required_47efd33: "Um nome de papel é obrigatório"
   a_section_is_required_64103992: "Uma seção é necessária"
   a_simplified_canvas_interface_for_k_5_80b33391: "Uma interface simplificada do Canvas para K-5"
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
@@ -212,6 +214,8 @@ pt-BR:
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "Um aluno acabou de entregar sua tarefa anônima (novamente), %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "Um aluno acabou de entregar sua tarefa anônima (atrasada), %{assignment_name}"
   a_student_just_turned_in_their_assignment_late_ass_e991e212: "Um aluno acabou de entregar a tarefa (atrasada), %{assignment_name}"
+  a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "Um sufixo não pode ter mais de 255 caracteres. Use um sufixo mais curto e tente novamente."
+  a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "Um sufixo não pode conter tabulações ou espaços. Por favor, remova-os e tente novamente."
   a_sync_is_currently_running_please_wait_for_curren_55ccf501: "Uma sincronização está em execução. Aguarde até que a sincronização atual termine antes de iniciar outra."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Uma tabela contendo o nome do esquema de avaliação e ícones para editar ou excluir o esquema."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Uma tabela contendo o nome do esquema de avaliação e botões para editar ou excluir o esquema."
@@ -1755,6 +1759,9 @@ pt-BR:
   activate_this_key_6cd98f4b: "Ativar esta chave"
   active_announcements_6b67f33b: "Anúncios ativos"
   active_d7e32718: Ativa(s)
+  active_development_53f63899: "Desenvolvimento ativo"
+  active_directory_lookup_attribute_d317cb60: "Atributo de pesquisa do Active Directory"
+  active_directory_lookup_attribute_selector_d56a326f: "Seletor de atributo de pesquisa do Active Directory"
   active_students_e4c48a06: "Alunos ativos"
   active_terms_83df727e: "Períodos ativos"
   activerecord: 
@@ -1946,6 +1953,7 @@ pt-BR:
       Adiciona uma nova guia E-mails Devolvidos às ferramentas de administração da conta, que
       permite pesquisar endereços de e-mail onde as notificações de tela
       foram devolvidas
+  adds_additional_information_and_filtering_for_feat_3e55a058: "Adiciona informações adicionais e filtragem para sinalizadores de recursos"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Adiciona link de análises ao menu de configurações do usuário."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adiciona análises ao cartão de contexto de um aluno."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Adiciona banco de comentários para comentários de tarefas no speedgrader"
@@ -2580,6 +2588,8 @@ pt-BR:
   allows_user_to_view_account_analytics_98fbc6ad: "Permite que o usuário visualize informações de análise da conta."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Permite que o usuário visualize todos os grupos do curso, não apenas aqueles em que eles estão matriculados, na janela Colaborar com."
   allows_user_to_view_all_course_groups_not_just_whe_e107af44: "Permite que o usuário visualize todos os grupos do curso, não apenas aqueles em que eles estão matriculados, na janela Colaborar com."
+  allows_user_to_view_all_item_banks_in_a_course_3b603780: "Permite ao usuário visualizar todos os bancos de itens em um curso."
+  allows_user_to_view_all_item_banks_in_the_account_36f5f214: "Permite ao usuário visualizar todos os bancos de itens na conta."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Permite que o usuário visualize todos os envios de tarefas de alunos e adicionem comentários."
   allows_user_to_view_analytics_link_in_the_user_set_56867782: "Permite que o usuário visualize link de análises no menu de configurações do usuário."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Permite que o usuário visualize e adicione usuários em uma colaboração."
@@ -2847,6 +2857,8 @@ pt-BR:
   an_error_occurred_while_starting_migration_8e6015e2: "Um erro ocorreu ao iniciar a migração"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ocorreu um erro ao tentar alterar a UI"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ocorreu um erro ao atualizar o estado bloqueado dos avisos."
+  an_error_occurred_while_updating_group_grouptitle__f32110b5: "Ocorreu um erro ao atualizar o grupo \"%{groupTitle}\": %{message}"
+  an_error_occurred_while_updating_group_grouptitle_fc919aa: "Ocorreu um erro ao atualizar o grupo \"%{groupTitle}\""
   an_error_occurred_while_updating_late_policies_a95b707f: "Um erro ocorreu ao atualizar políticas vencidas"
   an_error_occurred_while_updating_the_group_cdd08220: "Ocorreu um erro ao atualizar o grupo."
   an_error_occurred_while_updating_the_group_message_b9967da9: "Ocorreu um erro ao atualizar o grupo: %{message}"
@@ -3102,6 +3114,7 @@ pt-BR:
     wiki_front_page_default_content_group: "Bem-vindo ao wiki do seu novo grupo!"
   application_can_only_be_authorized_for_the_current_9e1b23e6: "%{application} só pode ser autorizada para o usuário atualmente logado (%{real_user}), e não pode ser feita enquanto agindo como outro usuário (%{target_user})."
   application_id_2aa1640f: "Id do Aplicativo"
+  application_not_authorized_for_tenant_please_make__4d5e2607: "Aplicativo não autorizado para inquilino. Certifique-se de que seu administrador concedeu acesso para que possamos acessar seu locatário da Microsoft."
   application_secret_e6803c7e: "Segredo do Aplicativo"
   applied_cc7be774: Aplicado
   apply_781a2546: Aplicar
@@ -3181,6 +3194,7 @@ pt-BR:
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Tem certeza que deseja excluir esta rubrica? Essa ação removerá essa associação de rubrica de todas as tarefas no curso atual e excluirá quaisquer avaliações associadas existentes."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Tem certeza de que deseja excluir este item da tarefa?"
   are_you_sure_you_want_to_delete_this_topic_403a0f40: "Tem certeza que deseja excluir este tópico?"
+  are_you_sure_you_want_to_delete_this_topic_c0466e91: "Tem certeza que deseja excluir este tópico"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "Tem certeza que deseja excluir esta faixa?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Tem certeza de que deseja excluir a sua cópia desta conversa? Essa ação não pode ser desfeita."
@@ -3339,6 +3353,7 @@ pt-BR:
     total_graded_submissions: "Total de envios avaliados:"
   assignment_details_expanded_20c6f0c7: "detalhes da tarefa ampliados"
   assignment_details_updated_493f410b: "Detalhes da tarefa atualizados"
+  assignment_does_not_accept_this_submission_type_38a55c27: "A tarefa não aceita este tipo de envio"
   assignment_does_not_exist_74178c34: "tarefa não existe"
   assignment_edit_6dced39f: "Edição da tarefa"
   assignment_editview: 
@@ -4429,6 +4444,9 @@ pt-BR:
   back_to_title_39e7a8f4: "Voltar para %{title}"
   background_color_b92b52ac: "Cor de Fundo"
   background_image_1a401e1a: "Imagem de Fundo"
+  banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id não é uma ID válida"
+  banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url e banner_image_id não podem ser configuradas."
+  banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url não é um URL válido"
   base_847aca7c: Base
   base_message_please_make_sure_name_has_a_due_date_928ae7ab: "%{base_message} Por favor, assegure que %{name} tenha um prazo de entrega."
   base_message_please_make_sure_name_has_a_due_date__9e9b0cfd: "%{base_message} Por favor, assegure que %{name} tenha um prazo de entrega e que o nome não seja longo demais."
@@ -5891,6 +5909,7 @@ pt-BR:
   conference_has_been_removed_f771cb11: "Conferência foi removida"
   conference_has_been_updated_title_2bacc5fa: "Conferência foi atualizada: %{title}"
   conference_selection_ea4050bb: "Seleção da conferência"
+  conference_type_names_formerly_conferences_c2e847b0: "%{conference_type_names} (antiga Conferências)"
   conference_was_deleted_30869390: "Conferência foi excluída"
   conferences: 
     concluded_conference: 
@@ -6998,6 +7017,9 @@ pt-BR:
   count_options_available_28794ede: 
     one: "Uma opção disponível."
     other: "%{count} opções disponíveis."
+  count_options_available_7529cd2d: 
+    one: "Uma opção disponível"
+    other: "%{count} opções disponíveis"
   count_options_loaded_cd59cc3b: "%{count} opções carregadas."
   count_outcomes_3af5e3e: 
     one: "%{count} Resultado"
@@ -7032,6 +7054,9 @@ pt-BR:
   count_points_4735a2e8: 
     one: "1 ponto"
     other: "%{count} pontos"
+  count_points_possible_aa76302d: 
+    one: "1 ponto possível"
+    other: "%{count} pontos possíveis"
   count_possible_points_1a36a638: 
     one: "*1* Ponto possível"
     other: "*%{count}* pontos possíveis"
@@ -7063,6 +7088,9 @@ pt-BR:
   count_results_displayed_ed39a0f0: 
     one: "Um resultado exibido"
     other: "%{count} resultados exibidos"
+  count_results_found_da21e05c: 
+    one: "1 resultado encontrado"
+    other: "%{count} resultados encontrados"
   count_rows_added_dacc9daf: "%{count} linhas adicionadas"
   count_rows_removed_c6ff7bc: "%{count} linhas removidas"
   count_sections_466dcd5c: 
@@ -7804,8 +7832,10 @@ pt-BR:
         allow_student_discussion_topics: "Permitir que os alunos criem assuntos do fórum"
         allow_student_forum_attachments: "Permitir que os alunos anexem arquivos em fóruns"
         allow_student_organized_groups: "Permitir que os alunos organizem os seus próprios grupos"
+        banner_image: "Imagem de banner largo"
         blueprint: "Habilitar curso como um Curso de Modelo"
         blueprint_course: "Curso Modelo"
+        card_image: "Imagem do cartão"
         conclude_at: Termina
         course_code: "Código do curso"
         course_color: Cor
@@ -8152,6 +8182,7 @@ pt-BR:
   created_created_bf5714b8: "Criado %{created}"
   created_descending_e9a1b097: "Criada: Decrescente"
   created_group_group_name_2097306b: "Grupo criado %{group_name}"
+  created_timingdisplay_82e15b1e: "Criado %{timingDisplay}"
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
       Cria objetos de arquivo (inicialmente ocultos para os alunos se em um Curso) depois
       que a mídia é carregada ou gravada por meio do RCE.
@@ -8635,6 +8666,7 @@ pt-BR:
   deleted_ce03674d: excluido
   deleted_content_exceptions_237e809d: "Exceções de conteúdo excluídas:"
   deleted_content_referenced_in_this_resource_e42d1998: "Conteúdo excluído referenciado neste recurso:"
+  deleted_deletedtimingdisplay_f4c73003: "%{deletedTimingDisplay} excluído"
   deleting_6421031e: Excluindo...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       A exclusão de um arquivo de envio geralmente é feita apenas quando um aluno posta material impróprio ou privado.
@@ -8943,6 +8975,7 @@ pt-BR:
   discussion_topic_menu_3d4684c6: "Menu de assuntos do fórum"
   discussion_topic_performance_improvements_for_bibs_79a483ef: "Melhorias de desempenho de Tópicos de Discussão para Bibsys"
   discussion_topic_post_error_page_7f7edc49: "Página de erro de postagem de tópico de discussão"
+  discussion_topic_title_95b1d6b6: "Tópico de discussão: %{title}"
   discussion_topic_will_be_available_starting_at_46aa7477: "Assunto do fórum estará disponível a partir de"
   discussion_topic_will_be_available_until_f5e3abc8: "Assunto do fórum estará disponível até"
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Assunto do fórum será exibido na lista de tarefas do aluno para data"
@@ -9261,6 +9294,7 @@ pt-BR:
             para alunos trocarem ideias e resolverem problemas. Discussões
             encadeadas são perfeitas para manter discussões profundas ou em longo termo
             organizadas, enquanto discussões Focadas são melhores para trocas curtas.
+  discussions_announcements_redesign_901c5528: "Redesenho de discussões/anúncios"
   discussions_create_94dff604: "Fóruns - criar"
   discussions_index_menu_42591bc9: "Menu de índice de discussões"
   discussions_menu_f18eb4a2: "Menu de discussões"
@@ -9440,6 +9474,7 @@ pt-BR:
     no_due_date: "vencimento: Sem data de entrega"
   due_dates_520a6c08: "Prazos de entrega"
   due_dates_changed_exceptions_ddb028: "Prazos de entrega alteraram exceções:"
+  due_dates_duedatecount_bbc24d65: "Datas de vencimento (%{dueDateCount})"
   due_datetime_f5a81b81: "Vencimento: %{dateTime}"
   due_due_today_4dfe420a: "%{due} vence hoje"
   due_dueat_39d7d6c2: "Vencimento às %{dueAt}"
@@ -9601,8 +9636,10 @@ pt-BR:
   edit_when_36c1c2c8: "Editar %{when}"
   edit_your_catalog_account_cce59310: "Editar a sua Conta de Catalog"
   edited_by_editorname_editedtimingdisplay_1ff58a2e: ", editado por %{editorName} %{editedTimingDisplay}"
+  edited_by_editorname_editedtimingdisplay_ae2f4692: "Editado por %{editorName} %{editedTimingDisplay}"
   edited_c4fcbdbf: "Editado:"
   edited_date_b0455372: "(Editado) %{date}"
+  edited_editedtimingdisplay_85d8f1db: "Editado %{editedTimingDisplay}"
   edited_editedtimingdisplay_8788890e: ", editado em %{editedTimingDisplay}"
   editing_permissions_for_name_3503e235: "Permissões de edição para: %{name}"
   editor: 
@@ -9685,6 +9722,7 @@ pt-BR:
   email_address_optional_72795076: "Endereço de e-mail (opcional)"
   email_addresses_893faeb2: "Endereços de E-mail"
   email_addresses_required_14483dc8: "Endereços de e-mail (obrigatório)"
+  email_alias_mailnickname_d92fa8bd: "Pseudônimo do e-mail (mailNickname)"
   email_already_in_use_330248e: "E-mail já em uso"
   email_e366fa29: e-mail
   email_is_invalid_e0d982eb: "O e-mail é inválido!"
@@ -9771,6 +9809,7 @@ pt-BR:
   end_dates_249d8dbb: "Datas de término:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Datas finais não podem ser antes das datas iniciais"
   end_time_250391e8: "Hora final"
+  end_time_must_be_after_start_time_84398c82: "end_time deve ser depois de start_time"
   end_tutorial_7fb16b6f: "Terminar tutorial"
   end_user_license_agreement_6d2c666b: "Acordo de licença do usuário final."
   ending_date_e1ea13a4: "Data de Término"
@@ -9783,6 +9822,7 @@ pt-BR:
   english_united_kingdom_a613f831: "Inglês (Reino Unido)"
   enhance_color_contrast_of_content_685ddd49: "Aprimorar contraste de cor do conteúdo"
   enhanced_grade_change_auditing_2b155dfa: "Auditoria aprimorada de mudança de nota"
+  enhanced_gradebook_filters_a3be5e7d: "Filtros de diário de classe aprimorados"
   enhances_the_canvas_experience_within_the_learning_8031b650: "Melhora a experiência do Canvas dentro do Boletim de Domínio da Aprendizagem."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Aprimora o contraste de cor do texto, botões, etc."
   enrolled_a6a517cd: Matriculado(a)
@@ -10330,6 +10370,7 @@ pt-BR:
   exactly_one_rating_can_have_mastery_c1d87990: "Exatamente uma avaliação pode ter domínio"
   example_84698b7d: Exemplo
   example_cb3509b8: "Exemplo:"
+  example_edu_cc1a0744: "@exemplo.edu"
   example_final_score_355aff0f: "Exemplo de pontuação final"
   example_final_score_a92b30b9: "Exemplo de pontuação final]]"
   example_https_example_com_config_xml_be5f36ac: "Exemplo: https://example.com/config.xml"
@@ -10632,6 +10673,7 @@ pt-BR:
   favorite_d720d310: "Adicionar aos favoritos"
   favorites_c7e0207c: Favoritos
   feature_f5526584: Funcionalidade
+  feature_flag_filters_bba9fefa: "Filtros de sinalização de recurso"
   feature_flags: 
     feature_flag: 
       allow: Permitir
@@ -10860,6 +10902,7 @@ pt-BR:
   filter_discussions_by_assignments_757924ed: "filtra discussões por tarefas "
   filter_discussions_by_unread_6c48322: "filtrar discussões por não lidos"
   filter_e3398407: Filtrar
+  filter_features_388eafd8: "Recursos de filtro"
   filter_ip_addresses_2f296bd2: "Filtrar endereços IP"
   filter_messages_by_course_21a53fc4: "Filtrar mensagens por curso"
   filter_replies_by_unread_342e8e90: "Filtrar respostas por não lido"
@@ -11078,6 +11121,7 @@ pt-BR:
   google_drive_7cb003c9: "Google Drive"
   google_meet_f896b61c: "Google Meet"
   google_template_29640bc0: "Modelo do Google"
+  got_error_from_microsoft_api_while_making_a_batch__6c373df9: "Erro na API da Microsoft ao fazer uma solicitação em lote."
   goto_first_page_650f1638: "Vai para página inicial"
   goto_last_page_405adce9: "Vai para página final"
   goto_next_page_e8e1ae6f: "Vai para próxima página"
@@ -12090,6 +12134,7 @@ pt-BR:
   group_group_name_is_full_297880d6: "O grupo %{group_name} está cheio"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "O grupo %{group_name} é inscrito apenas por convite"
   group_group_name_is_not_available_at_this_time_971001c1: "Grupo %{group_name} indisponível nesse momento"
+  group_groupname_entered_2a0624a0: "Grupo \"%{groupName}\" inserido."
   group_guid_exists_in_incorrect_context_64263138: "Grupo \"%{guid}\" existe no contexto incorreto"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Grupo “%{guid}” já apareceu nesta importação"
   group_home_249cb392: "Página inicial do grupo"
@@ -12948,6 +12993,7 @@ pt-BR:
       Se Melhorias RCE também estiverem habilitadas,
       o RCE salvará automaticamente o seu trabalho enquanto ocorre
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Se definido, permite que o status de envio seja alterado de dentro do Speedgrader"
+  if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Se definido, remove o atraso que normalmente ocorre ao pesquisar alunos."
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Se definida, a calculadora de notas ignorará tarefas anônimas não postadas ao calcular os totais."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Se definido, o exportador CSV do boletim anexará o título do período de avaliação selecionado aos cabeçalhos de coluna cujos valores variam com base no período de avaliação."
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Se definido, o boletim dividirá o carregamento de tarefas, carregando aqueles do período de avaliação selecionado primeiro."
@@ -13047,6 +13093,7 @@ pt-BR:
       Se essa permissão estiver habilitada, usuários não precisam que a permissão Dados SIS - ler esteja habilitada. A permissão da conta anula a permissão do curso. Para desabilitar que os usuários gerenciem IDs SIS no nível do curso, Dados SIS - gerenciar e Dados SIS - ler também devem ser desabilitadas.
       Para adicionar usuários a cursos via ID SIS, Usuários - adicionar/remover alunos de cursos e/ou Usuários - adicionar/remover professores, designers de cursos ou assistentes dos cursos também deve ser habilitada.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Se essa permissão estiver ativada, usuários não precisam que a permissão Dados SIS - leitura esteja ativada. A permissão da conta anula a permissão do curso."
+  if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Se essa permissão não estiver habilitada, os usuários podem visualizar bancos de itens criados por eles, compartilhados com eles de outro usuário ou compartilhados indiretamente por meio do curso em que estão inscritos com uma função de instrutor."
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Se esta permissão for desabilitada, e Discussões - visualizar estiver habilitada, o usuário ainda pode ajustar as configurações de bloqueio do modelo em discussões individuais em um curso de domínio do Modelo."
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Se Usuários - gerenciar detalhes de login ou Estatísticas - visualizar estiver habilitada, um usuário poderá gerar a atividade de login/sair nas Ferramentas do administrador. Para ocultar a opção de atividade de login/sair nas Ferramentas do administrador, ambas essas permissões precisam ser desabilitadas."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Se Usuários - gerenciar detalhes de login ou Estatísticas - visualizar estiver habilitada, um usuário poderá gerar a atividade de entrada/saída nas Ferramentas do administrador. Para ocultar a opção de atividade de login/sair nas Ferramentas do administrador, ambas essas permissões precisam ser desabilitadas."
@@ -13119,6 +13166,7 @@ pt-BR:
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader falhou em carregar"
   import_1b31507: Importar
   import_a_set_of_outcomes_6b782192: "Importar um conjunto de objetivos"
+  import_anyway_8c996ef6: "Importar mesmo assim"
   import_commons_favorites_e68fce81: "Importar favoritos do Commons"
   import_content_b2fd6620: "Importar conteúdo"
   import_course_student_groups_by_csv_d2cde97d: "Importar grupos de alunos do curso por csv"
@@ -13170,6 +13218,7 @@ pt-BR:
   importing_outcomes_e62a0375: "importando objetivos"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Aprimore a acessibilidade do menu à esquerda através do melhor uso de cor mais indicadores visuais e de leitor de tela de itens de menu inativos."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Melhora a capacidade de descoberta do arrastar e soltar em Arquivos"
+  improved_filtering_of_students_and_assignments_in__5c6a281: "Filtragem aprimorada de alunos e tarefas no Boletim."
   improved_interface_with_ongoing_updates_7316bdef: "Interface aprimorada com atualizações contínuas"
   improved_learning_mastery_gradebook_8628d06a: "Boletim de domínio de aprendizagem melhorado"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Suporte aprimorado de novos questionários com módulos, incluindo a criação de novos questionários a partir de módulos"
@@ -13445,7 +13494,11 @@ pt-BR:
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Hexcode inválido. Insira um código hexadecimal válido aqui para usar uma cor personalizada."
   invalid_hexcode_provided_522ba223: "Código hexadecimal inválido fornecido"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Locatário inválido do Microsoft Sync fornecido. Valide o seu inquilino"
+  invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Locatário inválido do Microsoft Sync fornecido. Valide o seu inquilino."
+  invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Atributo remoto do Microsoft Team Sync inválido. Atributos remotos válidos: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
+  invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "Sufixo de atributo de login do Microsoft Teams Sync inválido. Um sufixo deve ter menos de 255 caracteres e não pode ter nenhum espaço em branco."
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Atributo de login do Microsoft Teams Sync inválido. Atributos de login válidos: %{valid_attributes}"
+  invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Configuração de \"atributo de login\" inválida ou ausente na conta"
   invalid_or_missing_session_for_oauth_3ce4b605: "Sessão para OAuth inválida ou ausente"
   invalid_points_8e929c3f: "Pontos inválidos"
   invalid_points_for_rating_tier_index_i_400d307e: "Pontos inválidos para camada de classificação %{index}: \"%{i}\""
@@ -13492,6 +13545,7 @@ pt-BR:
   italian_bd3c792d: Italiano
   italy_39_cfad867a: "Itália (+39)"
   italy_daec3097: Itália
+  item_banks_1db48044: "Bancos de perguntas"
   item_banks_manage_account_e8040580: "Bancos de itens - gerenciar conta"
   item_cannot_be_duplicated_cebf3109: "Item não pode ser duplicado"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} ícone de categoria por nome do item %{item_name}"
@@ -13664,7 +13718,9 @@ pt-BR:
   last_post_at_date_bf77652f: "Última postagem às %{date}"
   last_post_display_last_reply_at_b9896355: "Último post %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Última atualização promovida: %{last_export_at}"
+  last_reply_lastreplyatdisplay_7a4af30: "Última resposta %{lastReplyAtDisplay}"
   last_reply_lastreplyatdisplaytext_45cf559f: ", última resposta %{lastReplyAtDisplayText}"
+  last_reply_lastreplyatdisplaytext_f3d8ee3a: "Última resposta %{lastReplyAtDisplayText}"
   last_sync_5aac1ff1: "Última sincronização:"
   last_sync_lastsynctime_c0726d5d: "Última sincronização: %{lastSyncTime}"
   last_synced_datetime_1c3e0295: "Última sincronização: %{datetime}"
@@ -14030,6 +14086,7 @@ pt-BR:
   loading_important_info_217bf805: "Carregando informações importantes"
   loading_last_attended_date_5a42463: "Carregando última data de participação"
   loading_latest_announcement_link_f1746190: "Carregando o último link de anúncio"
+  loading_learning_outcome_groups_599d259c: "Carregando grupos de resultados de aprendizagem"
   loading_mastery_paths_c558a766: "Carregando Caminhos de Domínio"
   loading_media_32847745: "Carregando mídia"
   loading_message_list_226a131e: "Carregando lista de mensagens"
@@ -14050,6 +14107,7 @@ pt-BR:
   loading_release_notes_7deaa2eb: "Carregando notas de lançamento"
   loading_results_769c8819: "Carregando resultados"
   loading_results_spinner_73ef739c: "Carregando o Rotador de Resultados"
+  loading_section_header_616c8cdd: "Carregando cabeçalho da seção"
   loading_staff_1ce7d803: "Carregando equipe..."
   loading_students_30b71301: "Carregando alunos"
   loading_sync_history_3eb11baf: "Carregando histórico de sincronização..."
@@ -14198,6 +14256,7 @@ pt-BR:
   login_6f3d6249: Login
   login_attribute_731a8181: "Atributo de Login"
   login_attribute_selector_9a106f9c: "Seletor de atributo de login"
+  login_attribute_suffix_input_area_18f7c7f7: "Área de entrada do sufixo do atributo de login"
   login_button_661b410a: "Botão de Login"
   login_button_text_c958250f: "Texto do Botão de Login"
   login_footer_link_badb3898: "Link do Rodapé de Login"
@@ -16369,14 +16428,18 @@ pt-BR:
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportação de Notas MGP"
   mic_a7f3d311: Mic
+  microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "O Microsoft 365 permite no máximo %{max} membros em uma equipe."
+  microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "O Microsoft 365 permite no máximo %{max} proprietários em uma equipe."
   microsoft_group_enrollment_syncing_854b5ea2: "Sincronização de matrícula do Grupo Microsoft"
   microsoft_immersive_reader_30edaaee: "Microsoft Immersive Reader"
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Avaliação grátis (Wiki Pages)"
   microsoft_sync_8bddc8a2: "Microsoft Sync"
+  microsoft_sync_has_encountered_an_internal_error_a2fc7027: "O Microsoft Sync encontrou um erro interno."
   microsoft_sync_toggle_button_e4c7a5: "Botão de alternância do Microsoft Sync"
   microsoft_teams_99cb45c0: "Microsoft Teams"
   microsoft_teams_sync_ef749b9a: "Microsoft Teams Sync"
   microsoft_teams_sync_settings_updated_ca31ca6: "Configurações do Microsoft Teams Sync atualizadas!"
+  microsoft_tenant_does_not_exist_70d68084: "O locatário da Microsoft não existe."
   microsoft_tenant_name_domain_ba8ed4bb: "microsoft_tenant_name%{domain}"
   migrate_67c9f753: Migrar
   migrate_quiz_5d0f777: "Migrar teste"
@@ -16766,6 +16829,7 @@ pt-BR:
   multiple_due_dates_283dd861: "Vários prazos de entrega"
   multiple_due_dates_47416f7a: "(Múltiplas datas de vencimento)"
   multiple_due_dates_6b0d75c6: "Múltiplas datas de entrega"
+  multiple_microsoft_education_classes_already_exist_317ca726: "Já existem várias classes educacionais da Microsoft para o curso."
   multiple_modules_930713d4: "Módulos Múltiplos"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "Deve conseguir domínio pelo menos uma vez. Pontuações acima do domínio terão valor médio para calcular pontuação final."
@@ -17116,6 +17180,7 @@ pt-BR:
   no_results_found_58717065: "Nenhum resultado encontrado"
   no_results_found_e4b686bd: "Nenhum resultado foi encontrado."
   no_results_found_for_searchterm_7ee9b03e: "Nenhum resultado encontrado para %{searchTerm}"
+  no_results_match_searchterm_f28e50e0: "Nenhum resultado corresponde a \"%{searchTerm}\""
   no_score_yet_c94e919b: "Sem pontuação ainda"
   no_start_date_6e81c22b: "Não há data de início"
   no_students_being_observed_42e11732: "Nenhum aluno sendo observado"
@@ -17190,6 +17255,7 @@ pt-BR:
   not_now_97efd947: "Agora não"
   not_now_afa29fa7: "Agora não"
   not_published_73f7079: "Não publicado"
+  not_required_if_this_is_populated_the_entered_text_68a9b719: "Não obrigatório. Se estiver preenchido, o texto inserido será anexado ao Atributo de Login"
   not_reviewed_c38d9e97: "Não revisado"
   not_selected_57866888: "não selecionado"
   not_signed_47acf472: "Não assinado"
@@ -18164,6 +18230,7 @@ pt-BR:
   peer_services_102357e3: "Serviços de pares"
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Pendente
+  pending_enforcement_eb32e3d: "Aplicação pendente"
   pending_message_2d9a8796: "Pendente: %{message}"
   people_account_30bbffec: "Pessoas (Conta)"
   people_account_course_305043bb: "Pessoas (Conta/Curso)"
@@ -18285,6 +18352,7 @@ pt-BR:
   please_select_a_user_role_for_this_link_9fb4e655: "Por favor, selecione um papel de usuário para este link."
   please_select_an_item_30c287ef: "Selecione um item"
   please_select_one_f931e883: "Por favor, selecione um"
+  please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Especifique se deseja ativar ou desativar a sincronização do Microsoft Teams."
   please_try_again_4c3d11b4: "Por favor, tente novamente"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Tente restabelecer a conexão à ferramenta ao selecionar novamente a ferramenta na tarefa ou interface do item do módulo e salvar."
   please_upload_files_as_a_zip_5a2c799f: "Por favor, faça upload dos arquivos como um .zip"
@@ -18916,6 +18984,7 @@ pt-BR:
   primary_color_630fc6f3: "Cor Primária"
   primary_color_button_b75db628: "Botão de cor primária"
   primary_color_button_disabled_9081ddff: "Botão de cor primária desativado"
+  primary_email_address_mail_9018f: "Endereço de e-mail primário (correio)"
   print_grades_9d5dd50f: "Imprimir notas"
   privacy_290109ea: Privacidade
   privacy_level_f0ec09a3: "Nível de privacidade"
@@ -18945,6 +19014,7 @@ pt-BR:
         token_never_expires: nunca
       titles: 
         delete_this_token: "Excluir este token"
+    account_notification_settings_title: "Configurações de notificações da conta"
     buttons: 
       generate_token: "Gerar token"
       generating_token: "Gerando token..."
@@ -21035,6 +21105,7 @@ pt-BR:
   received_callback_from_identity_provider_80d999f5: "Callback recebido do provedor de identidade"
   received_cas_ticket_ea1bbeb: "Tíquete CAS recebido"
   received_content_53049822: "Conteúdo recebido"
+  received_throttled_response_from_microsoft_api_whi_f0e664bd: "Resposta estrangulada recebida da API da Microsoft ao fazer uma solicitação em lote."
   recent_activity_51239235: "Atividade recente"
   recent_announcements_8becc59c: "Avisos recentes"
   recent_f19e8c64: Recente
@@ -21093,6 +21164,7 @@ pt-BR:
   region_939f2a6c: Região
   register_email_efc06d59: "Registrar e-mail"
   register_slack_email_1f6d7e6d: "Registrar e-mail do Slack"
+  register_tool_84de3186: "Registrar ferramenta"
   registration: 
     get_started: Começar
     incomplete_registration_warning: 
@@ -21173,6 +21245,7 @@ pt-BR:
   remove_course_association_name_b760c502: "Remover associação do curso %{name}"
   remove_d83a966c: "Remover:"
   remove_dates_9b9ba2f6: "Remover datas"
+  remove_delay_for_gradebook_student_search_307b4ecf: "Remover atraso para pesquisa de aluno no boletim"
   remove_designers_from_courses_42332a57: "Remover designers dos cursos"
   remove_displayname_a2f31aa3: "Remover %{displayName}"
   remove_domain_as_an_allowed_domain_c510a69e: "Remover %{domain} como um domínio permitido"
@@ -21278,6 +21351,15 @@ pt-BR:
   reply_to_this_message_in_canvas_7ec72dce: "Responder esta mensagem no Canvas"
   reply_to_title_f227303f: "Responder para %{title}"
   reply_to_topic_12412b0f: "Responder para Assunto"
+  replycount_replies_2775aca1: 
+    one: "%{replyCount} resposta"
+    other: "%{replyCount} respostas"
+  replycount_replies_unreadcount_c79e6060: 
+    one: "%{replyCount} resposta (%{unreadCount})"
+    other: "%{replyCount} respostas (%{unreadCount})"
+  replycount_replies_unreadcount_unread_a85c0bc8: 
+    one: "%{replyCount} resposta, %{unreadCount} não lida"
+    other: "%{replyCount} respostas, %{unreadCount} não lidas"
   report_has_been_aborted_2b5763ed: "Relatório foi abortado"
   report_issue_b5f1db0e: "Relatar questão"
   reported_3de7086a: Relatado
@@ -21540,6 +21622,7 @@ pt-BR:
   root_523acd46: Raiz
   root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "Contas Raiz "
+  root_learning_outcome_groups_4eb5a030: "Grupos de resultados de aprendizagem raiz"
   roster: 
     delete_confirm: "Tem certeza que deseja remover este usuário?"
     error_sending_invitations: "Erro ao enviar convite. Tente novamente."
@@ -22017,6 +22100,7 @@ pt-BR:
   select_a_group_category_295f7a34: "Selecionar uma categoria do grupo"
   select_a_group_to_reveal_outcomes_here_91883028: "Selecione um grupo para revelar os resultados aqui."
   select_a_homeroom_bd9ec5d5: "Selecionar uma sala de aula"
+  select_a_location_4eb17e4b: "Selecionar um local"
   select_a_log_type_to_search_247fc6b4: "Selecione o tipo de registro a pesquisar."
   select_a_module_optional_7edb5cb0: "Selecionar um módulo (opcional)"
   select_a_predefined_color_c77ab2f5: "Selecionar uma cor predefinida."
@@ -22028,6 +22112,7 @@ pt-BR:
     other: "Selecionar todos os (%{count}) cursos"
   select_all_students_7c2c34b3: "Selecionar todos os alunos"
   select_an_edit_operation_ec1467d: "Selecionar uma operação de edição"
+  select_an_outcome_group_6edb08a7: "Selecionar um grupo de resultados"
   select_assignment_title_4571ffcb: "Selecione tarefa: %{title}"
   select_audio_file_7d905cce: "Selecionar Arquivo de Áudio"
   select_by_date_range_c3af0101: "Selecionar por período"
@@ -23130,6 +23215,7 @@ pt-BR:
   show_new_analytics_for_course_and_user_data_18e92636: "Exibir novas análises para curso e dados do usuário"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Exibir novas análises para curso e dados do usuário. Dados podem levar 24 horas para aparecerem em Novas Análises após configurar este sinalizador de recursos para ATIVADO."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Exibir novos testes na página Testes"
+  show_newer_replies_9f73d06d: "Mostrar respostas mais recentes"
   show_notes_column_22d2b6c1: "Mostrar Coluna de Observações"
   show_older_replies_e85891b3: "Mostrar respostas antigas"
   show_one_question_at_a_time_271e346d: "Exibir uma pergunta por vez"
@@ -23938,6 +24024,7 @@ pt-BR:
   submit_comment_commenttext_8e5638d7: "Enviar comentário: %{commentText}"
   submit_comment_e5cc2718: "Enviar comentário"
   submit_confirmation_4d366dd1: "Enviar confirmação"
+  submit_file_using_name_bc8d7b71: "Enviar o arquivo usando %{name}"
   submit_for_student_d90838e8: "Enviar para aluno"
   submit_media_file_f334c1ba: "Enviar Arquivo de Mídia"
   submit_ticket_5515ffd: "Enviar Pedido"
@@ -23980,6 +24067,7 @@ pt-BR:
   successfully_resubmitted_to_vericite_dab924b6: "Reenviado com sucesso para o VeriCite."
   successfully_saved_the_comment_c87681fd: "Comentário salvo com sucesso"
   successfully_updated_the_comment_946360d5: "Comentário atualizado com sucesso"
+  suffix_294d5cc4: Sufixo
   suggestions_b8b03b9d: "Sugestões:"
   sum_of_all_files_in_mb_2b705055: "soma de todos os arquivos em MB"
   summary_statistics_f74852a5: "Estatísticas de Resumos"
@@ -24144,6 +24232,7 @@ pt-BR:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Diga-nos como e quando você gostaria de ser notificado de eventos no Canvas."
   templates_4ca13d07: Modelos
   tenant_d2a41f78: Locatário
+  tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Inquilino ausente ou sincronização desativada. Verifique as configurações de integração de sincronização da Microsoft para o curso e a conta."
   tenant_name_e174f404: "Nome do inquilino"
   tenant_name_input_area_283dfcde: "Área de entrada do nome do inquilino"
   term_41f37cae: período
@@ -24237,6 +24326,8 @@ pt-BR:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Esta conta de usuário foi excluída.  Entre em contato com seu administrador de sistema para reativar sua conta."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "A capacidade dos usuários de receber notificações do Slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "O ID de conta da conta ao qual pertence o usuário relatante"
+  the_account_wide_sync_settings_were_changed_while__90c48497: "As configurações de sincronização de toda a conta foram alteradas durante a sincronização. Tente sincronizar novamente."
+  the_active_directory_attribute_that_will_be_used_t_96f5824e: "O atributo do Active Directory que será usado para corresponder um usuário do Canvas a um usuário da Microsoft"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "O algoritmo a ser usado para assinar AuthnRequest, LogoutRequest, e mensagens LogoutResponse enviadas ao IdP."
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
       A funcionalidade de análises deve estar habilitada nas Configurações da conta para visualizar páginas de análises.
@@ -24292,6 +24383,7 @@ pt-BR:
   the_courses_delete_permission_affects_viewing_the__b8744b4c: "A permissão Cursos - excluir afeta a exibição do botão Excluir este Curso Permanentemente, que só aparece para cursos criados manualmente."
   the_courses_publish_permission_allows_the_user_to__30694e34: "A permissão Cursos - publicar permite que o usuário publique cursos que não contenham módulos. Para publicar/cancelar a publicação do conteúdo do módulo, Conteúdo do Curso - adicionar/editar/excluir deve estar habilitado."
   the_courses_reset_permission_allows_users_to_reset_29dbc267: "Os Cursos - permissão de redefinição permite que os usuários redefinam o conteúdo do curso para cursos gerenciados pelo SIS, independentemente de eles terem a permissão Dados do SIS - gerenciar."
+  the_courses_reset_permission_resets_course_content_921321c3: "A permissão Cursos - Redefinir redefine o conteúdo do curso para os cursos criados manualmente e gerenciados pelo SIS. (Para cursos gerenciados pelo SIS, a permissão Dados do SIS - gerenciar não se aplica.)"
   the_csv_header_row_is_invalid_a8ec1787: "A linha do cabeçalho CSV é inválida."
   the_date_is_not_valid_b6285fb5: "A data não é válida."
   the_discussion_entry_was_successfully_created_7cddf67b: "A entrada da discussão foi criada com sucesso."
@@ -24352,7 +24444,9 @@ pt-BR:
   the_group_groupname_was_automatically_selected_bec_450689f: "O grupo  “%{groupName}” foi selecionado automaticamente porque nenhum grupo foi escolhido anteriormente. Você pode alterar o grupo selecionado no Boletim."
   the_group_groupname_was_selected_because_the_previ_e080c168: "O grupo “%{groupName}” foi selecionado porque o grupo anteriormente selecionado não tinha alunos. Você pode alterar o grupo selecionado no Boletim."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "O grupo “%{groupName}” foi selecionado porque o aluno que você solicitou não está no grupo anteriormente selecionado. Você pode alterar o grupo selecionado no Boletim."
+  the_group_grouptitle_was_successfully_updated_e0dac60e: "O grupo “%{groupTitle}\" foi atualizado com sucesso."
   the_group_title_was_successfully_updated_9f5cfee3: "O grupo %{title} foi atualizado com sucesso."
+  the_image_will_be_cropped_to_a_5_1_aspect_ratio_57369a9c: "A imagem será cortada em uma proporção de 5:1"
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "O texto da pergunta importado para esta pergunta é muito longo."
   the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "O importador migrará da API v3 para a v4.1. As credenciais não serão alteradas, mas você deve garantir que sua conta tenha acesso à v4.1 até fevereiro de 2021."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "A instituição da qual você fez login não está configurada nesta conta."
@@ -24414,6 +24508,7 @@ pt-BR:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "os papéis em poder do usuário relatante (aluno, professor, administrador, etc)"
   the_salesforce_account_id_if_it_exists_e7949706: "O ID da Conta de Salesforce (caso exista)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "A ferramenta Agendador permite que você defina horários em que alunos (ou grupos de alunos) podem se registrar. Para começar, clique no botão abaixo."
+  the_search_returned_no_results_c2e4d13c: "A pesquisa não retornou resultados."
   the_search_returned_no_results_cd9eee1e: "A pesquisa não retornou resultados"
   the_selected_group_was_cleared_because_the_student_656e4f1c: "O grupo selecionado foi limpo porque o aluno que você solicitou não faz parte de quaisquer grupos. Você pode selecionar um grupo no Boletim."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "A gravidade do problema, conforme selecionado pelo usuário a partir de um menu suspenso."
@@ -24433,6 +24528,7 @@ pt-BR:
             dentro do curso.
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "A sincronização encontrou um erro e não foi concluída"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "A configuração Sincronizar para SIS não pode ser habilitada para a tarefa “%{assignment_name}” sem uma data de vencimento."
+  the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "A equipe não pôde ser criada porque o grupo da Microsoft não tem proprietários. Este pode ser um erro intermitente: tente sincronizar novamente e, se o problema persistir, entre em contato com o suporte."
   the_term_has_ended_for_this_course_f0ab367: "O termo terminou para este curso"
   the_title_cannot_be_longer_than_length_characters_7a822943: "O título não pode ter mais de %{length} caracteres"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "O título do seguinte banco de perguntas estava truncado: \"%{title}\""
@@ -24470,6 +24566,7 @@ pt-BR:
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "Não há nenhum LTI Configurado que interaja com colaborações."
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "Não há fóruns para mostrar nesta seção"
   there_are_no_outcomes_in_the_course_1d36d9c6: "Não há objetivos no curso."
+  there_are_no_outcomes_in_this_group_9a70fa8a: "Não há resultados neste grupo."
   there_are_no_reports_for_you_to_view_b716717a: "Não há relatórios para você visualizar"
   there_are_no_unsaved_changes_9276e87c: "Não existem alterações não salvas"
   there_are_no_unsynced_changes_4e8f0838: "Não há alterações não sincronizadas"
@@ -24576,6 +24673,7 @@ pt-BR:
   these_scores_are_out_of_order_4f0859ef: "estas pontuações estão fora de ordem"
   they_them_f4d17a04: Eles/os/as
   they_were_merged_into_other_user_64758f01: "Eles foram fundidos em *%{other_user}*."
+  this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Esta conta não permite que a sincronização do Microsoft Teams seja ativada. Habilite o sinalizador de recurso \"Sincronização de inscrição do Grupo Microsoft\" antes de editar qualquer configuração."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Esta conta não permite que a sincronização do Microsoft Teams seja ativada. Ative o sinalizador de recurso \"Sincronização de inscrição em Grupo da Microsoft\" antes de editar qualquer configuração"
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Esta ação foi desabilitada pelo o seu administrador."
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Isso permite que o usuário desmarque um curso como favorito diretamente a partir do seu cartão do painel."
@@ -24589,6 +24687,7 @@ pt-BR:
                      Isso será habilitado por uma Política de Segurança de Conteúdo (CSP).
                      Domínios serão adicionados à sua lista branca com a capacidade de manualmente adicionar domínios.
                      Há um limite de 100 domínios na lista branca.
+  this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Este anúncio não estará visível até %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Esta área será usada pelo assessor para deixar comentários relacionados a este critério."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Essa tarefa não irá contar para sua nota final"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Essa tarefa não irá contar para sua nota final."
@@ -24603,6 +24702,7 @@ pt-BR:
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Esta tarefa foi excluída e não fará parte do cálculo total"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Esta tarefa está dispensada e não fará parte do cálculo total"
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "Esta tarefa está em um período da avaliação fechado para este aluno."
+  this_assignment_is_locked_and_cannot_be_reassigned_9c1ed1ce: "Esta tarefa está bloqueada e não pode ser reatribuída."
   this_assignment_is_muted_915e2dab: "A tarefa está silenciada"
   this_assignment_is_not_applicable_to_this_student_c149a5ad: "Esta tarefa não é aplicável a este aluno"
   this_assignment_is_not_graded_576f1244: "Essa tarefa não está avaliada."
@@ -24648,6 +24748,12 @@ pt-BR:
       serão exibidas automaticamente a cada versão. Para obter os
       detalhes completos sobre as novas discussões, consulte o grupo de usuários beta Novas Discussões
       na comunidade do Canvas.
+  this_feature_enhances_the_canvas_experience_within_6e056472: |-
+      Este recurso aprimora a experiência do Canvas em Discussões e Anúncios.
+      Quando este sinalizador está ativado, o acesso antecipado às melhorias em andamento será
+      exibido automaticamente a cada versão. Para obter os detalhes completos,
+      consulte o grupo de usuários Redesign de Discussões/Anúncios 
+      na comunidade Canvas.
   this_feature_enhances_the_canvas_experience_within_d71a01c6: |-
       Esse recurso aumenta a experiência do Canvas dentro das Discussões.
       Quando esse sinalizador estiver ativado, o acesso antecipado às melhorias contínuas
@@ -25312,6 +25418,7 @@ pt-BR:
       Para agir como outros usuários, Usuários - agir como também deve ser habilitada.
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: "Para editar detalhes do usuário, modificar detalhes de login ou alterar senhas do usuário, Usuários - gerenciar detalhes de login também deve ser ativado."
   to_edit_user_details_modify_login_details_or_chang_800e894d: "Para editar detalhes do usuário, modificar detalhes de login ou alterar senhas do usuário, Usuários - gerenciar detalhes de login também deve ser habilitada. Para visualizar visualizações de páginas, Estatísticas - visualizar também deve ser habilitada. Para agir como outros usuários, Usuários - agir como também deve ser habilitada."
+  to_enable_microsoft_teams_sync_please_provide_a_te_44c6d180: "Para habilitar o Microsoft Teams Sync, forneça um inquilino, atributo de login e atributo remoto."
   to_end_a_long_running_conference_the_course_conten_63e3f993: "Para terminar uma conferência de longa duração, Conteúdo do curso deve ser habilitada."
   to_f0e90538: "Para:"
   to_fully_manage_course_level_question_banks_assign_2c31396f: "Para gerenciar completamente bancos de perguntas a nível de curso, a permissão Tarefas e Testes - adicionar/editar/excluir também deve estar habilitada."
@@ -25348,6 +25455,7 @@ pt-BR:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para vincular o observador do curso *%{name}* para um aluno, comece a digitar o nome do aluno abaixo para encontrá-lo e, em seguida, clique em Atualizar."
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "Para fazer login na sua conta do Canvas quando estiver em deslocamento, escaneie este código QR a partir do app Canvas Student."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "Para fazer login na sua conta do Canvas quando estiver em deslocamento, escaneie este código QR a partir de qualquer app móvel do Canvas."
+  to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "Para tornar mais fácil o alinhamento dos resultados, adicione apenas resultados pertinentes a este curso."
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: "Para gerenciar os cursos associados, Cursos - visualizar lista e Gerenciar Cursos - adicionar também deve estar habilitado."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Para gerenciar configurações de cursos modelo nas Configurações do curso, Cursos - adicionar/editar/excluir também deve ser habilitada."
   to_manage_course_announcements_discussions_moderat_5f02f46e: "Para gerenciar avisos do curso, Fóruns - moderar também deve ser habilitado."
@@ -25766,6 +25874,7 @@ pt-BR:
   type_of_item_8a37f69d: "Tipo de item"
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: "Digite ou use as teclas de seta para navegar. Múltiplas seleções são permitidas."
   type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Digite ou use as teclas de seta para navegar pelas opções"
+  type_or_use_arrow_keys_to_navigate_options_multipl_230dbaf7: "Digite ou use teclas de setas para navegar entre as opções. Várias seleções permitidas."
   type_to_search_de63ad38: "Digite para pesquisar"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Digite para pesquisar, use as teclas de seta para navegar pelas opções."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Opa! Entre em contato com o seu amigo o Desenvolvidor de Catalog. Mensagem de erro: %{message}"
@@ -25837,6 +25946,7 @@ pt-BR:
   unenrolled_bc89d5e3: "Matrícula cancelada"
   unenrolled_users_e7632d24: "Usuários com inscrição não cancelada"
   unexpected_error_while_performing_export_1e6b4207: "Erro inesperado ao realizar a exportação"
+  unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Resposta inesperada da API da Microsoft: código de status %{status_code} obtido"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Resposta inesperada da API da Microsoft. Provavelmente é um bug. Entre em contato com o suporte."
   unfavorite_cd0c113e: "Cancelar favorito"
   unfavorite_coursename_32f77231: "Cancelar favorito %{courseName}"
@@ -26077,6 +26187,7 @@ pt-BR:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Os direitos de uso serão definidos para todos os arquivos contidos em:"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Use uma “,” ou nova linha no meio para adicionar diversos usuários."
   use_arrow_keys_to_navigate_options_2021cc50: "Use teclas de setas para navegar entre as opções."
+  use_arrow_keys_to_navigate_options_d45347e8: "Use teclas de setas para navegar entre as opções"
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Usar teclas de setas para selecionar um provedor de conferências"
   use_arrows_a60b3330: "Usar as setas"
   use_as_front_page_274a488b: "Utilizar como página inicial"
@@ -26302,6 +26413,7 @@ pt-BR:
   user_observer_csv_3592a9cf: "CSV de Observador do Usuário"
   user_observers_454d4303: "Observadores do usuário"
   user_option_links_66090987: "Links de opção de usuário"
+  user_principal_name_upn_fbf59a08: "Nome principal do usuário (UPN)"
   user_profile: 
     invalid_url: "URL inválido"
     profile_bio_too_long: "Bio é longa demais"
@@ -26683,6 +26795,9 @@ pt-BR:
   view_ba339f93: Visualizar
   view_canvas_insights_beta_fe446d71: "Visualizar Canvas Insights (Beta)"
   view_conditional_content_settings_a2dca270: "Visualizar configurações de conteúdo condicional"
+  view_count_outcomes_9609792: 
+    one: "Ver 1 resultado"
+    other: "Ver %{count} resultados"
   view_course_analytics_eefe6b2: "Visualizar análise do curso"
   view_coursename_gradebook_8b3a6240: "Ver %{courseName} boletim"
   view_coursename_s_assignment_group_totals_bd4b707: "Ver os totais do grupo de tarefa %{courseName}"
@@ -27126,6 +27241,9 @@ pt-BR:
   yes_remove_86a61759: "Sim, remover"
   yiddish_f96986df: Iídiche
   yo_e4ee15a4: Oi
+  you_are_about_to_add_count_outcomes_to_this_course_de7e2b1d: 
+    one: "Você está prestes a adicionar 1 resultado a este curso."
+    other: "Você está prestes a adicionar %{count} resultados a este curso."
   you_are_about_to_delete_count_announcements_are_yo_96a2b383: 
     one: "Você está prestes a excluir 1 aviso. Você tem certeza?"
     other: "Você está prestes a excluir %{count} avisos. Você tem certeza?"
