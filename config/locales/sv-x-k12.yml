@@ -3508,7 +3508,7 @@ sv-x-k12:
       links: 
         submission: 
           details: Inlämningsdetaljer
-          download_attachment: "Ladda ned %{attachment_display_name}"
+          download_attachment: "Ladda ner %{attachment_display_name}"
           view_original_page: "Visa originalsidan"
           view_quiz: "Visa quiz-inlämning"
           view_survey: "Visa enkätinlämning"
@@ -4022,16 +4022,16 @@ sv-x-k12:
   blocked_domain_name_b5b93150: "Blockerat domännamn"
   blue_daf8fea9: Blå
   blueprint_5cca2ef: Modell
-  blueprint_course_associations_72c9609: Kursmallsassociationer
+  blueprint_course_associations_72c9609: Blueprint-sassociationer
   blueprint_course_e16ed131: Blueprint
   blueprint_course_id_9ee357fb: blueprint_course_id
-  blueprint_course_information_term_course_10d5cf30: "Kursmallsinformation: %{term}–%{course}"
-  blueprint_courses_9dd321b8: Kursmallar
-  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Kursmallar – lägg till/redigera/associera/ta bort"
+  blueprint_course_information_term_course_10d5cf30: "Blueprint-information: %{term}–%{course}"
+  blueprint_courses_9dd321b8: Blueprint-kurser
+  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Blueprint – lägg till/redigera/associera/ta bort"
   blueprint_courses_are_an_account_level_feature_opt_3388f731: "Kursmallar är ett funktionsalternativ på kontonivå.\n\n\
       Om du vill redigera låsinställningar för modeller från indexsidan för diskussioner, måste även Kurs – lägg till/redigera/ta bort och Diskussioner – moderera vara aktiverade. "
   blueprint_courses_are_an_account_level_feature_opt_e1f9ec2d: "Blueprint-kurser är ett funktionsalternativ på kontonivå. För att redigera låsinställningarna från indexsidan Diskussioner måste även Kurs – lägg till/redigera/ta bort och Diskussioner – moderera aktiveras. "
-  blueprint_courses_create_edit_associate_delete_bf41988e: "Kursmallar (skapa/redigera/associera/ta bort)"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint (skapa/redigera/associera/ta bort)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Kursmallar är ett funktionsalternativ på kontonivå. Kursroller kan endast hantera kursmallar om de läggs till i kursmallen som en lärar-, lärarassistent- eller designerroll. Om du vill öppna sidofältet för kursmallar måste Kurser – lägg till/redigera/ta bort kurser vara aktiverat. Om du vill lägga till en associerad kurs måste även Kurser – visa lista och Kurser – lägg till/redigera/ta bort vara aktiverat. Om du vill redigera låsinställningar på modellobjekttyper måste även Kurser – lägg till/redigera/ta bort vara aktiverat."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Kursmallar är ett funktionsalternativ på kontonivå. För att lägga till kopplade kurser måste även Blueprint-kurser – lägg till/redigera/koppla/ta bort samt Kurser – lägg till/redigera/ta bort aktiveras."
   blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Kursmallar är ett funktionsalternativ på kontonivå. Kursroller kan endast hantera Blueprint-kurser om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll. Om du vill öppna sidofältet för kursmallar måste Kurser – lägg till/redigera/ta bort kurser vara aktiverat. Om du vill lägga till en associerad kurs måste även Kurser – visa lista och Kurser – lägg till/redigera/ta bort vara aktiverat. Om du vill redigera låsinställningar på modellobjekttyper måste även Kurser – lägg till/redigera/ta bort vara aktiverat."
@@ -8331,22 +8331,22 @@ sv-x-k12:
   download_assignment_submissions_41e50ee7: "Ladda ner uppgiftsinlämningar"
   download_associated_files_f35dcb5e: "Ladda ner associerade filer"
   download_attachment_filename_8cc17629: "Ladda ner %{attachment.filename}"
-  download_c7ffdfb9: "Ladda ned"
-  download_canvas_android_app_60b5595f: "Ladda ned Canvas Android-app"
-  download_canvas_ios_app_11c8651b: "Ladda ned Canvas iOS-app"
+  download_c7ffdfb9: "Ladda ner"
+  download_canvas_android_app_60b5595f: "Ladda ner Canvas Android-app"
+  download_canvas_ios_app_11c8651b: "Ladda ner Canvas iOS-app"
   download_course_content_7f66edc9: "Ladda ner kursinnehåll"
   download_course_roster_csv_86b3d192: "Ladda ner deltagarlista som CSV-fil"
   download_epub_757cf0af: "Ladda ner ePub"
   download_errors_attchment_82ffea3f: "Hämta errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "Ladda ner objektets analysrapport %{statusLabel}"
-  download_page_views_csv_974f36e1: "Ladda ned sidvisningar (CSV)."
+  download_page_views_csv_974f36e1: "Ladda ner sidvisningar (CSV)."
   download_report_77164f62: "Ladda ner rapport"
   download_scores_generated_on_date_ff5b9cd2: "Ladda ner poäng genererade den %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Ladda ner elevens analysrapport %{statusLabel}"
-  download_submission_comments_2a6c0395: "Ladda ned inlämningskommentarer"
+  download_submission_comments_2a6c0395: "Ladda ner inlämningskommentarer"
   download_submissions_7454665f: "Ladda ner inlämningar"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Hämta hela listan med fel och varningar här."
-  download_these_results_as_csv_9a890883: "Ladda ned dessa resultat i en CSV-fil"
+  download_these_results_as_csv_9a890883: "Ladda ner dessa resultat i en CSV-fil"
   download_this_file_669f9174: "Ladda ner den här filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedladdning av kursinnehåll ger tillgång till innehållet offline. Innehållet kan vara filer, sidor, uppgifter, diskussionsämnen eller quiz. Klicka på ”Generera ePub” för varje kurs och öppna med en e-läsare för att visa."
   draft_92507c72: (utkast)
@@ -11113,7 +11113,7 @@ sv-x-k12:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(om ingen väljs, skicka till alla i hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Om ingen väljs, visa för alla i hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Om ingen väljs, visa för alla i hela kontot)"
-  if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Om en eller flera behörigheter är inaktiverade kan användare fortfarande visa och ladda ned filer i ZIP-format."
+  if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Om en eller flera behörigheter är inaktiverade kan användare fortfarande visa och ladda ner filer i ZIP-format."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Om även RCE-förbättring har aktiverats,
       kommer RCE att spara ditt arbete automatiskt under tiden du arbetar
@@ -13115,38 +13115,38 @@ sv-x-k12:
     assignment_unpublished_module: "Den här uppgiften är en del av en avpublicerad modul och är därför inte tillgänglig än."
     blueprint_content_added: 
       email: 
-        body: "Ändringar av kursmall har synkroniserats med %{name}."
+        body: "Ändringar av blueprint har synkroniserats med %{name}."
         details_link: "Visa ändringar: %{link}"
         html: 
-          body: "Ändringar av kursmall har synkroniserats med %{name}."
+          body: "Ändringar av blueprint har synkroniserats med %{name}."
           details_link: "Visa ändringar"
-          subject: "Synkning av kursmall: %{name}"
-        subject: "Synkning av kursmall: %{name}"
+          subject: "Synkning av blueprint: %{name}"
+        subject: "Synkning av blueprint: %{name}"
       sms: 
-        body: "Ändringar av kursmall har synkroniserats med %{name}."
+        body: "Ändringar av blueprint har synkroniserats med %{name}."
         link_message: "Mer information finns på %{url}"
       summary: 
-        body: "Synkning av kursmall: Ändringar synkroniserade med %{name}."
-        subject: "Synkning av kursmall: %{name}"
+        body: "Synkning av blueprint: Ändringar synkroniserade med %{name}."
+        subject: "Synkning av blueprint: %{name}"
       twitter: 
-        tweet: "Canvas-notis – Ändringar av kursmall har synkroniserats med %{name}"
+        tweet: "Canvas-notis – Ändringar av blueprint har synkroniserats med %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "Kursmallenen, %{name}, har synkroniserat ändringar med alla relaterade kurser."
+        body: "Blueprint, %{name}, har synkroniserat ändringar till alla relaterade kurser."
         details_link: "Mer info: %{link}"
         html: 
-          body: "Kursmallenen, %{name}, har synkroniserat ändringar med alla relaterade kurser."
+          body: "Blueprint, %{name}, har synkroniserat ändringar till alla relaterade kurser."
           details_link: "Mer info"
-          subject: "Synkning av kursmall klar: %{name}"
-        subject: "Synkning av kursmall klar: %{name}"
+          subject: "Synkning av blueprint klar: %{name}"
+        subject: "Synkning av blueprint klar: %{name}"
       sms: 
-        body: "Ändringar av kursmall har synkroniserats från %{name}."
+        body: "Ändringar av blueprint har synkroniserats från %{name}."
         link_message: "Mer information finns på %{url}"
       summary: 
-        body: "Synkning av kursmall: Ändringar synkroniserade från %{name}."
-        subject: "Synkning av kursmall klar: %{name}"
+        body: "Synkning av blueprint: Ändringar synkroniserade från %{name}."
+        subject: "Synkning av blueprint klar: %{name}"
       twitter: 
-        tweet: "Canvas-notis – Ändringar av kursmall har synkroniserats med %{name}."
+        tweet: "Canvas-notis – Ändringar av blueprint har synkroniserats med %{name}."
     collaboration_invitation: 
       email: 
         body: |-
@@ -14895,7 +14895,7 @@ sv-x-k12:
     added_to_conversation_description: "Du har lagts till i en konversation"
     added_to_conversation_display: "Tillagd i konversation"
     all_submissions_description: |-
-        *Endast lärare och admin:*
+        *Endast lärare och administratörer:*
         
         Uppgift (förutom quiz) inlämning/återinlämning
     all_submissions_display: "Alla inlämningar"
@@ -14911,9 +14911,9 @@ sv-x-k12:
     appointment_signups_description: "Nytt möte i din kalender"
     appointment_signups_display: "Nya mötestillfällen"
     blueprint_description: |-
-        *Endast lärare och admin:*
+        *Endast lärare och administratörer:*
         
-        Innehållet synkroniserades från en kursmall för tillhörande kurser
+        Innehållet synkroniserades från en blueprint till associerade kurser
     blueprint_display: "Synkronisering av blueprint"
     calendar_description: "Nya och ändrade objekt i din kurskalender"
     calendar_display: Kalender
@@ -14986,7 +14986,7 @@ sv-x-k12:
         * Kamratrespons och påminnelse
     invitation_display: Inbjudan
     late_grading_description: |-
-        *Endast lärare och admin:*
+        *Endast lärare och administratörer:*
         
         Sen uppgiftsinlämning
     late_grading_display: "Försenad bedömning"
@@ -15077,7 +15077,7 @@ sv-x-k12:
       web_conference_recording_ready: "Inspelning av webbkonferens redo"
     no_subject: "Inget ämne"
     other_description: |-
-        *Endast lärare och admin:*
+        *Endast lärare och administratörer:*
         
         * Kursregistrering
         * Rapport genererad
@@ -15089,7 +15089,7 @@ sv-x-k12:
     recording_ready_display: "Inspelning redo"
     reminder_display: Påminnelse
     student_appointment_description: |-
-        *Endast lärare och admin:*
+        *Endast lärare och administratörer:*
         
         Bokning av elevmöte
     student_appointment_display: "Ny bokning för mötestillfälle"
@@ -17111,7 +17111,7 @@ sv-x-k12:
     no_answer: "Inget svar"
     question_breakdown: "Uppdelning av fråga"
     question_header: "Fråga %{position}"
-    quiz-stats-noshow-warning: "Till och med fantastisk har sina begränsningar. Det går inte att återge statistik för det här quizet, men du kan ladda ned rapporterna."
+    quiz-stats-noshow-warning: "Till och med fantastisk har sina begränsningar. Det går inte att återge statistik för det här quizet, men du kan ladda ner rapporterna."
     sad-panda-alttext: "Tråkiga saker i pandaland."
     speedgrader: "Visa i SpeedGrader"
     summary: 
@@ -20060,7 +20060,7 @@ sv-x-k12:
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Visa New Quizzes på sidan Quiz"
   show_older_replies_e85891b3: "Visa äldre svar"
   show_one_question_at_a_time_271e346d: "Visa en fråga i taget"
-  show_only_blueprint_courses_9fb37b41: "Visa endast kursmallar"
+  show_only_blueprint_courses_9fb37b41: "Visa endast blueprintar"
   show_originality_report_to_students_be22f5ee: "Visa original rapport för elever"
   show_params_3401895b: "Visa parametrar"
   show_past_account_level_announcements_to_users_3b8208e2: "Visa tidigare kontonivåmeddelanden för användare."
@@ -20660,7 +20660,7 @@ sv-x-k12:
       assignment_submit_fail: "Uppgiften lämnades inte in"
       can_not_submit_locked_assignment: "Du kan inte lämna in en uppgift när den är låst"
       googld_drive_timeout: "Gjorde timeout under samtal med Google Drive"
-      google_drive_workflow: "Det gick inte att ladda ned Google Drive-posten"
+      google_drive_workflow: "Det gick inte att ladda ner Google Drive-posten"
       invalid_file_type: "Ogiltig filtyp"
       invalid_google_docs_domain: "Du kan inte lämna in uppgifter från den här google_docs domänen"
       media_file_attached: "Det fanns inga mediainspelningar i inlämningen"
@@ -21454,9 +21454,9 @@ sv-x-k12:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Den här bilden visas som en vattenstämpel i bakgrunden på din sida. Godkända format: png, svg, gif, jpeg"
   this_image_is_currently_unavailable_25c68857: "Den här bilden är för närvarande inte tillgänglig"
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Den här integreringen är inte aktiverad. Du måste aktivera den för att kunna göra inställningar."
-  this_is_a_blueprint_course_5e7b47fe: "Detta är en kursmall"
+  this_is_a_blueprint_course_5e7b47fe: "Detta är en blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Det här är en lista med kommaseparerade länkar som är betrodda. Om alla länkar i den här listan är betrodda åsidosätts CSRF-token vid inloggning till Canvas."
-  this_is_a_course_template_99bbe698: "Detta är en kursmall"
+  this_is_a_course_template_99bbe698: "Detta är en blueprint"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Detta är en funktion som möjliggör utveckling av en responsiv layout"
   this_is_a_graded_discussion_count_points_possible_59926e2c: 
     one: "Det här är en bedömd diskussion: %{count} möjlig poäng"
@@ -22729,7 +22729,7 @@ sv-x-k12:
             tillgängliga. När du sparar innehåll i Filer är det enkelt att därefter infoga dem direkt i
             moduler, uppgifter, diskussioner eller på sidor! Distribuera filer till elever
             från din kursmapp, eller lås filer tills du är redo att låta kursen
-            ladda ned dem.
+            ladda ner dem.
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
       Ladda upp kursfiler, kursöversikter, uppläsningar eller andra dokument.
                 Lås mappar för att hålla dem dolda från elever. Lägg till filer till moduler,
