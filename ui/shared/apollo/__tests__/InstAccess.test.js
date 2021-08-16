@@ -111,5 +111,26 @@ describe('InstAccess', () => {
       expect(finalResponse.status).toEqual(200)
       expect(fakeFetch.mock.calls.length).toEqual(3)
     })
+
+    it('uses global fetch if no implementation provided', async () => {
+      async function fakeGatewayFetch() {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({token: 'my-fake-token'}),
+          text: async () => {
+            return '{"data": { "aField": "aValue" }, "errors": []}'
+          }
+        }
+      }
+      jest.spyOn(global, 'fetch')
+      global.fetch.mockImplementation(fakeGatewayFetch)
+      const ia = new InstAccess({})
+      const finalResponse = await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
+      expect(finalResponse.status).toEqual(200)
+      expect(global.fetch.mock.calls.length).toEqual(2)
+      expect(global.fetch.mock.calls[0][0]).toEqual('/api/v1/inst_access_tokens')
+      expect(global.fetch.mock.calls[1][0]).toEqual('http://fake-gateway/graphql')
+    })
   })
 })

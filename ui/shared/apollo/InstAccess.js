@@ -31,7 +31,11 @@ class InstAccess {
   // expiration window).
   constructor(options = {}) {
     this.instAccessToken = options.token || null
-    this.fetchImpl = options.preferredFetch || fetch
+    this.fetchImpl =
+      options.preferredFetch ||
+      (async (uri, opts) => {
+        return fetch(uri, opts)
+      })
   }
 
   async gatewayAuthenticatedFetch(uri, options) {
