@@ -104,12 +104,19 @@ module FeatureFlags
   # starting with site admin
   def feature_flag_account_ids
     return [Account.site_admin.global_id] if is_a?(User)
-    return [] if self.is_a?(Account) && self.site_admin?
+    return [] if is_a?(Account) && site_admin?
 
-    cache = self.is_a?(Account) && root_account? ? MultiCache.cache : Rails.cache
+    # don't use a cache at all for root account, because
+    # it won't even hit the database
+    if is_a?(Account) && root_account?
+      chain = account_chain(include_site_admin: true).dup
+      chain.shift
+      return chain.reverse.map(&:global_id)
+    end
+
     RequestCache.cache('feature_flag_account_ids', self) do
       shard.activate do
-        cache.fetch(['feature_flag_account_ids', self].cache_key) do
+        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
           chain = account_chain(include_site_admin: true).dup
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
