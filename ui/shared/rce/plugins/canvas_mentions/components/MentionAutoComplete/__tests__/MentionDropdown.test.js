@@ -120,7 +120,9 @@ describe('Mention Dropdown', () => {
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock
       })
-      expect(onFocusedUserChangeMock.mock.calls.length).toBe(1)
+      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
+
+      expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
 
       const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
       fireEvent.click(menuItems[3].querySelector('li'))
@@ -134,6 +136,8 @@ describe('Mention Dropdown', () => {
       const {getAllByTestId} = setup({
         onSelect: onSelectMock
       })
+
+      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
 
       const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
       fireEvent.click(menuItems[3].querySelector('li'))
@@ -151,6 +155,8 @@ describe('Mention Dropdown', () => {
         onActiveDescendantChange: onActiveDescendantChangeMock
       })
 
+      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
+
       const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
       fireEvent.click(menuItems[1].querySelector('li'))
 
@@ -161,9 +167,8 @@ describe('Mention Dropdown', () => {
   describe('graphql', () => {
     it('should have 10 mentionable users using default handler', async () => {
       const {getAllByTestId} = setup()
-      const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
 
-      expect(menuItems.length).toBe(10)
+      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
     })
 
     it('should have 4 mentionable users using custom handler', async () => {
@@ -185,16 +190,15 @@ describe('Mention Dropdown', () => {
       )
 
       const {getAllByTestId} = setup()
-      const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
 
-      expect(menuItems.length).toBe(4)
+      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(4))
     })
 
     it('should render name', async () => {
       const {getByText} = setup()
 
-      expect(await waitFor(() => getByText('Rob Orton'))).toBeTruthy()
-      expect(await waitFor(() => getByText('Caleb Guanzon'))).toBeTruthy()
+      await waitFor(() => expect(getByText('Rob Orton')).toBeTruthy())
+      await waitFor(() => expect(getByText('Caleb Guanzon')).toBeTruthy())
     })
   })
 })
