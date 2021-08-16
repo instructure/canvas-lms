@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
+require 'spec_helper'
+require 'lti_1_3_spec_helper'
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
@@ -193,6 +193,22 @@ describe ExternalToolsController do
         it 'returns the TestUser claim when viewing as a student' do
           get :show, params: {:course_id => @course.id, id: tool.id}
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
+        end
+      end
+
+      context 'with deep links' do
+        before do
+          user_session(@teacher)
+        end
+
+        it 'get passed in target_link_uri' do
+          get :show, params: {:course_id => @course.id, id: tool.id, launch_url: 'http://www.example.com/deep_link'}
+          expect(cached_launch['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq 'http://www.example.com/deep_link'
+        end
+
+        it "does not pass in target_link_uri if it doesn't match the tool domain" do
+          get :show, params: {:course_id => @course.id, id: tool.id, launch_url: 'http://www.hi.com/deep_link'}
+          expect(cached_launch['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq 'http://www.example.com/basic_lti'
         end
       end
     end
@@ -2190,6 +2206,15 @@ describe ExternalToolsController do
         expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
         token = SessionToken.parse(CGI.parse(url.query)['session_token'].first)
         expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+      end
+
+      it 'returns the specified launch url for a deep link' do
+        controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
+        get :generate_sessionless_launch, params: params.merge(url: 'http://lti13testtool.docker/deep_link')
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
+        url = URI.parse(json['url'])
+        expect(CGI.parse(url.query)['launch_url']).to eq ["http://lti13testtool.docker/deep_link"]
       end
 
       it "doesn't work when there is no access token (non-API access)" do

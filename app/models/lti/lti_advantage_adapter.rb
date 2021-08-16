@@ -119,7 +119,7 @@ module Lti
     #    Default to "LtiResourceLink" if the requested message type is
     #    not recognized.
     # 2. Invoke the constructor for the "factory" class that builds
-    #    the requested message type. At the time of writting, these
+    #    the requested message type. At the time of writing, these
     #    classes live in "lib/lti/messages".
     # 3. Cache the ID token returned from the factory class (this is a
     #    signed JWT, so always a string)

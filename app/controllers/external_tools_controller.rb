@@ -169,8 +169,7 @@ class ExternalToolsController < ApplicationController
       selection_type: placement,
       launch_url: params[:url],
       content_item_id: params[:content_item_id],
-      secure_params: params[:secure_params],
-      post_live_event: true
+      secure_params: params[:secure_params]
     )
     return unless @lti_launch
     display_override = params['borderless'] ? 'borderless' : params[:display]
@@ -257,7 +256,7 @@ class ExternalToolsController < ApplicationController
     elsif launch_type == 'assessment'
       generate_assignment_sessionless_launch
     else
-      generate_common_sessionless_launch
+      generate_common_sessionless_launch(options: {launch_url: params[:url]})
     end
   end
 
@@ -411,7 +410,8 @@ class ExternalToolsController < ApplicationController
       set_active_tab @tool.asset_string
       @show_embedded_chat = false if @tool.tool_id == 'chat'
 
-      @lti_launch = lti_launch(tool: @tool, selection_type: placement, post_live_event: true)
+      launch_url = params[:launch_url] if params[:launch_url] && @tool.matches_host?(params[:launch_url])
+      @lti_launch = lti_launch(tool: @tool, selection_type: placement, launch_url: launch_url)
       return unless @lti_launch
 
       # Some LTI apps have tutorial trays. Provide some details to the client to know what tray, if any, to show
@@ -474,7 +474,7 @@ class ExternalToolsController < ApplicationController
     @headers = false
 
     return unless find_tool(params[:external_tool_id], selection_type)
-    @lti_launch = lti_launch(tool: @tool, selection_type: selection_type, launch_token: params[:launch_token], post_live_event: true)
+    @lti_launch = lti_launch(tool: @tool, selection_type: selection_type, launch_token: params[:launch_token])
     return unless @lti_launch
     render Lti::AppUtil.display_template('borderless')
   end
@@ -495,7 +495,7 @@ class ExternalToolsController < ApplicationController
   end
   protected :find_tool
 
-  def lti_launch(tool:, selection_type: nil, launch_url: nil, content_item_id: nil, secure_params: nil, launch_token: nil, post_live_event: false)
+  def lti_launch(tool:, selection_type: nil, launch_url: nil, content_item_id: nil, secure_params: nil, launch_token: nil, post_live_event: true)
     link_params = {custom:{}, ext:{}}
     if secure_params.present?
       jwt_body = Canvas::Security.decode_jwt(secure_params)
@@ -1127,7 +1127,7 @@ class ExternalToolsController < ApplicationController
 
     raise ActiveRecord::RecordNotFound if tool.nil?
 
-    launch = lti_launch(tool: tool)
+    launch = lti_launch(tool: tool, post_live_event: false)
     return unless launch
     params = launch.params.reject {|p| p.starts_with?('oauth_')}
     params[:consumer_key] = tool.consumer_key
@@ -1372,13 +1372,13 @@ class ExternalToolsController < ApplicationController
       # Create a launch URL that uses a session token to
       # initialize a Canvas session and launch the tool.
       begin
-        launch_url = sessionless_launch_url(
+        launch_link = sessionless_launch_link(
           options,
           @context,
           @tool,
           generate_session_token
         )
-        render :json => { id: @tool.id, name: @tool.name, url: launch_url }
+        render :json => { id: @tool.id, name: @tool.name, url: launch_link }
       rescue UnauthorizedClient
         render_unauthorized_action
       end
