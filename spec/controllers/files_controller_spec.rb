@@ -307,6 +307,8 @@ describe FilesController do
 
     it "should redirect for download" do
       user_session(@teacher)
+      # k5_mode hooks don't run because we never render
+      expect(allow_any_instantiation_of(@course)).not_to receive(:elementary_subject_course?)
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1}
       expect(response).to be_redirect
     end
@@ -518,6 +520,7 @@ describe FilesController do
 
       it "should hide the left side if in K5 mode" do
         toggle_k5_setting(@course.account)
+        expect(controller).to receive(:set_k5_mode).and_call_original
         get 'show', params: {:course_id => @course.id, :id => @file.id}
         expect(response).to be_successful
         expect(assigns[:show_left_side]).to be false

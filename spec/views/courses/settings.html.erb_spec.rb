@@ -145,6 +145,7 @@ describe "courses/settings.html.erb" do
     end
 
     before :each do
+      @course.root_account.reload
       view_context(@course, @teacher)
     end
 
@@ -247,7 +248,7 @@ describe "courses/settings.html.erb" do
     end
 
     context "with the feature enabled" do
-      before { Account.default.enable_feature!(:course_templates) }
+      before { @course.root_account.enable_feature!(:course_templates) }
 
       it "is visible" do
         render
