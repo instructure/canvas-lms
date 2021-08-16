@@ -38,7 +38,7 @@ class InstAccess {
     if (this.instAccessToken === null) {
       this.instAccessToken = await this._fetchFreshAccessToken()
     }
-    options.headers ||= {}
+    options.headers = options.headers || {}
     options.headers.authorization = `Bearer ${this.instAccessToken}`
     const firstTryResponse = await this.fetchImpl(uri, options)
     const {status} = firstTryResponse
@@ -60,7 +60,6 @@ class InstAccess {
   // an expiration issue in talking to the gateway, it's easy to just get another token
   // with the user's cookie.
   async _fetchFreshAccessToken() {
-    const csrfToken = getCookie('_csrf_token')
     const fetchOptions = {
       method: 'POST',
       credentials: 'same-origin',
@@ -68,7 +67,7 @@ class InstAccess {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-CSRF-Token': csrfToken
+        'X-CSRF-Token': getCookie('_csrf_token')
       }
     }
     const tokenResponse = await this.fetchImpl('/api/v1/inst_access_tokens', fetchOptions)
