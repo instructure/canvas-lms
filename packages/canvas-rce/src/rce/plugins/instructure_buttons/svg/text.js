@@ -26,6 +26,7 @@ export function buildText({text, textPosition, textSize, textColor, shape, size}
     x: Math.max(TEXT_BACKGROUND_PADDING, Math.floor(getTextXValue(text, textSize, size))),
     y: getTextYValue(textPosition, textSize, shape, size),
     fill: textColor || '',
+    'font-family': 'Lato Extended',
     'font-size': TEXT_SIZE[textSize],
     'font-weight': 'bold'
   })
@@ -94,7 +95,7 @@ export function getContainerHeight({text, textPosition, textSize, shape, size}) 
 function getTextWidth(text, textSize) {
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
-  context.font = `${TEXT_SIZE[textSize]}px LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif`
+  context.font = `${TEXT_SIZE[textSize]}px "Lato Extended"`
   const lines = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize])
   const widths = lines.map(line => context.measureText(line).width)
   return Math.max(...widths)

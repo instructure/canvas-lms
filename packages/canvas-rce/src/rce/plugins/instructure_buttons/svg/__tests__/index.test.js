@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildGroup, buildSvg, buildSvgWrapper} from '../index'
+import {buildGroup, buildSvg, buildSvgWrapper, buildStylesheet} from '../index'
 import {DEFAULT_OPTIONS, DEFAULT_SETTINGS} from '../constants'
 
 let settings, options
@@ -165,6 +165,7 @@ describe('buildSvg()', () => {
         />
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="103"
@@ -327,5 +328,23 @@ describe('buildGroup()', () => {
         />
       `)
     })
+  })
+})
+
+describe('buildStylesheet()', () => {
+  it('builds the <style /> element', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        blob: () => Promise.resolve(new Blob())
+      })
+    )
+
+    expect(await buildStylesheet()).toMatchInlineSnapshot(`
+      <style
+        type="text/css"
+      >
+        @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+      </style>
+    `)
   })
 })

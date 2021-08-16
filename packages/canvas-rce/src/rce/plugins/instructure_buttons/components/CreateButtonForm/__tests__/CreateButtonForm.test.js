@@ -46,6 +46,12 @@ describe('<CreateButtonForm />', () => {
     onClose: jest.fn()
   }
 
+  beforeAll(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      blob: () => Promise.resolve(new Blob())
+    })
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -54,7 +60,9 @@ describe('<CreateButtonForm />', () => {
     render(<CreateButtonForm {...defaults} />)
 
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
-    expect(startButtonsAndIconsUpload.mock.calls[0]).toMatchInlineSnapshot(`
+    await waitFor(() => {
+      if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
+      expect(startButtonsAndIconsUpload.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
         Object {
           "domElement": <svg
@@ -85,11 +93,17 @@ describe('<CreateButtonForm />', () => {
                 />
               </g>
             </svg>
+            <style
+              type="text/css"
+            >
+              @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+            </style>
           </svg>,
           "name": "untitled.svg",
         },
       ]
     `)
+    })
     await waitFor(() => expect(defaults.onClose).toHaveBeenCalled())
   })
 

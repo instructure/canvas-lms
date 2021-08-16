@@ -32,6 +32,7 @@ describe('buildText()', () => {
     expect(buildText({...settings})).toMatchInlineSnapshot(`
       <text
         fill=""
+        font-family="Lato Extended"
         font-size="14"
         font-weight="bold"
         x="55"
@@ -53,6 +54,7 @@ describe('buildText()', () => {
     expect(buildText({...settings, text})).toMatchInlineSnapshot(`
       <text
         fill=""
+        font-family="Lato Extended"
         font-size="14"
         font-weight="bold"
         x="47"
@@ -105,6 +107,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'small'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -124,6 +127,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'medium'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="16"
           font-weight="bold"
           x="55"
@@ -143,6 +147,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'large'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="22"
           font-weight="bold"
           x="55"
@@ -162,6 +167,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'x-large'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="28"
           font-weight="bold"
           x="55"
@@ -183,6 +189,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textColor: null})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -202,6 +209,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textColor: '#f00'})).toMatchInlineSnapshot(`
         <text
           fill="#f00"
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -223,6 +231,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textBackgroundColor: null})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -242,6 +251,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textBackgroundColor: '#f00'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -263,6 +273,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -282,6 +293,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'bottom-third'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
@@ -301,6 +313,7 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"

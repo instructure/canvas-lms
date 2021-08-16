@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useStoreProps} from '../../../shared/StoreContext'
 
 import {DEFAULT_SETTINGS} from '../../svg/constants'
-import {buildSvg} from '../../svg'
+import {buildSvg, buildStylesheet} from '../../svg'
 import formatMessage from '../../../../../format-message'
 
 import {Header} from './Header'
@@ -46,10 +46,14 @@ export const CreateButtonForm = ({editor, onClose}) => {
   const handleSubmit = () => {
     setStatus('loading')
 
-    storeProps
-      .startButtonsAndIconsUpload({
-        name: `${settings.name || formatMessage('untitled')}.svg`,
-        domElement: buildSvg(settings, {isPreview: false})
+    const svg = buildSvg(settings, {isPreview: false})
+    buildStylesheet()
+      .then(stylesheet => {
+        svg.appendChild(stylesheet)
+        return storeProps.startButtonsAndIconsUpload({
+          name: `${settings.name || formatMessage('untitled')}.svg`,
+          domElement: svg
+        })
       })
       .then(writeButtonToRCE)
       .then(onClose)
