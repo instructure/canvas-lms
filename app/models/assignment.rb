@@ -40,6 +40,8 @@ class Assignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
 
+  self.ignored_columns = %i[context_code]
+
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
@@ -195,9 +197,14 @@ class Assignment < ActiveRecord::Base
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
 
+  def context_code
+    "#{context_type.downcase}_#{context_id}"
+  end
+
   def positive_points_possible?
     return if self.points_possible.to_i >= 0
     return unless self.points_possible_changed?
+
     errors.add(
       :points_possible,
       I18n.t(
@@ -919,7 +926,6 @@ class Assignment < ActiveRecord::Base
 
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
 
     self.infer_all_day
@@ -2769,7 +2775,18 @@ class Assignment < ActiveRecord::Base
     where('assignment_group_id = ?', group_id.to_s)
   }
 
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
+  scope :for_context_codes, ->(codes) do
+     ids = codes.map do |code|
+      type, id = parse_asset_string(code)
+      next unless type == 'Course'
+
+      id
+     end.compact
+     next none if ids.empty?
+
+     for_course(ids)
+  end
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
   scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
 

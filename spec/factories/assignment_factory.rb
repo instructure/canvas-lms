@@ -66,7 +66,7 @@ module Factories
     now = Time.now.utc
     records = course_ids.each_with_index.map do |id, i|
       {
-        context_id: id, context_type: 'Course', context_code: "course_#{id}",
+        context_id: id, context_type: 'Course',
         title: "#{id}:#{i}", grading_type: "points", submission_types: "none",
         workflow_state: 'published',
         root_account_id: account.id,
