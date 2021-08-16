@@ -1554,6 +1554,7 @@ class Account < ActiveRecord::Base
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
+    feature_flags.load
   end
 
   class ::Canvas::AccountCacheError < StandardError; end

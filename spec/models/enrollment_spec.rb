@@ -2977,6 +2977,7 @@ describe Enrollment do
       before :each do
         course_with_student
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is true for a user who has been granted :manage_students' do
@@ -3041,6 +3042,7 @@ describe Enrollment do
       before :each do
         course_with_observer
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is true with :manage_students' do
@@ -3074,6 +3076,7 @@ describe Enrollment do
       before :each do
         course_with_teacher
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is false with :manage_students' do
