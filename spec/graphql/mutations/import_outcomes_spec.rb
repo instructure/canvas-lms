@@ -22,13 +22,19 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::ImportOutcomes do
-  def mutation_str(target_context_id:, target_context_type:, **attrs)
+  def mutation_str(**attrs)
+    target_group_id = attrs[:target_group_id]
+    target_context_id = attrs[:target_context_id]
+    target_context_type = attrs[:target_context_type]
     source_context_id = attrs[:source_context_id]
     source_context_type = attrs[:source_context_type]
     outcome_id = attrs[:outcome_id]
     group_id = attrs[:group_id]
 
     optional_fields = []
+    optional_fields << "targetGroupId: #{target_group_id}" if target_group_id
+    optional_fields << "targetContextId: #{target_context_id}" if target_context_id
+    optional_fields << "targetContextType: \"#{target_context_type}\"" if target_context_type
     optional_fields << "sourceContextId: #{source_context_id}" if source_context_id
     optional_fields << "sourceContextType: \"#{source_context_type}\"" if source_context_type
     optional_fields << "outcomeId: #{outcome_id}" if outcome_id
@@ -37,8 +43,6 @@ describe Mutations::ImportOutcomes do
     <<~GQL
       mutation {
         importOutcomes(input: {
-          targetContextId: "#{target_context_id}",
-          targetContextType: "#{target_context_type}",
           #{optional_fields.join(",\n")}
         }) {
           errors {
@@ -61,8 +65,7 @@ describe Mutations::ImportOutcomes do
     execute_query(
       mutation_str(
         **attrs.reverse_merge(
-          target_context_id: target_context_id,
-          target_context_type: target_context_type,
+          target_group_id: target_group.id,
           source_context_id: source_context_id,
           source_context_type: source_context_type
         )
@@ -73,16 +76,15 @@ describe Mutations::ImportOutcomes do
 
   def exec(**attrs)
     attrs.reverse_merge!(
-      target_context_id: target_context_id,
-      target_context_type: target_context_type,
+      target_group_id: target_group.id,
       source_context_id: source_context_id,
-      source_context_type: source_context_type
+      source_context_type: source_context_type,
     )
     source_context = attrs[:source_context_type].constantize.find_by(id: attrs[:source_context_id]) if attrs[:source_context_type]
     group = LearningOutcomeGroup.find_by(id: attrs[:group_id]) if attrs[:group_id]
+    target_group = LearningOutcomeGroup.find_by(id: attrs[:target_group_id])
     outcome_id = attrs[:outcome_id]
-    target_context = attrs[:target_context_type].constantize.find_by(id: attrs[:target_context_id])
-    described_class.execute(progress, source_context, group, outcome_id, target_context)
+    described_class.execute(progress, source_context, group, outcome_id, target_group)
   end
 
   def find_group(title)
@@ -93,17 +95,22 @@ describe Mutations::ImportOutcomes do
     LearningOutcome.find_by(context: context, short_description: title).id
   end
 
-  let(:target_context_id) { @course.id }
-  let(:target_context_type) { "Course" }
+  let(:target_context) { @course }
+  let(:target_group) {
+    @course.root_outcome_group
+  }
   let(:source_context_id) { Account.default.id }
   let(:source_context_type) { "Account" }
   let(:ctx) { { domain_root_account: Account.default, current_user: current_user } }
   let(:current_user) { @teacher }
   let(:progress) { @course.progresses.create!(tag: "import_outcomes") }
 
-  before(:once) do
+  before :once do
     Account.default.enable_feature!(:improved_outcomes_management)
     course_with_teacher
+  end
+
+  before do
     make_group_structure({
       title: "Group A",
       outcomes: 5,
@@ -156,10 +163,11 @@ describe Mutations::ImportOutcomes do
   end
 
   context "errors" do
-    before :once do
+    before(:once) do
       @course2 = Course.create!(name: "Second", account: Account.default)
       @course2_group = outcome_group_model(context: @course2)
       @course2_outcome = outcome_model(context: @course2, outcome_group: @course2_group)
+      @global_outcome = outcome_model(global: true, title: "Global outcome",)
       @outcome_without_group = LearningOutcome.create!(title: "Outcome without group")
     end
 
@@ -176,7 +184,7 @@ describe Mutations::ImportOutcomes do
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
-    it "errors when targetContextType and targetContextId are missing" do
+    it "errors when groupId is missing" do
       group_id = find_group("Group B").id
       query = <<~GQL
         mutation {
@@ -193,13 +201,15 @@ describe Mutations::ImportOutcomes do
       result = execute_query(query, ctx)
       errors = result.dig('errors')
       expect(errors).not_to be_nil
-      expect(errors.length).to eq 2
+      expect(errors.length).to eq 1
       expect(
-        errors.select {|e| e['path'] == ["mutation", "importOutcomes", "input", "targetContextType"]}
+        errors.select {|e| e['path'] == ["mutation", "importOutcomes", "input", "targetGroupId"]}
       ).not_to be_nil
-      expect(
-        errors.select {|e| e['path'] == ["mutation", "importOutcomes", "input", "targetContextId"]}
-      ).not_to be_nil
+    end
+
+    it "errors when no such group is found" do
+      result = exec_graphql(target_group_id: 9999)
+      expect_error(result, "no such target group")
     end
 
     it "errors when sourceContextType is invalid" do
@@ -230,24 +240,29 @@ describe Mutations::ImportOutcomes do
       )
     end
 
-    it "errors when targetContextType is blank" do
-      result = exec_graphql(target_context_type: '')
-      expect_validation_error(result, "targetContextType", "invalid value")
+    it "errors when targetContext and targetGroupId is blank" do
+      result = exec_graphql(target_context_type: nil, target_context_id: nil, target_group_id: nil)
+      expect_error(result, "You must provide targetGroupId or targetContextId and targetContextType")
     end
 
-    it "errors when targetContextId is blank" do
-      result = exec_graphql(target_context_id: '')
+    it "errors when targetContextId and targetGroupId is blank" do
+      result = exec_graphql(target_context_type: nil, target_context_id: 1, target_group_id: nil)
+      expect_error(result, "targetContextType required if targetContextId provided")
+    end
+
+    it "errors when targetContextType and targetGroupId is blank" do
+      result = exec_graphql(target_context_type: 'Account', target_context_id: nil, target_group_id: nil)
+      expect_error(result, "targetContextId required if targetContextType provided")
+    end
+
+    it "errors when no such context is found" do
+      result = exec_graphql(target_context_type: 'Account', target_context_id: -1, target_group_id: nil)
       expect_error(result, "no such target context")
     end
 
     it "errors when targetContextType is invalid" do
-      result = exec_graphql(target_context_type: 'FooContext')
-      expect_validation_error(result, "targetContextType", "invalid value")
-    end
-
-    it "errors when no such context is found" do
-      result = exec_graphql(target_context_type: 'Account', target_context_id: -1)
-      expect_error(result, "no such target context")
+      result = exec_graphql(target_context_type: 'Foo', target_context_id: -1, target_group_id: nil)
+      expect_error(result, "Invalid targetContextType")
     end
 
     it "errors when neither groupId or outcomeId value is provided" do
@@ -288,24 +303,12 @@ describe Mutations::ImportOutcomes do
     context 'import outcome' do
       it "errors when importing non-existence outcome" do
         result = exec_graphql(outcome_id: 0)
-        expect_error(result, "Outcome 0 is not available in context Course##{target_context_id}")
+        expect_error(result, "Outcome 0 is not available in context Course##{@course.id}")
       end
 
       it "errors when importing ineligible outcome" do
         result = exec_graphql(outcome_id: @course2_outcome.id)
-        expect_error(result, "Outcome #{@course2_outcome.id} is not available in context Course##{target_context_id}")
-      end
-
-      it "errors when importing outcome without group" do
-        expect {
-          exec(outcome_id: @outcome_without_group.id)
-        }.not_to change(LearningOutcomeGroup, :count)
-
-        progress.reload
-        expect(progress.message).to eql(
-          "Could not import Learning Outcome #{@outcome_without_group.id} because it doesn't belong to any group"
-        )
-        expect(progress).to be_failed
+        expect_error(result, "Outcome #{@course2_outcome.id} is not available in context Course##{@course.id}")
       end
     end
 
@@ -328,6 +331,39 @@ describe Mutations::ImportOutcomes do
     expect(result.dig("data", "importOutcomes", "progress", "id")).to be_present
   end
 
+  it "calls process_job with root_outcome_group if target_context provided" do
+    # rubocop:disable RSpec/AnyInstance
+    expect_any_instance_of(described_class).to receive(:process_job).with(
+      hash_including(target_group: @course.root_outcome_group)
+    ).and_call_original
+    # rubocop:enable RSpec/AnyInstance
+
+    exec_graphql(
+      outcome_id: get_outcome_id("0 Group E outcome"),
+      target_group_id: nil,
+      target_context_type: 'Course',
+      target_context_id: @course.id,
+    )
+  end
+
+  it "calls process_job with target_group if provided" do
+    dummy_group = outcome_group_model(
+      title: "Dummy",
+      context: @course
+    )
+
+    # rubocop:disable RSpec/AnyInstance
+    expect_any_instance_of(described_class).to receive(:process_job).with(
+      hash_including(target_group: dummy_group)
+    ).and_call_original
+    # rubocop:enable RSpec/AnyInstance
+
+    exec_graphql(
+      outcome_id: get_outcome_id("0 Group E outcome"),
+      target_group_id: dummy_group.id
+    )
+  end
+
   context "passing outcomeId" do
     it "works when importing outcomes from same group" do
       [
@@ -343,6 +379,31 @@ describe Mutations::ImportOutcomes do
           "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
           "3 Group E outcome", "4 Group E outcome"
         ]
+      }], @course.root_outcome_group)
+    end
+
+    it "works when importing outcomes to a target_group" do
+      target_group = outcome_group_model(
+        title: "Group A",
+        context: @course
+      )
+
+      [
+        "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
+        "3 Group E outcome", "4 Group E outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title), target_group_id: target_group.id)
+      end
+
+      assert_tree_exists([{
+        title: "Group A",
+        groups: [{
+          title: "Group E",
+          outcomes: [
+            "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
+            "3 Group E outcome", "4 Group E outcome"
+          ]
+        }]
       }], @course.root_outcome_group)
     end
 
@@ -523,6 +584,32 @@ describe Mutations::ImportOutcomes do
       }], @course.root_outcome_group)
     end
 
+    it "import all nested outcomes to a specific group" do
+      make_group_structure({
+        title: "Group F",
+      }, @course)
+
+      exec(
+        group_id: find_group("Group C").id,
+        target_group_id: find_group("Group F").id
+      )
+
+      assert_tree_exists([{
+        title: "Group F",
+        groups: [{
+          title: "Group C",
+          outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+          groups: [{
+            title: "Group D",
+            outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+          }, {
+            title: "Group E",
+            outcomes: 5.times.map {|i| "#{i} Group E outcome"}
+          }]
+        }]
+      }], @course.root_outcome_group)
+    end
+
     it "resync new added outcomes and groups" do
       group_e = LearningOutcomeGroup.find_by(title: "Group E")
       groupc_id = find_group("Group C").id
@@ -620,7 +707,7 @@ describe Mutations::ImportOutcomes do
         exec(
           outcome_id: get_outcome_id("0 Root Group A outcome", nil),
           source_context_id: nil, source_context_type: nil,
-          target_context_id: Account.default.id, target_context_type: "Account"
+          target_group_id: Account.default.root_outcome_group.id
         )
 
         exec(group_id: Account.default.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A").id)
@@ -696,13 +783,13 @@ describe Mutations::ImportOutcomes do
         exec(
           group_id: find_group("Root Group B").id,
           source_context_id: nil, source_context_type: nil,
-          target_context_id: Account.default.id, target_context_type: "Account"
+          target_group_id: Account.default.root_outcome_group.id
         )
 
         exec(
           group_id: find_group("Root Group C").id,
           source_context_id: nil, source_context_type: nil,
-          target_context_id: Account.default.id, target_context_type: "Account"
+          target_group_id: Account.default.root_outcome_group.id
         )
       end
 
