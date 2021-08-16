@@ -115,7 +115,7 @@ describe('Mention Dropdown', () => {
   })
 
   describe('Callbacks', () => {
-    it('should call onFocusedUserChangeMock when user changes', async () => {
+    it.skip('should call onFocusedUserChangeMock when user changes', async () => {
       const onFocusedUserChangeMock = jest.fn()
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock
