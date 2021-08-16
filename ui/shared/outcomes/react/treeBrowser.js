@@ -357,7 +357,11 @@ export const useFindOutcomeModal = open => {
   }
 
   useEffect(() => {
-    if (!open && selectedGroupId !== null) setSelectedGroupId(null)
+    if (!open && selectedGroupId !== null) {
+      setTimeout(() => {
+        setSelectedGroupId(null)
+      }, 500)
+    }
   }, [open, selectedGroupId, setSelectedGroupId])
 
   useEffect(() => {
