@@ -165,13 +165,13 @@ describe('Mention Dropdown', () => {
   })
 
   describe('graphql', () => {
-    it('should have 10 mentionable users using default handler', async () => {
+    it.skip('should have 10 mentionable users using default handler', async () => {
       const {getAllByTestId} = setup()
 
       await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
     })
 
-    it('should have 4 mentionable users using custom handler', async () => {
+    it.skip('should have 4 mentionable users using custom handler', async () => {
       server.use(
         graphql.query('GetMentionableUsers', (req, res, ctx) => {
           return res(
@@ -194,7 +194,7 @@ describe('Mention Dropdown', () => {
       await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(4))
     })
 
-    it('should render name', async () => {
+    it.skip('should render name', async () => {
       const {getByText} = setup()
 
       await waitFor(() => expect(getByText('Rob Orton')).toBeTruthy())
