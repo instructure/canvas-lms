@@ -84,7 +84,7 @@ const MentionDropdownMenu = ({
     <div
       className="mention-dropdown-menu"
       ref={setPopperElement}
-      style={{...styles.popper, zIndex: 1000}}
+      style={{...styles.popper, zIndex: 10000}}
       {...attributes.popper}
     >
       <View
