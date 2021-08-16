@@ -422,6 +422,6 @@ module AuthenticationMethods
 
     raise LoggedOutError if api_request? || request.format.json?
 
-    redirect_to_login
+    redirect_to_login unless is_a?(LoginController) && params[:action] == 'new'
   end
 end
