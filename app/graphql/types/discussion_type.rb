@@ -96,16 +96,6 @@ module Types
       get_entries(args)
     end
 
-    field :root_discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
-      argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
-      argument :sort_order, DiscussionSortOrderType, required: false
-    end
-    def root_discussion_entries_connection(**args)
-      args[:root_entries] = true
-      get_entries(args)
-    end
-
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
