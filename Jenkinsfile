@@ -27,6 +27,7 @@ def buildParameters = [
   string(name: 'GERRIT_PROJECT', value: "${env.GERRIT_PROJECT}"),
   string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
   string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
+  string(name: 'GERRIT_CHANGE_SUBJECT', value: "${env.GERRIT_CHANGE_SUBJECT}"),
   string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
   string(name: 'GERRIT_PATCHSET_REVISION', value: "${env.GERRIT_PATCHSET_REVISION}"),
   string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
