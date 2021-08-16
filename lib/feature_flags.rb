@@ -45,12 +45,12 @@ module FeatureFlags
 
   def set_feature_flag!(feature, state)
     feature = feature.to_s
-    flag = self.feature_flags.where(feature: feature).first
-    flag ||= self.feature_flags.build(feature: feature)
+    flag = feature_flags.find_or_initialize_by(feature: feature)
     flag.state = state
     @feature_flag_cache ||= {}
     @feature_flag_cache[feature] = flag
     flag.save!
+    association(:feature_flags).reset
   end
 
   def allow_feature!(feature)
@@ -141,6 +141,10 @@ module FeatureFlags
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
     accounts = feature_flag_account_ids.map do |id|
+      # optimizations for accounts we likely already have loaded (including their feature flags!)
+      next Account.site_admin if id == Account.site_admin.global_id
+      next Account.current_domain_root_account if id == Account.current_domain_root_account&.global_id
+
       account = Account.new
       account.id = id
       account.shard = Shard.shard_for(id, self.shard)
@@ -150,9 +154,10 @@ module FeatureFlags
 
     all_contexts = (accounts + [self]).uniq
     all_contexts -= [self] if inherited_only
-    all_contexts.each_with_index do |context, idx|
+    all_contexts.each do |context|
       flag = context.feature_flag(feature, skip_cache: context == self && skip_cache)
       next unless flag
+
       retval = flag
       break unless flag.can_override?
     end
