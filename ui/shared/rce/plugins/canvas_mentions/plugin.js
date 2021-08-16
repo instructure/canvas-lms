@@ -30,7 +30,7 @@ function onInputChange(_e, ed = false) {
   const editor = ed || tinymce.activeEditor
   const tinySelection = editor.selection
 
-  if (mentionWasInitiated(tinySelection.getSel())) {
+  if (mentionWasInitiated(tinySelection.getSel(), tinySelection.getNode())) {
     // Insert a "marker" node so we can find the cursor position
     // xsslint safeString.identifier MARKER_ID
     editor.execCommand(
