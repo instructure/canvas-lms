@@ -370,7 +370,9 @@ module Api
     begin
       paginated = collection.paginate(pagination_args)
     rescue Folio::InvalidPage
-      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.build_page.ordinal_pages?
+      # Have to .try(:build_page) because we use some collections (like
+      # PaginatedCollection) that do not conform to the full will_paginate API.
+      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.try(:build_page)&.ordinal_pages?
         # for backwards compatibility we currently require returning [] for
         # pages beyond the end of an ordinal collection, rather than a 404.
         paginated = Folio::Ordinal::Page.create

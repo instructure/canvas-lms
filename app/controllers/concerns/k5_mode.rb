@@ -21,7 +21,7 @@ module K5Mode
   extend ActiveSupport::Concern
 
   included do
-    before_action :set_k5_mode
+    set_callback :html_render, :before, :set_k5_mode
   end
 
   private
@@ -29,6 +29,10 @@ module K5Mode
   # Setting :require_k5_theme will enable k5 theming on the page as long as user is a k5 user, even if the current
   # context is not a k5 course. Intended for use on pages that are not in a course context (like the courses index)
   def set_k5_mode(require_k5_theme: false)
+    return if @set_k5_mode_run
+
+    @set_k5_mode_run = true
+
     # Only students should see the details view
     @k5_details_view = @context.try(:elementary_subject_course?) && !@context.grants_right?(@current_user, :read_as_admin)
     if @context.try(:elementary_subject_course?)
