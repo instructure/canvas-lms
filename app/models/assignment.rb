@@ -2791,14 +2791,22 @@ class Assignment < ActiveRecord::Base
 
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
-  scope :due_between_with_overrides, lambda { |start, ending|
-    where('assignments.due_at BETWEEN ? AND ? OR (EXISTS (?))',
-        start, ending,
-        AssignmentOverride.where('assignment_overrides.assignment_id = assignments.id AND
-          assignment_overrides.due_at_overridden AND
-          assignment_overrides.due_at BETWEEN ? AND ?', start, ending)
-    )
-  }
+  scope :due_between_with_overrides, ->(start, ending) do
+    overrides_subquery = AssignmentOverride.where("assignment_id=assignments.id")
+      .where(due_at_overridden: true, due_at: start..ending)
+
+    scope1 = where(due_at: start..ending)
+    scope2 = where("EXISTS (?)", overrides_subquery)
+    if group_values.present?
+      # subquery strategy doesn't work with GROUP BY
+      scope1.or(scope2)
+    else
+      scope1.union(
+        scope2.merge(unscoped.where.not(due_at: start..ending).or(unscoped.where(due_at: nil))),
+        from: true
+      )
+    end
+  end
 
   scope :due_between_for_user, -> (start, ending, user) do
     with_user_due_date(user).where(user_due_date: start..ending)
@@ -2864,7 +2872,7 @@ class Assignment < ActiveRecord::Base
 
   scope :gradeable, -> { where.not(submission_types: %w(not_graded wiki_page)) }
 
-  scope :active, -> { where("assignments.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
 
   scope :not_locked, -> {

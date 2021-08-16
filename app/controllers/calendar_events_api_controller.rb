@@ -1156,7 +1156,8 @@ class CalendarEventsApiController < ApplicationController
       scope = assignment_context_scope(user)
       next unless scope
 
-      scope = scope.active.order(:due_at, :id)
+      scope = scope.order(:due_at, :id)
+      scope = scope.active
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
