@@ -167,6 +167,7 @@ class WikiPagesController < ApplicationController
 
   private
   def wiki_pages_js_env(context)
+    set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
     wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
