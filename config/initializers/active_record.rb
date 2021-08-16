@@ -1284,6 +1284,10 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
+    scopes = scopes.reject { |s| s.is_a?(ActiveRecord::NullRelation) }
+    return scopes.first if scopes.length == 1
+    return self if scopes.empty?
+
     sub_query = scopes.map do |s|
       scope = s.except(:select, :order)
       scope = scope.select(primary_key) unless from
