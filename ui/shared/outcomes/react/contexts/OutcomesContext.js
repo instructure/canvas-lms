@@ -29,6 +29,7 @@ export const getContext = isMobileView => {
   const canManage = ENV.PERMISSIONS?.manage_outcomes
   const canImport = ENV.PERMISSIONS?.import_outcomes
   const isAdmin = ENV.current_user_roles?.includes('admin')
+  const isStudent = ENV.current_user_roles?.includes('student')
 
   return {
     env: {
@@ -40,7 +41,8 @@ export const getContext = isMobileView => {
       isMobileView,
       canManage,
       canImport,
-      isAdmin
+      isAdmin,
+      isStudent
     }
   }
 }
