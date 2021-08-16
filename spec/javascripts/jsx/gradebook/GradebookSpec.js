@@ -756,59 +756,10 @@ QUnit.module('Gradebook#makeColumnSortFn', {
   setup() {
     this.gradebook = createGradebook()
     sandbox.stub(this.gradebook, 'wrapColumnSortFn')
-    sandbox.stub(this.gradebook, 'compareAssignmentPositions')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
     sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
   }
-})
-
-test('wraps compareAssignmentPositions when called with a sortType of assignment_group', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('assignment_group', 'ascending'))
-  const expectedArgs = [this.gradebook.compareAssignmentPositions, 'ascending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
-})
-
-test('wraps compareAssignmentPositions when called with a sortType of alpha', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('alpha', 'descending'))
-  const expectedArgs = [this.gradebook.compareAssignmentPositions, 'descending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
-})
-
-test('wraps compareAssignmentNames when called with a sortType of name', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('name', 'ascending'))
-  const expectedArgs = [this.gradebook.compareAssignmentNames, 'ascending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
-})
-
-test('wraps compareAssignmentDueDates when called with a sortType of due_date', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('due_date', 'descending'))
-  const expectedArgs = [compareAssignmentDueDates, 'descending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
-})
-
-test('wraps compareAssignmentPointsPossible when called with a sortType of points', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('points', 'ascending'))
-  const expectedArgs = [this.gradebook.compareAssignmentPointsPossible, 'ascending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
-})
-
-test('wraps compareAssignmentModulePositions when called with a sortType of module_position', function () {
-  this.gradebook.makeColumnSortFn(this.sortOrder('module_position', 'ascending'))
-  const expectedArgs = [this.gradebook.compareAssignmentModulePositions, 'ascending']
-
-  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
-  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
 })
 
 QUnit.module('Gradebook#wrapColumnSortFn')
@@ -938,64 +889,6 @@ test('returns true when not filtering by a search term', function () {
 test('returns true when search term is not defined', function () {
   this.gradebook.userFilterTerm = null
   strictEqual(this.gradebook.rowFilter(this.student), true)
-})
-
-QUnit.module('Gradebook#makeCompareAssignmentCustomOrderFn')
-
-test('returns position difference if both are defined in the index', () => {
-  const sortOrder = {customOrder: ['foo', 'bar']}
-  const gradeBook = createGradebook()
-  sandbox.stub(gradeBook, 'compareAssignmentPositions')
-  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
-
-  const a = {id: 'foo'}
-  const b = {id: 'bar'}
-  equal(sortFn(a, b), -1)
-})
-
-test('returns -1 if the first arg is in the order and the second one is not', () => {
-  const sortOrder = {customOrder: ['foo', 'bar']}
-  const gradeBook = createGradebook()
-  sandbox.stub(gradeBook, 'compareAssignmentPositions')
-  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
-
-  const a = {id: 'foo'}
-  const b = {id: 'NO'}
-  equal(sortFn(a, b), -1)
-})
-
-test('returns 1 if the second arg is in the order and the first one is not', () => {
-  const sortOrder = {customOrder: ['foo', 'bar']}
-  const gradeBook = createGradebook()
-  sandbox.stub(gradeBook, 'compareAssignmentPositions')
-  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
-
-  const a = {id: 'NO'}
-  const b = {id: 'bar'}
-  equal(sortFn(a, b), 1)
-})
-
-test('calls wrapped compareAssignmentPositions otherwise', () => {
-  const sortOrder = {customOrder: ['foo', 'bar']}
-  const gradeBook = createGradebook()
-  sandbox.stub(gradeBook, 'compareAssignmentPositions')
-  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
-
-  const a = {id: 'taco'}
-  const b = {id: 'cat'}
-  sortFn(a, b)
-  ok(gradeBook.compareAssignmentPositions.called)
-})
-
-test('falls back to object id for the indexes if field is not in the map', () => {
-  const sortOrder = {customOrder: ['5', '11']}
-  const gradeBook = createGradebook()
-  sandbox.stub(gradeBook, 'compareAssignmentPositions')
-  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
-
-  const a = {id: 'NO', object: {id: 5}}
-  const b = {id: 'NOPE', object: {id: 11}}
-  equal(sortFn(a, b), -1)
 })
 
 QUnit.module('Gradebook#compareAssignmentNames', {
@@ -1179,16 +1072,6 @@ QUnit.module('Gradebook#compareAssignmentModulePositions - when neither record h
       this.secondRecord
     )
   }
-})
-
-test('calls compareAssignmentPositions', function () {
-  strictEqual(this.gradebook.compareAssignmentPositions.callCount, 1)
-  deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[0], this.firstRecord)
-  deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[1], this.secondRecord)
-})
-
-test('returns the result of compareAssignmentPositions', function () {
-  strictEqual(this.comparisonResult, -1)
 })
 
 QUnit.module('Gradebook Column Order', suiteHooks => {

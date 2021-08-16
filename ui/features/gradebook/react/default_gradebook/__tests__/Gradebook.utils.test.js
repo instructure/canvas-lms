@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getStudentGradeForColumn, getGradeAsPercent, onGridKeyDown} from '../Gradebook.utils'
+import {
+  getStudentGradeForColumn,
+  getGradeAsPercent,
+  onGridKeyDown,
+  compareAssignmentPositions
+} from '../Gradebook.utils'
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -96,5 +101,20 @@ describe('onGridKeyDown', () => {
     onGridKeyDown(event, {grid: this.grid, cell: undefined, row: undefined})
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
+  })
+})
+
+describe('compareAssignmentPositions', () => {
+  it('sorts (1)', () => {
+    const a = {object: {position: 1, assignment_group: {position: 1}}}
+    const b = {object: {position: 2, assignment_group: {position: 2}}}
+    const assignments = [a, b]
+    expect(assignments.sort(compareAssignmentPositions)).toStrictEqual([a, b])
+  })
+  it('sorts (2)', () => {
+    const a = {object: {position: 1, assignment_group: {position: 2}}}
+    const b = {object: {position: 2, assignment_group: {position: 1}}}
+    const assignments = [a, b]
+    expect(assignments.sort(compareAssignmentPositions)).toStrictEqual([b, a])
   })
 })

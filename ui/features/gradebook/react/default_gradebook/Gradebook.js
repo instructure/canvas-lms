@@ -47,7 +47,6 @@ import GradebookApi from './apis/GradebookApi'
 import SubmissionCommentApi from './apis/SubmissionCommentApi'
 import CourseSettings from './CourseSettings/index'
 import DataLoader from './DataLoader/index'
-import OldDataLoader from './OldDataLoader/index'
 import FinalGradeOverrides from './FinalGradeOverrides/index'
 import GradebookGrid from './GradebookGrid/index'
 import AssignmentRowCellPropFactory from './GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
@@ -99,6 +98,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 
 import {
   compareAssignmentDueDates,
+  compareAssignmentPositions,
   ensureAssignmentVisibility,
   forEachSubmission,
   getAssignmentGroupPointsPossible,
@@ -1063,7 +1063,7 @@ class Gradebook {
     })
     this.updateGrid()
     this.renderViewOptionsMenu()
-    return this.updateColumnHeaders()
+    this.updateColumnHeaders()
   }
 
   makeColumnSortFn(sortOrder) {
@@ -1079,17 +1079,8 @@ class Gradebook {
       case 'custom':
         return this.makeCompareAssignmentCustomOrderFn(sortOrder)
       default:
-        return this.wrapColumnSortFn(this.compareAssignmentPositions, sortOrder.direction)
+        return this.wrapColumnSortFn(compareAssignmentPositions, sortOrder.direction)
     }
-  }
-
-  compareAssignmentPositions(a, b) {
-    const diffOfAssignmentGroupPosition =
-      a.object.assignment_group.position - b.object.assignment_group.position
-    const diffOfAssignmentPosition = a.object.position - b.object.position
-    // order first by assignment_group position and then by assignment position
-    // will work when there are less than 1000000 assignments in an assignment_group
-    return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
   }
 
   compareAssignmentModulePositions(a, b) {
@@ -1113,7 +1104,7 @@ class Gradebook {
     } else if (firstAssignmentModulePosition != null && secondAssignmentModulePosition == null) {
       return -1
     } else {
-      return this.compareAssignmentPositions(a, b)
+      return compareAssignmentPositions(a, b)
     }
   }
 
@@ -1161,7 +1152,7 @@ class Gradebook {
       } else if (bIndex != null) {
         return 1
       } else {
-        return this.wrapColumnSortFn(this.compareAssignmentPositions)(a, b)
+        return this.wrapColumnSortFn(compareAssignmentPositions)(a, b)
       }
     }
   }

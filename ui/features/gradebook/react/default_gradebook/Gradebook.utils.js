@@ -108,3 +108,12 @@ export function renderComponent(reactClass, mountPoint, props = {}, children = n
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, mountPoint)
 }
+
+export function compareAssignmentPositions(a, b) {
+  const diffOfAssignmentGroupPosition =
+    a.object.assignment_group.position - b.object.assignment_group.position
+  const diffOfAssignmentPosition = a.object.position - b.object.position
+  // order first by assignment_group position and then by assignment position
+  // will work when there are less than 1000000 assignments in an assignment_group
+  return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
+}
