@@ -205,6 +205,13 @@ describe "Rubrics API", type: :request do
         expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
       end
 
+      it "returns not found status if the rubric is soft deleted" do
+        @rubric.destroy!
+        rubric_api_call(@course)
+
+        assert_status(404)
+      end
+
       it "requires the user to have permission to manage rubrics" do
         @user = @student
         raw_rubric_call(@course)
@@ -498,6 +505,22 @@ describe "Rubrics API", type: :request do
       it "returns a rubric" do
         response = rubric_api_call(@account, {}, 'account')
         expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+      end
+
+      it "returns account level rubric with course level association" do
+        course_with_teacher(active_all: true)
+        assignment = @course.assignments.create
+        @rubric.associate_with(assignment, @course, :purpose => 'grading')
+        response = rubric_api_call(@course, {})
+
+        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+      end
+
+      it "does not return account level rubric for a course, if the course isn't using it" do
+        course_with_teacher(active_all: true)
+        rubric_api_call(@course, {})
+
+        assert_status(404)
       end
 
       it "requires the user to have permission to manage rubrics" do
