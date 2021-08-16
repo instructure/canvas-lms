@@ -225,6 +225,18 @@ describe('DiscussionFullPage', () => {
       await waitFor(() => expect(container.queryByTestId('discussion-topic-container')).toBeNull())
     })
 
+    it('hides discussion topic when unread is selected', async () => {
+      const {findByTestId, getByLabelText, getByText, queryByTestId} = setup()
+      expect(await findByTestId('discussion-topic-container')).toBeTruthy()
+
+      const simpleSelect = await getByLabelText('Filter by')
+      await fireEvent.click(simpleSelect)
+      const unread = await getByText('Unread')
+      await fireEvent.click(unread)
+
+      await waitFor(() => expect(queryByTestId('discussion-topic-container')).toBeNull())
+    })
+
     it('does not hide discussion topic when single character search term is present', async () => {
       const container = setup()
       expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()

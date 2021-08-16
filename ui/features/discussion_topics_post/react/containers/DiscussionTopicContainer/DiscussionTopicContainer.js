@@ -61,7 +61,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
 
-  const {searchTerm} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
+  const isSearch = searchTerm || filter === 'unread'
 
   let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
   let dueAt = ''
@@ -320,7 +321,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               </Text>
             </Alert>
           )}
-          {!searchTerm && (
+          {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
                 <Flex.Item>
