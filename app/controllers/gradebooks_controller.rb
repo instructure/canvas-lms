@@ -882,7 +882,8 @@ class GradebooksController < ApplicationController
           help_url: I18n.t(:'community.instructor_guide_speedgrader'),
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
-          media_comment_asset_string: @current_user.asset_string
+          media_comment_asset_string: @current_user.asset_string,
+          late_policy: @context.late_policy&.as_json(include_root: false)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

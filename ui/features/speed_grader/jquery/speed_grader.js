@@ -49,6 +49,12 @@ import {
   IconCheckMarkIndeterminateLine
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
+import {
+  styleSubmissionStatusPills,
+  determineSubmissionSelection,
+  makeSubmissionUpdateRequest
+} from '../SpeedGraderStatusMenuHelpers'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
@@ -1137,31 +1143,36 @@ function allowsReassignment(submission) {
   )
 }
 
-function styleSubmissionStatusPills() {
-  // Once we are ready to remove the flag for
-  // edit_submission_status_from_speedgrader, we should:
-  //
-  // 1. remove this function
-  // 2. add the following styling to speed_grader.scss:
-
-  // .submission-late-pill,
-  // .submission-missing-pill {
-  //   font-size: 1rem;
-  //   padding-left: 10px;
-  //   padding-right: 10px;
-  //   display: 'flex';
-  //   justifyContent: 'flex-end';
-  //   flex: '1';
-  // }
-
-  const pillMountPoints = document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill'
+function renderStatusMenu(submission) {
+  ReactDOM.render(
+    <SpeedGraderStatusMenu
+      key={submission.id}
+      lateSubmissionInterval={ENV.late_policy?.late_submission_interval || 'day'}
+      locale={ENV.LOCALE}
+      secondsLate={submission.seconds_late || 0}
+      selection={determineSubmissionSelection(submission)}
+      updateSubmission={updateSubmissionAndPageEffects}
+    />,
+    document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
   )
-  pillMountPoints.forEach(mountPoint => {
-    mountPoint.style.display = 'flex'
-    mountPoint.style.justifyContent = 'flex-end'
-    mountPoint.style.flex = '1'
-  })
+}
+
+function getLateAndMissingPills() {
+  return document.querySelectorAll('.submission-missing-pill, .submission-late-pill')
+}
+
+function updateSubmissionAndPageEffects(data) {
+  const submission = EG.currentStudent.submission
+
+  makeSubmissionUpdateRequest(submission, ENV.course_id, data)
+    .then(() => {
+      refreshGrades(() => {
+        EG.refreshSubmissionsToView()
+        styleSubmissionStatusPills(getLateAndMissingPills())
+        renderStatusMenu(submission)
+      })
+    })
+    .catch(showFlashError())
 }
 
 // Public Variables and Methods
@@ -2025,17 +2036,8 @@ EG = {
 
     const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
     if (mountPoint) {
-      styleSubmissionStatusPills()
-      ReactDOM.render(
-        <SpeedGraderStatusMenu
-          lateSubmissionInterval="day"
-          locale="en"
-          secondsLate={0}
-          selection="late"
-          updateSubmission={() => {}}
-        />,
-        mountPoint
-      )
+      styleSubmissionStatusPills(getLateAndMissingPills())
+      renderStatusMenu(this.currentStudent.submission)
     }
 
     const turnitinEnabled =
@@ -3127,18 +3129,24 @@ EG = {
 
     // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
     // depends on it being there. so mimic it.
+    let historyIndex =
+      student.submission?.submission_history?.findIndex(history => {
+        const historySubmission = history.submission || history
+        if (historySubmission.attempt == null) {
+          return false
+        }
+        return historySubmission.attempt === submission.attempt
+      }) || 0
+    historyIndex = historyIndex === -1 ? 0 : historyIndex
+
     if (typeof submission.submission_history === 'undefined') {
-      let historyIndex =
-        student.submission?.submission_history?.findIndex(history => {
-          const historySubmission = history.submission || history
-          if (historySubmission.attempt == null) {
-            return false
-          }
-          return historySubmission.attempt === submission.attempt
-        }) || 0
-      historyIndex = historyIndex === -1 ? 0 : historyIndex
       submission.submission_history = Array.from({length: historyIndex + 1})
       submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
+    }
+
+    // update the nested submission in submission_history if needed
+    if (student.submission?.submission_history?.[historyIndex]?.submission) {
+      submission.submission_history[historyIndex].submission = $.extend(true, {}, submission)
     }
 
     $.extend(true, student.submission, submission)

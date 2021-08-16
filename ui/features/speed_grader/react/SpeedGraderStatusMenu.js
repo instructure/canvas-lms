@@ -39,7 +39,12 @@ export default function SpeedGraderStatusMenu(props) {
       return
     }
 
-    props.updateSubmission(newSelection)
+    const data = newSelection === 'excused' ? {excuse: true} : {latePolicyStatus: newSelection}
+    if (newSelection === 'late') {
+      data.secondsLateOverride = props.secondsLate
+    }
+
+    props.updateSubmission(data)
   }
 
   const menuOptions = ['late', 'missing', 'excused', 'none'].map(status => (
