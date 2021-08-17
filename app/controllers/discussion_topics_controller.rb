@@ -638,11 +638,11 @@ class DiscussionTopicsController < ApplicationController
 
     @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
     @sequence_asset = @context_module_tag.try(:content)
+    add_discussion_or_announcement_crumb
+    add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
-      add_discussion_or_announcement_crumb
-      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
 
       if @sequence_asset
@@ -675,8 +675,6 @@ class DiscussionTopicsController < ApplicationController
       nil
     end
     @context.require_assignment_group rescue nil
-    add_discussion_or_announcement_crumb
-    add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
     if @topic.deleted?
       flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
