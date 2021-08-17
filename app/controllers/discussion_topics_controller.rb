@@ -652,7 +652,14 @@ class DiscussionTopicsController < ApplicationController
     end
 
     # Render updated Post UI if feature flag is enabled
-    if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
+    if @context.feature_enabled?(:react_discussions_post)
+      topics = groups_and_group_topics if @topic.for_group_discussion?
+      if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
+        redirect_params = { root_discussion_topic_id: @topic.id }
+        redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+        redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
+        return
+      end
 
       if @sequence_asset
         js_env({SEQUENCE: {
