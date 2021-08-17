@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {HTMLButtonElement, HTMLElement, MouseEventHandler} from 'react'
+
 // These are special webpack-processed imports that Typescript doesn't understand
 // by default. Declaring them as wildcard modules allows TS to recognize them as
 // bare-bones interfaces with the `any` type.
@@ -25,3 +27,35 @@ declare module '*.coffee'
 declare module '*.graphql'
 declare module '*.handlebars'
 declare module '*.svg'
+
+// InstUI v7 is missing type information for a lot of its props, so these suppress
+// TS errors on valid props until we upgrade to v8.
+interface MissingButtonProps {
+  onClick?: MouseEventHandler<HTMLButtonElement>
+}
+
+interface MissingElementProps {
+  onMouseEnter?: MouseEventHandler<HTMLElement>
+  onMouseLeave?: MouseEventHandler<HTMLElement>
+}
+
+interface MissingThemeableProps {
+  theme?: object
+}
+
+declare module '@instructure/ui-buttons' {
+  export interface BaseButtonProps extends MissingButtonProps {}
+  export interface ButtonProps extends MissingButtonProps {}
+  export interface CloseButtonProps extends MissingButtonProps {}
+  export interface CondensedButtonProps extends MissingButtonProps {}
+  export interface IconButtonProps extends MissingButtonProps {}
+  export interface ToggleButtonProps extends MissingButtonProps {}
+}
+
+declare module '@instructure/ui-toggle-details' {
+  export interface ToggleDetailsProps extends MissingThemeableProps {}
+}
+
+declare module '@instructure/ui-view' {
+  export interface ViewProps extends MissingElementProps, MissingThemeableProps {}
+}

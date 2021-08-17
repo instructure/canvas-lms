@@ -21,9 +21,26 @@ class PacePlansController < ApplicationController
   before_action :require_context
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_pace_plan, only: [:update, :show]
+  before_action :load_pace_plan, only: [:api_show, :update]
+
+  include Api::V1::Course
 
   def show
+    not_found unless @context.account.feature_enabled?(:pace_plans) && @context.settings[:enable_pace_plans]
+    return unless authorized_action(@context, @current_user, :manage_content)
+
+    @pace_plan = @context.pace_plans.primary.first
+    js_env({
+             BLACKOUT_DATES: [],
+             COURSE: course_json(@context, @current_user, session, [], nil),
+             ENROLLMENTS: enrollments_json(@context),
+             SECTIONS: sections_json(@context),
+             PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json
+           })
+    js_bundle :pace_plans
+  end
+
+  def api_show
     plans_json = PacePlanPresenter.new(@pace_plan).as_json
     render json: { pace_plan: plans_json }
   end
@@ -52,15 +69,40 @@ class PacePlansController < ApplicationController
 
   private
 
+  def enrollments_json(course)
+    json = course.all_real_student_enrollments.map do |enrollment|
+      {
+        id: enrollment.id,
+        user_id: enrollment.user_id,
+        course_id: enrollment.course_id,
+        section_id: enrollment.course_section_id,
+        full_name: enrollment.user.name,
+        sortable_name: enrollment.user.sortable_name,
+        start_at: enrollment.start_at
+      }
+    end
+    json.index_by {|h| h[:id]}
+  end
+
+  def sections_json(course)
+    json = course.course_sections.map do |section|
+      {
+        id: section.id,
+        course_id: section.course_id,
+        name: section.name,
+        start_date: section.start_at,
+        end_date: section.end_at
+      }
+    end
+    json.index_by {|h| h[:id]}
+  end
+
   def authorize_action
     authorized_action(@context, @current_user, :manage_content)
   end
 
   def require_feature_flag
-    unless @context.account.feature_enabled?(:pace_plans) && @context.enable_pace_plans
-      render json: { message: 'Pace Plans feature flag is not enabled' },
-             status: :forbidden
-    end
+    not_found unless @context.account.feature_enabled?(:pace_plans) && @context.enable_pace_plans
   end
 
   def load_pace_plan

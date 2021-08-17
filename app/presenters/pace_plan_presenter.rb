@@ -40,6 +40,7 @@ class PacePlanPresenter
       published_at: pace_plan.published_at,
       root_account_id: pace_plan.root_account_id,
       modules: modules_json,
+      context_id: context_id,
       context_type: context_type
     }
   end
@@ -73,6 +74,10 @@ class PacePlanPresenter
         published: module_item.published?
       }
     end
+  end
+
+  def context_id
+    pace_plan.user_id || pace_plan.course_section_id || pace_plan.course_id
   end
 
   def context_type

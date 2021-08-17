@@ -45,6 +45,7 @@ describe PacePlanPresenter do
       formatted_plan = PacePlanPresenter.new(@pace_plan).as_json
 
       expect(formatted_plan[:id]).to eq(@pace_plan.id)
+      expect(formatted_plan[:context_id]).to eq(@pace_plan.course_id)
       expect(formatted_plan[:context_type]).to eq('Course')
       expect(formatted_plan[:course_id]).to eq(@pace_plan.course_id)
       expect(formatted_plan[:course_section_id]).to eq(@pace_plan.course_section_id)

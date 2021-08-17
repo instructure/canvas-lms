@@ -142,15 +142,8 @@ export default class ProficiencyRating extends React.Component {
   errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
-    const {
-      color,
-      description,
-      descriptionError,
-      disableDelete,
-      mastery,
-      points,
-      pointsError
-    } = this.props
+    const {color, description, descriptionError, disableDelete, mastery, points, pointsError} =
+      this.props
     return (
       <Table.Row>
         <Table.Cell textAlign="center">

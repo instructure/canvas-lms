@@ -456,6 +456,8 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    get 'pace_plans' => 'pace_plans#show'
+
     post 'collapse_all_modules' => 'context_modules#toggle_collapse_all'
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'offline_web_exports' => 'courses#offline_web_exports'
@@ -2353,7 +2355,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :pace_plans) do
       post 'courses/:course_id/pace_plans', action: :create
-      get 'courses/:course_id/pace_plans/:id', action: :show
+      get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
     end
   end

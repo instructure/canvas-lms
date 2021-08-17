@@ -1729,7 +1729,7 @@ describe CoursesController do
       end
 
       describe "update" do
-        
+
         it "syncs enrollments if setting is set" do
           progress = double('Progress').as_null_object
           allow(Progress).to receive(:new).and_return(progress)
@@ -1757,9 +1757,9 @@ describe CoursesController do
           @course.save!
 
           get 'update', params: {
-            :id => @course.id, 
+            :id => @course.id,
             :course => {
-              homeroom_course_id: '17', 
+              homeroom_course_id: '17',
               sync_enrollments_from_homeroom: '1'
             }
           }
