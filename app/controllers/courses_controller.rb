@@ -3572,12 +3572,14 @@ class CoursesController < ApplicationController
       )
     end
 
+    # we always output the role in the JSON, but we need it now in case we're
+    # running the condition below
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :role)
     # these are all duplicated in the params[:state] block above in SQL. but if
     # used the cached ones, or we added include_observed, we have to re-run them
     # in pure ruby
     if include_observed || !params[:state]
       if params[:enrollment_role]
-        ActiveRecord::Associations::Preloader.new.preload(enrollments, :role)
         enrollments.reject! { |e| e.role.name != params[:enrollment_role] }
       elsif params[:enrollment_role_id]
         enrollments.reject! { |e| e.role_id != params[:enrollment_role_id].to_i }
