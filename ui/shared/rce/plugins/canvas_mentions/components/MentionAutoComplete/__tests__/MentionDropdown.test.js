@@ -24,11 +24,6 @@ import tinymce from 'tinymce'
 import getPosition from '../getPosition'
 import {ARIA_ID_TEMPLATES} from '../../../constants'
 import {nanoid} from 'nanoid'
-import {handlers, MentionMockUsers} from '../graphql/mswHandlers'
-import {mswClient} from '../../../../../../msw/mswClient'
-import {mswServer} from '../../../../../../msw/mswServer'
-import {ApolloProvider} from 'react-apollo'
-import {graphql} from 'msw'
 
 const mockedEditor = {
   editor: {
@@ -38,21 +33,93 @@ const mockedEditor = {
 
 jest.mock('../getPosition')
 
-describe('Mention Dropdown', () => {
-  const server = mswServer(handlers)
+jest.mock('@apollo/react-hooks', () => {
+  const data = {
+    legacyNode: {
+      id: 'Vxb',
+      mentionableUsersConnection: {
+        nodes: [
+          {
+            _id: 'Aa',
+            id: 1,
+            name: 'Jeffrey Johnson',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ab',
+            id: 2,
+            name: 'Matthew Lemon',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ac',
+            id: 3,
+            name: 'Rob Orton',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ad',
+            id: 4,
+            name: 'Davis Hyer',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ae',
+            id: 5,
+            name: 'Drake Harper',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Af',
+            id: 6,
+            name: 'Omar Soto-Fortuño',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ag',
+            id: 7,
+            name: 'Chawn Neal',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ah',
+            id: 8,
+            name: 'Mauricio Ribeiro',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Ai',
+            id: 9,
+            name: 'Caleb Guanzon',
+            __typename: 'MessageableUser'
+          },
+          {
+            _id: 'Aj',
+            id: 10,
+            name: 'Jason Gillett',
+            __typename: 'MessageableUser'
+          }
+        ],
+        __typename: 'MessageableUserConnection'
+      },
+      __typename: 'Discussion'
+    }
+  }
 
+  return {
+    __esModule: true,
+    useQuery: () => ({data})
+  }
+})
+
+describe('Mention Dropdown', () => {
   beforeAll(() => {
     getPosition.mockImplementation(() => {
       return {top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0}
     })
-
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
   })
 
   beforeEach(() => {
-    mswClient.cache.reset()
     getPosition.mockClear()
     const editor = new FakeEditor()
     editor.getParam = () => {
@@ -63,21 +130,10 @@ describe('Mention Dropdown', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-    server.resetHandlers()
-  })
-
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   const setup = props => {
-    return render(
-      <ApolloProvider client={mswClient}>
-        <MentionDropdown editor={mockedEditor} {...props} />
-      </ApolloProvider>
-    )
+    return render(<MentionDropdown editor={mockedEditor} {...props} />)
   }
 
   describe('Rendering', () => {
@@ -115,7 +171,7 @@ describe('Mention Dropdown', () => {
   })
 
   describe('Callbacks', () => {
-    it.skip('should call onFocusedUserChangeMock when user changes', async () => {
+    it('should call onFocusedUserChangeMock when user changes', async () => {
       const onFocusedUserChangeMock = jest.fn()
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock
@@ -146,44 +202,6 @@ describe('Mention Dropdown', () => {
       fireEvent.click(menuItems[1].querySelector('li'))
 
       expect(spy).toHaveBeenCalled()
-    })
-  })
-
-  describe('graphql', () => {
-    it.skip('should have 10 mentionable users using default handler', async () => {
-      const {getAllByTestId} = setup()
-
-      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
-    })
-
-    it.skip('should have 4 mentionable users using custom handler', async () => {
-      server.use(
-        graphql.query('GetMentionableUsers', (req, res, ctx) => {
-          return res(
-            ctx.data({
-              legacyNode: {
-                id: 'Vxb',
-                mentionableUsersConnection: {
-                  nodes: MentionMockUsers.slice(0, 4),
-                  __typename: 'MessageableUserConnection'
-                },
-                __typename: 'Discussion'
-              }
-            })
-          )
-        })
-      )
-
-      const {getAllByTestId} = setup()
-
-      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(4))
-    })
-
-    it.skip('should render name', async () => {
-      const {getByText} = setup()
-
-      await waitFor(() => expect(getByText('Rob Orton')).toBeTruthy())
-      await waitFor(() => expect(getByText('Caleb Guanzon')).toBeTruthy())
     })
   })
 })
