@@ -30,7 +30,7 @@ module AssignmentOverrideApplicator
 
     # this is a cheap hack to avoid unnecessary work (especially stupid
     # simply_versioned queries)
-    if assignment_or_quiz.has_no_overrides
+    if user.nil? || assignment_or_quiz.has_no_overrides
       return assignment_or_quiz if skip_clone
       return setup_overridden_clone(assignment_or_quiz)
     end
