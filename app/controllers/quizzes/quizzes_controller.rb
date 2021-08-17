@@ -825,7 +825,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def get_submission
-    submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first
+    submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first if @current_user
     if !@current_user || (params[:preview] && can_preview?)
       user_code = temporary_user_code
       submission = @quiz.quiz_submissions.where(temporary_user_code: user_code).first
