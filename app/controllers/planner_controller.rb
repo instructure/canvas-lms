@@ -128,7 +128,7 @@ class PlannerController < ApplicationController
                              planner_overrides_meta_key,
                              page,
                              params[:filter],
-                             default_opts,
+                             Digest::MD5.hexdigest(default_opts.to_s),
                              contexts_cache_key].cache_key
       if stale?(etag: composite_cache_key, template: false)
         items_response = Rails.cache.fetch(composite_cache_key, expires_in: 1.week) do
@@ -243,20 +243,20 @@ class PlannerController < ApplicationController
 
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)).
-                    unread_for(@user),
+                    @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
+                    .unread_for(@user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end
 
   def unread_assignment_collection
-    assign_scope = Assignment.active.where(:context_type => "Course", :context_id => @local_course_ids)
-    disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids).
-      where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
-    scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted").
-      # we can assume content participations because they're automatically created when comments
-      # are made - see SubmissionComment#update_participation
-      joins(submissions: :content_participations).
-      where(content_participations: {user_id: @user, workflow_state: 'unread'}).union(
+    assign_scope = Assignment.active.where(context_type: "Course", context_id: @local_course_ids)
+    disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids)
+      .where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
+    # we can assume content participations because they're automatically created when comments
+    # are made - see SubmissionComment#update_participation
+    scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted")
+      .joins(submissions: :content_participations)
+      .where(content_participations: {user_id: @user, workflow_state: 'unread'}).union(
         assign_scope.where(id: disc_assign_ids)
       ).due_between_for_user(start_date, end_date, @user)
     item_collection('unread_assignment_submissions',
@@ -265,8 +265,8 @@ class PlannerController < ApplicationController
   end
 
   def planner_note_collection
-    user = @user_ids.presence || @user
-    shard = @user_ids.present? ? Shard.shard_for(@user_ids.first) : @user.shard # TODO fix to span multiple shards if needed
+    user = @local_user_ids.presence || @user
+    shard = @local_user_ids.present? ? Shard.shard_for(@local_user_ids.first) : @user.shard # TODO: fix to span multiple shards if needed
     course_ids = @course_ids.map{|id| Shard.relative_id_for(id, @user.shard, shard)}
     course_ids += [nil] if @user_ids.present?
     item_collection('planner_notes',
@@ -325,34 +325,79 @@ class PlannerController < ApplicationController
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'
+
+    # for specs, that do multiple requests in a single spec, we have to reset these ivars
+    @course_ids = @group_ids = @user_ids = nil
     if params[:context_codes].present?
-      @contexts = Context.from_context_codes(Array(params[:context_codes]))
-      perms = public_access? ? [:read, :read_syllabus] : [:read]
-      render_json_unauthorized and return false unless @contexts.all? { |c| c.grants_any_right?(@user, session, *perms) }
-      (@user&.shard || Shard.current).activate do
-        @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
-        @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
+      context_ids = ActiveRecord::Base.parse_asset_string_list(Array(params[:context_codes]))
+      @course_ids = context_ids['Course'] || []
+      @group_ids = context_ids['Group'] || []
+      @user_ids = context_ids['User'] || []
+      # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
+      # objects
+      @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
+    end
+ 
+    # make IDs relative to the user's shard
+    @course_ids, @group_ids, @user_ids = transpose_ids(Shard.current, @user.shard) if @user
+
+    (@user&.shard || Shard.current).activate do
+      original_course_ids = @course_ids || []
+      original_group_ids = @group_ids || []
+      original_user_ids = @user_ids || []
+      if @user
+        @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded: include_concluded)
+        @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
+        @user_ids ||= [@user.id]
+        @user_ids &= [@user.id]
+      else
+        @course_ids = @group_ids = @user_ids = []
       end
-      @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)
-    else
-      @course_ids = @user.course_ids_for_todo_lists(:student, **default_opts.slice(:course_ids, :include_concluded))
-      @group_ids = @user.group_ids_for_todo_lists(**default_opts.slice(:group_ids))
-      @user_ids = [@user.id]
+
+      # fetch all the objects they requested that weren't immediately available;
+      # we need to do a deep permissions check on them
+      contexts_to_check_permissions = ActiveRecord::Base.find_all_by_asset_string(
+        'Course' => original_course_ids - @course_ids,
+        'Group' => original_group_ids - @group_ids,
+        'User' => original_user_ids - @user_ids
+      )
+
+      perms = public_access? ? [:read, :read_syllabus] : [:read]
+
+      return render_json_unauthorized unless contexts_to_check_permissions.all? do |context|
+        next unless context.grants_any_right?(@user, session, *perms)
+
+        # as we verify access to the missing requested objects, we add them back in to
+        # the valid array
+        array = case context
+                when Course then @course_ids
+                when Group then @group_ids
+                when User then @user_ids
+        end
+        array << context.id
+      end
     end
 
-    # get ids relative to the current shard, not the user's
-    @local_course_ids = @user ? @course_ids.map{|id| Shard.relative_id_for(id, @user.shard, Shard.current)} : @course_ids
-    @local_group_ids = @user ? @group_ids.map{|id| Shard.relative_id_for(id, @user.shard, Shard.current)} : @group_ids
+    @local_course_ids, @local_group_ids, @local_user_ids = transpose_ids(@user&.shard || Shard.current, Shard.current)
 
-    @context_codes = @course_ids.map{|id| "course_#{id}"} || []
-    @context_codes += @group_ids.map{|id| "group_#{id}"}
-    @context_codes += @user_ids.map{|id| "user_#{id}"}
+    @context_codes = @course_ids.map { |id| "course_#{id}" }
+    @context_codes.concat(@group_ids.map { |id| "group_#{id}" })
+    @context_codes.concat(@user_ids.map { |id| "user_#{id}" })
   end
 
   def contexts_cache_key
-    [Context.last_updated_at(Course, @local_course_ids),
-     Context.last_updated_at(User, @user_ids),
-     Context.last_updated_at(Group, @local_group_ids)].compact.max || Time.zone.today
+    (Context.last_updated_at(Course => @local_course_ids,
+                             User => @local_user_ids,
+                             Group => @local_group_ids) ||
+      Time.zone.now.beginning_of_day).to_i
+  end
+
+  def transpose_ids(source, target)
+    return [@course_ids, @group_ids, @user_ids] if source == target
+
+    [@course_ids&.map { |id| Shard.relative_id_for(id, source, target) },
+     @group_ids&.map { |id| Shard.relative_id_for(id, source, target) },
+     @user_ids&.map { |id| Shard.relative_id_for(id, source, target) }]
   end
 
   def default_opts

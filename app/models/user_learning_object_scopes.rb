@@ -61,10 +61,14 @@ module UserLearningObjectScopes
     published_visible_assignments
   end
 
+  # everything is relative to the user's shard
   def course_ids_for_todo_lists(permission_type, course_ids: nil, contexts: nil, include_concluded: false)
+    return [] if course_ids&.empty?
+    return [] if contexts&.empty?
+
     shard.activate do
-      course_ids_result = GuardRail.activate(:secondary) do
-        if include_concluded
+      GuardRail.activate(:secondary) do
+        result = if include_concluded
           all_course_ids
         else
           case permission_type
@@ -74,20 +78,24 @@ module UserLearningObjectScopes
             manageable_enrollments_by_permission(permission_type).map(&:course_id)
           end
         end
-      end
 
-      course_ids_result &= course_ids if course_ids
-      course_ids_result &= Array.wrap(contexts).select{|c| c.is_a? Course}.map(&:id) if contexts
-      course_ids_result
+       result &= course_ids if course_ids
+       result &= Array.wrap(contexts).select { |c| c.is_a?(Course) }.map(&:id) if contexts
+       result
+      end
     end
   end
 
+  # everything is relative to the user's shard
   def group_ids_for_todo_lists(group_ids: nil, contexts: nil)
+    return [] if group_ids&.empty?
+    return [] if contexts&.empty?
+
     shard.activate do
-      group_ids_result = cached_current_group_memberships_by_date.map(&:group_id)
-      group_ids_result &= group_ids if group_ids
-      group_ids_result &= contexts.select{|g| g.is_a? Group}.map(&:id) if contexts
-      group_ids_result
+      result = cached_current_group_memberships_by_date.map(&:group_id)
+      result &= group_ids if group_ids
+      result &= Array.wrap(contexts).select { |g| g.is_a?(Group) }.map(&:id) if contexts
+      result
     end
   end
 

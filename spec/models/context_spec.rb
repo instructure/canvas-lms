@@ -73,31 +73,6 @@ describe Context do
     end
   end
 
-  context "from_context_codes" do
-    it "should give contexts for all context_codes sent" do
-      account = Account.create!
-      user = User.create!
-      course = Course.create!
-      course2 = Course.create!
-      group = Group.create!(context: account)
-      context_codes = [account.asset_string, course.asset_string, course2.asset_string, group.asset_string, user.asset_string]
-      expect(Context.from_context_codes(context_codes)).to match_array [account, course, course2, group, user]
-    end
-
-    it "should skip invalid context types" do
-      assignment_model
-      course = Course.create!
-      context_codes = [@assignment.asset_string, course.asset_string, "thing_1"]
-      expect(Context.from_context_codes(context_codes)).to eq [course]
-    end
-
-    it "should skip invalid context ids" do
-      account = Account.default
-      context_codes = ["course_hi", "group_0", "user_your_mom", "account_-1", account.asset_string]
-      expect(Context.from_context_codes(context_codes)).to eq [account]
-    end
-  end
-
   context "find_asset_by_asset_string" do
     it "should find a valid assignment" do
       assignment_model
@@ -384,24 +359,22 @@ describe Context do
   describe "last_updated_at" do
     before :once do
       @course1 = Course.create!(name: "course1", updated_at: 1.year.ago)
-      @course2 = Course.create!(name: "course2", updated_at: 1.day.ago)
+      @course2 = Course.create!(name: "course2", updated_at: 1.week.ago)
       @user1 = User.create!(name: "user1", updated_at: 1.year.ago)
       @user2 = User.create!(name: "user2", updated_at: 1.day.ago)
-      @group1 = Account.default.groups.create!(:name => "group1", updated_at: 1.year.ago)
-      @group2 = Account.default.groups.create!(:name => "group2", updated_at: 1.day.ago)
-      @account1 = Account.create!(name: "account1", updated_at: 1.year.ago)
-      @account2 = Account.create!(name: "account2", updated_at: 1.day.ago)
     end
 
     it "returns the latest updated_at date for a given set of context ids" do
-      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to eq @course2.updated_at
-      expect(Context.last_updated_at(User, [@user1.id, @user2.id])).to eq @user2.updated_at
-      expect(Context.last_updated_at(Group, [@group1.id, @group2.id])).to eq @group2.updated_at
-      expect(Context.last_updated_at(Account, [@account1.id, @account2.id])).to eq @account2.updated_at
+      expect(Context.last_updated_at(Course => [@course1.id, @course2.id])).to eq @course2.updated_at
     end
 
     it "raises an error if the class passed is not a context type" do
       expect {Context.last_updated_at(Hash, [1])}.to raise_error ArgumentError
+    end
+
+    it "returns the latest updated_at among multiple classes" do
+      expect(Context.last_updated_at(Course => [@course1.id, @course2.id],
+        User => [@user1.id, @user2.id])).to eq @user2.updated_at
     end
 
     it "returns nil when no updated_at is found for the given contexts" do
@@ -410,7 +383,7 @@ describe Context do
       PostPolicy.where(course_id: cs).delete_all
       Course.where(id: cs).delete_all
 
-      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to be_nil
+      expect(Context.last_updated_at(Course => [@course1.id, @course2.id])).to be_nil
     end
   end
 

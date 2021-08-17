@@ -1018,23 +1018,23 @@ class ApplicationController < ActionController::Base
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
-        course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        unless course_ids.empty?
-          courses = Course.
-            shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-            joins(enrollments: :enrollment_state).
-            merge(enrollment_scope.except(:joins)).
-            where(id: course_ids)
+        course_ids = only_contexts['Course']
+        if course_ids.present?
+          courses = Course
+            .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+            .joins(enrollments: :enrollment_state)
+            .merge(enrollment_scope.except(:joins))
+            .where(id: course_ids)
         end
         if include_groups
-          group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          include_groups = !group_ids.empty?
+          group_ids = only_contexts['Group']
+          include_groups = group_ids.present?
         end
       else
-        courses = Course.
-          shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-          joins(enrollments: :enrollment_state).
-          merge(enrollment_scope.except(:joins))
+        courses = Course
+          .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+          .joins(enrollments: :enrollment_state)
+          .merge(enrollment_scope.except(:joins))
       end
 
       groups = []
