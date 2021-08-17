@@ -684,18 +684,7 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    unless @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
-      return render_unauthorized_action unless @current_user
-      respond_to do |format|
-        if @topic.is_announcement
-          flash[:error] = t 'You do not have access to the requested announcement.'
-          format.html { redirect_to named_context_url(@context, :context_announcements_url) }
-        else
-          flash[:error] = t 'You do not have access to the requested discussion.'
-          format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
-        end
-      end
-    else
+    if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
       @headers = !params[:headless]
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
@@ -859,6 +848,17 @@ class DiscussionTopicsController < ApplicationController
 
             render stream: can_stream_template?
           end
+        end
+      end
+    else
+      return render_unauthorized_action unless @current_user
+      respond_to do |format|
+        if @topic.is_announcement
+          flash[:error] = t 'You do not have access to the requested announcement.'
+          format.html { redirect_to named_context_url(@context, :context_announcements_url) }
+        else
+          flash[:error] = t 'You do not have access to the requested discussion.'
+          format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
         end
       end
     end
