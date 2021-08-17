@@ -382,7 +382,10 @@ export const DiscussionThreadContainer = props => {
                     onCancel={() => setIsEditing(false)}
                     isIsolatedView={false}
                     editor={props.discussionEntry.editor}
-                    isUnread={!props.discussionEntry.read}
+                    isUnread={
+                      !props.discussionEntry.read ||
+                      !!props.discussionEntry?.rootEntryParticipantCounts?.unreadCount
+                    }
                     isForcedRead={props.discussionEntry.forcedReadState}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt

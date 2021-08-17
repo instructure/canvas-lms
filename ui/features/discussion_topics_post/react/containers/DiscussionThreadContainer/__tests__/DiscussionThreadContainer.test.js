@@ -275,6 +275,52 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
+  describe('Unread Badge', () => {
+    describe('should find unread badge', () => {
+      it('root is read and child reply is unread', () => {
+        const container = setup(defaultProps())
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+
+      it('root is unread and child reply is unread', () => {
+        const container = setup(defaultProps({discussionEntryOverrides: {read: false}}))
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+      it('root is unread and child is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              read: false,
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+    })
+
+    describe('should not find unread badge', () => {
+      it('root is read and child reply is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.queryByTestId('is-unread')).toBeNull()
+      })
+    })
+  })
+
   describe('Expand-Button', () => {
     it('should render expand when nested replies are present', () => {
       const {getByTestId} = setup(defaultProps())
