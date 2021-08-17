@@ -46,7 +46,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
 
   useEffect(() => {
     const debouncer = setTimeout(() => {
-      setDebouncedInputText(inputText)
+      setDebouncedInputText(inputText?.trim())
     }, 500)
 
     return () => {

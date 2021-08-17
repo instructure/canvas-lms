@@ -181,7 +181,7 @@ export const onKeyUp = e => {
   if (e.which === KEY_CODES.enter) return
 
   if (inMentionsMarker(editor)) {
-    broadcastMessage(inputChangeMessage(editor.selection.getNode().innerHTML), [
+    broadcastMessage(inputChangeMessage(editor.selection.getNode().textContent), [
       editor.getWin(),
       window
     ])
