@@ -647,7 +647,7 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
+    if (can_read_and_visible = @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user))
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
     end
 
@@ -680,7 +680,7 @@ class DiscussionTopicsController < ApplicationController
     @assignment = @topic.for_assignment? ? AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user) : nil
     @context.require_assignment_group rescue nil
 
-    if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
+    if can_read_and_visible
       @headers = !params[:headless]
       @unlock_at = @topic.available_from_for(@current_user)
       topics = groups_and_group_topics if @topic.for_group_discussion?
