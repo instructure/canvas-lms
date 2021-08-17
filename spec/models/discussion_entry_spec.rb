@@ -119,7 +119,7 @@ describe DiscussionEntry do
     before :once do
       course_with_teacher(active_all: true, name: 'captain america', short_name: 'steve')
       @entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
-      @entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
+      @entry.message = "<div data-discussion-reply-preview='23'>this is a reply preview</div><p>only this should stay</p>"
       @entry.save!
     end
 
@@ -143,6 +143,11 @@ describe DiscussionEntry do
       entry.destroy
       expect(entry.quoted_reply_html).not_to include("this is a message")
       expect(entry.quoted_reply_html).to include("Deleted by steve")
+    end
+
+    it 'should truncate message' do
+      entry = topic.discussion_entries.create!(user: student.user, message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin neque purus, mattis accumsan ligula ac, pharetra auctor purus. Ut pretium vulputate nunc, a feugiat elit dignissim eget. Aenean imperdiet nec orci elementum congue. Quisque lacus metus, tempus a sem vel, varius aliquet metus. Vestibulum risus dolor, pellentesque at tincidunt porttitor, pretium nec dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla vel risus non metus lobortis tempor at a ex. Sed vel turpis id nisl facilisis elementum. Donec nisi risus, ornare at aliquet id, mattis non diam.")
+      expect(entry.quoted_reply_html).not_to include("nunc")
     end
   end
 
