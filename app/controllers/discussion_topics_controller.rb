@@ -641,6 +641,12 @@ class DiscussionTopicsController < ApplicationController
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
+    if @topic.deleted?
+      flash[:notice] = I18n.t :deleted_topic_notice, "That topic has been deleted"
+      redirect_to named_context_url(@context, :context_discussion_topics_url)
+      return
+    end
+
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
@@ -667,20 +673,9 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    parent_id = params[:parent_id]
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
-    @assignment = if @topic.for_assignment?
-      AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
-    else
-      nil
-    end
+    @assignment = @topic.for_assignment? ? AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user) : nil
     @context.require_assignment_group rescue nil
-
-    if @topic.deleted?
-      flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
-      redirect_to named_context_url(@context, :context_discussion_topics_url)
-      return
-    end
 
     if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
       @headers = !params[:headless]
