@@ -527,7 +527,7 @@ module ApplicationHelper
     return [] if contexts.empty?
     cached_tools = Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
       tools = ContextExternalTool.shard(@context.shard).active.
-          having_setting('editor_button').polymorphic_where(context: contexts)
+          having_setting('editor_button').where(context: contexts)
       tools.sort_by(&:id)
     end
     ContextExternalTool.shard(@context.shard).editor_button_json(cached_tools, @context, @current_user, session)

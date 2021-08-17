@@ -2143,9 +2143,9 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      instances = instances.polymorphic_where('stream_item_instances.context' => opts[:contexts])
+      instances = instances.where(context: opts[:contexts])
     elsif opts[:context]
-      instances = instances.where(:context_type => opts[:context].class.base_class.name, :context_id => opts[:context])
+      instances = instances.where(context: opts[:context])
     elsif opts[:only_active_courses]
       instances = instances.where(:context_type => "Course", :context_id => self.participating_course_ids)
     end

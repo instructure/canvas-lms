@@ -1200,20 +1200,6 @@ ActiveRecord::Relation.class_eval do
     raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
   end
 
-  def polymorphic_where(args)
-    raise ArgumentError unless args.length == 1
-
-    column = args.first.first
-    values = Array(args.first.last)
-    original_length = values.length
-    values = values.compact
-    raise ArgumentError, "need to call polymorphic_where with at least one object" if values.empty?
-
-    sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
-    sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
-    where(sql, *values.map { |value| [value, value.class.base_class.name] }.flatten)
-  end
-
   def not_recently_touched
     scope = self
     if((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)

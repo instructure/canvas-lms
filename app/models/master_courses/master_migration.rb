@@ -241,7 +241,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     return false unless obj
     return true if last_export_at.nil?
     if obj.is_a?(LearningOutcome) && obj.context_type == "Account"
-      link = self.master_template.course.learning_outcome_links.polymorphic_where(:content => obj).first
+      link = self.master_template.course.learning_outcome_links.where(content: obj).first
       obj = link if link # export the outcome if it's a new link
     end
     obj.updated_at.nil? || obj.updated_at >= last_export_at

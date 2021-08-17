@@ -325,7 +325,7 @@ class DiscussionTopic < ActiveRecord::Base
       # prevent future syncs from recreating the deleted assignment
       if is_child_content?
         old_assignment.submission_types = 'none'
-        own_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).take
+        own_tag = MasterCourses::ChildContentTag.where(content: self).take
         own_tag.child_subscription.create_content_tag_for!(old_assignment, :downstream_changes => ['workflow_state']) if own_tag
       end
     elsif self.assignment && @saved_by != :assignment && !self.root_topic_id

@@ -374,10 +374,10 @@ class PlannerController < ApplicationController
   def wiki_page_todo_scopes
     scopes = []
     Shard.partition_by_shard(@pub_contexts) do |contexts|
-      scopes << WikiPage.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).active
+      scopes << WikiPage.where(todo_date: @start_date..@end_date, context: contexts).active
     end
     Shard.partition_by_shard(@unpub_contexts) do |contexts|
-      scopes << WikiPage.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).not_deleted
+      scopes << WikiPage.where(todo_date: @start_date..@end_date, context: contexts).not_deleted
     end
     scopes
   end
@@ -386,10 +386,10 @@ class PlannerController < ApplicationController
   def discussion_topic_todo_scopes
     scopes = []
     Shard.partition_by_shard(@pub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).published
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).published
     end
     Shard.partition_by_shard(@unpub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).active
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).active
     end
     scopes
   end

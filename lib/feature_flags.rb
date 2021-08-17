@@ -91,7 +91,7 @@ module FeatureFlags
         result = RequestCache.cache("feature_flag", self, feature) do
           feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
             # keep have the context association unloaded in case we can't marshal it
-            FeatureFlag.where(feature: feature.to_s).polymorphic_where(:context => self).first
+            FeatureFlag.where(feature: feature.to_s, context: self).first
           end
         end
         result.context = self if result

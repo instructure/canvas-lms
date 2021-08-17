@@ -208,8 +208,8 @@ class AssetUserAccess < ActiveRecord::Base
     correct_context = self.get_correct_context(context, accessed_asset)
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
     GuardRail.activate(:secondary) do
-      @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code]).
-        polymorphic_where(context: correct_context).first_or_initialize
+      @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code],
+        context: correct_context).first_or_initialize
     end
     accessed_asset[:level] ||= 'view'
     @access.log correct_context, accessed_asset
