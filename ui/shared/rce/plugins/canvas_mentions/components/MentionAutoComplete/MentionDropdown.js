@@ -39,10 +39,12 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
   const [inputText, setInputText] = useState('')
   const [debouncedInputText, setDebouncedInputText] = useState('')
   const [shouldExit, setShouldExit] = useState(false)
+  const [noResults, setNoResults] = useState(false)
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
   const filteredOptionsRef = useRef([])
+  const noResultsRef = useRef(noResults)
 
   useEffect(() => {
     const debouncer = setTimeout(() => {
@@ -135,6 +137,12 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
   }
 
   const handleInputChange = value => {
+    // If no results then exit
+    if (noResultsRef.current) {
+      onExited(editor, false)
+      return
+    }
+
     getXYPosition()
     setInputText(value)
   }
@@ -158,6 +166,18 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
         break
     }
   }
+
+  // Prepare for exiting naturally
+  useEffect(() => {
+    // Check that last character isn't space and we have results
+    if (mentionData.length === 0 && inputText.length > 0) {
+      setNoResults(true)
+      noResultsRef.current = true
+    } else if (mentionData.length > 0) {
+      setNoResults(false)
+      noResultsRef.current = false
+    }
+  }, [inputText, mentionData])
 
   // Make us maintain a focused user when open
   useEffect(() => {
