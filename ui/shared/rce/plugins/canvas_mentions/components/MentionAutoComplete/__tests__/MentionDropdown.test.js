@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import MentionDropdown from '../MentionDropdown'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
@@ -171,16 +171,16 @@ describe('Mention Dropdown', () => {
   })
 
   describe('Callbacks', () => {
-    it('should call onFocusedUserChangeMock when user changes', async () => {
+    it('should call onFocusedUserChangeMock when user changes', () => {
       const onFocusedUserChangeMock = jest.fn()
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock
       })
-      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
+      expect(getAllByTestId('mention-dropdown-item').length).toBe(10)
 
       expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
 
-      const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
+      const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[3].querySelector('li'))
 
       // Expect 2 re-renders per click totalling 4
@@ -189,16 +189,16 @@ describe('Mention Dropdown', () => {
   })
 
   describe('accessibility', () => {
-    it.skip('should call ARIA_ID_TEMPLATES and pass to callback', async () => {
+    it('should call ARIA_ID_TEMPLATES and pass to callback', async () => {
       const onActiveDescendantChangeMock = jest.fn()
       const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
       const {getAllByTestId} = setup({
         onActiveDescendantChange: onActiveDescendantChangeMock
       })
 
-      await waitFor(() => expect(getAllByTestId('mention-dropdown-item').length).toBe(10))
+      expect(getAllByTestId('mention-dropdown-item').length).toBe(10)
 
-      const menuItems = await waitFor(() => getAllByTestId('mention-dropdown-item'))
+      const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[1].querySelector('li'))
 
       expect(spy).toHaveBeenCalled()
