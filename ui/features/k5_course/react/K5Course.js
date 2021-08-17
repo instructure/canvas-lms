@@ -280,6 +280,7 @@ export function K5Course({
   timeZone,
   canManage = false,
   canReadAsAdmin,
+  canReadAnnouncements,
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
@@ -422,7 +423,8 @@ export function K5Course({
     id,
     shortName: name,
     href: `/courses/${id}`,
-    canManage
+    canManage,
+    canReadAnnouncements
   })
 
   return (
@@ -500,6 +502,7 @@ K5Course.propTypes = {
   cardImageUrl: PropTypes.string,
   canManage: PropTypes.bool,
   canReadAsAdmin: PropTypes.bool.isRequired,
+  canReadAnnouncements: PropTypes.bool.isRequired,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,

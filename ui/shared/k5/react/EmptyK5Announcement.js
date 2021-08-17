@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!empty_homeroom_announcement'
 import React from 'react'
-import {string} from 'prop-types'
+import {string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
@@ -45,7 +45,7 @@ K5AddAnnouncementButton.propTypes = {
   courseName: string.isRequired
 }
 
-export default function EmptyK5Announcement({courseUrl, courseName}) {
+export default function EmptyK5Announcement({courseUrl, courseName, canReadAnnouncements}) {
   return (
     <View>
       <Heading level="h3" as="h2" margin="medium 0 small">
@@ -54,9 +54,13 @@ export default function EmptyK5Announcement({courseUrl, courseName}) {
         </Link>
       </Heading>
       <Text as="div">
-        {I18n.t('New announcements show up in this area. Create a new announcement now.')}
+        {canReadAnnouncements
+          ? I18n.t('New announcements show up in this area. Create a new announcement now.')
+          : I18n.t('You do not have permission to view announcements in this course.')}
       </Text>
-      <K5AddAnnouncementButton courseUrl={courseUrl} courseName={courseName} />
+      {canReadAnnouncements && (
+        <K5AddAnnouncementButton courseUrl={courseUrl} courseName={courseName} />
+      )}
       <PresentationContent>
         <hr />
       </PresentationContent>
@@ -66,5 +70,6 @@ export default function EmptyK5Announcement({courseUrl, courseName}) {
 
 EmptyK5Announcement.propTypes = {
   courseUrl: string.isRequired,
-  courseName: string.isRequired
+  courseName: string.isRequired,
+  canReadAnnouncements: bool.isRequired
 }

@@ -282,6 +282,7 @@ export const parseAnnouncementDetails = (announcement, course) => {
     courseName: course.shortName,
     courseUrl: course.href,
     canEdit: course.canManage,
+    canReadAnnouncements: course.canReadAnnouncements,
     published: course.published
   }
   if (announcement) {

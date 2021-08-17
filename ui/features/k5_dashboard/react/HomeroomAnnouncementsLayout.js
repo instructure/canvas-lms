@@ -44,6 +44,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
                 courseName={homeroom.courseName}
                 courseUrl={homeroom.courseUrl}
                 canEdit={homeroom.canEdit}
+                canReadAnnouncements={homeroom.canReadAnnouncements}
                 published={homeroom.published}
                 showCourseDetails
                 firstAnnouncement={homeroom.announcement}

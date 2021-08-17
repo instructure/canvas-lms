@@ -24,6 +24,7 @@ describe('EmptyK5Announcement', () => {
   const getProps = (overrides = {}) => ({
     courseName: "Mr. Smith's Homeroom 2",
     courseUrl: 'http://google.com/courseurl2',
+    canReadAnnouncements: true,
     ...overrides
   })
 
@@ -38,6 +39,13 @@ describe('EmptyK5Announcement', () => {
     const {getByText} = render(<EmptyK5Announcement {...getProps()} />)
     expect(
       getByText('New announcements show up in this area. Create a new announcement now.')
+    ).toBeInTheDocument()
+  })
+
+  it('shows permission related text when applicable', () => {
+    const {getByText} = render(<EmptyK5Announcement {...getProps({canReadAnnouncements: false})} />)
+    expect(
+      getByText('You do not have permission to view announcements in this course.')
     ).toBeInTheDocument()
   })
 

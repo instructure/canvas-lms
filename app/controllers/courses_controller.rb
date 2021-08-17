@@ -2104,6 +2104,7 @@ class CoursesController < ApplicationController
         @course_home_view ||= default_view
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
+        @course_home_view = "syllabus" if @context.elementary_homeroom_course? && !@context.grants_right?(@current_user, session, :read_announcements)
 
         course_env_variables = {}
         # env.COURSE variables that apply to both classic and k5 courses
@@ -2163,7 +2164,7 @@ class CoursesController < ApplicationController
         when 'syllabus'
           set_active_tab "syllabus"
           rce_js_env
-          add_crumb(t('#crumbs.syllabus', "Syllabus"))
+          add_crumb @context.elementary_enabled? ? t("Important Info") : t('#crumbs.syllabus', "Syllabus")
           @groups = @context.assignment_groups.active.order(
             :position,
             AssignmentGroup.best_unicode_collation_key('name')
@@ -2234,7 +2235,8 @@ class CoursesController < ApplicationController
             CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
             PERMISSIONS: {
               manage: @context.grants_right?(@current_user, session, :manage),
-              read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin)
+              read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
+              read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },
             STUDENT_PLANNER_ENABLED: planner_enabled?,
             TABS: @context.tabs_available(@current_user, course_subject_tabs: true),

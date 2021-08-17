@@ -65,11 +65,21 @@ describe "Announcements API", type: :request do
       expect(json['message']).to include 'Invalid context_codes'
     end
 
-    it "requires :read_announcements permission on all courses" do
-      random_course = Course.create!
-      api_call_as_user(@teacher, :get, "/api/v1/announcements",
-               @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{random_course.id}" ]),
-               {}, {}, { :expected_status => 401 })
+    it "filters out announcements with :read_announcements permission lacking" do
+      @account = Account.default
+      custom_role = custom_teacher_role('No Announcement Viewing')
+      @account.role_overrides.create!(role: custom_role, enabled: false, permission: :read_announcements)
+
+     course_with_teacher(active_all: true, user: @teacher, role: custom_role)
+
+      @other_course = @course
+      @other_course.announcements.create :title => "Announcement That Should Be Filtered", :message => '1'
+
+      context_codes = ["course_#{@course1.id}", "course_#{@course2.id}", "course_#{@other_course.id}"]
+      json = api_call_as_user @teacher, :get, "/api/v1/announcements",
+                              @params.merge(:context_codes => context_codes), {}, {},
+                              { :expected_status => 200 }
+      expect(json.length).to eq 6
     end
 
     it "returns announcements for the the surrounding 14 days by default" do

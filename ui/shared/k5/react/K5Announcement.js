@@ -77,6 +77,7 @@ export default function K5Announcement({
   courseUrl,
   published,
   canEdit,
+  canReadAnnouncements,
   showCourseDetails,
   firstAnnouncement
 }) {
@@ -323,7 +324,7 @@ export default function K5Announcement({
           <Text data-testid="no-recent-announcements" color="secondary" size="large">
             {I18n.t('No recent announcements')}
           </Text>
-          {canEdit && (
+          {canEdit && canReadAnnouncements && (
             <View as="div">
               <K5AddAnnouncementButton courseName={courseName} courseUrl={courseUrl} />
             </View>
@@ -363,7 +364,13 @@ export default function K5Announcement({
 
   // if there are no announcements at all, show teachers something
   if (canEdit && noAnnouncementsAtAll()) {
-    return <EmptyK5Announcement courseUrl={courseUrl} courseName={courseName} />
+    return (
+      <EmptyK5Announcement
+        courseUrl={courseUrl}
+        courseName={courseName}
+        canReadAnnouncements={canReadAnnouncements}
+      />
+    )
   }
 
   return (
@@ -410,6 +417,7 @@ K5Announcement.propTypes = {
   courseUrl: PropTypes.string,
   published: PropTypes.bool,
   canEdit: PropTypes.bool.isRequired,
+  canReadAnnouncements: PropTypes.bool.isRequired,
   showCourseDetails: PropTypes.bool.isRequired,
   // announcement
   firstAnnouncement: K5AnnouncementType

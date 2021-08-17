@@ -1658,7 +1658,7 @@ describe CoursesController do
         user_session(@teacher)
 
         get 'show', params: {:id => @course.id}
-        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_as_admin: true})
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_announcements: true, read_as_admin: true})
       end
 
       it "sets COURSE.color appropriately in js_env" do
@@ -1679,6 +1679,17 @@ describe CoursesController do
         expect(assigns[:course_home_view]).to eq "announcements"
         bundle = assigns[:js_bundles].select { |b| b.include? :announcements }
         expect(bundle.size).to eq 1
+      end
+
+      it "sets the course_home_view to 'Important Info' if the teacher has no announcement reading permission for the homeroom" do
+        @course.homeroom_course = true
+        @course.save!
+
+        @course.account.role_overrides.create!(permission: :read_announcements, role: teacher_role, enabled: false)
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq 'syllabus'
       end
 
       it "sets COURSE.has_syllabus_body to true when syllabus exists" do

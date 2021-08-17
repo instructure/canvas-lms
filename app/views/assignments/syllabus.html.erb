@@ -28,8 +28,12 @@
   <%= page_title %>
 <% end %>
 
-<% unless @context.elementary_enabled? %>
-  <% provide :right_side do %>
+<% provide :right_side do %>
+  <% if @context.elementary_homeroom_course? && !@context.grants_right?(@current_user, session, :read_announcements) # Sylalbus is serving as course_home %>
+    <%= render :partial => '/courses/course_show_secondary' %>
+  <% end %>
+
+  <% unless @context.elementary_enabled? %>
     <%= render :partial => 'assignments/syllabus_right_side' %>
   <% end %>
 <% end %>

@@ -26,6 +26,7 @@ const homeroomAnnouncements = [
     courseName: 'Homeroom - Mr. Jessie',
     courseUrl: 'http://google.com/course',
     canEdit: true,
+    canReadAnnouncements: true,
     announcement: {
       title: 'Welcome to Class!',
       message: '<p>Yayyyy</p>',
@@ -43,6 +44,7 @@ const homeroomAnnouncements = [
     courseName: 'Homeroom 0144232',
     courseUrl: 'http://google.com/course2',
     canEdit: true,
+    canReadAnnouncements: true,
     announcement: {
       title: 'Sign the permission slip!',
       message: '<p>Hello</p>',
@@ -55,6 +57,7 @@ const homeroomAnnouncements = [
     courseName: 'New Homeroom',
     courseUrl: 'http://google.com',
     canEdit: true,
+    canReadAnnouncements: true,
     published: true
   }
 ]
@@ -86,7 +89,8 @@ describe('HomeroomAnnouncementsLayout', () => {
               courseId: 1236,
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
-              canEdit: true
+              canEdit: true,
+              canReadAnnouncements: true
             }
           ]
         })}
@@ -107,7 +111,8 @@ describe('HomeroomAnnouncementsLayout', () => {
               courseId: 1236,
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
-              canEdit: false
+              canEdit: false,
+              canReadAnnouncements: true
             }
           ]
         })}

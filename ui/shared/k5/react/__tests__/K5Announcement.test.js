@@ -28,6 +28,7 @@ describe('K5Announcement', () => {
     courseName: "Mrs. Jensen's Homeroom",
     courseUrl: 'http://google.com/courseurl',
     canEdit: true,
+    canReadAnnouncements: true,
     published: true,
     showCourseDetails: true,
     ...overrides
