@@ -1097,13 +1097,7 @@ module ApplicationHelper
   end
 
   def file_access_user
-    if !@files_domain
-      @current_user
-    elsif session['file_access_user_id'].present?
-      @file_access_user ||= User.where(id: session['file_access_user_id']).first
-    else
-      nil
-    end
+    @current_user || session&.file_access_user
   end
 
   def file_access_real_user
@@ -1228,7 +1222,7 @@ module ApplicationHelper
   def file_authenticator
     FileAuthenticator.new(
       user: file_access_real_user,
-      acting_as: file_access_user,
+      acting_as: @files_domain ? file_access_user : @current_user,
       access_token: @access_token,
       # TODO: we prefer the access token when we have it, and we'll _need_ to
       # before we can implement the long term API access solution (which means

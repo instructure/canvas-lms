@@ -214,6 +214,7 @@ class FilesController < ApplicationController
       session['file_access_root_acocunt_id'] = access_verifier[:root_account]&.global_id
       session['file_access_oauth_host'] = access_verifier[:oauth_host]
       session['file_access_expiration'] = 1.hour.from_now.to_i
+      session.file_access_user = access_verifier[:user]
 
       session[:permissions_key] = SecureRandom.uuid
 
@@ -510,7 +511,7 @@ class FilesController < ApplicationController
         @skip_crumb = true unless @context
       else
         # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-        @attachment = @context.attachments.find(params[:id])
+        @attachment ||= @context.attachments.find(params[:id])
       end
 
       params[:download] ||= params[:preview]
@@ -714,8 +715,7 @@ class FilesController < ApplicationController
   protected :send_attachment
 
   def send_stored_file(attachment, inline=true)
-    user = @current_user
-    user ||= api_find(User, session['file_access_user_id']) if session['file_access_user_id'].present?
+    user = file_access_user
     attachment.context_module_action(user, :read) if user && !params[:preview]
 
     if params[:preview].blank?

@@ -193,6 +193,9 @@ class AssetUserAccess < ActiveRecord::Base
   def self.get_correct_context(context, accessed_asset)
     if accessed_asset[:category] == "files" && accessed_asset[:code]&.starts_with?('attachment')
       attachment_id = accessed_asset[:code].match(/\A\w+_(\d+)\z/)[1]
+      asset = accessed_asset[:asset_for_root_account_id]
+      return asset.context if asset.is_a?(Attachment) && asset.id == attachment_id
+
       Attachment.find_by(id: attachment_id)&.context
     elsif context.is_a?(UserProfile)
       context.user
@@ -205,8 +208,10 @@ class AssetUserAccess < ActiveRecord::Base
 
   def self.log(user, context, accessed_asset)
     return unless user && accessed_asset[:code]
+
     correct_context = self.get_correct_context(context, accessed_asset)
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
+
     GuardRail.activate(:secondary) do
       @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code],
         context: correct_context).first_or_initialize
