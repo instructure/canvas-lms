@@ -34,7 +34,6 @@ const OutcomeMoveModal = ({
   isOpen,
   onCloseHandler,
   onCleanupHandler,
-  onGroupCreated,
   onSuccess,
   rootGroup
 }) => {
@@ -153,7 +152,6 @@ const OutcomeMoveModal = ({
               setTargetGroup(targetGroup)
               setTargetAncestorsIds(targetAncestorsIds)
             }}
-            onGroupCreated={onGroupCreated}
           />
         </View>
       </Modal.Body>
@@ -180,7 +178,6 @@ OutcomeMoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired,
   rootGroup: PropTypes.object.isRequired,
   onSuccess: PropTypes.func
 }

@@ -31,12 +31,12 @@ import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 export const ROOT_ID = '0'
 export const ACCOUNT_FOLDER_ID = '-1'
 
-const structFromGroup = (g, parentGroupId) => ({
+const structFromGroup = g => ({
   id: g._id,
   name: g.title,
   collections: [],
   isRootGroup: g.isRootGroup,
-  parentGroupId
+  parentGroupId: g.parentOutcomeGroup?._id
 })
 
 const formatNewGroup = g => ({
@@ -44,7 +44,10 @@ const formatNewGroup = g => ({
   title: g.title,
   description: g.description,
   isRootGroup: false,
-  parentGroupId: g.parent_outcome_group.id,
+  parentOutcomeGroup: {
+    _id: g.parent_outcome_group.id,
+    __typename: 'LearningOutcomeGroup'
+  },
   __typename: 'LearningOutcomeGroup'
 })
 
@@ -52,7 +55,7 @@ const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
   description: null,
   title: null,
-  parentGroupId: null,
+  parentOutcomeGroup: null,
   isRootGroup: false,
   ...group
 })
@@ -61,16 +64,19 @@ const extractGroups = parentGroup =>
   (parentGroup?.childGroups?.nodes || [])
     .map(g => ({
       ...g,
-      parentGroupId: parentGroup._id
+      parentOutcomeGroup: {
+        _id: parentGroup._id,
+        __typename: 'LearningOutcomeGroup'
+      }
     }))
     .concat(parentGroup)
     .map(ensureAllGroupFields)
 
 const getCollectionsByParentId = groups =>
   (groups || []).reduce((memo, g) => {
-    if (g.parentGroupId) {
-      memo[g.parentGroupId] = memo[g.parentGroupId] || []
-      memo[g.parentGroupId].push(g._id)
+    if (g.parentOutcomeGroup) {
+      memo[g.parentOutcomeGroup._id] = memo[g.parentOutcomeGroup._id] || []
+      memo[g.parentOutcomeGroup._id].push(g._id)
     }
 
     return memo
@@ -81,7 +87,9 @@ const GROUPS_QUERY = gql`
     groups(collection: $collection) {
       ${groupFields}
       isRootGroup
-      parentGroupId
+      parentOutcomeGroup {
+        _id
+      }
     }
   }
 `
@@ -115,7 +123,7 @@ const useTreeBrowser = queryVariables => {
       (memo, g) => ({
         ...memo,
         [g._id]: {
-          ...structFromGroup(g, g.parentGroupId),
+          ...structFromGroup(g),
           collections: collectionsByParentId[g._id] || []
         }
       }),
@@ -282,7 +290,7 @@ export const useManageOutcomes = collection => {
         message: I18n.t('"%{groupName}" has been created.', {groupName}),
         type: 'success'
       })
-      return newGroup.data
+      return structFromGroup(formatNewGroup(newGroup.data))
     } catch (err) {
       showFlashAlert({
         message: err.message
@@ -416,7 +424,10 @@ export const useFindOutcomeModal = open => {
             extractGroups({
               ...g,
               isRootGroup: true,
-              parentGroupId: ACCOUNT_FOLDER_ID
+              parentOutcomeGroup: {
+                _id: ACCOUNT_FOLDER_ID,
+                __typename: 'LearningOutcomeGroup'
+              }
             })
           ),
           ...extractGroups({

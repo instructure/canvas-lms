@@ -34,7 +34,6 @@ const GroupMoveModal = ({
   parentGroupId,
   isOpen,
   onCloseHandler,
-  onGroupCreated,
   onSuccess,
   rootGroup
 }) => {
@@ -103,7 +102,6 @@ const GroupMoveModal = ({
             groupId={groupId}
             // eslint-disable-next-line no-shadow
             setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
-            onGroupCreated={onGroupCreated}
           />
         </View>
       </Modal.Body>
@@ -131,14 +129,12 @@ GroupMoveModal.propTypes = {
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
   rootGroup: PropTypes.object.isRequired
 }
 
 GroupMoveModal.defaultProps = {
-  onSuccess: () => {},
-  onGroupCreated: () => {}
+  onSuccess: () => {}
 }
 
 export default GroupMoveModal

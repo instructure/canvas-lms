@@ -63,7 +63,6 @@ const OutcomeManagementPanel = () => {
     rootId,
     selectedGroupId,
     selectedParentGroupId,
-    addNewGroup,
     removeGroup,
     loadedGroups,
     createGroup
@@ -312,7 +311,6 @@ const OutcomeManagementPanel = () => {
               parentGroupId={selectedParentGroupId}
               isOpen={isGroupMoveModalOpen}
               onCloseHandler={closeGroupMoveModal}
-              onGroupCreated={addNewGroup}
               onSuccess={() => {
                 queryCollections({
                   id: selectedParentGroupId
@@ -340,7 +338,6 @@ const OutcomeManagementPanel = () => {
                 isOpen={isOutcomeMoveModalOpen}
                 onCloseHandler={onCloseOutcomeMoveModal}
                 onCleanupHandler={onCloseOutcomeMoveModal}
-                onGroupCreated={addNewGroup}
                 onSuccess={onSuccessMoveOutcomes}
                 rootGroup={collections[rootId]}
               />

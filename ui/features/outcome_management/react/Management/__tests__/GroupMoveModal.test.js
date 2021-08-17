@@ -24,6 +24,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import GroupMoveModal from '../GroupMoveModal'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as api from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
@@ -250,5 +251,57 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(onSuccess).toHaveBeenCalled()
+  })
+
+  describe('for a newly created group', () => {
+    const newGroup = {
+      id: '200',
+      title: 'new group',
+      description: '',
+      isRootGroup: false,
+      parent_outcome_group: {id: '100'}
+    }
+    const mocks = [
+      ...smallOutcomeTree(),
+      updateOutcomeGroupMock({
+        id: '400',
+        parentOutcomeGroupId: '200',
+        title: null,
+        description: null,
+        vendorGuid: null
+      })
+    ]
+
+    it('becomes selected and can be moved into', async () => {
+      jest
+        .spyOn(api, 'addOutcomeGroup')
+        .mockImplementation(() => Promise.resolve({status: 200, data: newGroup}))
+      const {getByText, getByLabelText} = render(
+        <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />,
+        {
+          mocks
+        }
+      )
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Account folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.change(getByLabelText('Enter new group name'), {
+        target: {value: 'new group'}
+      })
+      fireEvent.click(getByText('Create new group'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: '"new group" has been created.',
+        type: 'success'
+      })
+      expect(getByText('Move').closest('button')).toBeEnabled()
+      fireEvent.click(getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: '"Account folder 0" has been moved to "new group".',
+        type: 'success'
+      })
+    })
   })
 })

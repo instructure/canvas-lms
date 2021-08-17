@@ -51,7 +51,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const {addNewGroup, rootId, collections} = useManageOutcomes('OutcomeManagementPanel')
+  const {rootId, collections} = useManageOutcomes('OutcomeManagementPanel')
   const [targetGroup, setTargetGroup] = useState(null)
 
   useEffect(() => {
@@ -206,10 +206,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             <Text size="medium" weight="bold">
               {isMobileView ? I18n.t('Select a location') : I18n.t('Location')}
             </Text>
-            <TargetGroupSelector
-              setTargetGroup={handleSetTargetGroup}
-              onGroupCreated={addNewGroup}
-            />
+            <TargetGroupSelector setTargetGroup={handleSetTargetGroup} />
           </View>
         </Modal.Body>
         <Modal.Footer>

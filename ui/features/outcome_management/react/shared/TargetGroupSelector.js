@@ -41,11 +41,7 @@ const getAncestorsIds = (targetGroup, collections) => {
   return ids
 }
 
-const TargetGroupSelector = ({
-  groupId,
-  setTargetGroup,
-  onGroupCreated
-}) => {
+const TargetGroupSelector = ({groupId, setTargetGroup}) => {
   const {isCourse} = useCanvasContext()
   const [expanded, setExpanded] = useState(false)
   const [hasExpanded, setHasExpanded] = useState(false)
@@ -72,8 +68,11 @@ const TargetGroupSelector = ({
   const onCreateGroupHandler = async (groupName, parentId) => {
     const newGroup = await createGroup(groupName, parentId)
     if (newGroup) {
-      onGroupCreated(newGroup) // NOTE: This updates the TreeBrowser on the LHS of the Manage screen
       queryCollections({id: newGroup.id, parentGroupId: parentId, shouldLoad: false})
+      setTargetGroup({
+        targetGroup: newGroup,
+        targetAncestorsIds: getAncestorsIds(newGroup, collections)
+      })
     }
   }
 
@@ -141,8 +140,7 @@ const TargetGroupSelector = ({
 
 TargetGroupSelector.propTypes = {
   groupId: PropTypes.string,
-  setTargetGroup: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired
+  setTargetGroup: PropTypes.func.isRequired
 }
 
 export default TargetGroupSelector

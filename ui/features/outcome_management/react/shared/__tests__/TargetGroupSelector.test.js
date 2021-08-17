@@ -37,12 +37,10 @@ describe('TargetGroupSelector', () => {
   let cache
   let setTargetGroupMock
   let showFlashAlertSpy
-  let onGroupCreatedMock
 
   const defaultProps = (props = {}) => ({
     parentGroupId: '1',
     setTargetGroup: setTargetGroupMock,
-    onGroupCreated: onGroupCreatedMock,
     targetGroupId: '1',
     ...props
   })
@@ -51,7 +49,6 @@ describe('TargetGroupSelector', () => {
     cache = createCache()
     setTargetGroupMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    onGroupCreatedMock = jest.fn()
   })
 
   afterEach(() => {
@@ -178,7 +175,6 @@ describe('TargetGroupSelector', () => {
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
-      expect(onGroupCreatedMock).toHaveBeenCalledWith(newGroup)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
         message: '"new group name" has been created.'
