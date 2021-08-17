@@ -20,7 +20,7 @@
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
 import {makeMarkerEditable} from './contentEditable'
-import {onKeyDown, onKeyUp, onSetContent, onMouseDown} from './events'
+import {onKeyDown, onKeyUp, onSetContent, onMouseDown, onMentionsExit} from './events'
 import {ARIA_ID_TEMPLATES, MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
@@ -47,12 +47,13 @@ function onInputChange(_e, ed = false) {
 
 export const pluginDefinition = {
   init(editor) {
-    // TODO: Remove console log
     editor.on('input', onInputChange)
     editor.on('SetContent', onSetContent)
     editor.on('KeyDown', onKeyDown)
     editor.on('KeyUp', onKeyUp)
     editor.on('MouseDown', onMouseDown)
+    editor.on('Remove', e => onMentionsExit(e.target))
+    editor.on('ViewChange', e => onMentionsExit(e.target))
   }
 }
 

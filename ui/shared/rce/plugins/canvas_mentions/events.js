@@ -230,7 +230,17 @@ export const onFocusedUserChange = (focusedUser, ed) => {
   currentMentionsSelection = temp
 }
 
-const onMentionsExit = (ed, setMention = false) => {
+/**
+ * Unmounts the mentions component and removes the
+ * mount element.
+ *
+ * If setMention is true, also injects the mention
+ * HTML for the currently selected mention suggestion
+ *
+ * @param Editor ed
+ * @param Bool setMention
+ */
+export const onMentionsExit = (ed, setMention = false) => {
   const editor = ed || tinymce.activeEditor
   const menuMountElem = document.querySelector(MENTION_MENU_SELECTOR)
   const markerEl = editor.dom.select(MARKER_SELECTOR)[0]

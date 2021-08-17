@@ -21,7 +21,7 @@ import * as plugin from '../plugin'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import {screen} from '@testing-library/dom'
 import {KEY_CODES} from '../constants'
-import {onFocusedUserChange} from '../events'
+import {onFocusedUserChange, onMentionsExit} from '../events'
 
 const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
@@ -43,6 +43,11 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
       })
     }
   }
+}))
+
+jest.mock('../events', () => ({
+  ...jest.requireActual('../events'),
+  onMentionsExit: jest.fn()
 }))
 
 jest.mock('../components/MentionAutoComplete/MentionDropdown')
@@ -358,5 +363,48 @@ describe('pluginDefinition', () => {
         expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
       })
     })
+  })
+
+  function sharedExamplesForHandlersThatUnmount(subject) {
+    it('calls "onMentionExit"', () => {
+      subject()
+      expect(onMentionsExit).toHaveBeenCalledWith(editor)
+    })
+  }
+
+  describe('Remove', () => {
+    const subject = () => editor.fire('Remove', {target: editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForHandlersThatUnmount(subject)
+  })
+
+  describe('ViewChange', () => {
+    const subject = () => editor.fire('ViewChange', {target: editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForHandlersThatUnmount(subject)
   })
 })

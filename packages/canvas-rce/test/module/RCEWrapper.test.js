@@ -241,6 +241,18 @@ describe('RCEWrapper', () => {
       assert.equal(element.getCode(), 'Some Input HTML')
     })
 
+    it('emits "ViewChange" on view changes', () => {
+      const fireSpy = sinon.spy()
+      const fire = element.mceInstance().fire
+
+      element.mceInstance().fire = fireSpy
+      element.toggleView()
+
+      assert(fireSpy.calledWith('ViewChange'))
+
+      element.mceInstance().fire = fire
+    })
+
     it('calls focus on its tinyMCE instance', () => {
       element = createBasicElement({textareaId: 'myOtherUniqId'})
       element.focus()
