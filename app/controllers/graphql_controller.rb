@@ -25,8 +25,8 @@ CanvasSchema.graphql_definition
 class GraphQLController < ApplicationController
   include Api::V1
 
-  before_action :require_inst_access_token_auth, only: :subgraph_execute
   before_action :require_user, if: :require_auth?
+  before_action :require_inst_access_token_auth, only: :subgraph_execute, unless: :sdl_query?
 
   # This action is for use only with the federated API Gateway. See
   # `app/graphql/README.md` for details.
@@ -79,13 +79,25 @@ class GraphQLController < ApplicationController
       return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
     end
 
+    if action_name == 'subgraph_execute' && sdl_query?
+      return false
+    end
+
     true
+  end
+
+  def sdl_query?
+    query = (params[:query] || '').strip
+    return false unless query.starts_with?('query') || query.starts_with?('{')
+    query = query[/{.*/] # slice off leading "query" keyword and/or query name, if any
+    query.gsub!(/\s+/, '') # strip all whitespace
+    query == '{_service{sdl}}'
   end
 
   def require_inst_access_token_auth
     unless @authenticated_with_inst_access_token
       render(
-        json: {error: "InstAccess token auth required"},
+        json: {errors: [{message: "InstAccess token auth required"}]},
         status: 401
       )
     end
