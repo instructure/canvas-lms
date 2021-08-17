@@ -362,6 +362,11 @@ module ActiveRecord
           expect(s1).not_to be s2
           expect(s1.union(s2)).to be s1
         end
+
+        it "serializes to valid SQL with selects, limits, and orders" do
+          s = Assignment.select(:updated_at).order(updated_at: :desc).limit(1)
+          s.union(s)
+        end
       end
 
       context "directly on the table" do

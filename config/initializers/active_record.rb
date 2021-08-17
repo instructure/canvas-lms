@@ -1271,10 +1271,9 @@ ActiveRecord::Relation.class_eval do
     return scopes.first if scopes.length == 1
     return self if scopes.empty?
 
-    sub_query = scopes.map do |s|
-      scope = s.except(:select, :order)
-      scope = scope.select(primary_key) unless from
-      scope.to_sql
+    sub_query = scopes.map do |scope|
+      scope = scope.except(:select, :order).select(primary_key) unless from
+      "(#{scope.to_sql})"
     end.join(" UNION ALL ")
     return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
 
