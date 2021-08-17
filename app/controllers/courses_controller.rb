@@ -3641,6 +3641,7 @@ class CoursesController < ApplicationController
     preloads << { context_modules: :content_tags } if includes.include?('course_progress')
     preloads << :enrollment_term if includes.include?('term') || includes.include?('concluded')
     ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
+    MasterCourses::MasterTemplate.preload_is_master_course(courses)
 
     preloads = []
     preloads << :course_section if includes.include?('sections')
