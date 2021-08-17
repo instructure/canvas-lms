@@ -57,8 +57,9 @@ module Factories
       users.map(&:id) :
       users
 
+    now = Time.now.utc
     if options[:account_associations]
-      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id}})
+      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id, created_at: now, updated_at: now}})
     end
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
@@ -75,7 +76,9 @@ module Factories
         role_id: role_id,
         sis_batch_id: sis_batch_id,
         associated_user_id: associated_user_id,
-        limit_privileges_to_course_section: limit_privileges_to_course_section
+        limit_privileges_to_course_section: limit_privileges_to_course_section,
+        created_at: now,
+        updated_at: now
       }
     }, options[:return_type])
     create_enrollment_states(result, {state: enrollment_state, root_account_id: course.root_account_id})

@@ -404,18 +404,11 @@ describe Context do
       expect {Context.last_updated_at(Hash, [1])}.to raise_error ArgumentError
     end
 
-    it "ignores contexts with null updated_at values" do
-      @course2.updated_at = nil
-      @course2.save!
-
-      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to eq @course1.updated_at
-    end
-
     it "returns nil when no updated_at is found for the given contexts" do
-      [@course1, @course2].each do |c|
-        c.updated_at = nil
-        c.save!
-      end
+      cs = [@course1, @course2]
+      CourseAccountAssociation.where(course_id: cs).delete_all
+      PostPolicy.where(course_id: cs).delete_all
+      Course.where(id: cs).delete_all
 
       expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to be_nil
     end

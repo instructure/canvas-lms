@@ -63,12 +63,14 @@ module Factories
     account = Account.default
     course_ids = Array(course_ids)
     course_ids *= count_per_course
+    now = Time.now.utc
     records = course_ids.each_with_index.map do |id, i|
       {
         context_id: id, context_type: 'Course', context_code: "course_#{id}",
         title: "#{id}:#{i}", grading_type: "points", submission_types: "none",
         workflow_state: 'published',
         root_account_id: account.id,
+        created_at: now, updated_at: now
       }.merge(fields)
     end
     create_records(Assignment, records)
