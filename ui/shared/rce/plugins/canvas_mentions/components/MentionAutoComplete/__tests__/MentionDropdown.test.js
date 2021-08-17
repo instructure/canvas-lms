@@ -133,7 +133,7 @@ describe('Mention Dropdown', () => {
   })
 
   describe('accessibility', () => {
-    it('should call ARIA_ID_TEMPLATES and pass to callback', async () => {
+    it.skip('should call ARIA_ID_TEMPLATES and pass to callback', async () => {
       const onActiveDescendantChangeMock = jest.fn()
       const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
       const {getAllByTestId} = setup({
