@@ -201,6 +201,8 @@ class Course < ActiveRecord::Base
   has_many :gradebook_csvs, inverse_of: :course
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
+  # only valid if non-nil
+  attr_accessor :is_master_course
   has_many :master_course_subscriptions, :class_name => "MasterCourses::ChildSubscription", :foreign_key => 'child_course_id'
   has_one :late_policy, dependent: :destroy, inverse_of: :course
   has_many :notification_policy_overrides, as: :context, inverse_of: :context
