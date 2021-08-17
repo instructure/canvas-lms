@@ -647,9 +647,12 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
+    if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
+      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
+    end
+
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
-      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
 
       if @sequence_asset
         js_env({SEQUENCE: {
@@ -680,7 +683,6 @@ class DiscussionTopicsController < ApplicationController
     if @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user)
       @headers = !params[:headless]
       @unlock_at = @topic.available_from_for(@current_user)
-      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
         @groups = @topic.group_category.groups.active
         if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
