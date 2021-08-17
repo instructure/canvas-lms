@@ -149,8 +149,7 @@ class PlannerNotesController < ApplicationController
       context_codes = Array(context_codes)
 
       # Append to our notes scope to include the context codes for courses
-      course_codes = context_codes.select{|c| c =~ /course_\d+/}
-      contexts = Context.from_context_codes(course_codes)
+      contexts = Course.find_all_by_asset_string(context_codes, ['Course'])
       accessible_courses = contexts.select { |c| c.grants_right?(@current_user, :read) }
 
       # include course-less events if the current user is passed in as a context

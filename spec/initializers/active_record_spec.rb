@@ -289,7 +289,7 @@ module ActiveRecord
       end
     end
 
-    describe "parse_asset_string" do
+    describe ".parse_asset_string" do
       it "parses simple asset strings" do
         expect(ActiveRecord::Base.parse_asset_string("course_123")).to eql(["Course", 123])
       end
@@ -308,6 +308,38 @@ module ActiveRecord
 
       it "behaves predictably on an invalid asset string" do
         expect(ActiveRecord::Base.parse_asset_string("what")).to eql(["", 0])
+      end
+    end
+
+    describe ".parse_asset_string_list" do
+      it "parses to a hash" do
+        expect(ActiveRecord::Base.parse_asset_string_list("course_1,course_2,user_3"))
+          .to eq({ 'Course' => [1, 2], 'User' => [3] })
+      end
+
+      it "accepts an array" do
+        expect(ActiveRecord::Base.parse_asset_string_list(%w{course_1 course_2 user_3}))
+          .to eq({ 'Course' => [1, 2], 'User' => [3] })
+      end
+    end
+
+    describe ".find_all_by_asset_string" do
+      let_once(:course) { course_factory }
+      let_once(:user) { user_factory }
+
+      it "works" do
+        expect(ActiveRecord::Base.find_all_by_asset_string([course.asset_string, user.asset_string]))
+          .to eq [course, user]
+      end
+
+      it "accepts a pre-parsed hash" do
+        expect(ActiveRecord::Base.find_all_by_asset_string('Course' => [course.id], 'User' => [user.id]))
+          .to eq [course, user]
+      end
+
+      it "ignores unnamed asset types" do
+        expect(ActiveRecord::Base.find_all_by_asset_string([course.asset_string, user.asset_string], ['User', 'Group']))
+          .to eq [user]
       end
     end
   end

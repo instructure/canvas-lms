@@ -195,25 +195,16 @@ module Context
 
   def self.context_code_for(record)
     raise ArgumentError unless record.respond_to?(:context_type) && record.respond_to?(:context_id)
+
     "#{record.context_type.underscore}_#{record.context_id}"
   end
 
   def self.find_by_asset_string(string)
-    from_context_codes([string]).first
+    ActiveRecord::Base.find_by_asset_string(string, CONTEXT_TYPES.map(&:to_s))
   end
 
-  def self.from_context_codes(context_codes)
-    contexts = {}
-    context_codes.each do |cc|
-      type, _, id = cc.rpartition('_')
-      if CONTEXT_TYPES.include?(type.camelize.to_sym)
-        contexts[type.camelize] = [] unless contexts[type.camelize]
-        contexts[type.camelize] << id
-      end
-    end
-    contexts.reduce([]) do |memo, (context, ids)|
-      memo + context.constantize.where(id: ids)
-    end
+  def self.find_all_by_asset_string(strings)
+    ActiveRecord::Base.find_all_by_asset_string(strings, CONTEXT_TYPES.map(&:to_s))
   end
 
   def self.asset_type_for_string(string)
@@ -221,23 +212,22 @@ module Context
   end
 
   def self.find_asset_by_asset_string(string, context=nil, allowed_types=nil)
-    opts = string.split("_")
-    id = opts.pop
-    type = opts.join('_').classify
+    type, id = ActiveRecord::Base.parse_asset_string(string)
     klass = asset_type_for_string(type)
     klass = nil if allowed_types && !allowed_types.include?(klass.to_s.underscore.to_sym)
     return nil unless klass
+
     res = nil
     if context && klass == ContextExternalTool
       res = klass.find_external_tool_by_id(id, context)
     elsif context && (klass.column_names & ['context_id', 'context_type']).length == 2
-      res = klass.where(context_id: context, context_type: context.class.to_s, id: id).first
+      res = klass.where(context: context, id: id).first
     else
-      res = klass.where(id: id).first
-      res = nil if context && res && res.respond_to?(:context) && res.context != context
+      res = klass.find_by(id: id)
+      res = nil if context && res.respond_to?(:context_id) && res.context_id != context.id
     end
     res
-  rescue => e
+  rescue
     nil
   end
 
@@ -360,14 +350,23 @@ module Context
     self.send fallback if fallback
   end
 
-  def self.last_updated_at(klass, ids)
-    raise ArgumentError unless CONTEXT_TYPES.include?(klass.class_name.to_sym)
+  def self.last_updated_at(klasses_to_ids)
+    scopes = []
 
-    klass.where(id: ids)
-      .where.not(updated_at: nil)
-      .order(updated_at: :desc)
-      .limit(1)
-      .pluck(:updated_at)&.first
+    klasses_to_ids.each do |(klass, ids)|
+      next if ids.empty?
+
+      scopes << klass.where(id: ids)
+        .order(updated_at: :desc)
+        .select(:updated_at)
+        .limit(1)
+    end
+
+    return nil if scopes.empty?
+
+    final_scope = scopes.first if scopes.length == 1
+    final_scope ||= scopes.first.union(*scopes[1..], from: true)
+    final_scope.order(updated_at: :desc).limit(1).pluck(:updated_at)&.first
   end
 
   def resolved_root_account_id
