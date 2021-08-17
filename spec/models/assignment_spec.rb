@@ -6199,7 +6199,7 @@ describe Assignment do
       @attachment.content_type = "foo/bar"
       @attachment.size = 10
       @attachment.save!
-      
+
       @submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [@attachment]
     end
 
@@ -9442,7 +9442,7 @@ describe Assignment do
         it_behaves_like 'assignment to line item attribute sync check'
 
         it 'change the `custom` attribute at resource link when it is given' do
-          assignment.lti_resource_link_custom_params = nil
+          assignment.lti_resource_link_custom_params = ""
           assignment.save!
           assignment.reload
 
@@ -9464,7 +9464,7 @@ describe Assignment do
             referer_name: 'Custom params changed'
           }
 
-          assignment.lti_resource_link_custom_params = new_custom_params.to_json
+          assignment.lti_resource_link_custom_params = new_custom_params
           assignment.save!
           assignment.reload
 

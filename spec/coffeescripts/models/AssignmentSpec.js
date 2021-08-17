@@ -832,19 +832,19 @@ QUnit.module('Assignment#inGradingPeriod', {
   }
 })
 
-test('returns true if the assignment has a due_at in the given period', function() {
+test('returns true if the assignment has a due_at in the given period', function () {
   const assignment = new Assignment()
   assignment.set('due_at', this.dateInPeriod)
   equal(assignment.inGradingPeriod(this.gradingPeriod), true)
 })
 
-test('returns false if the assignment has a due_at outside the given period', function() {
+test('returns false if the assignment has a due_at outside the given period', function () {
   const assignment = new Assignment()
   assignment.set('due_at', this.dateOutsidePeriod)
   equal(assignment.inGradingPeriod(this.gradingPeriod), false)
 })
 
-test('returns true if the assignment has a date group in the given period', function() {
+test('returns true if the assignment has a date group in the given period', function () {
   const dates = [
     new DateGroup({
       due_at: this.dateInPeriod,
@@ -855,7 +855,7 @@ test('returns true if the assignment has a date group in the given period', func
   equal(assignment.inGradingPeriod(this.gradingPeriod), true)
 })
 
-test('returns false if the assignment does not have a date group in the given period', function() {
+test('returns false if the assignment does not have a date group in the given period', function () {
   const dates = [
     new DateGroup({
       due_at: this.dateOutsidePeriod,
@@ -1377,7 +1377,7 @@ QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   }
 })
 
-test('polls for updates', function() {
+test('polls for updates', function () {
   this.assignment.pollUntilFinishedDuplicating()
   this.clock.tick(2000)
   notOk(this.assignment.fetch.called)
@@ -1385,7 +1385,7 @@ test('polls for updates', function() {
   ok(this.assignment.fetch.called)
 })
 
-test('stops polling when the assignment has finished duplicating', function() {
+test('stops polling when the assignment has finished duplicating', function () {
   this.assignment.pollUntilFinishedDuplicating()
   this.assignment.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
@@ -1405,7 +1405,7 @@ QUnit.module('Assignment#pollUntilFinishedImporting', {
   }
 })
 
-test('polls for updates', function() {
+test('polls for updates', function () {
   this.assignment.pollUntilFinishedImporting()
   this.clock.tick(2000)
   notOk(this.assignment.fetch.called)
@@ -1413,7 +1413,7 @@ test('polls for updates', function() {
   ok(this.assignment.fetch.called)
 })
 
-test('stops polling when the assignment has finished importing', function() {
+test('stops polling when the assignment has finished importing', function () {
   this.assignment.pollUntilFinishedImporting()
   this.assignment.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
@@ -1433,7 +1433,7 @@ QUnit.module('Assignment#pollUntilFinishedMigrating', {
   }
 })
 
-test('polls for updates', function() {
+test('polls for updates', function () {
   this.assignment.pollUntilFinishedMigrating()
   this.clock.tick(2000)
   notOk(this.assignment.fetch.called)
@@ -1441,7 +1441,7 @@ test('polls for updates', function() {
   ok(this.assignment.fetch.called)
 })
 
-test('stops polling when the assignment has finished migrating', function() {
+test('stops polling when the assignment has finished migrating', function () {
   this.assignment.pollUntilFinishedMigrating()
   this.assignment.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
@@ -1581,7 +1581,7 @@ QUnit.module('Assignment#externalToolTagAttributes', hooks => {
       external_tool_tag_attributes: {
         content_id: 999,
         content_type: 'context_external_tool',
-        custom: customParams,
+        custom_params: customParams,
         new_tab: '0',
         url: 'http://lti13testtool.docker/launch',
         external_data: externalData
@@ -1594,13 +1594,13 @@ QUnit.module('Assignment#externalToolTagAttributes', hooks => {
     fakeENV.teardown()
   })
 
-  test(`returns url from assignment's external tool attributtes`, () => {
+  test(`returns url from assignment's external tool attributes`, () => {
     const url = assignment.externalToolUrl()
 
     equal(url, 'http://lti13testtool.docker/launch')
   })
 
-  test(`returns external data from assignment's external tool attributtes`, () => {
+  test(`returns external data from assignment's external tool attributes`, () => {
     const data = assignment.externalToolData()
 
     equal(data.key1, 'val1')
@@ -1608,17 +1608,16 @@ QUnit.module('Assignment#externalToolTagAttributes', hooks => {
     equal(assignment.externalToolDataStringified(), JSON.stringify(externalData))
   })
 
-  test(`returns custom params from assignment's external tool attributtes`, () => {
+  test(`returns custom params from assignment's external tool attributes`, () => {
     equal(assignment.externalToolCustomParams(), customParams)
   })
 
   test(`returns custom params stringified from assignment's external tool attributtes`, () => {
     const data = assignment.externalToolCustomParamsStringified()
-
     equal(data, JSON.stringify(customParams))
   })
 
-  test(`returns new tab from assignment's external tool attributtes`, () => {
+  test(`returns new tab from assignment's external tool attributes`, () => {
     equal(assignment.externalToolNewTab(), '0')
   })
 })
