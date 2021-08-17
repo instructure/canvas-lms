@@ -71,6 +71,9 @@ class Assignment < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   attribute :lti_resource_link_custom_params, :string, default: nil
+  # Serializing this as JSON vs a Hash allows us to distinguish between nil (no changes need to be made)
+  # and an actual Hash to set custom params to, which could be an empty hash.
+  serialize :lti_resource_link_custom_params, JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
@@ -1113,7 +1116,7 @@ class Assignment < ActiveRecord::Base
       if lti_1_3_external_tool_tag? && line_items.empty?
         rl = Lti::ResourceLink.create!(
           context: self,
-          custom: lti_resource_link_custom_params_as_hash,
+          custom: validate_resource_link_custom_params,
           resource_link_uuid: lti_context_id,
           context_external_tool: ContextExternalTool.from_content_tag(
             external_tool_tag,
@@ -1130,9 +1133,12 @@ class Assignment < ActiveRecord::Base
 
       if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
         options = {}
-
-        unless primary_resource_link.custom == lti_resource_link_custom_params_as_hash
-          options[:custom] = lti_resource_link_custom_params_as_hash
+        validated_params = validate_resource_link_custom_params
+        # Check if they actually passed something that isn't just our default value of nil, such as an
+        # empty string to signify they really want to set the custom params to nil, then format
+        # it for storage.
+        if !lti_resource_link_custom_params.nil? && validated_params != primary_resource_link.custom
+          options[:custom] = validated_params
         end
 
         options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
@@ -1145,10 +1151,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :update_line_items
 
-  def lti_resource_link_custom_params_as_hash
+  def validate_resource_link_custom_params
     Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link_custom_params)
   end
-  private :lti_resource_link_custom_params_as_hash
+  private :validate_resource_link_custom_params
 
   def primary_resource_link
     @primary_resource_link ||= begin

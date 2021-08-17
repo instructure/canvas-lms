@@ -569,6 +569,19 @@ test('sets seconds of due_at to 00 if the new minute value is not 59', function 
   strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
 })
 
+test('getFormData returns custom_params as a JSON object, not a string', function () {
+  const custom_params = {
+    hello: 'world'
+  }
+  const view = this.editView()
+  // You have to stringify this, as the custom_params are not stored in memory as an object. Oh no,
+  // that would make too much sense. Instead, they're stored inside a hidden input on the page with
+  // id '#assignment_external_tool_tag_attributes_custom_params', because Backbone and Coffeescript
+  // are the worst thing ever.
+  view.$externalToolsCustomParams.val(JSON.stringify(custom_params))
+  deepEqual(view.getFormData().external_tool_tag_attributes.custom_params, custom_params)
+})
+
 // The UI doesn't allow editing the seconds value and always returns 00. If
 // the seconds value was set to something different prior to the update, keep
 // that value.
