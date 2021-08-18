@@ -99,6 +99,7 @@ module Types
     end
 
     global_id_field :id
+    key_field_id
 
     field :name, String, null: true
 

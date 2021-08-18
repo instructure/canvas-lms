@@ -80,12 +80,9 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
-    key fields: "id"
-    def self.resolve_reference(reference, context)
-      GraphQLNodeLoader.load("Course", reference[:id], context)
-    end
-
     global_id_field :id
+    key_field_id
+
     field :name, String, null: false
     field :course_code, String, "course short name", null: true
     field :state, CourseWorkflowState, method: :workflow_state, null: false
