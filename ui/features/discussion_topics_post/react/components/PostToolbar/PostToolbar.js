@@ -33,6 +33,7 @@ import {
   IconLockLine,
   IconMarkAsReadLine,
   IconMoreLine,
+  IconNextUnreadLine,
   IconNoSolid,
   IconPeerReviewLine,
   IconRubricSolid,
@@ -150,6 +151,14 @@ const getMenuConfigs = props => {
       selectionCallback: props.onReadAll
     })
   }
+  if (props.onUnreadAll) {
+    options.push({
+      key: 'unread-all',
+      icon: <IconNextUnreadLine />,
+      label: I18n.t('Mark All as Unread'),
+      selectionCallback: props.onUnreadAll
+    })
+  }
   if (props.onEdit) {
     options.push({
       key: 'edit',
@@ -259,6 +268,10 @@ PostToolbar.propTypes = {
    * Behavior for marking the thread as read
    */
   onReadAll: PropTypes.func,
+  /**
+   * Behavior for marking the thread as unread
+   */
+  onUnreadAll: PropTypes.func,
   /**
    * Behavior for deleting the discussion post.
    * Providing this function will result in the menu option being rendered.

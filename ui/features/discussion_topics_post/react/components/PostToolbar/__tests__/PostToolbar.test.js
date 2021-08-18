@@ -117,6 +117,17 @@ describe('PostToolbar', () => {
       })
     })
 
+    describe('mark all as unread', () => {
+      it('calls provided callback when clicked', () => {
+        const onUnreadAllMock = jest.fn()
+        const {getByTestId, getByText} = setup({onUnreadAll: onUnreadAllMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onUnreadAllMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Mark All as Unread'))
+        expect(onUnreadAllMock.mock.calls.length).toBe(1)
+      })
+    })
+
     describe('edit', () => {
       it('does not render if the callback is not provided', () => {
         const {queryByText, getByTestId} = setup()
