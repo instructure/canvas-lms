@@ -67,6 +67,51 @@ it('renders a "late" status pill if the last graded submission is late', async (
   expect(getByText('Late')).toBeInTheDocument()
 })
 
+it('shows the grade for a late submission if it is not hidden from the student', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10
+    },
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
+      gradeHidden: false,
+      submissionStatus: 'late'
+    }
+  })
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByText('6/10 Points')).toBeInTheDocument()
+})
+
+it('shows N/A for a late submission if the grade is hidden from the student', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10
+    },
+    Submission: {
+      ...SubmissionMocks.submitted,
+      attempt: 1,
+      gradeHidden: true,
+      submissionStatus: 'late'
+    }
+  })
+  const {getByTestId} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByTestId('assignment-student-header')).toHaveTextContent(/Attempt 1 Score:\s*N\/A/)
+})
+
 it('shows the number of points deducted in the tooltip when the current grade is focused', async () => {
   const props = await mockAssignmentAndSubmission({
     Assignment: {
