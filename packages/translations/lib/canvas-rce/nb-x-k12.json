@@ -27,6 +27,7 @@
   },
   "announcement_list_da155734": { "message": "Beskjedliste" },
   "announcements_a4b8ed4a": { "message": "Beskjeder" },
+  "apply_781a2546": { "message": "Søk" },
   "apps_54d24a47": { "message": "Apper" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Dimensjonene vil bli bevart"
@@ -44,6 +45,8 @@
     "message": "Automatisk åpne en forhåndsvisning av prosesslinjen. (Forhåndsvisning vises etter lagring)"
   },
   "available_folders_694d0436": { "message": "Tilgjengelige mapper" },
+  "below_81d4dceb": { "message": "Under" },
+  "bottom_third_5f5fec1d": { "message": "Nedre tredjedel" },
   "button_color_608a0242": { "message": "Knappefarge" },
   "button_outline_cf14f071": { "message": "Knappeomriss" },
   "button_outline_size_cc1d1df7": { "message": "Knappeomriss størrelse" },
@@ -256,6 +259,7 @@
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Medie" },
   "medium_5a8e9ead": { "message": "Medium" },
+  "middle_27dc1d5": { "message": "Midten" },
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Moduler" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -380,6 +384,10 @@
   "syllabus_f191f65b": { "message": "Fagoversikt" },
   "tab_arrows_4cf5abfc": { "message": "TAB/piltaster" },
   "text_7f4593da": { "message": "Tekst" },
+  "text_background_color_16e61c3f": { "message": "Bakgrunnsfarge tekst" },
+  "text_color_acf75eb6": { "message": "Tekstfargen" },
+  "text_position_8df8c162": { "message": "Tekstposisjon" },
+  "text_size_887c2f6": { "message": "Tekststørrelse" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet er i det offentlige domenet"
   },
@@ -446,6 +454,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Bruk piltastene for å velge en størrelse."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Bruk piltastene for å velge en tekstposisjon."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Bruk piltastene for å velge en tekststørrelse."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Bruk piltastene for å velge størrelse på omriss."

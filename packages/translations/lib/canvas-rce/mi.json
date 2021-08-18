@@ -29,6 +29,7 @@
   },
   "announcement_list_da155734": { "message": "Rārangi Pānuitanga" },
   "announcements_a4b8ed4a": { "message": "Pānuitanga" },
+  "apply_781a2546": { "message": "Tono" },
   "apps_54d24a47": { "message": "Tono" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "E tiaki i Hau aronga"
@@ -48,6 +49,8 @@
     "message": "Aunoa huaki he arokite i roto i te raina. (Arokite whakātu anake i muri o te tiaki)"
   },
   "available_folders_694d0436": { "message": "Ngā kōpaki e wātea ana" },
+  "below_81d4dceb": { "message": "Raro" },
+  "bottom_third_5f5fec1d": { "message": "Raro Tuatoru" },
   "button_color_608a0242": { "message": "Pātene Tae" },
   "button_outline_cf14f071": { "message": "Pātene Whakahuahua" },
   "button_outline_size_cc1d1df7": { "message": "Pātene Whakahuahua Rahi" },
@@ -270,6 +273,7 @@
   "locked_762f138b": { "message": "Kua rakaina" },
   "media_af190855": { "message": "Pāpāho" },
   "medium_5a8e9ead": { "message": "Kauwaka" },
+  "middle_27dc1d5": { "message": "Waenganui" },
   "miscellaneous_e9818229": { "message": "Momo kē" },
   "modules_c4325335": { "message": "Kōwae" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -392,6 +396,10 @@
   "syllabus_f191f65b": { "message": "Marautanga" },
   "tab_arrows_4cf5abfc": { "message": "TAB/ngā pere" },
   "text_7f4593da": { "message": "Kuputuhi" },
+  "text_background_color_16e61c3f": { "message": "Kuputuhi Papamuri Tae" },
+  "text_color_acf75eb6": { "message": "Kuputuhi tae" },
+  "text_position_8df8c162": { "message": "Kuputuhi Tūnga" },
+  "text_size_887c2f6": { "message": "Kuputuhi Rahi" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Ko te rauemi kei roto i te rohe tūmatanui"
   },
@@ -458,6 +466,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Mahia ngā kī pero ki te tīpako he rahi."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Mahia ngā kī pero ki te tīpako he kuputuhi tūnga."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Mahia ngā kī pero ki te tīpako he kuputuhi rahi."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Mahia ngā kī pero ki te tīpako he whakahuahua rahi."

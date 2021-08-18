@@ -80,6 +80,9 @@
     "announcements_a4b8ed4a": {
         "message": "Anuncis"
     },
+    "apply_781a2546": {
+        "message": "Aplica"
+    },
     "apps_54d24a47": {
         "message": "Aplicacions"
     },
@@ -146,8 +149,14 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Principi de l''historial de tasques pendents"
     },
+    "below_81d4dceb": {
+        "message": "A sota de"
+    },
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "A continuació s’ofereix un exemple de com els estudiants veuran la seva planificació"
+    },
+    "bottom_third_5f5fec1d": {
+        "message": "Terç inferior"
     },
     "button_color_608a0242": {
         "message": "Color del botó"
@@ -776,6 +785,9 @@
     "medium_5a8e9ead": {
         "message": "Mitjà"
     },
+    "middle_27dc1d5": {
+        "message": "Centre"
+    },
     "miscellaneous_e9818229": {
         "message": "Diversos"
     },
@@ -1148,6 +1160,18 @@
     "text_7f4593da": {
         "message": "Text"
     },
+    "text_background_color_16e61c3f": {
+        "message": "Color de fons del text"
+    },
+    "text_color_acf75eb6": {
+        "message": "Color del text"
+    },
+    "text_position_8df8c162": {
+        "message": "Posició del text"
+    },
+    "text_size_887c2f6": {
+        "message": "Mida del text"
+    },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "La data i l''hora en què venç aquesta tasca pendent"
     },
@@ -1285,6 +1309,12 @@
     },
     "use_arrow_keys_to_select_a_size_699a19f4": {
         "message": "Feu servir les tecles de fletxes per seleccionar una mida."
+    },
+    "use_arrow_keys_to_select_a_text_position_72f9137c": {
+        "message": "Feu servir les tecles de fletxes per seleccionar una posició del text."
+    },
+    "use_arrow_keys_to_select_a_text_size_65e89336": {
+        "message": "Feu servir les tecles de fletxes per seleccionar una mida del text."
     },
     "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
         "message": "Feu servir les tecles de fletxes per seleccionar la mida d’un contorn."

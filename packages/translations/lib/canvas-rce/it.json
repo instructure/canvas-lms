@@ -27,6 +27,7 @@
   },
   "announcement_list_da155734": { "message": "Elenco annuncio" },
   "announcements_a4b8ed4a": { "message": "Annunci" },
+  "apply_781a2546": { "message": "Applica" },
   "apps_54d24a47": { "message": "App" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Le proporzioni verranno mantenute"
@@ -46,6 +47,8 @@
     "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
   },
   "available_folders_694d0436": { "message": "Cartelle disponibili" },
+  "below_81d4dceb": { "message": "Sotto" },
+  "bottom_third_5f5fec1d": { "message": "Terzo inferiore" },
   "button_color_608a0242": { "message": "Colore pulsanti" },
   "button_outline_cf14f071": { "message": "Struttura pulsanti" },
   "button_outline_size_cc1d1df7": {
@@ -276,6 +279,7 @@
   "locked_762f138b": { "message": "Bloccato" },
   "media_af190855": { "message": "Elementi multimediali" },
   "medium_5a8e9ead": { "message": "Medio" },
+  "middle_27dc1d5": { "message": "Centro" },
   "miscellaneous_e9818229": { "message": "Varie" },
   "modules_c4325335": { "message": "Moduli" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -402,6 +406,10 @@
   "syllabus_f191f65b": { "message": "Piano di studio" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Frecce" },
   "text_7f4593da": { "message": "Testo" },
+  "text_background_color_16e61c3f": { "message": "Colore sfondo testo" },
+  "text_color_acf75eb6": { "message": "Colore testo" },
+  "text_position_8df8c162": { "message": "Posizione testo" },
+  "text_size_887c2f6": { "message": "Dimensione testo" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Il materiale è nel dominio pubblico"
   },
@@ -472,6 +480,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Usa i tasti freccia per selezionare una dimensione."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Usa i tasti freccia per selezionare una posizione testo."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Usa i tasti freccia per selezionare una dimensione testo."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Usa i tasti freccia per selezionare una dimensione struttura."

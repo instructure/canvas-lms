@@ -44,6 +44,9 @@
     "calendar_event_89aadc1c": {
         "message": "Օրացուցային միջոցառում"
     },
+    "cancel_caeb1e68": {
+        "message": "Չեղյալ համարել"
+    },
     "choose_usage_rights_33683854": {
         "message": "Ընտրել օգտագործման իրավունքները..."
     },
@@ -250,6 +253,9 @@
     },
     "my_files_2f621040": {
         "message": "Իմ ֆայլերը"
+    },
+    "name_1aed4a1b": {
+        "message": "Անուն"
     },
     "new_13daf639": {
         "message": "Նոր"

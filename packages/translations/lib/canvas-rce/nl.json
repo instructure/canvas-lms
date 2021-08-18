@@ -27,6 +27,7 @@
   },
   "announcement_list_da155734": { "message": "Lijst met aankondiging" },
   "announcements_a4b8ed4a": { "message": "Aankondigingen" },
+  "apply_781a2546": { "message": "Toepassen" },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Beeldverhouding blijft behouden"
@@ -46,6 +47,8 @@
     "message": "Wordt automatisch geopend in een in-line voorbeeld. (Voorbeeld wordt pas na het opslaan weergegeven)"
   },
   "available_folders_694d0436": { "message": "Beschikbare mappen" },
+  "below_81d4dceb": { "message": "Hieronder" },
+  "bottom_third_5f5fec1d": { "message": "Derde van beneden" },
   "button_color_608a0242": { "message": "Knopkleur" },
   "button_outline_cf14f071": { "message": "Knopomtrek" },
   "button_outline_size_cc1d1df7": { "message": "Knopomtrekgrootte" },
@@ -274,6 +277,7 @@
   "locked_762f138b": { "message": "Vergrendeld" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
+  "middle_27dc1d5": { "message": "Midden" },
   "miscellaneous_e9818229": { "message": "Diversen" },
   "modules_c4325335": { "message": "Modules" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -400,6 +404,10 @@
   "syllabus_f191f65b": { "message": "Syllabus" },
   "tab_arrows_4cf5abfc": { "message": "TAB/pijlen" },
   "text_7f4593da": { "message": "Tekst" },
+  "text_background_color_16e61c3f": { "message": "Achtergrondkleur van tekst" },
+  "text_color_acf75eb6": { "message": "Tekstkleur" },
+  "text_position_8df8c162": { "message": "Tekstpositie" },
+  "text_size_887c2f6": { "message": "Tekstgrootte" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Het materiaal bevindt zich in het openbaar domein"
   },
@@ -466,6 +474,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Gebruik pijltoetsen om een grootte te selecteren."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Gebruik pijltoetsen om een tekstpositie te selecteren."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Gebruik pijltoetsen om een tekstgrootte te selecteren."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Gebruik pijltoetsen om een omtrekgrootte te selecteren."

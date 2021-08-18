@@ -29,6 +29,7 @@
   },
   "announcement_list_da155734": { "message": "Lista de anuncios" },
   "announcements_a4b8ed4a": { "message": "Anuncios" },
+  "apply_781a2546": { "message": "Aplicar" },
   "apps_54d24a47": { "message": "Aplicaciones" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Se conservará la relación de aspecto"
@@ -48,6 +49,8 @@
     "message": "Abrir automáticamente una vista previa directa. (La vista previa solo se muestra después de guardar)"
   },
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
+  "below_81d4dceb": { "message": "Debajo" },
+  "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
   "button_color_608a0242": { "message": "Color del botón" },
   "button_outline_cf14f071": { "message": "Contorno del botón" },
   "button_outline_size_cc1d1df7": {
@@ -274,6 +277,7 @@
   "locked_762f138b": { "message": "Bloqueado" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
+  "middle_27dc1d5": { "message": "El medio" },
   "miscellaneous_e9818229": { "message": "Misceláneo" },
   "modules_c4325335": { "message": "Módulos" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -400,6 +404,10 @@
   "syllabus_f191f65b": { "message": "Programa" },
   "tab_arrows_4cf5abfc": { "message": "Tabulador/flechas" },
   "text_7f4593da": { "message": "Texto" },
+  "text_background_color_16e61c3f": { "message": "Color del fondo del texto" },
+  "text_color_acf75eb6": { "message": "Color del texto" },
+  "text_position_8df8c162": { "message": "Posición del texto" },
+  "text_size_887c2f6": { "message": "Tamaño del texto" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "El material es de dominio público"
   },
@@ -466,6 +474,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Utilice las teclas de flecha para seleccionar un tamaño."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Usar las teclas de flechas para seleccionar la posición del texto."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Usar las teclas de flechas para seleccionar el tamaño del texto."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Utilice las teclas de flecha para seleccionar un tamaño de contorno."

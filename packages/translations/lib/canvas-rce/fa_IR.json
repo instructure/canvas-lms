@@ -15,6 +15,7 @@
   "attributes_963ba262": { "message": "ویژگی ها" },
   "available_folders_694d0436": { "message": "پوشه های موجود" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "لغو" },
   "choose_usage_rights_33683854": { "message": "انتخاب حقوق استفاده..." },
   "clear_2084585f": { "message": "پاک کردن" },
   "clear_selected_file_82388e50": { "message": "پاک کردن فایل انتخاب شده" },
@@ -89,6 +90,7 @@
   "media_af190855": { "message": "رسانه" },
   "modules_c4325335": { "message": "ماژول ها" },
   "my_files_2f621040": { "message": "فایل های من" },
+  "name_1aed4a1b": { "message": "نام" },
   "next_page_d2a39853": { "message": "صفحه بعد" },
   "no_e16d9132": { "message": "خیر" },
   "no_preview_is_available_for_this_file_f940114a": {
