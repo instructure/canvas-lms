@@ -739,7 +739,8 @@ class AccountsController < ApplicationController
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
     page_opts = {}
-    page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
+    # don't calculate a total count for this endpoint.
+    page_opts[:total_entries] = nil
 
     all_precalculated_permissions = nil
     GuardRail.activate(:secondary) do
