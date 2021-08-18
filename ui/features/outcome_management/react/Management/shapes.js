@@ -45,8 +45,9 @@ export const groupCollectionShape = PropTypes.shape({
 export const outcomeEdgesNodeShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  isImported: PropTypes.bool.isRequired,
-  description: PropTypes.string
+  isImported: PropTypes.bool,
+  description: PropTypes.string,
+  displayName: PropTypes.string
 })
 
 export const outcomeEdgeShape = PropTypes.shape({

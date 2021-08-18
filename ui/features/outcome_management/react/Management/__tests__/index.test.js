@@ -87,10 +87,11 @@ describe('OutcomeManagementPanel', () => {
       contextType = 'Account',
       contextId = '1',
       canManage = true,
-      mocks = accountMocks({childGroupsCount: 0})
+      mocks = accountMocks({childGroupsCount: 0}),
+      renderer = rtlRender
     } = {}
   ) => {
-    return rtlRender(
+    return renderer(
       <OutcomesContext.Provider
         value={{
           env: {contextType, contextId, canManage, isMobileView, rootIds: [ACCOUNT_GROUP_ID]}
@@ -933,6 +934,44 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('2 Outcomes')).toBeInTheDocument()
       expect(getByLabelText('Search field')).toHaveValue('')
+    })
+  })
+
+  describe('After an outcome is added', () => {
+    const createdOutcomeProps = (props = {}, ancestorIds = ['2']) => ({
+      createdOutcomeGroupIds: ancestorIds,
+      ...props
+    })
+
+    it('it does not trigger a refetch if an outcome is created but not in the currently selected group', async () => {
+      const {getByText, queryByText, rerender} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      render(<OutcomeManagementPanel {...createdOutcomeProps()} />, {
+        ...groupDetailDefaultProps,
+        renderer: rerender
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText(/Newly Created Outcome/)).not.toBeInTheDocument()
+    })
+
+    it('it does trigger a refetch if an outcome is created is in currently selected group in RHS', async () => {
+      const {getByText, queryByText, rerender} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+
+      render(<OutcomeManagementPanel {...createdOutcomeProps({}, ['200'])} />, {
+        ...groupDetailDefaultProps,
+        renderer: rerender
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText(/Newly Created Outcome/)).toBeInTheDocument()
     })
   })
 

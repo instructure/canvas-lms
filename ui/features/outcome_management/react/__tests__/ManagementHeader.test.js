@@ -56,6 +56,7 @@ describe('ManagementHeader', () => {
   })
 
   afterEach(() => {
+    showImportOutcomesModal.mockRestore()
     jest.clearAllMocks()
   })
 

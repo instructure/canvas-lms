@@ -54,6 +54,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [importRef, setImportRef] = useState(null)
   const [importNumber, setImportNumber] = useState(0)
   const [isImporting, setIsImporting] = useState(false)
+  const [createdOutcomeGroupIds, setCreatedOutcomeGroupIds] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
@@ -149,6 +150,10 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
     })
   }
 
+  const onSuccessfulCreateOutcome = ({selectedGroupAncestorIds}) => {
+    setCreatedOutcomeGroupIds(selectedGroupAncestorIds)
+  }
+
   const isMobileView = !breakpoints?.tablet
 
   const onAddOutcomes = addedOutcomes => {
@@ -160,7 +165,11 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   return (
     <OutcomesContext.Provider value={getContext(isMobileView)}>
       {improvedManagement && (
-        <ManagementHeader handleAddOutcomes={onAddOutcomes} handleFileDrop={onFileDrop} />
+        <ManagementHeader
+          handleFileDrop={onFileDrop}
+          handleAddOutcomes={onAddOutcomes}
+          onSuccessfulCreateOutcome={onSuccessfulCreateOutcome}
+        />
       )}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel
@@ -170,7 +179,12 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
           id="management"
         >
           {improvedManagement ? (
-            !isImporting && <OutcomeManagementPanel importNumber={importNumber} />
+            !isImporting && (
+              <OutcomeManagementPanel
+                importNumber={importNumber}
+                createdOutcomeGroupIds={createdOutcomeGroupIds}
+              />
+            )
           ) : (
             <OutcomePanel />
           )}

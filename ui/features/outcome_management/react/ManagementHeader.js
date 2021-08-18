@@ -34,7 +34,7 @@ import CreateOutcomeModal from './CreateOutcomeModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 
-const ManagementHeader = ({handleFileDrop, handleAddOutcomes}) => {
+const ManagementHeader = ({handleFileDrop, handleAddOutcomes, onSuccessfulCreateOutcome}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
   const {isMobileView, canManage, canImport} = useCanvasContext()
@@ -112,14 +112,20 @@ const ManagementHeader = ({handleFileDrop, handleAddOutcomes}) => {
       <CreateOutcomeModal
         isOpen={isCreateOutcomeModalOpen}
         onCloseHandler={closeCreateOutcomeModal}
+        onSuccess={onSuccessfulCreateOutcome}
       />
     </div>
   )
 }
 
+ManagementHeader.defaultProps = {
+  onSuccessfulCreateOutcome: () => {}
+}
+
 ManagementHeader.propTypes = {
   handleFileDrop: PropTypes.func.isRequired,
-  handleAddOutcomes: PropTypes.func.isRequired
+  handleAddOutcomes: PropTypes.func.isRequired,
+  onSuccessfulCreateOutcome: PropTypes.func
 }
 
 export default ManagementHeader
