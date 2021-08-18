@@ -305,7 +305,7 @@ export default function K5Announcement({
     if (currentAnnouncement.id === FAUX_ANNOUNCEMENT_ID) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Text color="secondary" size="large">
+          <Text data-testid="no-recent-announcements" color="secondary" size="large">
             {I18n.t('No recent announcements')}
           </Text>
           {canEdit && (

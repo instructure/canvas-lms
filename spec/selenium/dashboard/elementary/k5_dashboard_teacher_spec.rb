@@ -24,6 +24,7 @@ require_relative '../pages/k5_grades_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../pages/k5_schedule_tab_page'
 require_relative '../../../helpers/k5_common'
+require_relative '../shared_examples/k5_announcements_shared_examples'
 
 describe "teacher k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -36,6 +37,7 @@ describe "teacher k5 dashboard" do
 
   before :once do
     teacher_setup
+    Account.site_admin.enable_feature!(:k5_homeroom_many_announcements)
   end
 
   before :each do
@@ -93,22 +95,6 @@ describe "teacher k5 dashboard" do
   end
 
   context 'homeroom announcements' do
-    it 'presents latest homeroom announcements' do
-      announcement_heading = "K5 Let's do this"
-      announcement_content = "So happy to see all of you."
-      new_announcement(@homeroom_course, announcement_heading, announcement_content)
-
-      announcement_heading = "Happy Monday!"
-      announcement_content = "Let's get to work"
-      new_announcement(@homeroom_course, announcement_heading, announcement_content)
-
-      get "/"
-
-      expect(homeroom_course_title_link(@course_name)).to be_displayed
-      expect(announcement_title(announcement_heading)).to be_displayed
-      expect(announcement_content_text(announcement_content)).to be_displayed
-    end
-
     it 'navigates to homeroom course announcement edit when announcement button is clicked' do
       get "/"
 
@@ -131,64 +117,21 @@ describe "teacher k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}/edit")
     end
 
-    it 'opens up the announcement when announcement title is clicked' do
-      announcement_title = "Happy Monday!"
-      announcement = new_announcement(@homeroom_course, announcement_title, "Let's get to work")
+    it 'provides the +Announcement button along with no recent announcements' do
+      announcement_heading1 = "K5 Do this"
+      announcement_content1 = "So happy to see all of you."
+      announcement1 = new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
+      announcement1.update!(posted_at: 15.days.ago)
 
       get "/"
 
-      click_announcement_title(announcement_title)
-      wait_for_ajaximations
-
-      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}")
+      expect(no_recent_announcements).to be_displayed
+      expect(announcement_button).to be_displayed
     end
 
-    it 'shows two different homeroom course announcements for teacher enrolled in two homerooms' do
-      first_course_announcement_title = "K5 Latest"
-      new_announcement(@homeroom_course, first_course_announcement_title, "Let's get to work!")
+    it_behaves_like 'k5 homeroom announcements'
 
-      second_homeroom_course_title = 'Second Teacher Homeroom'
-      course_with_teacher(
-        active_course: 1,
-        active_enrollment: 1,
-        course_name: second_homeroom_course_title,
-        user: @homeroom_teacher
-      )
-
-      @course.homeroom_course = true
-      @course.save!
-      second_course_announcement_title = "Homeroom 2"
-      announcement_course2 = new_announcement(@course, second_course_announcement_title, "You got this!")
-
-      get "/"
-
-      expect(homeroom_course_title_link(@course_name)).to be_displayed
-      expect(announcement_title(first_course_announcement_title)).to be_displayed
-      expect(homeroom_course_title_link(second_homeroom_course_title)).to be_displayed
-      expect(announcement_title(second_course_announcement_title)).to be_displayed
-    end
-
-    context 'announcement attachments with the better file downloading and previewing flags on' do
-      before :once do
-        Account.site_admin.enable_feature!(:rce_better_file_downloading)
-        Account.site_admin.enable_feature!(:rce_better_file_previewing)
-
-        attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
-        @homeroom_course.announcements.create!(title: "Welcome to class", message: "Hello!", attachment: @attachment)
-      end
-
-      it 'shows download button next to homeroom announcement attachment', custom_timeout: 30 do
-        get "/"
-        wait_for(method: nil, timeout: 20) { f('span.instructure_file_holder').displayed? }
-        expect(f("a.file_download_btn")).to be_displayed
-      end
-
-      it 'opens preview overlay when clicking on homeroom announcement attachment' do
-        get "/"
-        f("a.preview_in_overlay").click
-        expect(f("iframe.ef-file-preview-frame")).to be_displayed
-      end
-    end
+    it_behaves_like 'k5 homeroom announcements with multiple homerooms', :teacher
   end
 
   context 'course cards' do
