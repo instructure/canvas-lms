@@ -252,7 +252,7 @@ const FindOutcomesView = ({
                 </View>
               )}
               {outcomes?.edges?.map(
-                ({id: linkId, node: {_id, title, description, isImported}}, index) => (
+                ({_id: linkId, node: {_id, title, description, isImported}}, index) => (
                   <FindOutcomeItem
                     key={linkId}
                     id={_id}
