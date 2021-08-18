@@ -61,6 +61,7 @@ const locale = {
   },
   "available_folders_694d0436": { "message": "Elérhető mappák" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Mégse" },
   "choose_caption_file_9c45bc4e": { "message": "Feliratfájl választása" },
   "choose_usage_rights_33683854": {
     "message": "Válasszon a felhasználói jogokból..."
@@ -262,6 +263,7 @@ const locale = {
     "message": "Legalább { width } x { height } pixel szükséges"
   },
   "my_files_2f621040": { "message": "Fájljaim" },
+  "name_1aed4a1b": { "message": "Név" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigáljon a menün vagy eszköztáron át"
   },

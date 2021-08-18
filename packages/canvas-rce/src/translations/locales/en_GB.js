@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
+  "apply_781a2546": { "message": "Apply" },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
@@ -65,6 +66,8 @@ const locale = {
     "message": "Automatically open an in-line preview. (Preview displays only after saving)"
   },
   "available_folders_694d0436": { "message": "Available folders" },
+  "below_81d4dceb": { "message": "Below" },
+  "bottom_third_5f5fec1d": { "message": "Bottom Third" },
   "button_color_608a0242": { "message": "Button Colour" },
   "button_outline_cf14f071": { "message": "Button Outline" },
   "button_outline_size_cc1d1df7": { "message": "Button Outline Size" },
@@ -271,6 +274,7 @@ const locale = {
   "locked_762f138b": { "message": "Locked" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
+  "middle_27dc1d5": { "message": "Middle" },
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
   "modules_c4325335": { "message": "Modules" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -391,6 +395,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Syllabus" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Arrows" },
   "text_7f4593da": { "message": "Text" },
+  "text_background_color_16e61c3f": { "message": "Text Background Colour" },
+  "text_color_acf75eb6": { "message": "Text colour" },
+  "text_position_8df8c162": { "message": "Text Position" },
+  "text_size_887c2f6": { "message": "Text Size" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
   },
@@ -455,6 +463,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Use arrow keys to select a size."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Use arrow keys to select a text position."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Use arrow keys to select a text size."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Use arrow keys to select an outline size."

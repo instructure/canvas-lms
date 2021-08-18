@@ -32,6 +32,7 @@ const locale = {
   "assignments_1e02582c": { "message": "Εργασίες" },
   "attributes_963ba262": { "message": "Πεδία" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Ακύρωση" },
   "choose_usage_rights_33683854": {
     "message": "Επιλέξτε δικαιώματα χρήσης..."
   },
@@ -106,6 +107,7 @@ const locale = {
   "media_af190855": { "message": "Δεδομένα" },
   "modules_c4325335": { "message": "Ενότητες" },
   "my_files_2f621040": { "message": "Τα αρχεία μου" },
+  "name_1aed4a1b": { "message": "Όνομα" },
   "no_e16d9132": { "message": "μη δημοσιευμένο" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."

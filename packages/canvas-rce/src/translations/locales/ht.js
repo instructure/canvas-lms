@@ -47,6 +47,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Lis Anons" },
   "announcements_a4b8ed4a": { "message": "Anons" },
+  "apply_781a2546": { "message": "Aplike" },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "Fòma ap konsève" },
   "assignments_1e02582c": { "message": "Sesyon" },
@@ -62,6 +63,8 @@ const locale = {
     "message": "Ovri otomatikman nan apèsi an liy. (Apèsi a ap afiche sèlman aprè anrejistreman an)"
   },
   "available_folders_694d0436": { "message": "Dosye disponib" },
+  "below_81d4dceb": { "message": "Anba" },
+  "bottom_third_5f5fec1d": { "message": "Tyè Enferyè" },
   "button_color_608a0242": { "message": "Koulè Bouton" },
   "button_outline_cf14f071": { "message": "Kontou Bouton" },
   "button_outline_size_cc1d1df7": { "message": "Gwosè Kontou Bouton" },
@@ -260,6 +263,7 @@ const locale = {
   "locked_762f138b": { "message": "Bloke" },
   "media_af190855": { "message": "Medya" },
   "medium_5a8e9ead": { "message": "Mwayen" },
+  "middle_27dc1d5": { "message": "Mitan" },
   "miscellaneous_e9818229": { "message": "Divès" },
   "modules_c4325335": { "message": "Modil" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -382,6 +386,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Pwogram" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Flèch" },
   "text_7f4593da": { "message": "Tèks" },
+  "text_background_color_16e61c3f": { "message": "Koulè Fon Tèks" },
+  "text_color_acf75eb6": { "message": "Koulè Tèks" },
+  "text_position_8df8c162": { "message": "Pozisyon Tèks" },
+  "text_size_887c2f6": { "message": "Gwosè Tèks" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materyèl la nan domèn piblik la"
   },
@@ -448,6 +456,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Itilize touch flèch yo pou seleksyone yon dimansyon."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Itilize tout flèch yo pou ka seleksyone yon pozisyon tèks."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Itilize tout flèch yo pou ka seleksyone yon dimansyon tèks"
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Itilize touch flèch yo pou seleksyone dimansyon kontou."

@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
+  "apply_781a2546": { "message": "Rhoi ar waith" },
   "apps_54d24a47": { "message": "Apiau" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
@@ -67,6 +68,8 @@ const locale = {
     "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
   },
   "available_folders_694d0436": { "message": "Ffolderi sydd ar gael" },
+  "below_81d4dceb": { "message": "O dan" },
+  "bottom_third_5f5fec1d": { "message": "Traean Isaf" },
   "button_color_608a0242": { "message": "Lliw’r Botwm" },
   "button_outline_cf14f071": { "message": "Amlinell o’r Botwm" },
   "button_outline_size_cc1d1df7": { "message": "Maint yr Amlinell o’r Botwm" },
@@ -289,6 +292,7 @@ const locale = {
   "locked_762f138b": { "message": "Wedi Cloi" },
   "media_af190855": { "message": "Cyfryngau" },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
+  "middle_27dc1d5": { "message": "Canol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
   "modules_c4325335": { "message": "Modiwlau" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -415,6 +419,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Maes Llafur" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Saethau" },
   "text_7f4593da": { "message": "Testun" },
+  "text_background_color_16e61c3f": { "message": "Lliw Cefndir yTestun" },
+  "text_color_acf75eb6": { "message": "Lliw''r Testun" },
+  "text_position_8df8c162": { "message": "Lleoliad y Testun" },
+  "text_size_887c2f6": { "message": "Maint y Testun" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Mae’r deunydd yn y parth cyhoeddus"
   },
@@ -483,6 +491,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Defnyddiwch y saethau i ddewis maint."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Defnyddiwch y saethau i ddewis lleoliad y testun."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Defnyddiwch y saethau i ddewis maint y testun."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Defnyddiwch y saethau i ddewis maint amlinelliad."

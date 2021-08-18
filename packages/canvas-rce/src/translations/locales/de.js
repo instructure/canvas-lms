@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Ankündigungsliste" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
+  "apply_781a2546": { "message": "Anwenden" },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Seitenverhältnis wird beibehalten"
@@ -65,6 +66,8 @@ const locale = {
     "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
   },
   "available_folders_694d0436": { "message": "Verfügbare Ordner" },
+  "below_81d4dceb": { "message": "Unten" },
+  "bottom_third_5f5fec1d": { "message": "Unteres Drittel" },
   "button_color_608a0242": { "message": "Farbe der Schaltfläche" },
   "button_outline_cf14f071": { "message": "Kontur der Schaltfläche" },
   "button_outline_size_cc1d1df7": {
@@ -283,6 +286,7 @@ const locale = {
   "locked_762f138b": { "message": "Gesperrt" },
   "media_af190855": { "message": "Medien" },
   "medium_5a8e9ead": { "message": "Medium" },
+  "middle_27dc1d5": { "message": "Mitte" },
   "miscellaneous_e9818229": { "message": "Verschiedenes" },
   "modules_c4325335": { "message": "Module" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -409,6 +413,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Kursplan" },
   "tab_arrows_4cf5abfc": { "message": "<TAB>/Pfeile" },
   "text_7f4593da": { "message": "Text" },
+  "text_background_color_16e61c3f": { "message": "Texthintergrundfarbe" },
+  "text_color_acf75eb6": { "message": "Textfarbe" },
+  "text_position_8df8c162": { "message": "Textposition" },
+  "text_size_887c2f6": { "message": "Textgröße" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Das Material ist gemeinfrei."
   },
@@ -477,6 +485,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Verwenden Sie die Pfeiltasten, um eine Größe auszuwählen."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Verwenden Sie die Pfeiltasten, um eine Textposition auszuwählen."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Verwenden Sie die Pfeiltasten, um eine Textgröße auszuwählen."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Verwenden Sie die Pfeiltasten, um eine Konturgröße auszuwählen."

@@ -50,6 +50,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
+  "apply_781a2546": { "message": "تطبيق" },
   "apps_54d24a47": { "message": "التطبيق" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
@@ -67,6 +68,8 @@ const locale = {
     "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
   },
   "available_folders_694d0436": { "message": "المجلدات المتاحة" },
+  "below_81d4dceb": { "message": "الأسفل" },
+  "bottom_third_5f5fec1d": { "message": "الثالث من الأسفل" },
   "button_color_608a0242": { "message": "لون الزر" },
   "button_outline_cf14f071": { "message": "إطار الزر" },
   "button_outline_size_cc1d1df7": { "message": "حجم إطار الزر" },
@@ -269,6 +272,7 @@ const locale = {
   "locked_762f138b": { "message": "مؤمّن" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
+  "middle_27dc1d5": { "message": "الأوسط" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -387,6 +391,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "المناهج" },
   "tab_arrows_4cf5abfc": { "message": "ضغط/أسهم" },
   "text_7f4593da": { "message": "نص" },
+  "text_background_color_16e61c3f": { "message": "لون خلفية النص" },
+  "text_color_acf75eb6": { "message": "لون النص" },
+  "text_position_8df8c162": { "message": "موضع النص" },
+  "text_size_887c2f6": { "message": "حجم النص" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "توجد المادة في المجال العام"
   },
@@ -451,6 +459,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "استخدم مفاتيح الأسهم لتحديد حجم."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "استخدم مفاتيح الأسهم لتحديد موضع النص."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "استخدم مفاتيح الأسهم لتحديد حجم النص."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "استخدم مفاتيح الأسهم لتحديد حجم الإطار."

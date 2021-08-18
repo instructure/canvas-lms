@@ -52,6 +52,7 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "{ title } ses oynatıcı" },
   "available_folders_694d0436": { "message": "Mevcut klasörler" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "İptal" },
   "choose_caption_file_9c45bc4e": { "message": "Alt yazı dosyasını seçin" },
   "choose_usage_rights_33683854": { "message": "Kullanıcı haklarını seçin..." },
   "circle_unordered_list_9e3a0763": {
@@ -159,6 +160,7 @@ const locale = {
   "media_af190855": { "message": "Medya" },
   "modules_c4325335": { "message": "Modüller" },
   "my_files_2f621040": { "message": "Dosyalarım" },
+  "name_1aed4a1b": { "message": "İsim" },
   "next_page_d2a39853": { "message": "Sonraki Sayfa" },
   "no_e16d9132": { "message": "Hayır" },
   "no_preview_is_available_for_this_file_f940114a": {

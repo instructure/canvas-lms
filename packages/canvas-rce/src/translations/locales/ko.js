@@ -29,6 +29,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "비율을 유지" },
   "assignments_1e02582c": { "message": "과제" },
   "attributes_963ba262": { "message": "속성" },
+  "cancel_caeb1e68": { "message": "취소" },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Click to embed { imageName }"
   },
@@ -80,6 +81,7 @@ const locale = {
   "media_af190855": { "message": "미디어" },
   "modules_c4325335": { "message": "모듈" },
   "my_files_2f621040": { "message": "내 파일" },
+  "name_1aed4a1b": { "message": "이름" },
   "no_e16d9132": { "message": "아니요" },
   "no_results_940393cf": { "message": "No results." },
   "none_3b5e34d2": { "message": "없음" },

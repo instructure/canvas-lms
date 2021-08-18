@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
+  "apply_781a2546": { "message": "Zastosuj" },
   "apps_54d24a47": { "message": "Aplikacje" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
@@ -67,6 +68,8 @@ const locale = {
     "message": "Automatycznie otwórz pogląd w wierszu. (podgląd zostanie wyświetlony po zapisaniu)"
   },
   "available_folders_694d0436": { "message": "Dostępne foldery" },
+  "below_81d4dceb": { "message": "Poniżej" },
+  "bottom_third_5f5fec1d": { "message": "Trzeci od dołu" },
   "button_color_608a0242": { "message": "Kolor przycisku" },
   "button_outline_cf14f071": { "message": "Obramowanie przycisku" },
   "button_outline_size_cc1d1df7": {
@@ -285,6 +288,7 @@ const locale = {
   "locked_762f138b": { "message": "Zablokowany" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Średni" },
+  "middle_27dc1d5": { "message": "Środkowy" },
   "miscellaneous_e9818229": { "message": "Różne" },
   "modules_c4325335": { "message": "Moduły" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -417,6 +421,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Program" },
   "tab_arrows_4cf5abfc": { "message": "TAB/klawisze strzałek" },
   "text_7f4593da": { "message": "Tekst" },
+  "text_background_color_16e61c3f": { "message": "Kolor tła tekstu" },
+  "text_color_acf75eb6": { "message": "Kolor tekstu" },
+  "text_position_8df8c162": { "message": "Położenie tekstu" },
+  "text_size_887c2f6": { "message": "Rozmiar tekstu" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiał znajduje się w domenie publicznej"
   },
@@ -485,6 +493,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Użyj klawiszy strzałek, aby wybrać rozmiar."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Użyj klawiszy strzałek, aby wybrać położenie tekstu."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Użyj klawiszy strzałek, aby wybrać rozmiar tekstu."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Użyj klawiszy strzałek, aby wybrać rozmiar obramowania."

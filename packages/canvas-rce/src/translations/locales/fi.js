@@ -49,6 +49,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Ilmoitusluettelo" },
   "announcements_a4b8ed4a": { "message": "Ilmoitukset" },
+  "apply_781a2546": { "message": "Käytä" },
   "apps_54d24a47": { "message": "Sovellukset" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Kuvasuhde säilytetään"
@@ -68,6 +69,8 @@ const locale = {
     "message": "Avaa automaattisesti tekstiin sidottu esikatselu. (Esikatselu näkyy vain tallentamisen jälkeen)"
   },
   "available_folders_694d0436": { "message": "Saatavissa olevat kansiot" },
+  "below_81d4dceb": { "message": "Alle" },
+  "bottom_third_5f5fec1d": { "message": "Alakolmannes" },
   "button_color_608a0242": { "message": "Painikkeen väri" },
   "button_outline_cf14f071": { "message": "Painikkeen ääriviiva" },
   "button_outline_size_cc1d1df7": { "message": "Painikkeen ääriviivan koko" },
@@ -288,6 +291,7 @@ const locale = {
   "locked_762f138b": { "message": "Lukittu" },
   "media_af190855": { "message": "Tietoväline" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
+  "middle_27dc1d5": { "message": "Kohtalainen" },
   "miscellaneous_e9818229": { "message": "Muut asiat" },
   "modules_c4325335": { "message": "Moduulit" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -412,6 +416,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Opinto-ohjelma" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Nuolet" },
   "text_7f4593da": { "message": "Teksti" },
+  "text_background_color_16e61c3f": { "message": "Tekstin taustaväri" },
+  "text_color_acf75eb6": { "message": "Tekstiväri" },
+  "text_position_8df8c162": { "message": "Tekstin paikka" },
+  "text_size_887c2f6": { "message": "Tekstikoko" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiaali on vapaasti käytössä (public domain)."
   },
@@ -476,6 +484,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Valitse nuolipainikkeet valitaksesi koon."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Valitse nuolipainikkeet valitaksesi tekstin paikan."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Valitse nuolipainikkeet valitaksesi tekstin koon."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Valitse nuolipainikkeet ääriviivan koon."

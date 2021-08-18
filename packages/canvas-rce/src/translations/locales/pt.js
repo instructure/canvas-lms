@@ -50,6 +50,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Lista de anúncio" },
   "announcements_a4b8ed4a": { "message": "Anúncios" },
+  "apply_781a2546": { "message": "Aplicar" },
   "apps_54d24a47": { "message": "Aplicativos" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "A relação de aspeto será preservada"
@@ -69,6 +70,8 @@ const locale = {
     "message": "Abra automaticamente uma pré-visualização em linha. (A pré-visualização é exibida somente após salvar)"
   },
   "available_folders_694d0436": { "message": "Pastas disponíveis" },
+  "below_81d4dceb": { "message": "Abaixo" },
+  "bottom_third_5f5fec1d": { "message": "Terço inferior" },
   "button_color_608a0242": { "message": "Cor do Botão" },
   "button_outline_cf14f071": { "message": "Esboço do Botão" },
   "button_outline_size_cc1d1df7": { "message": "Tamanho do Esboço do Botão" },
@@ -295,6 +298,7 @@ const locale = {
   "locked_762f138b": { "message": "Bloqueado" },
   "media_af190855": { "message": "Mídia" },
   "medium_5a8e9ead": { "message": "Médio" },
+  "middle_27dc1d5": { "message": "Médio" },
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Módulos" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -419,6 +423,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Programa" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Setas" },
   "text_7f4593da": { "message": "Texto" },
+  "text_background_color_16e61c3f": { "message": "Cor de fundo do texto" },
+  "text_color_acf75eb6": { "message": "Cor do texto" },
+  "text_position_8df8c162": { "message": "Posição do texto" },
+  "text_size_887c2f6": { "message": "Tamanho do texto" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "O material é de domínio público"
   },
@@ -485,6 +493,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Utilizar as teclas de setas para selecionar um tamanho."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Utilizar as teclas de setas para selecionar uma posição de texto."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Utilizar as teclas de setas para selecionar um tamanho de texto."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Usar as teclas de setas para selecionar um tamanho de contorno."

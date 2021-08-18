@@ -32,6 +32,7 @@ const locale = {
   "assignments_1e02582c": { "message": "Հանձնարարություններ" },
   "attributes_963ba262": { "message": "Հատկանիշեր" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001թ. Acme Inc." },
+  "cancel_caeb1e68": { "message": "Չեղյալ համարել" },
   "choose_usage_rights_33683854": {
     "message": "Ընտրել օգտագործման իրավունքները..."
   },
@@ -104,6 +105,7 @@ const locale = {
   "media_af190855": { "message": "Մուլտիմեդիա" },
   "modules_c4325335": { "message": "Մոդուլներ" },
   "my_files_2f621040": { "message": "Իմ ֆայլերը" },
+  "name_1aed4a1b": { "message": "Անուն" },
   "no_e16d9132": { "message": "Ոչ" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"

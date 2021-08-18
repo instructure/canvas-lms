@@ -45,6 +45,7 @@ const locale = {
     "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
   },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Скасувати" },
   "choose_usage_rights_33683854": {
     "message": "Виберіть права використання..."
   },
@@ -136,6 +137,7 @@ const locale = {
   "media_af190855": { "message": "Носій інформації" },
   "modules_c4325335": { "message": "Розділи" },
   "my_files_2f621040": { "message": "Мої файли" },
+  "name_1aed4a1b": { "message": "Ім''я" },
   "next_page_d2a39853": { "message": "Наступна Сторінка" },
   "no_e16d9132": { "message": "Ні" },
   "no_preview_is_available_for_this_file_f940114a": {

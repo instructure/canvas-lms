@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "アナウンス リスト" },
   "announcements_a4b8ed4a": { "message": "発表" },
+  "apply_781a2546": { "message": "適用" },
   "apps_54d24a47": { "message": "アプリ" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "アスペクト比は維持されます"
@@ -67,6 +68,8 @@ const locale = {
     "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
   },
   "available_folders_694d0436": { "message": "使用可能なフォルダ" },
+  "below_81d4dceb": { "message": "下の" },
+  "bottom_third_5f5fec1d": { "message": "下から3番目" },
   "button_color_608a0242": { "message": "ボタンの色" },
   "button_outline_cf14f071": { "message": "ボタンの輪郭" },
   "button_outline_size_cc1d1df7": { "message": "ボタンの輪郭サイズ" },
@@ -289,6 +292,7 @@ const locale = {
   "locked_762f138b": { "message": "ロックされています" },
   "media_af190855": { "message": "メディア" },
   "medium_5a8e9ead": { "message": "中" },
+  "middle_27dc1d5": { "message": "中位" },
   "miscellaneous_e9818229": { "message": "その他" },
   "modules_c4325335": { "message": "モジュール" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -415,6 +419,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "シラバス" },
   "tab_arrows_4cf5abfc": { "message": "TAB/矢印" },
   "text_7f4593da": { "message": "テキスト" },
+  "text_background_color_16e61c3f": { "message": "テキスト背景の色" },
+  "text_color_acf75eb6": { "message": "テキストカラー" },
+  "text_position_8df8c162": { "message": "テキストの位置" },
+  "text_size_887c2f6": { "message": "テキストのサイズ" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "この資料はパブリック ドメインです"
   },
@@ -483,6 +491,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "矢印キーを使ってサイズを選択します。"
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "矢印キーを使ってテキストの位置を選択します。"
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "矢印キーを使ってテキストのサイズを選択します。"
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "矢印キーを使ってアウトラインサイズを選択します。"

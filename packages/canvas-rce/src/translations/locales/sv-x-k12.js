@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "Anslagslista" },
   "announcements_a4b8ed4a": { "message": "Anslag" },
+  "apply_781a2546": { "message": "Tillämpa" },
   "apps_54d24a47": { "message": "Appar" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bildförhållande kommer att behållas"
@@ -65,6 +66,8 @@ const locale = {
     "message": "Öppna automatiskt en infogad förhandsvisning (Förhandsvisningen visas endast efter att den sparats)"
   },
   "available_folders_694d0436": { "message": "Tillgängliga mappar" },
+  "below_81d4dceb": { "message": "Nedan" },
+  "bottom_third_5f5fec1d": { "message": "Tredje nerifrån" },
   "button_color_608a0242": { "message": "Knappfärg" },
   "button_outline_cf14f071": { "message": "Knappkontur" },
   "button_outline_size_cc1d1df7": { "message": "Storlek på knappkontur" },
@@ -289,6 +292,7 @@ const locale = {
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
+  "middle_27dc1d5": { "message": "Mitten" },
   "miscellaneous_e9818229": { "message": "Blandat" },
   "modules_c4325335": { "message": "Moduler" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -419,6 +423,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "Kursöversikt" },
   "tab_arrows_4cf5abfc": { "message": "FLIK/Pilar" },
   "text_7f4593da": { "message": "Text" },
+  "text_background_color_16e61c3f": { "message": "Bakgrundsfärg för text" },
+  "text_color_acf75eb6": { "message": "Textfärg" },
+  "text_position_8df8c162": { "message": "Textposition" },
+  "text_size_887c2f6": { "message": "Textstorlek" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet är i den offentliga domänen"
   },
@@ -485,6 +493,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Använd pilknapparna för att välja en storlek."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Använd pilknapparna för att välja en textposition."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Använd pilknapparna för att välja en textstorlek."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Använd pilknapparna för att välja en konturstorlek."

@@ -61,6 +61,7 @@ const locale = {
   },
   "available_folders_694d0436": { "message": "Tilgjengelege mapper" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
   "choose_usage_rights_33683854": { "message": "Vel bruksrett..." },
   "circle_unordered_list_9e3a0763": { "message": "sirkulær uordna liste" },
@@ -250,6 +251,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mine filer" },
   "my_images_427f9b0c": { "message": "Mine bilder" },
+  "name_1aed4a1b": { "message": "Namn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },

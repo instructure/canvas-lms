@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "通告清單" },
   "announcements_a4b8ed4a": { "message": "通告" },
+  "apply_781a2546": { "message": "應用" },
   "apps_54d24a47": { "message": "應用程式" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "外觀比例將被保留" },
   "assignments_1e02582c": { "message": "作業列表" },
@@ -63,6 +64,8 @@ const locale = {
     "message": "自動開啟行中預覽。（僅在儲存後顯示預覽）"
   },
   "available_folders_694d0436": { "message": "可用資料夾" },
+  "below_81d4dceb": { "message": "以下" },
+  "bottom_third_5f5fec1d": { "message": "底部第三個" },
   "button_color_608a0242": { "message": "按鈕顏色" },
   "button_outline_cf14f071": { "message": "按鈕提綱" },
   "button_outline_size_cc1d1df7": { "message": "按鈕提綱大小" },
@@ -245,6 +248,7 @@ const locale = {
   "locked_762f138b": { "message": "已鎖定" },
   "media_af190855": { "message": "媒體" },
   "medium_5a8e9ead": { "message": "中" },
+  "middle_27dc1d5": { "message": "中間" },
   "miscellaneous_e9818229": { "message": "雜項" },
   "modules_c4325335": { "message": "單元" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -359,6 +363,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "課程大綱" },
   "tab_arrows_4cf5abfc": { "message": "TAB/箭頭" },
   "text_7f4593da": { "message": "文字" },
+  "text_background_color_16e61c3f": { "message": "文字背景顏色" },
+  "text_color_acf75eb6": { "message": "文字顏色" },
+  "text_position_8df8c162": { "message": "文字位置" },
+  "text_size_887c2f6": { "message": "文字大小" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "該材料位於公用網域中。"
   },
@@ -423,6 +431,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "使用箭頭鍵選擇大小。"
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "使用箭頭鍵選擇文字位置。"
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "使用箭頭鍵選擇文字大小。"
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "使用箭頭鍵選擇提綱大小。"

@@ -33,6 +33,7 @@ const locale = {
   "assignments_1e02582c": { "message": "משימות" },
   "attributes_963ba262": { "message": "מאפיינים" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "ביטול" },
   "choose_usage_rights_33683854": { "message": "בחירה של זכויות שימוש..." },
   "clear_2084585f": { "message": "ניקוי" },
   "click_to_embed_imagename_c41ea8df": {
@@ -101,6 +102,7 @@ const locale = {
   "media_af190855": { "message": "מדיה" },
   "modules_c4325335": { "message": "מודולים" },
   "my_files_2f621040": { "message": "הקבצים שלי" },
+  "name_1aed4a1b": { "message": "שם" },
   "no_e16d9132": { "message": "לא" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "אין תצוגה מקדימה לקובץ זה"

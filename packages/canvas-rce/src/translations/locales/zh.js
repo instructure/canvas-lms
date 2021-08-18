@@ -48,6 +48,7 @@ const locale = {
   },
   "announcement_list_da155734": { "message": "公告列表" },
   "announcements_a4b8ed4a": { "message": "公告" },
+  "apply_781a2546": { "message": "申请" },
   "apps_54d24a47": { "message": "应用程序" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "保留长宽比" },
   "assignments_1e02582c": { "message": "作业" },
@@ -63,6 +64,8 @@ const locale = {
     "message": "自动打开在线预览。（预览仅在保存后显示）"
   },
   "available_folders_694d0436": { "message": "可用文件夹" },
+  "below_81d4dceb": { "message": "下方" },
+  "bottom_third_5f5fec1d": { "message": "倒数第三" },
   "button_color_608a0242": { "message": "按钮颜色" },
   "button_outline_cf14f071": { "message": "按钮轮廓" },
   "button_outline_size_cc1d1df7": { "message": "按钮轮廓大小" },
@@ -247,6 +250,7 @@ const locale = {
   "locked_762f138b": { "message": "已锁定" },
   "media_af190855": { "message": "媒体" },
   "medium_5a8e9ead": { "message": "中等" },
+  "middle_27dc1d5": { "message": "中间" },
   "miscellaneous_e9818229": { "message": "其他" },
   "modules_c4325335": { "message": "单元" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -359,6 +363,10 @@ const locale = {
   "syllabus_f191f65b": { "message": "教学大纲" },
   "tab_arrows_4cf5abfc": { "message": "TAB/箭头" },
   "text_7f4593da": { "message": "文本" },
+  "text_background_color_16e61c3f": { "message": "文字背景颜色" },
+  "text_color_acf75eb6": { "message": "文本颜色" },
+  "text_position_8df8c162": { "message": "文字位置" },
+  "text_size_887c2f6": { "message": "文字大小" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "材料在公开域中"
   },
@@ -423,6 +431,12 @@ const locale = {
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "使用箭头键选择大小。"
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "使用箭头键选择文字位置。"
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "使用箭头键选择文字大小。"
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "使用箭头键选择轮廓大小。"
