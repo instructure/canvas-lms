@@ -55,6 +55,7 @@ describe('FindOutcomesView', () => {
       outcomes: {
         edges: [
           {
+            _id: 10,
             node: {
               _id: '11',
               title: 'Outcome 1',
