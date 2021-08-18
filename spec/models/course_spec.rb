@@ -2638,7 +2638,7 @@ describe Course, "tabs_available" do
 
         it 'returns the plugin names' do
           tabs = @course.tabs_available(@user)
-          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Formerly Conferences)")
+          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Conferences)")
         end
       end
 
