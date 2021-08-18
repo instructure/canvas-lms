@@ -508,30 +508,12 @@ describe "context modules" do
       expect(f("#select_context_content_dialog")).to be_displayed
     end
 
-    it "should add an external tool item to a module from apps", priority: "1", test_id: 126706 do
-      @course.context_modules.create!(name: "New Module")
-      get "/courses/#{@course.id}/settings"
-
-      f("#tab-tools-link").click
-      f(".add_tool_link.lm").click
-      f("#configuration_type_selector").click
-      f("option[value='url']").click
-      ff(".formFields input")[0].send_keys("Khan Academy")
-      ff(".formFields input")[1].send_keys("key")
-      ff(".formFields input")[2].send_keys("secret")
-      ff(".formFields input")[3].send_keys("https://www.eduappcenter.com/configurations/rt6spjamqrgkduhr.xml")
-      f("#submitExternalAppBtn").click
-      get "/courses/#{@course.id}/modules"
-      add_new_external_item('External Tool', 'https://www.edu-apps.org/lti_public_resources/launch?driver=khan_academy&remote_id=y2-uaPiyoxc', 'Counting with small numbers')
-      expect(fln('Counting with small numbers')).to be_displayed
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-    end
-
     it "should add an external tool item to a module", priority: "1", test_id: 2624909 do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
       expect(fln('Instructure')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
     it "should not render links for subheader type items", priority: "1" do
