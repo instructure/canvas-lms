@@ -37,6 +37,8 @@ describe('useOutcomesImport', () => {
   let cache, showFlashAlertSpy
   const groupId = '100'
   const outcomeId = '200'
+  const outcomesCount = 2
+  const outcomeCount = 1
   beforeEach(() => {
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
@@ -77,7 +79,7 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
     })
@@ -90,7 +92,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       await act(async () => jest.runAllTimers())
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_FAILED})
@@ -101,7 +103,7 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       await act(async () => jest.runAllTimers())
       expect(resolveProgress).toHaveBeenCalled()
@@ -121,7 +123,7 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
@@ -134,12 +136,12 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while importing this group.',
+        message: 'An error occurred while importing these outcomes.',
         type: 'error'
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_FAILED})
@@ -150,11 +152,11 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'The outcome group was successfully imported into this account.',
+        message: '2 outcomes have been successfully added to this account.',
         type: 'success'
       })
     })
@@ -172,11 +174,11 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'The outcome group was successfully imported into this course.',
+        message: '2 outcomes have been successfully added to this course.',
         type: 'success'
       })
     })
@@ -193,7 +195,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while importing this group: GraphQL error: Network error.',
+        message: 'An error occurred while importing these outcomes: GraphQL error: Network error.',
         type: 'error'
       })
     })
@@ -210,7 +212,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while importing this group.',
+        message: 'An error occurred while importing these outcomes.',
         type: 'error'
       })
     })
@@ -220,7 +222,7 @@ describe('useOutcomesImport', () => {
         wrapper
       })
       act(() => {
-        result.current.importOutcomes(groupId)
+        result.current.importOutcomes(groupId, outcomesCount)
       })
       await act(async () => jest.runAllTimers())
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_COMPLETED})
@@ -240,7 +242,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
     })
@@ -253,7 +255,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       await act(async () => jest.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_FAILED})
@@ -267,7 +269,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       await act(async () => jest.runAllTimers())
       expect(resolveProgress).toHaveBeenCalled()
@@ -290,7 +292,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
@@ -306,7 +308,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
@@ -325,7 +327,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
@@ -342,7 +344,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
@@ -359,7 +361,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false)
+        result.current.importOutcomes(outcomeId, outcomeCount, false)
       })
       await act(async () => jest.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
@@ -377,7 +379,7 @@ describe('useOutcomesImport', () => {
         }
       })
       act(() => {
-        result.current.importOutcomes(outcomeId, false, 300, 'Account')
+        result.current.importOutcomes(outcomeId, outcomeCount, false, 300, 'Account')
       })
       await act(async () => jest.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})

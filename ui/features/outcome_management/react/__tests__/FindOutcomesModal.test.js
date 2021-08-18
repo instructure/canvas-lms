@@ -324,7 +324,7 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('The outcome group was successfully imported into this account.')[0]
+          getAllByText('25 outcomes have been successfully added to this account.')[0]
         ).toBeInTheDocument()
       })
 
@@ -352,7 +352,7 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('The outcome group was successfully imported into this course.')[0]
+          getAllByText('50 outcomes have been successfully added to this course.')[0]
         ).toBeInTheDocument()
       })
 
@@ -483,7 +483,7 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText('The outcome group was successfully imported into this course.')[0]
+          getAllByText('51 outcomes have been successfully added to this course.')[0]
         ).toBeInTheDocument()
       })
 
@@ -503,7 +503,7 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('The outcome group was successfully imported into this account.')[0]
+          getAllByText('25 outcomes have been successfully added to this account.')[0]
         ).toBeInTheDocument()
       })
 
@@ -527,7 +527,7 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Import Anyway'))
         expect(
           getAllByText(
-            'An error occurred while importing this group: GraphQL error: Network error.'
+            'An error occurred while importing these outcomes: GraphQL error: Network error.'
           )[0]
         ).toBeInTheDocument()
       })
@@ -550,7 +550,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
-        expect(getAllByText('An error occurred while importing this group.')[0]).toBeInTheDocument()
+        expect(
+          getAllByText('An error occurred while importing these outcomes.')[0]
+        ).toBeInTheDocument()
       })
     })
 

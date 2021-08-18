@@ -56,20 +56,20 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     showFlashAlert({
       message: err.message
         ? isGroup
-          ? I18n.t('An error occurred while importing this group: %{message}.', {
+          ? I18n.t('An error occurred while importing these outcomes: %{message}.', {
               message: err.message
             })
           : I18n.t('An error occurred while importing this outcome: %{message}.', {
               message: err.message
             })
         : isGroup
-        ? I18n.t('An error occurred while importing this group.')
+        ? I18n.t('An error occurred while importing these outcomes.')
         : I18n.t('An error occurred while importing this outcome.'),
       type: 'error'
     })
 
   const trackProgress = useCallback(
-    async (progress, outcomeOrGroupId, isGroup) => {
+    async (progress, outcomeOrGroupId, outcomesCount, isGroup) => {
       try {
         await resolveProgress(
           {
@@ -83,8 +83,24 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         if (isGroup) {
           showFlashAlert({
             message: isCourse
-              ? I18n.t('The outcome group was successfully imported into this course.')
-              : I18n.t('The outcome group was successfully imported into this account.'),
+              ? I18n.t(
+                  {
+                    one: '1 outcome has been successfully added to this course.',
+                    other: '%{count} outcomes have been successfully added to this course.'
+                  },
+                  {
+                    count: outcomesCount
+                  }
+                )
+              : I18n.t(
+                  {
+                    one: '1 outcome has been successfully added to this account.',
+                    other: '%{count} outcomes have been successfully added to this account.'
+                  },
+                  {
+                    count: outcomesCount
+                  }
+                ),
             type: 'success'
           })
         }
@@ -98,7 +114,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
   )
 
   const importOutcomes = useCallback(
-    async (outcomeOrGroupId, isGroup = true, sourceContextId, sourceContextType) => {
+    async (outcomeOrGroupId, outcomesCount, isGroup = true, sourceContextId, sourceContextType) => {
       try {
         const input = {
           targetContextId,
@@ -118,10 +134,9 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const importResult = await importOutcomesMutation({variables: {input}})
         const progress = importResult.data?.importOutcomes?.progress
         const importErrors = importResult.data?.importOutcomes?.errors
-        const errorMessage = importErrors?.[0]?.message
-        if (importErrors !== null) throw new Error(errorMessage)
+        if (importErrors !== null) throw new Error(importErrors?.[0]?.message)
 
-        trackProgress(progress, outcomeOrGroupId, isGroup)
+        trackProgress(progress, outcomeOrGroupId, outcomesCount, isGroup)
       } catch (err) {
         showFlashError(err, isGroup)
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
