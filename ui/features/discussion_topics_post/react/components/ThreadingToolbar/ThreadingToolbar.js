@@ -56,11 +56,14 @@ export function ThreadingToolbar({...props}) {
               const isolatedId = props.discussionEntry.rootEntry
                 ? props.discussionEntry.rootEntry.id
                 : props.discussionEntry.id
+              const relativeId = props.discussionEntry.rootEntry ? props.discussionEntry._id : null
+
               props.onOpenIsolatedView(
                 isolatedId,
                 props.discussionEntry.rootEntryId,
                 false,
-                props.discussionEntry._id
+                relativeId,
+                props.discussionEntry.id
               )
             }}
           >

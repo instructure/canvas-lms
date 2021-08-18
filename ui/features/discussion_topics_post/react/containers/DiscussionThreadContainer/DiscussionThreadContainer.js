@@ -83,7 +83,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, sort} = useContext(SearchContext)
+  const {searchTerm, sort, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -409,6 +409,7 @@ export const DiscussionThreadContainer = props => {
                           discussionEntry={props.discussionEntry}
                           onOpenIsolatedView={props.onOpenIsolatedView}
                           isIsolatedView={false}
+                          filter={filter}
                         >
                           {threadActions}
                         </ThreadingToolbar>

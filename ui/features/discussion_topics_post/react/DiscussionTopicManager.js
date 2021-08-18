@@ -235,8 +235,14 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, relativeId) => {
-            setHighlightEntryId(relativeId)
+          onOpenIsolatedView={(
+            discussionEntryId,
+            rootEntryId,
+            withRCE,
+            relativeId,
+            highlightId
+          ) => {
+            setHighlightEntryId(highlightId)
             openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
