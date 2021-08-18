@@ -144,10 +144,11 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
-        expect { subject }.to raise_error do |e|
-          expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
-          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        end
+        klass = MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant
+        message = /make sure your admin has granted access/
+
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, message)
+
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
       end
@@ -164,7 +165,7 @@ describe MicrosoftSync::GraphService do
       it 'raises an ApplicationNotAuthorizedForTenant error' do
         expect { subject }.to raise_error do |e|
           expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
-          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelError)
         end
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
@@ -323,10 +324,10 @@ describe MicrosoftSync::GraphService do
 
   shared_examples_for 'a batch request that fails' do
     it 'raises an error with a message with the codes/bodies' do
-      expect { subject }.to raise_error(
-        expected_error,
-        "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
-      )
+      expected_message = "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
+      expect { subject }.to raise_error(expected_error, expected_message) do |e|
+        expect(e).to be_a_microsoft_sync_public_error(/while making a batch request/)
+      end
     end
 
     it 'increments statsd counters based on the responses' do

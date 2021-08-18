@@ -20,6 +20,9 @@ import I18n from 'i18n!discussion_posts'
 import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
+import {responsiveQuerySizes} from '../../utils'
 import {View} from '@instructure/ui-view'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
@@ -82,40 +85,69 @@ export const DiscussionEdit = props => {
               plugins: getPlugins()
             }}
             height={300}
-            defaultContent={props.value}
+            defaultContent={props.replyPreview + props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
       </View>
-      <Flex margin="small none none none">
-        <Flex.Item shouldGrow shouldShrink textAlign="end">
-          <Button
-            onClick={() => {
-              if (props.onCancel) {
-                props.onCancel()
-              }
-            }}
-            display="inline-block"
-            color="secondary"
-            data-testid="DiscussionEdit-cancel"
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            onClick={() => {
-              if (props.onSubmit) {
-                props.onSubmit(rceContent)
-              }
-            }}
-            display="inline-block"
-            color="primary"
-            margin="none none none small"
-            data-testid="DiscussionEdit-submit"
-          >
-            {props.isEdit ? I18n.t('Save') : I18n.t('Reply')}
-          </Button>
-        </Flex.Item>
-      </Flex>
+      <Responsive
+        match="media"
+        query={responsiveQuerySizes({mobile: true, desktop: true})}
+        props={{
+          mobile: {
+            direction: 'column-reverse',
+            display: 'block',
+            marginCancel: 'small 0 0 0',
+            marginReply: '0 0 0 0'
+          },
+          desktop: {
+            direction: 'row',
+            display: 'inline-block',
+            marginCancel: '0 0 0 0',
+            marginReply: '0 0 0 small'
+          }
+        }}
+        render={responsiveProps => (
+          <Flex margin="small none none none" direction={responsiveProps.direction}>
+            <Flex.Item
+              shouldGrow
+              shouldShrink
+              textAlign="end"
+              overflowY="hidden"
+              overflowX="hidden"
+            >
+              <Button
+                onClick={() => {
+                  if (props.onCancel) {
+                    props.onCancel()
+                  }
+                }}
+                margin={responsiveProps.marginCancel}
+                display={responsiveProps.display}
+                color="secondary"
+                data-testid="DiscussionEdit-cancel"
+              >
+                <Text size="medium">{I18n.t('Cancel')}</Text>
+              </Button>
+            </Flex.Item>
+            <Flex.Item shouldShrink textAlign="end" overflowY="hidden" overflowX="hidden">
+              <Button
+                onClick={() => {
+                  if (props.onSubmit) {
+                    props.onSubmit(rceContent)
+                  }
+                }}
+                display={responsiveProps.display}
+                color="primary"
+                margin={responsiveProps.marginReply}
+                data-testid="DiscussionEdit-submit"
+              >
+                <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')} </Text>
+              </Button>
+            </Flex.Item>
+          </Flex>
+        )}
+      />
     </div>
   )
 }
@@ -125,12 +157,15 @@ DiscussionEdit.propTypes = {
   value: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  isEdit: PropTypes.bool
+  isEdit: PropTypes.bool,
+  replyPreview: PropTypes.string
 }
 
 DiscussionEdit.defaultProps = {
   show: true,
-  isEdit: false
+  isEdit: false,
+  replyPreview: '',
+  value: ''
 }
 
 export default DiscussionEdit

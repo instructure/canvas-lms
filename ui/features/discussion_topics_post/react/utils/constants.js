@@ -20,6 +20,7 @@ import React from 'react'
 export const ISOLATED_VIEW_INITIAL_PAGE_SIZE = 5
 export const PER_PAGE = 20
 export const HIGHLIGHT_TIMEOUT = 6000
+export const AUTO_MARK_AS_READ_DELAY = 3000
 
 const searchFilter = {
   searchTerm: '',

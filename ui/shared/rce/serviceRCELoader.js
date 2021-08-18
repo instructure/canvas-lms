@@ -216,7 +216,7 @@ const RCELoader = {
       languages,
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       ltiTools: window.INST?.editorButtons,
-      autosave,
+      autosave: tinyMCEInitOptions.autosave || autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       maxInitRenderedRCEs: window.ENV?.FEATURES?.rce_limit_init_render_on_page
         ? tinyMCEInitOptions.maxInitRenderedRCEs

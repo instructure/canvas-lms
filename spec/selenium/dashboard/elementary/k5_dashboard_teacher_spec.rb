@@ -207,7 +207,7 @@ describe "teacher k5 dashboard" do
 
       get "/"
 
-      expect(hex_value_for_color(dashboard_card)).to eq(new_color)
+      expect(hex_value_for_color(dashboard_card, 'background-color')).to eq(new_color)
     end
   end
 

@@ -36,12 +36,13 @@ import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useSelectedOutcomes from '@canvas/outcomes/react/hooks/useSelectedOutcomes'
 import GroupMoveModal from './GroupMoveModal'
-import EditGroupModal from './EditGroupModal'
+import GroupEditModal from './GroupEditModal'
 import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
+import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 
 const NoOutcomesBillboard = () => {
   const {isCourse} = useCanvasContext()
@@ -92,13 +93,16 @@ const OutcomeManagementPanel = () => {
     queryCollections,
     rootId,
     selectedGroupId,
-    selectedParentGroupId
+    selectedParentGroupId,
+    addNewGroup,
+    removeGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
-  const {group, loading, loadMore} = useGroupDetail({
+  const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString
   })
+
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -130,6 +134,12 @@ const OutcomeManagementPanel = () => {
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
+  }
+  const onSucessGroupRemove = () => {
+    if (selectedParentGroupId) {
+      queryCollections({id: selectedParentGroupId})
+    }
+    removeGroup(selectedGroupId)
   }
 
   const groupMenuHandler = useCallback(
@@ -181,7 +191,7 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
+  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId]?.outcomesCount > 0
   const canManage = ENV.PERMISSIONS?.manage_outcomes
 
   return (
@@ -249,7 +259,7 @@ const OutcomeManagementPanel = () => {
               }}
             >
               <View as="div" padding="x-small none none x-small">
-                {selectedGroupId && (
+                {selectedGroupId ? (
                   <ManageOutcomesView
                     key={selectedGroupId}
                     outcomeGroup={group}
@@ -265,6 +275,8 @@ const OutcomeManagementPanel = () => {
                     scrollContainer={scrollContainer}
                     isRootGroup={collections[selectedGroupId]?.isRootGroup}
                   />
+                ) : (
+                  <ManageOutcomesBillboard />
                 )}
               </View>
             </Flex.Item>
@@ -284,6 +296,8 @@ const OutcomeManagementPanel = () => {
                 groupId={selectedGroupId}
                 isOpen={isGroupRemoveModalOpen}
                 onCloseHandler={closeGroupRemoveModal}
+                onCollectionToggle={queryCollections}
+                onSuccess={onSucessGroupRemove}
               />
               {!loading && (
                 <GroupMoveModal
@@ -292,6 +306,12 @@ const OutcomeManagementPanel = () => {
                   parentGroupId={selectedParentGroupId}
                   isOpen={isGroupMoveModalOpen}
                   onCloseHandler={closeGroupMoveModal}
+                  onGroupCreated={addNewGroup}
+                  onSuccess={() => {
+                    queryCollections({
+                      id: selectedParentGroupId
+                    })
+                  }}
                 />
               )}
               {selectedOutcome && (
@@ -301,6 +321,7 @@ const OutcomeManagementPanel = () => {
                     isOpen={isOutcomeRemoveModalOpen}
                     onCloseHandler={onCloseOutcomeRemoveModal}
                     onCleanupHandler={onCloseOutcomeRemoveModal}
+                    onRemoveLearningOutcomesHandler={removeLearningOutcomes}
                   />
                   <OutcomeEditModal
                     outcome={selectedOutcome}
@@ -312,6 +333,7 @@ const OutcomeManagementPanel = () => {
                     isOpen={isOutcomeMoveModalOpen}
                     onCloseHandler={onCloseOutcomeMoveModal}
                     onCleanupHandler={onCloseOutcomeMoveModal}
+                    onGroupCreated={addNewGroup}
                   />
                 </>
               )}
@@ -319,7 +341,7 @@ const OutcomeManagementPanel = () => {
           )}
           {group && (
             <>
-              <EditGroupModal
+              <GroupEditModal
                 outcomeGroup={group}
                 isOpen={isGroupEditModalOpen}
                 onCloseHandler={closeGroupEditModal}
@@ -338,6 +360,7 @@ const OutcomeManagementPanel = () => {
                 isOpen={isOutcomesRemoveModalOpen}
                 onCloseHandler={closeOutcomesRemoveModal}
                 onCleanupHandler={onCloseOutcomesRemoveModal}
+                onRemoveLearningOutcomesHandler={removeLearningOutcomes}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomes}

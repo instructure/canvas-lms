@@ -47,17 +47,21 @@
   </div>
   <div id="select-course-component" class="rs-section"></div>
   <div class="rs-section">
-    <span role="button" id="calendar-toggle-button" class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
-        aria-label="<%= t("Calendars toggle list visibility") %>" tabindex="0">
-      <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
-    </span>
+    <h2 tabindex="-1">
+      <span role="button" id="calendar-toggle-button"   class="element_toggler" aria-controls="context-list-holder"   aria-expanded="true"
+          aria-label="<%= t("Calendars toggle list visibility") %>" tabindex="0">
+          <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
+      </span>
+    </h2>
     <div id="context-list-holder"></div>
   </div>
   <div class="rs-section" id="undated-events-section">
-    <span href="#" role="button" id="undated-events-button" class="element_toggler" aria-controls="undated-events" aria-expanded="false"
-        aria-label="<%= t("Undated items toggle list visibility") %>" tabindex="0">
-      <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated") %>
-    </span>
+    <h2 tabindex="-1">
+      <span href="#" role="button" id="undated-events-button" class="element_toggler" aria-controls="undated-events" aria-expanded="false"
+          aria-label="<%= t("Undated items toggle list visibility") %>" tabindex="0">
+        <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated") %>
+      </span>
+    </h2>
     <div id="undated-events"></div>
   </div>
   <div class="rs-section" id="calendar-feed">

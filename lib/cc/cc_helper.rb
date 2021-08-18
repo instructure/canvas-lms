@@ -150,7 +150,7 @@ module CCHelper
 
   def get_html_title_and_body(doc)
     title = get_node_val(doc, 'html head title')
-    body = doc.at_css('html body').to_s.force_encoding(Encoding::UTF_8).gsub(%r{</?body>}, '').strip
+    body = doc.at_css('html body').to_s.encode(Encoding::UTF_8).gsub(%r{</?body>}, '').strip
     [title, body]
   end
 
@@ -342,7 +342,7 @@ module CCHelper
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
-        obj = MediaObject.by_media_id(media_id).first
+        obj = MediaObject.active.by_media_id(media_id).first
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
@@ -354,7 +354,7 @@ module CCHelper
       # process new RCE media iframes too
       doc.css('iframe[data-media-id]').each do |iframe|
         media_id = iframe['data-media-id']
-        obj = MediaObject.by_media_id(media_id).take
+        obj = MediaObject.active.by_media_id(media_id).take
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
@@ -393,7 +393,7 @@ module CCHelper
       client.startSession(CanvasKaltura::SessionType::ADMIN)
     end
     if flavor
-      assets = client.flavorAssetGetByEntryId(obj.media_id)
+      assets = client.flavorAssetGetByEntryId(obj.media_id) || []
       asset = assets.sort_by { |f| f[:size].to_i }.reverse.find { |f| f[:containerFormat] == flavor }
       asset ||= assets.first
     else

@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Carregar/Gravar Mídia"
     },
+    "uploading_19e8a4e7": {
+        "message": "A realizar carregamento"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "O carregamento de legendas/subtítulos fechados falhou."
     },

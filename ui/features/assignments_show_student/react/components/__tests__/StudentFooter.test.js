@@ -22,13 +22,38 @@ import StudentFooter from '../StudentFooter'
 
 it('renders passed-in elements in order', async () => {
   const buttons = [
-    {key: 'item1', element: <div data-testid="child-item">item 1</div>},
-    {key: 'item2', element: <div data-testid="child-item">item 2</div>}
+    {align: 'left', key: 'item1', element: <div data-testid="child-item">item 1</div>},
+    {align: 'left', key: 'item2', element: <div data-testid="child-item">item 2</div>},
+    {align: 'right', key: 'item3', element: <div data-testid="child-item">item 3</div>},
+    {align: 'right', key: 'item4', element: <div data-testid="child-item">item 4</div>}
   ]
 
   const {getAllByTestId} = render(<StudentFooter buttons={buttons} />)
   expect(getAllByTestId('child-item').map(element => element.innerHTML)).toEqual([
     'item 1',
-    'item 2'
+    'item 2',
+    'item 3',
+    'item 4'
+  ])
+})
+
+it('renders left-aligned elements first', async () => {
+  const buttons = [
+    {align: 'right', key: 'item4', element: <div data-testid="child-item">item 4</div>},
+    {align: 'left', key: 'item1', element: <div data-testid="child-item">item 1</div>},
+    {align: 'right', key: 'item5', element: <div data-testid="child-item">item 5</div>},
+    {align: 'left', key: 'item2', element: <div data-testid="child-item">item 2</div>},
+    {align: 'right', key: 'item6', element: <div data-testid="child-item">item 6</div>},
+    {align: 'left', key: 'item3', element: <div data-testid="child-item">item 3</div>}
+  ]
+
+  const {getAllByTestId} = render(<StudentFooter buttons={buttons} />)
+  expect(getAllByTestId('child-item').map(element => element.innerHTML)).toEqual([
+    'item 1',
+    'item 2',
+    'item 3',
+    'item 4',
+    'item 5',
+    'item 6'
   ])
 })

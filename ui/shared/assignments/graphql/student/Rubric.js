@@ -26,9 +26,9 @@ export const Rubric = {
       criteria {
         ...RubricCriterion
       }
+      _id
       free_form_criterion_comments: freeFormCriterionComments
       hide_score_total: hideScoreTotal
-      id: _id
       points_possible: pointsPossible
       title
     }
@@ -36,10 +36,10 @@ export const Rubric = {
   `,
 
   shape: shape({
+    id: string.isRequired,
     criteria: arrayOf(RubricCriterion.shape),
     free_form_criterion_comments: bool,
     hide_score_total: bool,
-    id: string.isRequired,
     points_possible: number.isRequired,
     title: string.isRequired
   })
@@ -47,7 +47,7 @@ export const Rubric = {
 
 export const DefaultMocks = {
   Rubric: () => ({
-    id: '1',
+    _id: '1',
     criteria: [{}],
     freeFormCriterionComments: false
   })

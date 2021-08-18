@@ -25,7 +25,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    discussion_topic_model({context: @course})
+    discussion_topic_model({context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED})
   end
 
   def mutation_str(
@@ -92,6 +92,20 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', '_id')).to eq entry.id.to_s
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parent', '_id')).to eq parent_entry.id.to_s
+  end
+
+  it 'replies to an existing discussion child entry' do
+    root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
+    parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
+    result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id)
+    expect(result.dig('errors')).to be nil
+    expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
+
+    entry = @topic.discussion_entries.last
+    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', '_id')).to eq entry.id.to_s
+    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
+    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parent', '_id')).to eq parent_entry.id.to_s
+    expect(entry.root_entry_id).to eq root_entry.id
   end
 
   it 'adds an attachment when creating a discussion entry' do

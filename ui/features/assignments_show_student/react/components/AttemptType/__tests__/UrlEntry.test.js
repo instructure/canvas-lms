@@ -94,7 +94,7 @@ describe('UrlEntry', () => {
       expect(getByTestId('url-entry')).toBeInTheDocument()
     })
 
-    it('renders the more options button', async () => {
+    it('renders an upload button for each external tool', async () => {
       const props = await makeProps()
       const overrides = {
         ExternalToolConnection: {
@@ -102,13 +102,13 @@ describe('UrlEntry', () => {
         }
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {findByText} = render(
+      const {findByRole} = render(
         <MockedProvider mocks={mocks}>
           <UrlEntry {...props} />
         </MockedProvider>
       )
 
-      expect(await findByText('More Options')).toBeInTheDocument()
+      expect(await findByRole('button', {name: /Tool 1/})).toBeInTheDocument()
     })
 
     it('renders an error message when given an invalid url', async () => {

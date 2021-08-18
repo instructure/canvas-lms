@@ -20,14 +20,16 @@
 
 #
 # Is responsible for finding the the user's ULUVs (user lookup values -- the value
-# we use to look up a Micrososft user by) according to the
+# we use to look up a Microsoft user by) according to the
 # microsoft_sync_login_attribute in the Account settings
 #
 module MicrosoftSync
   # When `login_attribute` is not set or is one that we don't know how find the
   # Canvas user id information, we'll raise and exception and stop the job
-  class InvalidOrMissingLoginAttributeConfig < StandardError
-    include Errors::GracefulCancelErrorMixin
+  class InvalidOrMissingLoginAttributeConfig < Errors::GracefulCancelError
+    def self.public_message
+      I18n.t 'Invalid or missing "login attribute" config in account'
+    end
   end
 
   class UsersUluvsFinder

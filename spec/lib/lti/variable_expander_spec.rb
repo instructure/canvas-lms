@@ -104,12 +104,17 @@ module Lti
         root_account,
         account,
         controller,
+        variable_expander_opts
+      )
+    end
+    let(:variable_expander_opts) do
+      {
         current_user: user,
         tool: tool,
         originality_report: originality_report,
         editor_contents: editor_contents,
         editor_selection: editor_selection
-      )
+      }
     end
 
     describe ".deregister_expansion" do
@@ -487,6 +492,46 @@ module Lti
         exp_hash = {test: '$vnd.Canvas.OriginalityReport.url'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report'
+      end
+
+      context 'com.instructure.Assignment.allowedFileExtensions' do
+        let(:exp_hash) do
+          {
+            test: expansion
+          }
+        end
+        let(:allowed_extensions) { 'docx,txt,pdf' }
+        let(:course) { course_model }
+        let(:assignment) { assignment_model(context: course) }
+        let(:expansion) { '$com.instructure.Assignment.allowedFileExtensions'}
+        let(:variable_expander_opts) { super().merge(context: course, assignment: assignment) }
+
+        it 'it expands when an assignment with online_upload submission type and extensions is present' do
+          assignment.update!(allowed_extensions: allowed_extensions, submission_types: 'online_upload')
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq allowed_extensions
+        end
+
+        it "doesn't expand if online_uploads is not a submission_type" do
+          assignment.update!(submission_types: 'online_text_entry,online_url')
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "$com.instructure.Assignment.allowedFileExtensions"
+        end
+
+        it 'expands to an empty string if there are no limits on file types' do
+          assignment.update!(submission_types: 'online_upload,online_text_entry')
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq ""
+        end
+
+        context 'no assignment present' do
+          let(:variable_expander_opts) { super().merge(context: course) }
+
+          it "doesn't expand" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq expansion
+          end
+        end
       end
 
       it 'has substitution for com.instructure.OriginalityReport.id' do

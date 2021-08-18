@@ -56,7 +56,31 @@ describe Login::CasController do
 
     post :destroy, params: {logoutRequest: request_text}
     expect(response.status).to eq 200
- end
+  end
+
+  it "doesn't allow deleted users to login" do
+    account = account_with_cas(account: Account.default)
+    user_with_pseudonym(active_all: true, account: account)
+    @user.update!(workflow_state: 'deleted')
+
+    response_text = <<-RESPONSE_TEXT
+        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+          <cas:authenticationSuccess>
+            <cas:user>#{@user.email}</cas:user>
+          </cas:authenticationSuccess>
+        </cas:serviceResponse>
+    RESPONSE_TEXT
+
+    controller.instance_variable_set(:@domain_root_account, Account.default)
+    cas_client = controller.client
+    cas_client.instance_variable_set(:@stub_response, response_text)
+    def cas_client.request_cas_response(_uri, type, _options={})
+      type.new(@stub_response, @conf_options)
+    end
+
+    get 'new', params: {:ticket => 'ST-abcd'}
+    expect(response).to redirect_to(login_url)
+  end
 
   it "should accept extra attributes" do
     account = account_with_cas(account: Account.default)

@@ -79,7 +79,7 @@ describe Types::LearningOutcomeGroupType do
     root_group = course.root_outcome_group
 
     query = <<~GQL
-      outcomes() {
+      outcomes {
         nodes {
           ... on LearningOutcome {
             isImported(targetContextType: "Course", targetContextId: #{course.id})
@@ -158,11 +158,11 @@ describe Types::LearningOutcomeGroupType do
 
   describe '#outcomes_count' do
     it 'returns the total outcomes at the nested outcome groups' do
-      expect(outcome_group_type.resolve("outcomesCount")).to eq 0
+      expect(outcome_group_type.resolve("outcomesCount")).to eq 2
     end
 
     it "accepts search_query in outcomes_count" do
-      expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 0
+      expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
     end
   end
 

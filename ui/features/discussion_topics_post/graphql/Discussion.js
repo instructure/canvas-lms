@@ -42,6 +42,7 @@ export const Discussion = {
       requireInitialPost
       initialPostRequiredForCurrentUser
       isSectionSpecific
+      isAnnouncement
       discussionType
       allowRating
       onlyGradersCanRate
@@ -95,6 +96,7 @@ export const Discussion = {
     requireInitialPost: bool,
     initialPostRequiredForCurrentUser: bool,
     isSectionSpecific: bool,
+    isAnnouncement: bool,
     discussionType: string,
     allowRating: bool,
     onlyGradersCanRate: bool,
@@ -102,6 +104,7 @@ export const Discussion = {
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
+    searchEntryCount: number,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number
@@ -130,6 +133,7 @@ export const Discussion = {
     requireInitialPost = false,
     initialPostRequiredForCurrentUser = false,
     isSectionSpecific = false,
+    isAnnouncement = false,
     discussionType = 'threaded',
     allowRating = true,
     onlyGradersCanRate = false,
@@ -137,6 +141,7 @@ export const Discussion = {
     subscribed = true,
     published = true,
     canUnpublish = false,
+    searchEntryCount = 3,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -168,6 +173,7 @@ export const Discussion = {
     requireInitialPost,
     initialPostRequiredForCurrentUser,
     isSectionSpecific,
+    isAnnouncement,
     discussionType,
     allowRating,
     onlyGradersCanRate,
@@ -185,6 +191,7 @@ export const Discussion = {
     childTopics,
     groupSet,
     rootTopic,
+    searchEntryCount,
     entriesTotalPages,
     discussionEntriesConnection,
     __typename: 'Discussion'

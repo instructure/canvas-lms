@@ -43,6 +43,7 @@ describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
   let onCleanupHandlerMock
   let showFlashAlertSpy
+  let onRemoveLearningOutcomesHandlerMock
   let cache
 
   const defaultProps = (props = {}) => ({
@@ -50,6 +51,7 @@ describe('OutcomeRemoveModal', () => {
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onCleanupHandler: onCleanupHandlerMock,
+    onRemoveLearningOutcomesHandler: onRemoveLearningOutcomesHandlerMock,
     ...props
   })
 
@@ -57,6 +59,7 @@ describe('OutcomeRemoveModal', () => {
     cache = createCache()
     onCloseHandlerMock = jest.fn()
     onCleanupHandlerMock = jest.fn()
+    onRemoveLearningOutcomesHandlerMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
@@ -124,6 +127,17 @@ describe('OutcomeRemoveModal', () => {
     })
 
     describe('deletes outcome', () => {
+      it('calls onRemoveLearningOutcomesHandler after request succedes', async () => {
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock()]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+
+        await waitFor(() => {
+          expect(onRemoveLearningOutcomesHandlerMock).toHaveBeenCalledWith(['1'])
+        })
+      })
+
       it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock()]
@@ -373,6 +387,24 @@ describe('OutcomeRemoveModal', () => {
     })
 
     describe('deletes outcomes', () => {
+      it('calls onRemoveLearningOutcomesHandler after request succedes', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+
+        await waitFor(() => {
+          expect(onRemoveLearningOutcomesHandlerMock).toHaveBeenCalledWith(['1', '2'])
+        })
+      })
+
       it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
         const {getByText} = render(
           <OutcomeRemoveModal

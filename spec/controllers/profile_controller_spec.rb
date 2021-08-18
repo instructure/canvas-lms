@@ -331,4 +331,16 @@ describe ProfileController do
       end
     end
   end
+
+  describe "communication" do
+    context "when rendering the full view" do
+      render_views
+
+      it "sets the appropriate page title" do
+        user_session(@user)
+        get "communication"
+        expect(response.body).to include "<title>Account Notification Settings</title>"
+      end
+    end
+  end
 end

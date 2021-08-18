@@ -939,6 +939,7 @@ $(function() {
       $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++)
       RichContentEditor.loadNewEditor($(this), {
         manageParent: true,
+        autosave: {enabled: false},
         maxInitRenderedRCEs: 5
       })
     })

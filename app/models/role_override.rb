@@ -495,7 +495,6 @@ class RoleOverride < ActiveRecord::Base
            'TaEnrollment',
            'DesignerEnrollment',
            'TeacherEnrollment',
-           'TeacherlessStudentEnrollment',
            'ObserverEnrollment',
            'AccountAdmin',
            'AccountMembership'
@@ -516,7 +515,6 @@ class RoleOverride < ActiveRecord::Base
          'TaEnrollment',
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'ObserverEnrollment',
          'AccountAdmin',
          'AccountMembership'
@@ -537,7 +535,6 @@ class RoleOverride < ActiveRecord::Base
          'TaEnrollment',
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'ObserverEnrollment',
          'AccountAdmin',
          'AccountMembership'
@@ -563,7 +560,6 @@ class RoleOverride < ActiveRecord::Base
          'TaEnrollment',
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'ObserverEnrollment',
          'AccountAdmin',
          'AccountMembership'
@@ -571,7 +567,6 @@ class RoleOverride < ActiveRecord::Base
        :true_for => [
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'AccountAdmin'
        ]
     },
@@ -772,7 +767,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -793,7 +787,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -812,7 +805,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'TeacherEnrollment',
         'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -892,7 +884,6 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
         TeacherEnrollment
-        TeacherlessStudentEnrollment
         ObserverEnrollment
         AccountAdmin
         AccountMembership
@@ -909,7 +900,6 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
         TeacherEnrollment
-        TeacherlessStudentEnrollment
         ObserverEnrollment
         AccountAdmin
         AccountMembership
@@ -926,7 +916,6 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
         TeacherEnrollment
-        TeacherlessStudentEnrollment
         ObserverEnrollment
         AccountAdmin
         AccountMembership
@@ -981,7 +970,6 @@ class RoleOverride < ActiveRecord::Base
          'TaEnrollment',
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'ObserverEnrollment',
          'AccountAdmin',
          'AccountMembership'
@@ -989,7 +977,6 @@ class RoleOverride < ActiveRecord::Base
        :true_for => [
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'AccountAdmin'
        ]
     },
@@ -999,7 +986,6 @@ class RoleOverride < ActiveRecord::Base
        :available_to => [
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'AccountAdmin',
          'AccountMembership'
        ],
@@ -1013,7 +999,6 @@ class RoleOverride < ActiveRecord::Base
        :available_to => [
          'DesignerEnrollment',
          'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
          'AccountAdmin',
          'AccountMembership'
        ],
@@ -1082,7 +1067,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'AccountAdmin',
         'AccountMembership'
       ],
@@ -1173,7 +1157,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'TeacherEnrollment',
         'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1194,7 +1177,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'TeacherEnrollment',
         'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1215,7 +1197,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'TeacherEnrollment',
         'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1237,7 +1218,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1257,7 +1237,6 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
-          'TeacherlessStudentEnrollment',
           'ObserverEnrollment',
           'AccountAdmin',
           'AccountMembership'
@@ -1280,7 +1259,6 @@ class RoleOverride < ActiveRecord::Base
            'TaEnrollment',
            'DesignerEnrollment',
            'TeacherEnrollment',
-           'TeacherlessStudentEnrollment',
            'ObserverEnrollment',
            'AccountAdmin',
            'AccountMembership'
@@ -1303,7 +1281,6 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
-          'TeacherlessStudentEnrollment',
           'ObserverEnrollment',
           'AccountAdmin',
           'AccountMembership'
@@ -1323,7 +1300,6 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
-          'TeacherlessStudentEnrollment',
           'ObserverEnrollment',
           'AccountAdmin',
           'AccountMembership'
@@ -1345,7 +1321,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1383,7 +1358,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1416,7 +1390,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1437,7 +1410,6 @@ class RoleOverride < ActiveRecord::Base
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
-        'TeacherlessStudentEnrollment',
         'ObserverEnrollment',
         'AccountAdmin',
         'AccountMembership'
@@ -1580,10 +1552,6 @@ class RoleOverride < ActiveRecord::Base
     end
   end
 
-  def self.teacherless_permissions
-    @teacherless_permissions ||= permissions.select{|p, data| data[:available_to].include?('TeacherlessStudentEnrollment') }.map{|p, data| p }
-  end
-
   def self.clear_cached_contexts; end
 
   # permission changes won't register right away but we already cache user permission checks for an hour so adding some latency here isn't the worst
@@ -1663,7 +1631,7 @@ class RoleOverride < ActiveRecord::Base
   def self.uncached_overrides_for(context, role, role_context, preloaded_overrides: nil, only_permission: nil)
     context.shard.activate do
       accounts = context.account_chain(include_site_admin: true)
-      
+
       preloaded_overrides ||= preload_overrides(context, [role], role_context)
 
       overrides = {}

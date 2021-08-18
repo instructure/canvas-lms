@@ -20,13 +20,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {fireEvent, waitFor} from '@testing-library/react'
 
-import GradebookSettingsModal from 'ui/features/gradebook/react/default_gradebook/components/GradebookSettingsModal.js'
-import * as GradebookSettingsModalApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
+import GradebookSettingsModal from 'ui/features/gradebook/react/default_gradebook/components/GradebookSettingsModal'
+import * as GradebookSettingsModalApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import CourseSettings from 'ui/features/gradebook/react/default_gradebook/CourseSettings/index.js'
-import PostPolicies from 'ui/features/gradebook/react/default_gradebook/PostPolicies/index.js'
-import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi.js'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import CourseSettings from 'ui/features/gradebook/react/default_gradebook/CourseSettings/index'
+import PostPolicies from 'ui/features/gradebook/react/default_gradebook/PostPolicies/index'
+import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookSettingsModal', suiteHooks => {
   let $container
@@ -91,6 +91,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       },
       courseId: '1201',
       courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
+      gradebookIsEditable: true,
       gradedLateSubmissionsExist: true,
       locale: 'en',
       onClose: sinon.spy(),

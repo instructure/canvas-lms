@@ -65,8 +65,7 @@ describe "student planner" do
     validate_link_to_calendar(event)
   end
 
-  it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
-    Account.default.enable_feature!(:course_card_images)
+  it "shows course images", priority: "1", test_id: 3306206 do
     @course_root = Folder.root_folders(@course).first
     @course_attachment = @course_root.attachments.create!(:context => @course,
                                                           :uploaded_data => jpeg_data_frd, :filename => 'course.jpg',

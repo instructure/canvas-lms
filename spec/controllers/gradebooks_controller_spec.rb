@@ -638,6 +638,22 @@ describe GradebooksController do
         user_session(@admin)
       end
 
+      describe 'js_env enhanced_gradebook_filters' do
+        it "should set enhanced_gradebook_filters in js_env as true if enabled" do
+          Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(true)
+        end
+
+        it "should set enhanced_gradebook_filters in js_env as false if disabled" do
+          Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(false)
+        end
+      end
+
       it "renders default gradebook when preferred with 'default'" do
         @admin.set_preference(:gradebook_version, "default")
         get "show", params: { course_id: @course.id }

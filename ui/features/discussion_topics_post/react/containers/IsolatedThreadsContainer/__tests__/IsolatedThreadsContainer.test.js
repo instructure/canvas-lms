@@ -20,13 +20,18 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  AUTO_MARK_AS_READ_DELAY: 0
+}))
 
 describe('IsolatedThreadsContainer', () => {
   const server = mswServer(handlers)
@@ -70,6 +75,7 @@ describe('IsolatedThreadsContainer', () => {
           DiscussionEntry.mock({
             _id: '50',
             id: '50',
+            read: false,
             message: '<p>This is the child reply</P>'
           })
         ],
@@ -100,10 +106,67 @@ describe('IsolatedThreadsContainer', () => {
     expect(await container.findByText('This is the child reply')).toBeInTheDocument()
   })
 
+  it('does not render the pagination component if there is only 1 page', () => {
+    const props = defaultProps()
+    props.discussionTopic.entriesTotalPages = 1
+    const {queryByTestId} = setup(props)
+    expect(queryByTestId('pagination')).toBeNull()
+  })
+
+  describe('Spinners', () => {
+    it('show newer spinner when fetchingMoreNewerReplies is true', async () => {
+      const container = setup(
+        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: true})
+      )
+      await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeTruthy())
+    })
+
+    it('hide newer button spinner when fetchingMoreNewerReplies is false', async () => {
+      const container = setup(
+        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: false})
+      )
+      await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeNull())
+    })
+
+    it('show older button spinner when fetchingMoreOlderReplies is true', async () => {
+      const container = setup(
+        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: true})
+      )
+      await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeTruthy())
+    })
+
+    it('hide older button spinner when fetchingMoreOlderReplies is false', async () => {
+      const container = setup(
+        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: false})
+      )
+      await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeNull())
+    })
+  })
+
+  describe('show more replies buttons', () => {
+    it('clicking show older replies button calls showOlderReplies()', async () => {
+      const showOlderReplies = jest.fn()
+      const container = setup(defaultProps({hasMoreOlderReplies: true, showOlderReplies}))
+      const showOlderRepliesButton = await container.findByTestId('show-more-replies-button')
+      fireEvent.click(showOlderRepliesButton)
+      await waitFor(() => expect(showOlderReplies).toHaveBeenCalled())
+    })
+
+    it('clicking show newer replies button calls showNewerReplies()', async () => {
+      const showNewerReplies = jest.fn()
+      const container = setup(defaultProps({hasMoreNewerReplies: true, showNewerReplies}))
+      const showNewerRepliesButton = await container.findByTestId('show-more-replies-button')
+      fireEvent.click(showNewerRepliesButton)
+      await waitFor(() => expect(showNewerReplies).toHaveBeenCalled())
+    })
+  })
+
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', async () => {
       const onToggleUnread = jest.fn()
-      const {findByTestId, findAllByTestId} = setup(defaultProps({onToggleUnread}))
+      const props = defaultProps({onToggleUnread})
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].read = true
+      const {findAllByTestId, findByTestId} = setup(props)
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
       fireEvent.click(threadActionsMenu[0])

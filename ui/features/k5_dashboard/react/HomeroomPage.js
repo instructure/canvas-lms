@@ -118,7 +118,8 @@ const HomeroomPage = ({
         <LoadingWrapper
           id="course-cards"
           isLoading={!cards}
-          skeletonsCount={ENV?.INITIAL_NUM_K5_CARDS || 5}
+          skeletonsNum={cards?.filter(c => !c.isHomeroom)?.length}
+          defaultSkeletonsNum={ENV?.INITIAL_NUM_K5_CARDS}
           renderCustomSkeleton={skeletonCard}
           renderSkeletonsContainer={skeletonCardsContainer}
         >

@@ -201,12 +201,18 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def redo_submission
-    if @assignment.can_reassign?(@current_user) &&
-        @submission.cached_due_date
+    if !(@assignment.can_reassign?(@current_user) && @submission.cached_due_date)
+      render_unauthorized_action
+    elsif @assignment.locked_for?(@submission.user)
+      render json: {
+        errors: {
+          message: 'Assignment is locked for student.',
+          error_code: 'ASSIGNMENT_LOCKED'
+        }
+      }, status: 422
+    else
       @submission.update!(redo_request: true)
       head :no_content
-    else
-      render_unauthorized_action
     end
   end
 

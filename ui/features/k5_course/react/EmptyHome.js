@@ -29,7 +29,7 @@ import PropTypes from 'prop-types'
 
 import emptyHomeUrl from '../images/empty-home.svg'
 
-const EmptyHome = ({pagesPath, hasWikiPages, courseName, userIsInstructor}) => (
+const EmptyHome = ({pagesPath, hasWikiPages, courseName, canManage}) => (
   <Flex
     as="div"
     direction="column"
@@ -43,7 +43,7 @@ const EmptyHome = ({pagesPath, hasWikiPages, courseName, userIsInstructor}) => (
     <View width="25rem" margin="x-large none small none">
       <Text size="large">{I18n.t('This is where you’ll land when your home is complete.')}</Text>
     </View>
-    {userIsInstructor && (
+    {canManage && (
       <Button
         id="k5-manage-home-btn"
         data-testid="manage-home-button"
@@ -60,7 +60,7 @@ const EmptyHome = ({pagesPath, hasWikiPages, courseName, userIsInstructor}) => (
 EmptyHome.propTypes = {
   pagesPath: PropTypes.string.isRequired,
   hasWikiPages: PropTypes.bool.isRequired,
-  userIsInstructor: PropTypes.bool.isRequired,
+  canManage: PropTypes.bool.isRequired,
   courseName: PropTypes.string.isRequired
 }
 export default EmptyHome

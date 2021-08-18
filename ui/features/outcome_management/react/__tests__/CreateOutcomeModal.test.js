@@ -40,7 +40,6 @@ describe('CreateOutcomeModal', () => {
   const defaultProps = (props = {}) => ({
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
-    breakpoints: {tablet: true},
     ...props
   })
 
@@ -50,11 +49,14 @@ describe('CreateOutcomeModal', () => {
       contextType = 'Account',
       contextId = '1',
       friendlyDescriptionFF = true,
-      mocks = accountMocks({childGroupsCount: 0})
+      mocks = accountMocks({childGroupsCount: 0}),
+      isMobileView = false
     } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, friendlyDescriptionFF}}}>
+      <OutcomesContext.Provider
+        value={{env: {contextType, contextId, friendlyDescriptionFF, isMobileView}}}
+      >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -148,19 +150,7 @@ describe('CreateOutcomeModal', () => {
   }
 
   describe('Desktop', () => {
-    itBehavesLikeAForm({breakpoints: {tablet: true}})
-
-    it('loads nested groups', async () => {
-      const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-        mocks: [...smallOutcomeTree('Account')]
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Root account folder'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Account folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Group 100 folder 0')).toBeInTheDocument()
-    })
+    itBehavesLikeAForm()
 
     it('calls onCloseHandler on Create button click', async () => {
       const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
@@ -415,6 +405,16 @@ describe('CreateOutcomeModal', () => {
   })
 
   describe('Mobile', () => {
-    itBehavesLikeAForm({breakpoints: {tablet: false}})
+    itBehavesLikeAForm({isMobileView: true})
+
+    it('displays the root group and its subgroups in the group selection drill down', async () => {
+      const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+        mocks: [...smallOutcomeTree('Account')],
+        isMobileView: true
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Root account folder')).toBeInTheDocument()
+      expect(getByText('Account folder 0')).toBeInTheDocument()
+    })
   })
 })

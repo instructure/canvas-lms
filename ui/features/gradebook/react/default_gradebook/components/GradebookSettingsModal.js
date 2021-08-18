@@ -92,6 +92,7 @@ export default class GradebookSettingsModal extends React.Component {
     locale: string.isRequired,
     onClose: func.isRequired,
     onEntered: func,
+    gradebookIsEditable: bool.isRequired,
     gradedLateSubmissionsExist: bool.isRequired,
     onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
@@ -276,6 +277,7 @@ export default class GradebookSettingsModal extends React.Component {
                   changeLatePolicy={this.changeLatePolicy}
                   locale={this.props.locale}
                   showAlert={this.props.gradedLateSubmissionsExist}
+                  gradebookIsEditable={this.props.gradebookIsEditable}
                 />
               </Tabs.Panel>
 
@@ -289,6 +291,7 @@ export default class GradebookSettingsModal extends React.Component {
                     anonymousAssignmentsPresent={this.props.anonymousAssignmentsPresent}
                     onChange={this.changePostPolicy}
                     settings={this.state.coursePostPolicy}
+                    gradebookIsEditable={this.props.gradebookIsEditable}
                   />
                 </Tabs.Panel>
               )}

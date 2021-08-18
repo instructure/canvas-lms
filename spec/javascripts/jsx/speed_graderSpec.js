@@ -5169,6 +5169,13 @@ QUnit.module('SpeedGrader', rootHooks => {
         )
       })
 
+      test('shows a specific error message if given an ASSIGNMENT_LOCKED error code', () => {
+        SpeedGrader.EG.handleGradingError({errors: {error_code: 'ASSIGNMENT_LOCKED'}})
+
+        const [errorMessage] = $.flashError.firstCall.args
+        strictEqual(errorMessage, 'This assignment is locked and cannot be reassigned.')
+      })
+
       test('forbears from showing an error message if given a PROVISIONAL_GRADE_INVALID_SCORE error code', () => {
         const maxGradersError = {base: 'bad grade', error_code: 'PROVISIONAL_GRADE_INVALID_SCORE'}
         SpeedGrader.EG.handleGradingError({errors: maxGradersError})

@@ -30,8 +30,11 @@ describe MicrosoftSync::UsersUluvsFinder do
     context 'when microsoft sync is not configured' do
       let(:user_ids) { [1] }
 
-      it 'raise an error' do
-        expect { subject }.to raise_error(MicrosoftSync::InvalidOrMissingLoginAttributeConfig)
+      it 'raises a descriptive GracefulCancelError' do
+        klass = MicrosoftSync::InvalidOrMissingLoginAttributeConfig
+        public_message = 'Invalid or missing "login attribute" config in account'
+
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, public_message)
       end
     end
 

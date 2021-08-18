@@ -95,14 +95,17 @@ export default class AddTray extends Component {
   }
 
   handleSaveButton = () => {
+    if (this.state.selectedRoleName.length === 0) {
+      const roleNameErrors = [{type: 'error', text: I18n.t('A role name is required')}]
+      this.setState({roleNameErrors})
+      return
+    }
     const newRole = this.state.selectedBaseType
     newRole.base_role_type =
       this.props.tab === COURSE ? newRole.base_role_type : 'AccountMembership'
     const context = this.props.tab === COURSE ? 'Course' : 'Account'
     this.props.createNewRole(this.state.selectedRoleName, newRole, context)
   }
-
-  isDoneSelecting = () => !!this.state.selectedRoleName
 
   renderTrayHeader = () => (
     <Flex alignItems="center" margin="small">
@@ -130,10 +133,11 @@ export default class AddTray extends Component {
   renderSelectRoleName = () => (
     <View display="block" margin="medium 0">
       <TextInput
+        isRequired
         onChange={this.onChangeRoleName}
         id="add_role_input"
         value={this.state.selectedRoleName}
-        label={<Text weight="light">{`${I18n.t('Role Name')}:`}</Text>}
+        renderLabel={<Text weight="light">{`${I18n.t('Role Name')}:`}</Text>}
         messages={this.state.roleNameErrors}
       />
     </View>
@@ -174,7 +178,7 @@ export default class AddTray extends Component {
           </Button>
           <Button
             id="permissions-add-tray-submit-button"
-            disabled={!this.isDoneSelecting() || this.state.roleNameErrors.length !== 0}
+            disabled={this.state.roleNameErrors.length !== 0}
             type="submit"
             variant="primary"
             onClick={this.handleSaveButton}

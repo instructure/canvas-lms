@@ -390,6 +390,7 @@ class UsersController < ApplicationController
   def api_index
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
+
     search_term = params[:search_term].presence
     page_opts = {}
     if search_term
@@ -1290,12 +1291,19 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
       includes = api_show_includes
-
       # would've preferred to pass User.with_last_login as the collection to
       # api_find but the implementation of that scope appears to be incompatible
       # with what api_find does
       if includes.include?('last_login')
-        @user.last_login = User.with_last_login.find(@user.id).read_attribute(:last_login)
+        pseudonyms =
+          SisPseudonym.for(
+            @user,
+            @domain_root_account,
+            type: :implicit,
+            require_sis: false,
+            include_all_pseudonyms: true
+          )
+        @user.last_login = pseudonyms.max_by(&:current_login_at).current_login_at
       end
 
       render json: user_json(@user, @current_user, session, includes, @domain_root_account),

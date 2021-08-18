@@ -20,7 +20,7 @@
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
 import {makeMarkerEditable} from './contentEditable'
-import {onKeyDown, onSetContent, onMouseDown} from './events'
+import {onKeyDown, onKeyUp, onSetContent, onMouseDown} from './events'
 import {MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
@@ -32,7 +32,6 @@ function onInputChange(_e, ed = false) {
 
   if (mentionWasInitiated(tinySelection.getSel())) {
     // Insert a "marker" node so we can find the cursor position
-    // TODO: Add ARIA attributes to this span
     // xsslint safeString.identifier MARKER_ID
     editor.execCommand(
       'mceInsertContent',
@@ -42,8 +41,6 @@ function onInputChange(_e, ed = false) {
 
     // Make the mentions marker editable for A11y
     makeMarkerEditable(editor, MARKER_SELECTOR)
-
-    // TODO: Render the mentions component at that position
   }
 }
 
@@ -53,6 +50,7 @@ export const pluginDefinition = {
     editor.on('input', onInputChange)
     editor.on('SetContent', onSetContent)
     editor.on('KeyDown', onKeyDown)
+    editor.on('KeyUp', onKeyUp)
     editor.on('MouseDown', onMouseDown)
   }
 }

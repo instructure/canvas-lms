@@ -34,11 +34,6 @@ describe('ImportantInfo', () => {
     ...mainOverrides
   })
 
-  it('renders a loading skeleton if isLoading', () => {
-    const {getByText} = render(<ImportantInfo {...getProps({isLoading: true})} />)
-    expect(getByText('Loading important info')).toBeInTheDocument()
-  })
-
   it('shows a title with edit button if showTitle and canEdit', () => {
     const {getByText, getByRole} = render(<ImportantInfo {...getProps()} />)
     expect(getByText('Homeroom')).toBeInTheDocument()

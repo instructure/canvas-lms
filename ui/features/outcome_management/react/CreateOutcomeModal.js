@@ -26,19 +26,18 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {Spinner} from '@instructure/ui-spinner'
 import {Mask} from '@instructure/ui-overlays'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import useRCE from './hooks/useRCE'
+import TargetGroupSelector from './shared/TargetGroupSelector'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {
   CREATE_LEARNING_OUTCOME,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
 } from '@canvas/outcomes/graphql/Management'
-import TreeBrowser from './Management/TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
@@ -52,8 +51,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const {error, isLoading, collections, queryCollections, rootId, selectedGroupId} =
-    useManageOutcomes('CreateOutcomeModal')
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const {addNewGroup} = useManageOutcomes('OutcomeManagementPanel')
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -69,6 +68,10 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     displayNameChangeHandler('')
     setRCECode('')
     onCloseHandler()
+  }
+
+  const handleSetTargetGroup = group => {
+    setSelectedGroupId(group?.id)
   }
 
   const onCreateOutcomeHandler = () => {
@@ -195,38 +198,14 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
           )}
           <View as="div" padding="x-small 0 0">
             <Text size="medium" weight="bold">
-              {I18n.t('Location')}
+              {isMobileView ? I18n.t('Select a location') : I18n.t('Location')}
             </Text>
-            {!isMobileView && (
-              <View as="div" padding="small 0">
-                {isLoading ? (
-                  <View
-                    as="div"
-                    textAlign="center"
-                    padding="medium 0"
-                    margin="0 auto"
-                    data-testid="loading"
-                  >
-                    <Spinner renderTitle={I18n.t('Loading')} size="medium" />
-                  </View>
-                ) : error ? (
-                  <Text color="danger" data-testid="loading-error">
-                    {contextType === 'Course'
-                      ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
-                      : I18n.t('An error occurred while loading account outcomes: %{error}', {
-                          error
-                        })}
-                  </Text>
-                ) : (
-                  <TreeBrowser
-                    onCollectionToggle={queryCollections}
-                    collections={collections}
-                    rootId={rootId}
-                    showRootCollection
-                  />
-                )}
-              </View>
-            )}
+            <TargetGroupSelector
+              groupId={selectedGroupId}
+              setTargetGroup={handleSetTargetGroup}
+              onGroupCreated={addNewGroup}
+              modalName="CreateOutcomeModal"
+            />
           </View>
         </Modal.Body>
         <Modal.Footer>

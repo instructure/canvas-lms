@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, within} from '@testing-library/react'
 import ManageOutcomesView from '../ManageOutcomesView'
 import {outcomeGroup} from '@canvas/outcomes/mocks/Management'
-import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {isRTL} from '@canvas/i18n/rtlHelper'
+
+jest.mock('@canvas/i18n/rtlHelper')
 
 describe('ManageOutcomesView', () => {
   let onSelectOutcomesHandler
@@ -93,9 +95,7 @@ describe('ManageOutcomesView', () => {
 
   it('renders outcomes count', () => {
     const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
-    expect(
-      getByText(`15 "${addZeroWidthSpace('Grade.2.Math.3A.Elementary.CCSS.Calculus.1')}" Outcomes`)
-    ).toBeInTheDocument()
+    expect(getByText(`15 Outcomes`)).toBeInTheDocument()
   })
 
   it('renders list of outcomes', () => {
@@ -160,8 +160,26 @@ describe('ManageOutcomesView', () => {
     expect(getByTestId('search-loading')).toBeInTheDocument()
   })
 
+  it('render a message when the group has no outcomes', () => {
+    const {getByText, getByTestId} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
+          },
+          searchString: ''
+        })}
+      />
+    )
+    expect(getByTestId('no-outcomes-svg')).toBeInTheDocument()
+    expect(getByText('There are no outcomes in this group.')).toBeInTheDocument()
+  })
+
   it('render a message when search does not return any result', () => {
-    const {queryByText} = render(
+    const {getByText} = render(
       <ManageOutcomesView
         {...defaultProps({
           outcomeGroup: {
@@ -173,7 +191,7 @@ describe('ManageOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).toBeInTheDocument()
+    expect(getByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
@@ -190,7 +208,7 @@ describe('ManageOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 
   it('calls load more when hasNextPage is true and scroll reaches the infinite scroll threshold', () => {
@@ -235,5 +253,31 @@ describe('ManageOutcomesView', () => {
     mockContainer(scrollContainer, 'scrollTop', 600)
     fireEvent.scroll(scrollContainer)
     expect(loadMore).not.toHaveBeenCalled()
+  })
+
+  it('shows right arrow icon with screen reader accessible title in search breadcrumb', () => {
+    const {getByTitle} = render(
+      <ManageOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
+    )
+    expect(getByTitle('search results for')).toBeInTheDocument()
+  })
+
+  it('flips order of search term and outcome title if RTL is enabled', () => {
+    isRTL.mockReturnValue(false)
+    const {getByTestId, rerender} = render(
+      <ManageOutcomesView {...defaultProps({loading: true, searchString: 'ltrtest'})} />
+    )
+    expect(
+      within(getByTestId('group-name-ltr')).getByText('Grade.2.Math.3A.Elementary.CCSS.Calculus.1')
+    ).toBeTruthy()
+    expect(within(getByTestId('search-string-ltr')).getByText('ltrtest')).toBeTruthy()
+    isRTL.mockReturnValue(true)
+    rerender(<ManageOutcomesView {...defaultProps({loading: true, searchString: 'rtltest'})} />)
+    expect(within(getByTestId('group-name-ltr')).getByText('rtltest')).toBeTruthy()
+    expect(
+      within(getByTestId('search-string-ltr')).getByText(
+        'Grade.2.Math.3A.Elementary.CCSS.Calculus.1'
+      )
+    ).toBeTruthy()
   })
 })

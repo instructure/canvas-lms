@@ -455,11 +455,9 @@ describe "assignments" do
         expect(f('#assignment_show fieldset')).to include_text('a text entry box or a student annotation')
       end
 
-      it 'displays annotatbale document to student and submits assignment for grading' do
+      it 'displays annotatable document to student and submits assignment for grading' do
         course_with_student_logged_in(active_all: true, course: @course)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-        f('.submit_assignment_link').click
 
         expect(f('.submit_annotated_document_option')).to be_displayed
         f('.submit_annotated_document_option').click

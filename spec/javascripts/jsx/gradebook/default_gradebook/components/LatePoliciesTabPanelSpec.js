@@ -25,8 +25,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Spinner} from '@instructure/ui-spinner'
 
-import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
-import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel.js'
+import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi'
+import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel'
 
 const MIN = '0'
 const MAX = '100'
@@ -49,6 +49,7 @@ QUnit.module(
         },
         changeLatePolicy,
         locale: 'en',
+        gradebookIsEditable: true,
         showAlert: false
       }
       changeLatePolicySpy = sinon.spy(props, 'changeLatePolicy')
@@ -161,6 +162,13 @@ QUnit.module(
           mountComponent(props)
           const input = getGradePercentageForMissingSubmissionsInput()
           strictEqual(input.value, '58')
+        })
+
+        test('input and checkbox are disabled if gradebook is not editable by user', () => {
+          props.gradebookIsEditable = false
+          setupComponent(props)
+          strictEqual(getGradePercentageForMissingSubmissionsInput().disabled, true)
+          strictEqual(getAutomaticallyApplyGradeForMissingSubmissionsCheckbox().disabled, true)
         })
 
         QUnit.module('given default props', contextHooks => {
@@ -308,10 +316,21 @@ QUnit.module(
                 getAutomaticallyApplyDeductionToLateSubmissionsCheckbox().click()
               })
 
+              test('inputs and checkbox are disabled if gradebook is not editable by user', () => {
+                props.gradebookIsEditable = false
+                setupComponent(props)
+                strictEqual(
+                  getAutomaticallyApplyDeductionToLateSubmissionsCheckbox().disabled,
+                  true
+                )
+                strictEqual(getLowestPossibleGradePercentInput().disabled, true)
+                strictEqual(getLateSubmissionDeductionPercentInput().disabled, true)
+                strictEqual(getLateSubmissionDeductionIntervalInput().disabled, true)
+              })
+
               test('passes "lateSubmissionDeductionEnabled" to parent', () => {
-                const {
-                  lateSubmissionDeductionEnabled
-                } = changeLatePolicySpy.lastCall.args[0].changes
+                const {lateSubmissionDeductionEnabled} =
+                  changeLatePolicySpy.lastCall.args[0].changes
                 strictEqual(lateSubmissionDeductionEnabled, true)
               })
 
@@ -412,27 +431,19 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   }
 
   function lateDeductionInput(wrapper) {
-    return latePenaltiesForm(wrapper)
-      .find('input#late-submission-deduction')
-      .at(0)
+    return latePenaltiesForm(wrapper).find('input#late-submission-deduction').at(0)
   }
 
   function lateDeductionIntervalSelect(wrapper) {
-    return latePenaltiesForm(wrapper)
-      .find('CanvasSelect')
-      .at(0)
+    return latePenaltiesForm(wrapper).find('CanvasSelect').at(0)
   }
 
   function lateDeductionIntervalSelectInput(wrapper) {
-    return latePenaltiesForm(wrapper)
-      .find('input')
-      .at(0)
+    return latePenaltiesForm(wrapper).find('input').at(0)
   }
 
   function lateSubmissionMinimumPercentInput(wrapper) {
-    return latePenaltiesForm(wrapper)
-      .find('input[type="text"]')
-      .at(2)
+    return latePenaltiesForm(wrapper).find('input[type="text"]').at(2)
   }
 
   function missingDeductionCheckbox(wrapper) {
@@ -459,13 +470,16 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
 
   function changeLateDeductionIntervalSelect(wrapper, value) {
     // enzyme's simulate didn't work for 'change' on CanvasSelect for some unknown reason
-    return lateDeductionIntervalSelect(wrapper)
-      .props()
-      .onChange({target: {value}}, value)
+    return lateDeductionIntervalSelect(wrapper).props().onChange({target: {value}}, value)
   }
 
   function mountComponent(latePolicyProps = {}, otherProps = {}) {
-    const defaults = {changeLatePolicy() {}, locale: 'en', showAlert: false}
+    const defaults = {
+      changeLatePolicy() {},
+      gradebookIsEditable: true,
+      locale: 'en',
+      showAlert: false
+    }
     props = {
       latePolicy: {
         changes: {},
@@ -567,12 +581,12 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('shows a spinner if no data is present', function() {
+  test('shows a spinner if no data is present', function () {
     this.wrapper = mountComponent({data: undefined})
     strictEqual(spinner(this.wrapper).length, 1)
   })
 
-  test('does not show a spinner if data is present', function() {
+  test('does not show a spinner if data is present', function () {
     this.wrapper = mountComponent()
     strictEqual(spinner(this.wrapper).length, 0)
   })
@@ -583,12 +597,12 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('shows a message if missing deduction validation errors are passed', function() {
+  test('shows a message if missing deduction validation errors are passed', function () {
     this.wrapper = mountComponent({validationErrors: {missingSubmissionDeduction: 'An Error'}})
     ok(this.wrapper.text().includes('An Error'))
   })
 
-  test('shows a message if late deduction validation errors are passed', function() {
+  test('shows a message if late deduction validation errors are passed', function () {
     this.wrapper = mountComponent({validationErrors: {lateSubmissionDeduction: 'An Error'}})
     ok(this.wrapper.text().includes('An Error'))
   })
@@ -599,7 +613,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('calls the changeLatePolicy function when the missing submission deduction checkbox is changed', function() {
+  test('calls the changeLatePolicy function when the missing submission deduction checkbox is changed', function () {
     this.wrapper = mountComponent()
     missingDeductionCheckbox(this.wrapper).simulate('change', {target: {checked: false}})
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -610,7 +624,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('does not send any changes to the changeLatePolicy function on the second action if the missing submission deduction checkbox is unchecked and then checked', function() {
+  test('does not send any changes to the changeLatePolicy function on the second action if the missing submission deduction checkbox is unchecked and then checked', function () {
     this.wrapper = mountComponent()
     const checkbox = missingDeductionCheckbox(this.wrapper)
     checkbox.simulate('change', {target: {checked: false}})
@@ -625,26 +639,24 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('missing submission input has label describing it', function() {
+  test('missing submission input has label describing it', function () {
     this.wrapper = mountComponent()
-    const input = missingPenaltiesForm(this.wrapper)
-      .find('#missing-submission-grade')
-      .at(0)
+    const input = missingPenaltiesForm(this.wrapper).find('#missing-submission-grade').at(0)
     strictEqual(input.text(), 'Grade percentage for missing submissions')
   })
 
-  test('enables the missing deduction input if the missing deduction checkbox is checked', function() {
+  test('enables the missing deduction input if the missing deduction checkbox is checked', function () {
     this.wrapper = mountComponent()
     notOk(missingDeductionInput(this.wrapper).prop('disabled'))
   })
 
-  test('disables the missing deduction input if the missing deduction checkbox is unchecked', function() {
+  test('disables the missing deduction input if the missing deduction checkbox is unchecked', function () {
     const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
     this.wrapper = mountComponent({data})
     strictEqual(missingDeductionInput(this.wrapper).prop('disabled'), true)
   })
 
-  test('calls the changeLatePolicy function with a new deduction when the missing submission deduction input is changed and is valid', function() {
+  test('calls the changeLatePolicy function with a new deduction when the missing submission deduction input is changed and is valid', function () {
     this.wrapper = mountComponent()
     missingDeductionInput(this.wrapper).simulate('change', {target: {value: '22'}})
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -655,7 +667,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('does not send any changes to the changeLatePolicy function when the missing submission deduction input is changed back to its initial value', function() {
+  test('does not send any changes to the changeLatePolicy function when the missing submission deduction input is changed back to its initial value', function () {
     this.wrapper = mountComponent()
     const input = missingDeductionInput(this.wrapper)
     input.simulate('change', {target: {value: '22'}})
@@ -679,7 +691,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('calls the changeLatePolicy function with a validationError if the missing submission deduction input is changed and is not numeric', function() {
+  test('calls the changeLatePolicy function with a validationError if the missing submission deduction input is changed and is not numeric', function () {
     this.wrapper = mountComponent()
     missingDeductionInput(this.wrapper).simulate('change', {target: {value: 'abc'}})
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -711,7 +723,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('calls the changeLatePolicy function without a validationError for missing submission deduction if a valid input is entered after an invalid input is entered', function() {
+  test('calls the changeLatePolicy function without a validationError for missing submission deduction if a valid input is entered after an invalid input is entered', function () {
     this.wrapper = mountComponent({
       changes: {
         missingSubmissionDeduction: 0
@@ -735,7 +747,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('calls the changeLatePolicy function when the late submission deduction checkbox is changed', function() {
+  test('calls the changeLatePolicy function when the late submission deduction checkbox is changed', function () {
     const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
     this.wrapper = mountComponent({data})
     lateDeductionCheckbox(this.wrapper).simulate('change', {target: {checked: true}})
@@ -747,7 +759,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('does not send any changes to the changeLatePolicy function on the second action if the late submission deduction checkbox is unchecked and then checked', function() {
+  test('does not send any changes to the changeLatePolicy function on the second action if the late submission deduction checkbox is unchecked and then checked', function () {
     this.wrapper = mountComponent()
     const checkbox = lateDeductionCheckbox(this.wrapper)
     checkbox.simulate('change', {target: {checked: false}})
@@ -756,7 +768,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     deepEqual(changeLatePolicySpy.getCall(1).args[0].changes, {}, 'does not send any changes')
   })
 
-  test('sets lateSubmissionMinimumPercentEnabled to true when the late submission deduction checkbox is checked and the late submission minimum percent is greater than zero', function() {
+  test('sets lateSubmissionMinimumPercentEnabled to true when the late submission deduction checkbox is checked and the late submission minimum percent is greater than zero', function () {
     const data = {
       ...latePolicyData,
       lateSubmissionMinimumPercent: 1,
@@ -772,7 +784,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('does not set lateSubmissionMinimumPercentEnabled to true when the late submission deduction checkbox is checked and the late submission minimum percent is zero', function() {
+  test('does not set lateSubmissionMinimumPercentEnabled to true when the late submission deduction checkbox is checked and the late submission minimum percent is zero', function () {
     const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
     this.wrapper = mountComponent({data})
     lateDeductionCheckbox(this.wrapper).simulate('change', {target: {checked: true}})
@@ -790,18 +802,18 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     }
   })
 
-  test('disables the late deduction input if the late deduction checkbox is unchecked', function() {
+  test('disables the late deduction input if the late deduction checkbox is unchecked', function () {
     const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
     this.wrapper = mountComponent({data})
     ok(lateDeductionInput(this.wrapper).prop('disabled'))
   })
 
-  test('enables the late deduction input if the late deduction checkbox is checked', function() {
+  test('enables the late deduction input if the late deduction checkbox is checked', function () {
     this.wrapper = mountComponent()
     notOk(lateDeductionInput(this.wrapper).prop('disabled'))
   })
 
-  test('calls the changeLatePolicy function with a new deduction when the late submission deduction input is changed and is valid', function() {
+  test('calls the changeLatePolicy function with a new deduction when the late submission deduction input is changed and is valid', function () {
     this.wrapper = mountComponent()
     lateDeductionInput(this.wrapper).simulate('change', {target: {value: '22'}})
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -812,7 +824,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('does not send any changes to the changeLatePolicy function when the late submission deduction input is changed back to its initial value', function() {
+  test('does not send any changes to the changeLatePolicy function when the late submission deduction input is changed back to its initial value', function () {
     this.wrapper = mountComponent()
     const input = lateDeductionInput(this.wrapper)
     input.simulate('change', {target: {value: '22'}})
@@ -838,7 +850,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('calls the changeLatePolicy function with a validationError if the late submission deduction input is changed and is not numeric', function() {
+  test('calls the changeLatePolicy function with a validationError if the late submission deduction input is changed and is not numeric', function () {
     this.wrapper = mountComponent()
     lateDeductionInput(this.wrapper).simulate('change', {target: {value: 'abc'}})
 
@@ -860,7 +872,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     )
   })
 
-  test('calls the changeLatePolicy function without a validationError for late submission deduction if a valid input is entered after an invalid input is entered', function() {
+  test('calls the changeLatePolicy function without a validationError for late submission deduction if a valid input is entered after an invalid input is entered', function () {
     this.wrapper = mountComponent({
       changes: {
         lateSubmissionDeduction: 100

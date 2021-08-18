@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent, within} from '@testing-library/react'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import FindOutcomesView from '../FindOutcomesView'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
@@ -54,6 +55,7 @@ describe('FindOutcomesView', () => {
     searchString: '',
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
+    disableAddAllButton: false,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
     ...props
@@ -127,7 +129,7 @@ describe('FindOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
@@ -140,7 +142,7 @@ describe('FindOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 
   it('calls onClearHandler on click on clear search button', () => {
@@ -219,9 +221,9 @@ describe('FindOutcomesView', () => {
     expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
-  it('disables "Add All Outcomes" button if the search is present', () => {
-    const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  it('hides "Add All Outcomes" button if search string is present', () => {
+    const {queryByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
   it('shows large loader if data is loading and outcomes are missing/undefined', () => {
@@ -266,5 +268,19 @@ describe('FindOutcomesView', () => {
     rerender(<FindOutcomesView {...defaultProps({loading: true, searchString: 'rtltest'})} />)
     expect(within(getByTestId('group-name-ltr')).getByText('rtltest')).toBeTruthy()
     expect(within(getByTestId('search-string-ltr')).getByText('State Standards')).toBeTruthy()
+  })
+
+  describe('mobile view', () => {
+    const mobileRender = children =>
+      render(
+        <OutcomesContext.Provider value={{env: {isMobileView: true}}}>
+          {children}
+        </OutcomesContext.Provider>
+      )
+
+    it('does not render the group name', () => {
+      const {queryByText} = mobileRender(<FindOutcomesView {...defaultProps()} />)
+      expect(queryByText('State Standards')).not.toBeInTheDocument()
+    })
   })
 })

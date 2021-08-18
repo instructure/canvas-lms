@@ -123,6 +123,7 @@ class LatePoliciesTabPanel extends React.Component {
       })
     }).isRequired,
     changeLatePolicy: func.isRequired,
+    gradebookIsEditable: bool.isRequired,
     locale: string.isRequired,
     showAlert: bool.isRequired
   }
@@ -297,6 +298,7 @@ class LatePoliciesTabPanel extends React.Component {
             ref={c => {
               this.missingSubmissionCheckbox = c
             }}
+            disabled={!this.props.gradebookIsEditable}
           />
         </View>
 
@@ -316,7 +318,10 @@ class LatePoliciesTabPanel extends React.Component {
                         this.missingSubmissionDeductionInput = m
                       }}
                       renderLabel={I18n.t('Grade percentage for missing submissions')}
-                      disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
+                      disabled={
+                        !this.getLatePolicyAttribute('missingSubmissionDeductionEnabled') ||
+                        !this.props.gradebookIsEditable
+                      }
                       value={this.currentInputDisplayValue(
                         'missingSubmissionDeduction',
                         MAX_PERCENTAGE_INPUT
@@ -360,6 +365,7 @@ class LatePoliciesTabPanel extends React.Component {
             label={I18n.t('Automatically apply deduction to late submissions')}
             defaultChecked={data.lateSubmissionDeductionEnabled}
             onChange={this.changeLateSubmissionDeductionEnabled}
+            disabled={!this.props.gradebookIsEditable}
           />
         </View>
 
@@ -379,7 +385,10 @@ class LatePoliciesTabPanel extends React.Component {
                         this.lateSubmissionDeductionInput = l
                       }}
                       renderLabel={I18n.t('Late submission deduction percent')}
-                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      disabled={
+                        !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
+                        !this.props.gradebookIsEditable
+                      }
                       value={this.currentInputDisplayValue(
                         'lateSubmissionDeduction',
                         MIN_PERCENTAGE_INPUT
@@ -397,7 +406,10 @@ class LatePoliciesTabPanel extends React.Component {
                   </Grid.Col>
                   <Grid.Col width="auto">
                     <CanvasSelect
-                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      disabled={
+                        !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
+                        !this.props.gradebookIsEditable
+                      }
                       id="late-submission-interval"
                       label={I18n.t('Late submission deduction interval')}
                       onChange={this.changeLateSubmissionInterval}
@@ -425,7 +437,10 @@ class LatePoliciesTabPanel extends React.Component {
                         'lateSubmissionMinimumPercent',
                         MIN_PERCENTAGE_INPUT
                       )}
-                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      disabled={
+                        !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
+                        !this.props.gradebookIsEditable
+                      }
                       onBlur={_event => this.handleBlur('lateSubmissionMinimumPercent')}
                       onChange={(_event, val) =>
                         this.handleChange('lateSubmissionMinimumPercent', val)

@@ -18,16 +18,99 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../../helpers/color_common'
 
 module K5ImportantDatesSectionPageObject
+  include ColorCommon
 
   #------------------------- Selectors --------------------------
 
   def add_override_selector
     "#add_due_date"
   end
+
+  def assignment_icon_selector
+    "[data-testid='date-icon-wrapper']"
+  end
+
+  def assignment_important_dates_block_selector
+    "#edit_assignment_form #important_dates"
+  end
+
+  def calendar_add_selector
+    "#create_new_event_link"
+  end
+
+  def calendar_assignment_mark_dates_selector
+    "#edit_assignment_form #calendar_event_important_dates"
+  end
+
+  def calendar_assignment_modal_submit_selector
+    "#edit_assignment_form .event-details-footer button[type='submit']"
+  end
+
+  def calendar_assignment_subject_selector
+    "#assignment_context"
+  end
+
+  def calendar_assignment_title_selector
+    "#edit_assignment_form #assignment_title"
+  end
+
+  def calendar_choose_text_selector
+    "[data-testid='calendar-selection-text']"
+  end
+
+  def calendar_edit_dialog_selector
+    "#edit-event"
+  end
+
+  def calendar_event_more_options_selector
+    "a:contains('More Options')"
+  end
+
+  def calendar_event_submit_button_selector
+    ".event-details-footer button[type='submit']"
+  end
+
+  def calendar_for_subject_selector
+    ".context_id"
+  end
+
+  def calendars_left_text_selector
+    "[data-testid='calendars-left-text']"
+  end
+
+  def calendar_mark_important_dates_selector
+    "#calendar_event_important_dates"
+  end
+
+  def calendar_modal_selector
+    "[aria-label='Calendars']"
+  end
+
+  def calendar_modal_cancel_selector
+    "//button[.//*[. = 'Cancel']]"
+  end
+
+  def calendar_modal_close_button_selector
+    "[data-testid='instui-modal-close']"
+  end
+
+  def calendar_modal_submit_selector
+    "//button[.//*[. = 'Submit']]"
+  end
+
+  def calendar_picker_gear_selector
+    "[data-testid='filter-important-dates-button']"
+  end
+
   def date_field_selector
     ".date_field[data-date-type='due_at']"
+  end
+
+  def edit_assignment_selector
+    ".edit_assignment_option"
   end
 
   def edit_assignment_submit_selector
@@ -54,6 +137,10 @@ module K5ImportantDatesSectionPageObject
     "[data-testid='important-date-subject']"
   end
 
+  def important_dates_block_selector
+    "#important_dates"
+  end
+
   def important_dates_title_selector
     "h2:contains('Important Dates')"
   end
@@ -70,18 +157,102 @@ module K5ImportantDatesSectionPageObject
     "[data-testid='important-dates-panda']"
   end
 
+  def subject_list_input_selector
+    "[data-testid='subject-calendars']"
+  end
+
+  def subject_list_xpath_selector
+    "//label[..//input[@data-testid = 'subject-calendars']]"
+  end
+
   #------------------------- Elements --------------------------
 
   def add_override
     f(add_override_selector)
   end
 
+  def assignment_icon
+    f(assignment_icon_selector)
+  end
+
+  def assignment_important_dates_block
+    f(assignment_important_dates_block_selector)
+  end
+
   def assignment_link(link_text)
     fln(link_text)
   end
 
+  def calendar_add
+    f(calendar_add_selector)
+  end
+
+  def calendar_assignment_mark_dates
+    f(calendar_assignment_mark_dates_selector)
+  end
+
+  def calendar_assignment_title
+    f(calendar_assignment_title_selector)
+  end
+
+  def calendar_choose_text
+    f(calendar_choose_text_selector)
+  end
+
+  def calendar_edit_dialog
+    f(calendar_edit_dialog_selector)
+  end
+
+  def calendar_event_submit_button
+    f(calendar_event_submit_button_selector)
+  end
+
+  def calendar_event_more_options_button
+    fj(calendar_event_more_options_selector)
+  end
+
+  def calendar_for_subject
+    f(calendar_for_subject_selector)
+  end
+
+  def calendars_left_text
+    f(calendars_left_text_selector)
+  end
+
+  def calendar_mark_important_dates
+    f(calendar_mark_important_dates_selector)
+  end
+
+  def calendar_modal
+    f(calendar_modal_selector)
+  end
+
+  def calendar_modal_cancel
+    fxpath(calendar_modal_cancel_selector)
+  end
+
+  def calendar_modal_close_button
+    f(calendar_modal_close_button_selector)
+  end
+
+  def calendar_modal_submit
+    fxpath(calendar_modal_submit_selector)
+  end
+
+  def calendar_assignment_modal_submit
+    f(calendar_assignment_modal_submit_selector)
+  end
+
+  def calendar_picker_gear
+    f(calendar_picker_gear_selector)
+  end
+
   def date_field
     ff(date_field_selector)
+  end
+
+  def edit_assignment
+    f(edit_assignment_selector)
   end
 
   def important_date_icon(icon_type)
@@ -94,6 +265,14 @@ module K5ImportantDatesSectionPageObject
 
   def important_date_subject
     f(important_date_subject_selector)
+  end
+
+  def important_date_subject_list
+    ff(important_date_subject_selector)
+  end
+
+  def important_dates_block
+    f(important_dates_block_selector)
   end
 
   def important_dates_title
@@ -112,7 +291,23 @@ module K5ImportantDatesSectionPageObject
     f(no_important_dates_image_selector)
   end
 
+  def subject_list_input
+    ff(subject_list_input_selector)
+  end
+
+  def subject_list_xpath
+    ffxpath(subject_list_xpath_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+  def calendar_dialog_exists?
+    element_exists?(calendar_edit_dialog_selector)
+  end
+
+  def calendar_mark_important_dates_exists?
+    element_exists?(calendar_mark_important_dates_selector)
+  end
 
   def important_date_icon_exists?(icon_name)
     element_exists?(important_date_icon_selector(icon_name))
@@ -126,10 +321,77 @@ module K5ImportantDatesSectionPageObject
     date_field[date_field_index].clear
   end
 
+  def create_important_date_assignment(course, title, due_at)
+    assignment = create_dated_assignment(course, title, due_at)
+    assignment.update!(important_dates: true)
+    assignment
+  end
+
   #----------------------- Click Items -------------------------------
+
+
+  def click_calendar_add
+    calendar_add.click
+  end
+
+  def click_calendar_assignment_mark_dates
+    calendar_assignment_mark_dates.click
+  end
+
+  def click_calendar_event_more_options_button
+    calendar_event_more_options_button.click
+  end
+
+  def click_calendar_event_submit_button
+    calendar_event_submit_button.click
+  end
+
+  def click_calendar_gear
+    calendar_picker_gear.click
+  end
+
+  def click_calendar_mark_important_dates
+    calendar_mark_important_dates.click
+  end
+
+  def click_calendar_modal_cancel
+    calendar_modal_cancel.click
+    wait_for_ajaximations
+  end
+
+  def click_calendar_modal_close
+    calendar_modal_close_button.click
+    wait_for_ajaximations
+  end
+
+  def click_calendar_modal_submit
+    calendar_modal_submit.click
+    wait_for_ajaximations
+  end
+
+  def click_calendar_assignment_modal_submit
+    calendar_assignment_modal_submit.click
+    wait_for_ajaximations
+  end
+
+  def click_calendar_picker_gear
+    calendar_picker_gear.click
+  end
+
+  def click_calendar_subject(subject_name)
+    click_option(calendar_for_subject, subject_name)
+  end
+
+  def click_assignment_calendar_subject(subject_name)
+    click_option(calendar_assignment_subject_selector, subject_name)
+  end
 
   def click_add_override
     add_override.click
+  end
+
+  def click_edit_assignment
+    edit_assignment.click
   end
 
   def click_important_date_link
@@ -140,9 +402,24 @@ module K5ImportantDatesSectionPageObject
     mark_important_dates.click
   end
 
+  def click_subject_calendar_checkbox(checkbox_item)
+    subject_list_xpath[checkbox_item].click
+  end
+
   #------------------------------Retrieve Text----------------------#
 
+  def subject_list_text
+    subject_list_xpath.map(&:text)
+  end
 
   #----------------------------Element Management---------------------#
+
+  def calendar_modal_exists?
+    element_exists?(calendar_modal_selector)
+  end
+
+  def is_calendar_modal_gone?
+    wait_for_no_such_element { calendar_modal }
+  end
 
 end

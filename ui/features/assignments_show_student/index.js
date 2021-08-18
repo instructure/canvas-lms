@@ -22,15 +22,3 @@ import $ from 'jquery'
 $(() => {
   renderAssignmentsApp(ENV, $('<div/>').appendTo('#content')[0])
 })
-
-import('@canvas/module-sequence-footer').then(() => {
-  $(() => {
-    $('<div id="module_sequence_footer" style="margin-top: 30px" />')
-      .appendTo('#content')
-      .moduleSequenceFooter({
-        assetType: 'Assignment',
-        assetID: ENV.ASSIGNMENT_ID,
-        courseID: ENV.COURSE_ID
-      })
-  })
-})

@@ -51,8 +51,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     microsoft_sync_remote_attribute
   ].freeze
 
-  class AccountSettingsChanged < StandardError
-    include MicrosoftSync::Errors::GracefulCancelErrorMixin
+  class AccountSettingsChanged < MicrosoftSync::Errors::GracefulCancelError
+    def self.public_message
+      I18n.t 'The account-wide sync settings were changed while syncing. ' \
+        'Please attempt the sync again.'
+    end
   end
 
   # Get the IDs of users enrolled in a course which do not have UserMappings

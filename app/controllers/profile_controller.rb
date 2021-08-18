@@ -234,6 +234,7 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
+    @page_title = t('account_notification_settings_title', 'Account Notification Settings')
     set_active_tab 'notifications'
 
     add_crumb(@current_user.short_name, profile_path)

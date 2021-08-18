@@ -21,10 +21,10 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
@@ -71,13 +71,12 @@ export const IsolatedParent = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
-        )}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         isReadOnly={!props.RCEOpen}
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}
@@ -90,9 +89,9 @@ export const IsolatedParent = props => {
       {props.discussionEntry.parent && (
         <div
           style={{
-            paddingLeft: '0.50rem',
-            paddingRight: '0.50rem',
-            paddingBottom: '0.50rem'
+            paddingLeft: theme.variables.spacing.xSmall,
+            paddingRight: theme.variables.spacing.xSmall,
+            paddingBottom: theme.variables.spacing.xSmall
           }}
         >
           <BackButton
@@ -103,9 +102,8 @@ export const IsolatedParent = props => {
       <div
         style={{
           marginLeft: theme.variables.spacing.medium,
-          paddingLeft: '0.75rem',
-          paddingRight: '0.75rem',
-          paddingBottom: '0.375rem'
+          paddingRight: theme.variables.spacing.small,
+          paddingBottom: theme.variables.spacing.xxSmall
         }}
       >
         <Highlight isHighlighted={props.isHighlighted}>
@@ -116,6 +114,7 @@ export const IsolatedParent = props => {
                 isIsolatedView
                 threadActions={threadActions}
                 isEditing={isEditing}
+                padding="small 0 medium small"
                 onCancel={() => {
                   setIsEditing(false)
                 }}
@@ -128,7 +127,7 @@ export const IsolatedParent = props => {
               />
             </Flex.Item>
             {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
+              <Flex.Item align="stretch" padding="small 0 0 0">
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}

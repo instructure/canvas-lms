@@ -37,6 +37,7 @@ describe('student view integration tests', () => {
   beforeEach(() => {
     window.ENV = {
       context_asset_string: 'test_1',
+      ASSIGNMENT_ID: '1',
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       PREREQS: {}

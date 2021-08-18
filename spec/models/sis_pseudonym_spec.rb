@@ -282,6 +282,60 @@ describe SisPseudonym do
       expect(SisPseudonym.for(@user, Account.default, type: :implicit)).to eq @pseudonym
       expect(SisPseudonym.for(@user, Account.default, type: :implicit, in_region: true)).to eq @pseudonym
     end
+
+    it 'returns a collection of all relevant pseudonyms' do
+      @shard1.activate { @user = User.create! }
+      @pseudonym =
+        Account
+          .default
+          .pseudonyms
+          .create!(user: @user, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+      @shard2.activate do
+        expect(
+          SisPseudonym.for(@user, Account.default, type: :implicit, include_all_pseudonyms: true)
+        ).to eq [@pseudonym]
+      end
+    end
+
+    it 'returns a collection of all relevant pre-loaded pseudonyms' do
+      @shard1.activate { @user = User.create! }
+      @pseudonym = Account.default.pseudonyms.create!(user: @user, unique_id: 'user')
+      @shard2.activate do
+        @user.pseudonyms.to_a
+        expect(
+          SisPseudonym.for(
+            @user,
+            Account.default,
+            type: :implicit,
+            require_sis: false,
+            include_all_pseudonyms: true
+          )
+        ).to eq [@pseudonym]
+      end
+    end
+
+    it 'returns a collection of all relevant non-duplicated pseudonyms' do
+      @user = u
+      p1 = @user.pseudonyms.create!(pseud_params('a'))
+      p2 = @user.pseudonyms.create!(pseud_params('b'))
+      @shard1.activate do
+        account = account_model
+        course = account.courses.create!
+        course.enroll_student(@user)
+        @user.pseudonyms.create!(pseud_params('a', account))
+        @user.pseudonyms.create!(pseud_params('b', account))
+        @user.pseudonyms.create!(pseud_params('c', account))
+      end
+      expect(
+        SisPseudonym.for(
+          @user,
+          Account.default,
+          type: :implicit,
+          require_sis: false,
+          include_all_pseudonyms: true
+        )
+      ).to eq [p1, p2]
+    end
   end
 
 end

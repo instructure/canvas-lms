@@ -523,11 +523,6 @@ $(document).ready(function () {
       }
     )
   })
-  $('#enrollment_type').change(function () {
-    $('.teacherless_invite_message').showIf(
-      $(this).find(':selected').hasClass('teacherless_invite')
-    )
-  })
 
   $('.self_enrollment_checkbox')
     .change(function () {

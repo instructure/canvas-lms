@@ -56,6 +56,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
       id="homeroom-announcements"
       isLoading={loading}
       renderCustomSkeleton={loadingMask}
+      skeletonsNum={homeroomAnnouncements?.filter(h => h.announcement || h.canEdit)?.length} // if there is no homeroom course set, this loading mask shouldn't appear
     >
       <View>
         {homeroomAnnouncements?.map(homeroom => {

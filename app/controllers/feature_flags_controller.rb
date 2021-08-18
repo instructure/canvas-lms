@@ -73,6 +73,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "pending_enforcement": {
+#           "description": "Whether the feature is nearing completion and will be finalized at an upcoming date.",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "autoexpand": {
 #           "description": "Whether the details of the feature are autoexpanded on page load vs. the user clicking to expand.",
 #            "example": true,

@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPreferencesContextType < Types::BaseEnum
-  graphql_name 'NotificationPreferencesContextType'
-  description 'Context types that can be associated with notification preferences'
-  value 'Course'
-  value 'Account'
-end
-
 class NotificationFrequencyType < Types::BaseEnum
   graphql_name 'NotificationFrequencyType'
   description 'Frequency that notifications can be delivered on'
@@ -48,7 +41,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
   argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
-  argument :context_type, NotificationPreferencesContextType, required: true
+  argument :context_type, Types::NotificationPreferencesContextType, required: true
 
   argument :enabled, Boolean, required: false
   argument :has_read_privacy_notice, Boolean, required: false

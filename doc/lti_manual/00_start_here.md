@@ -25,6 +25,7 @@
 - [Custom Parameters](./08_custom_parameters.md)
 - [1.1 Implementation](./09_lti_1_1_implementation.md)
 - [Common Testing Scenarios](./11_testing.md)
+- [Deep Linking](./12_deep_linking.md)
 
 **Other Docs**
 - [External Tools Introduction - Canvas LMS REST API Documentation (instructure.com)](https://canvas.instructure.com/doc/api/file.tools_intro.html)
@@ -38,7 +39,7 @@ More topics to write about:
 - PostMessage
 - list of placements and the postmessages and variable substitutions that work for each of them - probably also worth making customer facing
 - variable expansion and custom fields
-- deep linking and custom params
+- custom params
 - Services (implementation specifics)
 	- Outcomes 1.1
 	- AGS 1.3

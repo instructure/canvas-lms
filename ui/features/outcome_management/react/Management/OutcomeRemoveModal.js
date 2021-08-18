@@ -33,7 +33,13 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {outcomeShape} from './shapes'
 
-const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) => {
+const OutcomeRemoveModal = ({
+  outcomes,
+  isOpen,
+  onCloseHandler,
+  onCleanupHandler,
+  onRemoveLearningOutcomesHandler
+}) => {
   const {isCourse} = useCanvasContext()
   const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
   const nonRemovableLinkIds = Object.keys(outcomes).filter(linkId => !outcomes[linkId].canUnlink)
@@ -57,6 +63,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}
         const errorMessage = result.data?.deleteOutcomeLinks?.errors?.[0]?.message
         if (deletedOutcomeLinkIds?.length === 0) throw new Error(errorMessage)
         if (deletedOutcomeLinkIds?.length !== removableCount) throw new Error()
+        onRemoveLearningOutcomesHandler(removableLinkIds)
 
         showFlashAlert({
           message: isCourse
@@ -113,7 +120,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}
     <List as="ul" size="medium" margin="0" isUnstyled>
       {outcomeLinkIds.map(linkId => (
         <List.Item size="medium" key={linkId}>
-          <TruncateText>{outcomes[linkId].title}</TruncateText>
+          <TruncateText position="middle">{outcomes[linkId].title}</TruncateText>
         </List.Item>
       ))}
     </List>
@@ -227,6 +234,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}
       shouldReturnFocus
       onDismiss={onCloseHandler}
       shouldCloseOnDocumentClick={false}
+      data-testid="outcome-management-remove-modal"
     >
       <Modal.Body overflow="scroll">
         <View as="div">
@@ -260,7 +268,12 @@ OutcomeRemoveModal.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onCleanupHandler: PropTypes.func.isRequired
+  onCleanupHandler: PropTypes.func.isRequired,
+  onRemoveLearningOutcomesHandler: PropTypes.func
+}
+
+OutcomeRemoveModal.defaultProps = {
+  onRemoveLearningOutcomesHandler: () => {}
 }
 
 export default OutcomeRemoveModal

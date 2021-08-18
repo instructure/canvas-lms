@@ -194,6 +194,16 @@ module Types
       end
     end
 
+    field :search_entry_count, Integer, null: true do
+      argument :search_term, String, required: false
+      argument :filter, DiscussionFilterType, required: false
+    end
+    def search_entry_count(**args)
+      get_entries(args).then do |entries|
+        entries.count
+      end
+    end
+
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
       return [] if object.initial_post_required?(current_user, session)
       Loaders::DiscussionEntryLoader.for(

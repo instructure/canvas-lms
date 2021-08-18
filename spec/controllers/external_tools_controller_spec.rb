@@ -1095,6 +1095,80 @@ describe ExternalToolsController do
         expect(json_data[:default_launch_url]).to eq tool.url
       end
     end
+
+    context 'for assignment launches with overrides' do
+      let(:assignment) do
+        a = assignment_model(course: @course, due_at: due_at)
+        a.submission_types = 'external_tool'
+        a.external_tool_tag_attributes = {url: tool.url}
+        a.due_at = due_at
+        a.save!
+        a
+      end
+
+      let(:tool) do
+        account.context_external_tools.create!({
+          name: "Quizzes.Next",
+          url: 'http://example.com/launch',
+          domain: "example.com",
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          privacy_level: 'public',
+          tool_id: 'Quizzes 2',
+          settings: {
+            custom_fields: { 'canvas_assignment_due_at' => '$Canvas.assignment.dueAt.iso8601' } 
+          }
+        })
+      end
+
+      let(:due_at) { '2021-07-29 08:26:56.000000000 +0000'.to_datetime }
+
+      let(:due_at_diff) { '2021-07-30 08:26:56.000000000 +0000'.to_datetime }
+
+      before do
+        student_in_course
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        adhoc_override = assignment_override_model(:assignment => assignment)
+        override_student = adhoc_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+        adhoc_override.override_due_at(due_at_diff)
+        adhoc_override.save!
+      end
+
+      it "generates a student launch with overriden params" do
+        expect(assignment.due_at).to eq due_at
+
+        user_session(@student)
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: 'http://example.com/launch',
+          placement: :assignment_selection
+        }
+
+        expect(
+          assigns[:lti_launch].params['custom_canvas_assignment_due_at'].to_datetime
+        ).to eq due_at_diff
+      end
+
+      it "generates an admin/teacher launch with overriden params" do
+        expect(assignment.due_at).to eq due_at
+
+        user_session(@user)
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: 'http://example.com/launch',
+          placement: :assignment_selection
+        }
+
+        expect(
+          assigns[:lti_launch].params['custom_canvas_assignment_due_at'].to_datetime
+        ).to eq due_at_diff
+      end
+    end
   end
 
   describe "GET 'resource_selection'" do

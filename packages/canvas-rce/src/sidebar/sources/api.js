@@ -150,6 +150,19 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
+  fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, bookmark) {
+    return fetchFunction(properties, bookmark)
+      .then(result => {
+        onSuccess(result)
+        if (result.bookmark) {
+          this.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, result.bookmark)
+        }
+      })
+      .catch(error => {
+        onError(error)
+      })
+  }
+
   fetchDocs(props) {
     const documents = props.documents[props.contextType]
     const uri = documents.bookmark || this.uriFor('documents', props)
@@ -242,6 +255,16 @@ class RceApiSource {
     const headers = headerFor(this.jwt)
     const uri = bookmark || this.uriFor('folders/all', props)
     return this.apiFetch(uri, headers)
+  }
+
+  fetchSubFolders(props, bookmark) {
+    const uri = bookmark || `${this.baseUri('folders', props.host)}/${props.folderId}`
+    return this.apiFetch(uri, headerFor(this.jwt))
+  }
+
+  fetchButtonsAndIconsFolder(props) {
+    const uri = this.uriFor('folders/buttons_and_icons', props)
+    return this.fetchPage(uri)
   }
 
   fetchMediaFolder(props) {
@@ -485,8 +508,10 @@ class RceApiSource {
   //   //rce.docker/api/wikiPages?context_type=course&context_id=42
   //
   uriFor(endpoint, props) {
-    const {host, contextType, contextId, sortBy, searchString} = props
+    const {host, contextType, contextId, sortBy, searchString, perPage} = props
     let extra = ''
+    const pageSizeParam = perPage ? `&per_page=${perPage}` : ''
+
     switch (endpoint) {
       case 'images':
         extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
@@ -514,10 +539,11 @@ class RceApiSource {
       default:
         extra = getSearchParam(searchString)
     }
+
     return `${this.baseUri(
       endpoint,
       host
-    )}?contextType=${contextType}&contextId=${contextId}${extra}`
+    )}?contextType=${contextType}&contextId=${contextId}${pageSizeParam}${extra}`
   }
 }
 

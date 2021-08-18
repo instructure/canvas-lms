@@ -207,24 +207,31 @@ it('onChangeRoleName changes role name properly', () => {
   expect(tree.state().selectedRoleName).toEqual('Awesome_aaron')
 })
 
-it('save button is properly disabled if no role name is set', () => {
+it('displays an error if attempting to save with an empty role name', () => {
   const props = defaultProps()
   const tree = shallow(<AddTray {...props} />)
-  tree.setState({
-    selectedRoleName: ''
-  })
   const inst = tree.instance()
-  expect(inst.isDoneSelecting()).toBeFalsy()
+  let errors = tree.state().roleNameErrors
+  expect(errors).toHaveLength(0)
+  inst.handleSaveButton()
+  errors = tree.state().roleNameErrors
+  expect(errors).toHaveLength(1)
 })
 
-it('save button is properly enabled if role name is set', () => {
+it('clears the empty role name error when text is entered', () => {
   const props = defaultProps()
   const tree = shallow(<AddTray {...props} />)
-  tree.setState({
-    selectedRoleName: 'blahp'
-  })
   const inst = tree.instance()
-  expect(inst.isDoneSelecting()).toBeTruthy()
+  inst.handleSaveButton()
+  let errors = tree.state().roleNameErrors
+  expect(errors).toHaveLength(1)
+  inst.onChangeRoleName({
+    target: {
+      value: 'Custom Student Role'
+    }
+  })
+  errors = tree.state().roleNameErrors
+  expect(errors).toHaveLength(0)
 })
 
 it('does not pass in the account admin base role in mapStateToProps', () => {

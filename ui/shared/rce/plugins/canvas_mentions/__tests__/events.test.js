@@ -18,11 +18,23 @@
 
 import {makeBodyEditable} from '../contentEditable'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown} from '../events'
+import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onActiveDescendantChange} from '../events'
+import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
   makeBodyEditable: jest.fn()
 }))
+
+jest.mock('../constants', () => ({
+  ...jest.requireActual('../constants'),
+  TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com'
+}))
+
+jest.mock('react-dom', () => ({
+  render: jest.fn()
+}))
+
+jest.mock('../components/MentionAutoComplete/MentionDropdown')
 
 describe('events', () => {
   let editor
@@ -45,7 +57,8 @@ describe('events', () => {
       event = {
         content: 'hello',
         target: editor,
-        paste: false
+        paste: false,
+        editor
       }
     })
 
@@ -69,6 +82,14 @@ describe('events', () => {
       it('does not make the body editable', () => {
         subject()
         expect(makeBodyEditable).not.toHaveBeenCalled()
+      })
+
+      it('mounts the dropdown component', () => {
+        jest.spyOn(document, 'querySelector').mockImplementation(() => {
+          return false
+        })
+        subject()
+        expect(ReactDOM.render).toHaveBeenCalled()
       })
     })
   })
@@ -148,6 +169,138 @@ describe('events', () => {
         expect(makeBodyEditable).not.toHaveBeenCalled()
       })
     })
+
+    describe('with mentions suggestion navigation events', () => {
+      let expectedValue, expectedMessageType
+
+      function examplesForMentionsEvents() {
+        it('does not make the body editable', () => {
+          subject()
+          expect(makeBodyEditable).not.toHaveBeenCalled()
+        })
+
+        it('prevents the event default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('broadcasts the message to the tiny and main windows', () => {
+          subject()
+          expect(global.postMessage).toHaveBeenCalledTimes(2)
+          expect(global.postMessage).toHaveBeenCalledWith(
+            {
+              messageType: expectedMessageType,
+              value: expectedValue
+            },
+            'https://canvas.instructure.com'
+          )
+        })
+      }
+
+      describe('when the key is "up"', () => {
+        beforeEach(() => {
+          event.which = 38
+
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          expectedValue = 'UpArrow'
+          expectedMessageType = 'mentions.NavigationEvent'
+        })
+
+        examplesForMentionsEvents()
+      })
+
+      describe('when the key is "down"', () => {
+        beforeEach(() => {
+          event.which = 40
+
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          expectedValue = 'DownArrow'
+          expectedMessageType = 'mentions.NavigationEvent'
+        })
+
+        examplesForMentionsEvents()
+      })
+
+      describe('when the key is "enter"', () => {
+        beforeEach(() => {
+          event.which = 13
+
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          expectedValue = 'Enter'
+          expectedMessageType = 'mentions.SelectionEvent'
+
+          onActiveDescendantChange('#foo', editor)
+        })
+
+        examplesForMentionsEvents()
+      })
+    })
+  })
+
+  describe('onKeyUp()', () => {
+    let event
+
+    const subject = () => onKeyUp(event)
+
+    beforeEach(() => {
+      event = {
+        editor,
+        which: 1
+      }
+
+      global.postMessage = jest.fn()
+
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      editor.setSelectedNode(editor.dom.select('#mentions-marker')[0])
+    })
+
+    it('broadcasts the message to the tiny and main windows', () => {
+      subject()
+      expect(global.postMessage).toHaveBeenCalledTimes(2)
+      expect(global.postMessage).toHaveBeenCalledWith(
+        {
+          messageType: 'mentions.InputChangeEvent',
+          value: 'wes'
+        },
+        'https://canvas.instructure.com'
+      )
+    })
+
+    describe('when the mentions marker is not the current node', () => {
+      beforeEach(() => {
+        editor.selection.select(editor.dom.select('#test')[0])
+      })
+
+      it('does not broadcast the message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the "enter" key is pressed', () => {
+      beforeEach(() => (event.which = 13))
+
+      it('does not broadcast an input change method', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
   })
 
   describe('onMouseDown()', () => {
@@ -158,12 +311,12 @@ describe('events', () => {
     beforeEach(() => {
       event = {
         editor,
-        currentTarget: {}
+        target: {}
       }
     })
 
     describe('when the current target is the marker', () => {
-      beforeEach(() => (event.currentTarget.id = 'mentions-marker'))
+      beforeEach(() => (event.target.id = 'mentions-marker'))
 
       it('does not make the body editable', () => {
         subject()
@@ -172,11 +325,49 @@ describe('events', () => {
     })
 
     describe('when the current target is not the marker', () => {
-      beforeEach(() => (event.currentTarget.id = undefined))
+      beforeEach(() => (event.target.id = undefined))
 
       it('does not make the body editable', () => {
         subject()
         expect(makeBodyEditable).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('onActiveDescendantChange()', () => {
+    let activeDescendant
+
+    const subject = () => onActiveDescendantChange(activeDescendant, editor)
+
+    beforeEach(() => {
+      activeDescendant = '#foo'
+
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+    })
+
+    it('sets the active descendant attribute', () => {
+      subject()
+      expect(
+        editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+      ).toEqual('#foo')
+    })
+
+    describe('when the active descendant is blank', () => {
+      beforeEach(() => (activeDescendant = undefined))
+
+      it('sets the active descendant attribute to an empty string', () => {
+        subject()
+        expect(
+          editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+        ).toEqual('')
       })
     })
   })

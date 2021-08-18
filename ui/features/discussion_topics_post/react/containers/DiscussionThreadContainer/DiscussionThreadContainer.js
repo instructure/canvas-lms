@@ -34,6 +34,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
@@ -41,7 +42,7 @@ import {View} from '@instructure/ui-view'
 import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
-  addReplyToDiscussion,
+  updateDiscussionTopicRepliesCount,
   resolveAuthorRoles
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
@@ -78,7 +79,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const {sort} = useContext(SearchContext)
+  const {sort, searchTerm} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -87,9 +88,15 @@ export const DiscussionThreadContainer = props => {
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+    const variables = {
+      discussionEntryID: newDiscussionEntry.parent.id,
+      first: PER_PAGE,
+      sort,
+      courseID: window.ENV?.course_id
+    }
 
-    addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
+    updateDiscussionTopicRepliesCount(cache, props.discussionTopic.id)
+    addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -203,13 +210,12 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
-        )}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         onClick={() => {
           if (ENV.isolated_view) {
             props.onOpenIsolatedView(props.discussionEntry._id, false)
@@ -293,7 +299,7 @@ export const DiscussionThreadContainer = props => {
   return (
     <>
       <Highlight isHighlighted={highlightEntry}>
-        <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
+        <div style={{marginLeft: marginDepth}} ref={threadRef}>
           <Flex>
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
@@ -305,6 +311,7 @@ export const DiscussionThreadContainer = props => {
                   setIsEditing(false)
                 }}
                 onSave={onUpdate}
+                padding="small 0 small medium"
                 discussionRoles={resolveAuthorRoles(
                   props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
                     !!props?.discussionTopic?.author?.id &&
@@ -315,7 +322,7 @@ export const DiscussionThreadContainer = props => {
               />
             </Flex.Item>
             {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
+              <Flex.Item align="stretch" padding="small 0 0 0">
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}
@@ -340,6 +347,7 @@ export const DiscussionThreadContainer = props => {
                         }
                   }
                   goToTopic={props.goToTopic}
+                  isSearch={!!searchTerm}
                 />
               </Flex.Item>
             )}

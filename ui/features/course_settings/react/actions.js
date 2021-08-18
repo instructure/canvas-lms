@@ -84,12 +84,12 @@ const Actions = {
     }
   },
 
-  getCourseImage(courseId, ajaxLib = axios) {
+  getCourseImage(courseId, settingName, ajaxLib = axios) {
     return dispatch => {
       ajaxLib
         .get(`/api/v1/courses/${courseId}/settings`)
         .then(response => {
-          dispatch(this.gotCourseImage(response.data.image, courseId))
+          dispatch(this.gotCourseImage(response.data[settingName], courseId))
         })
         .catch(() => {
           $.flashError(I18n.t('There was an error retrieving the course image'))
@@ -116,8 +116,10 @@ const Actions = {
     }
   },
 
-  putImageData(courseId, imageUrl, imageId = null, ajaxLib = axios) {
-    const data = imageId ? {'course[image_id]': imageId} : {'course[image_url]': imageUrl}
+  putImageData(courseId, imageUrl, settingName, imageId = null, ajaxLib = axios) {
+    const data = imageId
+      ? {[`course[${settingName}_id]`]: imageId}
+      : {[`course[${settingName}_url]`]: imageUrl}
 
     return dispatch => {
       this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib)
@@ -132,10 +134,10 @@ const Actions = {
     }
   },
 
-  putRemoveImage(courseId) {
+  putRemoveImage(courseId, settingName) {
     return dispatch => {
       dispatch(this.removingImage())
-      this.ajaxPutFormData(`/api/v1/courses/${courseId}`, {'course[remove_image]': true})
+      this.ajaxPutFormData(`/api/v1/courses/${courseId}`, {[`course[remove_${settingName}]`]: true})
         .then(() => {
           dispatch(this.removedImage())
         })
@@ -145,9 +147,9 @@ const Actions = {
     }
   },
 
-  prepareSetImage(imageUrl, imageId, courseId, ajaxLib = axios) {
+  prepareSetImage(imageUrl, imageId, settingName, courseId, ajaxLib = axios) {
     if (imageUrl) {
-      return this.putImageData(courseId, imageUrl, imageId, ajaxLib)
+      return this.putImageData(courseId, imageUrl, settingName, imageId, ajaxLib)
     } else {
       // In this case the url field was blank so we could either
       // recreate it or hit the API to get it.  We hit the api
@@ -156,7 +158,7 @@ const Actions = {
         ajaxLib
           .get(`/api/v1/files/${imageId}`)
           .then(response => {
-            dispatch(this.putImageData(courseId, response.data.url, imageId, ajaxLib))
+            dispatch(this.putImageData(courseId, response.data.url, settingName, imageId, ajaxLib))
           })
           .catch(() => {
             dispatch(this.errorUploadingImage())
@@ -165,10 +167,10 @@ const Actions = {
     }
   },
 
-  uploadImageSearchUrl(imageUrl, courseId, confirmationId = null, ajaxLib = axios) {
+  uploadImageSearchUrl(imageUrl, courseId, settingName, confirmationId = null, ajaxLib = axios) {
     return dispatch => {
       dispatch(this.uploadingImage())
-      dispatch(this.putImageData(courseId, imageUrl, null, ajaxLib))
+      dispatch(this.putImageData(courseId, imageUrl, settingName, null, ajaxLib))
       if (confirmationId != null) {
         this.confirmImageSelection(confirmationId, ajaxLib)
       }
@@ -180,7 +182,7 @@ const Actions = {
     return ajaxLib.post(`/api/v1/image_selection/${confirmationId}`)
   },
 
-  uploadFile(event, courseId, ajaxLib = axios) {
+  uploadFile(event, courseId, settingName, ajaxLib = axios) {
     event.preventDefault()
     return dispatch => {
       const {type, file} = Helpers.extractInfoFromEvent(event)
@@ -192,13 +194,15 @@ const Actions = {
         const data = {
           name: file.name,
           size: file.size,
-          parent_folder_path: 'course_image',
+          parent_folder_path: `course_${settingName}`,
           type,
           no_redirect: true
         }
         rawUploadFile(url, data, file, ajaxLib)
           .then(attachment => {
-            dispatch(this.prepareSetImage(attachment.url, attachment.id, courseId, ajaxLib))
+            dispatch(
+              this.prepareSetImage(attachment.url, attachment.id, settingName, courseId, ajaxLib)
+            )
           })
           .catch(_response => {
             dispatch(this.errorUploadingImage())

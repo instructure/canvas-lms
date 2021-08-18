@@ -19,32 +19,50 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!discussion_posts'
-
+import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
-import {Flex} from '@instructure/ui-flex'
-
-export const MOCK_ROLE_PILLS = {
-  discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment']
-}
+import {InlineList} from '@instructure/ui-list'
+import {responsiveQuerySizes} from '../../utils'
+import {Responsive} from '@instructure/ui-responsive'
 
 const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment']
 
 export function RolePillContainer({...props}) {
   const baseRolesToDisplay = sortDiscussionRoles(props.discussionRoles)
   return (
-    <>
-      {baseRolesToDisplay.length > 0 && (
-        <Flex display="inline-flex" data-testid="pill-container">
-          {baseRolesToDisplay.map(baseRole => {
-            return (
-              <Flex padding="none small none none" key={baseRole}>
-                <Pill data-testid={`pill-${roleName(baseRole)}`}>{roleName(baseRole)}</Pill>
-              </Flex>
-            )
-          })}
-        </Flex>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          display: 'inline',
+          delimiter: 'pipe'
+        },
+        desktop: {
+          display: 'inline-block',
+          delimiter: 'none'
+        }
+      }}
+      render={(responsiveProps, matches) => (
+        <>
+          {baseRolesToDisplay.length > 0 && (
+            <InlineList delimiter={responsiveProps.delimiter} data-testid="pill-container">
+              {baseRolesToDisplay.map(baseRole => (
+                <InlineList.Item key={baseRole}>
+                  {matches.includes('mobile') ? (
+                    <Text size="x-small" transform="uppercase" data-testid={`mobile-${baseRole}`}>
+                      {baseRole}
+                    </Text>
+                  ) : (
+                    <Pill data-testid={`pill-${baseRole}`}>{baseRole}</Pill>
+                  )}
+                </InlineList.Item>
+              ))}
+            </InlineList>
+          )}
+        </>
       )}
-    </>
+    />
   )
 }
 
@@ -72,7 +90,11 @@ function sortDiscussionRoles(roleNameArray) {
     const roleABortScore = ROLE_HIERARCHY.indexOf(roleNameB)
     return roleASortScore - roleABortScore
   })
-  return roleNameArray
+
+  const roleNames = roleNameArray.map(rawName => {
+    return roleName(rawName)
+  })
+  return roleNames
 }
 
 RolePillContainer.propTypes = {

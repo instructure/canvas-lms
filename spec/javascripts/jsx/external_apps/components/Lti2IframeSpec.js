@@ -37,7 +37,8 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
     props = {
       handleInstall() {},
       registrationUrl: 'http://localhost/register',
-      reregistration: false
+      reregistration: false,
+      toolName: 'The best LTI tool ever'
     }
   })
 
@@ -96,6 +97,11 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
     test('sets the "data-lti-launch" attribute', () => {
       renderComponent()
       equal(getIframe().getAttribute('data-lti-launch'), 'true')
+    })
+
+    test('sets the iframe title', () => {
+      renderComponent()
+      equal(getIframe().getAttribute('title'), 'The best LTI tool ever')
     })
   })
 

@@ -18,20 +18,22 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../graphql/Discussion'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {graphql} from 'msw'
 import {handlers} from '../../graphql/mswHandlers'
 import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
-import {Discussion} from '../../graphql/Discussion'
-import {graphql} from 'msw'
 import React from 'react'
+import {responsiveQuerySizes} from '../utils'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../utils/constants', () => ({
   ...jest.requireActual('../utils/constants'),
   HIGHLIGHT_TIMEOUT: 0
 }))
+jest.mock('../utils')
 
 describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
@@ -54,6 +56,16 @@ describe('DiscussionFullPage', () => {
       course_id: '1'
     }
 
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
     window.INST = {
       editorButtons: []
     }
@@ -65,6 +77,9 @@ describe('DiscussionFullPage', () => {
 
   beforeEach(() => {
     mswClient.cache.reset()
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {maxWidth: '1000'}
+    }))
   })
 
   afterEach(() => {
@@ -342,12 +357,9 @@ describe('DiscussionFullPage', () => {
     it('should render Teacher and Ta pills', async () => {
       window.ENV.course_id = 1
       const container = setup()
-      const pillContainer = await container.findAllByTestId('pill-container')
-      const teacherPill = await container.findAllByTestId('pill-Teacher')
-      const taPill = await container.findAllByTestId('pill-TA')
-      expect(pillContainer).toBeTruthy()
-      expect(teacherPill).toBeTruthy()
-      expect(taPill).toBeTruthy()
+      await waitFor(() => expect(container.queryAllByTestId('pill-container')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-Teacher')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-TA')).toBeTruthy())
     })
 
     it('should not render Teacher and Ta if no course is given', async () => {
@@ -359,119 +371,6 @@ describe('DiscussionFullPage', () => {
       expect(pillContainer).toEqual([])
       expect(teacherPill).toEqual([])
       expect(taPill).toEqual([])
-    })
-  })
-
-  describe('isolated view', () => {
-    beforeAll(() => {
-      window.ENV.isolated_view = true
-    })
-
-    afterAll(() => {
-      window.ENV.isolated_view = false
-    })
-
-    afterEach(() => {
-      setOnSuccess.mockClear()
-    })
-
-    it.skip('should be able to post a reply to an entry', async () => {
-      const {findByText, findByTestId, queryByTestId} = setup()
-
-      const replyButton = await findByTestId('threading-toolbar-reply')
-      fireEvent.click(replyButton)
-
-      expect(findByText('Thread')).toBeTruthy()
-
-      const doReplyButton = await findByTestId('DiscussionEdit-submit')
-      fireEvent.click(doReplyButton)
-
-      await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
-      )
-    })
-
-    it('should be able to edit a root entry', async () => {
-      const {findByText, findByTestId, findAllByTestId} = setup()
-
-      const expandButton = await findByTestId('expand-button')
-      fireEvent.click(expandButton)
-
-      const actionsButtons = await findAllByTestId('thread-actions-menu')
-      fireEvent.click(actionsButtons[0]) // Root Entry kebab
-
-      const editButton = await findByText('Edit')
-      fireEvent.click(editButton)
-
-      const saveButton = await findByText('Save')
-      fireEvent.click(saveButton)
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
-      )
-    })
-
-    it('should open isolated view when go to reply button is clicked', async () => {
-      const container = setup()
-      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
-      fireEvent.change(await container.findByTestId('search-filter'), {
-        target: {value: 'a'}
-      })
-      const goToReply = await container.findByTestId('go-to-reply')
-      fireEvent.click(goToReply)
-
-      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
-    })
-
-    it.skip('should show reply button in isolated view when search term is present', async () => {
-      const container = setup()
-      fireEvent.change(await container.findByTestId('search-filter'), {
-        target: {value: 'a'}
-      })
-      const goToReply = await container.findByTestId('go-to-reply')
-      fireEvent.click(goToReply)
-      await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
-    })
-
-    it.skip('go to topic button should clear search term', async () => {
-      const container = setup()
-      fireEvent.change(await container.findByTestId('search-filter'), {
-        target: {value: 'a'}
-      })
-      const goToReply = await container.findByTestId('go-to-reply')
-      fireEvent.click(goToReply)
-
-      const isolatedKabab = await container.findByTestId('thread-actions-menu')
-      fireEvent.click(isolatedKabab)
-
-      await waitFor(() => {
-        expect(container.queryByTestId('discussion-topic-container')).toBeNull()
-      })
-      const goToTopic = await container.findByText('Go To Topic')
-      fireEvent.click(goToTopic)
-
-      expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
-    })
-
-    it('should clear input when button is pressed', async () => {
-      const container = setup()
-      let searchInput = container.findByTestId('search-filter')
-
-      fireEvent.change(await container.findByTestId('search-filter'), {
-        target: {value: 'A new Search'}
-      })
-      let clearSearchButton = container.queryByTestId('clear-search-button')
-      searchInput = container.getByLabelText('Search entries or author')
-      expect(searchInput.value).toBe('A new Search')
-      expect(clearSearchButton).toBeInTheDocument()
-
-      fireEvent.click(clearSearchButton)
-      clearSearchButton = container.queryByTestId('clear-search-button')
-      searchInput = container.getByLabelText('Search entries or author')
-      expect(searchInput.value).toBe('')
-      expect(clearSearchButton).toBeNull()
     })
   })
 

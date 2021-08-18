@@ -109,6 +109,10 @@ module K5DashboardPageObject
     "[data-testid = 'empty-dash-panda']:visible"
   end
 
+  def empty_subject_home_selector
+    "[data-testid = 'empty-home-panda']:visible"
+  end
+
   def enable_homeroom_checkbox_selector
     '#course_homeroom_course'
   end
@@ -155,6 +159,10 @@ module K5DashboardPageObject
 
   def manage_button_selector
     "[data-testid = 'manage-button']"
+  end
+
+  def manage_home_button_selector
+    "[data-testid = 'manage-home-button'"
   end
 
   def missing_item_href_selector(course_id, assignment_id)
@@ -323,6 +331,10 @@ module K5DashboardPageObject
     fj(empty_dashboard_selector)
   end
 
+  def empty_subject_home
+    fj(empty_subject_home_selector)
+  end
+
   def enable_homeroom_checkbox
     f(enable_homeroom_checkbox_selector)
   end
@@ -365,6 +377,10 @@ module K5DashboardPageObject
 
   def manage_button
     f(manage_button_selector)
+  end
+
+  def manage_home_button
+    f(manage_home_button_selector)
   end
 
   def modules_tab

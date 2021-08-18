@@ -28,15 +28,15 @@ describe Types::DiscussionEntryType do
     [
       {
         value: 'delete',
-        allowed: proc {|user| discussion_entry.grants_right?(user, :delete)}
+        allowed: proc { |user| discussion_entry.grants_right?(user, :delete) }
       },
       {
         value: 'rate',
-        allowed: proc {|user| discussion_entry.grants_right?(user, :rate)}
+        allowed: proc { |user| discussion_entry.grants_right?(user, :rate) }
       },
       {
         value: 'viewRating',
-        allowed: proc {discussion_entry.discussion_topic.allow_rating && !discussion_entry.deleted?}
+        allowed: proc { discussion_entry.discussion_topic.allow_rating && !discussion_entry.deleted? }
       }
     ]
   }
@@ -46,15 +46,25 @@ describe Types::DiscussionEntryType do
   end
 
   it 'queries the attributes' do
-    expect(discussion_entry_type.resolve("message")).to eq discussion_entry.message
-    expect(discussion_entry_type.resolve("ratingSum")).to eq discussion_entry.rating_sum
-    expect(discussion_entry_type.resolve("ratingCount")).to eq discussion_entry.rating_count
-    expect(discussion_entry_type.resolve("rating")).to eq discussion_entry.rating.present?
-    expect(discussion_entry_type.resolve("deleted")).to eq discussion_entry.deleted?
-    expect(discussion_entry_type.resolve("read")).to eq discussion_entry.read?
-    expect(discussion_entry_type.resolve("author { _id }")).to eq discussion_entry.user_id.to_s
-    expect(discussion_entry_type.resolve("editor { _id }")).to eq discussion_entry.editor_id.to_s
-    expect(discussion_entry_type.resolve("discussionTopic { _id }")).to eq discussion_entry.discussion_topic.id.to_s
+    parent_entry = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id, editor: @teacher)
+    type = GraphQLTypeTester.new(parent_entry, current_user: @teacher)
+    expect(type.resolve("discussionTopicId")).to eq parent_entry.discussion_topic_id.to_s
+    expect(type.resolve("parentId")).to eq parent_entry.parent_id.to_s
+    expect(type.resolve("rootEntryId")).to eq parent_entry.root_entry_id.to_s
+    expect(type.resolve("message")).to eq parent_entry.message
+    expect(type.resolve("ratingSum")).to eq parent_entry.rating_sum
+    expect(type.resolve("ratingCount")).to eq parent_entry.rating_count
+    expect(type.resolve("rating")).to eq parent_entry.rating.present?
+    expect(type.resolve("deleted")).to eq parent_entry.deleted?
+    expect(type.resolve("read")).to eq parent_entry.read?
+    expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
+    expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
+    expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
+  end
+
+  it 'returns the quoted reply html for reply preview' do
+    Account.site_admin.enable_feature!(:isolated_view)
+    expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
   end
 
   it 'allows querying for discussion subentries' do
@@ -127,7 +137,7 @@ describe Types::DiscussionEntryType do
   describe "forced_read_state attribute" do
     context "forced_read_state is nil" do
       before do
-        discussion_entry.update_or_create_participant({current_user:@teacher, forced:nil})
+        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: nil })
       end
 
       it 'returns false' do
@@ -137,7 +147,7 @@ describe Types::DiscussionEntryType do
 
     context "forced_read_state is false" do
       before do
-        discussion_entry.update_or_create_participant({current_user:@teacher, forced:false})
+        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: false })
       end
 
       it 'returns false' do
@@ -147,9 +157,9 @@ describe Types::DiscussionEntryType do
 
     context "forced_read_state is true" do
       before do
-        discussion_entry.update_or_create_participant({current_user:@teacher, forced:true})
+        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: true })
       end
-      
+
       it 'returns true' do
         expect(discussion_entry_type.resolve("forcedReadState")).to be true
       end
@@ -164,4 +174,5 @@ describe Types::DiscussionEntryType do
     sub_entry_type = GraphQLTypeTester.new(de, current_user: @teacher)
     expect(sub_entry_type.resolve('rootEntry { _id }')).to eq discussion_entry.id.to_s
   end
+
 end

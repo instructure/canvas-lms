@@ -76,8 +76,24 @@ module Importers
       if result[:resolved]
         # resolved, just replace and carry on
         new_url = result[:new_url] || url
-        if @migration && !relative_url?(new_url) && processed_url = @migration.process_domain_substitutions(new_url)
-          new_url = processed_url
+        if @migration && !relative_url?(new_url)
+          # perform configured substitutions
+          if (processed_url = @migration.process_domain_substitutions(new_url))
+            new_url = processed_url
+          end
+          # relative-ize absolute links outside the course but inside our domain
+          # (analogous to what is done in Api#process_incoming_html_content)
+          if (account = @migration&.context&.root_account)
+            begin
+              uri = URI.parse(new_url)
+              account_hosts = HostUrl.context_hosts(account).map { |h| h.split(':').first }
+              if account_hosts.include?(uri.host)
+                uri.scheme = uri.host = uri.port = nil
+                new_url = uri.to_s
+              end
+            rescue URI::InvalidURIError
+            end
+          end
         end
         node[attr] = new_url
       else

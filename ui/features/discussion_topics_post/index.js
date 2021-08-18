@@ -23,15 +23,16 @@ import $ from 'jquery'
 ready(() => {
   renderCanvasDiscussionPosts(ENV, $('<div/>').appendTo('#content')[0])
 })
-
-import('@canvas/module-sequence-footer').then(() => {
-  $(() => {
-    $('<div id="module_sequence_footer" style="margin-top: 30px" />')
-      .appendTo('#content')
-      .moduleSequenceFooter({
-        assetType: 'Discussion',
-        assetID: ENV.discussion_topic_id,
-        courseID: ENV.course_id
-      })
+if (ENV.SEQUENCE != null) {
+  import('@canvas/module-sequence-footer').then(() => {
+    $(() => {
+      $('<div id="module_sequence_footer" style="margin-top: 30px" />')
+        .appendTo('#content')
+        .moduleSequenceFooter({
+          assetType: 'Discussion',
+          assetID: ENV.SEQUENCE.ASSET_ID,
+          courseID: ENV.SEQUENCE.COURSE_ID
+        })
+    })
   })
-})
+}

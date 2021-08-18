@@ -32,7 +32,9 @@ export function Highlight({...props}) {
 
   return (
     <div
-      style={{paddingBottom: theme.variables.spacing.xxxSmall}}
+      style={{
+        borderRadius: theme.variables.borders.radiusLarge
+      }}
       className={classNames({'highlight-fadeout': props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
       ref={highlightRef}

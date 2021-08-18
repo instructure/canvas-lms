@@ -30,11 +30,25 @@ const MentionMockUsers = [
   }
 ]
 
+const tinyMCE = {
+  activeEditor: {
+    getParam: () => 'LTR'
+  }
+}
+
 const setup = props => {
   return render(<MentionDropdownMenu mentionOptions={MentionMockUsers} {...props} />)
 }
 
 describe('MentionDropdownMenu tests', () => {
+  beforeEach(() => {
+    global.tinyMCE = tinyMCE
+  })
+
+  afterEach(() => {
+    global.tinyMCE = null
+  })
+
   it('should render', () => {
     const component = setup()
     expect(component).toBeTruthy()
@@ -62,16 +76,5 @@ describe('MentionDropdownMenu tests', () => {
     })
     const menuComponent = container.querySelector('.mention-dropdown-menu')
     expect(menuComponent).toBeTruthy()
-  })
-
-  it('should load x and y props respectively', () => {
-    const {container} = setup({
-      show: true,
-      x: '42',
-      y: '24'
-    })
-    const menuContainer = container.querySelector('.mention-dropdown-menu')
-    expect(menuContainer.style.left).toBe('42px')
-    expect(menuContainer.style.top).toBe('24px')
   })
 })

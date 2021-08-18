@@ -76,6 +76,12 @@ describe('ThreadActions', () => {
     expect(queryByText('Open in SpeedGrader')).toBeFalsy()
   })
 
+  it('should not render when is search', () => {
+    const {queryByTestId} = render(<ThreadActions {...defaultRequiredProps} isSearch />)
+    const menu = queryByTestId('thread-actions-menu')
+    expect(menu).toBeNull()
+  })
+
   describe('menu options', () => {
     describe('mark thread as read', () => {
       it('calls provided callback when clicked', () => {

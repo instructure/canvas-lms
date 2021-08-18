@@ -29,6 +29,7 @@ class Folder < ActiveRecord::Base
   end
   include Workflow
 
+  BUTTONS_AND_ICONS_UNIQUE_TYPE = "buttons and icons"
   ROOT_FOLDER_NAME = "course files"
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"
@@ -60,7 +61,8 @@ class Folder < ActiveRecord::Base
   after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
 
   def file_attachments_visible_to(user)
-    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
+        self.grants_right?(user, :read_as_admin)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
@@ -342,6 +344,10 @@ class Folder < ActiveRecord::Base
       end
     end
     folder
+  end
+
+  def self.buttons_and_icons_folder(context)
+    unique_folder(context, BUTTONS_AND_ICONS_UNIQUE_TYPE, ->{ t("Buttons and Icons") })
   end
 
   MEDIA_TYPE = "media"

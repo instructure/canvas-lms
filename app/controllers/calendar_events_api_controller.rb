@@ -1159,7 +1159,8 @@ class CalendarEventsApiController < ApplicationController
       scope = assignment_context_scope(user)
       next unless scope
 
-      scope = scope.active.order(:due_at, :id)
+      scope = scope.order(:due_at, :id)
+      scope = scope.active
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
@@ -1239,6 +1240,7 @@ class CalendarEventsApiController < ApplicationController
         relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
+        relation = relation.with_important_dates if @important_dates
         if includes.include?('web_conference')
           relation = relation.preload(:web_conference)
         end
@@ -1247,8 +1249,8 @@ class CalendarEventsApiController < ApplicationController
     else
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
+      scope = scope.with_important_dates if @important_dates
     end
-    scope = scope.with_important_dates if @important_dates
     scope
   end
 

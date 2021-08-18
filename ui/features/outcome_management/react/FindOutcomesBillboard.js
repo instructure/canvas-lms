@@ -27,25 +27,33 @@ import SVGWrapper from '@canvas/svg-wrapper'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const FindOutcomesBillboard = () => {
-  const {contextType} = useCanvasContext()
-  const courseContext = contextType === 'Course'
+  const {isCourse, isMobileView} = useCanvasContext()
 
   return (
-    <Flex as="div" height="100%">
+    <Flex as="div" height={isMobileView ? '' : '100%'} direction="row" justifyItems="center">
       <Flex.Item margin="auto">
         <Billboard
           size="small"
-          heading={courseContext ? I18n.t('PRO TIP!') : ''}
+          heading={isCourse ? I18n.t('PRO TIP!') : ''}
           headingLevel="h3"
           headingAs="h3"
           hero={
             <PresentationContent>
-              {courseContext ? (
+              {isCourse ? (
                 <div data-testid="clipboard-checklist-icon">
-                  <SVGWrapper url="/images/outcomes/clipboard_checklist.svg" />
+                  <SVGWrapper
+                    url={
+                      isMobileView
+                        ? '/images/outcomes/find_outcomes_mobile.svg'
+                        : '/images/outcomes/clipboard_checklist.svg'
+                    }
+                  />
                 </div>
               ) : (
-                <div style={{transform: 'scale(1.7)'}} data-testid="outcomes-icon">
+                <div
+                  style={{transform: isMobileView ? '' : 'scale(1.7)'}}
+                  data-testid="outcomes-icon"
+                >
                   <SVGWrapper url="/images/outcomes/outcomes.svg" />
                 </div>
               )}
@@ -56,10 +64,10 @@ const FindOutcomesBillboard = () => {
               as="div"
               padding="small 0 xx-large"
               margin="0 auto"
-              width={courseContext ? '60%' : '100%'}
+              width={isCourse ? '60%' : '100%'}
             >
               <Text size="large" color="primary">
-                {courseContext
+                {isCourse
                   ? I18n.t(
                       'Save yourself a lot of time by only adding the outcomes that are specific to your course content.'
                     )

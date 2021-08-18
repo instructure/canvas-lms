@@ -46,7 +46,7 @@ export default class UndatedEventsList {
     this.div
       .on('click keyclick', '.undated_event_title', this.clickEvent)
       .on('click', '.undated-events-link', this.show)
-    if ((toggler = this.div.prev('.element_toggler'))) {
+    if ((toggler = this.div.parent().find('#undated-events-button.element_toggler'))) {
       toggler.on('click keyclick', this.toggle)
       this.div.find('.undated-events-link').hide()
     }

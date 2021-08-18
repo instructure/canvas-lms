@@ -28,28 +28,24 @@ const DiscussionsTray = () => (
     imageWidth="9rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I create a discussion as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029'
+        href: I18n.t('#community.instructor_create_discussion')
       },
       {
         label: I18n.t('How do I publish or unpublish a discussion as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590'
+        href: I18n.t('#community.instructor_publish_discussion')
       },
       {
         label: I18n.t('How do I reply to a discussion as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110'
+        href: I18n.t('#community.instructor_reply_discussion')
       },
       {
         label: I18n.t('How do I view and sort discussion replies as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908'
+        href: I18n.t('#community.instructor_view_discussion_replies')
       }
     ]}
   >

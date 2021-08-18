@@ -70,7 +70,7 @@ class Login::CasController < ApplicationController
         pseudonym = aac.provision_user(st.user, st.extra_attributes)
       end
 
-      if pseudonym
+      if pseudonym && (user = pseudonym.login_assertions_for_user)
         # Successful login and we have a user
 
         @domain_root_account.pseudonyms.scoping do
@@ -80,7 +80,7 @@ class Login::CasController < ApplicationController
         session[:login_aac] = aac.id
 
         pseudonym.infer_auth_provider(aac)
-        successful_login(pseudonym.user, pseudonym)
+        successful_login(user, pseudonym)
       else
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
         logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."

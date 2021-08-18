@@ -24,7 +24,7 @@ module DynamicSettings
     DEFAULT_TTL = 5.minutes
     # The TTL for cached values if none is specified in the constructor
 
-    attr_reader :prefix, :tree, :service, :environment, :cluster
+    attr_reader :prefix, :tree, :service, :environment, :cluster, :retry_limit, :retry_base, :circuit_breaker
     attr_accessor :query_logging
 
     # Build a new prefix proxy
@@ -45,7 +45,10 @@ module DynamicSettings
                     cluster: nil,
                     default_ttl: DEFAULT_TTL,
                     data_center: nil,
-                    query_logging: true)
+                    query_logging: true,
+                    retry_limit: nil,
+                    retry_base: nil,
+                    circuit_breaker: nil)
       @prefix = prefix
       @tree = tree
       @service = service
@@ -54,6 +57,9 @@ module DynamicSettings
       @default_ttl = default_ttl
       @data_center = data_center
       @query_logging = query_logging
+      @retry_limit = retry_limit
+      @retry_base = retry_base
+      @circuit_breaker = circuit_breaker
     end
 
     def cache
@@ -77,6 +83,8 @@ module DynamicSettings
       unknown_kwargs = kwargs.keys - [:failsafe]
       raise ArgumentError, "unknown keyword(s): #{unknown_kwargs.map(&:inspect).join(', ')}" unless unknown_kwargs.empty?
 
+      retry_count = 1
+
       keys = [
         full_key(key),
         [tree, service, environment, prefix, key].compact.join("/"),
@@ -94,65 +102,84 @@ module DynamicSettings
         return result if result
       end
 
-      # okay now pre-cache an entire tree
-      tree_key = [tree, service, environment].compact.join("/")
-      # This longer TTL is important for race condition for now.
-      # if the tree JUST expired, we don't want to find
-      # a valid tree, and then no valid subkeys, that makes
-      # nils start popping up in the cache.  Subkeys should
-      # last much longer than it takes to notice the tree key is
-      # expired and trying to replace it.  When the tree writes
-      # are fully atomic, this is much less of a concern,
-      # we could have one ttl again
-      subtree_ttl = ttl * 2
-      cache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
-        values = kv_fetch(tree_key, recurse: true, stale: true)
-        if values.nil?
-          # no sense trying to populate the subkeys
-          # when there's no tree
-          nil
-        else
-          populate_cache(values, subtree_ttl)
-          values
-        end
-      end
-
-      keys.each do |full_key|
-        # these keys will have been populated (or not!) above
-        cache_result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: subtree_ttl) do
-          # this should rarely happen.  If we JUST populated the parent tree,
-          # the value will already by in the cache.  If it's NOT in the tree, we'll cache
-          # a nil (intentionally) and not hit this fetch over and over.  This protects us
-          # from the race condition where we just expired and filled out the whole tree,
-          # then the cache gets cleared, then we try to fetch one of the things we "know"
-          # is in the cache now.  It's better to fall back to asking consul in those cases.
-          # these values will still get overwritten the next time the parent tree expires,
-          # and they'll still go away eventually if we REMOVE a key from a subtree in consul.
-          kv_fetch(full_key, stale: true)
-        end
-        return cache_result if cache_result
-      end
-
-      fallback_keys.each do |full_key|
-        result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
-          kv_fetch(full_key, stale: true)
-        end
-        return result if result
-      end
-      DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
-      nil
-    rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
-      if cache.respond_to?(:fetch_without_expiration)
-        cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
-          if val
-            DynamicSettings.on_fallback_recovery(e)
-            return val
+      begin
+        # okay now pre-cache an entire tree
+        tree_key = [tree, service, environment].compact.join("/")
+        # This longer TTL is important for race condition for now.
+        # if the tree JUST expired, we don't want to find
+        # a valid tree, and then no valid subkeys, that makes
+        # nils start popping up in the cache.  Subkeys should
+        # last much longer than it takes to notice the tree key is
+        # expired and trying to replace it.  When the tree writes
+        # are fully atomic, this is much less of a concern,
+        # we could have one ttl again
+        subtree_ttl = ttl * 2
+        cache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
+          values = kv_fetch(tree_key, recurse: true, stale: true)
+          if values.nil?
+            # no sense trying to populate the subkeys
+            # when there's no tree
+            nil
+          else
+            populate_cache(values, subtree_ttl)
+            values
           end
         end
-      end
 
-      return kwargs[:failsafe] if kwargs.key?(:failsafe)
-      raise
+        keys.each do |full_key|
+          # these keys will have been populated (or not!) above
+          cache_result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: subtree_ttl) do
+            # this should rarely happen.  If we JUST populated the parent tree,
+            # the value will already by in the cache.  If it's NOT in the tree, we'll cache
+            # a nil (intentionally) and not hit this fetch over and over.  This protects us
+            # from the race condition where we just expired and filled out the whole tree,
+            # then the cache gets cleared, then we try to fetch one of the things we "know"
+            # is in the cache now.  It's better to fall back to asking consul in those cases.
+            # these values will still get overwritten the next time the parent tree expires,
+            # and they'll still go away eventually if we REMOVE a key from a subtree in consul.
+            kv_fetch(full_key, stale: true)
+          end
+          return cache_result if cache_result
+        end
+
+        fallback_keys.each do |full_key|
+          result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
+            kv_fetch(full_key, stale: true)
+          end
+          return result if result
+        end
+        DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
+        nil
+      rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
+        if cache.respond_to?(:fetch_without_expiration)
+          cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
+            if val
+              DynamicSettings.on_fallback_recovery(e)
+              return val
+            end
+          end
+        end
+
+        return kwargs[:failsafe] if kwargs.key?(:failsafe)
+
+        if retry_limit && retry_base && retry_count < retry_limit && !circuit_breaker&.tripped?
+          # capture this to make sure that we have SOME
+          # signal that the problem is continuing, even if our
+          # retries are all successful.
+          DynamicSettings.on_retry(e)
+
+          backoff_interval = retry_base ** retry_count
+          retry_count += 1
+          DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] Consul error; retrying in #{backoff_interval} seconds...")
+          sleep(backoff_interval)
+          retry
+        end
+
+        # retries failed; trip the circuit breaker and avoid retries for some amount of time
+        circuit_breaker&.trip
+
+        raise
+      end
     end
     alias [] fetch
 

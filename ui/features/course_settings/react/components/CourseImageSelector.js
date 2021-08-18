@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {IconMoreLine, IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -29,11 +30,22 @@ import CourseImagePicker from './CourseImagePicker'
 let overflow = ''
 
 export default class CourseImageSelector extends React.Component {
+  static propTypes = {
+    courseId: PropTypes.string.isRequired,
+    setting: PropTypes.string.isRequired,
+    store: PropTypes.object.isRequired,
+    wide: PropTypes.bool
+  }
+
+  static defaultProps = {
+    wide: false
+  }
+
   state = this.props.store.getState()
 
   UNSAFE_componentWillMount() {
     this.props.store.subscribe(() => this.setState(this.props.store.getState()))
-    this.props.store.dispatch(Actions.getCourseImage(this.props.courseId))
+    this.props.store.dispatch(Actions.getCourseImage(this.props.courseId, this.props.setting))
     this.setState({gettingImage: true})
   }
 
@@ -52,13 +64,14 @@ export default class CourseImageSelector extends React.Component {
 
   changeImage = () => this.props.store.dispatch(Actions.setModalVisibility(true))
 
-  removeImage = () => this.props.store.dispatch(Actions.putRemoveImage(this.props.courseId))
+  removeImage = () =>
+    this.props.store.dispatch(Actions.putRemoveImage(this.props.courseId, this.props.setting))
 
   render() {
     return (
       <div>
         <div
-          className="CourseImageSelector"
+          className={`CourseImageSelector ${this.props.wide ? 'wide' : ''}`}
           style={this.state.imageUrl ? {backgroundImage: `url(${this.state.imageUrl})`} : {}}
         >
           {this.state.gettingImage || this.state.removingImage ? (
@@ -106,11 +119,16 @@ export default class CourseImageSelector extends React.Component {
               courseId={this.props.courseId}
               handleClose={this.handleModalClose}
               handleFileUpload={(e, courseId) =>
-                this.props.store.dispatch(Actions.uploadFile(e, courseId))
+                this.props.store.dispatch(Actions.uploadFile(e, courseId, this.props.setting))
               }
               handleImageSearchUrlUpload={(imageUrl, confirmationId = null) =>
                 this.props.store.dispatch(
-                  Actions.uploadImageSearchUrl(imageUrl, this.props.courseId, confirmationId)
+                  Actions.uploadImageSearchUrl(
+                    imageUrl,
+                    this.props.courseId,
+                    this.props.setting,
+                    confirmationId
+                  )
                 )
               }
               uploadingImage={this.state.uploadingImage}

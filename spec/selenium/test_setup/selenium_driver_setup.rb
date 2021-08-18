@@ -117,9 +117,6 @@ module SeleniumDriverSetup
         # examples in this group, meaning other workers won't pick them
         # up).
         #
-        # the custom exit code is so that test-queue can detect and allow
-        # a certain percentage of bad workers, while the build as a whole
-        # can still succeed
         exit! 98
       end
 

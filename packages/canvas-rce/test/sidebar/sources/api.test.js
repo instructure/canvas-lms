@@ -264,6 +264,116 @@ describe('sources/api', () => {
     })
   })
 
+  describe('fetchSubFolders()', () => {
+    let bookmark, props
+
+    const subject = () => apiSource.fetchSubFolders(props, bookmark)
+
+    beforeEach(() => {
+      props = {host: 'canvas.rce', folderId: 2}
+      bookmark = undefined
+      sinon.stub(apiSource, 'apiFetch').returns(Promise.resolve({}))
+    })
+
+    afterEach(() => apiSource.apiFetch.reset())
+
+    it('makes a request to the folders api with the given host and ID', () => {
+      subject()
+      sinon.assert.calledWith(apiSource.apiFetch, 'about://canvas.rce/api/folders/2', {
+        Authorization: 'Bearer theJWT'
+      })
+    })
+
+    describe('with a provided bookmark', () => {
+      beforeEach(() => (bookmark = 'https://canvas.rce/api/folders/2?page=2'))
+
+      it('makes a request to the bookmark', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, bookmark, {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+    })
+  })
+
+  describe('fetchBookmarkedData', () => {
+    let fetchFunction, properties, onSuccess, onError
+
+    beforeEach(() => {
+      fetchFunction = sinon
+        .stub()
+        .onFirstCall()
+        .returns(Promise.resolve({bookmark: 'https://canvas.rce/api/thing/1?page=2'}))
+        .onSecondCall()
+        .returns(Promise.resolve({data: 'foo'}))
+      properties = {foo: 'bar'}
+      onSuccess = sinon.stub()
+      onError = sinon.stub()
+    })
+
+    afterEach(() => {
+      fetchFunction.reset()
+      onSuccess.reset()
+      onError.reset()
+    })
+
+    const subject = () =>
+      apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
+
+    it('calls the "fetchFunction", passing "properties"', () => {
+      subject().then(() => {
+        sinon.assert.alwaysCalledWith(fetchFunction, properties)
+        sinon.assert.calledTwice(fetchFunction)
+      })
+    })
+
+    it('calls "onSuccess" for each page', () => {
+      return subject().then(() => {
+        sinon.assert.calledTwice(onSuccess)
+      })
+    })
+
+    describe('when "fetchFunction" throws an exception', () => {
+      beforeEach(() => {
+        fetchFunction.onFirstCall().returns(Promise.reject('error'))
+      })
+
+      it('calls "onError"', () => {
+        return subject().then(() => {
+          sinon.assert.calledOnce(onError)
+        })
+      })
+    })
+  })
+
+  describe('fetchButtonsAndIconsFolder', () => {
+    let folders
+
+    beforeEach(() => {
+      folders = [{id: 24}]
+      const body = {folders}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+
+    it('calls fetchPage with the proper params', () => {
+      return apiSource
+        .fetchButtonsAndIconsFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/buttons_and_icons?contextType=course&contextId=22'
+          )
+        })
+    })
+  })
+
   describe('fetchMediaFolder', () => {
     let files
     beforeEach(() => {

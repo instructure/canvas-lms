@@ -4557,6 +4557,72 @@ describe Submission do
       expect(@a1.submission_for_student(@u1).grade).to be_nil
       expect(@a1.submission_for_student(@u2).grade).to be_nil
     end
+
+    describe "submitting comments via bulk update" do
+      let(:auto_assignment) { @a1 }
+      let(:manual_assignment) do
+        @a2.post_policy.update!(post_manually: true)
+        @a2
+      end
+
+      it "sets the comment to visible if the assignment is automatically posted" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if the relevant submission has already been posted" do
+        auto_assignment.grade_student(@u1, grade: 0, grader: @teacher)
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if a grade is also included in the update" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {posted_grade: 0, text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      context "for a manually-posted assignment" do
+        let(:submission) { manual_assignment.submission_for_student(@u1) }
+
+        it "shows the comment if the associated submission is already posted" do
+          manual_assignment.post_submissions(submission_ids: [submission.id])
+
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "hello there"}
+            }
+          })
+          expect(submission.submission_comments.last).not_to be_hidden
+        end
+
+        it "leaves the comment hidden if the associated submission is not posted" do
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "clandestine comment"}
+            }
+          })
+          expect(submission.submission_comments.last).to be_hidden
+        end
+      end
+    end
   end
 
   describe 'find_or_create_provisional_grade!' do

@@ -102,7 +102,7 @@ const ManageOutcomeItem = ({
         </Flex.Item>
         <Flex.Item align="start" size="50%" shouldGrow>
           <div style={{padding: '0.625rem 0'}}>
-            <Heading level="h4">
+            <Heading level="h4" data-testid="outcome-management-item-title">
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
             </Heading>
           </div>

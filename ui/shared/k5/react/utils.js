@@ -45,6 +45,7 @@ export const fetchGrades = (userId = 'self') =>
       // Grades are the same across all enrollments, just look at first one
       const hasGradingPeriods = course.has_grading_periods
       const enrollment = course.enrollments[0]
+      const showTotalsForAllGradingPeriods = enrollment.totals_for_all_grading_periods_option
       return {
         courseId: course.id,
         courseName: course.name,
@@ -62,7 +63,14 @@ export const fetchGrades = (userId = 'self') =>
         grade: hasGradingPeriods
           ? enrollment.current_period_computed_current_grade
           : enrollment.computed_current_grade,
-        isHomeroom: course.homeroom_course
+        isHomeroom: course.homeroom_course,
+        showTotalsForAllGradingPeriods,
+        totalScoreForAllGradingPeriods: showTotalsForAllGradingPeriods
+          ? enrollment.computed_current_score
+          : null,
+        totalGradeForAllGradingPeriods: showTotalsForAllGradingPeriods
+          ? enrollment.computed_current_grade
+          : null
       }
     })
   )

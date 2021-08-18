@@ -285,6 +285,14 @@ $(document).ready(function () {
     recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
   })
 
+  function showSubmissionContent() {
+    $('#submit_assignment').show()
+    $('.submit_assignment_link').hide()
+    $('html,body').scrollTo($('#submit_assignment'))
+    createSubmitAssignmentTabs()
+    $('#submit_assignment_tabs li').first().focus()
+  }
+
   $('.submit_assignment_link').click(function (event, skipConfirmation) {
     event.preventDefault()
     const late = $(this).hasClass('late')
@@ -306,11 +314,8 @@ $(document).ready(function () {
         return
       }
     }
-    $('#submit_assignment').show()
-    $('.submit_assignment_link').hide()
-    $('html,body').scrollTo($('#submit_assignment'))
-    createSubmitAssignmentTabs()
-    $('#submit_assignment_tabs li').first().focus()
+
+    showSubmissionContent()
   })
 
   $('.switch_text_entry_submission_views').click(function (event) {
@@ -537,6 +542,34 @@ $(document).ready(function () {
       .showIf($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0)
     checkAllowUploadSubmit()
   })
+
+  const annotatedDocumentSubmission = $('.annotated-document-submission')
+  if (ENV.SUBMISSION_ID && annotatedDocumentSubmission.length) {
+    return axios
+      .post('/api/v1/canvadoc_session', {
+        submission_attempt: 'draft',
+        submission_id: ENV.SUBMISSION_ID
+      })
+      .then(result => {
+        $(annotatedDocumentSubmission).attr('src', result.data.canvadocs_session_url)
+      })
+      .catch(error => {
+        annotatedDocumentSubmission.replaceWith(
+          `<div>${I18n.t('There was an error loading the document.')}</div>`
+        )
+
+        return error
+      })
+      .then(error => {
+        if (ENV.FIRST_ANNOTATION_SUBMISSION) {
+          showSubmissionContent()
+        }
+
+        if (error) {
+          throw new Error(error)
+        }
+      })
+  }
 })
 
 $('#submit_google_doc_form').submit(() => {
@@ -573,22 +606,4 @@ $(document).ready(() => {
       $('#media_media_recording_thumbnail').attr('id', 'media_comment_' + id)
     })
   })
-
-  const annotatedDocumentSubmission = $('.annotated-document-submission')
-  if (ENV.SUBMISSION_ID && annotatedDocumentSubmission.length) {
-    axios
-      .post('/api/v1/canvadoc_session', {
-        submission_attempt: 'draft',
-        submission_id: ENV.SUBMISSION_ID
-      })
-      .then(result => {
-        $(annotatedDocumentSubmission).attr('src', result.data.canvadocs_session_url)
-      })
-      .catch(error => {
-        annotatedDocumentSubmission.replaceWith(
-          `<div>${I18n.t('There was an error loading the document.')}</div>`
-        )
-        throw new Error(error)
-      })
-  }
 })

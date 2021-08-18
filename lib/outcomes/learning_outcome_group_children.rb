@@ -86,7 +86,7 @@ module Outcomes
         relation = add_search_query(relation, args[:search_query])
       end
 
-      relation.select(:content_id).distinct.count
+      relation.count
     end
 
     def add_search_query(relation, search_query)

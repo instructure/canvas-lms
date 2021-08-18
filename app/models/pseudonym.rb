@@ -205,6 +205,8 @@ class Pseudonym < ActiveRecord::Base
     end
 
     user = self.user
+    return nil if user.unavailable?
+
     user.workflow_state = 'registered' unless user.registered?
 
     add_ldap_channel

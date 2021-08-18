@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {mount} from 'enzyme'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   CREATE_SUBMISSION,
@@ -151,7 +152,9 @@ describe('SubmissionManager', () => {
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
         window.ENV = {
-          CONFETTI_ENABLED: enabled
+          CONFETTI_ENABLED: enabled,
+          ASSIGNMENT_ID: 1,
+          COURSE_ID: 1
         }
       })
 
@@ -1062,6 +1065,65 @@ describe('SubmissionManager', () => {
 
       const submitButton = getByRole('button', {name: 'Submit Assignment'})
       expect(submitButton).not.toBeDisabled()
+    })
+  })
+
+  describe('Module sequence footer buttons', () => {
+    let props
+    let wrapper
+    let submissionManager
+
+    beforeEach(async () => {
+      window.ENV.CONTEXT_MODULE_ITEM = {
+        done: false,
+        id: '1',
+        module_id: '2'
+      }
+      window.ENV.ASSIGNMENT_ID = 1
+      window.ENV.COURSE_ID = 1
+
+      props = await mockAssignmentAndSubmission()
+
+      wrapper = mount(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      submissionManager = wrapper.find(SubmissionManager)
+    })
+
+    afterEach(() => {
+      delete window.ENV.CONTEXT_MODULE_ITEM
+      delete window.ENV.ASSIGNMENT_ID
+      delete window.ENV.COURSE_ID
+    })
+
+    it('contains the Previous button when previousModuleObject is defined', async () => {
+      submissionManager.setState({
+        previousModuleObject: {
+          tooltipText: 'Assignment 1',
+          url: 'http://example.com/courses/1/modules/items/14'
+        }
+      })
+      expect(wrapper.find({'data-testid': 'previous-assignment-btn'}).exists()).toBeTruthy()
+    })
+
+    it('contains the Next button when nextModuleObject is defined', async () => {
+      submissionManager.setState({
+        nextModuleObject: {
+          tooltipText: 'Assignment 2',
+          url: 'http://example.com/courses/1/modules/items/15'
+        }
+      })
+      expect(wrapper.find({'data-testid': 'next-assignment-btn'})).toBeTruthy()
+    })
+
+    it('not contains the Previous button when previousModuleObject is not defined', async () => {
+      expect(wrapper.find({'data-testid': 'previous-assignment-btn'}).exists()).toBeFalsy()
+    })
+
+    it('not contains the Next button when nextModuleObject is not defined', async () => {
+      expect(wrapper.find({'data-testid': 'next-assignment-btn'}).exists()).toBeFalsy()
     })
   })
 })

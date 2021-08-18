@@ -58,13 +58,6 @@ conditional_release:
   root_opt_in: true
   custom_transition_proc: conditional_release_transition_hook
   after_state_change_proc: conditional_release_after_change_hook
-course_card_images:
-  state: allowed
-  display_name: Enable Dashboard Images for Courses
-  description: Allow course images to be assigned to a course and used on the dashboard
-    cards.
-  applies_to: Course
-  root_opt_in: true
 disable_alert_timeouts:
   state: allowed
   display_name:
@@ -111,6 +104,7 @@ embedded_release_notes:
   description: Show Instructure-provided release notes filtered by user role in the
        Help Menu. Available to users with admin, teacher (instructor), and observer
        roles. Applicable features for student roles are included in observer notes.
+  pending_enforcement: true
   applies_to: Account
 encrypted_sourcedids:
   state: allowed
@@ -124,6 +118,11 @@ epub_export:
   description: This enables users to generate and download course ePub.
   applies_to: Course
   root_opt_in: true
+feature_flag_filters:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Feature Flag Filters
+  description: Adds additional information and filtering for feature flags
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin

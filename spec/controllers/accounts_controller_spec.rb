@@ -1201,6 +1201,14 @@ describe AccountsController do
       expect(response.body).to match(/#{@c2.id}/)
     end
 
+    it "should not set pagination total_pages/last page link" do
+      admin_logged_in(@account)
+      get 'courses_api', params: {:account_id => @account.id, per_page: 1}
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+    end
+
     it "should properly remove sections from includes" do
       @s1 = @course.course_sections.create!
       @course.enroll_student(user_factory(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)

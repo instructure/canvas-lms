@@ -22,6 +22,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'config_file'
 require 'diplomat'
+require 'dynamic_settings/circuit_breaker'
 require 'dynamic_settings/memory_cache'
 require 'dynamic_settings/fallback_proxy'
 require 'dynamic_settings/prefix_proxy'
@@ -35,7 +36,7 @@ module DynamicSettings
   class << self
     attr_accessor :environment
     attr_reader :fallback_data, :use_consul, :config
-    attr_writer :fallback_recovery_lambda, :cache, :logger
+    attr_writer :fallback_recovery_lambda, :retry_lambda, :cache, :logger
 
     def config=(conf_hash)
       @config = conf_hash
@@ -58,6 +59,7 @@ module DynamicSettings
         @default_service = conf_hash.fetch('service', :canvas)
         @cache = conf_hash.fetch('cache', ::DynamicSettings::MemoryCache.new)
         @fallback_recovery_lambda = conf_hash.fetch('fallback_recovery_lambda', nil)
+        @retry_lambda = conf_hash.fetch('retry_lambda', nil)
         @logger = conf_hash.fetch('logger', nil)
       else
         @environment = nil
@@ -76,9 +78,11 @@ module DynamicSettings
     end
 
     def on_fallback_recovery(exception)
-      if @fallback_recovery_lambda.present?
-        @fallback_recovery_lambda.call(exception)
-      end
+      @fallback_recovery_lambda&.call(exception)
+    end
+
+    def on_retry(exception)
+      @retry_lambda&.call(exception)
     end
 
     def on_reload!
@@ -132,7 +136,10 @@ module DynamicSettings
           cluster: cluster,
           default_ttl: default_ttl,
           data_center: data_center || @data_center,
-          query_logging: @config.fetch('query_logging', true)
+          query_logging: @config.fetch('query_logging', true),
+          retry_limit: @config.fetch('retry_limit', 1),
+          retry_base: @config.fetch('retry_base', 1.4),
+          circuit_breaker: @config.fetch('circuit_breaker', nil)
         )
       else
         proxy = root_fallback_proxy

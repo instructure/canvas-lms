@@ -62,6 +62,9 @@ class CreateTicketForm extends React.Component {
   }
 
   render() {
+    // xsslint safeString.identifier guidesLink
+    const guidesLink = I18n.t('#community.guides_home')
+
     return (
       <form ref={c => (this.form = c)} action="/error_reports" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">
@@ -74,9 +77,7 @@ class CreateTicketForm extends React.Component {
               __html: I18n.t(
                 'For an instant answer, see if your issue is addressed in the *Canvas Guides*.',
                 {
-                  wrappers: [
-                    '<a target="_blank" href="https://community.canvaslms.com/t5/Canvas/ct-p/canvas">$1</a>'
-                  ]
+                  wrappers: ['<a target="_blank" href="' + guidesLink + '">$1</a>']
                 }
               )
             }}

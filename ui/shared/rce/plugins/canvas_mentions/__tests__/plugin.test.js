@@ -20,6 +20,7 @@ import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import {screen} from '@testing-library/dom'
+import {KEY_CODES} from '../constants'
 
 const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
@@ -43,6 +44,13 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   }
 }))
 
+jest.mock('../components/MentionAutoComplete/MentionDropdown')
+jest.mock('react-dom')
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
 describe('plugin', () => {
   it('has a name', () => {
     expect(plugin.name).toEqual('canvas_mentions')
@@ -65,6 +73,9 @@ describe('pluginDefinition', () => {
   beforeEach(() => {
     editor = new FakeEditor()
     plugin.pluginDefinition.init(editor)
+    global.tinymce = {
+      activeEditor: editor
+    }
   })
 
   afterEach(() => editor.setContent(''))
@@ -167,13 +178,62 @@ describe('pluginDefinition', () => {
     })
   })
 
-  describe('KeyDown', () => {
+  describe('KeyUp', () => {
     let which
 
-    const subject = () => editor.fire('KeyDown', {which, editor})
+    const subject = () => editor.fire('KeyUp', {which, editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      editor.setSelectedNode(editor.dom.select('#mentions-marker')[0])
+
+      global.postMessage = jest.fn()
+    })
+
+    describe('when the event is for a non-navigation key', () => {
+      beforeEach(() => (which = 69))
+
+      it('broadcasts the message', () => {
+        subject()
+        expect(global.postMessage).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    describe('when the event is for a navigation key', () => {
+      beforeEach(() => (which = KEY_CODES.up))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the marker node is not selected', () => {
+      beforeEach(() => editor.selection.select(editor.dom.select('#test')[0]))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('KeyDown', () => {
+    let which, preventDefault
+
+    const subject = () => editor.fire('KeyDown', {which, editor, preventDefault})
 
     beforeEach(() => {
       which = 1
+      preventDefault = jest.fn()
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
@@ -191,9 +251,50 @@ describe('pluginDefinition', () => {
         editor.selection.select(editor.dom.select('#mentions-marker')[0])
       })
 
+      function examplesForMentionEvents() {
+        it('prevents default', () => {
+          subject()
+          expect(preventDefault).toHaveBeenCalled()
+        })
+
+        it('broadcasts the event via postMessage', () => {
+          subject()
+          expect(global.postMessage).toHaveBeenCalled()
+        })
+      }
+
       it('does not make the body contenteditable', () => {
         subject()
         expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+
+      describe('and the key pressed was "up"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.up
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionEvents()
+      })
+
+      describe('and the key pressed was "down"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.down
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionEvents()
+      })
+
+      describe('and the key pressed was "enter"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.enter
+          global.postMessage = jest.fn()
+
+          editor.dom.select('#mentions-marker')[0]?.setAttribute('aria-activedescendant', '#foo')
+        })
+
+        examplesForMentionEvents()
       })
 
       describe('with the key down for a "backspace" deleting the trigger character', () => {
@@ -226,12 +327,12 @@ describe('pluginDefinition', () => {
   })
 
   describe('MouseDown', () => {
-    let currentTarget
+    let target
 
-    const subject = () => editor.fire('MouseDown', {editor, currentTarget})
+    const subject = () => editor.fire('MouseDown', {editor, target})
 
     beforeEach(() => {
-      currentTarget = {id: ''}
+      target = {id: ''}
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
@@ -245,7 +346,7 @@ describe('pluginDefinition', () => {
     sharedExamplesForEventHandlers(subject)
 
     describe('when the target of the click is the marker', () => {
-      beforeEach(() => (currentTarget = {id: 'mentions-marker'}))
+      beforeEach(() => (target = {id: 'mentions-marker'}))
 
       it('does not make the body contenteditable', () => {
         subject()

@@ -27,28 +27,24 @@ const FilesTray = () => (
     image="/images/tutorial-tray-images/Panda_Files.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use Files as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929'
+        href: I18n.t('#community.instructor_use_files')
       },
       {
         label: I18n.t('How do I upload a file to a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618'
+        href: I18n.t('#community.instructor_upload_course_file')
       },
       {
         label: I18n.t('How do I bulk upload files to a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623'
+        href: I18n.t('#community.instructor_bulk_upload')
       },
       {
         label: I18n.t('How do I move and organize my files as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622'
+        href: I18n.t('#community.instructor_organize_files')
       }
     ]}
   >

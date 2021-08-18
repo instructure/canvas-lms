@@ -40,7 +40,12 @@ describe CC::CCHelper do
   end
 
   describe CC::CCHelper::HtmlContentExporter do
-    before do
+    before :once do
+      course_with_teacher
+      @obj = @course.media_objects.create!(:media_id => 'abcde')
+    end
+
+    before :each do
       @kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@kaltura)
       allow(@kaltura).to receive(:startSession)
@@ -66,8 +71,6 @@ describe CC::CCHelper do
       },
       ])
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId('abcde').first)
-      course_with_teacher
-      @obj = @course.media_objects.create!(:media_id => 'abcde')
     end
 
     it "should translate media links using the original flavor" do
@@ -86,6 +89,17 @@ describe CC::CCHelper do
       HTML
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
+    end
+
+    it "should not touch links to deleted media objects" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      @obj.destroy
+      orig = <<-HTML
+      <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
+      HTML
+      translated = @exporter.html_content(orig)
+      expect(translated).to eq orig
+      expect(@exporter.media_object_infos[@obj.id]).to be_nil
     end
 
     it "should translate media links using an alternate flavor" do
@@ -277,6 +291,17 @@ describe CC::CCHelper do
       expect(translated).to include "$WIKI_REFERENCE$/pages/#{other_page.url}?embedded=true"
       expect(translated).to include "$CANVAS_OBJECT_REFERENCE$/assignments/#{CC::CCHelper.create_key(assignment)}?bamboozled=true"
       expect(translated).to include "$CANVAS_COURSE_REFERENCE$/modules/items/#{CC::CCHelper.create_key(tag)}?seriously=0"
+    end
+
+    it "deals with a missing media object on kaltura" do
+      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with('xyzzy').and_return(nil)
+      @course.media_objects.create!(:media_id => 'xyzzy')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
+      expect {
+        @exporter.html_content(<<-HTML)
+        <p><a id='media_comment_xyzzy' class='instructure_inline_media_comment'>this is a media comment</a></p>
+        HTML
+      }.not_to raise_error
     end
   end
 end

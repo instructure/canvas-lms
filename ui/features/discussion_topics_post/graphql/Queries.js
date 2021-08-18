@@ -74,6 +74,7 @@ export const DISCUSSION_QUERY = gql`
           filter: $filter
           searchTerm: $searchTerm
         )
+        searchEntryCount(filter: $filter, searchTerm: $searchTerm)
       }
     }
   }
@@ -93,6 +94,9 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     $sort: DiscussionSortOrderType
     $courseID: ID
     $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
+    $relativeEntryId: ID
+    $includeRelativeEntry: Boolean
+    $beforeRelativeEntry: Boolean
   ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
@@ -111,6 +115,9 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
           first: $first
           last: $last
           sortOrder: $sort
+          relativeEntryId: $relativeEntryId
+          includeRelativeEntry: $includeRelativeEntry
+          beforeRelativeEntry: $beforeRelativeEntry
         ) {
           nodes {
             ...DiscussionEntry

@@ -27,7 +27,7 @@ module MicrosoftSync
     attr_reader :graph_service
 
     class UnexpectedResponseError < Errors::PublicError
-      def public_message
+      def self.public_message
         I18n.t('Unexpected response from Microsoft API. This is likely a bug. ' \
                'Please contact support.')
       end

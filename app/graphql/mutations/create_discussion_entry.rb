@@ -32,12 +32,13 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
 
     association = topic.discussion_entries
+    entry = build_entry(association, input[:message], topic)
+
     if input[:parent_entry_id]
       parent_entry = topic.discussion_entries.find(input[:parent_entry_id])
-      association = parent_entry.discussion_subentries
+      entry.parent_entry = parent_entry
     end
 
-    entry = build_entry(association, input[:message], topic)
     if input[:file_id]
       attachment = Attachment.find(input[:file_id])
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user

@@ -101,6 +101,7 @@ module Lti
          vnd.Canvas.submission.url
          Context.title
          com.instructure.Assignment.lti.id
+         com.instructure.Assignment.allowedFileExtensions
          com.instructure.Person.name_sortable
          com.instructure.PostMessageToken
          com.instructure.Editor.contents

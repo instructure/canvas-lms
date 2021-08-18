@@ -92,12 +92,7 @@ describe Api::V1::PlannerItem do
       @course.name = "test course name"
       expect(api.planner_item_json(@assignment, @student, session)[:context_name]).to eq "test course name"
 
-      # still no image if feature flag is off
       @course.image_url = "path/to/course/image.png"
-      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to be_nil
-
-      # ok, now that course has an image and the feature flag is on there should be an image
-      @course.enable_feature!(:course_card_images)
       expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
     end
 

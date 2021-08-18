@@ -111,6 +111,14 @@ iframe[data-media-id] {
   height: 1.5rem;
 }
 
+/* make the outline of the mentions span match the theme */
+#mentions-marker:read-write {
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 2px 2px 2px;
+  box-shadow: 0 0 0 1px var(--ic-brand-primary);
+}
+
 /* the svg and keyframe styles are lifted from instui spinner */
 span[data-placeholder-for] {
   border: solid 1px #8b969e;

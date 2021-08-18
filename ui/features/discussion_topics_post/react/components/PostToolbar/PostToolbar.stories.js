@@ -58,3 +58,9 @@ StudentView.args = {
   onOpenSpeedgrader: null,
   onShareToCommons: null
 }
+
+export const NoReplies = Template.bind({})
+NoReplies.args = {
+  isPublished: true,
+  isSubscribed: true
+}

@@ -29,9 +29,11 @@ ready(() => {
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
+        canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
         currentUser={ENV.current_user}
         id={ENV.COURSE.id}
-        imageUrl={ENV.COURSE.image_url}
+        bannerImageUrl={ENV.COURSE.banner_image_url}
+        cardImageUrl={ENV.COURSE.image_url}
         color={ENV.COURSE.color}
         name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}

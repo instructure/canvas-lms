@@ -27,7 +27,8 @@ const rows = [
   sampleData.allowedOnFeature,
   sampleData.allowedFeature,
   sampleData.onFeature,
-  sampleData.offFeature
+  sampleData.offFeature,
+  sampleData.betaFeature
 ]
 
 describe('feature_flags::FeatureFlags', () => {
@@ -77,6 +78,51 @@ describe('feature_flags::FeatureFlags', () => {
       await waitFor(() => {
         expect(queryByText('Account')).not.toBeInTheDocument()
         expect(queryByText('Course')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('filter', () => {
+    describe('with feature disabled', () => {
+      it('does not render', async () => {
+        const {queryAllByPlaceholderText} = render(<FeatureFlags />)
+        const filterField = await queryAllByPlaceholderText('Filter Features')
+        expect(filterField.length).toBe(0)
+      })
+    })
+    describe('with feature enabled', () => {
+      beforeEach(() => {
+        ENV.FEATURES = {feature_flag_filters: true}
+      })
+
+      it('renders an empty multiselect bar on load', async () => {
+        const {findByPlaceholderText} = render(
+          <div>
+            <FeatureFlags />
+            <div id="aria_alerts" role="alert" />
+          </div>
+        )
+        const filterField = await findByPlaceholderText('Filter Features')
+        expect(filterField).toBeInTheDocument()
+        expect(filterField.value).toBe('')
+      })
+
+      it('filters based on tag', async () => {
+        const {findByPlaceholderText, getAllByText, queryByText} = render(
+          <div>
+            <FeatureFlags />
+            <div id="aria_alerts" role="alert" />
+          </div>
+        )
+        const filterField = await findByPlaceholderText('Filter Features')
+        fireEvent.change(filterField, {target: {value: 'active'}})
+        fireEvent.click(await getAllByText('Active Development')[1])
+        expect(await getAllByText('Course')[0]).toBeInTheDocument()
+        expect(await getAllByText('Beta Feature')[0]).toBeInTheDocument()
+        await waitFor(() => {
+          expect(queryByText('Account')).not.toBeInTheDocument()
+          expect(queryByText('User')).not.toBeInTheDocument()
+        })
       })
     })
   })

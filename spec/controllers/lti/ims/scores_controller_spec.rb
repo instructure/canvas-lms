@@ -388,7 +388,7 @@ module Lti::Ims
               ]
             end
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false })
             end
             let(:expected_progress_url) do
               "http://test.host/api/lti/courses/#{context_id}/progress/"
@@ -409,6 +409,48 @@ module Lti::Ims
               attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
               send_request
               expect(result.submission.reload.attempt).to eq attempt + 1
+            end
+
+            context 'for assignment with attempt limit' do
+              before { assignment.update!(allowed_attempts: 3) }
+
+              context 'with an existing submission' do
+                context 'when under attempt limit' do
+                  it 'succeeds' do
+                    send_request
+                    expect(response.status.to_i).to eq 200
+                  end
+                end
+
+                context 'when over attempt limit' do
+                  it 'succeeds' do
+                    result.submission.update!(attempt: 4)
+                    send_request
+                    expect(response.status.to_i).to eq 200
+                  end
+                end
+              end
+
+              context 'with a new submission' do
+                let(:params_overrides) do
+                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: true })
+                end
+
+                context 'when under attempt limit' do
+                  it 'succeeds' do
+                    send_request
+                    expect(response.status.to_i).to eq 200
+                  end
+                end
+
+                context 'when over attempt limit' do
+                  it 'fails' do
+                    result.submission.update!(attempt: 4)
+                    send_request
+                    expect(response.status.to_i).to eq 422
+                  end
+                end
+              end
             end
 
             shared_examples_for 'a file submission' do
@@ -508,6 +550,123 @@ module Lti::Ims
                 end
 
                 it_behaves_like 'a 400'
+              end
+            end
+          end
+        end
+
+        context 'when assignment has an attempt limit' do
+          before { assignment.update!(allowed_attempts: 3) }
+
+          let(:extension_overrides) { {} }
+
+          shared_examples_for 'existing submission' do
+            let(:params_overrides) do
+              super().merge(
+                Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
+                  new_submission: false,
+                  submission_type: submission_type
+                }),
+                scoreGiven: 10,
+                scoreMaximum: 10
+              )
+            end
+
+            it 'succeeds when under limit' do
+              send_request
+              expect(response.status.to_i).to eq 200
+            end
+
+            it 'succeeds when over limit' do
+              result.submission.update!(attempt: 4)
+              send_request
+              expect(response.status.to_i).to eq 200
+            end
+          end
+
+          shared_examples_for 'attempt-limited new submission' do
+            let(:params_overrides) do
+              super().merge(
+                Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
+                  new_submission: true,
+                  submission_type: submission_type
+                }),
+                scoreGiven: 10,
+                scoreMaximum: 10
+              )
+            end
+
+            it 'succeeds when under limit' do
+              send_request
+              expect(response.status.to_i).to eq 200
+            end
+
+            it 'fails when over limit' do
+              result.submission.update!(attempt: 4)
+              send_request
+              expect(response.status.to_i).to eq 422
+            end
+          end
+
+          shared_examples_for 'attempt-unlimited new submission' do
+            let(:params_overrides) do
+              super().merge(
+                Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
+                  new_submission: true,
+                  submission_type: submission_type
+                }),
+                scoreGiven: 10,
+                scoreMaximum: 10
+              )
+            end
+
+            it 'succeeds when under limit' do
+              send_request
+              expect(response.status.to_i).to eq 200
+            end
+
+            it 'succeeds when over limit' do
+              result.submission.update!(attempt: 4)
+              send_request
+              expect(response.status.to_i).to eq 200
+            end
+          end
+
+          %w[online_url online_text_entry external_tool basic_lti_launch].each do |type|
+            context "when submission_type is #{type}" do
+              let(:submission_type) { type }
+
+              it_behaves_like 'existing submission'
+              it_behaves_like 'attempt-limited new submission'
+            end
+          end
+
+          context "when submission_type is none" do
+            let(:submission_type) { 'none' }
+
+            it_behaves_like 'existing submission'
+
+            context 'when new_submission is true' do
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
+                    new_submission: true,
+                    submission_type: submission_type
+                  }),
+                  scoreGiven: 10,
+                  scoreMaximum: 10
+                )
+              end
+  
+              it 'succeeds when under limit' do
+                send_request
+                expect(response.status.to_i).to eq 200
+              end
+  
+              it 'succeeds when over limit' do
+                result.submission.update!(attempt: 4)
+                send_request
+                expect(response.status.to_i).to eq 200
               end
             end
           end

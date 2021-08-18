@@ -51,6 +51,7 @@ export const ContextCheckbox = ({
     }}
   >
     <Checkbox
+      data-testid="subject-calendars"
       label={originalName}
       value={`${assetString}_selected`}
       checked={selected}
@@ -111,7 +112,7 @@ const FilterCalendarsModal = ({
           <Heading>{modalLabel}</Heading>
         </View>
         <View as="div" margin="x-small 0 0">
-          <Text>
+          <Text data-testid="calendar-selection-text">
             {I18n.t(
               {
                 one: 'Choose up to 1 subject calendar',
@@ -141,7 +142,7 @@ const FilterCalendarsModal = ({
         <Flex.Item shouldGrow margin="0 0 0 small">
           <Flex>
             <Flex.Item shouldGrow shouldShrink>
-              <Text>
+              <Text data-testid="calendars-left-text">
                 {I18n.t(
                   {
                     one: 'You have 1 calendar left',

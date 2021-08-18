@@ -107,5 +107,11 @@ describe Auditors::FeatureFlag do
       pg_record = Auditors::ActiveRecord::FeatureFlagRecord.where(uuid: @event.id).first
       expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(per_page: 10)).to include(pg_record)
     end
+
+    it "does not swallow auditor write errors" do
+      test_err_class = Class.new(StandardError){ }
+      allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
+      expect { Auditors::FeatureFlag.record(@flag, @user, 'on') }.to raise_error(test_err_class)
+    end
   end
 end

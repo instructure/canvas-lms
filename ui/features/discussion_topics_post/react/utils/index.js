@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
-import {ISOLATED_VIEW_INITIAL_PAGE_SIZE} from './constants'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -51,7 +50,7 @@ export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
   return `/courses/${courseId}/assignments/${assignmentId}/submissions/${revieweeId}`
 }
 
-export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
+export const updateDiscussionTopicRepliesCount = (cache, discussionTopicGraphQLId) => {
   const options = {
     id: discussionTopicGraphQLId,
     fragment: Discussion.fragment,
@@ -69,34 +68,76 @@ export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
   }
 }
 
-export const addReplyToDiscussionEntry = (cache, perPage, newDiscussionEntry, courseID) => {
+export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) => {
   try {
-    const options = {
-      query: DISCUSSION_SUBENTRIES_QUERY,
-      variables: {
-        discussionEntryID: newDiscussionEntry.parent.id,
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
-        sort: 'asc',
-        courseID
+    // Creates an object containing the data that needs to be updated
+    // Writes that new data to the cache using the id of the object
+    const discussionEntryOptions = {
+      id: variables.discussionEntryID,
+      fragment: DiscussionEntry.fragment,
+      fragmentName: 'DiscussionEntry'
+    }
+    const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+    if (data) {
+      if (data.rootEntryParticipantCounts) {
+        data.lastReply = {
+          createdAt: newDiscussionEntry.createdAt,
+          __typename: 'DiscussionEntry'
+        }
       }
+
+      data.subentriesCount += 1
+
+      cache.writeFragment({
+        ...discussionEntryOptions,
+        data
+      })
     }
-    const currentSubentries = JSON.parse(JSON.stringify(cache.readQuery(options)))
-
-    if (currentSubentries) {
-      const subentriesLegacyNode = currentSubentries.legacyNode
-      subentriesLegacyNode.subentriesCount += 1
-
-      subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
-
-      cache.writeQuery({...options, data: currentSubentries})
+    // The writeQuery creates a subentry query shape using the data from the new discussion entry
+    // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
+    const subEntriesOptions = {
+      query: DISCUSSION_SUBENTRIES_QUERY,
+      variables
     }
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
+
+    const currentSubentriesQueryData = JSON.parse(
+      JSON.stringify(cache.readQuery(subEntriesOptions))
+    )
+    if (currentSubentriesQueryData) {
+      const subentriesLegacyNode = currentSubentriesQueryData.legacyNode
+      if (variables.sort === 'desc') {
+        subentriesLegacyNode.discussionSubentriesConnection.nodes.unshift(newDiscussionEntry)
+      } else {
+        subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
+      }
+
+      cache.writeQuery({...subEntriesOptions, data: currentSubentriesQueryData})
+    }
+  } catch (e) {
+    // If a subentry query has never been called for the entry being replied to, an exception will be thrown
+    // This doesn't matter functionally because the expansion button will be visible and upon clicking it the
+    // subentry query will be called, getting the new reply
+    // Future new replies to the thread will not throw an exception because the subentry query is now in the cache
+  }
 }
 
 export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
-  if (isAuthor) {
+  if (isAuthor && discussionRoles) {
     return discussionRoles.concat('Author')
   }
   return discussionRoles
+}
+
+export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
+  const querySizes = {}
+  if (mobile) {
+    querySizes.mobile = {maxWidth: '767px'}
+  }
+  if (tablet) {
+    querySizes.tablet = {minWidth: '768px'}
+  }
+  if (desktop) {
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+  }
+  return querySizes
 }

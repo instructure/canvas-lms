@@ -70,6 +70,11 @@ environment_configuration(defined?(config) && config) do |config|
   # allow docker dev setup to use http proxy
   config.hosts << ENV['VIRTUAL_HOST'] if ENV['VIRTUAL_HOST']
 
+  # allow any additional hosts
+  ENV['ADDITIONAL_ALLOWED_HOSTS']&.split(',')&.each do |host|
+    config.hosts << host
+  end
+
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

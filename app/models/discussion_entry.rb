@@ -49,6 +49,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_create :infer_root_entry_id
   before_create :populate_legacy
   before_create :set_root_account_id
+  before_save :process_reply_preview
   after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
@@ -84,6 +85,16 @@ class DiscussionEntry < ActiveRecord::Base
 
   def mentioned_users
     User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+  end
+
+  def process_reply_preview
+    reply_preview = Nokogiri::HTML.fragment(message).search('[data-discussion-reply-preview]')
+    if reply_preview.present?
+      self.include_reply_preview = true
+      new_message = Nokogiri::HTML.fragment(message)
+      new_message.search('[data-discussion-reply-preview]').remove
+      self.message = new_message.to_html
+    end
   end
 
   def course_broadcast_data
@@ -182,6 +193,17 @@ class DiscussionEntry < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def quoted_reply_html
+    "<div class=\"mceNonEditable\" \"reply_preview\" data-discussion-reply-preview=\"1\">
+      <blockquote cite=\"#\">
+        <span>
+          <strong>#{user.short_name}</strong> #{created_at.iso8601}
+        </span>
+        #{message}
+      </blockquote>
+    </div>"
   end
 
   def plaintext_message=(val)

@@ -17,50 +17,44 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-
-jest.useFakeTimers()
+import {ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 
 describe('GroupActionDrillDown', () => {
-  let onCollectionClick, showFlashAlertSpy
+  let onCollectionClick, showFlashAlertSpy, setShowOutcomesView
 
   const collections = {
     0: {
       id: '0',
       name: 'Root folder',
-      collections: ['1', '2'],
+      collections: [ACCOUNT_FOLDER_ID, '2'],
       parentGroupId: null
     },
-    1: {
-      id: '1',
+    [ACCOUNT_FOLDER_ID]: {
+      id: ACCOUNT_FOLDER_ID,
       name: 'Account folder',
       collections: ['100', '101'],
-      outcomesCount: 2,
       parentGroupId: '0'
     },
     2: {
       id: '2',
       name: 'State folder',
       collections: [],
-      outcomesCount: 2,
-      childGroupsCount: 2,
       parentGroupId: '0'
     },
     100: {
       id: '100',
       name: 'Folder with groups',
       collections: ['101'],
-      outcomesCount: 0,
-      parentGroupId: '1'
+      parentGroupId: ACCOUNT_FOLDER_ID
     },
     101: {
       id: '101',
       name: 'Leaf folder',
       collections: [],
-      outcomesCount: 1,
-      parentGroupId: '1'
+      parentGroupId: ACCOUNT_FOLDER_ID
     }
   }
 
@@ -68,13 +62,17 @@ describe('GroupActionDrillDown', () => {
     collections,
     rootId: '0',
     onCollectionClick,
-    loadedGroups: ['0', '1', '2', '100', '101'],
+    loadedGroups: ['0', ACCOUNT_FOLDER_ID, '2', '100', '101'],
+    setShowOutcomesView,
+    isLoadingGroupDetail: false,
+    outcomesCount: 2,
     ...props
   })
 
   beforeEach(() => {
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     onCollectionClick = jest.fn()
+    setShowOutcomesView = jest.fn()
   })
 
   afterEach(() => {
@@ -113,7 +111,7 @@ describe('GroupActionDrillDown', () => {
     const {getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
     fireEvent.click(getByText('Groups'))
     fireEvent.click(getByText('Account folder'))
-    expect(onCollectionClick).toHaveBeenCalledWith({id: '1'})
+    expect(onCollectionClick).toHaveBeenCalledWith({id: ACCOUNT_FOLDER_ID})
   })
 
   it('renders a loading spinner while a group is loading', () => {
@@ -126,17 +124,77 @@ describe('GroupActionDrillDown', () => {
     expect(getByText('Loading learning outcome groups')).toBeInTheDocument()
   })
 
+  it('calls setShowOutcomesView on unmount', () => {
+    const {unmount} = render(<GroupActionDrillDown {...defaultProps()} />)
+    unmount()
+    expect(setShowOutcomesView).toHaveBeenCalledTimes(1)
+    expect(setShowOutcomesView).toHaveBeenCalledWith(false)
+  })
+
   describe('action links', () => {
-    it('does not render an action link until a group is clicked', async () => {
+    it('does not render an action link for the account folder', () => {
       const {queryByText, getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
       fireEvent.click(getByText('Groups'))
-      expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
       fireEvent.click(getByText('Account folder'))
-      await act(async () => jest.runAllTimers())
+      expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+    })
+
+    it('does not render an action link until a group is clicked', () => {
+      const {getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('State folder'))
       expect(getByText('View 2 Outcomes')).toBeInTheDocument()
-      expect(getByText('Folder with groups')).toBeInTheDocument()
+    })
+
+    it('calls showOutcomesView upon being clicked', () => {
+      const {getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('State folder'))
+      fireEvent.click(getByText('View 2 Outcomes'))
+      expect(setShowOutcomesView).toHaveBeenCalled()
+    })
+
+    it('hides the options and sets the display value to the group that was clicked', () => {
+      const {queryByText, getByText, getByDisplayValue} = render(
+        <GroupActionDrillDown {...defaultProps()} />
+      )
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('Account folder'))
       fireEvent.click(getByText('Leaf folder'))
-      expect(getByText('View 1 Outcome')).toBeInTheDocument()
+      fireEvent.click(getByText('View 2 Outcomes'))
+      expect(getByDisplayValue('Leaf folder')).toBeInTheDocument()
+      expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+    })
+
+    it('clears the display value when the dropdown is clicked', () => {
+      const {getByPlaceholderText, getByText, getByDisplayValue} = render(
+        <GroupActionDrillDown {...defaultProps()} />
+      )
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('State folder'))
+      fireEvent.click(getByText('View 2 Outcomes'))
+      fireEvent.click(getByDisplayValue('State folder'))
+      expect(getByText('View 2 Outcomes')).toBeInTheDocument()
+      expect(getByPlaceholderText('Select an outcome group')).toBeInTheDocument()
+    })
+
+    it('does not render an action link if isLoadingGroupDetail is true', () => {
+      const {getByText, rerender, queryByText} = render(
+        <GroupActionDrillDown {...defaultProps()} />
+      )
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('State folder'))
+      expect(getByText('View 2 Outcomes')).toBeInTheDocument()
+      rerender(<GroupActionDrillDown {...defaultProps({isLoadingGroupDetail: true})} />)
+      expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+    })
+
+    it('renders the link based on outcomesCount', () => {
+      const {getByText} = render(<GroupActionDrillDown {...defaultProps({outcomesCount: 100})} />)
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('Account folder'))
+      fireEvent.click(getByText('Folder with groups'))
+      expect(getByText('View 100 Outcomes')).toBeInTheDocument()
     })
   })
 })

@@ -1673,7 +1673,7 @@ describe CoursesController do
         user_session(@teacher)
 
         get 'show', params: {:id => @course.id}
-        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_as_admin: true})
       end
 
       it "sets COURSE.color appropriately in js_env" do

@@ -40,12 +40,20 @@ module MicrosoftSync
 
     DEFAULT_N_INTERMITTENT_RETRIES = 1
 
-    class ApplicationNotAuthorizedForTenant < StandardError
-      include Errors::GracefulCancelErrorMixin
+    class ApplicationNotAuthorizedForTenant < MicrosoftSync::Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Application not authorized for tenant. ' \
+          'Please make sure your admin has granted access for us to access your Microsoft tenant.'
+      end
     end
 
-    class BatchRequestFailed < StandardError; end
-    class BatchRequestThrottled < StandardError
+    class BatchRequestFailed < MicrosoftSync::Errors::PublicError
+      def self.public_message
+        I18n.t 'Got error from Microsoft API while making a batch request.'
+      end
+    end
+
+    class BatchRequestThrottled < MicrosoftSync::Errors::PublicError
       include Errors::Throttled
 
       def initialize(msg, responses)
@@ -55,6 +63,10 @@ module MicrosoftSync
           headers = resp['headers']&.transform_keys(&:downcase) || {}
           headers['retry-after'].presence&.to_f
         end.compact.max
+      end
+
+      def self.public_message
+        I18n.t 'Received throttled response from Microsoft API while making a batch request.'
       end
     end
 

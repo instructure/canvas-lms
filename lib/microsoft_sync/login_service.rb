@@ -24,8 +24,10 @@
 #
 module MicrosoftSync
   module LoginService
-    class TenantDoesNotExist < StandardError
-      include Errors::GracefulCancelErrorMixin
+    class TenantDoesNotExist < MicrosoftSync::Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Microsoft tenant does not exist.'
+      end
     end
 
     BASE_URL = 'https://login.microsoftonline.com'

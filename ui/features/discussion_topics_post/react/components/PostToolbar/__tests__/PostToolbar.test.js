@@ -20,6 +20,23 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {PostToolbar} from '../PostToolbar'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
 const setup = props => {
   return render(<PostToolbar onReadAll={Function.prototype} {...props} />)
 }
@@ -27,12 +44,16 @@ const setup = props => {
 describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
-      const {queryByText} = setup({repliesCount: 1})
-      expect(queryByText('1 reply')).toBeTruthy()
+      const {queryAllByText} = setup({repliesCount: 1})
+      expect(queryAllByText('1 reply').length).toBe(2)
+    })
+    it('not displayed if replies = 0', () => {
+      const {queryAllByText} = setup({repliesCount: 0})
+      expect(queryAllByText('0 reply').length).toBe(0)
     })
     it('correct pluralization displayed', () => {
-      const {queryByText} = setup({repliesCount: 2})
-      expect(queryByText('2 replies')).toBeTruthy()
+      const {queryAllByText} = setup({repliesCount: 2})
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 
@@ -252,19 +273,42 @@ describe('PostToolbar', () => {
     })
 
     describe('share to commons', () => {
-      it('does not render if the callback is not provided', () => {
+      beforeAll(() => {
+        window.ENV = {
+          discussion_topic_menu_tools: [
+            {
+              base_url: 'example.com',
+              canvas_icon_class: 'icon-commons',
+              id: '1',
+              title: 'Share to Commons'
+            },
+            {
+              base_url: 'example.com',
+              canvas_icon_class: 'icon-example',
+              id: '2',
+              title: 'Share to Example'
+            }
+          ]
+        }
+      })
+
+      it('does not render if cannot manage content', () => {
         const {queryByText, getByTestId} = setup()
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(queryByText('Share to Commons')).toBeFalsy()
       })
 
-      it('calls provided callback when clicked', () => {
-        const onShareToCommonsMock = jest.fn()
-        const {getByTestId, getByText} = setup({onShareToCommons: onShareToCommonsMock})
+      it('render if can manage content', () => {
+        const {getByTestId, getByText} = setup({canManageContent: true, discussionTopicId: '1'})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onShareToCommonsMock.mock.calls.length).toBe(0)
-        fireEvent.click(getByText('Share to Commons'))
-        expect(onShareToCommonsMock.mock.calls.length).toBe(1)
+        expect(getByText('Share to Commons')).toBeTruthy()
+      })
+
+      it('render multiple LTI if can manage content', () => {
+        const {getByTestId, getByText} = setup({canManageContent: true, discussionTopicId: '1'})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Share to Commons')).toBeTruthy()
+        expect(getByText('Share to Example')).toBeTruthy()
       })
     })
   })

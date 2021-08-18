@@ -429,9 +429,15 @@
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
-                    <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
                     <td>
-                      <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/>
+                      <label><%= t("Name:") %>
+                        <input type="text" class="name" value="<%= name %>"/>
+                      </label>
+                    </td>
+                    <td>
+                      <label><%= t("Filter:") %>
+                        <input type="text" class="value" value="<%= filter %>" maxlength="255"/>
+                      </label>
                       <button
                         type="button"
                         class="Button Button--icon-action delete_filter_link"
@@ -473,7 +479,7 @@
                     </p>
                     <p>
                       <%= t do %>
-                        To learn more about Canvas for Elementary, please refer to <a href="https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board" target="_blank">our documentation</a>.
+                        To learn more about Canvas for Elementary, please refer to <a href="<%= t(:'#community.canvas_for_elementary') %>" target="_blank">our documentation</a>.
                       <% end %>
                     </p>
                   </div>
@@ -540,7 +546,7 @@
                     </p>
                     <p>
                       <%= t do %>
-                      Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253" target="_blank"> our documentation</a>.
+                      Before implementing custom CSS or Javascript, please refer to <a href="<%= t(:'#community.admin_custom_js_css') %>" target="_blank"> our documentation</a>.
                       <% end %>
                     </p>
                   </div>

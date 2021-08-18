@@ -19,13 +19,14 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
+import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
+import {responsiveQuerySizes} from '../../utils'
 import {ToggleButton} from './ToggleButton'
 
 import {Flex} from '@instructure/ui-flex'
 import {
   IconBookmarkSolid,
   IconBookmarkLine,
-  IconCommonsSolid,
   IconCompleteSolid,
   IconDuplicateLine,
   IconEditLine,
@@ -42,65 +43,72 @@ import {
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-
-function InfoText({repliesCount, unreadCount}) {
-  const infoText = []
-
-  if (repliesCount > 0) {
-    infoText.push(
-      I18n.t(
-        {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
-        {count: repliesCount, repliesCount}
-      )
-    )
-  }
-
-  if (unreadCount > 0) {
-    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
-  }
-
-  return infoText.length > 0 ? (
-    <View padding="0 x-small 0 0">
-      <Text weight="normal" size="small" data-testid="replies-counter">
-        {infoText.join(', ')}
-      </Text>
-    </View>
-  ) : null
-}
 
 export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (
-    <>
-      <InfoText repliesCount={repliesCount} unreadCount={unreadCount} />
-      {props.onTogglePublish && (
-        <ToggleButton
-          isEnabled={props.isPublished}
-          enabledIcon={<IconCompleteSolid />}
-          disabledIcon={<IconNoSolid />}
-          enabledTooltipText={I18n.t('Unpublish')}
-          disabledTooltipText={I18n.t('Publish')}
-          enabledScreenReaderLabel={I18n.t('Published')}
-          disabledScreenReaderLabel={I18n.t('Unpublished')}
-          onClick={props.onTogglePublish}
-          interaction={props.canUnpublish ? 'enabled' : 'readonly'}
-        />
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          justifyItems: 'space-between',
+          textSize: 'x-small'
+        },
+        desktop: {
+          justifyItems: 'end',
+          textSize: 'small'
+        }
+      }}
+      render={responsiveProps => (
+        <Flex justifyItems={repliesCount > 0 ? responsiveProps.justifyItems : 'end'}>
+          {repliesCount > 0 && (
+            <Flex.Item margin="0 x-small 0 0">
+              <Text weight="normal" size={responsiveProps.textSize}>
+                <ReplyInfo replyCount={repliesCount} unreadCount={unreadCount} />
+              </Text>
+            </Flex.Item>
+          )}
+          <Flex.Item>
+            <Flex>
+              {props.onTogglePublish && (
+                <Flex.Item>
+                  <ToggleButton
+                    isEnabled={props.isPublished}
+                    enabledIcon={<IconCompleteSolid />}
+                    disabledIcon={<IconNoSolid />}
+                    enabledTooltipText={I18n.t('Unpublish')}
+                    disabledTooltipText={I18n.t('Publish')}
+                    enabledScreenReaderLabel={I18n.t('Published')}
+                    disabledScreenReaderLabel={I18n.t('Unpublished')}
+                    onClick={props.onTogglePublish}
+                    interaction={props.canUnpublish ? 'enabled' : 'readonly'}
+                  />
+                </Flex.Item>
+              )}
+              {props.onToggleSubscription && (
+                <Flex.Item>
+                  <ToggleButton
+                    isEnabled={props.isSubscribed}
+                    enabledIcon={<IconBookmarkSolid />}
+                    disabledIcon={<IconBookmarkLine />}
+                    enabledTooltipText={I18n.t('Unsubscribe')}
+                    disabledTooltipText={I18n.t('Subscribe')}
+                    enabledScreenReaderLabel={I18n.t('Subscribed')}
+                    disabledScreenReaderLabel={I18n.t('Unsubscribed')}
+                    onClick={props.onToggleSubscription}
+                  />
+                </Flex.Item>
+              )}
+              <Flex.Item>
+                <ToolbarMenu {...props} />
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        </Flex>
       )}
-      {props.onToggleSubscription && (
-        <ToggleButton
-          isEnabled={props.isSubscribed}
-          enabledIcon={<IconBookmarkSolid />}
-          disabledIcon={<IconBookmarkLine />}
-          enabledTooltipText={I18n.t('Unsubscribe')}
-          disabledTooltipText={I18n.t('Subscribe')}
-          enabledScreenReaderLabel={I18n.t('Subscribed')}
-          disabledScreenReaderLabel={I18n.t('Unsubscribed')}
-          onClick={props.onToggleSubscription}
-        />
-      )}
-      <ToolbarMenu {...props} />
-    </>
+    />
   )
 }
 
@@ -214,12 +222,18 @@ const getMenuConfigs = props => {
       selectionCallback: props.onAddRubric
     })
   } */
-  if (props.onShareToCommons) {
-    options.push({
-      key: 'shareToCommons',
-      icon: <IconCommonsSolid />,
-      label: I18n.t('Share to Commons'),
-      selectionCallback: props.onShareToCommons
+  if (props.canManageContent && ENV.discussion_topic_menu_tools?.length > 0) {
+    ENV.discussion_topic_menu_tools.forEach(tool => {
+      options.push({
+        key: 'lti' + tool.id,
+        icon: <i className={tool.canvas_icon_class} />,
+        label: tool.title,
+        selectionCallback: () => {
+          window.location.assign(
+            `${tool.base_url}&discussion_topics%5B%5D=${props.discussionTopicId}`
+          )
+        }
+      })
     })
   }
   if (props.onPeerReviews) {
@@ -306,10 +320,6 @@ PostToolbar.propTypes = {
    */
   onAddRubric: PropTypes.func,
   /**
-   * Callback to be fired when Share to Commons action is fired.
-   */
-  onShareToCommons: PropTypes.func,
-  /**
    * Indicate the replies count associated with the Post.
    */
   repliesCount: PropTypes.number,
@@ -328,7 +338,15 @@ PostToolbar.propTypes = {
   /**
    * Callback to be fired when Close for Comments action is fired
    */
-  onCloseForComments: PropTypes.func
+  onCloseForComments: PropTypes.func,
+  /**
+   * Verifies if user can manage content (specially, for LTI use)
+   */
+  canManageContent: PropTypes.bool,
+  /**
+   * The id of the discussion topic
+   */
+  discussionTopicId: PropTypes.string
 }
 
 PostToolbar.defaultProps = {

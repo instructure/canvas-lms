@@ -41,18 +41,10 @@ end
 
 Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
 
-if defined?(TestQueue::Runner::RSpec::LazyGroups)
-  # because test-queue's lazy loading requires this file *after* the before
-  # :suite hooks run, we can't do this in such a hook... so just do it as
-  # soon as this file is required. the TEST_ENV_NUMBER check ensures the
-  # background file loader doesn't also fire up firefox and a webserver
-  SeleniumDriverSetup.run if ENV["TEST_ENV_NUMBER"]
-else
-  RSpec.configure do |config|
-    config.before :suite do
-      # For flakey spec catcher: if server and driver are already initialized, reuse instead of starting another instance
-      SeleniumDriverSetup.run unless SeleniumDriverSetup.server.present? && SeleniumDriverSetup.driver.present?
-    end
+RSpec.configure do |config|
+  config.before :suite do
+    # For flakey spec catcher: if server and driver are already initialized, reuse instead of starting another instance
+    SeleniumDriverSetup.run unless SeleniumDriverSetup.server.present? && SeleniumDriverSetup.driver.present?
   end
 end
 

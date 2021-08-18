@@ -22,7 +22,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GraphQLController do
   before :once do
-    student_in_course
+    student_in_course(user: user_with_pseudonym)
+  end
+
+  let(:federation_query_params) do
+    {
+      query: 'query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }',
+      variables: {
+        representations: [ {__typename: "Course", id: "1"} ]
+      }
+    }
   end
 
   context "graphiql" do
@@ -55,8 +64,8 @@ describe GraphQLController do
 
   context "graphql, without a session" do
     it "requires a user" do
-      post :execute, params: {query: "{}"}
-      expect(response.location).to match(/\/login$/)
+      post :execute, params: {query: "{}"}, format: :json
+      expect(response).to be_unauthorized
     end
   end
 
@@ -64,28 +73,75 @@ describe GraphQLController do
     before { user_session(@student) }
 
     it "works" do
-      post :execute, params: {query: "{}"}
+      post :execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+      expect(JSON.parse(response.body)["errors"]).to be_blank
+      expect(JSON.parse(response.body)["data"]).not_to be_blank
+    end
+
+    it "does not handle Apollo Federation queries" do
+      post :execute, params: federation_query_params, format: :json
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
+      expect(JSON.parse(response.body)["data"]).to be_blank
     end
 
     context "data dog metrics" do
       it "reports data dog metrics if requested" do
         expect(InstStatsd::Statsd).to receive(:increment).with("graphql.ASDF.count", tags: anything)
         request.headers["GraphQL-Metrics"] = "true"
-        post :execute, params: {query: 'query ASDF { course(id: "1") { id } }'}
+        post :execute, params: {query: 'query ASDF { course(id: "1") { id } }'}, format: :json
       end
     end
   end
 
-  context "with release flag require_execute_auth disabled" do
+  describe "subgraph_execute" do
+    context "with authentication" do
+      around do |example|
+        InstAccess.with_config(signing_key: signing_priv_key) do
+          example.run
+        end
+      end
+      let(:token_signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
+      let(:signing_priv_key) { token_signing_keypair.to_s }
+      let(:token) { InstAccess::Token.for_user(user_uuid: @student.uuid, account_uuid: @student.account.uuid) }
+
+      it "handles standard queries" do
+        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
+        post :subgraph_execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+        expect(JSON.parse(response.body)["errors"]).to be_blank
+        expect(JSON.parse(response.body)["data"]).not_to be_blank
+      end
+
+      it "handles Apollo Federation queries" do
+        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
+        post :subgraph_execute, params: federation_query_params, format: :json
+        expect(JSON.parse(response.body)["errors"]).to be_blank
+      end
+    end
+
+    describe "without authentication" do
+      it "services subgraph introspection queries" do
+        post :subgraph_execute, params: {query: 'query FederationSubgraphIntrospection { _service { sdl } }'}, format: :json
+        expect(JSON.parse(response.body)["errors"]).to be_blank
+        expect(JSON.parse(response.body)["data"]).not_to be_blank
+      end
+
+      it "rejects other queries" do
+        post :subgraph_execute, params: federation_query_params, format: :json
+        expect(response).to be_unauthorized
+      end
+    end
+  end
+
+  context "with feature flag disable_graphql_authentication enabled" do
 
     context "graphql, without a session" do
       it "works" do
         expect(Account.site_admin).to(
           receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
         )
-        post :execute, params: {query: "{}"}
-        expect(JSON.parse(response.body)["errors"]).not_to be_blank
+        post :execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+        expect(JSON.parse(response.body)["errors"]).to be_blank
+        expect(JSON.parse(response.body)["data"]).not_to be_blank
       end
     end
   end

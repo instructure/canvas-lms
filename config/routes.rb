@@ -26,6 +26,9 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 
 CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
+  post "/api/graphql/subgraph", to: "graphql#subgraph_execute"
+  # The subgraph endpoint is for use only with the federated API Gateway. See
+  # `app/graphql/README.md` for details.
   get 'graphiql', to: 'graphql#graphiql'
 
   resources :submissions, only: [] do
@@ -1015,6 +1018,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/folders', controller: :folders, action: :create
       get 'courses/:course_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
+      get 'courses/:course_id/folders/buttons_and_icons', controller: :folders, action: :buttons_and_icons_folder
       get 'courses/:course_id/folders/media', controller: :folders, action: :media_folder
       get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
       get 'media_objects', controller: 'media_objects', action: :index, as: :media_objects
@@ -2198,8 +2202,8 @@ CanvasRails::Application.routes.draw do
       post 'jwts/refresh', action: :refresh
     end
 
-    scope(controller: :inst_ids) do
-      post 'inst_ids', action: :create
+    scope(controller: :inst_access_tokens) do
+      post 'inst_access_tokens', action: :create
     end
 
     scope(controller: :gradebook_settings) do

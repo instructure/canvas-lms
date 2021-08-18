@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {func, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
+import RceApiSource from '../../../sidebar/sources/api'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -34,7 +35,17 @@ RceFileBrowser.propTypes = {
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect, searchString, onAllFilesLoading} = props
+  const {onFileSelect, searchString, onAllFilesLoading, jwt, refreshToken, host, source} = props
+  const apiSource = useMemo(() => {
+    return (
+      source ||
+      new RceApiSource({
+        jwt,
+        refreshToken,
+        host
+      })
+    )
+  }, [source])
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api['content-type']
@@ -66,6 +77,8 @@ export default function RceFileBrowser(props) {
         contentTypes={['**']}
         searchString={searchString}
         onLoading={onAllFilesLoading}
+        source={apiSource}
+        context={props.context}
       />
     </View>
   )

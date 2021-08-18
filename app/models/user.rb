@@ -2704,7 +2704,7 @@ class User < ActiveRecord::Base
     # so short-circuit if it's enabled, else we might return false prematurely
     # depending on the state of :granular_permissions_manage_users feature flag
     if course.grants_right?(self, session, :manage_students)
-      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type)
         return true
       end
     end
@@ -2998,6 +2998,10 @@ class User < ActiveRecord::Base
 
   def preferred_gradebook_version
     get_preference(:gradebook_version) || 'default'
+  end
+
+  def should_show_deeply_nested_alert?
+    ActiveModel::Type::Boolean.new.cast(get_preference(:isolated_view_deeply_nested_alert) || true)
   end
 
   def stamp_logout_time!

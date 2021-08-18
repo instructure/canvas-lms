@@ -371,7 +371,7 @@ class AccountsController < ApplicationController
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
-      course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids))
+      course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids), always_use_bookmarks: true)
       @accounts = Api.paginate(course_accounts, self, api_v1_course_accounts_url)
     else
       @accounts = []
@@ -739,7 +739,8 @@ class AccountsController < ApplicationController
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
     page_opts = {}
-    page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
+    # don't calculate a total count for this endpoint.
+    page_opts[:total_entries] = nil
 
     all_precalculated_permissions = nil
     GuardRail.activate(:secondary) do

@@ -18,10 +18,24 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
+
+import Actions from '../../actions'
 import CourseImageSelector from '../CourseImageSelector'
 import initialState from '../../store/initialState'
 
+jest.mock('../../actions')
+
+afterEach(() => {
+  jest.resetAllMocks()
+})
+
 describe('CourseImageSelector', () => {
+  const defaultProps = {
+    courseId: '1',
+    name: 'course[image]',
+    setting: 'image'
+  }
+
   const fakeStore = () => ({
     subscribe: jest.fn(),
     dispatch: jest.fn(),
@@ -29,14 +43,14 @@ describe('CourseImageSelector', () => {
   })
 
   it('renders', () => {
-    const wrapper = mount(<CourseImageSelector store={fakeStore()} />)
+    const wrapper = mount(<CourseImageSelector {...defaultProps} store={fakeStore()} />)
     expect(wrapper.text()).toContain('Loading')
   })
 
   it('sets the background image style properly', () => {
     const store = fakeStore()
     store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
-    const wrapper = shallow(<CourseImageSelector store={store} />)
+    const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} />)
 
     expect(wrapper.find('.CourseImageSelector').prop('style').backgroundImage).toBe(
       'url(http://coolUrl)'
@@ -46,9 +60,25 @@ describe('CourseImageSelector', () => {
   it('renders course image edit options when an image is present', () => {
     const store = fakeStore()
     store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
-    const wrapper = shallow(<CourseImageSelector store={store} />)
+    const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} />)
 
     wrapper.setState({gettingImage: false})
     expect(wrapper.find('Menu').exists()).toBeTruthy()
+  })
+
+  it('adds the wide classname if the wide prop is true', () => {
+    const store = fakeStore()
+    store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} wide />)
+
+    expect(wrapper.find('.CourseImageSelector').hasClass('wide')).toBe(true)
+  })
+
+  it('passes the setting prop to actions', () => {
+    const store = fakeStore()
+    store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    shallow(<CourseImageSelector {...defaultProps} setting="banner_image" store={store} />)
+
+    expect(Actions.getCourseImage).toHaveBeenCalledWith('1', 'banner_image')
   })
 })

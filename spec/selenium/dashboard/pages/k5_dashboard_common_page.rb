@@ -139,8 +139,8 @@ module K5DashboardCommonPageObject
     toggle_k5_setting(@account)
   end
 
-  def hex_value_for_color(element)
-    '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
+  def hex_value_for_color(element, style_type)
+    '#' + ColorCommon.rgba_to_hex(element.style(style_type))
   end
 
   def new_announcement(course, title, message)

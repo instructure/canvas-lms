@@ -155,9 +155,11 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.module_updated(obj)
     when ContextModuleProgression
       if changes["completed_at"]
+        singleton_key = "course_progress_course_#{obj.context_module.global_context_id}_user_#{obj.global_user_id}"
         CourseProgress.delay_if_production(
-          singleton: "course_progress_#{obj.global_id}",
-          run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now
+          singleton: singleton_key,
+          run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now,
+          on_conflict: :overwrite
         ).dispatch_live_event(obj)
       end
     when ContentTag

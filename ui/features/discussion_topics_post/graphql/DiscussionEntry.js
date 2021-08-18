@@ -35,6 +35,7 @@ export const DiscussionEntry = {
       ratingSum
       rating
       read
+      replyPreview
       forcedReadState
       subentriesCount
       rootEntryParticipantCounts {
@@ -78,6 +79,7 @@ export const DiscussionEntry = {
     ratingSum: number,
     rating: bool,
     read: bool,
+    replyPreview: string,
     forcedReadState: bool,
     subentriesCount: number,
     author: User.shape,
@@ -117,6 +119,7 @@ export const DiscussionEntry = {
     ratingSum = null,
     rating = false,
     read = true,
+    replyPreview = '',
     forcedReadState = false,
     subentriesCount = 2,
     author = User.mock(),
@@ -160,6 +163,7 @@ export const DiscussionEntry = {
     ratingSum,
     rating,
     read,
+    replyPreview,
     forcedReadState,
     subentriesCount,
     author,

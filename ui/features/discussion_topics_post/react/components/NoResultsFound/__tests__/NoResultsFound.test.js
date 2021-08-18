@@ -19,14 +19,29 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {NoResultsFound} from '../NoResultsFound'
+import {SearchContext} from '../../../utils/constants'
 
-const setup = () => {
-  return render(<NoResultsFound />)
+const setup = (searchTerm = '') => {
+  return render(
+    <SearchContext.Provider value={{searchTerm}}>
+      <NoResultsFound />
+    </SearchContext.Provider>
+  )
 }
 
 describe('NoResultsFound', () => {
   it('displays the message', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Your search did not match any entries.')).toBeTruthy()
+    const container = setup('asdf')
+    expect(container.queryByText('No Results Found')).toBeTruthy()
+  })
+
+  it('displays the search term not found', () => {
+    const container = setup('asdf')
+    expect(container.queryByText('No results match "asdf"')).toBeTruthy()
+  })
+
+  it('displays the sad panda', () => {
+    const container = setup('asdf')
+    expect(container.queryByTestId('page-not-found-panda')).toBeTruthy()
   })
 })

@@ -160,7 +160,7 @@ module MicrosoftSync
     # of time we may clear the state and restart the job. See `job_is_stale?`
     STALE_JOB_TIME = 1.day
 
-    # SEE ALSO Errors::GracefulCancelErrorMixin
+    # SEE ALSO Errors::GracefulCancelError
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
@@ -170,6 +170,9 @@ module MicrosoftSync
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state=nil)
       run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
+    rescue IRB::Abort => e
+      update_state_record_to_errored_and_cleanup(e)
+      raise
     end
 
     def run_later(initial_mem_state=nil)
@@ -247,7 +250,7 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          if e.is_a?(Errors::GracefulCancelErrorMixin)
+          if e.is_a?(Errors::GracefulCancelError)
             statsd_increment(:cancel, current_step, e)
             update_state_record_to_errored_and_cleanup(e)
             return
@@ -311,7 +314,7 @@ module MicrosoftSync
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.user_facing_message(error)
+      error_msg = MicrosoftSync::Errors.serialize(error)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id

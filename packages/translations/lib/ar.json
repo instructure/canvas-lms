@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "تحميل/تسجيل الوسائط"
     },
+    "uploading_19e8a4e7": {
+        "message": "جارٍ التحميل"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
     },

@@ -297,7 +297,7 @@ describe "student k5 dashboard schedule" do
 
       get "/#schedule"
 
-      expect(hex_value_for_color(planner_assignment_header)).to eq(new_color)
+      expect(hex_value_for_color(planner_assignment_header, 'background-color')).to eq(new_color)
     end
   end
 end

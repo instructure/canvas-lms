@@ -28,7 +28,7 @@ import {
   IconArrowOpenDownLine,
   IconArrowOpenEndSolid,
   IconArrowOpenDownSolid,
-  IconAddLine
+  IconAddSolid
 } from '@instructure/ui-icons'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeDescription from './Management/OutcomeDescription'
@@ -53,25 +53,20 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
   }
 
   const checkbox = (
-    <Flex.Item size={isMobileView ? '' : '5rem'} alignSelf="end">
+    <Flex.Item size={isMobileView ? '' : '6.75rem'} alignSelf="end">
       <div
         style={{
-          padding: isMobileView
-            ? '0'
-            : description && addedOutcome
-            ? '1.2815rem 0 0 0'
-            : description
-            ? '1.2815rem 0 0 1rem'
-            : addedOutcome
-            ? '0.313rem 0 0 0'
-            : '0.313rem 0 0 1rem'
+          padding: isMobileView ? '0' : description ? '1.2815rem 0 0' : '0.313rem 0 0',
+          marginRight: isMobileView ? '-0.5rem' : '0',
+          display: 'flex',
+          flexFlow: 'row-reverse nowrap'
         }}
       >
         <Button
           interaction={addedOutcome ? 'disabled' : 'enabled'}
           size="small"
           margin={isMobileView ? '0' : '0 x-small 0 0'}
-          renderIcon={IconAddLine}
+          renderIcon={IconAddSolid}
           onClick={onButtonClick}
         >
           {buttonMessage}
