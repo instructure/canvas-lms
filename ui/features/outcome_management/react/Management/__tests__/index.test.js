@@ -962,7 +962,7 @@ describe('OutcomeManagementPanel', () => {
       expect(getByText('Groups')).toBeInTheDocument()
     })
 
-    it.skip('renders the groups within the drilldown', async () => {
+    it('renders the groups within the drilldown', async () => {
       const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
         mocks: accountMocks({childGroupsCount: 2})
       })
@@ -972,13 +972,40 @@ describe('OutcomeManagementPanel', () => {
       expect(getByText('Account folder 1')).toBeInTheDocument()
     })
 
-    it.skip('renders the action link for the root group', async () => {
+    it('renders the action link for the root group', async () => {
       const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
         mocks: accountMocks({childGroupsCount: 2})
       })
       await act(async () => jest.runOnlyPendingTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
       expect(getByText('View 0 Outcomes')).toBeInTheDocument()
+    })
+
+    it('loads group detail data correctly', async () => {
+      const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('View 2 Outcomes'))
+      expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+      expect(getByText('Outcome 2 - Course folder 0')).toBeInTheDocument()
+    })
+
+    it('focuses on the Select input after the group header is clicked', async () => {
+      const {getByText, queryByText, getByPlaceholderText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('View 2 Outcomes'))
+      fireEvent.click(getByText('Select another group'))
+      expect(getByPlaceholderText('Select an outcome group')).toHaveFocus()
     })
   })
 })

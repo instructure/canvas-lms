@@ -79,6 +79,8 @@ const OutcomeManagementPanel = () => {
   })
 
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
+  const [showOutcomesView, setShowOutcomesView] = useState(false)
+  const [showGroupOptions, setShowGroupOptions] = useState(false)
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -165,6 +167,11 @@ const OutcomeManagementPanel = () => {
     }
   }
 
+  const hideOutcomesViewHandler = () => {
+    setShowOutcomesView(false)
+    setShowGroupOptions(true)
+  }
+
   if (isLoading) {
     return (
       <div style={{textAlign: 'center'}}>
@@ -191,25 +198,49 @@ const OutcomeManagementPanel = () => {
           width="100%"
           display="inline-block"
           position="relative"
-          height="60vh"
+          height="70vh"
           overflowY="visible"
           overflowX="auto"
-          padding="small 0 0"
+          padding="small x-small 0"
+          elementRef={el => {
+            setRightColumnRef(el)
+            setScrollContainer(el)
+          }}
         >
-          <View as="div" padding="x-small x-small none">
-            {/* TODO: Add ManageView in OUT-4183  */}
-            <GroupActionDrillDown
-              onCollectionClick={queryCollections}
-              collections={collections}
-              rootId={rootId}
-              loadedGroups={loadedGroups}
-              setShowOutcomesView={() => {}}
-              isLoadingGroupDetail={loading}
-              outcomesCount={group?.outcomesCount}
-              showActionLinkForRoot
+          {showOutcomesView && selectedGroupId ? (
+            <ManageOutcomesView
+              key={selectedGroupId}
+              outcomeGroup={group}
+              loading={loading}
+              selectedOutcomes={selectedOutcomes}
+              searchString={searchString}
+              onSelectOutcomesHandler={toggleSelectedOutcomes}
+              onOutcomeGroupMenuHandler={groupMenuHandler}
+              onOutcomeMenuHandler={outcomeMenuHandler}
+              onSearchChangeHandler={onSearchChangeHandler}
+              onSearchClearHandler={onSearchClearHandler}
+              loadMore={loadMore}
+              scrollContainer={scrollContainer}
+              isRootGroup={collections[selectedGroupId]?.isRootGroup}
+              hideOutcomesView={hideOutcomesViewHandler}
             />
-            <ManageOutcomesBillboard />
-          </View>
+          ) : (
+            <>
+              <GroupActionDrillDown
+                onCollectionClick={queryCollections}
+                collections={collections}
+                rootId={rootId}
+                loadedGroups={loadedGroups}
+                isLoadingGroupDetail={loading}
+                outcomesCount={group?.outcomesCount}
+                selectedGroupId={selectedGroupId}
+                showActionLinkForRoot
+                showOptions={showGroupOptions}
+                setShowOutcomesView={setShowOutcomesView}
+              />
+              <ManageOutcomesBillboard />
+            </>
+          )}
         </View>
       ) : (
         <Flex elementRef={setContainerRef}>

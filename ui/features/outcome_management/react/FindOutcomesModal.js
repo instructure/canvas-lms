@@ -64,6 +64,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
+  useEffect(() => {
+    if (!open) {
+      setShowOutcomesView(false)
+    }
+  }, [open])
+
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
 

@@ -818,45 +818,61 @@ describe('FindOutcomesModal', () => {
         ).toBeInTheDocument()
       })
     })
+  })
 
-    describe('mobileView', () => {
-      beforeEach(() => {
-        isMobileView = true
-      })
-      itBehavesLikeAModal()
-      itBehavesLikeATreeBrowser()
+  describe('mobileView', () => {
+    beforeEach(() => {
+      isMobileView = true
+    })
+    itBehavesLikeAModal()
+    itBehavesLikeATreeBrowser()
 
-      it('renders the action drilldown', async () => {
-        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        expect(getByText('Groups')).toBeInTheDocument()
-      })
+    it('renders the action drilldown', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Groups')).toBeInTheDocument()
+    })
 
-      it('does not render the TreeBrowser', async () => {
-        const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        const treeBrowser = queryByTestId('groupsColumnRef')
-        expect(treeBrowser).not.toBeInTheDocument()
-      })
+    it('does not render the TreeBrowser', async () => {
+      const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      const treeBrowser = queryByTestId('groupsColumnRef')
+      expect(treeBrowser).not.toBeInTheDocument()
+    })
 
-      it('does not render the list of outcomes until the action link is clicked', async () => {
-        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        await clickEl(queryByText('Groups'))
-        await clickEl(getByText('Account Standards'))
-        await clickEl(getByText('Root Account Outcome Group 0'))
-        expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
-        await clickEl(getByText('View 0 Outcomes'))
-        expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
-      })
+    it('does not render the list of outcomes until the action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+      await clickEl(getByText('View 0 Outcomes'))
+      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
+    })
 
-      it('renders the billboard until an action link is clicked', async () => {
-        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        await clickEl(queryByText('Groups'))
-        await clickEl(getByText('Account Standards'))
-        expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
-      })
+    it('renders the billboard until an action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      fireEvent.click(getByText('View 0 Outcomes'))
+      expect(queryByText('Select a group to reveal outcomes here.')).not.toBeInTheDocument()
+    })
+
+    it('unselects the selected group when the modal is closed', async () => {
+      const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      fireEvent.click(getByText('View 0 Outcomes'))
+      render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
+      render(<FindOutcomesModal {...defaultProps({open: true})} />, {renderer: rerender})
+      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
     })
   })
 })
