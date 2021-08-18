@@ -1056,7 +1056,9 @@ class CoursesController < ApplicationController
           users = users.where(uuid: user_uuids)
         end
 
-        users = Api.paginate(users, self, api_v1_course_users_url)
+        # don't calculate a total count/last page for this endpoint.
+        page_opts = { total_entries: nil }
+        users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
         includes = Array(params[:include]).concat(['sis_user_id', 'email'])
 
         # user_json_preloads loads both active/accepted and deleted

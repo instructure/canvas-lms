@@ -3578,7 +3578,6 @@ describe CoursesController, type: :request do
         expect(link_header[0]).to match /page=1&per_page=5/ # current page
         expect(link_header[1]).to match /page=2&per_page=5/ # next page
         expect(link_header[2]).to match /page=1&per_page=5/ # first page
-        expect(link_header[3]).to match /page=2&per_page=5/ # last page
       end
 
       it "should allow jumping to a user's page based on id" do
