@@ -141,11 +141,25 @@ describe('GroupActionDrillDown', () => {
     expect(getByText('Loading learning outcome groups')).toBeInTheDocument()
   })
 
-  it('calls setShowOutcomesView on unmount', () => {
-    const {unmount} = render(<GroupActionDrillDown {...defaultProps()} />)
-    unmount()
-    expect(setShowOutcomesView).toHaveBeenCalledTimes(1)
-    expect(setShowOutcomesView).toHaveBeenCalledWith(false)
+  it('selects a group if selectedGroupId is provided', () => {
+    const {getByText} = render(
+      <GroupActionDrillDown {...defaultProps({selectedGroupId: ['101']})} />
+    )
+    fireEvent.click(getByText('Groups'))
+    expect(getByText('Leaf folder')).toBeInTheDocument()
+  })
+
+  it('expands the Select if showOptions is true', () => {
+    const {getByText} = render(<GroupActionDrillDown {...defaultProps({showOptions: true})} />)
+    expect(getByText('Account folder')).toBeInTheDocument()
+  })
+
+  it('focuses on the Select if showOptions is true', () => {
+    const {getByPlaceholderText, rerender} = render(<GroupActionDrillDown {...defaultProps()} />)
+    render(<GroupActionDrillDown {...defaultProps({showOptions: true})} />, {
+      renderer: rerender
+    })
+    expect(getByPlaceholderText('Select an outcome group')).toHaveFocus()
   })
 
   describe('action links', () => {
