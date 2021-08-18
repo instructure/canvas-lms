@@ -24,9 +24,38 @@ module Outcomes
 
     SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"
 
+    # rubocop:disable Layout/LineLength
     # E'<[^>]+>' -> removes html tags
     # E'&\\w+;'  -> removes html entities
     DESCRIPTION = "regexp_replace(regexp_replace(coalesce(learning_outcomes.description, ''), E'<[^>]+>', '', 'gi'), E'&\\w+;', ' ', 'gi')"
+    # rubocop:enable Layout/LineLength
+
+    MAP_CANVAS_POSTGRES_LOCALES = {
+      "ar" => "arabic", # العربية
+      "ca" => "spanish", # Català
+      "da" => "danish", # Dansk
+      "da-x-k12" => "danish", # Dansk GR/GY
+      "de" => "german", # Deutsch
+      "en-AU" => "english", # English (Australia)
+      "en-CA" => "english", # English (Canada)
+      "en-GB" => "english", # English (United Kingdom)
+      "en" => "english", # English (US)
+      "es" => "spanish", # Español
+      "fr" => "french", # Français
+      "fr-CA" => "french", # Français (Canada)
+      "it" => "italian", # Italiano
+      "hu" => "hungarian", # Magyar
+      "nl" => "dutch", # Nederlands
+      "nb" => "norwegian", # Norsk (Bokmål)
+      "nb-x-k12" => "norwegian", # Norsk (Bokmål) GS/VGS
+      "pt" => "portuguese", # Português
+      "pt-BR" => "portuguese", # Português do Brasil
+      "ru" => "russian", # pу́сский
+      "fi" => "finnish", # Suomi
+      "sv" => "swedish", # Svenska
+      "sv-x-k12" => "swedish", # Svenska GR/GY
+      "tr" => "turkish" # Türkçe
+    }.freeze
 
     def initialize(context = nil)
       @context = context
@@ -45,10 +74,10 @@ module Outcomes
 
     def suboutcomes_by_group_id(learning_outcome_group_id, args={})
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
-      relation = ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: learning_outcome_groups_ids).
-        joins(:learning_outcome_content).
-        joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
+      relation = ContentTag.active.learning_outcome_links
+        .where(associated_asset_id: learning_outcome_groups_ids)
+        .joins(:learning_outcome_content)
+        .joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
               ON logs.id = content_tags.associated_asset_id")
 
       if args[:search_query]
@@ -73,13 +102,20 @@ module Outcomes
       Rails.cache.delete(context_timestamp_cache_key) if improved_outcomes_management?
     end
 
+    def self.supported_languages
+      # cache this in the class since this won't change so much
+      @supported_languages ||= ContentTag.connection.execute(
+        'SELECT cfgname FROM pg_ts_config'
+      ).to_a.map {|r| r['cfgname']}
+    end
+
     private
 
     def total_outcomes_for(learning_outcome_group_id, args={})
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
 
-      relation = ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: learning_outcome_groups_ids)
+      relation = ContentTag.active.learning_outcome_links
+        .where(associated_asset_id: learning_outcome_groups_ids)
 
       if args[:search_query]
         relation = relation.joins(:learning_outcome_content)
@@ -90,18 +126,33 @@ module Outcomes
     end
 
     def add_search_query(relation, search_query)
-      search_query_tokens = search_query.split(' ')
+      # Tried to check if the lang is supported in the same query
+      # using a CASE WHEN but it wont work because it'll
+      # parse to_tsvector with the not supported lang, and it'll throw an error
 
-      short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])", search_query_tokens])
+      sql = if self.class.supported_languages.include?(lang)
+        ContentTag.sanitize_sql_array([<<~SQL.squish, lang, search_query])
+          SELECT unnest(tsvector_to_array(to_tsvector(?, ?))) as token
+        SQL
+      else
+        ContentTag.sanitize_sql_array([<<~SQL.squish, search_query])
+          SELECT unnest(tsvector_to_array(to_tsvector(?))) as token
+        SQL
+      end
+
+      search_query_tokens = ContentTag.connection.execute(sql).to_a.map {|r| r['token']}.uniq
+
+      short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])",
+                                                               search_query_tokens])
       description_query = ContentTag.sanitize_sql_array(["#{DESCRIPTION} ~* ANY(array[?])", search_query_tokens])
 
       relation.where("#{short_description_query} OR #{description_query}")
     end
 
     def add_search_order(relation, search_query)
-      select_query = ContentTag.sanitize_sql_array([<<-SQL, search_query, search_query])
+      select_query = ContentTag.sanitize_sql_array([<<-SQL.squish, search_query, search_query])
         "content_tags".*,
-        GREATEST(public.word_similarity(#{SHORT_DESCRIPTION}, ?), public.word_similarity(#{DESCRIPTION}, ?)) as sim
+        GREATEST(public.word_similarity(?, #{SHORT_DESCRIPTION}), public.word_similarity(?, #{DESCRIPTION})) as sim
       SQL
 
       relation.select(select_query).order(
@@ -127,7 +178,7 @@ module Outcomes
     end
 
     def learning_outcome_group_descendants_query
-      <<-SQL
+      <<-SQL.squish
         WITH RECURSIVE levels AS (
           SELECT id, learning_outcome_group_id AS parent_id
             FROM (#{LearningOutcomeGroup.active.where(context: context).to_sql}) AS data
@@ -163,15 +214,25 @@ module Outcomes
     end
 
     def context_asset_string
-     @_context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
+     @context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
     end
 
     def improved_outcomes_management?
-      @improved_outcomes_management ||= begin
-        return context.root_account.feature_enabled?(:improved_outcomes_management) if context
-
+      @improved_outcomes_management ||= if context
+        context.root_account.feature_enabled?(:improved_outcomes_management)
+      else
         LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
       end
+    end
+
+    def lang
+      # lang can be nil, so we check with instance_variable_defined? method
+      unless instance_variable_defined?("@lang")
+        account = context&.root_account || LoadAccount.default_domain_root_account
+        @lang = MAP_CANVAS_POSTGRES_LOCALES[account.default_locale || "en"]
+      end
+
+      @lang
     end
   end
 end

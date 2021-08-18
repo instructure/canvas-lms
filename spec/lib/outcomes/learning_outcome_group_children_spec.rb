@@ -23,7 +23,7 @@ require 'spec_helper'
 describe Outcomes::LearningOutcomeGroupChildren do
   subject { described_class.new(context) }
 
-  # rubocop:disable RSpec/LetSetup
+  # rubocop:disable RSpec/LetSetup, Layout/LineLength
   let!(:context) { Account.default }
   let!(:global_group) { LearningOutcomeGroup.create(title: 'global') }
   let!(:global_group_subgroup) { global_group.child_outcome_groups.build(title: 'global subgroup') }
@@ -48,7 +48,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:o9) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.1', short_description: 'Outcome 7.1') }
   let!(:o10) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.2', short_description: 'Outcome 7.2') }
   let!(:o11) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
-  # rubocop:enable RSpec/LetSetup
+  # rubocop:enable RSpec/LetSetup, Layout/LineLength
 
   # Outcome Structure for visual reference
   # Global
@@ -151,7 +151,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
   describe '#suboutcomes_by_group_id' do
     it 'returns the outcomes ordered by parent group title then outcome short_description' do
-      g_outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
+      g_outcomes = subject.suboutcomes_by_group_id(global_group.id)
+        .map(&:learning_outcome_content).map(&:short_description)
       expect(g_outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
       r_outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
       expect(r_outcomes).to match_array(
@@ -226,7 +227,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       subject { described_class.new }
 
       it 'returns global outcomes' do
-        outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content)
+          .map(&:short_description)
         expect(outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
       end
     end
@@ -258,13 +260,15 @@ describe Outcomes::LearningOutcomeGroupChildren do
           outcome_group: g1,
           title: "FO.3",
           description: 'apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology)'\
-                       ' as listed in English Appendix 1, both to read aloud and to understand the meaning of new words they meet'
+                       ' as listed in English Appendix 1, both to read aloud and to understand the meaning of new wor'\
+                       'ds they meet'
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "HT.ML.1.1",
-          description: '<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>'
+          description: '<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e'\
+                       'gestas.</p>'
         )
         outcome_model(
           context: context,
@@ -275,41 +279,140 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       it "filters title with non-alphanumerical chars" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1"}).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1"})
+          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
           "LA.1.1.1", "LA.1.1.1.1"
         ])
       end
 
       it "filters description with text content" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "knowledge"}).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "knowledge"})
+          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          'LA.1.1.1', 'FO.3'
+          'FO.3', 'LA.1.1.1'
         ])
       end
 
       it "filters description with html content" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "Pellentesque"}).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "Pellentesque"})
+          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
           'HT.ML.1.1'
         ])
       end
 
       it "filters more than 1 word" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1.1 Pellentesque"}).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1.1 Pellentesque"})
+          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
+          "HT.ML.1.1",
           "LA.1.1.1",
-          "LA.1.1.1.1",
-          "HT.ML.1.1"
+          "LA.1.1.1.1"
         ])
       end
 
       it "filters when words aren't all completed" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "recog awe"}).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "recog awe"})
+          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          "HT.ML.1.2",
-          "LA.2.2.1.2"
+          "LA.2.2.1.2",
+          "HT.ML.1.2"
         ])
+      end
+
+      context 'when lang is portuguese' do
+        it "filters outcomes removing portuguese stop words" do
+          account = context.root_account
+          account.default_locale = "pt-BR"
+          account.save!
+
+          outcome_model(
+            context: context,
+            outcome_group: g1,
+            title: "will bring",
+            description: '<p>Um texto <b>portugues</b>.</p>'
+          )
+          outcome_model(
+            context: context,
+            outcome_group: g1,
+            title: "won't bring",
+            description: '<p>Um animal bonito.</p>'
+          )
+
+          outcomes = subject.suboutcomes_by_group_id(
+            g1.id, {
+              search_query: "Um portugues"
+            }
+          ).map(&:learning_outcome_content).map(&:short_description)
+
+          expect(outcomes).to eql([
+            "will bring"
+          ])
+        end
+
+        context 'when context is nil' do
+          subject { described_class.new }
+
+          it 'filters outcomes removing portuguese stop words' do
+            account = Account.default
+            account.default_locale = "pt-BR"
+            account.save!
+
+            outcome_model(
+              global: true,
+              title: "will bring",
+              description: '<p>Um texto <b>portugues</b>.</p>'
+            )
+            outcome_model(
+              global: true,
+              title: "won't bring",
+              description: '<p>Um animal bonito.</p>'
+            )
+
+            outcomes = subject.suboutcomes_by_group_id(
+              LearningOutcomeGroup.find_or_create_root(nil, true).id, {
+                search_query: "Um portugues"
+              }
+            ).map(&:learning_outcome_content).map(&:short_description)
+
+            expect(outcomes).to eql([
+              "will bring"
+            ])
+          end
+        end
+      end
+
+      context 'when lang is not supported' do
+        before do
+          account = context.root_account
+          account.default_locale = "pl" # polski
+          account.save!
+        end
+
+        it "filters outcomes normally" do
+          outcome_model(
+            context: context,
+            outcome_group: g1,
+            title: "will bring",
+            description: '<p>Um texto <b>portugues</b>.</p>'
+          )
+          outcome_model(
+            context: context,
+            outcome_group: g1,
+            title: "will bring too",
+            description: '<p>Um animal bonito.</p>'
+          )
+
+          outcomes = subject.suboutcomes_by_group_id(
+            g1.id, {search_query: "Um portugues"}
+          ).map(&:learning_outcome_content).map(&:short_description)
+
+          expect(outcomes).to eql([
+            "will bring",
+            "will bring too"
+          ])
+        end
       end
     end
   end
