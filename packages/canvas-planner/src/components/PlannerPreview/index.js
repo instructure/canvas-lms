@@ -29,6 +29,11 @@ import formatMessage from '../../format-message'
 import Day from '../Day'
 import KinderPandaSvg from './kinder-panda.svg'
 
+import {SMALL_MEDIA_QUERY, MEDIUM_MEDIA_QUERY} from '../responsiviser'
+
+const smallMediaQuery = window.matchMedia(SMALL_MEDIA_QUERY)
+const mediumMediaQuery = window.matchMedia(MEDIUM_MEDIA_QUERY)
+
 const noOp = () => {}
 
 const COMMON_PROPS = {
@@ -108,6 +113,10 @@ const ITEMS = [
 ]
 
 export default function PlannerPreview({timeZone}) {
+  let responsiveSize = 'large'
+  if (smallMediaQuery.matches) responsiveSize = 'small'
+  if (mediumMediaQuery.matches) responsiveSize = 'medium'
+
   return (
     <View as="section">
       <View as="section" margin="x-large large">
@@ -133,6 +142,7 @@ export default function PlannerPreview({timeZone}) {
         updateTodo={noOp}
         simplifiedControls
         showMissingAssignments={false}
+        responsiveSize={responsiveSize}
       />
     </View>
   )

@@ -298,6 +298,7 @@ export class PlannerApp extends Component {
         simplifiedControls={this.props.k5Mode}
         singleCourseView={this.props.singleCourseView}
         showMissingAssignments={this.props.k5Mode}
+        responsiveSize={this.props.responsiveSize}
       />
     )
     workingDay.add(1, 'days')

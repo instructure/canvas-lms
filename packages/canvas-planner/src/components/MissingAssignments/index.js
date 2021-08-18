@@ -28,11 +28,10 @@ import {themeable} from '@instructure/ui-themeable'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-import {courseShape, opportunityShape} from '../plannerPropTypes'
+import {courseShape, opportunityShape, sizeShape} from '../plannerPropTypes'
 import {toggleMissingItems} from '../../actions'
 import formatMessage from '../../format-message'
 import PlannerItem from '../PlannerItem'
-import responsiviser from '../responsiviser'
 import styles from './styles.css'
 import theme from './theme'
 
@@ -76,7 +75,8 @@ function MissingAssignment({
   due_at,
   submission_types,
   timeZone,
-  course = {}
+  course = {},
+  responsiveSize = 'large'
 }) {
   return (
     <PlannerItem
@@ -92,6 +92,7 @@ function MissingAssignment({
       associated_item={convertSubmissionType(submission_types)}
       simplifiedControls
       isMissingItem
+      responsiveSize={responsiveSize}
     />
   )
 }
@@ -104,7 +105,8 @@ MissingAssignment.propTypes = {
   due_at: string.isRequired,
   submission_types: arrayOf(string).isRequired,
   timeZone: string.isRequired,
-  course: shape(courseShape)
+  course: shape(courseShape),
+  responsiveSize: sizeShape
 }
 
 // Themeable doesn't support pure functional components
@@ -170,8 +172,7 @@ const mapStateToProps = ({courses, opportunities}) => ({
 
 const mapDispatchToProps = {toggleMissing: toggleMissingItems}
 
-const ResponsiveMissingAssignment = responsiviser()(MissingAssignments)
-const ThemeableMissingAssignments = themeable(theme, styles)(ResponsiveMissingAssignment)
+const ThemeableMissingAssignments = themeable(theme, styles)(MissingAssignments)
 const ConnectedMissingAssignments = connect(
   mapStateToProps,
   mapDispatchToProps

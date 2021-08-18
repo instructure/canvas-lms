@@ -42,7 +42,6 @@ import {momentObj} from 'react-moment-proptypes'
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'
-import responsiviser from '../responsiviser'
 import styles from './styles.css'
 import theme from './theme'
 import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
@@ -602,8 +601,7 @@ export class PlannerItem extends Component {
   }
 }
 
-const ResponsivePlannerItem = responsiviser()(PlannerItem)
-const ThemeablePlannerItem = themeable(theme, styles)(ResponsivePlannerItem)
+const ThemeablePlannerItem = themeable(theme, styles)(PlannerItem)
 const AnimatablePlannerItem = animatable(ThemeablePlannerItem)
 AnimatablePlannerItem.theme = ThemeablePlannerItem.theme
 export default AnimatablePlannerItem
