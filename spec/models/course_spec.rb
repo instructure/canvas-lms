@@ -5087,11 +5087,11 @@ describe Course, "section_visibility" do
 
   context "require_message_permission" do
     it "should check the message permission" do
-      expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true)).to eql :full
-      expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true)).to eql :restricted
+      expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to eql :full
+      expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to eql :restricted
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
                            :role => student_role, :enabled => false)
-      expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true)).to eql :restricted
+      expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to eql :restricted
     end
   end
 end

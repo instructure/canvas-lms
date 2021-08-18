@@ -109,7 +109,7 @@ module SearchHelper
 
       if context.is_a?(Course)
         add_courses.call [context], :current
-        visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), true)
+        visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), require_message_permission: true)
         sections = case visibility
                    when :sections, :sections_limited, :limited
           context.sections_visible_to(@current_user)
@@ -126,7 +126,7 @@ module SearchHelper
           add_courses.call [context.context], :current if context.context.is_a?(Course)
         end
       elsif context.is_a?(CourseSection)
-        visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), true)
+        visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
         sections = visibility == :restricted ? [] : [context]
         add_courses.call [context.course], :current
         add_sections.call context.course.sections_visible_to(@current_user, sections)

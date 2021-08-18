@@ -972,7 +972,7 @@ class MessageableUser
     def course_visibility(course)
       @course_visibilities ||= {}
       @course_visibilities[course.global_id] ||=
-        course.enrollment_visibility_level_for(@user, course.section_visibilities_for(@user), true)
+        course.enrollment_visibility_level_for(@user, course.section_visibilities_for(@user), require_message_permission: true)
     end
 
     def all_courses_by_visibility(visibility)

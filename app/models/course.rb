@@ -2774,21 +2774,17 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # returns :all, :none, or an array of section ids
+  # returns :all or an array of section ids
   def course_section_visibility(user, opts={})
     visibilities = section_visibilities_for(user, opts)
-    visibility = enrollment_visibility_level_for(user, visibilities)
-    if [:full, :limited, :restricted, :sections, :sections_limited].include?(visibility)
-      enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
-      if [:restricted, :sections].include?(visibility) || (
-          visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
-        )
-        visibilities.map{ |s| s[:course_section_id] }.sort
-      else
-        :all
-      end
+    visibility = enrollment_visibility_level_for(user, visibilities, check_full: false)
+    enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
+    if [:restricted, :sections].include?(visibility) || (
+        visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
+      )
+      visibilities.map { |s| s[:course_section_id] }.sort # rubocop:disable Rails/Pluck
     else
-      :none
+      :all
     end
   end
 
@@ -2806,29 +2802,43 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
+  # check_full is a hint that we don't care about the difference between :full and :limited,
+  # so don't bother with an extra permission check to see if they have :full. Just return :limited.
+  def enrollment_visibility_level_for(user,
+                                      visibilities = section_visibilities_for(user),
+                                      require_message_permission: false,
+                                      check_full: true)
     manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
       :allow_course_admin_actions
     else
       :manage_admin_users
     end
 
-    permissions = require_message_permission ?
-      [:send_messages] :
-      [:manage_grades, :manage_students, manage_perm, :read_roster, :view_all_grades, :read_as_admin]
-    granted_permissions = self.granted_rights(user, *permissions)
-    if granted_permissions.empty?
-      :restricted # e.g. observer, can only see admins in the course
-    elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
-      if granted_permissions.eql? [:read_roster]
-        :sections_limited
-      else
-        :sections
-      end
-    elsif granted_permissions.eql? [:read_roster]
-      :limited
-    else
+    return :restricted if require_message_permission && !grants_right?(user, :send_messages)
+
+    has_read_roster = grants_right?(user, :read_roster) unless require_message_permission
+
+    visibility_limited_to_section = visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
+    if require_message_permission
+      has_admin = true
+    elsif visibility_limited_to_section || check_full || !has_read_roster
+      has_admin = grants_any_right?(user,
+                                    :read_as_admin,
+                                    :view_all_grades,
+                                    :manage_grades,
+                                    :manage_students,
+                                    manage_perm)
+    end
+
+    # e.g. observer, can only see admins in the course
+    return :restricted unless has_read_roster || has_admin
+ 
+    if visibility_limited_to_section
+      has_admin ? :sections : :sections_limited
+    elsif has_admin
       :full
+    else
+      :limited
     end
   end
 
