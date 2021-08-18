@@ -5093,6 +5093,33 @@ describe Course, "#sync_homeroom_enrollments" do
     @course.save!
     expect(@course.sync_homeroom_enrollments).not_to eq(false)
   end
+
+  context "cross-shard" do
+    specs_require_sharding
+
+    before :once do
+      @shard1.activate do
+        account = Account.create!
+        account.enable_as_k5_account!
+        @cross_shard_course = course_factory(account: account, active_course: true)
+        @cross_shard_course.sync_enrollments_from_homeroom = true
+        @cross_shard_course.homeroom_course_id = @homeroom_course.id
+        @cross_shard_course.save!
+      end
+    end
+
+    it "syncs enrollments across shards" do
+      expect(@cross_shard_course.user_is_instructor?(@teacher)).to eq(false)
+      expect(@cross_shard_course.user_is_instructor?(@ta)).to eq(false)
+      expect(@cross_shard_course.user_is_student?(@student)).to eq(false)
+      expect(@cross_shard_course.user_has_been_observer?(@observer)).to eq(false)
+      @cross_shard_course.sync_homeroom_enrollments
+      expect(@cross_shard_course.user_is_instructor?(@teacher)).to eq(true)
+      expect(@cross_shard_course.user_is_instructor?(@ta)).to eq(true)
+      expect(@cross_shard_course.user_is_student?(@student)).to eq(true)
+      expect(@cross_shard_course.user_has_been_observer?(@observer)).to eq(true)
+    end
+  end
 end
 
 describe Course, "user_is_instructor?" do

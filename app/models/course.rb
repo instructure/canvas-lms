@@ -3345,16 +3345,22 @@ class Course < ActiveRecord::Base
 
   def sync_homeroom_enrollments(progress=nil)
     return false unless elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course
-
     progress&.calculate_completion!(0, linked_homeroom_course.enrollments.size)
     linked_homeroom_course.all_enrollments.find_each do |enrollment|
-      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
-      course_enrollment.workflow_state = enrollment.workflow_state
-      course_enrollment.start_at = enrollment.start_at
-      course_enrollment.end_at = enrollment.end_at
-      course_enrollment.completed_at = enrollment.completed_at
-      course_enrollment.save!
-      progress.increment_completion!(1) if progress&.total
+      self.shard.activate do
+        course_enrollment = if self.shard == enrollment.shard
+          all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
+        else
+          # roles don't apply across shards, so fall back to the base type
+          all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id)
+        end
+        course_enrollment.workflow_state = enrollment.workflow_state
+        course_enrollment.start_at = enrollment.start_at
+        course_enrollment.end_at = enrollment.end_at
+        course_enrollment.completed_at = enrollment.completed_at
+        course_enrollment.save!
+        progress.increment_completion!(1) if progress&.total
+      end
     end
   end
 
