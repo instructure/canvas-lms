@@ -42,7 +42,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from './shared/OutcomesRceField'
 
-const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
+const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
@@ -51,14 +51,16 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const {rootId, collections} = useManageOutcomes('OutcomeManagementPanel')
-  const [targetGroup, setTargetGroup] = useState(null)
+  const {rootId, collections, addNewGroup} = useManageOutcomes('OutcomeManagementPanel')
+  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
 
   useEffect(() => {
-    if (rootId && collections[rootId] && !targetGroup) {
-      setTargetGroup(collections[rootId])
+    if (rootId && collections[rootId] && !selectedGroup) {
+      setSelectedGroup(collections[rootId])
+      setSelectedGroupAncestorIds([rootId])
     }
-  }, [collections, rootId, targetGroup])
+  }, [collections, rootId, selectedGroup, selectedGroupAncestorIds])
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -75,17 +77,13 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     onCloseHandler()
   }
 
-  const handleSetTargetGroup = ({targetGroup}) => {
-    setTargetGroup(targetGroup)
-  }
-
   const onCreateOutcomeHandler = () => {
     ;(async () => {
       try {
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {
             input: {
-              groupId: targetGroup.id,
+              groupId: selectedGroup.id,
               title,
               displayName,
               description
@@ -112,6 +110,11 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             }
           })
         }
+        onSuccess({selectedGroupAncestorIds})
+        // resetting selectedGroup to null otherwise it will be maintained
+        // and will cause the group to not be loaded in the GroupSelectedDrillDown
+        // when opening the create modal again
+        setSelectedGroup(null)
 
         showFlashAlert({
           message: I18n.t('Outcome "%{title}" was successfully created.', {title}),
@@ -206,7 +209,15 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             <Text size="medium" weight="bold">
               {isMobileView ? I18n.t('Select a location') : I18n.t('Location')}
             </Text>
-            <TargetGroupSelector setTargetGroup={handleSetTargetGroup} />
+            <TargetGroupSelector
+              groupId={selectedGroup?.id}
+              setTargetGroup={({targetGroup, targetAncestorsIds}) => {
+                setSelectedGroupAncestorIds(targetAncestorsIds)
+                setSelectedGroup(targetGroup)
+              }}
+              onGroupCreated={addNewGroup}
+              modalName="CreateOutcomeModal"
+            />
           </View>
         </Modal.Body>
         <Modal.Footer>
@@ -218,7 +229,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             color="primary"
             margin="0 x-small 0 0"
             interaction={
-              !invalidTitle && !invalidDisplayName && targetGroup ? 'enabled' : 'disabled'
+              !invalidTitle && !invalidDisplayName && selectedGroup ? 'enabled' : 'disabled'
             }
             onClick={onCreateOutcomeHandler}
           >
@@ -230,9 +241,14 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   )
 }
 
+CreateOutcomeModal.defaultProps = {
+  onSuccess: () => {}
+}
+
 CreateOutcomeModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func
 }
 
 export default CreateOutcomeModal

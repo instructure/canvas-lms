@@ -35,10 +35,12 @@ jest.useFakeTimers()
 
 describe('CreateOutcomeModal', () => {
   let onCloseHandlerMock
+  let onSuccessMock
   let cache
   const defaultProps = (props = {}) => ({
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
+    onSuccess: onSuccessMock,
     ...props
   })
 
@@ -65,6 +67,7 @@ describe('CreateOutcomeModal', () => {
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    onSuccessMock = jest.fn()
     cache = createCache()
   })
 
@@ -142,7 +145,7 @@ describe('CreateOutcomeModal', () => {
         expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
       })
 
-      it('calls onCloseHandler on Create button click', async () => {
+      it('calls onCloseHandler & onSuccess on Create button click', async () => {
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree('Account')]
         })
@@ -171,6 +174,38 @@ describe('CreateOutcomeModal', () => {
         expect(within(getByRole('dialog')).getByText('Create').closest('button')).toBeDisabled()
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         expect(within(getByRole('dialog')).getByText('Create').closest('button')).not.toBeDisabled()
+      })
+
+      it('calls onSuccess if create request succeeds', async () => {
+        const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+          mocks: [
+            ...smallOutcomeTree('Account'),
+            setFriendlyDescriptionOutcomeMock({
+              inputDescription: 'Friendly Description value'
+            }),
+            createLearningOutcomeMock({
+              title: 'Outcome 123',
+              displayName: 'Display name',
+              description: '',
+              groupId: '100'
+            })
+          ]
+        })
+        await act(async () => jest.runOnlyPendingTimers())
+        fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+        fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
+        fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
+          target: {value: 'Friendly Description value'}
+        })
+        fireEvent.click(getByText('Account folder 0'))
+        fireEvent.click(getByText('Create'))
+        await act(async () => jest.runOnlyPendingTimers())
+        await waitFor(() => {
+          expect(onSuccessMock).toHaveBeenCalledTimes(1)
+          expect(onSuccessMock).toHaveBeenCalledWith({
+            selectedGroupAncestorIds: ['100', '1']
+          })
+        })
       })
 
       it('displays flash confirmation with proper message if create request succeeds', async () => {
