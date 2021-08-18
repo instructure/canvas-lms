@@ -8,7 +8,7 @@ linter_options = {
   linter_name: "Rubocop",
   file_regex: /\.rb$/,
   format: "rubocop",
-  command: "bundle exec rubocop",
+  command: "bin/rubocop",
   campsite_mode: false,
   append_files_to_command: true,
   severe_levels: [],
