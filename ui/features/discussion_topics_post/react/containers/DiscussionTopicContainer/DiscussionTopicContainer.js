@@ -67,7 +67,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
 
-  if (ENV.DISCUSSION) {
+  if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
     rubricTriggers.initDialog()
   }
 
