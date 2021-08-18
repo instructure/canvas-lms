@@ -769,6 +769,34 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["due_date"].to_date).to eq(new_due_date.to_date)
     end
 
+    it "returns only applicable date to student" do
+      course_with_student_logged_in(active_all: true)
+      section1 = @course.course_sections.create!(:name => 'Section 1')
+
+      @mod = @course.context_modules.create!
+      @assign = @course.assignments.create! title: "Differentiated Assignment", points_possible: 100
+      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+
+      new_due_date = 1.week.from_now
+      override = @assign.assignment_overrides.build
+      override.set = section1
+      override.due_at = new_due_date
+      override.due_at_overridden = true
+      override.save!
+
+      # no date
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"]).to be_nil
+
+      # overridden date
+      student1 = student_in_course(course: @course, section: section1).user
+      user_session(student1)
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"].to_date).to eq new_due_date.to_date
+    end
+
     it "should return too_many_overrides if applicable for assignments" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
