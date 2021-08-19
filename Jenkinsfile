@@ -430,7 +430,9 @@ pipeline {
             extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               extendedStage('Linters - Dependency Check')
                 .nodeRequirements(label: 'canvas-docker', podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
-                .required(configuration.isChangeMerged())
+                // Skipping the stage due to an issue in a snyk dependendent package (boolean)
+                // requiring node > 16.7 https://github.com/thenativeweb/boolean/issues
+                .required(false)
                 .execute(dependencyCheckStage.queueTestStage())
 
               extendedStage('Linters')
