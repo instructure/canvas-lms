@@ -348,6 +348,16 @@ module MessageBus
     @production_worker
   end
 
+  def self.rescuable_pulsar_errors
+    [
+      ::Pulsar::Error::AlreadyClosed,
+      ::Pulsar::Error::BrokerPersistenceError,
+      ::Pulsar::Error::ConnectError,
+      ::Pulsar::Error::ServiceUnitNotReady,
+      ::Pulsar::Error::Timeout
+    ]
+  end
+
   ##
   # Internal: drop all instance variable state for talking to pulsar.
   # This appears to be useful to get over the hump when a maintenance event

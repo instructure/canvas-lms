@@ -356,7 +356,7 @@ module Context
     false
   end
 
-  def nickname_for(_user, fallback = :name)
+  def nickname_for(_user, fallback = :name, prefer_friendly_name: true)
     self.send fallback if fallback
   end
 

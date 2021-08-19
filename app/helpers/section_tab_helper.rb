@@ -18,11 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SectionTabHelper
+  # This should contain all the permissions that are checked in Course#uncached_tabs_available
   PERMISSIONS_TO_PRECALCULATE = %i[
     create_conferences
     create_forum
     manage_admin_users
     manage_assignments
+    manage_assignments_add
+    manage_assignments_delete
     manage_content
     manage_files_add
     manage_files_edit

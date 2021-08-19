@@ -18,7 +18,9 @@
 
 import $ from 'jquery'
 import {isArray, isObject, uniq} from 'lodash'
-import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import { configure as configureTimezone } from '@canvas/timezone'
+import timezone from 'timezone'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import denver from 'timezone/America/Denver'
 import juneau from 'timezone/America/Juneau'
@@ -67,16 +69,21 @@ QUnit.module('AgendaView', {
     fcUtil.addMinuteDelta(this.startDate, -60 * 24 * 15)
     this.dataSource = new EventDataSource(this.contexts)
     this.server = sinon.fakeServer.create()
-    this.snapshot = tz.snapshot()
-    tz.changeZone(denver, 'America/Denver')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(denver, 'America/Denver'),
+      tzData: {
+        'America/Denver': denver
+      },
+      momentLocale: 'en'
+    })
     I18nStubber.pushFrame()
     fakeENV.setup({CALENDAR: {}})
   },
   teardown() {
     this.container.remove()
     this.server.restore()
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
     fakeENV.teardown()
   }
 })
@@ -188,7 +195,14 @@ test('should only include days on page breaks once', function() {
 })
 
 test('renders non-assignment events with locale-appropriate format string', function() {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(denver, 'America/Denver', french, 'fr_FR'),
+    tzData: {
+      'America/Denver': denver,
+    },
+    momentLocale: 'fr'
+  })
+  // tz.changeLocale(french, 'fr_FR', 'fr')
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {'time.formats.tiny': '%k:%M'})
   const view = new AgendaView({
@@ -210,7 +224,13 @@ test('renders non-assignment events with locale-appropriate format string', func
 })
 
 test('renders assignment events with locale-appropriate format string', function() {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(denver, 'America/Denver', french, 'fr_FR'),
+    tzData: {
+      'America/Denver': denver,
+    },
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {'time.formats.tiny': '%k:%M'})
   const view = new AgendaView({
@@ -232,7 +252,13 @@ test('renders assignment events with locale-appropriate format string', function
 })
 
 test('renders non-assignment events in appropriate timezone', function() {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
+
   I18nStubber.stub('en', {
     'time.formats.tiny': '%l:%M%P',
     date: {}
@@ -256,7 +282,12 @@ test('renders non-assignment events in appropriate timezone', function() {
 })
 
 test('renders assignment events in appropriate timezone', function() {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   I18nStubber.stub('en', {
     'time.formats.tiny': '%l:%M%P',
     date: {}

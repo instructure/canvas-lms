@@ -30,11 +30,21 @@ export const KEY_CODES = {
   backspace: 8,
   enter: 13,
   up: 38,
-  down: 40
+  down: 40,
+  escape: 27
 }
 
 export const KEY_NAMES = {
   [KEY_CODES.up]: 'UpArrow',
   [KEY_CODES.down]: 'DownArrow',
   [KEY_CODES.enter]: 'Enter'
+}
+
+export const ARIA_ID_TEMPLATES = {
+  ariaControlTemplate: instanceId => {
+    return `${instanceId}-mention-popup`
+  },
+  activeDescendant: (instanceId, itemId) => {
+    return `${instanceId}-mention-popup-item-${itemId}`
+  }
 }

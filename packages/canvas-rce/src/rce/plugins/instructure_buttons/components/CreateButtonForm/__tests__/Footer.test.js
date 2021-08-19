@@ -17,65 +17,35 @@
  */
 
 import React from 'react'
-import {act, render, screen} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
-import sidebarHandlers from '../../../../../../sidebar/containers/sidebarHandlers'
-import {buildSvg} from '../../../svg'
-import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {Footer} from '../Footer'
-import {StoreProvider} from '../../../../shared/StoreContext'
-
-jest.mock('../../../../../../sidebar/containers/sidebarHandlers')
-
-const renderComponent = () => {
-  return render(<StoreProvider>{props => <Footer {...props} />}</StoreProvider>)
-}
 
 describe('<Footer />', () => {
-  describe('clicking the "Apply" button', () => {
-    const getApplyButton = () => {
-      return screen.getByRole('button', {name: 'Apply'})
-    }
+  const defaults = {
+    onCancel: jest.fn(),
+    onSubmit: jest.fn()
+  }
 
-    let promise, uploadStub
+  it('submits the buttons tray', () => {
+    const onSubmit = jest.fn()
+    render(<Footer {...defaults} onSubmit={onSubmit} />)
+    userEvent.click(screen.getByRole('button', {name: /apply/i}))
+    expect(onSubmit).toHaveBeenCalled()
+  })
 
-    beforeEach(() => {
-      promise = Promise.resolve()
-      uploadStub = jest.fn(() => promise)
+  it('closes the buttons tray', () => {
+    const onCancel = jest.fn()
+    render(<Footer {...defaults} onCancel={onCancel} />)
+    userEvent.click(screen.getByRole('button', {name: /cancel/i}))
+    expect(onCancel).toHaveBeenCalled()
+  })
 
-      sidebarHandlers.mockReturnValue(() => ({
-        startButtonsAndIconsUpload: uploadStub
-      }))
-
-      renderComponent({settings: DEFAULT_SETTINGS})
-    })
-
-    it('calls the startButtonsAndIconsUpload prop', async () => {
-      userEvent.click(getApplyButton())
-      await act(() => promise)
-      expect(uploadStub.mock.calls.length).toBe(1)
-    })
-
-    it('calls the startButtonsAndIconsUpload prop with the svg name and dom element', async () => {
-      const svg = buildSvg(DEFAULT_SETTINGS)
-      userEvent.click(getApplyButton())
-      await act(() => promise)
-      expect(uploadStub.mock.calls[0][0]).toEqual({name: 'placeholder_name.svg', domElement: svg})
-    })
-
-    it('is disabled while the upload is in progress', async () => {
-      const applyButton = getApplyButton()
-      userEvent.click(applyButton)
-      expect(applyButton.hasAttribute('disabled')).toBe(true)
-      await act(() => promise)
-    })
-
-    it('is not disabled after an upload has finished', async () => {
-      const applyButton = getApplyButton()
-      userEvent.click(applyButton)
-      await act(() => promise)
-      expect(applyButton.hasAttribute('disabled')).toBe(false)
-    })
+  it('renders the footer disabled', () => {
+    render(<Footer {...defaults} disabled />)
+    const cancelButton = screen.getByRole('button', {name: /cancel/i})
+    const applyButton = screen.getByRole('button', {name: /apply/i})
+    expect(cancelButton).toBeDisabled()
+    expect(applyButton).toBeDisabled()
   })
 })

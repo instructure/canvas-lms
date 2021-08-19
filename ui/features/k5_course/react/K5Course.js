@@ -381,11 +381,11 @@ export function K5Course({
       <View as="section" data-testid="main-content" elementRef={e => (contentRef.current = e)}>
         {courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
-        {currentTab === renderTabs?.[0]?.id && latestAnnouncement && (
+        {currentTab === renderTabs?.[0]?.id && (
           <K5Announcement
             showCourseDetails={false}
-            {...announcementDetails.announcement}
             {...announcementDetails}
+            firstAnnouncement={announcementDetails.announcement}
           />
         )}
         {currentTab === TAB_IDS.HOME &&

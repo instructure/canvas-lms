@@ -40,7 +40,7 @@ group :test do
   gem 'rspec-mocks', '3.10.2'
   gem 'shoulda-matchers', '4.3.0'
 
-  gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
+  gem 'rubocop-canvas', require: false, path: root_path.join('gems/rubocop-canvas')
     gem 'rubocop', '0.68.0', require: false
       gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rspec', '1.33.0', require: false

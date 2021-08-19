@@ -126,6 +126,7 @@ export function setFixtureHtml($fixture) {
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>
         <div id="gradebook_grid"></div>
+        <div id="gradebook-secondary-toolbar"></div>
       </div>
     </div>
   `)

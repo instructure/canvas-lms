@@ -55,13 +55,21 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
+import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
+import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
 
-  const {searchTerm} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
+  const isSearch = searchTerm || filter === 'unread'
+
+  if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
+    rubricTriggers.initDialog()
+  }
 
   let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
   let dueAt = ''
@@ -240,75 +248,99 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   }
 
   return (
-    <>
-      {props.discussionTopic.initialPostRequiredForCurrentUser && (
-        <Alert renderCloseButtonLabel="Close">
-          {I18n.t('You must post before seeing replies.')}
-        </Alert>
-      )}
-      {props.discussionTopic.permissions?.readAsAdmin &&
-        props.discussionTopic.groupSet &&
-        props.discussionTopic.assignment?.onlyVisibleToOverrides && (
-          <View as="div" margin="none none small" width="80%" data-testid="differentiated-alert">
-            <Alert renderCloseButtonLabel="Close">
-              {I18n.t(
-                'Note: for differentiated group topics, some threads may not have any students assigned.'
-              )}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          alert: {
+            textSize: 'small'
+          },
+          assignmentDetails: {
+            margin: '0'
+          },
+          border: {
+            width: 'small 0',
+            radius: 'none'
+          },
+          container: {
+            padding: '0 xx-small'
+          },
+          replyButton: {
+            display: 'block'
+          },
+          RCE: {
+            paddingClosed: 'none',
+            paddingOpen: 'none none small'
+          }
+        },
+        desktop: {
+          alert: {
+            textSize: 'medium'
+          },
+          assignmentDetails: {
+            margin: '0 0 small 0'
+          },
+          border: {
+            width: 'small',
+            radius: 'medium'
+          },
+          container: {
+            padding: '0 medium'
+          },
+          replyButton: {
+            display: 'inline-block'
+          },
+          RCE: {
+            paddingClosed: 'none medium none xx-large',
+            paddingOpen: 'none medium medium xx-large'
+          }
+        }
+      }}
+      render={responsiveProps => (
+        <>
+          {props.discussionTopic.initialPostRequiredForCurrentUser && (
+            <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
+              <Text size={responsiveProps.alert.textSize}>
+                {I18n.t('You must post before seeing replies.')}
+              </Text>
             </Alert>
-          </View>
-        )}
-      {isAnnouncementDelayed && (
-        <Alert renderCloseButtonLabel="Close">
-          {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
-            delayedPostAt: DateHelper.formatDatetimeForDiscussions(
-              props.discussionTopic.delayedPostAt
-            )
-          })}
-        </Alert>
-      )}
-      {!searchTerm && (
-        <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
-          <Flex as="div" direction="column" data-testid="discussion-topic-container">
-            <Flex.Item>
-              <View
-                as="div"
-                borderWidth="small"
-                borderRadius="medium"
-                borderStyle="solid"
-                borderColor="primary"
-                padding="small 0"
-              >
-                <Responsive
-                  match="media"
-                  query={responsiveQuerySizes({mobile: true, desktop: true})}
-                  props={{
-                    mobile: {
-                      assignmentDetails: {
-                        margin: '0'
-                      },
-                      replyButton: {
-                        display: 'block'
-                      },
-                      RCE: {
-                        paddingClosed: 'none',
-                        paddingOpen: 'none none small'
-                      }
-                    },
-                    desktop: {
-                      assignmentDetails: {
-                        margin: '0 0 small 0'
-                      },
-                      replyButton: {
-                        display: 'inline-block'
-                      },
-                      RCE: {
-                        paddingClosed: 'none medium none xx-large',
-                        paddingOpen: 'none medium medium xx-large'
-                      }
-                    }
-                  }}
-                  render={responsiveProps => (
-                    <Flex direction="column" padding="0 medium 0">
+          )}
+          {props.discussionTopic.permissions?.readAsAdmin &&
+            props.discussionTopic.groupSet &&
+            props.discussionTopic.assignment?.onlyVisibleToOverrides && (
+              <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
+                <Text size={responsiveProps.alert.textSize}>
+                  {I18n.t(
+                    'Note: for differentiated group topics, some threads may not have any students assigned.'
+                  )}
+                </Text>
+              </Alert>
+            )}
+          {isAnnouncementDelayed && (
+            <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
+              <Text size={responsiveProps.alert.textSize}>
+                {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
+                  delayedPostAt: DateHelper.formatDatetimeForDiscussions(
+                    props.discussionTopic.delayedPostAt
+                  )
+                })}
+              </Text>
+            </Alert>
+          )}
+          {!isSearch && (
+            <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
+              <Flex as="div" direction="column" data-testid="discussion-topic-container">
+                <Flex.Item>
+                  <View
+                    as="div"
+                    borderWidth={responsiveProps.border.width}
+                    borderRadius={responsiveProps.border.radius}
+                    borderStyle="solid"
+                    borderColor="primary"
+                    padding="xx-small 0 small"
+                  >
+                    <Flex direction="column" padding={responsiveProps.container.padding}>
                       {isGraded(props.discussionTopic.assignment) && (
                         <Flex.Item
                           shouldShrink
@@ -400,11 +432,16 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                       )
                                   : null
                               }
-                              onShowRubric={
-                                props.discussionTopic.permissions?.showRubric ? () => {} : null
-                              }
-                              onAddRubric={
-                                props.discussionTopic.permissions?.addRubric ? () => {} : null
+                              showRubric={props.discussionTopic.permissions?.showRubric}
+                              addRubric={props.discussionTopic.permissions?.addRubric}
+                              onDisplayRubric={
+                                props.discussionTopic.permissions?.showRubric ||
+                                props.discussionTopic.permissions?.addRubric
+                                  ? () => {
+                                      rubricTriggers.openDialog()
+                                      rubricEditing.init()
+                                    }
+                                  : null
                               }
                               isPublished={props.discussionTopic.published}
                               canUnpublish={props.discussionTopic.canUnpublish}
@@ -487,30 +524,30 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         )}
                       </Flex.Item>
                     </Flex>
-                  )}
-                />
-              </View>
-            </Flex.Item>
-          </Flex>
-        </Highlight>
+                  </View>
+                </Flex.Item>
+              </Flex>
+            </Highlight>
+          )}
+          <DirectShareUserModal
+            open={sendToOpen}
+            courseId={ENV.course_id}
+            contentShare={{content_type: 'discussion_topic', content_id: props.discussionTopic._id}}
+            onDismiss={() => {
+              setSendToOpen(false)
+            }}
+          />
+          <DirectShareCourseTray
+            open={copyToOpen}
+            sourceCourseId={ENV.course_id}
+            contentSelection={{discussion_topics: [props.discussionTopic._id]}}
+            onDismiss={() => {
+              setCopyToOpen(false)
+            }}
+          />
+        </>
       )}
-      <DirectShareUserModal
-        open={sendToOpen}
-        courseId={ENV.course_id}
-        contentShare={{content_type: 'discussion_topic', content_id: props.discussionTopic._id}}
-        onDismiss={() => {
-          setSendToOpen(false)
-        }}
-      />
-      <DirectShareCourseTray
-        open={copyToOpen}
-        sourceCourseId={ENV.course_id}
-        contentSelection={{discussion_topics: [props.discussionTopic._id]}}
-        onDismiss={() => {
-          setCopyToOpen(false)
-        }}
-      />
-    </>
+    />
   )
 }
 

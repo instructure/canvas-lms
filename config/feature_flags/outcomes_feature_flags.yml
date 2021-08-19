@@ -54,6 +54,11 @@ improved_lmgb:
   applies_to: RootAccount
   display_name: Learning Mastery Gradebook Redesign
   description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
+  environments:
+    production:
+      state: disabled
+    beta:
+      state: disabled
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin

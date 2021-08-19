@@ -26,9 +26,29 @@ export default {
   component: FindOutcomesView,
   args: {
     collection: {
-      id: 1,
       name: 'State Standards',
-      outcomesCount: 3
+      isRootGroup: true,
+      id: '1'
+    },
+    outcomeGroup: {
+      contextId: 1,
+      contextType: 'Account',
+      outcomes: {
+        edges: [
+          {
+            node: {
+              _id: '11',
+              title: 'Outcome 1',
+              description: 'Outcome 1 description',
+              isImported: false
+            }
+          }
+        ],
+        pageInfo: {
+          endCursor: 'abc',
+          hasNextPage: true
+        }
+      }
     },
     searchString: '',
     onChangeHandler: () => {},

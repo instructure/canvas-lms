@@ -22,7 +22,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "setting"
   },
   "allowedOnFeature": {
     "feature": "feature2",
@@ -47,7 +48,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "onFeature": {
     "feature": "feature3",
@@ -72,7 +74,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "offFeature": {
     "feature": "feature4",
@@ -98,7 +101,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed"
-    }
+    },
+    "type": "feature_option"
   },
   "allowedOnRootAccountFeature": {
     "feature": "feature5",
@@ -123,7 +127,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed_on"
-    }
+    },
+    "type": "feature_option"
   },
   "allowedOnCourseFeature": {
     "feature": "feature6",
@@ -145,7 +150,8 @@
       "locked": false,
       "hidden": false,
       "parent_state": "allowed_on"
-    }
+    },
+    "type": "feature_option"
   },
   "betaFeature": {
     "feature": "betaFeature",
@@ -168,6 +174,56 @@
       "hidden": false,
       "parent_state": "allowed_on"
     },
-    "beta": true
+    "beta": true,
+    "type": "feature_option"
+  },
+  "pendingEnforcementOnFeature": {
+    "feature": "feature7",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement On",
+    "description": "This feature has pending enforcement on",
+    "enable_at": "2021-08-23",
+    "pending_enforcement": true ,
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    },
+    "type": "feature_option"
+  },
+  "pendingEnforcementOffFeature": {
+    "feature": "feature8",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement Off",
+    "description": "This feature has pending enforcement off",
+    "enable_at": "2021-08-23",
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    },
+    "type": "feature_option"
   }
 }

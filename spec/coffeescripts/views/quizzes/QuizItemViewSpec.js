@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView.js'
+import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView'
 import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
@@ -27,9 +26,7 @@ import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
 import ReactDOM from 'react-dom'
 
-const fixtures = $('#fixtures')
-
-const createQuiz = function(options = {}) {
+const createQuiz = function (options = {}) {
   const permissions = {
     delete: true,
     ...options.permissions
@@ -40,7 +37,7 @@ const createQuiz = function(options = {}) {
   })
 }
 
-const createView = function(quiz, options = {}) {
+const createView = function (quiz, options = {}) {
   if (quiz == null) {
     quiz = createQuiz({
       id: 1,
@@ -51,7 +48,8 @@ const createView = function(quiz, options = {}) {
   const icon = new PublishIconView({model: quiz})
 
   ENV.PERMISSIONS = {
-    manage: options.canManage
+    manage: options.canManage,
+    create: options.canCreate || options.canManage
   }
 
   ENV.FLAGS = {
@@ -89,8 +87,9 @@ QUnit.module('QuizItemView', {
   }
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
-  const quiz = new Quiz({id: 1, title: 'Foo', can_update: true})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz)
   const done = assert.async()
   return assertions.isAccessible(view, done, {a11yReport: true})
@@ -102,13 +101,13 @@ test('renders admin if canManage', () => {
   equal(view.$('.ig-admin').length, 1)
 })
 
-test('doesnt render admin if canManage is false', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo'})
+test('does not render admin if canManage and canDelete is false', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', permissions: {delete: false}})
   const view = createView(quiz, {canManage: false})
   equal(view.$('.ig-admin').length, 0)
 })
 
-test('renders Migrate Button if post to migrateQuizEnabled is true', () => {
+test('renders Migrate Button if migrateQuizEnabled is true', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: true})
   equal(view.$('.migrate').length, 1)
@@ -141,10 +140,10 @@ test('shows a student a solid quiz icon for old quizzes', () => {
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
-test('#migrateQuiz is called', function() {
+test('#migrateQuiz is called', function () {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
-  const event = new jQuery.Event()
+  const event = new $.Event()
   view.migrateQuiz(event)
   ok(this.ajaxStub.called)
 })
@@ -257,8 +256,9 @@ test('confirm delete destroys model', () => {
   ok(destroyed)
 })
 
-test('doesnt redirect if clicking on ig-admin area', () => {
-  const view = createView()
+test('does not redirect if clicking on ig-admin area', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', permissions: {delete: false}})
+  const view = createView(quiz)
 
   let redirected = false
   view.redirectTo = () => (redirected = true)
@@ -324,14 +324,14 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
 
 test('does not render mastery paths menu option for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
-  const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment'})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('renders mastery paths menu option for assignment quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     title: 'Foo',
     can_update: true,
@@ -344,28 +344,28 @@ test('renders mastery paths menu option for assignment quiz if cyoe on', () => {
 
 test('does not render mastery paths menu option for survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'survey'})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'survey'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('does not render mastery paths menu option for graded survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey'})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('does not render mastery paths menu option for practice quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz'})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('does not render mastery paths link for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '1',
     title: 'Foo',
@@ -378,7 +378,7 @@ test('does not render mastery paths link for quiz if cyoe off', () => {
 
 test('does not render mastery paths link for quiz if quiz does not have a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '2',
     title: 'Foo',
@@ -391,7 +391,7 @@ test('does not render mastery paths link for quiz if quiz does not have a rule',
 
 test('renders mastery paths link for quiz if quiz has a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '1',
     title: 'Foo',
@@ -404,7 +404,7 @@ test('renders mastery paths link for quiz if quiz has a rule', () => {
 
 test('does not render mastery paths icon for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '1',
     title: 'Foo',
@@ -417,7 +417,7 @@ test('does not render mastery paths icon for quiz if cyoe off', () => {
 
 test('does not render mastery paths icon for quiz if quiz is not released by a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '1',
     title: 'Foo',
@@ -430,7 +430,7 @@ test('does not render mastery paths icon for quiz if quiz is not released by a r
 
 test('renders mastery paths link for quiz if quiz has is released by a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-  const quiz = new Quiz({
+  const quiz = createQuiz({
     id: 1,
     assignment_id: '2',
     title: 'Foo',
@@ -496,7 +496,7 @@ test('clicks on Retry button to trigger another migrating request', () => {
   ok(quiz.retry_migration.called)
 })
 
-test('can duplicate when a user has permissons to manage assignments', () => {
+test('can duplicate when a user has permissons to create quizzes', () => {
   const quiz = createQuiz({
     id: 1,
     title: 'Foo',

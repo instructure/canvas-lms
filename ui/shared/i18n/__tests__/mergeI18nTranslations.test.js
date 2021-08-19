@@ -20,6 +20,18 @@ import mergeI18nTranslations from '../mergeI18nTranslations'
 import i18nObj from '../i18nObj'
 
 describe('mergeI18nTranslations', () => {
+  let originalTranslations
+
+  beforeEach(() => {
+    originalTranslations = i18nObj.translations
+    i18nObj.translations = {en: {}}
+  })
+
+  afterEach(() => {
+    i18nObj.translations = originalTranslations
+    originalTranslations = null
+  })
+
   it('merges onto i18n.translations', () => {
     const newStrings = {
       ar: {someKey: 'arabic value'},

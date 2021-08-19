@@ -110,6 +110,13 @@ describe "admin settings tab" do
     wait_for_ajaximations
   end
 
+  def select_filter_option(option_text)
+    feature_filter_element = f("[placeholder='Filter Features']")
+    feature_filter_element.send_keys(option_text[0..3])
+    feature_filter_item = fj("[role='option']:contains('#{option_text}')")
+    feature_filter_item.click
+  end
+
   context "account settings" do
     before :each do
       get "/accounts/#{Account.default.id}/settings"
@@ -599,6 +606,24 @@ describe "admin settings tab" do
       else
         expect(features_text).to include(feature.display_name.call)
       end
+    end
+  end
+
+  context 'feature flag search and filters' do
+    before :each do
+      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
+      course_with_admin_logged_in(account: Account.default, user: user)
+      Account.site_admin.enable_feature!(:feature_flag_filters)
+    end
+
+    it 'allows for searching and deleting a feature flag filter ' do
+      go_to_feature_options(Account.site_admin.id)
+      select_filter_option('Pending Enforcement')
+      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
+
+      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
+      f(pending_enforcement_filter_button_selector).click
+      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
     end
   end
 

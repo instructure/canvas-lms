@@ -34,6 +34,8 @@ var scanner = require("./scanner");
 // tell i18nliner's babylon how to handle `import('../foo').then`
 I18nliner.config.babylonPlugins.push('dynamicImport')
 I18nliner.config.babylonPlugins.push('optionalChaining')
+// tell i18nliner's babylon how to handle typescript
+I18nliner.config.babylonPlugins.push('typescript')
 
 AbstractProcessor.prototype.checkFiles = function() {
   const processor = this.constructor.name.replace(/Processor/, '').toLowerCase()

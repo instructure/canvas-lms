@@ -131,9 +131,7 @@ describe MicrosoftSync::GraphServiceHttp do
 
       context 'when the response is non-200 and the block returns truthy' do
         let(:result) do
-          subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar') do |resp|
-            resp.code == 409 && :foo
-          end
+          subject.request(:get, url) { |resp| resp.code == 409 && :foo }
         end
 
         it 'returns the value the block returned' do
@@ -150,6 +148,20 @@ describe MicrosoftSync::GraphServiceHttp do
         end
       end
 
+      context 'when the block returns a StandardError' do
+        let(:err) { StandardError.new('hello') }
+        let(:result) { subject.request(:get, url) { err } }
+
+        it 'raises that exception and increments an "expected" counter, not an "error" counter' do
+          expect { result }.to raise_error(err)
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.expected',
+                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+          expect(InstStatsd::Statsd).to_not have_received(:increment)
+            .with('microsoft_sync.graph_service.error', anything)
+        end
+      end
+
       context 'when the response is non-200 and the block returns falsey' do
         let(:result) do
           subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar') do |resp|
@@ -157,7 +169,7 @@ describe MicrosoftSync::GraphServiceHttp do
           end
         end
 
-        it 'raises an error and increments an "intermittent" counter' do
+        it 'raises an error and increments an "error" counter' do
           expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with('microsoft_sync.graph_service.error',
@@ -296,7 +308,9 @@ describe MicrosoftSync::GraphServiceHttp do
   describe '#get_paginated_list' do
     subject do
       results = []
-      http.get_paginated_list('some/list', quota: [2, 3]) { |result| results << result }
+      http.get_paginated_list('some/list', quota: [2, 3], **extra_opts) do |result|
+        results << result
+      end
       results
     end
 
@@ -305,6 +319,7 @@ describe MicrosoftSync::GraphServiceHttp do
     let(:continue_url) { initial_url + '?cont=123' }
     let(:continue_response) { json_200_response(value: {a: 1}, '@odata.nextLink' => continue_url) }
     let(:finished_response) { json_200_response(value: {b: 2}) }
+    let(:extra_opts) { {} }
 
     def json_200_response(body)
       {status: 200, body: body.to_json, headers: {'Content-type' => 'application/json'}}
@@ -332,6 +347,27 @@ describe MicrosoftSync::GraphServiceHttp do
       subject
       expect(http).to \
         have_received(:request).with(:get, continue_url, hash_including(quota: [2, 3]))
+    end
+
+    context 'when passed an expected_error_block' do
+      let(:extra_opts) { {expected_error_block: block} }
+
+      context 'when the block returns false' do
+        let(:block) { lambda { |resp| resp.code == 400 } }
+
+        it 'returns results as usual' do
+          expect(subject).to eq([{'a' => 1}, {'b' => 2}])
+        end
+      end
+
+      context 'when the block returns an error' do
+        let(:err) { StandardError.new }
+        let(:block) { lambda { |resp| resp.code == 200 && err } }
+
+        it 'raises that error' do
+          expect { subject }.to raise_error(err)
+        end
+      end
     end
   end
 

@@ -24,7 +24,7 @@ const setup = props => {
   return render(<SearchSpan searchTerm="" text="" {...props} />)
 }
 
-describe('SearchSpan', () => {
+describe.skip('SearchSpan', () => {
   it('should perform no highlights if no searchTerm is present', () => {
     const {queryAllByTestId} = setup()
     expect(queryAllByTestId('highlighted-search-item').length).toBe(0)

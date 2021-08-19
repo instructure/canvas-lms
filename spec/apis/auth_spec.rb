@@ -667,6 +667,13 @@ describe "API Authentication", type: :request do
       expect(JSON.parse(response.body).size).to eq 1
     end
 
+    it "doesn't allow usage of a suspended pseudonym" do
+      @pseudonym.update!(workflow_state: 'suspended')
+
+      get "/api/v1/courses?access_token=#{@token.full_token}"
+      expect(response.status).to eq 401
+    end
+
     it "should allow passing the access token in the authorization header" do
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       expect(JSON.parse(response.body).size).to eq 1

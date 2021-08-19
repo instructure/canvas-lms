@@ -188,13 +188,12 @@ describe('ManagementHeader', () => {
       expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
     })
 
-    it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
+    it('opens FindOutcomesModal when Find Menu Item is clicked', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
-      await act(async () => jest.runAllTimers())
       expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
     })
 

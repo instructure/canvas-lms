@@ -34,6 +34,7 @@ export const ColorSection = ({settings, onChange}) => (
     direction="column"
     id="buttons-tray-color-section"
     justifyItems="space-between"
+    padding="0 small"
   >
     <Flex.Item padding="small">
       <ColorInput

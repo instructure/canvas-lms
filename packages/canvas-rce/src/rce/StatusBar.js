@@ -250,6 +250,7 @@ export default function StatusBar(props) {
         <IconButton
           data-btn-id="rce-kbshortcut-btn"
           color="primary"
+          aria-haspopup="dialog"
           title={kbshortcut}
           tabIndex={tabIndexForBtn('rce-kbshortcut-btn')}
           onClick={event => {

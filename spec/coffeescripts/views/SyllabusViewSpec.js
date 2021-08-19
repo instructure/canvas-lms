@@ -19,6 +19,8 @@
 import $ from 'jquery'
 import _ from 'lodash'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
@@ -119,9 +121,13 @@ QUnit.module('Syllabus', {
     // Setup stubs/mocks
     this.server = setupServerResponses()
 
-    this.tzSnapshot = tz.snapshot()
-    tz.changeZone(denver, 'America/Denver')
-    tz.preload('America/New_York', newYork)
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(denver, 'America/Denver'),
+      tzData: {
+        'America/Denver': denver,
+        'America/New_York': newYork
+      }
+    })
 
     this.clock = sinon.useFakeTimers(new Date(2012, 0, 23, 15, 30).getTime())
 
@@ -190,7 +196,7 @@ QUnit.module('Syllabus', {
     this.miniMonth.remove()
     this.jumpToToday.remove()
     this.clock.restore()
-    tz.restore(this.tzSnapshot)
+    tzInTest.restore()
     this.server.restore()
     document.getElementById('fixtures').innerHTML = ''
   },

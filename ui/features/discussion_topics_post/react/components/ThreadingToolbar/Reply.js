@@ -22,20 +22,43 @@ import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../utils'
 
 export function Reply({...props}) {
   return (
-    <CondensedButton
-      onClick={props.onClick}
-      withBackground={props.withBackground}
-      color="primary"
-      data-testid="threading-toolbar-reply"
-      interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-    >
-      <AccessibleContent alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}>
-        <Text weight="bold">{I18n.t('Reply')}</Text>
-      </AccessibleContent>
-    </CondensedButton>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'small',
+          itemSpacing: 'none small 0 none'
+        },
+        desktop: {
+          textSize: undefined,
+          itemSpacing: undefined
+        }
+      }}
+      render={responsiveProps => (
+        <CondensedButton
+          onClick={props.onClick}
+          withBackground={props.withBackground}
+          color="primary"
+          data-testid="threading-toolbar-reply"
+          interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+          margin={responsiveProps.itemSpacing}
+        >
+          <AccessibleContent
+            alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
+          >
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Reply')}
+            </Text>
+          </AccessibleContent>
+        </CondensedButton>
+      )}
+    />
   )
 }
 

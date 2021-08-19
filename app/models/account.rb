@@ -450,6 +450,11 @@ class Account < ActiveRecord::Base
     enable_as_k5_account[:value]
   end
 
+  def enable_as_k5_account!
+    self.settings[:enable_as_k5_account] = {value: true}
+    self.save!
+  end
+
   def open_registration?
     !!settings[:open_registration] && canvas_authentication?
   end
@@ -630,6 +635,14 @@ class Account < ActiveRecord::Base
 
   def root_account
     return self if root_account?
+
+    super
+  end
+
+  def root_account=(value)
+    return if value == self && root_account?
+    raise ArgumentError, "cannot change the root account of a root account" if root_account? && persisted?
+
     super
   end
 
@@ -999,10 +1012,17 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self).freeze
+    @account_chain ||= Account.account_chain(self).tap do |chain|
+      # preload the root account and parent accounts that we also found here
+      ra = chain.find(&:root_account?)
+      chain.each { |a| a.root_account = ra if a.root_account_id == ra.id }
+      chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
+    end.freeze
+
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
     end
+
     @account_chain
   end
 
@@ -1779,7 +1799,7 @@ class Account < ActiveRecord::Base
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
       tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_assignments)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings

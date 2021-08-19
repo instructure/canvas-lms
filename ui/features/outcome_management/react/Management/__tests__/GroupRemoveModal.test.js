@@ -155,7 +155,7 @@ describe('GroupRemoveModal', () => {
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while removing this group: Network error',
+        message: 'An error occurred while removing this group: Network error.',
         type: 'error'
       })
     })

@@ -129,6 +129,9 @@ class OutcomePopover extends React.Component {
                   I18n.t('No submissions')
                 )}
               </div>
+              {outcome.friendly_description && (
+                <div style={{padding: '0.5rem 0 0 0'}}>{outcome.friendly_description}</div>
+              )}
             </Flex.Item>
             {!isVertical && <Flex.Item align="stretch">{this.renderSelectedRating()}</Flex.Item>}
           </Flex>

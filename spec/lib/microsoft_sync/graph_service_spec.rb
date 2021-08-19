@@ -449,6 +449,25 @@ describe MicrosoftSync::GraphService do
     it_behaves_like 'a paginated list endpoint' do
       it_behaves_like 'an endpoint that uses up quota', [1, 0]
     end
+
+    context 'when the API says the tenant is not an Education tenant' do
+      let(:http_method) { :get }
+      let(:status) { 400 }
+      let(:response) do
+        {
+          status: 400,
+          body:  "{\"error\":{\"code\":\"Request_UnsupportedQuery\",\"message\":\"Property 'extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType' does not exist as a declared property or extension property.\"}"
+        }
+      end
+
+      it 'raises a graceful cancel NotEducationTenant error' do
+        klass = MicrosoftSync::Errors::NotEducationTenant
+        msg =  /not an Education tenant, so cannot be used/
+        expect {
+          service.list_education_classes
+        }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
+      end
+    end
   end
 
   describe '#create_education_class' do
@@ -739,6 +758,11 @@ describe MicrosoftSync::GraphService do
       {id: id, status: 400, body: {error: {code:"Request_BadRequest", message: msg}}}
     end
 
+    def last_owner_removed(id)
+      msg = "The group must have at least one owner, hence this owner cannot be removed."
+      {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: msg}}}
+    end
+
     context 'when all are successfully removed' do
       let(:batch_responses) do
         [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
@@ -793,6 +817,18 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    context 'when the last owner in a group is removed' do
+      let(:batch_responses) do
+        [succ('members_m1'), succ('members_m2'), last_owner_removed('owners_o1'), succ('owners_o2')]
+      end
+
+      it 'raises an MissingOwners' do
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(
+          MicrosoftSync::Errors::MissingOwners, /must have owners/
+        )
+      end
+    end
+
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
@@ -807,6 +843,7 @@ describe MicrosoftSync::GraphService do
       let(:endpoint_name) { 'group_remove_users' }
       let(:ignored_members_m1_response) { missing('members_m1') }
     end
+
   end
 
   describe '#team_exists?' do

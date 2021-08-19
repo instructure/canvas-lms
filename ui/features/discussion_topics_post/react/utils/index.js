@@ -50,17 +50,27 @@ export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
   return `/courses/${courseId}/assignments/${assignmentId}/submissions/${revieweeId}`
 }
 
-export const updateDiscussionTopicRepliesCount = (cache, discussionTopicGraphQLId) => {
+export const updateDiscussionTopicEntryCounts = (
+  cache,
+  discussionTopicGraphQLId,
+  entryCountChange
+) => {
   const options = {
     id: discussionTopicGraphQLId,
     fragment: Discussion.fragment,
     fragmentName: 'Discussion'
   }
+
   const data = JSON.parse(JSON.stringify(cache.readFragment(options)))
-
   if (data) {
-    data.entryCounts.repliesCount += 1
-
+    if (entryCountChange?.unreadCountChange) {
+      const newUnreadCount = entryCountChange.unreadCountChange + data.entryCounts.unreadCount
+      data.entryCounts.unreadCount = newUnreadCount < 0 ? 0 : newUnreadCount
+    }
+    if (entryCountChange?.repliesCountChange) {
+      const newRepliesCount = entryCountChange.repliesCountChange + data.entryCounts.repliesCount
+      data.entryCounts.repliesCount = newRepliesCount < 0 ? 0 : newRepliesCount
+    }
     cache.writeFragment({
       ...options,
       data
@@ -140,4 +150,8 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
     querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
   }
   return querySizes
+}
+
+export const isTopicAuthor = (topicAuthor, entryAuthor) => {
+  return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
 }

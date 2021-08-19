@@ -35,7 +35,7 @@ import {
   IconMoreLine,
   IconNoSolid,
   IconPeerReviewLine,
-  // IconRubricSolid,
+  IconRubricSolid,
   IconSpeedGraderSolid,
   IconTrashLine,
   IconUnlockLine,
@@ -206,22 +206,14 @@ const getMenuConfigs = props => {
       selectionCallback: props.onOpenSpeedgrader
     })
   }
-  /* if (false && props.onShowRubric && !props.onAddRubric) {
+  if (props.addRubric || props.showRubric) {
     options.push({
       key: 'rubric',
       icon: <IconRubricSolid />,
-      label: I18n.t('Show Rubric'),
-      selectionCallback: props.onShowRubric
+      label: props.addRubric ? I18n.t('Add Rubric') : I18n.t('Show Rubric'),
+      selectionCallback: props.onDisplayRubric
     })
   }
-  if (props.onAddRubric) {
-    options.push({
-      key: 'rubric',
-      icon: <IconRubricSolid />,
-      label: I18n.t('Add Rubric'),
-      selectionCallback: props.onAddRubric
-    })
-  } */
   if (props.canManageContent && ENV.discussion_topic_menu_tools?.length > 0) {
     ENV.discussion_topic_menu_tools.forEach(tool => {
       options.push({

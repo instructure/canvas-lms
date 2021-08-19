@@ -201,6 +201,14 @@ module K5DashboardPageObject
     "//*[@aria-label = '#{subject_course_title}']//*[text() = 'Nothing due today']"
   end
 
+  def observed_student_label_selector
+    "[data-testid='observed-student-label']"
+  end
+
+  def observed_student_dropdown_selector
+    "[data-testid='observed-student-dropdown']"
+  end
+
   def pink_color_button_selector
     "//button[contains(@id,'DF6B91')]"
   end
@@ -415,6 +423,14 @@ module K5DashboardPageObject
     fxpath(nothing_due_selector(subject_course_title))
   end
 
+  def observed_student_label
+    f(observed_student_label_selector)
+  end
+
+  def observed_student_dropdown
+    f(observed_student_dropdown_selector)
+  end
+
   def pink_color_button
     fxpath(pink_color_button_selector)
   end
@@ -518,6 +534,10 @@ module K5DashboardPageObject
 
   def click_new_course_create
     new_course_modal_create.click
+  end
+
+  def click_observed_student_option(student_name)
+    click_option(observed_student_dropdown_selector, student_name)
   end
 
   def click_pink_color_button

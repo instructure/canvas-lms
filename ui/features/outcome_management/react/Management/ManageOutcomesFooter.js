@@ -25,7 +25,13 @@ import I18n from 'i18n!OutcomeManagement'
 import OutcomesPopover from './OutcomesPopover'
 import {outcomeShape} from './shapes'
 
-const ManageOutcomesFooter = ({selected, selectedCount, onRemoveHandler, onMoveHandler}) => {
+const ManageOutcomesFooter = ({
+  selected,
+  selectedCount,
+  onRemoveHandler,
+  onMoveHandler,
+  onClearHandler
+}) => {
   const btnState = selectedCount > 0 ? 'enabled' : 'disabled'
 
   return (
@@ -49,7 +55,11 @@ const ManageOutcomesFooter = ({selected, selectedCount, onRemoveHandler, onMoveH
               </Flex.Item>
               <Flex.Item as="div">
                 <div style={{paddingLeft: '1.1875rem'}}>
-                  <OutcomesPopover outcomes={selected} outcomeCount={selectedCount} />
+                  <OutcomesPopover
+                    outcomes={selected}
+                    outcomeCount={selectedCount}
+                    onClearHandler={onClearHandler}
+                  />
                 </div>
               </Flex.Item>
             </Flex>
@@ -82,7 +92,8 @@ ManageOutcomesFooter.propTypes = {
   selected: PropTypes.objectOf(outcomeShape).isRequired,
   selectedCount: PropTypes.number.isRequired,
   onRemoveHandler: PropTypes.func.isRequired,
-  onMoveHandler: PropTypes.func.isRequired
+  onMoveHandler: PropTypes.func.isRequired,
+  onClearHandler: PropTypes.func.isRequired
 }
 
 export default ManageOutcomesFooter

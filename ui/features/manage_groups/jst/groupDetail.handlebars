@@ -34,6 +34,8 @@
         <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
         {{#if canEdit}}
           <li><a role="button" href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
+        {{/if}}
+        {{#if canDelete}}
           <li><a role="button" href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
         {{/if}}
       </ul>

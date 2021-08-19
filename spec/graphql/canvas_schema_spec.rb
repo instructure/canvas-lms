@@ -36,7 +36,8 @@ describe CanvasSchema do
       }
     GQL
   end
-  let(:variables) { {representations: [{ __typename: 'Course', id: @course.id.to_s }]} }
+  let(:course_gql_id) { GraphQL::Schema::UniqueWithinType.encode("Course", @course.id) }
+  let(:variables) { {representations: [{ __typename: 'Course', id: course_gql_id }]} }
   let(:gql_context) { {current_user: @student} }
 
   let(:all_courses_query) do

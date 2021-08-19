@@ -224,7 +224,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
   return (
     <BaseUploadTool
       renderFooter={footerContents}
-      icon=<IconFolderLine size="medium" color="brand" />
+      icon={<IconFolderLine size="medium" color="brand" />}
       label={I18n.t('Files')}
     >
       {() => contents}
@@ -270,7 +270,7 @@ function WebcamPhotoUpload({onPhotoTaken}) {
   return (
     <BaseUploadTool
       hideFooter
-      icon=<Img alt={I18n.t('Take a Photo via Webcam')} src={TakePhotoUrl} {...iconDimensions} />
+      icon={<Img alt={I18n.t('Take a Photo via Webcam')} src={TakePhotoUrl} {...iconDimensions} />}
       label={I18n.t('Webcam')}
       title={I18n.t('Take a Photo via Webcam')}
     >

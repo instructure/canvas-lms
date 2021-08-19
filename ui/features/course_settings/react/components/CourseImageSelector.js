@@ -69,40 +69,42 @@ export default class CourseImageSelector extends React.Component {
 
   render() {
     return (
-      <div>
-        <div
-          className={`CourseImageSelector ${this.props.wide ? 'wide' : ''}`}
-          style={this.state.imageUrl ? {backgroundImage: `url(${this.state.imageUrl})`} : {}}
-        >
-          {this.state.gettingImage || this.state.removingImage ? (
-            <div className="CourseImageSelector__Overlay">
-              <Spinner renderTitle="Loading" size="small" />
-            </div>
-          ) : this.state.imageUrl ? (
-            <Menu
-              trigger={
-                <div className="CourseImageSelector__Button">
-                  <Button
-                    size="small"
-                    variant="circle-primary"
-                    label={I18n.t('Course image settings')}
-                    aria-label={I18n.t('Course image settings')}
-                  >
-                    <IconMoreLine />
-                  </Button>
-                </div>
-              }
-            >
-              <Menu.Item onClick={this.changeImage}>
-                <IconEditLine /> {I18n.t('Choose image')}
-              </Menu.Item>
-              <Menu.Item onClick={this.removeImage}>
-                <IconTrashLine /> {I18n.t('Remove image')}
-              </Menu.Item>
-            </Menu>
-          ) : (
-            <Button onClick={this.changeImage}>{I18n.t('Choose Image')}</Button>
-          )}
+      <div className={`CourseImageSelectorWrapper ${this.props.wide ? 'wide' : ''}`}>
+        <div className="CourseImageSelectorContent">
+          <div
+            className="CourseImageSelector"
+            style={this.state.imageUrl ? {backgroundImage: `url(${this.state.imageUrl})`} : {}}
+          >
+            {this.state.gettingImage || this.state.removingImage ? (
+              <div className="CourseImageSelector__Overlay">
+                <Spinner renderTitle="Loading" size="small" />
+              </div>
+            ) : this.state.imageUrl ? (
+              <Menu
+                trigger={
+                  <div className="CourseImageSelector__Button">
+                    <Button
+                      size="small"
+                      variant="circle-primary"
+                      label={I18n.t('Course image settings')}
+                      aria-label={I18n.t('Course image settings')}
+                    >
+                      <IconMoreLine />
+                    </Button>
+                  </div>
+                }
+              >
+                <Menu.Item onClick={this.changeImage}>
+                  <IconEditLine /> {I18n.t('Choose image')}
+                </Menu.Item>
+                <Menu.Item onClick={this.removeImage}>
+                  <IconTrashLine /> {I18n.t('Remove image')}
+                </Menu.Item>
+              </Menu>
+            ) : (
+              <Button onClick={this.changeImage}>{I18n.t('Choose Image')}</Button>
+            )}
+          </div>
         </div>
         <Modal
           open={this.state.showModal}

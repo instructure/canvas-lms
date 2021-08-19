@@ -62,11 +62,7 @@ export function DeletedPostMessage({...props}) {
               </span>
             </Tooltip>
           </Flex.Item>
-          {props.children && (
-            <Flex.Item margin="small 0 0 0" overflowY="hidden">
-              {props.children}
-            </Flex.Item>
-          )}
+          {props.children && <Flex.Item overflowY="hidden">{props.children}</Flex.Item>}
         </Flex>
       )}
     />

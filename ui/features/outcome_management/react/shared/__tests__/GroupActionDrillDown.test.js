@@ -20,14 +20,14 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
+import {ACCOUNT_FOLDER_ID, ROOT_ID} from '@canvas/outcomes/react/treeBrowser'
 
 describe('GroupActionDrillDown', () => {
   let onCollectionClick, showFlashAlertSpy, setShowOutcomesView
 
   const collections = {
-    0: {
-      id: '0',
+    [ROOT_ID]: {
+      id: ROOT_ID,
       name: 'Root folder',
       collections: [ACCOUNT_FOLDER_ID, '2'],
       parentGroupId: null
@@ -36,13 +36,13 @@ describe('GroupActionDrillDown', () => {
       id: ACCOUNT_FOLDER_ID,
       name: 'Account folder',
       collections: ['100', '101'],
-      parentGroupId: '0'
+      parentGroupId: ROOT_ID
     },
     2: {
       id: '2',
       name: 'State folder',
       collections: [],
-      parentGroupId: '0'
+      parentGroupId: ROOT_ID
     },
     100: {
       id: '100',
@@ -66,6 +66,7 @@ describe('GroupActionDrillDown', () => {
     setShowOutcomesView,
     isLoadingGroupDetail: false,
     outcomesCount: 2,
+    showActionLinkForRoot: false,
     ...props
   })
 
@@ -132,11 +133,29 @@ describe('GroupActionDrillDown', () => {
   })
 
   describe('action links', () => {
-    it('does not render an action link for the account folder', () => {
+    it('does not render an action link for the folder with an id of ACCOUNT_FOLDER_ID', () => {
       const {queryByText, getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('Account folder'))
       expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+    })
+
+    describe('showActionLinkForRoot', () => {
+      it('renders an action link for the root if true', () => {
+        const {getByText} = render(
+          <GroupActionDrillDown {...defaultProps({showActionLinkForRoot: true, rootId: '2'})} />
+        )
+        fireEvent.click(getByText('Groups'))
+        expect(getByText('View 2 Outcomes')).toBeInTheDocument()
+      })
+
+      it('does not render an action link for the root if false', () => {
+        const {getByText, queryByText} = render(
+          <GroupActionDrillDown {...defaultProps({rootId: '2'})} />
+        )
+        fireEvent.click(getByText('Groups'))
+        expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+      })
     })
 
     it('does not render an action link until a group is clicked', () => {

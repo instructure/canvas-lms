@@ -83,11 +83,6 @@
 #            "example": true,
 #            "type": "boolean"
 #          },
-#         "development": {
-#           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
-#           "example": false,
-#           "type": "boolean"
-#         },
 #         "release_notes_url": {
 #           "description": "A URL to the release notes describing the feature",
 #           "example": "http://canvas.example.com/release_notes#fancy_wickets",
@@ -161,7 +156,7 @@ class FeatureFlagsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :features])
-      features = Feature.applicable_features(@context)
+      features = Feature.applicable_features(@context, type: params[:type])
       features = Api.paginate(features, self, route)
 
       skip_cache = @context.grants_right?(@current_user, session, :manage_feature_flags)

@@ -58,6 +58,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
+import ObserverOptions from '@canvas/k5/react/ObserverOptions'
 
 const DASHBOARD_TABS = [
   {
@@ -125,7 +126,7 @@ export const K5Dashboard = ({
   assignmentsMissing,
   assignmentsCompletedForToday,
   createPermissions,
-  currentUser: {display_name},
+  currentUser,
   currentUserRoles,
   loadingOpportunities,
   loadAllOpportunities,
@@ -136,7 +137,8 @@ export const K5Dashboard = ({
   hideGradesTabForStudents = false,
   showImportantDates,
   selectedContextCodes,
-  selectedContextsLimit
+  selectedContextsLimit,
+  parentSupportEnabled
 }) => {
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
@@ -147,6 +149,7 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
+  const [observedUserId, setObservedUserId] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -225,7 +228,7 @@ export const K5Dashboard = ({
       <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
         <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
           <Heading as="h1" level={sticky ? 'h2' : 'h1'}>
-            {I18n.t('Welcome, %{name}!', {name: display_name})}
+            {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
           </Heading>
         </Flex.Item>
         {useImportantDatesTray && showImportantDates && (
@@ -262,6 +265,13 @@ export const K5Dashboard = ({
     <>
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
+          {parentSupportEnabled && (
+            <ObserverOptions
+              currentUser={currentUser}
+              currentUserRoles={currentUserRoles}
+              handleChangeObservedUser={setObservedUserId}
+            />
+          )}
           <K5DashboardContext.Provider
             value={{
               assignmentsDueToday,
@@ -345,7 +355,9 @@ K5Dashboard.propTypes = {
   assignmentsCompletedForToday: PropTypes.object.isRequired,
   createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   currentUser: PropTypes.shape({
-    display_name: PropTypes.string
+    id: PropTypes.string,
+    display_name: PropTypes.string,
+    avatar_image_url: PropTypes.string
   }).isRequired,
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
   loadingOpportunities: PropTypes.bool.isRequired,
@@ -357,7 +369,8 @@ K5Dashboard.propTypes = {
   hideGradesTabForStudents: PropTypes.bool,
   showImportantDates: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
-  selectedContextsLimit: PropTypes.number.isRequired
+  selectedContextsLimit: PropTypes.number.isRequired,
+  parentSupportEnabled: PropTypes.bool.isRequired
 }
 
 const mapDispatchToProps = {

@@ -18,6 +18,7 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import MentionDropdownMenu from '../MentionDropdownMenu'
+import {ARIA_ID_TEMPLATES} from '../../../constants'
 
 const MentionMockUsers = [
   {
@@ -76,5 +77,14 @@ describe('MentionDropdownMenu tests', () => {
     })
     const menuComponent = container.querySelector('.mention-dropdown-menu')
     expect(menuComponent).toBeTruthy()
+  })
+
+  it('should call ARIA template for the Popup menu', () => {
+    const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
+    setup({
+      show: true
+    })
+    expect(spy).toHaveBeenCalled()
+    expect(spy.mock.calls.length).toBe(2)
   })
 })

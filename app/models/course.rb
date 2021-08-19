@@ -236,6 +236,8 @@ class Course < ActiveRecord::Base
 
   has_many :comment_bank_items, inverse_of: :course
 
+  has_many :pace_plans
+
   prepend Profile::Association
 
   before_save :assign_uuid
@@ -2585,7 +2587,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course, :course_color
+      :homeroom_course, :course_color, :alt_name
     ]
   end
 
@@ -3140,8 +3142,8 @@ class Course < ActiveRecord::Base
         member_only_tabs = tabs.select{ |t| t[:visibility] == 'members' }
         tabs -= member_only_tabs if member_only_tabs.present? && !check_for_permission.call(:participate_as_student, :read_as_admin)
 
-        delete_unless.call([TAB_ASSIGNMENTS, TAB_QUIZZES], :read, :manage_content, :manage_assignments)
-        delete_unless.call([TAB_SYLLABUS], :read, :read_syllabus, :manage_content, :manage_assignments)
+        delete_unless.call([TAB_ASSIGNMENTS, TAB_QUIZZES], :read, :manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        delete_unless.call([TAB_SYLLABUS], :read, :read_syllabus, :manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
         admin_only_tabs = tabs.select{ |t| t[:visibility] == 'admins' }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
@@ -3158,7 +3160,7 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
         delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
-        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, :manage_assignments)
+        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
@@ -3166,9 +3168,9 @@ class Course < ActiveRecord::Base
 
         # remove hidden tabs from students
         additional_checks = {
-          TAB_ASSIGNMENTS => [:manage_content, :manage_assignments],
-          TAB_SYLLABUS => [:manage_content, :manage_assignments],
-          TAB_QUIZZES => [:manage_content, :manage_assignments],
+          TAB_ASSIGNMENTS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
+          TAB_SYLLABUS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
+          TAB_QUIZZES => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_GRADES => [:view_all_grades, :manage_grades],
           TAB_PEOPLE => [:manage_students, :manage_admin_users],
           TAB_FILES => RoleOverride::GRANULAR_FILE_PERMISSIONS,
@@ -3306,9 +3308,12 @@ class Course < ActiveRecord::Base
   add_setting :syllabus_course_summary, :boolean => true, :default => true
   add_setting :syllabus_updated_at
 
+  add_setting :enable_pace_plans, :boolean => true, :default => false
+
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :course_color
+  add_setting :alt_name
 
   def elementary_enabled?
     account.enable_as_k5_account?
@@ -3320,6 +3325,14 @@ class Course < ActiveRecord::Base
 
   def elementary_subject_course?
     !homeroom_course? && elementary_enabled?
+  end
+
+  def friendly_name
+    elementary_enabled? ? alt_name.presence : nil
+  end
+
+  def friendly_name=(name)
+    self.alt_name = name
   end
 
   def lock_all_announcements?
@@ -3660,7 +3673,8 @@ class Course < ActiveRecord::Base
     !!defined?(@preloaded_nickname)
   end
 
-  def nickname_for(user, fallback = :name)
+  def nickname_for(user, fallback = :name, prefer_friendly_name: true)
+    return friendly_name if prefer_friendly_name && friendly_name.present?
     nickname = preloaded_nickname? ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
@@ -3672,7 +3686,7 @@ class Course < ActiveRecord::Base
   end
 
   def apply_nickname_for!(user)
-    @nickname = nickname_for(user, nil)
+    @nickname = user && nickname_for(user, nil)
   end
 
   def self.preload_menu_data_for(courses, user, preload_favorites: false)

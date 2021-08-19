@@ -29,6 +29,11 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
@@ -52,6 +57,16 @@ describe('IsolatedViewContainer', () => {
       },
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
   })
 
   afterEach(() => {
@@ -102,7 +117,7 @@ describe('IsolatedViewContainer', () => {
 
     fireEvent.click(backButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('77', false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('77', '77', false)
   })
 
   it('should go to root reply when clicking Go To Parent', async () => {
@@ -139,7 +154,7 @@ describe('IsolatedViewContainer', () => {
     expect(goToParentButton).toBeInTheDocument()
     fireEvent.click(goToParentButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('70', false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('70', '70', false)
   })
 
   it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
@@ -175,7 +190,7 @@ describe('IsolatedViewContainer', () => {
       graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
         return res(
           ctx.data({
-            legacyNode: DiscussionEntry.mock({parent: null})
+            legacyNode: DiscussionEntry.mock({parentId: null})
           })
         )
       })
@@ -310,7 +325,7 @@ describe('IsolatedViewContainer', () => {
     const viewRepliesButton = await findByText('View Replies')
     fireEvent.click(viewRepliesButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', null, false)
   })
 
   it('calls the onOpenIsolatedView callback when clicking reply', async () => {
@@ -319,7 +334,7 @@ describe('IsolatedViewContainer', () => {
     const replyButton = await findAllByText('Reply')
     fireEvent.click(replyButton[1])
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', true)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', '77', true)
   })
 
   describe('replying', () => {

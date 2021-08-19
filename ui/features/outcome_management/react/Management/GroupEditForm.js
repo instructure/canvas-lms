@@ -31,8 +31,8 @@ import {
   maxLengthValidator,
   requiredValidator
 } from '@canvas/outcomes/react/validators/finalFormValidators'
-import LabeledTextField from '@canvas/outcomes/react/LabeledTextField'
-import LabeledRceField from '@canvas/outcomes/react/LabeledRceField'
+import LabeledTextField from '../shared/LabeledTextField'
+import LabeledRceField from '../shared/LabeledRceField'
 
 const titleValidator = composeValidators(requiredValidator, maxLengthValidator(255))
 

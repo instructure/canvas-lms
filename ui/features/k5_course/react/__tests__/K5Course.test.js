@@ -39,9 +39,7 @@ const currentUser = {
 const defaultEnv = {
   current_user: currentUser,
   K5_USER: true,
-  FEATURES: {
-    unpublished_courses: true
-  },
+  FEATURES: {},
   PREFERENCES: {
     hide_dashcard_color_overlays: false
   },
@@ -95,7 +93,7 @@ const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
 )
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
 
@@ -352,9 +350,7 @@ describe('K-5 Subject Course', () => {
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://address/to/hw.pdf')
       expect(
-        getByText(
-          `Posted on ${tz.format('2021-05-14T17:06:21-06:00', 'date.formats.full_with_weekday')}`
-        )
+        getByText(tz.format('2021-05-14T17:06:21-06:00', 'date.formats.date_at_time'))
       ).toBeInTheDocument()
     })
 

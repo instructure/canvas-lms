@@ -38,31 +38,6 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFeatureStates, setSelectedFeatureStates] = useState([])
 
-  useFetchApi({
-    success: setFeatures,
-    loading: setLoading,
-    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features`,
-    fetchAllPages: true,
-    params: {
-      hide_inherited_enabled: true,
-      per_page: 50
-    }
-  })
-
-  const groupedFeatures = groupBy(
-    features.filter(
-      feat =>
-        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
-        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
-    ),
-    'applies_to'
-  )
-  if (groupedFeatures.Account || groupedFeatures.RootAccount) {
-    groupedFeatures.Account = (groupedFeatures.Account || []).concat(
-      groupedFeatures.RootAccount || []
-    )
-  }
   const categories = [
     {
       id: 'SiteAdmin',
@@ -79,8 +54,68 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     {
       id: 'User',
       title: I18n.t('User')
+    },
+    {
+      id: 'feature_option',
+      title: I18n.t('Feature Option')
+    },
+    {
+      id: 'setting',
+      title: I18n.t('Setting')
     }
   ]
+
+  useFetchApi({
+    success: setFeatures,
+    loading: setLoading,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features`,
+    fetchAllPages: true,
+    params: {
+      hide_inherited_enabled: true,
+      per_page: 50
+    }
+  })
+
+  let groupedFeatures = {}
+
+  if (ENV.FEATURES?.feature_flag_filters) {
+    groupedFeatures = features.reduce((accum, feat) => {
+      if (
+        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
+        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
+      ) {
+        let {applies_to} = feat
+        if (applies_to === 'RootAccount') {
+          applies_to = 'Account'
+        }
+        accum[feat.type] = accum[feat.type] || {}
+        for (const category of categories) {
+          accum[feat.type][category.title] = accum[feat.type][category.title] || []
+          if (category.id === applies_to) {
+            accum[feat.type][category.title] = accum[feat.type][category.title].concat(feat)
+          }
+        }
+      }
+      return accum
+    }, {})
+  } else {
+    groupedFeatures = groupBy(
+      features.filter(
+        feat =>
+          (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
+          feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
+      ),
+      'applies_to'
+    )
+
+    if (groupedFeatures.Account || groupedFeatures.RootAccount) {
+      groupedFeatures.Account = (groupedFeatures.Account || []).concat(
+        groupedFeatures.RootAccount || []
+      )
+    }
+  }
 
   const handleQueryChange = debounce(setSearchQuery, SEARCH_DELAY, {
     leading: false,
@@ -124,7 +159,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
           </Flex>
 
           {categories.map(cat => {
-            if (!groupedFeatures[cat.id]?.length) {
+            if (!groupedFeatures[cat.id] || !Object.keys(groupedFeatures[cat.id]).length) {
               return null
             }
             return (
@@ -133,6 +168,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
                 title={cat.title}
                 rows={groupedFeatures[cat.id]}
                 disableDefaults={disableDefaults}
+                showTitle={Object.keys(groupedFeatures[cat.id]).length > 0}
               />
             )
           })}

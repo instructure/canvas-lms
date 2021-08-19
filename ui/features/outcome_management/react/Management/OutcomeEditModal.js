@@ -30,7 +30,6 @@ import {Mask} from '@instructure/ui-overlays'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
-import useRCE from '../hooks/useRCE'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {titleValidator, displayNameValidator} from '../../validators/outcomeValidators'
 import {
@@ -39,16 +38,16 @@ import {
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
+import OutcomesRceField from '../shared/OutcomesRceField'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
   const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(
     outcome.displayName || ''
   )
-  const [description] = useInput(outcome.description || '')
+  const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
     useInput(outcome.friendlyDescription?.description || '')
-  const [setRCERef, getRCECode] = useRCE()
   const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
@@ -78,14 +77,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
 
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
-      const descriptionRCE = getRCECode()
-
       try {
         const promises = []
         if (
           (title && titleChanged) ||
           (displayName && displayNameChanged) ||
-          (descriptionRCE && descriptionRCE !== description)
+          (description && descriptionChanged)
         ) {
           promises.push(
             updateLearningOutcomeMutation({
@@ -94,7 +91,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
                   id: outcome._id,
                   title,
                   displayName,
-                  description: descriptionRCE
+                  description
                 }
               }
             })
@@ -191,15 +188,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
           </Flex>
           <View as="div" padding="small 0">
             {attributesEditable.description ? (
-              <TextArea
-                size="medium"
-                defaultValue={description}
-                label={I18n.t('Description')}
-                textareaRef={setRCERef}
-                data-testid="description-input"
-              />
+              <>
+                <Text weight="bold">{I18n.t('Description')}</Text> <br />
+                <OutcomesRceField onChangeHandler={setDescription} defaultContent={description} />
+              </>
             ) : (
-              <View as="div">
+              <View as="div" data-testid="readonly-description">
                 <Text weight="bold">{I18n.t('Description')}</Text> <br />
                 <View as="div" margin="small 0 0">
                   <Text as="p" dangerouslySetInnerHTML={{__html: outcome.description}} />

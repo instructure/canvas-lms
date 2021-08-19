@@ -48,12 +48,14 @@ export default function RceFileBrowser(props) {
   }, [source])
 
   function handleFileSelect(fileInfo) {
-    const content_type = fileInfo.api['content-type']
+    const content_type = fileInfo.api.type
     const canPreview = isPreviewable(content_type)
+
     const clazz = classnames('instructure_file_link', {
       instructure_scribd_file: canPreview,
       inline_disabled: true
     })
+
     const url = downloadToWrap(fileInfo.src)
     const embedded_iframe_url = mediaPlayerURLFromFile(fileInfo.api)
 
@@ -62,7 +64,7 @@ export default function RceFileBrowser(props) {
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
-      media_id: fileInfo.api.media_entry_id,
+      media_id: fileInfo.api.embed?.id,
       target: '_blank',
       class: clazz,
       content_type

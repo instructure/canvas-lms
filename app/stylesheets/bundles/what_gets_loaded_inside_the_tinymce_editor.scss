@@ -27,11 +27,23 @@ body {
   margin: 0;
 }
 
-body.elementary-theme {
+body.elementary-theme,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Balsamiq Sans', $ic-font-family;
 }
 
-body.default-theme {
+body.default-theme,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: inherit;
 }
 
@@ -104,8 +116,8 @@ iframe[data-media-id] {
 /* TinyMCE noneditable plugin overrides for discussion mentions */
 .mceNonEditable.mention {
   cursor: default;
-  background:rgba(102, 24, 157, 0.1);
-  color: #66189D;
+  background: rgba(102, 24, 157, 0.1);
+  color: #66189d;
   border-radius: 0.25rem;
   padding: 0.125rem;
   height: 1.5rem;

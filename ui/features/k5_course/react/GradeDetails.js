@@ -77,7 +77,7 @@ const GradeDetails = ({
     forceResult: loadingGradingPeriods ? [] : undefined,
     fetchAllPages: true,
     params: {
-      include: ['assignments', 'submission', 'read_state'],
+      include: ['assignments', 'submission', 'read_state', 'submission_comments'],
       ...gradingPeriodParam
     }
   })
@@ -206,7 +206,7 @@ const GradeDetails = ({
         renderLoadedContainer={gradesDetailsTable}
       >
         {grades.map(assignment => (
-          <GradeRow key={assignment.id} {...assignment} />
+          <GradeRow key={assignment.id} currentUserId={currentUser.id} {...assignment} />
         ))}
       </LoadingWrapper>
     </>

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": true, // allows importing of .js files from .ts files
+    "esModuleInterop": true, // more accurately transpiles to the ES6 module spec (maybe not needed w/ babel transpilation)
+    "isolatedModules": true, // required to adhere to babel's single-file transpilation process
+    "jsx": "react", // transpiles jsx to React.createElement calls (maybe not needed w/ babel transpilation)
+    "module": "ES2020", // support the most modern ES6-style module syntax
+    "moduleResolution": "node", // required for non-commonjs imports
+    "resolveJsonModule": true, // enables importing json files
+    "strict": true, // enables a bunch of strict mode family options. See https://www.typescriptlang.org/tsconfig#strict
+    "target": "ES2020" // support the most modern JS features (let babel handle transpilation)
+  },
+  "include": ["ui/**/*"]
+}

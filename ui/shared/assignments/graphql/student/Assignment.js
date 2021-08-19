@@ -19,6 +19,7 @@ import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 
 import {AssignmentGroup} from './AssignmentGroup'
+import {GroupSet} from './GroupSet'
 import {LockInfo} from './LockInfo'
 import {Module} from './Module'
 import {Submission} from './Submission'
@@ -38,6 +39,10 @@ export const Assignment = {
       dueAt
       expectsSubmission
       gradingType
+      gradeGroupStudentsIndividually
+      groupSet {
+        ...GroupSet
+      }
       lockAt
       lockInfo {
         ...LockInfo
@@ -52,6 +57,7 @@ export const Assignment = {
       unlockAt
     }
     ${AssignmentGroup.fragment}
+    ${GroupSet.fragment}
     ${LockInfo.fragment}
     ${Module.fragment}
   `,
@@ -65,6 +71,8 @@ export const Assignment = {
     dueAt: string,
     expectsSubmission: bool.isRequired,
     gradingType: string,
+    gradeGroupStudentsIndividually: bool,
+    groupSet: GroupSet.shape,
     lockAt: string,
     lockInfo: LockInfo.shape,
     modules: arrayOf(Module.shape),

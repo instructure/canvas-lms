@@ -19,26 +19,32 @@
 .CourseImageSelector {
   box-sizing: border-box;
   border: 1px solid $ic-border-dark;
-  position: relative;
+  position: absolute;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  margin-bottom: $ic-sp;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  width: 100%;
+}
 
+.CourseImageSelectorWrapper{
+  position: relative;
+  margin-bottom: $ic-sp;
   &:not(.wide) {
     height: 146px;
     width: 262px;
   }
   &.wide {
-    aspect-ratio: 5/1;
-    height: auto;
     max-width: 562px;
+    & > .CourseImageSelectorContent{
+      // this gives the element a height of 20% of the width of its parent
+      padding-bottom: 20%;
+    }
   }
 }
-
 .CourseImageSelector__Overlay {
   height: 100%;
   width: 100%;

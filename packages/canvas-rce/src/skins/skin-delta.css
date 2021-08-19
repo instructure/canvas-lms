@@ -58,6 +58,10 @@
   .tox-tinymce-aux {
     font-family: var(--canvasFontFamily);
   }
+  /* z-index must be greater than the InstUI Modal/Tray ones */
+  .tox.tox-tinymce-aux {
+    z-index: 10000;
+  }
   .tox .tox-button {
     background-color: var(--canvasPrimaryButtonBackground);
     font-family: var(--canvasFontFamily);

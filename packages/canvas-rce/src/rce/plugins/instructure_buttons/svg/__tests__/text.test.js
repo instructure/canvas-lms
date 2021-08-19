@@ -32,7 +32,9 @@ describe('buildText()', () => {
     expect(buildText({...settings})).toMatchInlineSnapshot(`
       <text
         fill=""
+        font-family="Lato Extended"
         font-size="14"
+        font-weight="bold"
         x="55"
         y="68"
       >
@@ -52,7 +54,9 @@ describe('buildText()', () => {
     expect(buildText({...settings, text})).toMatchInlineSnapshot(`
       <text
         fill=""
+        font-family="Lato Extended"
         font-size="14"
+        font-weight="bold"
         x="47"
         y="68"
       >
@@ -103,7 +107,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'small'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -121,7 +127,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'medium'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="16"
+          font-weight="bold"
           x="55"
           y="69"
         >
@@ -139,7 +147,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'large'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="22"
+          font-weight="bold"
           x="55"
           y="72"
         >
@@ -157,7 +167,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textSize: 'x-large'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="28"
+          font-weight="bold"
           x="55"
           y="75"
         >
@@ -177,7 +189,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textColor: null})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -195,7 +209,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textColor: '#f00'})).toMatchInlineSnapshot(`
         <text
           fill="#f00"
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -215,7 +231,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textBackgroundColor: null})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -233,7 +251,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textBackgroundColor: '#f00'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -253,7 +273,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="68"
         >
@@ -271,7 +293,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'bottom-third'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="125"
         >
@@ -289,7 +313,9 @@ describe('buildText()', () => {
       expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="55"
           y="144"
         >
@@ -313,7 +339,7 @@ describe('buildTextBackground()', () => {
   it('builds <path /> if text is valid', () => {
     expect(buildTextBackground({...settings, text: 'Hello World!'})).toMatchInlineSnapshot(`
       <path
-        d="M55,52 h12 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-12 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z"
+        d="M55,52 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
         fill=""
       />
     `)
@@ -345,7 +371,7 @@ describe('getContainerWidth()', () => {
         })
       })
     })
-    expect(getContainerWidth({...settings, text: 'This is a long text for testing'})).toBe(123)
+    expect(getContainerWidth({...settings, text: 'This is a long text for testing'})).toBe(125)
     document.createElement.reset()
   })
 })

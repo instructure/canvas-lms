@@ -349,6 +349,24 @@ module ActiveRecord
           union_where = wheres.detect{|w| w.is_a?(String) && w.include?("UNION ALL")}
           expect(union_where).not_to include('"id" = 99')
         end
+
+        it "ignores null scopes" do
+          s1 = Assignment.all
+          s2 = Assignment.all.none
+          expect(s1.union(s2)).to be s1
+        end
+
+        it "just returns self if everything is null scope" do
+          s1 = Assignment.all.none
+          s2 = Assignment.all.none
+          expect(s1).not_to be s2
+          expect(s1.union(s2)).to be s1
+        end
+
+        it "serializes to valid SQL with selects, limits, and orders" do
+          s = Assignment.select(:updated_at).order(updated_at: :desc).limit(1)
+          s.union(s)
+        end
       end
 
       context "directly on the table" do

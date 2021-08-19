@@ -61,28 +61,30 @@
             <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account : "{{ account_id }}"), :class => 'account_name') %>
           </td>
           <td class='details'>
-            <table class="ic-Table--condensed">
-              <tr class='login_details'>
-                <td scope="row"><%= before_label('last_request', 'Last request') %></td>
-                <td><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></td>
-              </tr>
-              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('current_login', 'Current login') %></td>
-                <td><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></td>
-              </tr>
-              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('current_ip', 'Current login IP') %></td>
-                <td><%= pseudonym.try(:current_login_ip) || t('none', "none") %></td>
-              </tr>
-              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('last_login', 'Last login') %></td>
-                <td><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></td>
-              </tr>
-              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('last_ip', 'Last login IP') %></td>
-                <td><%= pseudonym.try(:last_login_ip) || t('none', "none") %></td>
-              </tr>
-            </table>
+
+            <ul class="login_details_list">
+              <li class='login_details'>
+                <span class="login_details_label"><%= before_label('last_request', 'Last request') %></span>
+                <span class="login_details_value"><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></span>
+              </li>
+              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <span class="login_details_label"><%= before_label('current_login', 'Current login') %></span>
+                <span class="login_details_value"><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></span>
+              </li>
+              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <span class="login_details_label"><%= before_label('current_ip', 'Current login IP') %></span>
+                <span class="login_details_value"><%= pseudonym.try(:current_login_ip) || t('none', "none") %></span>
+              </li>
+              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <span class="login_details_label"><%= before_label('last_login', 'Last login') %></span>
+                <span class="login_details_value"><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></span>
+              </li>
+              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <span class="login_details_label"><%= before_label('last_ip', 'Last login IP') %></span>
+                <span class="login_details_value"><%= pseudonym.try(:last_login_ip) || t('none', "none") %></span>
+              </li>
+            </ul>
+
             <% if pseudonyms.length > 1 || !pseudonym %>
               <a href="#" class="login_details_link"><%= t('more', 'more...') %></a>
             <% end %>

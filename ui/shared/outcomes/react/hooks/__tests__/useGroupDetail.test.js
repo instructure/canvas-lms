@@ -20,7 +20,7 @@ import React from 'react'
 import useGroupDetail from '../useGroupDetail'
 import {createCache} from '@canvas/apollo'
 import {renderHook, act} from '@testing-library/react-hooks'
-import {groupDetailMocks} from '../../../mocks/Management'
+import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
 import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -75,6 +75,25 @@ describe('groupDetailHook', () => {
       'Outcome 4 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  it('should move the outcomes to correct order when loading the same outcome', async () => {
+    mocks = groupDetailMocksFetchMore()
+    const {result} = renderHook(() => useGroupDetail({id: '1'}), {
+      wrapper
+    })
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+      'Outcome 1 - Group 1',
+      'Outcome 2 - Group 1'
+    ])
+    act(() => result.current.loadMore())
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+      'Outcome 2 - Group 1',
+      'New Outcome 1 - Group 1',
+      'Outcome 3 - Group 1'
+    ])
   })
 
   it("should flash an error message and return the error when coudn't load by default", async () => {
@@ -188,7 +207,7 @@ describe('groupDetailHook', () => {
 
     expect(result.current.group.outcomesCount).toBe(1)
     expect(contentTags.length).toBe(1)
-    expect(contentTags[0].id).toBe('2')
+    expect(contentTags[0]._id).toBe('2')
   })
 
   it('if searching, should remove outcomes from not searching cache', async () => {

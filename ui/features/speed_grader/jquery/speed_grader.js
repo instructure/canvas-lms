@@ -37,6 +37,7 @@ import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
+import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
 import {isGraded, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import studentViewedAtTemplate from '../jst/student_viewed_at.handlebars'
 import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
@@ -103,6 +104,7 @@ const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
+const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -1135,6 +1137,33 @@ function allowsReassignment(submission) {
   )
 }
 
+function styleSubmissionStatusPills() {
+  // Once we are ready to remove the flag for
+  // edit_submission_status_from_speedgrader, we should:
+  //
+  // 1. remove this function
+  // 2. add the following styling to speed_grader.scss:
+
+  // .submission-late-pill,
+  // .submission-missing-pill {
+  //   font-size: 1rem;
+  //   padding-left: 10px;
+  //   padding-right: 10px;
+  //   display: 'flex';
+  //   justifyContent: 'flex-end';
+  //   flex: '1';
+  // }
+
+  const pillMountPoints = document.querySelectorAll(
+    '.submission-missing-pill, .submission-late-pill'
+  )
+  pillMountPoints.forEach(mountPoint => {
+    mountPoint.style.display = 'flex'
+    mountPoint.style.justifyContent = 'flex-end'
+    mountPoint.style.flex = '1'
+  })
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -1992,6 +2021,21 @@ EG = {
       submission =
         submissionHistory[currentSelectedIndex].submission ||
         submissionHistory[currentSelectedIndex]
+    }
+
+    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
+    if (mountPoint) {
+      styleSubmissionStatusPills()
+      ReactDOM.render(
+        <SpeedGraderStatusMenu
+          lateSubmissionInterval="day"
+          locale="en"
+          secondsLate={0}
+          selection="late"
+          updateSubmission={() => {}}
+        />,
+        mountPoint
+      )
     }
 
     const turnitinEnabled =

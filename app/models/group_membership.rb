@@ -224,13 +224,43 @@ class GroupMembership < ActiveRecord::Base
   end
 
   set_policy do
-    # for non-communities, people can be put into groups by users who can manage groups at the context level,
-    # but not moderators (hence :manage_groups)
-    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.can_join?(self.user) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !self.group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+        user && self.user && self.group && !self.group.group_category.try(:communities?) &&
+        (
+          (user == self.user && self.group.grants_right?(user, session, :join)) ||
+            (
+              self.group.can_join?(self.user) && self.group.context &&
+                self.group.context.grants_right?(user, session, :manage_groups)
+            )
+        )
+    end
+    can :create
+
+    ##################### End legacy permission block ##########################
+
+    # for non-communities, people can be placed into groups by users who can
+    # manage groups at the context level, but not moderators (hence :manage_groups_manage)
+    given do |user, session|
+      self.group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+        user && self.user && self.group && !self.group.group_category.try(:communities?) &&
+        (
+          (user == self.user && self.group.grants_right?(user, session, :join)) ||
+            (
+              self.group.can_join?(self.user) && self.group.context &&
+                self.group.context.grants_right?(user, session, :manage_groups_manage)
+            )
+        )
+    end
     can :create
 
     # for communities, users must initiate in order to be added to a group
-    given { |user, session| user && self.group && user == self.user && self.group.grants_right?(user, :join) && self.group.group_category.try(:communities?) }
+    given do |user, _session|
+      user && self.group && user == self.user && self.group.grants_right?(user, :join) &&
+        self.group.group_category.try(:communities?)
+    end
     can :create
 
     # user can read group membership if they can read its group's roster
@@ -240,8 +270,15 @@ class GroupMembership < ActiveRecord::Base
     given { |user, session| user && self.group && self.group.grants_right?(user, session, :manage) }
     can :update
 
-    # allow moderators to kick people out (hence :manage instead of :manage_groups on the context)
-    given { |user, session| user && self.user && self.group && ((user == self.user && self.group.grants_right?(self.user, session, :leave)) || self.group.grants_right?(user, session, :manage)) }
+    # allow moderators to kick people out
+    # hence :manage instead of :manage_groups_delete on the context
+    given do |user, session|
+      user && self.user && self.group &&
+        (
+          (user == self.user && self.group.grants_right?(self.user, session, :leave)) ||
+            self.group.grants_right?(user, session, :manage)
+        )
+    end
     can :delete
   end
 end

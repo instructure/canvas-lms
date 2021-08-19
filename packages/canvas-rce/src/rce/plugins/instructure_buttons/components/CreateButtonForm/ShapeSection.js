@@ -27,7 +27,7 @@ const SHAPES = ['square', 'circle', 'triangle', 'hexagon', 'octagon', 'star']
 const SIZES = ['x-small', 'small', 'medium', 'large']
 
 export const ShapeSection = ({settings, onChange}) => (
-  <Flex as="section" justifyItems="space-between" direction="column">
+  <Flex as="section" direction="column" justifyItems="space-between" padding="small small 0">
     <Flex.Item padding="small">
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select a shape.')}

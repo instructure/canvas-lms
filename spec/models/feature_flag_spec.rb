@@ -133,7 +133,7 @@ describe FeatureFlag do
       flag.save!
       log = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1).first
       expect(log.feature_flag_id).to eq(flag.id)
-      expect(log.state_before).to eq("created, prior default:allowed")
+      expect(log.state_before).to eq("allowed")
       expect(log.state_after).to eq(flag.state)
       expect(log.context_type).to eq("Account")
       expect(log.context_id).to eq(t_root_account.id)
@@ -145,7 +145,7 @@ describe FeatureFlag do
       flag.save!
       log = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1).first
       expect(log.feature_flag_id).to eq(flag.id)
-      expect(log.state_before).to eq("created, prior default:allowed")
+      expect(log.state_before).to eq("allowed")
       expect(log.state_after).to eq("on")
       expect(log.context_type).to eq("Course")
       expect(log.context_id).to eq(t_course.id)
@@ -175,15 +175,15 @@ describe FeatureFlag do
     end
 
     it "logs feature destruction" do
-      flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'allowed')
+      flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'on')
       flag.current_user = acting_user
       flag.save!
       flag.destroy
       logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
-      log = logs.detect{|l| l.state_after == 'removed, new default: allowed' }
+      log = logs.detect{|l| l.state_after == 'allowed' }
       expect(log.feature_flag_id).to eq(flag.id)
-      expect(log.state_after).to eq("removed, new default: allowed")
-      expect(log.state_before).to eq("allowed")
+      expect(log.state_after).to eq("allowed")
+      expect(log.state_before).to eq("on")
       expect(log.context_type).to eq("Account")
       expect(log.context_id).to eq(t_root_account.id)
     end

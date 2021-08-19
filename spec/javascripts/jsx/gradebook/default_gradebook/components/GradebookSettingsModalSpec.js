@@ -253,6 +253,10 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     return findTab('Advanced')
   }
 
+  function getViewOptionsTab() {
+    return findTab('View Options')
+  }
+
   function findCheckbox(label) {
     const $modal = getModalElement()
     const $label = [...$modal.querySelectorAll('label')].find($el =>
@@ -345,6 +349,19 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       props.courseFeatures.finalGradeOverrideEnabled = false
       await mountOpenAndLoad()
       notOk(getAdvancedTab())
+    })
+  })
+
+  QUnit.module('View options tab', () => {
+    test('is present when "Enhanced Gradebook Filters" is enabled', async () => {
+      props.enhancedGradebookFilters = true
+      await mountOpenAndLoad()
+      ok(getViewOptionsTab())
+    })
+
+    test('is not present when "Enhanced Gradebook Filters" is disabled', async () => {
+      await mountOpenAndLoad()
+      notOk(getViewOptionsTab())
     })
   })
 

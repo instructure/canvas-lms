@@ -80,7 +80,9 @@ export default class FakeEditor {
           },
           anchorOffset: this._anchorOffset
         }
-      }
+      },
+      getBookmark: () => {},
+      moveToBookmark: () => {}
     }
 
     this.dom = {

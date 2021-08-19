@@ -599,7 +599,11 @@ class Submission < ActiveRecord::Base
           )
         end
       end
-      self.assignment&.delay_if_production&.multiple_module_actions([self.user_id], :scored, self.score)
+
+      unless ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
+        # trigger assignments have to wait for ConditionalRelease::OverrideHandler#handle_grade_change
+        self.assignment&.delay_if_production&.multiple_module_actions([self.user_id], :scored, self.score)
+      end
     end
     true
   end
@@ -1958,8 +1962,10 @@ class Submission < ActiveRecord::Base
         self.course.feature_enabled?(:conditional_release)
       end
       if ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
-        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand: "conditional_release_grade_change:#{self.global_assignment_id}").
+        strand = "conditional_release_grade_change:#{self.global_assignment_id}"
+        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand: strand).
           handle_grade_change(self)
+        self.assignment&.delay_if_production(strand: strand)&.multiple_module_actions([self.user_id], :scored, self.score)
       end
     end
   end

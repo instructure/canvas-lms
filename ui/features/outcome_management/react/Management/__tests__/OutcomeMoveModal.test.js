@@ -52,6 +52,10 @@ describe('OutcomeMoveModal', () => {
     onCloseHandler: onCloseHandlerMock,
     onCleanupHandler: onCleanupHandlerMock,
     outcomes: generateOutcomes(1),
+    rootGroup: {
+      id: '0',
+      title: 'Root account folder'
+    },
     ...props
   })
 
@@ -126,27 +130,32 @@ describe('OutcomeMoveModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('enables the move button when a valid group is selected', async () => {
+  it('enables the move button by default', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
+    expect(getByText('Move').closest('button')).toBeEnabled()
+  })
+
+  it('enables the move button when a child group is selected', async () => {
+    const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
+      mocks: [...smallOutcomeTree('Account')]
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Move').closest('button')).toBeEnabled()
   })
 
-  it('displays flash confirmation if move outcomes request succeeds', async () => {
+  it('displays flash confirmation and calls onSuccess if move outcomes request succeeds', async () => {
+    const onSuccess = jest.fn()
     const {getByText} = render(
-      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
+      <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
         mocks: [...smallOutcomeTree('Account'), moveOutcomeMock()]
       }
     )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -155,6 +164,11 @@ describe('OutcomeMoveModal', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '2 outcomes have been moved to "Account folder 1".',
       type: 'success'
+    })
+    expect(onSuccess).toHaveBeenCalledWith({
+      movedOutcomeLinkIds: ['1', '2'],
+      groupId: '101',
+      targetAncestorsIds: ['101', '1']
     })
   })
 
@@ -170,8 +184,6 @@ describe('OutcomeMoveModal', () => {
         ]
       }
     )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -197,8 +209,6 @@ describe('OutcomeMoveModal', () => {
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -222,8 +232,6 @@ describe('OutcomeMoveModal', () => {
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
@@ -246,8 +254,6 @@ describe('OutcomeMoveModal', () => {
         ]
       }
     )
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())

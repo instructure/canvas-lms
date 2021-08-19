@@ -17,6 +17,8 @@
  */
 
 export const DEFAULT_SETTINGS = {
+  name: '',
+  alt: '',
   shape: 'square',
   size: 'small',
   color: null,

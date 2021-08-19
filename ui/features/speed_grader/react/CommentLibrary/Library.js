@@ -113,9 +113,12 @@ const Library = ({
               onClick={() => setIsTrayOpen(true)}
               renderIcon={showSuggestions ? <IconCommentLine /> : renderTooltip()}
               iconPlacement="start"
+              data-testid="comment-library-link"
             >
               <ScreenReaderContent>{I18n.t('Open Comment Library')}</ScreenReaderContent>
-              <PresentationContent>{I18n.n(comments.length)}</PresentationContent>
+              <PresentationContent data-testid="comment-library-count">
+                {I18n.n(comments.length)}
+              </PresentationContent>
             </Link>
             {showSuggestions && suggestionsRef && (
               <Suggestions

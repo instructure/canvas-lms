@@ -88,7 +88,12 @@ const Comment = ({
   }
 
   return (
-    <View as="div" position="relative" borderWidth="none none small none">
+    <View
+      as="div"
+      position="relative"
+      borderWidth="none none small none"
+      data-testid="comment-library"
+    >
       <Flex>
         <Flex.Item as="div" shouldGrow size="80%" shouldShrink>
           <FocusedComment
@@ -108,6 +113,7 @@ const Comment = ({
               withBorder={false}
               elementRef={el => (editButtonRef.current = el)}
               size="small"
+              data-testid="comment-library-edit-button"
             />
           </View>
           <View as="div" display="inline-block" padding="x-small small 0 0">
@@ -119,6 +125,7 @@ const Comment = ({
               withBorder={false}
               elementRef={el => (deleteButtonRef.current = el)}
               size="small"
+              data-testid="comment-library-delete-button"
             />
           </View>
           <PresentationContent>

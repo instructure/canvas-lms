@@ -73,7 +73,7 @@ export default class ItemView extends Backbone.View {
     }
   }
 
-  initialize(options) {
+  initialize(_options) {
     this.initializeChildViews()
     this.observeModel()
     this.model.pollUntilFinishedLoading(3000)
@@ -133,7 +133,7 @@ export default class ItemView extends Backbone.View {
   }
 
   redirectTo(path) {
-    return (location.href = path)
+    return (window.location.href = path)
   }
 
   migrateQuizEnabled() {
@@ -173,7 +173,7 @@ export default class ItemView extends Backbone.View {
   onDelete(e) {
     e.preventDefault()
     if (this.canDelete()) {
-      if (confirm(this.messages.confirm)) return this.delete()
+      if (window.confirm(this.messages.confirm)) return this.delete()
     }
   }
 
@@ -254,6 +254,10 @@ export default class ItemView extends Backbone.View {
     return ENV.PERMISSIONS.manage
   }
 
+  canCreate() {
+    return ENV.PERMISSIONS.create
+  }
+
   isStudent() {
     // must check canManage because current_user_roles will include roles from other enrolled courses
     return ENV.current_user_roles?.includes('student') && !this.canManage()
@@ -261,9 +265,8 @@ export default class ItemView extends Backbone.View {
 
   canDuplicate() {
     const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
-    const canManage = this.canManage()
     const canDuplicate = this.model.get('can_duplicate')
-    return (userIsAdmin || canManage) && canDuplicate
+    return (userIsAdmin || this.canCreate()) && canDuplicate
   }
 
   onDuplicate(e) {
@@ -284,9 +287,7 @@ export default class ItemView extends Backbone.View {
   }
 
   focusOnQuiz(quiz) {
-    $(`#assignment_${quiz.id}`)
-      .attr('tabindex', -1)
-      .focus()
+    $(`#assignment_${quiz.id}`).attr('tabindex', -1).focus()
   }
 
   onDuplicateOrImportFailedCancel(e) {
@@ -338,7 +339,7 @@ export default class ItemView extends Backbone.View {
       base.link_href = this.model.get('url')
     }
 
-    base.migrateQuizEnabled = this.migrateQuizEnabled
+    base.migrateQuizEnabled = this.migrateQuizEnabled()
     base.canDuplicate = this.canDuplicate()
     base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
     base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
@@ -360,7 +361,8 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
-    base.canOpenManageOptions = this.canManage() || base.DIRECT_SHARE_ENABLED
+    base.canOpenManageOptions =
+      this.canManage() || this.canDuplicate() || this.canDelete() || base.DIRECT_SHARE_ENABLED
 
     return base
   }

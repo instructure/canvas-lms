@@ -296,7 +296,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
           klass = described_class::TenantMissingOrSyncDisabled
-          msg = 
+          msg =
             'Tenant missing or sync disabled. ' \
             'Check the Microsoft sync integration settings for the course and account.'
           expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
@@ -630,7 +630,7 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no local owners (course teacher enrollments)' do
       it 'raises a graceful exit error informing the user' do
         expect(diff).to receive(:local_owners).and_return Set.new
-        klass = described_class::MissingOwners
+        klass = MicrosoftSync::Errors::MissingOwners
         msg = /no users corresponding to the instructors of the Canvas course could be found/
         expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
       end

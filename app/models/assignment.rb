@@ -1724,16 +1724,34 @@ class Assignment < ActiveRecord::Base
     can :manage_files_edit and
     can :manage_files_delete
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :create and can :read and can :attach_submission_comment_files
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
+    can :create and can :read
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_add)
+    end
+    can :create and can :read
 
     given { |user, session| self.user_can_update?(user, session) }
     can :update
 
     given do |user, session|
-      self.context.grants_right?(user, session, :manage_assignments) &&
-        (self.context.account_membership_allows(user) ||
-         !in_closed_grading_period?)
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments) &&
+          (self.context.account_membership_allows(user) ||
+           !in_closed_grading_period?)
+    end
+    can :delete
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_delete) &&
+          (self.context.account_membership_allows(user) ||
+           !in_closed_grading_period?)
     end
     can :delete
   end
@@ -3643,8 +3661,8 @@ class Assignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
-    return false if external_tool? || quiz? || discussion_topic? || wiki_page? ||
-      group_category? || peer_reviews?
+    return false if external_tool? || quiz? || discussion_topic? || wiki_page? || peer_reviews?
+
     true
   end
 

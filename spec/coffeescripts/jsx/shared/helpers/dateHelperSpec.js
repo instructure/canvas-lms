@@ -19,6 +19,8 @@
 import DateHelper from '@canvas/datetime/dateHelper'
 import {isDate, isNull, isUndefined} from 'lodash'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 
@@ -59,19 +61,28 @@ test('gracefully handles undefined values', () => {
 
 QUnit.module('DateHelper#formatDatetimeForDisplay', {
   setup() {
-    this.snapshot = tz.snapshot()
   },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
 test('formats the date for display, adjusted for the timezone', () => {
   const assignment = defaultAssignment()
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    }
+  })
   let formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015 at 2:35pm')
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015 at 10:35am')
 })
@@ -93,37 +104,51 @@ test("can specify 'short' format which excludes the year if it matches the curre
 })
 
 QUnit.module('DateHelper#formatDateForDisplay', {
-  setup() {
-    this.snapshot = tz.snapshot()
-  },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
 test('formats the date for display, adjusted for the timezone, excluding the time', () => {
   const assignment = defaultAssignment()
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    }
+  })
   let formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015')
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015')
 })
 
 QUnit.module('DateHelper#isMidnight', {
-  setup() {
-    this.snapshot = tz.snapshot()
-  },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
 test('returns true if the time is midnight, adjusted for the timezone', () => {
   const date = '2015-07-14T04:00:00Z'
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    }
+  })
   ok(DateHelper.isMidnight(date))
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   notOk(DateHelper.isMidnight(date))
 })

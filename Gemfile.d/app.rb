@@ -22,7 +22,7 @@
 if CANVAS_RAILS6_0
   gem 'rails', '6.0.4'
     gem 'tzinfo', '1.2.7'
-  gem 'switchman', '2.1.5'
+  gem 'switchman', '2.1.6'
     gem 'guardrail', '2.0.1'
   gem 'switchman-inst-jobs', '3.1.2'
 else
@@ -147,10 +147,10 @@ gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 gem 'faraday', '0.17.4'
   gem 'faraday_middleware', '0.14.0'
 
-path 'engines' do
+path root_path.join('engines') do
   gem 'audits'
 end
-path 'gems' do
+path root_path.join('gems') do
   gem 'activesupport-suspend_callbacks'
   gem 'acts_as_list'
   gem 'adheres_to_policy'
@@ -200,5 +200,5 @@ path 'gems' do
   gem 'workflow'
 end
 
-gem 'csv_diff', path: 'gems'
+gem 'csv_diff', path: root_path.join('gems')
   gem 'sqlite3', '1.4.2'

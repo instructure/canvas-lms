@@ -18,7 +18,7 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import {makeBodyEditable} from './contentEditable'
-
+import {insertMentionFor} from './edit'
 import {
   MARKER_SELECTOR,
   MARKER_ID,
@@ -26,12 +26,11 @@ import {
   MENTION_MENU_SELECTOR,
   KEY_CODES
 } from './constants'
-import MentionDropdown from './components/MentionAutoComplete/MentionDropdown'
-import broadcastMessage, {
-  inputChangeMessage,
-  navigationMessage,
-  selectionMessage
-} from './broadcastMessage'
+import MentionsUI from './components/MentionAutoComplete/MentionsUI'
+import broadcastMessage, {inputChangeMessage, navigationMessage} from './broadcastMessage'
+
+// track the currently selected user
+let currentMentionsSelection
 
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
@@ -47,7 +46,10 @@ function shouldRestoreFromKeyEvent(event, editor) {
     //
     // In this case, "enter" should select the user from the
     // list, not restore editability to the tinymce body
-    return activeDescendant === '' || !activeDescendant
+    if (activeDescendant) {
+      event.preventDefault()
+      return onMentionsExit(editor, true)
+    }
   }
 
   // Nothing but a backspace key press can restore
@@ -66,7 +68,12 @@ function isMentionsNavigationEvent(event, editor) {
 
   if (!inMentionsMarker(editor)) return false
 
-  return which === KEY_CODES.up || which === KEY_CODES.down || which === KEY_CODES.enter
+  return (
+    which === KEY_CODES.up ||
+    which === KEY_CODES.down ||
+    which === KEY_CODES.enter ||
+    which === KEY_CODES.escape
+  )
 }
 
 function inMentionsMarker(editor) {
@@ -87,7 +94,7 @@ export const onSetContent = e => {
   // If the content being inserted is not the marker and
   // due to a paste
   if (!e.content.includes(MARKER_ID) && !e.paste) {
-    makeBodyEditable(e.target, MARKER_SELECTOR)
+    onMentionsExit(editor)
   }
 
   // If content being set is the marker, load the menu
@@ -98,9 +105,11 @@ export const onSetContent = e => {
       elm.id = MENTION_MENU_ID
       document.body.appendChild(elm)
       ReactDom.render(
-        <MentionDropdown
+        <MentionsUI
           rceRef={editor.getBody()}
-          onActiveDescendantChange={onActiveDescendantChange}
+          onFocusedUserChange={onFocusedUserChange}
+          onExited={onMentionsExit}
+          editor={editor}
         />,
         elm
       )
@@ -129,7 +138,7 @@ export const onKeyDown = e => {
   // Is the current node already outside the
   // mentions marker?
   if (!inMentionsMarker(editor) || shouldRestoreFromKeyEvent(e, editor)) {
-    makeBodyEditable(editor, MARKER_SELECTOR)
+    onMentionsExit(editor)
     return
   }
 
@@ -139,9 +148,16 @@ export const onKeyDown = e => {
     // Don't move the cursor please
     e.preventDefault()
 
+    // If the user pressed the 'escape' key
+    if (e.which === KEY_CODES.escape) {
+      return onMentionsExit(editor)
+    }
+
+    // Do nothing if the user was selecting a suggestion
+    if (e.which === KEY_CODES.enter) return
+
     // Broadcast the event to mentions components
-    const message = e.which === KEY_CODES.enter ? selectionMessage(e) : navigationMessage(e)
-    broadcastMessage(message, [editor.getWin(), window])
+    broadcastMessage(navigationMessage(e), [editor.getWin(), window])
   }
 }
 
@@ -165,7 +181,7 @@ export const onKeyUp = e => {
   if (e.which === KEY_CODES.enter) return
 
   if (inMentionsMarker(editor)) {
-    broadcastMessage(inputChangeMessage(editor.selection.getNode().innerHTML), [
+    broadcastMessage(inputChangeMessage(editor.selection.getNode().textContent), [
       editor.getWin(),
       window
     ])
@@ -183,7 +199,7 @@ export const onMouseDown = e => {
   const editor = e.editor || tinymce.activeEditor
 
   if (e.target.id !== MARKER_ID) {
-    makeBodyEditable(editor, MARKER_SELECTOR)
+    onMentionsExit(editor)
   }
 }
 
@@ -194,10 +210,54 @@ export const onMouseDown = e => {
  * @param String activeDescendant
  * @param Editor ed
  */
-export const onActiveDescendantChange = (activeDescendant, ed) => {
+export const onFocusedUserChange = (focusedUser, ed) => {
   const editor = ed || tinymce.activeEditor
+  const markerEl = editor.dom.select(MARKER_SELECTOR)[0]
 
-  editor.dom
-    .select(MARKER_SELECTOR)[0]
-    ?.setAttribute('aria-activedescendant', activeDescendant || '')
+  // TODO: Pass this object in from the component
+  const temp = {
+    activeDescendant: focusedUser?.ariaActiveDescendantId,
+    user: {
+      shortName: focusedUser?.name,
+      id: focusedUser?.id
+    }
+  }
+
+  markerEl?.setAttribute('aria-activedescendant', focusedUser?.ariaActiveDescendantId || '')
+  markerEl?.setAttribute('data-displayname', focusedUser?.name || '')
+  markerEl?.setAttribute('data-userId', focusedUser?.id || '')
+
+  currentMentionsSelection = temp
+}
+
+/**
+ * Unmounts the mentions component and removes the
+ * mount element.
+ *
+ * If setMention is true, also injects the mention
+ * HTML for the currently selected mention suggestion
+ *
+ * @param Editor ed
+ * @param Bool setMention
+ */
+export const onMentionsExit = (ed, setMention = false) => {
+  const editor = ed || tinymce.activeEditor
+  const menuMountElem = document.querySelector(MENTION_MENU_SELECTOR)
+  const markerEl = editor.dom.select(MARKER_SELECTOR)[0]
+
+  if (menuMountElem && markerEl) {
+    makeBodyEditable(editor, MARKER_SELECTOR)
+
+    if (setMention) {
+      // Mention successful: insert mention HTML
+      insertMentionFor(currentMentionsSelection?.user, ed)
+    } else {
+      // Mention cancelled: remove all attributes
+      Array.from(markerEl.attributes).forEach(a => markerEl.removeAttribute(a.name))
+    }
+
+    menuMountElem.remove()
+
+    return ReactDom.unmountComponentAtNode(menuMountElem)
+  }
 }

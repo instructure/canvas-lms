@@ -217,6 +217,7 @@ export function enhanceUserContent() {
     }
     let $download_btn, $preview_link
     if ($.trim($link.text())) {
+      const filename = this.textContent
       // instructure_file_link_holder is used to find file_preview_link
       const $span = $(
         "<span class='instructure_file_holder link_holder instructure_file_link_holder'/>"
@@ -235,7 +236,7 @@ export function enhanceUserContent() {
           )}">
               <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
               <span class="screenreader-only">
-                ${htmlEscape(I18n.t('download'))}
+                ${htmlEscape(I18n.t('Download %{filename}', {filename}))}
               </span>
             </a>`
         )
@@ -250,15 +251,21 @@ export function enhanceUserContent() {
             $link.addClass('file_preview_link')
           }
         } else if (!$link.hasClass('inline_disabled')) {
-          $preview_link = $(
-            "<a class='file_preview_link' aria-hidden='true' href='" +
-              htmlEscape($link.attr('href')) +
-              "' title='" +
-              htmlEscape(I18n.t('titles.preview_document', 'Preview the document')) +
-              "' style='margin-inline-start: 5px;'><img src='/images/preview.png' alt='" +
-              htmlEscape(I18n.t('titles.preview_document', 'Preview the document')) +
-              "'/></a>"
-          )
+          $preview_link = $(`
+          <a
+          class='file_preview_link'
+          aria-hidden='true'
+          href='${htmlEscape($link.attr('href'))}'
+          title='${htmlEscape(I18n.t('titles.preview_document', 'Preview the document'))}'
+          style='margin-inline-start: 5px;'>
+            <img
+            src='/images/preview.png'
+            alt='${htmlEscape(I18n.t('titles.preview_document', 'Preview the document'))}' />
+            <span class="screenreader-only">
+                ${htmlEscape(I18n.t('Preview %{filename}', {filename}))}
+              </span>
+          </a>
+          `)
         }
       }
       $link.removeClass('instructure_file_link')
@@ -799,8 +806,9 @@ $(function () {
       $(this).loadingImage('remove')
       const $message = $(this).parents('.communication_sub_message')
       if ($(this).hasClass('submission_comment_form')) {
-        const user_id = $(this).getTemplateData({textValues: ['submission_user_id']})
-          .submission_user_id
+        const user_id = $(this).getTemplateData({
+          textValues: ['submission_user_id']
+        }).submission_user_id
         let submission = null
         for (const idx in data) {
           const s = data[idx].submission

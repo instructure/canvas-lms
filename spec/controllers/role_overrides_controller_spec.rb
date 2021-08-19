@@ -308,7 +308,7 @@ describe RoleOverridesController do
 
     describe "other permissions" do
       it "returns 400 with an error message" do
-        get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_groups'}
+        get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_content'}
         expect(response.code.to_i).to eq(400)
         expect(json['message']).to be
       end

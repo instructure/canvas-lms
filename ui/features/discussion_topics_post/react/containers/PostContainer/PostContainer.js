@@ -80,16 +80,10 @@ export const PostContainer = props => {
       }}
       render={responsiveProps => (
         <Flex direction="column">
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item shouldGrow shouldShrink overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
               {props.author && (
-                <Flex.Item
-                  shouldGrow
-                  shouldShrink
-                  overflowX="hidden"
-                  overflowY="hidden"
-                  padding={responsiveProps.authorInfo.padding}
-                >
+                <Flex.Item shouldGrow shouldShrink padding={responsiveProps.authorInfo.padding}>
                   <AuthorInfo
                     author={props.author}
                     editor={props.editor}

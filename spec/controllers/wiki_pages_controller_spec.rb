@@ -139,8 +139,7 @@ describe WikiPagesController do
 
         context "K5 mode enabled" do
           before do
-            @course.account.settings[:enable_as_k5_account] = {value: true}
-            @course.account.save!
+            @course.account.enable_as_k5_account!
           end
 
           it "should hide view_all_pages link" do

@@ -1023,6 +1023,19 @@ describe "Accounts API", type: :request do
       expect(json[0]["total_students"]).to eq 0
     end
 
+    it "should don't override name with friendly_name" do
+      @c1 = course_model(name: 'c1', account: @a1, root_account: @a1, friendly_name: 'barney')
+      @a1.enable_as_k5_account!
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+        { controller: 'accounts', action: 'courses_api', account_id: @a1.to_param,
+          format: 'json' }, {})
+      expect(json.size).to eq 1
+      expect(json[0]['name']).to eq 'c1'
+      expect(json[0]['friendly_name']).to eq 'barney'
+      expect(json[0]['original_name']).to be_nil
+    end
+
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)

@@ -125,16 +125,13 @@ describe User do
     expect(@user.associated_accounts.length).to eql(1)
     expect(@user.associated_accounts.first).to eql(account1)
 
-    account2 = account_model
-    account1.parent_account = account2
-    account1.root_account = account2
-    account1.save!
-    @course.reload
+    account2 = account_model(root_account: account1)
+    @course.update(account: account2)
     @user.reload
 
     expect(@user.associated_accounts.length).to eql(2)
-    expect(@user.associated_accounts[0]).to eql(account1)
-    expect(@user.associated_accounts[1]).to eql(account2)
+    expect(@user.associated_accounts[0]).to eql(account2)
+    expect(@user.associated_accounts[1]).to eql(account1)
   end
 
   it "should update account associations when a user is associated to an account just by pseudonym" do
@@ -158,15 +155,6 @@ describe User do
     user.reload
     expect(user.associated_accounts.length).to eql(1)
     expect(user.associated_accounts.first).to eql(account1)
-
-    account1.parent_account = account2
-    account1.root_account = account2
-    account1.save!
-
-    user.reload
-    expect(user.associated_accounts.length).to eql(2)
-    expect(user.associated_accounts[0]).to eql(account1)
-    expect(user.associated_accounts[1]).to eql(account2)
   end
 
   it "should update account associations when a user is associated to an account just by account_users" do
@@ -2010,7 +1998,7 @@ describe User do
       context = double
       assignments = [double, double, double]
       user = User.new
-      allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return false
+      allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return false
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)
         allow(assignment).to receive(:context).and_return(context)
@@ -2023,7 +2011,7 @@ describe User do
       context = double
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
-        allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return true
+        allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return true
         due_date1 = {:due_at => Time.now + 1.day}
         due_date2 = {:due_at => Time.now + 1.week}
         due_date3 = {:due_at => 2.weeks.from_now }

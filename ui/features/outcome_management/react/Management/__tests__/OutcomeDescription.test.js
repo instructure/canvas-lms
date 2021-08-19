@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
 import OutcomeDescription from '../OutcomeDescription'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('OutcomeDescription', () => {
   let onClickHandlerMock
@@ -26,13 +27,23 @@ describe('OutcomeDescription', () => {
   const truncatedTestId = 'description-truncated'
   const truncatedTestContentId = 'description-truncated-content'
   const expandedTestId = 'description-expanded'
+  const friendlyExpandedTestId = 'friendly-description-expanded'
   const defaultProps = (props = {}) => ({
     withExternalControl: true,
     truncate: true,
     description: 'Description',
+    friendlyDescription: '',
     onClickHandler: onClickHandlerMock,
     ...props
   })
+
+  const render = (children, {friendlyDescriptionFF = false, isStudent = false} = {}) => {
+    return rtlRender(
+      <OutcomesContext.Provider value={{env: {friendlyDescriptionFF, isStudent}}}>
+        {children}
+      </OutcomesContext.Provider>
+    )
+  }
 
   beforeEach(() => {
     onClickHandlerMock = jest.fn()
@@ -120,6 +131,101 @@ describe('OutcomeDescription', () => {
       const descExpanded = getByTestId(expandedTestId)
       fireEvent.click(descExpanded)
       expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
+    })
+  })
+
+  describe('with friendly description', () => {
+    describe('feature flag enabled', () => {
+      it('displays the friendly description when expanded', () => {
+        const {getByTestId, queryByTestId} = render(
+          <OutcomeDescription
+            {...defaultProps({
+              withExternalControl: false,
+              friendlyDescription: 'Friendly Description'
+            })}
+          />,
+          {
+            friendlyDescriptionFF: true
+          }
+        )
+        const descTruncated = getByTestId(truncatedTestId)
+        fireEvent.click(descTruncated)
+        expect(queryByTestId(friendlyExpandedTestId)).toBeInTheDocument()
+      })
+
+      it('displays the friendly description as the description if the user is a student', () => {
+        const {getByTestId, queryByTestId, getByText} = render(
+          <OutcomeDescription
+            {...defaultProps({
+              withExternalControl: false,
+              friendlyDescription: 'Friendly Description'
+            })}
+          />,
+          {
+            friendlyDescriptionFF: true,
+            isStudent: true
+          }
+        )
+        const descTruncated = getByTestId(truncatedTestId)
+        fireEvent.click(descTruncated)
+        expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
+        expect(getByText('Friendly Description')).toBeInTheDocument()
+      })
+
+      it('displays the friendly description as the description if there is no description', () => {
+        const {getByTestId, queryByTestId, getByText} = render(
+          <OutcomeDescription
+            {...defaultProps({
+              withExternalControl: false,
+              friendlyDescription: 'Very Friendly Text',
+              description: ''
+            })}
+          />,
+          {
+            friendlyDescriptionFF: true
+          }
+        )
+        const descTruncated = getByTestId(truncatedTestId)
+        fireEvent.click(descTruncated)
+        expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
+        expect(queryByTestId('Description')).not.toBeInTheDocument()
+        expect(getByText('Very Friendly Text')).toBeInTheDocument()
+      })
+    })
+
+    describe('feature flag disabled', () => {
+      it('does not display the friendly description', () => {
+        const {getByTestId, queryByTestId} = render(
+          <OutcomeDescription
+            {...defaultProps({
+              withExternalControl: false,
+              friendlyDescription: 'Friendly Description'
+            })}
+          />
+        )
+        const descTruncated = getByTestId(truncatedTestId)
+        fireEvent.click(descTruncated)
+        expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
+      })
+
+      it('does not display the friendly description as the description if the user is a student', () => {
+        const {getByTestId, queryByTestId, queryByText} = render(
+          <OutcomeDescription
+            {...defaultProps({
+              withExternalControl: false,
+              friendlyDescription: 'Friendly Description'
+            })}
+          />,
+          {
+            isStudent: true
+          }
+        )
+        const descTruncated = getByTestId(truncatedTestId)
+        fireEvent.click(descTruncated)
+        expect(getByTestId(expandedTestId)).toBeInTheDocument()
+        expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
+        expect(queryByText('Friendly Description')).not.toBeInTheDocument()
+      })
     })
   })
 })

@@ -48,12 +48,15 @@ module FeatureFlags
       [:custom_transition_proc, :after_state_change_proc, :visible_on].each do |check|
         definition[check] = wrap_hook_method(definition[check]) if definition[check]
       end
+      definition[:type] ||= 'feature_option'
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end
+      definition[:enable_at] = eval(definition[:enable_at]) if definition[:enable_at]
       definition[:state] = ensure_state_if_boolean(definition[:state]) if definition.key? :state
       definition[:environments]&.each do |_env_name, env|
         env[:state] = ensure_state_if_boolean(env[:state]) if env.key? :state
+        env[:enable_at] = eval(env[:enable_at]) if env.key? :enable_at
       end
       Feature.register({ name => definition })
     end

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {connect, Provider} from 'react-redux'
+import React, {createContext, useContext, useState} from 'react'
+import {connect, Provider as ReduxProvider} from 'react-redux'
 
 import bridge from '../../../bridge'
 import sidebarHandlers from '../../../sidebar/containers/sidebarHandlers'
@@ -36,12 +36,24 @@ function Consumer({children, ...props}) {
 
 export const StoreConsumer = connect(propsFromState, sidebarHandlers)(Consumer)
 
+const StoreContext = createContext()
+
 export function StoreProvider({children, ...storeProps}) {
   const [store] = useState(() => configureStore(storeProps))
 
   return (
-    <Provider store={store}>
-      <StoreConsumer>{children}</StoreConsumer>
-    </Provider>
+    <ReduxProvider store={store}>
+      <StoreConsumer>
+        {props => <StoreContext.Provider value={props}>{children(props)}</StoreContext.Provider>}
+      </StoreConsumer>
+    </ReduxProvider>
   )
+}
+
+export function useStoreProps() {
+  const storeProps = useContext(StoreContext)
+
+  if (!storeProps) throw new Error('useStoreProps should be used within a StoreProvider')
+
+  return storeProps
 }

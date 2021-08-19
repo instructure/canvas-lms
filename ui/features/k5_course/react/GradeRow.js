@@ -43,7 +43,9 @@ export const GradeRow = ({
   unread,
   late,
   excused,
-  missing
+  missing,
+  hasComments,
+  currentUserId
 }) => {
   const renderStatus = () => {
     if (late) {
@@ -177,6 +179,15 @@ export const GradeRow = ({
           {pointsPossible && (
             <Text size="x-small">{I18n.t('Out of %{pointsPossible} pts', {pointsPossible})}</Text>
           )}
+          {hasComments && (
+            <Link
+              href={`${url}/submissions/${currentUserId}`}
+              isWithinText={false}
+              margin="xx-small 0"
+            >
+              {I18n.t('View feedback')}
+            </Link>
+          )}
         </Flex>
       </Table.Cell>
     </Table.Row>
@@ -202,7 +213,9 @@ GradeRow.propTypes = {
   unread: PropTypes.bool.isRequired,
   late: PropTypes.bool,
   excused: PropTypes.bool,
-  missing: PropTypes.bool
+  missing: PropTypes.bool,
+  hasComments: PropTypes.bool.isRequired,
+  currentUserId: PropTypes.string.isRequired
 }
 
 GradeRow.displayName = 'Row'

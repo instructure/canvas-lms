@@ -135,15 +135,15 @@ export default class AssignmentGroupListItemView extends DraggableCollectionView
     @createAssignmentView = false
     @deleteGroupView = false
 
-    if @canManage()
+    if @canAdd()
       @editGroupView = new CreateGroupView
         assignmentGroup: @model
         userIsAdmin: @userIsAdmin
       @createAssignmentView = new CreateAssignmentView
         assignmentGroup: @model
-      if @canDelete()
-        @deleteGroupView = new DeleteGroupView
-          model: @model
+    if @canDelete()
+      @deleteGroupView = new DeleteGroupView
+        model: @model
 
   initCache: ->
     $.extend true, @, Cache
@@ -358,7 +358,12 @@ export default class AssignmentGroupListItemView extends DraggableCollectionView
       m.isRestrictedByMasterCourse()
 
   canDelete: ->
-    (@userIsAdmin or @model.canDelete()) && !@hasMasterCourseRestrictedAssignments()
+    ENV.PERMISSIONS.manage_assignments_delete &&
+      (@userIsAdmin or @model.canDelete()) &&
+      !@hasMasterCourseRestrictedAssignments()
+
+  canAdd: ->
+    ENV.PERMISSIONS.manage_assignments_add
 
   canManage: ->
     ENV.PERMISSIONS.manage

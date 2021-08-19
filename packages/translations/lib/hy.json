@@ -17,6 +17,9 @@
     "announcements_a4b8ed4a": {
         "message": "Հայտարարություններ"
     },
+    "apply_781a2546": {
+        "message": "Կիրառել"
+    },
     "apps_54d24a47": {
         "message": "Հավելվածներ"
     },
@@ -40,6 +43,9 @@
     },
     "calendar_event_89aadc1c": {
         "message": "Օրացուցային միջոցառում"
+    },
+    "cancel_caeb1e68": {
+        "message": "Չեղյալ համարել"
     },
     "choose_usage_rights_33683854": {
         "message": "Ընտրել օգտագործման իրավունքները..."
@@ -247,6 +253,9 @@
     },
     "my_files_2f621040": {
         "message": "Իմ ֆայլերը"
+    },
+    "name_1aed4a1b": {
+        "message": "Անուն"
     },
     "new_13daf639": {
         "message": "Նոր"

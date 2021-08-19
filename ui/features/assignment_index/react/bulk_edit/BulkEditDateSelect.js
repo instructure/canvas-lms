@@ -32,7 +32,7 @@ function formatDate(date) {
   return tz.format(date, 'date.formats.medium_with_weekday')
 }
 
-export default function({selectDateRange}) {
+function BulkEditDateSelect({selectDateRange}) {
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
 
@@ -102,3 +102,5 @@ export default function({selectDateRange}) {
     </Flex>
   )
 }
+
+export default BulkEditDateSelect

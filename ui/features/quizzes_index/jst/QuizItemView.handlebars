@@ -108,40 +108,40 @@
             </button>
 
             <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
-                {{#if can_update}}
-                  <li role="presentation">
-                    <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
-                  </li>
-                  {{#if canDuplicate}}
-                  <li>
-                    <a
-                      class="duplicate_assignment icon-copy-course"
-                      id="assignment_{{id}}_settings_duplicate_item"
-                      aria-label="{{#t}}Duplicate Quiz {{name}}{{/t}}"
-                      data-focus-returns-to"assign_{{id}}_manage_link"
-                    >{{#t}}Duplicate{{/t}}</a>
-                  </li>
-                  {{/if}}
-                  {{#if cyoe.isCyoeAble}}
-                  <li role="presentation">
-                      <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
-                  </li>
-                  {{/if}}
-                  {{#unless is_locked}}
-                    <li role="presentation">
-                    {{#if permissions.delete}}
-                      <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
-                    {{else}}
-                      <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
-                    {{/if}}
-                    </li>
-                  {{/unless}}
-                  {{#if migrateQuizEnabled}}
-                    <li role="presentation">
-                      <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>
-                    </li>
-                  {{/if}}
+              {{#if can_update}}
+                <li role="presentation">
+                  <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
+                </li>
+              {{/if}}
+              {{#if canDuplicate}}
+              <li>
+                <a
+                  class="duplicate_assignment icon-copy-course"
+                  id="assignment_{{id}}_settings_duplicate_item"
+                  aria-label="{{#t}}Duplicate Quiz {{name}}{{/t}}"
+                  data-focus-returns-to"assign_{{id}}_manage_link"
+                >{{#t}}Duplicate{{/t}}</a>
+              </li>
+              {{/if}}
+              {{#ifAll can_update cyoe.isCyoeAble}}
+              <li role="presentation">
+                  <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+              </li>
+              {{/ifAll}}
+              {{#unless is_locked}}
+                <li role="presentation">
+                {{#if permissions.delete}}
+                  <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+                {{else}}
+                  <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
                 {{/if}}
+                </li>
+              {{/unless}}
+              {{#ifAll can_update migrateQuizEnabled}}
+                <li role="presentation">
+                  <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>
+                </li>
+              {{/ifAll}}
               {{#if DIRECT_SHARE_ENABLED}}
                 <li role="presentation">
                   <a href="#" class="icon-user quiz-send-to" role="menuitem" title="{{#t}}Send Quiz to User{{/t}}">{{#t}}Send to...{{/t}}</a>

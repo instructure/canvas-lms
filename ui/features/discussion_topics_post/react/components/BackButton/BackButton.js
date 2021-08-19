@@ -21,22 +21,40 @@ import {IconArrowStartLine} from '@instructure/ui-icons'
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../utils'
 import {Text} from '@instructure/ui-text'
 
 export function BackButton({onClick, ...props}) {
   return (
-    <Button
-      onClick={onClick}
-      withBorder={false}
-      withBackground={false}
-      color="primary"
-      renderIcon={<IconArrowStartLine />}
-      theme={{borderWidth: '0'}}
-      data-testid="back-button"
-      {...props}
-    >
-      <Text weight="bold">{I18n.t('Back')}</Text>
-    </Button>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'small'
+        },
+        desktop: {
+          textSize: 'medium'
+        }
+      }}
+      render={responsiveProps => (
+        <Button
+          onClick={onClick}
+          withBorder={false}
+          withBackground={false}
+          color="primary"
+          renderIcon={<IconArrowStartLine />}
+          theme={{borderWidth: '0'}}
+          data-testid="back-button"
+          {...props}
+        >
+          <Text weight="bold" size={responsiveProps.textSize}>
+            {I18n.t('Back')}
+          </Text>
+        </Button>
+      )}
+    />
   )
 }
 

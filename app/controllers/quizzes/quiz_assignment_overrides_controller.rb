@@ -160,7 +160,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   private
 
   def assignment_overrides(scope, api_route)
-    can_manage = @course.grants_any_right?(@current_user, session, :manage_assignments, :read_as_admin)
+    can_manage = @course.grants_any_right?(@current_user, session, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     quiz_ids = (Array(params[:quiz_assignment_overrides])[0] || {})[:quiz_ids]
 

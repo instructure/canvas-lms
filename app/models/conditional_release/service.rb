@@ -71,7 +71,7 @@ module ConditionalRelease
 
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
-      return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
+      return unless course.grants_any_right?(current_user, session, :read, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
         rules = course.conditional_release_rules.active.with_assignments.to_a

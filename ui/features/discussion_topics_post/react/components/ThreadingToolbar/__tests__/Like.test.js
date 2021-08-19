@@ -19,6 +19,27 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {Like} from '../Like'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 const setup = props => {
   return render(
@@ -75,5 +96,21 @@ describe('Like', () => {
     expect(queryByTestId('liked-icon')).toBeTruthy()
     expect(queryByText('Like post from Xerxes')).toBeFalsy()
     expect(queryByText('Unlike post from Xerxes')).toBeTruthy()
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('uses mobile prop values', () => {
+      const container = setup()
+      const outerHTML = container.getByTestId('like-button').outerHTML
+
+      const expectedMargin = `margin: 0px 1rem 0px 0px`
+      expect(outerHTML.includes(expectedMargin)).toBeTruthy()
+    })
   })
 })

@@ -18,6 +18,7 @@
 import mockedNotificationPreferences from './MockedNotificationPreferences'
 import NotificationPreferencesTable from '../Table'
 import {render} from '@testing-library/react'
+import {within} from '@testing-library/dom'
 import React from 'react'
 
 const category = 0
@@ -82,7 +83,7 @@ describe('Notification Preferences Table', () => {
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
-    expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
+    expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
       dueDateCategory.children[commsChannel2].querySelector('svg[name="IconNo"]')
     ).toBeInTheDocument()
@@ -98,7 +99,7 @@ describe('Notification Preferences Table', () => {
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
-    expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
+    expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
       dueDateCategory.children[commsChannel3].querySelector('svg[name="IconNo"]')
     ).toBeInTheDocument()
@@ -114,7 +115,7 @@ describe('Notification Preferences Table', () => {
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
-    expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
+    expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
       dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]')
     ).toBeInTheDocument()
@@ -145,7 +146,7 @@ describe('Notification Preferences Table', () => {
   })
 
   it('renders the category description', () => {
-    const {getByTestId, getByText} = render(
+    const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
@@ -153,8 +154,25 @@ describe('Notification Preferences Table', () => {
     )
 
     const dueDateTooltip = getByTestId('due_date_description')
+    const {getByText} = within(dueDateTooltip)
+
     expect(dueDateTooltip).not.toBeNull()
     expect(dueDateTooltip).toContainElement(getByText('Due date description'))
+  })
+
+  it('renders the category description in screen reader', () => {
+    const {getByTestId} = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
+    )
+
+    const dueDateScreenReader = getByTestId('due_date_screenReader')
+    const {getByText} = within(dueDateScreenReader)
+
+    expect(dueDateScreenReader).not.toBeNull()
+    expect(dueDateScreenReader).toContainElement(getByText('Due date description'))
   })
 
   it('renders the send scores in emails toggle as enabled when the setting is set', () => {

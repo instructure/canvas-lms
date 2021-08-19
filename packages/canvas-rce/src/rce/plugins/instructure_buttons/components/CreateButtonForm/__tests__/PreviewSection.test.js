@@ -19,12 +19,12 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
-import {PreviewSection} from '../PreviewSection'
+import {Preview} from '../Preview'
 
-describe('<PreviewSection />', () => {
+describe('<Preview />', () => {
   it('renders the svg preview', () => {
     const {container} = render(
-      <PreviewSection
+      <Preview
         settings={{
           ...DEFAULT_SETTINGS,
           color: null,

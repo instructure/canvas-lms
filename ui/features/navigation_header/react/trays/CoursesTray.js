@@ -29,8 +29,7 @@ import {Link} from '@instructure/ui-link'
 const UNPUBLISHED = 'unpublished'
 
 export default function CoursesTray({courses, hasLoaded, k5User}) {
-  const showSplitList =
-    window.ENV?.FEATURES?.unpublished_courses && window.ENV.current_user_roles?.includes('teacher')
+  const showSplitList = window.ENV.current_user_roles?.includes('teacher')
 
   function renderSplitList() {
     const published = courses.filter(course => course.workflow_state !== UNPUBLISHED)

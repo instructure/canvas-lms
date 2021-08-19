@@ -80,6 +80,9 @@
     "announcements_a4b8ed4a": {
         "message": "الإعلانات"
     },
+    "apply_781a2546": {
+        "message": "تطبيق"
+    },
     "apps_54d24a47": {
         "message": "التطبيق"
     },
@@ -146,8 +149,14 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "بداية سجل قائمة المهام الخاصة بك"
     },
+    "below_81d4dceb": {
+        "message": "الأسفل"
+    },
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "يوجد أدناه مثال على طريقة عرض الطلاب لجداولهم"
+    },
+    "bottom_third_5f5fec1d": {
+        "message": "الثالث من الأسفل"
     },
     "button_color_608a0242": {
         "message": "لون الزر"
@@ -776,6 +785,9 @@
     "medium_5a8e9ead": {
         "message": "متوسط"
     },
+    "middle_27dc1d5": {
+        "message": "الأوسط"
+    },
     "miscellaneous_e9818229": {
         "message": "متنوعات"
     },
@@ -1148,6 +1160,18 @@
     "text_7f4593da": {
         "message": "نص"
     },
+    "text_background_color_16e61c3f": {
+        "message": "لون خلفية النص"
+    },
+    "text_color_acf75eb6": {
+        "message": "لون النص"
+    },
+    "text_position_8df8c162": {
+        "message": "موضع النص"
+    },
+    "text_size_887c2f6": {
+        "message": "حجم النص"
+    },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "تاريخ ووقت استحقاق قائمة المهام تلك"
     },
@@ -1285,6 +1309,12 @@
     },
     "use_arrow_keys_to_select_a_size_699a19f4": {
         "message": "استخدم مفاتيح الأسهم لتحديد حجم."
+    },
+    "use_arrow_keys_to_select_a_text_position_72f9137c": {
+        "message": "استخدم مفاتيح الأسهم لتحديد موضع النص."
+    },
+    "use_arrow_keys_to_select_a_text_size_65e89336": {
+        "message": "استخدم مفاتيح الأسهم لتحديد حجم النص."
     },
     "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
         "message": "استخدم مفاتيح الأسهم لتحديد حجم الإطار."

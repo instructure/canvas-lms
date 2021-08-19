@@ -186,6 +186,11 @@ class ApplicationController < ActionController::Base
           },
         }
 
+        dynamic_settings_tree = Canvas::DynamicSettings.find(tree: :private)
+        if dynamic_settings_tree['api_gateway_enabled'] == 'true'
+          @js_env[:API_GATEWAY_URI] = dynamic_settings_tree['api_gateway_uri']
+        end
+
         @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user&.prefers_no_toast_timeout?
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
@@ -233,11 +238,12 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing,
-    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters
+    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
+    :k5_homeroom_many_announcements
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
-    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
+    :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
+    :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -1525,6 +1531,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
+  rescue_from ActiveRecord::StaleObjectError, with: :rescue_expected_error_type
   # Canvas exceptions
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
@@ -2582,12 +2589,19 @@ class ApplicationController < ActionController::Base
 
   ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
-    rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
+    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
+    unless @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
+      permissions[:manage_assignments_add] = permissions[:manage_assignments]
+      permissions[:manage_assignments_delete] = permissions[:manage_assignments]
+    end
     permissions[:manage] = permissions[:manage_assignments]
     permissions[:by_assignment_id] = @context.assignments.map do |assignment|
-      [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+      [assignment.id, {
+        update: assignment.user_can_update?(@current_user, session),
+        delete: assignment.grants_right?(@current_user, :delete)
+      }]
     end.to_h
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)

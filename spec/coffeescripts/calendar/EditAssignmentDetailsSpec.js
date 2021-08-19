@@ -71,6 +71,7 @@ QUnit.module('EditAssignmentDetails', {
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
     tz.restore(this.snapshot)
+    I18nStubber.clear()
   }
 })
 const createView = function(model, event) {
@@ -135,7 +136,6 @@ test('should localize start date', function() {
   })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')
-  I18nStubber.popFrame()
 })
 
 test('requires name to save assignment event', function() {

@@ -14,6 +14,9 @@
     "announcements_a4b8ed4a": {
         "message": "공지"
     },
+    "apply_781a2546": {
+        "message": "적용"
+    },
     "apps_54d24a47": {
         "message": "앱"
     },
@@ -34,6 +37,9 @@
     },
     "calendar_event_89aadc1c": {
         "message": "행사"
+    },
+    "cancel_caeb1e68": {
+        "message": "취소"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
@@ -211,6 +217,9 @@
     },
     "my_files_2f621040": {
         "message": "내 파일"
+    },
+    "name_1aed4a1b": {
+        "message": "이름"
     },
     "new_13daf639": {
         "message": "새 항목"

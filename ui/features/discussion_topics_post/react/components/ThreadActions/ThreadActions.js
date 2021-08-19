@@ -99,14 +99,14 @@ const getMenuConfigs = props => {
     options.push({
       key: 'markAsRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Post as Read'),
+      label: I18n.t('Mark as Read'),
       selectionCallback: props.onToggleUnread
     })
   } else {
     options.push({
       key: 'markAsUnread',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Post as Unread'),
+      label: I18n.t('Mark as Unread'),
       selectionCallback: props.onToggleUnread
     })
   }

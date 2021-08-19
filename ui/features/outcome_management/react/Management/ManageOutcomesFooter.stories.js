@@ -24,8 +24,10 @@ export default {
   component: ManageOutcomesFooter,
   args: {
     selected: 1,
+    selectedCount: 1,
     onRemoveHandler: () => {},
-    onMoveHandler: () => {}
+    onMoveHandler: () => {},
+    onClearHandler: () => {}
   }
 }
 

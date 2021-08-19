@@ -132,8 +132,8 @@ describe('HomeroomAnnouncementsLayout', () => {
       <HomeroomAnnouncementsLayout {...getProps({loading: true, homeroomAnnouncements: []})} />
     )
     expect(getByText('Loading Homeroom Course Name')).toBeInTheDocument()
-    expect(getByText('Loading Homeroom Announcement Title')).toBeInTheDocument()
-    expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()
+    expect(getByText('Loading Announcement Title')).toBeInTheDocument()
+    expect(getByText('Loading Announcement Content')).toBeInTheDocument()
     expect(queryByText('Welcome to Class!')).not.toBeInTheDocument()
   })
 })

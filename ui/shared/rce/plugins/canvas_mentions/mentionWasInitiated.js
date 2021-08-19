@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {MARKER_ID} from './constants'
+
 // characters allowed to proceed an "inline" @mention
 const spaceCharacters = [' ', '\u00A0']
 
@@ -28,9 +30,12 @@ const spaceCharacters = [' ', '\u00A0']
  *
  * @returns {boolean} Was a mention triggered?
  */
-export default function mentionWasInitiated(selection, triggerChar = '@') {
+export default function mentionWasInitiated(selection, selectedNode, triggerChar = '@') {
   const {anchorOffset, anchorNode} = selection
   const {wholeText} = anchorNode
+
+  // If we are already in a selection, don't trigger another
+  if (selectedNode?.id === MARKER_ID) return false
 
   // Is the trigger character being entered at the first position in a node?
   if (anchorOffset === 1 && anchorNode?.wholeText?.charAt(0) === triggerChar) return true

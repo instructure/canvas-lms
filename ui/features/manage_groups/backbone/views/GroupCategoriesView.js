@@ -91,12 +91,10 @@ export default class GroupCategoriesView extends CollectionView {
       this.$tabs.hide()
     }
     this.$tabs.find('li.static a').unbind()
-    return this.$tabs.on('keydown', 'li.static', function(event) {
+    return this.$tabs.on('keydown', 'li.static', function (event) {
       event.stopPropagation()
       if (event.keyCode === 13 || event.keyCode === 32) {
-        return (window.location.href = $(this)
-          .find('a')
-          .attr('href'))
+        return (window.location.href = $(this).find('a').attr('href'))
       }
     })
   }

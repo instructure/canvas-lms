@@ -16,9 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import React from 'react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import {responsiveQuerySizes} from '../../../utils'
 import {ThreadingToolbar} from '../ThreadingToolbar'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 describe('PostToolbar', () => {
   it('renders provided children', () => {
@@ -67,5 +89,59 @@ describe('PostToolbar', () => {
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
+  })
+
+  it('calls the onOpenIsolatedView callback with the root entry id', async () => {
+    const onOpenIsolatedView = jest.fn()
+    const container = render(
+      <ThreadingToolbar
+        discussionEntry={DiscussionEntry.mock({
+          id: '1',
+          _id: '1',
+          rootEntry: DiscussionEntry.mock({id: '2', _id: '2'})
+        })}
+        searchTerm="neato"
+        onOpenIsolatedView={onOpenIsolatedView}
+      />
+    )
+
+    fireEvent.click(container.getByText('Go to Reply'))
+    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '77', false, '1'))
+  })
+
+  it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
+    const onOpenIsolatedView = jest.fn()
+    const container = render(
+      <ThreadingToolbar
+        discussionEntry={DiscussionEntry.mock({
+          id: '1',
+          _id: '1'
+        })}
+        searchTerm="neato"
+        onOpenIsolatedView={onOpenIsolatedView}
+      />
+    )
+
+    fireEvent.click(container.getByText('Go to Reply'))
+    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '77', false, '1'))
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('should render mobile children', () => {
+      const {queryAllByTestId} = render(
+        <ThreadingToolbar>
+          <>First</>
+          <>Second</>
+        </ThreadingToolbar>
+      )
+
+      expect(queryAllByTestId('mobile-thread-tool')).toBeTruthy()
+    })
   })
 })

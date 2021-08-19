@@ -17,8 +17,10 @@
  */
 
 import I18n from '@canvas/i18n'
+import 'translations/_core_en'
 
 const frames = []
+const enTranslations = I18n.translations.en
 
 export default {
   pushFrame() {
@@ -39,6 +41,11 @@ export default {
   },
   clear() {
     while (frames.length > 0) this.popFrame()
+  },
+  useInitialTranslations() {
+    this.pushFrame()
+    I18n.locale = 'en'
+    I18n.translations = { en: enTranslations }
   },
   stub(locale, translations, cb) {
     if (cb) {

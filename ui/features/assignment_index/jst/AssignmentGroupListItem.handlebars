@@ -66,7 +66,7 @@
         </ul>
       {{/ifAny}}
 
-      {{#if ENV.PERMISSIONS.manage}}
+      {{#if ENV.PERMISSIONS.manage_assignments_add}}
         <a
           href="#"
           class="add_assignment Button--icon-action"
@@ -76,13 +76,15 @@
           <span class="screenreader-only">{{#t}}Add Assignment to {{name}}{{/t}}</span>
           <i class="icon-plus"></i>
         </a>
-
+      {{/if}}
+      {{#ifAny ENV.PERMISSIONS.manage canDelete}}
         <div class="inline-block">
           <button id="ag_{{id}}_manage_link" class="al-trigger Button--icon-action" tabindex="0">
             <span class="screenreader-only">{{#t}}Manage {{name}}{{/t}}</span>
             <i class="icon-more" aria-hidden="true"></i>
           </button>
           <ul class="al-options">
+            {{#if ENV.PERMISSIONS.manage}}
             <li>
               <a
                 class="edit_group icon-edit"
@@ -90,6 +92,7 @@
                 data-focus-returns-to="ag_{{id}}_manage_link"
               >{{#t}}Edit{{/t}}</a>
             </li>
+            {{/if}}
             {{#if canDelete}}
             <li>
               <a
@@ -107,7 +110,7 @@
               >{{#t}}Delete{{/t}}</a>
             </li>
             {{/if}}
-            {{#if canMove}}
+            {{#ifAll ENV.PERMISSIONS.manage canMove}}
             <li>
               <a
                 class="move_contents icon-move-down"
@@ -122,23 +125,27 @@
                 data-focus-returns-to="ag_{{id}}_manage_link"
               >{{#t}}Move Group…{{/t}}</a>
             </li>
+            {{/ifAll}}
+            {{#if ENV.PERMISSIONS.manage}}
+              {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars assignmentGroupMenuPlacements}}
             {{/if}}
-            {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars assignmentGroupMenuPlacements}}
           </ul>
         </div>
-      {{/if}}
+      {{/ifAny}}
     </div>
-
-
   </div>
 
   <div id="assignment_group_{{id}}_assignments" class="assignment-list" >
     <ul class="collectionViewItems ig-list draggable"></ul>
   </div>
 
-  {{#if ENV.PERMISSIONS.manage}}
+  {{#if ENV.PERMISSIONS.manage_assignments_add}}
     <form data-view="createAssignment" class="form-dialog"></form>
+  {{/if}}
+  {{#if ENV.PERMISSIONS.manage}}
     <form data-view="editAssignmentGroup" class="form-dialog"></form>
+  {{/if}}
+  {{#if canDelete}}
     <form data-view="deleteAssignmentGroup" class="form-dialog"></form>
   {{/if}}
 </div>

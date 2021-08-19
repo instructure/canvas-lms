@@ -24,16 +24,19 @@ const locale = {
   "all_4321c3a1": { "message": "Բոլորը" },
   "announcement_list_da155734": { "message": "Հայտարարությունների ցուցակ" },
   "announcements_a4b8ed4a": { "message": "Հայտարարություններ" },
+  "apply_781a2546": { "message": "Կիրառել" },
   "apps_54d24a47": { "message": "Հավելվածներ" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Կողմերի հարաբերակցությունը պահպանվելու է"
   },
   "assignments_1e02582c": { "message": "Հանձնարարություններ" },
+  "attributes_963ba262": { "message": "Հատկանիշեր" },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001թ. Acme Inc." },
   "cancel_caeb1e68": { "message": "Չեղյալ համարել" },
-  "canvas_plugins_705a5016": { "message": "Canvas  միացվող մոդուլներ" },
-  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-    "message": "Սեղմեք ցանկացած էջ՝ այդ էջին հղում տեղադրելու համար:"
+  "choose_usage_rights_33683854": {
+    "message": "Ընտրել օգտագործման իրավունքները..."
   },
+  "clear_2084585f": { "message": "Մաքրել" },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Click to embed { imageName }"
   },
@@ -42,13 +45,20 @@ const locale = {
   },
   "close_d634289d": { "message": "Փակել" },
   "collaborations_5c56c15f": { "message": "Համատեղ աշխատանքներ" },
+  "content_1440204b": { "message": "Բովանդակություն" },
   "content_type_2cf90d95": { "message": "Բովանդակության տեսակ" },
+  "copyright_holder_66ee111": {
+    "message": "Հեղինակային իրավունք ունեցող անձը՝"
+  },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "Դասընթացի ֆայլեր" },
   "course_files_a31f97fc": { "message": "Դասընթացի ֆայլեր" },
   "course_navigation_dd035109": { "message": "Նավարկում դասընթացում" },
+  "creative_commons_license_725584ae": {
+    "message": "\"Creative Commons\" լիցենզիա"
+  },
   "decrease_indent_de6343ab": { "message": "Նվազեցնել ներսի տողագլուխը" },
   "details_98a31b68": { "message": "Մանրամասներ" },
   "dimensions_45ddb7b7": { "message": "Չափերը" },
@@ -57,12 +67,22 @@ const locale = {
   "done_54e3d4b6": { "message": "Պատրաստ է" },
   "due_multiple_dates_cc0ee3f5": { "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ" },
   "embed_image_1080badc": { "message": "Տեղադրել պատկերը" },
+  "external_tools_6e77821": { "message": "Արտաքին գործիքներ" },
   "files_c300e900": { "message": "Ֆայլեր" },
   "files_index_af7c662b": { "message": "Ֆայլերի ցուցիչ" },
+  "format_4247a9c5": { "message": "Ֆորմատ" },
   "generating_preview_45b53be0": { "message": "Կարծիքը գեներացվում է ..." },
   "grades_a61eba0a": { "message": "Գնահատականներ" },
   "group_files_82e5dcdb": { "message": "Խմբի ֆայլեր" },
   "group_navigation_99f191a": { "message": "Խմբի նավարկում" },
+  "home_351838cd": { "message": "Սկիզբ" },
+  "html_editor_fb2ab713": { "message": "HTML խմբագիր" },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Ես հեղինակային իրավունք ունեմ"
+  },
   "image_8ad06": { "message": "Պատկեր" },
   "images_7ce26570": { "message": "Պատկերներ" },
   "increase_indent_6d550a4a": { "message": "Ավելացնել ներսի տողագլուխը" },
@@ -73,14 +93,9 @@ const locale = {
     "message": "Զետեղել մաթեմատիկական հավասարում"
   },
   "invalid_file_type_881cc9b2": { "message": "Ֆայլի անընդունելի տեսակ" },
+  "invalid_url_cbde79f": { "message": "Սխալ URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Արագ հասանելիության ստեղներ" },
   "link_7262adec": { "message": "Հղում" },
-  "link_to_other_content_in_the_course_879163b5": {
-    "message": "Կապակցել դասընթացի այլ բովանդակության հետ:"
-  },
-  "link_to_other_content_in_the_group_3fe25379": {
-    "message": "Հղում խմբի մյուս բովանդակությանը:"
-  },
   "links_14b70841": { "message": "Հղումներ" },
   "load_more_results_460f49a9": { "message": "Load more results" },
   "loading_25990131": { "message": "Բեռնում է..." },
@@ -90,8 +105,13 @@ const locale = {
   "media_af190855": { "message": "Մուլտիմեդիա" },
   "modules_c4325335": { "message": "Մոդուլներ" },
   "my_files_2f621040": { "message": "Իմ ֆայլերը" },
+  "name_1aed4a1b": { "message": "Անուն" },
   "no_e16d9132": { "message": "Ոչ" },
+  "no_preview_is_available_for_this_file_f940114a": {
+    "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"
+  },
   "no_results_940393cf": { "message": "No results." },
+  "none_3b5e34d2": { "message": "Ոչինչ չկա" },
   "options_3ab0ea65": { "message": "Պարամետրեր" },
   "pages_e5414c2c": { "message": "Էջեր" },
   "people_b4ebb13c": { "message": "Մարդիկ" },
@@ -99,19 +119,25 @@ const locale = {
   "published_c944a23d": { "message": "հրապարակված" },
   "quizzes_7e598f57": { "message": "Թեստեր" },
   "record_7c9448b": { "message": "Գրառում" },
-  "recording_98da6bda": { "message": "Ձայնագրում" },
   "rich_content_editor_2708ef21": { "message": "Ֆորմատավորված տեքստի խմբագիր" },
-  "save_11a80ec3": { "message": "Պահպանել" },
   "search_280d00bd": { "message": "Որոնել" },
   "size_b30e1077": { "message": "Չափ" },
-  "start_over_f7552aa9": { "message": "Սկսել նորից" },
+  "star_8d156e09": { "message": "Նշել աստղիկով" },
   "submit_a3cc6859": { "message": "Ուղարկել" },
   "syllabus_f191f65b": { "message": "Դասընթացի ծրագիր" },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Նյութը գտնվում է հանրությանը հասանելի դոմենում"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Նյութը արտոնագրված է  Creative Commons կողմից"
+  },
   "title_ee03d132": { "message": "Վերնագիր" },
   "unpublished_dfd8801": { "message": "չհրապարակված" },
   "upload_file_fd2361b8": { "message": "Բեռնել ֆայլը " },
+  "uploading_19e8a4e7": { "message": "Բեռնում" },
   "url_22a5f3b8": { "message": "URL" },
-  "video_player_b371005": { "message": "Տեսաձայնագրության նվագարկիչ" },
+  "usage_right_ff96f3e2": { "message": "Օգտագործման իրավունք՝" },
+  "view_ba339f93": { "message": "Դիտել" },
   "wiki_home_9cd54d0": { "message": "Վիկիի տնային էջ" },
   "yes_dde87d5": { "message": "Այո" }
 }

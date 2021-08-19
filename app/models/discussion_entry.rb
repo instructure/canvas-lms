@@ -94,6 +94,8 @@ class DiscussionEntry < ActiveRecord::Base
       new_message = Nokogiri::HTML.fragment(message)
       new_message.search('[data-discussion-reply-preview]').remove
       self.message = new_message.to_html
+    else
+      self.include_reply_preview = false
     end
   end
 
@@ -196,12 +198,12 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def quoted_reply_html
-    "<div class=\"mceNonEditable\" \"reply_preview\" data-discussion-reply-preview=\"1\">
+    "<div class=\"mceNonEditable reply_preview\" data-discussion-reply-preview=\"1\">
       <blockquote cite=\"#\">
         <span>
           <strong>#{user.short_name}</strong> #{created_at.iso8601}
         </span>
-        #{message}
+        #{self.deleted? ? "<p>#{I18n.t('Deleted by %{user}', user: editor.short_name)}</p>" : message}
       </blockquote>
     </div>"
   end
@@ -285,9 +287,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where("discussion_entries.workflow_state<>'deleted'") }
-  scope :deleted, -> { where(:workflow_state => 'deleted') }
-
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
   end
@@ -367,12 +366,21 @@ class DiscussionEntry < ActiveRecord::Base
     can :rate
   end
 
-  scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
-  scope :for_users, lambda { |users| where(:user_id => users) }
-  scope :after, lambda { |date| where("created_at>?", date) }
-  scope :top_level_for_topics, lambda { |topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
-  scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :for_user, ->(user) { where(:user_id => user).order("discussion_entries.created_at") }
+  scope :for_users, ->(users) { where(user_id: users) }
+  scope :after, ->(date) { where("created_at>?", date) }
+  scope :top_level_for_topics, ->(topics) { where(root_entry_id: nil, discussion_topic_id: topics) }
+  scope :all_for_topics, ->(topics) { where(discussion_topic_id: topics) }
   scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
+  # when there is no discussion_entry_participant for a user, it is considered unread
+  scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ['unread', nil] }) }
+
+  def self.participant_join_sql(current_user)
+    sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
+      AND discussion_entry_participants.user_id = ?", current_user.id])
+  end
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")

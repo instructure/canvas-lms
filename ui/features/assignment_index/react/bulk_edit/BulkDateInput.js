@@ -22,6 +22,7 @@ import moment from 'moment-timezone'
 import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 BulkDateInput.propTypes = {
   label: string.isRequired,
@@ -54,25 +55,10 @@ function BulkDateInput({
   fancyMidnight,
   interaction
 }) {
-  const locale = ENV?.LOCALE || navigator.language
-
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
-  const formatDate = useCallback(
-    date => {
-      const jsDate = date instanceof Date ? date : new Date(date)
-      const formatter = new Intl.DateTimeFormat(locale, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: timezone
-      })
-      return formatter.format(jsDate)
-    },
-    [locale, timezone]
-  )
+  const formatDate = useDateTimeFormat('date.formats.medium_with_weekday', timezone)
 
   const setDate = useCallback(
     newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
@@ -120,6 +106,7 @@ function BulkDateInput({
       timezone={timezone}
       interaction={interaction}
       messages={messages}
+      withRunningValue
     />
   )
 }

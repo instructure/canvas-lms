@@ -31,6 +31,7 @@ const useCanvasContext = () => {
   const canManage = context?.env?.canManage
   const canImport = context?.env?.canImport
   const isAdmin = context?.env?.isAdmin
+  const isStudent = context?.env?.isStudent
 
   return {
     contextType,
@@ -42,7 +43,8 @@ const useCanvasContext = () => {
     isMobileView,
     canManage,
     canImport,
-    isAdmin
+    isAdmin,
+    isStudent
   }
 }
 

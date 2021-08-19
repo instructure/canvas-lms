@@ -71,7 +71,6 @@ class Enrollment < ActiveRecord::Base
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
-  after_save :restore_submissions_and_scores
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
@@ -1449,12 +1448,6 @@ class Enrollment < ActiveRecord::Base
     ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
   end
 
-  def self.restore_submissions_and_scores_for_enrollments(enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if enrollments.count > 1_000
-    restore_deleted_submissions_for_enrollments(enrollments)
-    restore_deleted_scores_for_enrollments(enrollments)
-  end
-
   private
 
   def enrollments_exist_for_user_in_course?
@@ -1469,57 +1462,6 @@ class Enrollment < ActiveRecord::Base
   def need_to_copy_scores?
     return false unless saved_change_to_id? || being_restored?
     student_or_fake_student? && other_enrollment_of_same_type.present?
-  end
-
-  def restore_submissions_and_scores
-    return unless being_restored?(to_state: "completed")
-
-    # running in an n_strand to handle situations where a SIS import could
-    # update a ton of enrollments from "deleted" to "completed".
-    delay_if_production(n_strand: ["Enrollment#restore_submissions_and_scores", root_account.global_id],
-                        priority: Delayed::LOW_PRIORITY)
-      .restore_submissions_and_scores_now
-  end
-
-  def restore_submissions_and_scores_now
-    restore_deleted_submissions
-    restore_deleted_scores
-  end
-
-  def restore_deleted_submissions
-    Enrollment.restore_deleted_submissions_for_enrollments([self])
-  end
-
-  def self.restore_deleted_submissions_for_enrollments(student_enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if student_enrollments.count > 1_000
-    student_enrollments.group_by(&:course_id).each do |course_id, students|
-      Submission.
-        joins(:assignment).
-        where(user_id: students.map(&:user_id), workflow_state: "deleted", assignments: { context_id: course_id }).
-        merge(Assignment.active).
-        in_batches.
-        update_all("workflow_state = #{DueDateCacher::INFER_SUBMISSION_WORKFLOW_STATE_SQL}")
-    end
-  end
-
-  def restore_deleted_scores
-    Enrollment.restore_deleted_scores_for_enrollments([self])
-  end
-
-  def self.restore_deleted_scores_for_enrollments(student_enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if student_enrollments.count > 1_000
-    student_enrollments.group_by(&:course_id).each do |_course_id, students|
-      course = students.first.course
-      assignment_groups = course.assignment_groups.active.except(:order)
-      grading_periods = GradingPeriod.for(course)
-
-      Score.where(course_score: true).or(
-        Score.where(assignment_group: assignment_groups)
-      ).or(
-        Score.where(grading_period: grading_periods)
-      ).where(enrollment_id: students.map(&:id), workflow_state: "deleted").
-        update_all(workflow_state: "active")
-    end
   end
 
   def other_enrollment_of_same_type

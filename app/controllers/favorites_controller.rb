@@ -272,10 +272,18 @@ class FavoritesController < ApplicationController
   # When we have other favorites, this needs to be modified to handle the other
   # types, rather than just courses.
   def check_defaults
-    return unless @current_user.favorites.count == 0
-    @current_user.menu_courses.each do |course|
-      @current_user.favorites.create :context => course
+    return if @current_user.favorites.exists?
+
+    @current_user.shard.activate do
+      Favorite.transaction do
+        @current_user.menu_courses.each do |course|
+          @current_user.favorites.create :context => course
+        end
+      end
     end
+  rescue ActiveRecord::RecordNotUnique
+    # another process got to it first
+    nil
   end
 
   def touch_user

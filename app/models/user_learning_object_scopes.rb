@@ -52,9 +52,9 @@ module UserLearningObjectScopes
   end
 
   def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin,
-                                                                       :manage_grades,
-                                                                       :manage_assignments)
+    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades,
+                                                                 *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
     published_visible_assignments = course.active_assignments.published
     published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
                                                                           self, course, is_teacher: false)

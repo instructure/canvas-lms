@@ -25,7 +25,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {accountMocks, deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
-const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
+const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, title = '') =>
   new Array(count).fill(0).reduce(
     (acc, _curr, idx) => ({
       ...acc,
@@ -33,7 +33,9 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
         _id: `${idx + 100}`,
         linkId: `${startId + idx}`,
         title: title || `Learning Outcome ${startId + idx}`,
-        canUnlink
+        canUnlink,
+        parentGroupId: sameGroup ? 1001 : `${1001 + idx}`,
+        parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`
       }
     }),
     {}
@@ -384,6 +386,42 @@ describe('OutcomeRemoveModal', () => {
           'The outcomes that you have selected cannot be removed because they are aligned to content in this course.'
         )
       ).toBeInTheDocument()
+    })
+
+    it('displays group names in alphanumerical order', async () => {
+      const sortedOutcomes = outcomesGenerator(1, 10, true)
+      const unsortedOutcomes = {
+        9: sortedOutcomes[9],
+        5: sortedOutcomes[5],
+        3: sortedOutcomes[3],
+        7: sortedOutcomes[7]
+      }
+      const {findAllByText} = render(
+        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
+      )
+      const outcomes = await findAllByText(/Outcome Group/)
+      expect(outcomes[0]).toContainHTML('Outcome Group 1003')
+      expect(outcomes[1]).toContainHTML('Outcome Group 1005')
+      expect(outcomes[2]).toContainHTML('Outcome Group 1007')
+      expect(outcomes[3]).toContainHTML('Outcome Group 1009')
+    })
+
+    it('displays outcome names in alphanumerical order within a group', async () => {
+      const sortedOutcomes = outcomesGenerator(1, 10, true, true)
+      const unsortedOutcomes = {
+        9: sortedOutcomes[9],
+        5: sortedOutcomes[5],
+        3: sortedOutcomes[3],
+        7: sortedOutcomes[7]
+      }
+      const {findAllByText} = render(
+        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
+      )
+      const outcomes = await findAllByText(/Learning Outcome/)
+      expect(outcomes[0]).toContainHTML('Learning Outcome 3')
+      expect(outcomes[1]).toContainHTML('Learning Outcome 5')
+      expect(outcomes[2]).toContainHTML('Learning Outcome 7')
+      expect(outcomes[3]).toContainHTML('Learning Outcome 9')
     })
 
     describe('deletes outcomes', () => {
