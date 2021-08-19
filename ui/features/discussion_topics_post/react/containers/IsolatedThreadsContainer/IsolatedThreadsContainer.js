@@ -235,6 +235,7 @@ const IsolatedThreadContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        isIsolatedView
         onClick={() =>
           props.onOpenIsolatedView(
             props.discussionEntry.id,

@@ -331,8 +331,8 @@ describe('IsolatedViewContainer', () => {
   it('calls the onOpenIsolatedView callback when clicking reply', async () => {
     const {findAllByText} = setup(defaultProps())
 
-    const replyButton = await findAllByText('Reply')
-    fireEvent.click(replyButton[1])
+    const replyButton = await findAllByText('Quote')
+    fireEvent.click(replyButton[0])
 
     expect(onOpenIsolatedView).toHaveBeenCalledWith('50', '77', true)
   })
