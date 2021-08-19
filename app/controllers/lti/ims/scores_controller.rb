@@ -287,13 +287,12 @@ module Lti::Ims
       end
     end
 
-    # for non-online-upload requests, this check is done by assignment.submit_homework.
-    # but since that method is called in a job for requests with file content items,
-    # do this check up front so that the job doesn't fail later on.
-    # note that we don't care about this check if the attempt number is not going
-    # to get incremented.
+    # a similar check is done by assignment.submit_homework for online_* submission types,
+    # but the AGS should perform this check for all requests that are going to create new
+    # submissions and increment the attempt number, including those with the external_tool
+    # submission type, and those with file content items that are processed in a job.
     def verify_attempts_for_online_upload
-      return unless has_content_items? && new_submission?
+      return unless new_submission?
 
       submission = line_item.assignment.find_or_create_submission(user)
       # if attempts_left is 0, trying to submit will fail
