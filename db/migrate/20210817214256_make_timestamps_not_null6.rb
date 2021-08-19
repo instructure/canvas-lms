@@ -105,6 +105,21 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
     TABLES.each do |table|
       change_column_null(table, :created_at, false)
       change_column_null(table, :updated_at, false)
+    rescue ActiveRecord::NotNullViolation
+      # check if it was a one-time event (all rows missing values are within a 1 week timespan)
+      klass = table.classify.constantize
+      min_id = klass.where(created_at: nil).minimum(:id)
+      max_id = klass.where(created_at: nil).maximum(:id)
+      lower_bound = klass.where("id<?", min_id).order(id: :desc).limit(1).pluck(:created_at).first
+      upper_bound = klass.where("id>?", max_id).order(:id).limit(1).pluck(:created_at).first
+      upper_bound ||= lower_bound if klass.where("id>=?", min_id).count < 10_000
+      lower_bound ||= upper_bound if klass.where("id<=?", max_id).count < 10_000
+      raise unless upper_bound && lower_bound
+      raise if upper_bound - lower_bound > 1.week.to_i
+
+      # and if so, just backfill with a guesstimate
+      klass.where(created_at: nil).update_all(["created_at=?, updated_at=COALESCE(updated_at, ?)", lower_bound, lower_bound])
+      retry
     end
   end
 end
