@@ -186,6 +186,7 @@ export class Grouping extends Component {
           simplifiedControls={this.props.simplifiedControls}
           readOnly={item.readOnly}
           responsiveSize={this.props.responsiveSize}
+          onlineMeetingURL={item.onlineMeetingURL}
         />
       </li>
     ))

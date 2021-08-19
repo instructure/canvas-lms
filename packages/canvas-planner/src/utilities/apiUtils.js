@@ -54,6 +54,7 @@ const getItemDetailsFromPlannable = apiResponse => {
     if (!details.allDay && plannable.end_at && plannable.end_at !== apiResponse.plannable_date) {
       details.endTime = moment(plannable.end_at)
     }
+    details.onlineMeetingURL = plannable.online_meeting_url
   }
 
   return details

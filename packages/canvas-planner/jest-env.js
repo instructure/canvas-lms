@@ -47,6 +47,6 @@ if (!('MutationObserver' in window)) {
   })
 }
 
-if (!window.scroll) {
+if (!window.scroll || window.scroll?.toString().includes('notImplemented')) {
   window.scroll = function () {}
 }

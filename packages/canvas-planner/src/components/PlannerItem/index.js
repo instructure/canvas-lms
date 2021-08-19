@@ -17,13 +17,19 @@
  */
 import React, {Component} from 'react'
 import classnames from 'classnames'
+import moment from 'moment-timezone'
 import {colors} from '@instructure/canvas-theme'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
+import {
+  AccessibleContent,
+  ScreenReaderContent,
+  PresentationContent
+} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {Avatar} from '@instructure/ui-avatar'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+
 import {Button} from '@instructure/ui-buttons'
 import {
   IconAssignmentLine,
@@ -34,7 +40,9 @@ import {
   IconDocumentLine,
   IconEditLine,
   IconPeerReviewLine,
-  IconWarningLine
+  IconWarningLine,
+  IconVideoCameraSolid,
+  IconVideoCameraLine
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
@@ -87,7 +95,8 @@ export class PlannerItem extends Component {
     timeZone: string.isRequired,
     simplifiedControls: bool,
     isMissingItem: bool,
-    readOnly: bool
+    readOnly: bool,
+    onlineMeetingURL: string
   }
 
   static defaultProps = {
@@ -408,6 +417,7 @@ export class PlannerItem extends Component {
             </Text>
           </div>
         </div>
+        {this.props.responsiveSize !== 'small' && this.renderOnlineMeeting()}
       </div>
     )
   }
@@ -450,9 +460,29 @@ export class PlannerItem extends Component {
             </Text>
           </div>
         )}
+        {this.renderMoreDetails()}
+      </div>
+    )
+  }
+
+  renderMoreDetails() {
+    if (this.props.responsiveSize === 'small') {
+      return (
+        <>
+          <div className={styles.moreDetails}>
+            {this.renderTitle()}
+            {this.renderOnlineMeeting()}
+          </div>
+          {this.renderCourseName()}
+        </>
+      )
+    }
+
+    return (
+      <>
         {this.renderTitle()}
         {this.renderCourseName()}
-      </div>
+      </>
     )
   }
 
@@ -570,6 +600,36 @@ export class PlannerItem extends Component {
         </ApplyTheme>
       </div>
     )
+  }
+
+  renderOnlineMeeting() {
+    // simplifiedControls is a surrogate for k5Mode (see PlannerApp/index.js)
+    if (this.props.simplifiedControls && this.props.onlineMeetingURL) {
+      const now = moment()
+      const enabled =
+        (this.props.allDay && now.isSame(this.props.date, 'day')) || // an all day event today
+        (this.props.endTime && now.isBetween(this.props.date, this.props.endTime)) || // during an event
+        (!this.props.endTime && now.isSame(this.props.date, 'day') && now > this.props.date) // after start time today for an event with no end time
+      const srlabel = enabled
+        ? formatMessage('join active online meeting')
+        : formatMessage('join online meeting')
+      return (
+        <div className={styles.onlineMeeting}>
+          <Button
+            data-testid={enabled ? 'join-button-hot' : 'join-button'}
+            size="small"
+            color={enabled ? 'success' : 'secondary'}
+            margin={this.props.responsiveSize === 'small' ? '0' : '0 0 0 x-small'}
+            renderIcon={enabled ? IconVideoCameraSolid : IconVideoCameraLine}
+            onClick={() => {
+              window.open(this.props.onlineMeetingURL)
+            }}
+          >
+            <AccessibleContent alt={srlabel}>{formatMessage('Join')}</AccessibleContent>
+          </Button>
+        </div>
+      )
+    }
   }
 
   render() {
