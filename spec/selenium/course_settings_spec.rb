@@ -272,7 +272,6 @@ describe "course settings" do
 
       expect(element_exists?('#course_show_announcements_on_home_page')).to be_falsey
       expect(element_exists?('#course_allow_student_discussion_topics')).to be_falsey
-      expect(element_exists?('#course_allow_student_organized_groups')).to be_falsey
       expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
       expect(element_exists?('#course_lock_all_announcements')).to be_falsey
     end
