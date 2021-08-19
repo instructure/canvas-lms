@@ -26,6 +26,7 @@ describe Types::DiscussionEntryType do
   let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id, user: @teacher) }
   let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
+  let(:discussion_sub_entry_type) { GraphQLTypeTester.new(sub_entry, current_user: @teacher) }
   let(:permissions) {
     [
       {
@@ -69,14 +70,18 @@ describe Types::DiscussionEntryType do
       allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
     end
 
+    it 'returns empty string when is a root entry reply' do
+      expect(discussion_entry_type.resolve("replyPreview")).to eq nil
+    end
+
     it 'returns the quoted reply html for reply preview' do
-      expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
+      expect(discussion_sub_entry_type.resolve("replyPreview")).to eq sub_entry.quoted_reply_html
     end
 
     it 'returns the deleted reply html for reply preview' do
-      discussion_entry.update(editor: user_model(name: 'jim bo'))
-      discussion_entry.destroy
-      expect(discussion_entry_type.resolve("replyPreview")).to include "Deleted by jim bo"
+      sub_entry.update(editor: user_model(name: 'jim bo'))
+      sub_entry.destroy
+      expect(discussion_sub_entry_type.resolve("replyPreview")).to include "Deleted by jim bo"
     end
 
     it 'returns the reply preview data' do

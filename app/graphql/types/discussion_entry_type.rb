@@ -79,7 +79,7 @@ module Types
 
     field :reply_preview, String, null: true
     def reply_preview
-      if Account.site_admin.feature_enabled?(:isolated_view)
+      if object.parent_id? && Account.site_admin.feature_enabled?(:isolated_view)
         Promise.all([load_association(:user), load_association(:editor)]).then do
           object.quoted_reply_html
         end

@@ -302,7 +302,7 @@ export const IsolatedViewContainer = props => {
     let preview = ''
     nodes.every(reply => {
       if (reply._id === previewId) {
-        preview = reply.replyPreview
+        preview = reply.replyPreview ? reply.replyPreview : ''
         return false
       }
       return true
