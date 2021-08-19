@@ -1472,8 +1472,8 @@ class Assignment < ActiveRecord::Base
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at = CanvasTime.fancy_midnight(self.due_at)
-    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
+    self.due_at = CanvasTime.fancy_midnight(self.due_at) if will_save_change_to_due_at?
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at) if will_save_change_to_lock_at?
   end
 
   def infer_all_day(tz = nil)
