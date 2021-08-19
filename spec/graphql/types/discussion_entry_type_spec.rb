@@ -23,8 +23,8 @@ require_relative "../graphql_spec_helper"
 
 describe Types::DiscussionEntryType do
   let_once(:discussion_entry) { create_valid_discussion_entry }
-  let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id) }
-  let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id) }
+  let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id, user: @teacher) }
+  let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
   let(:permissions) {
     [
@@ -77,6 +77,13 @@ describe Types::DiscussionEntryType do
       discussion_entry.update(editor: user_model(name: 'jim bo'))
       discussion_entry.destroy
       expect(discussion_entry_type.resolve("replyPreview")).to include "Deleted by jim bo"
+    end
+
+    it 'returns the reply preview data' do
+      sub_entry.update!(message: "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>", include_reply_preview: true)
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { authorName }')).to eq parent.user.short_name
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { createdAt }')).to eq parent.created_at.iso8601
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { message }')).to eq parent.summary
     end
   end
 

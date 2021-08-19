@@ -208,6 +208,14 @@ class DiscussionEntry < ActiveRecord::Base
     </div>"
   end
 
+  def reply_preview_data
+    {
+      author_name: user.short_name,
+      created_at: created_at,
+      message: self.deleted? ? "<p>'Deleted by #{editor.short_name}'</p>" : summary
+    }
+  end
+
   def plaintext_message=(val)
     self.message = format_message(val).first
   end

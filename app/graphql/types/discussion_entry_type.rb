@@ -19,6 +19,14 @@
 #
 
 module Types
+  class ReplyPreviewDataType < ApplicationObjectType
+    graphql_name 'ReplyPreviewDataType'
+
+    field :author_name, String, null: false
+    field :created_at, Types::DateTimeType, null: false
+    field :message, String, null: false
+  end
+
   class DiscussionEntryType < ApplicationObjectType
     graphql_name 'DiscussionEntry'
 
@@ -51,6 +59,21 @@ module Types
         end
       else
         object.message
+      end
+    end
+
+    field :reply_preview_data, Types::ReplyPreviewDataType, null: true
+    def reply_preview_data
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry).then do |parent|
+          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
+            parent.reply_preview_data
+          end
+        end
+      else
+        nil
       end
     end
 
