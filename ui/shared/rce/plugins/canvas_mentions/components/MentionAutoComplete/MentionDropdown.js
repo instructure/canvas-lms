@@ -179,6 +179,13 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
     }
   }, [inputText, mentionData])
 
+  // When only spces exit without saving mention
+  useEffect(() => {
+    if (!inputText.replace(/\s/g, '').length && inputText.length > 0) {
+      onExited(editor, false)
+    }
+  }, [editor, inputText, onExited])
+
   // Make us maintain a focused user when open
   useEffect(() => {
     if (!filteredOptions.includes(focusedUser)) {
