@@ -103,7 +103,8 @@ export const onSetContent = e => {
     if (!document.querySelector(MENTION_MENU_SELECTOR)) {
       const elm = document.createElement('span')
       elm.id = MENTION_MENU_ID
-      document.body.appendChild(elm)
+      editor.getContainer().parentNode.appendChild(elm)
+      console.log(editor.getContainer().parentNode)
       ReactDom.render(
         <MentionsUI
           rceRef={editor.getBody()}
