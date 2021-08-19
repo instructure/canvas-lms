@@ -70,7 +70,13 @@ class CommunicationChannel
         cc.id,
         cc.path_type,
         cc.path_description
-      ] + self.class.report_columns.values.map { |value_generator| value_generator.to_proc.call(cc) }
+      ] + self.class.report_columns.values.map do |value_generator|
+        if value_generator == :last_bounce_at
+          value_generator.to_proc.call(cc)&.to_time&.iso8601
+        else
+          value_generator.to_proc.call(cc)
+        end
+      end
     end
 
     def csv_report
