@@ -839,7 +839,7 @@ describe CommunicationChannelsController do
           cc.id.try(:to_s),
           cc.path_type,
           cc.path_description,
-          cc.last_bounce_at.try(:to_s),
+          cc.last_bounce_at&.to_time&.iso8601,
           cc.last_bounce_summary.try(:to_s)
         ]
       end
