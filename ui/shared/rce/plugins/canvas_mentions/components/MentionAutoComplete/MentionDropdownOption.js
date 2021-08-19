@@ -28,10 +28,10 @@ const MentionDropdownOption = props => {
 
   // Scroll individual item into view when its selected or navigated towards
   useEffect(() => {
-    if (props.isSelected && !props.highlightMouse) {
+    if (props.isSelected && !props.highlightMouse && props.isInteractive) {
       optionRef.current.scrollIntoView(false)
     }
-  }, [props.highlightMouse, props.isSelected])
+  }, [props.highlightMouse, props.isInteractive, props.isSelected])
 
   return (
     <View

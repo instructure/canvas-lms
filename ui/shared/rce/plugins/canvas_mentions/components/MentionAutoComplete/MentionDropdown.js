@@ -18,6 +18,7 @@
 
 import React, {useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo} from 'react'
 import MentionDropdownMenu from './MentionDropdownMenu'
+import MentionDropdownPortal from './MentionDropdownPortal'
 import PropTypes from 'prop-types'
 import getPosition from './getPosition'
 import {
@@ -35,7 +36,7 @@ import {useQuery} from '@apollo/react-hooks'
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
 
-const MentionUIManager = ({editor, onExited, onFocusedUserChange}) => {
+const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   // Setup State
   const [mentionCoordinates, setMentionCoordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -239,24 +240,31 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange}) => {
   }, [editor, onExited, shouldExit])
 
   return (
-    <MentionDropdownMenu
-      instanceId={editor.id}
-      mentionOptions={filteredOptions}
-      show
-      coordiantes={mentionCoordinates}
-      selectedUser={focusedUser?.id}
-      onSelect={user => {
-        setFocusedUser(user)
-        setShouldExit(true)
-      }}
-      onMouseEnter={() => {
-        setFocusType(MOUSE_FOCUS_TYPE)
-      }}
-      onOptionMouseEnter={user => {
-        setFocusedUser(user)
-      }}
-      highlightMouse={focusType === MOUSE_FOCUS_TYPE}
-    />
+    <>
+      <MentionDropdownMenu
+        instanceId={editor.id}
+        mentionOptions={filteredOptions}
+        coordiantes={mentionCoordinates}
+        selectedUser={focusedUser?.id}
+        onSelect={user => {
+          setFocusedUser(user)
+          setShouldExit(true)
+        }}
+        onMouseEnter={() => {
+          setFocusType(MOUSE_FOCUS_TYPE)
+        }}
+        onOptionMouseEnter={user => {
+          setFocusedUser(user)
+        }}
+        highlightMouse={focusType === MOUSE_FOCUS_TYPE}
+      />
+      <MentionDropdownPortal
+        instanceId={editor.id}
+        mentionOptions={filteredOptions}
+        selectedUser={focusedUser?.id}
+        rceBodyRef={rceRef}
+      />
+    </>
   )
 }
 

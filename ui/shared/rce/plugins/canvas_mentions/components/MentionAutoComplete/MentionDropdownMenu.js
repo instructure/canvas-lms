@@ -26,12 +26,12 @@ const MentionDropdownMenu = ({
   onSelect,
   onMouseEnter,
   mentionOptions,
-  show,
   coordiantes,
   selectedUser,
   instanceId,
   highlightMouse,
-  onOptionMouseEnter
+  onOptionMouseEnter,
+  isInteractive
 }) => {
   // Variables
   const directionality = tinyMCE?.activeEditor?.getParam('directionality')
@@ -77,22 +77,23 @@ const MentionDropdownMenu = ({
           onOptionMouseEnter={() => {
             onOptionMouseEnter(user)
           }}
+          isInteractive={isInteractive}
         />
       )
     })
-  }, [mentionOptions, selectedUser, instanceId, highlightMouse, onSelect, onOptionMouseEnter])
+  }, [mentionOptions, selectedUser, instanceId, highlightMouse, onSelect, onOptionMouseEnter, isInteractive])
 
   // Don't show if menu is empty
-  if (!show || mentionOptions?.length === 0) {
+  if (mentionOptions?.length === 0) {
     return null
   }
 
   return (
     <div
       className="mention-dropdown-menu"
-      ref={setPopperElement}
-      style={{...styles.popper, zIndex: 10000}}
-      onMouseEnter={onMouseEnter}
+      ref={isInteractive ? setPopperElement : null}
+      style={isInteractive ? {...styles.popper, zIndex: 10000} : null}
+      onMouseEnter={isInteractive ? onMouseEnter : null}
       {...attributes.popper}
     >
       <View
@@ -138,10 +139,6 @@ MentionDropdownMenu.proptypes = {
    */
   instanceId: PropTypes.string,
   /**
-   * Bool that controls visibility of menu
-   */
-  show: PropTypes.bool,
-  /**
    * cordinates for menu on screen
    */
   coordiantes: PropTypes.object,
@@ -164,5 +161,15 @@ MentionDropdownMenu.proptypes = {
   /**
    * Callback to set user on hover
    */
-  onOptionMouseEnter: PropTypes.func
+  onOptionMouseEnter: PropTypes.func,
+  /**
+   * isInteractive determines if menu will recieve events
+   * This is used for the hidden menu offscreen in the RCE
+   */
+  isInteractive: PropTypes.bool
+}
+
+MentionDropdownMenu.defaultProps = {
+  isInteractive: true,
+  onSelect: () => {}
 }
