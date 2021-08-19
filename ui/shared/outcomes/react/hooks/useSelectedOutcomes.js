@@ -18,18 +18,20 @@
 
 import {useReducer, useCallback} from 'react'
 
-const useSelectedOutcomes = (initialValue = {}) => {
+const useSelectedOutcomes = (initialValue = new Set()) => {
   const reducer = (prevState, action) => {
     switch (action.type) {
       case 'clear': {
-        return {}
+        return new Set()
       }
       case 'toggle': {
-        const {_id, linkId, title, canUnlink, parentGroupId, parentGroupTitle} = action.payload
-        const newState = {...prevState}
-        prevState[linkId]
-          ? delete newState[linkId]
-          : (newState[linkId] = {_id, linkId, title, canUnlink, parentGroupId, parentGroupTitle})
+        const {linkId} = action.payload
+        const newState = new Set(prevState)
+        if (newState.has(linkId)) {
+          newState.delete(linkId)
+        } else {
+          newState.add(linkId)
+        }
         return newState
       }
       default:
@@ -37,20 +39,20 @@ const useSelectedOutcomes = (initialValue = {}) => {
     }
   }
   // reducer supports limited number of actions so they are hard coded as functions
-  const [selectedOutcomes, dispatchSelectedOutcomes] = useReducer(reducer, initialValue)
-  const selectedOutcomesCount = Object.keys(selectedOutcomes).length
+  const [selectedOutcomeIds, dispatchSelectedOutcomeIds] = useReducer(reducer, initialValue)
+  const selectedOutcomesCount = selectedOutcomeIds.size
   const toggleSelectedOutcomes = useCallback(
-    outcome => dispatchSelectedOutcomes({type: 'toggle', payload: outcome}),
+    outcome => dispatchSelectedOutcomeIds({type: 'toggle', payload: {linkId: outcome.linkId}}),
     []
   )
-  const clearSelectedOutcomes = useCallback(() => dispatchSelectedOutcomes({type: 'clear'}), [])
+  const clearSelectedOutcomes = useCallback(() => dispatchSelectedOutcomeIds({type: 'clear'}), [])
 
   return {
-    selectedOutcomes,
+    selectedOutcomeIds,
     selectedOutcomesCount,
     toggleSelectedOutcomes,
     clearSelectedOutcomes,
-    dispatchSelectedOutcomes
+    dispatchSelectedOutcomeIds
   }
 }
 

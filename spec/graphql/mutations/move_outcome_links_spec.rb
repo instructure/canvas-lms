@@ -54,7 +54,9 @@ describe Mutations::MoveOutcomeLinks do
         moveOutcomeLinks(input: {
           #{gql_arguments('', attrs)}
         }) {
-          movedOutcomeLinkIds
+          movedOutcomeLinks {
+            _id
+          }
           errors {
             attribute
             message
@@ -93,8 +95,8 @@ describe Mutations::MoveOutcomeLinks do
         current_user: @teacher
       }
     )
-
-    expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinkIds")).to eql([@outcome_link.id.to_s])
+    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link['_id'] }
+    expect(moved_links).to eql([@outcome_link.id.to_s])
     expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
       {"attribute"=>@outcome_other_context_link.id.to_s, "message"=>"Could not find associated outcome in this context"}
     ])
@@ -199,7 +201,7 @@ describe Mutations::MoveOutcomeLinks do
         }
       )
 
-      expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinkIds")).to eql([])
+      expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks")).to eql([])
       expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
         {"attribute"=>"123123", "message"=>"Could not find associated outcome in this context"}
       ])
@@ -216,7 +218,7 @@ describe Mutations::MoveOutcomeLinks do
         }
       )
 
-      expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinkIds")).to eql([])
+      expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks")).to eql([])
       expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
         {"attribute"=>@outcome_other_context_link.id.to_s, "message"=>"Could not find associated outcome in this context"}
       ])

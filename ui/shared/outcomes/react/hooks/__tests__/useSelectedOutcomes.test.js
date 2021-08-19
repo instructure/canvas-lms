@@ -25,26 +25,21 @@ describe('useSelectedOutcomes', () => {
       (acc, _val, ind) => ({
         ...acc,
         [`${ind + 1}`]: {
-          _id: `${10 + ind}`,
-          linkId: `${ind + 1}`,
-          title: `Outcome ${10 + ind}`,
-          canUnlink: true,
-          parentGroupId: `${100 + ind}`,
-          parentGroupTitle: `Outcome Group ${100 + ind}`
+          linkId: `${ind + 1}`
         }
       }),
       {}
     )
-  const initialState = generateOutcomes(2)
+  const initialState = new Set([...Object.keys(generateOutcomes(2))])
 
   test('should create custom hook with initial state', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    expect(result.current.selectedOutcomes).toBe(initialState)
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
   })
 
   test('should create custom hook with state equal to an empty object if no initial state provided', () => {
     const {result} = renderHook(() => useSelectedOutcomes())
-    expect(result.current.selectedOutcomes).toEqual({})
+    expect(result.current.selectedOutcomeIds).toEqual(new Set())
   })
 
   test('should calculate number of outcomes stored in the hook', () => {
@@ -55,7 +50,7 @@ describe('useSelectedOutcomes', () => {
   test('should clear state if clearSelectedOutcomes is called', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
     act(() => result.current.clearSelectedOutcomes())
-    expect(result.current.selectedOutcomes).toEqual({})
+    expect(result.current.selectedOutcomeIds).toEqual(new Set())
   })
 
   test('should toggle selected outcome in state if toggleSelectedOutcome is called', () => {
@@ -69,9 +64,9 @@ describe('useSelectedOutcomes', () => {
 
   test('should not change state if action type is missing or not defined', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    act(() => result.current.dispatchSelectedOutcomes({}))
-    expect(result.current.selectedOutcomes).toBe(initialState)
-    act(() => result.current.dispatchSelectedOutcomes({type: 'not_defined_action_type'}))
-    expect(result.current.selectedOutcomes).toBe(initialState)
+    act(() => result.current.dispatchSelectedOutcomeIds({}))
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
+    act(() => result.current.dispatchSelectedOutcomeIds({type: 'not_defined_action_type'}))
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
   })
 })

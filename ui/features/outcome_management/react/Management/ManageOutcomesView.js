@@ -181,7 +181,6 @@ const ManageOutcomesView = ({
             ({
               canUnlink,
               _id: linkId,
-              group: {_id: parentGroupId, title: parentGroupTitle},
               node: {_id, title, description, friendlyDescription, canEdit}
             }) => (
               <ManageOutcomeItem
@@ -194,8 +193,6 @@ const ManageOutcomesView = ({
                 canManageOutcome={canEdit}
                 canUnlink={canUnlink}
                 isChecked={!!selectedOutcomes[linkId]}
-                parentGroupId={parentGroupId}
-                parentGroupTitle={parentGroupTitle}
                 onMenuHandler={onOutcomeMenuHandler}
                 onCheckboxHandler={onSelectOutcomesHandler}
               />

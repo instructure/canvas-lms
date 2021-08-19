@@ -24,6 +24,7 @@ import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import {uniqWith, uniqBy, isEqual} from 'lodash'
+import {gql} from '@canvas/apollo'
 
 const useAbortController = dependencies => {
   const abortRef = useRef()
@@ -181,12 +182,51 @@ const useGroupDetail = ({
     })
   }
 
+  const readLearningOutcomes = selectedIds => {
+    return [...selectedIds]
+      .map(linkId => {
+        const link = client.readFragment({
+          id: `ContentTag${linkId}`,
+          fragment: gql`
+            fragment LearningOutcomeFragment on ContentTag {
+              _id
+              canUnlink
+              node {
+                ... on LearningOutcome {
+                  _id
+                  description
+                  title
+                }
+              }
+              group {
+                _id
+                title
+              }
+            }
+          `
+        })
+        return {
+          linkId: link._id,
+          _id: link.node._id,
+          title: link.node.title,
+          canUnlink: link.canUnlink,
+          parentGroupId: link.group._id,
+          parentGroupTitle: link.group.title
+        }
+      })
+      .reduce((dict, link) => {
+        dict[link.linkId] = link
+        return dict
+      }, {})
+  }
+
   return {
     loading,
     group,
     error,
     loadMore,
-    removeLearningOutcomes
+    removeLearningOutcomes,
+    readLearningOutcomes
   }
 }
 

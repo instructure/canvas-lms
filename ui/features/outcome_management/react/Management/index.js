@@ -53,7 +53,7 @@ const OutcomeManagementPanel = () => {
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
-  const {selectedOutcomes, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
+  const {selectedOutcomeIds, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
     useSelectedOutcomes()
   const {
     error,
@@ -68,11 +68,12 @@ const OutcomeManagementPanel = () => {
     createGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
-  const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
+  const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString
   })
 
+  const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -110,6 +111,7 @@ const OutcomeManagementPanel = () => {
       queryCollections({id: selectedParentGroupId})
     }
     removeGroup(selectedGroupId)
+    clearSelectedOutcomes()
   }
 
   const groupMenuHandler = useCallback(
@@ -130,7 +132,14 @@ const OutcomeManagementPanel = () => {
   const outcomeMenuHandler = useCallback(
     (linkId, action) => {
       const edge = group.outcomes.edges.find(edgeEl => edgeEl._id === linkId)
-      setSelectedOutcome({linkId, canUnlink: edge.canUnlink, ...edge.node})
+      const parentGroup = edge.group
+      setSelectedOutcome({
+        linkId,
+        canUnlink: edge.canUnlink,
+        parentGroupId: parentGroup._id,
+        parentGroupTitle: parentGroup.title,
+        ...edge.node
+      })
       if (action === 'remove') {
         openOutcomeRemoveModal()
       } else if (action === 'edit') {

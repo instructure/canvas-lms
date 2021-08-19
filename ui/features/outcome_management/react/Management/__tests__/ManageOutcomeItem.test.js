@@ -38,7 +38,6 @@ describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
   let onCheckboxHandlerMock
   const defaultProps = (props = {}) => ({
-    _id: '1',
     linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
@@ -80,12 +79,7 @@ describe('ManageOutcomeItem', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     const checkbox = getByText('Select outcome')
     fireEvent.click(checkbox)
-    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({
-      _id: '1',
-      linkId: '2',
-      title: 'Outcome Title',
-      canUnlink: true
-    })
+    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({linkId: '2'})
   })
 
   it('displays right pointing caret when description is truncated', () => {

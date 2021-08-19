@@ -1326,6 +1326,7 @@ export const deleteOutcomeMock = ({
 export const moveOutcomeMock = ({
   groupId = '101',
   outcomeLinkIds = ['1', '2'],
+  parentGroupTitle = 'Outcome Group',
   failResponse = false,
   failMutation = false,
   failMutationNoErrMsg = false,
@@ -1335,7 +1336,15 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: outcomeLinkIds,
+        movedOutcomeLinks: outcomeLinkIds.map(idx => ({
+          _id: idx,
+          group: {
+            _id: groupId,
+            title: parentGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'ContentTag'
+        })),
         errors: null
       }
     }
@@ -1356,7 +1365,7 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: [],
+        movedOutcomeLinks: [],
         errors: [
           {
             attribute: 'message',
@@ -1372,7 +1381,7 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: [],
+        movedOutcomeLinks: [],
         errors: [
           {
             attribute: 'message',
@@ -1387,7 +1396,17 @@ export const moveOutcomeMock = ({
   const partialSuccessResponse = {
     data: {
       moveOutcomeLinks: {
-        movedOutcomeLinkIds: outcomeLinkIds.filter((_, idx) => idx !== 0),
+        movedOutcomeLinks: outcomeLinkIds
+          .filter((_, idx) => idx !== 0)
+          .map(idx => ({
+            _id: idx,
+            group: {
+              _id: '101',
+              title: parentGroupTitle,
+              __typename: 'LearningOutcomeGroup'
+            },
+            __typename: 'ContentTag'
+          })),
         __typename: 'MoveOutcomeLinksPayload',
         errors: [
           {
