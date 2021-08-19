@@ -660,6 +660,7 @@ class DiscussionTopicsController < ApplicationController
         redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
         return
       end
+      log_asset_access(@topic, 'topics', 'topics')
 
       if @sequence_asset
         js_env({SEQUENCE: {
