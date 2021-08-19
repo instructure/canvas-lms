@@ -75,7 +75,6 @@ const getOptimisticResponse = text => {
           viewRating: false,
           __typename: 'DiscussionEntryPermissions'
         },
-        rootEntry: null,
         rootEntryId: null,
         parentId: 'PLACEHOLDER',
         __typename: 'DiscussionEntry'

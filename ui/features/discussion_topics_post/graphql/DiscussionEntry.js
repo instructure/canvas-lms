@@ -49,13 +49,6 @@ export const DiscussionEntry = {
         ...DiscussionEntryPermissions
       }
       rootEntryId
-      rootEntry {
-        id
-        rootEntryParticipantCounts {
-          unreadCount
-          repliesCount
-        }
-      }
       parentId
     }
     ${DiscussionEntryPermissions.fragment}
@@ -86,13 +79,6 @@ export const DiscussionEntry = {
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
-    rootEntry: shape({
-      id: string,
-      rootEntryParticipantCounts: shape({
-        unreadCount: number,
-        repliesCount: number
-      })
-    }),
     parentId: string
   }),
 
@@ -128,7 +114,6 @@ export const DiscussionEntry = {
       __typename: 'DiscussionSubentriesConnection'
     },
     rootEntryId = '77',
-    rootEntry = null,
     parentId = '77'
   } = {}) => ({
     id,
@@ -151,7 +136,6 @@ export const DiscussionEntry = {
     permissions,
     discussionSubentriesConnection,
     rootEntryId,
-    rootEntry,
     parentId,
     __typename: 'DiscussionEntry'
   })

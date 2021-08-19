@@ -53,10 +53,12 @@ export function ThreadingToolbar({...props}) {
             isWithinText={false}
             data-testid="go-to-reply"
             onClick={() => {
-              const isolatedId = props.discussionEntry.rootEntry
-                ? props.discussionEntry.rootEntry.id
+              const isolatedId = props.discussionEntry.rootEntryId
+                ? props.discussionEntry.rootEntryId
                 : props.discussionEntry.id
-              const relativeId = props.discussionEntry.rootEntry ? props.discussionEntry._id : null
+              const relativeId = props.discussionEntry.rootEntryId
+                ? props.discussionEntry._id
+                : null
 
               props.onOpenIsolatedView(
                 isolatedId,

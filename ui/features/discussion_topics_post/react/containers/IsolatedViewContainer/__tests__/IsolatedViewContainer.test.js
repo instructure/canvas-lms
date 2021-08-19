@@ -132,7 +132,7 @@ describe('IsolatedViewContainer', () => {
                     _id: '50',
                     id: '50',
                     message: '<p>This is the child reply</p>',
-                    rootEntry: DiscussionEntry.mock({id: '70'})
+                    rootEntryId: '70'
                   })
                 ],
                 pageInfo: PageInfo.mock(),

@@ -92,13 +92,14 @@ describe('PostToolbar', () => {
   })
 
   it('calls the onOpenIsolatedView callback with the root entry id', async () => {
+    window.ENV.isolated_view = true
     const onOpenIsolatedView = jest.fn()
     const container = render(
       <ThreadingToolbar
         discussionEntry={DiscussionEntry.mock({
           id: '1',
           _id: '1',
-          rootEntry: DiscussionEntry.mock({id: '2', _id: '2'})
+          rootEntryId: '2'
         })}
         searchTerm="neato"
         onOpenIsolatedView={onOpenIsolatedView}
@@ -106,16 +107,18 @@ describe('PostToolbar', () => {
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '77', false, '1', '1'))
+    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '2', false, '1', '1'))
   })
 
   it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
+    window.ENV.isolated_view = true
     const onOpenIsolatedView = jest.fn()
     const container = render(
       <ThreadingToolbar
         discussionEntry={DiscussionEntry.mock({
           id: '1',
-          _id: '1'
+          _id: '1',
+          rootEntryId: null
         })}
         searchTerm="neato"
         onOpenIsolatedView={onOpenIsolatedView}
@@ -124,7 +127,7 @@ describe('PostToolbar', () => {
 
     fireEvent.click(container.getByText('Go to Reply'))
     await waitFor(() =>
-      expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '77', false, null, '1')
+      expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
     )
   })
 

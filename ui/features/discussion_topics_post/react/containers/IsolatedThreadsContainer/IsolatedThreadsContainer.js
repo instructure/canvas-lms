@@ -319,10 +319,10 @@ const IsolatedThreadContainer = props => {
                         }
                         goToParent={() => {
                           props.onOpenIsolatedView(
-                            props.discussionEntry.rootEntry.id,
-                            props.discussionEntry.rootEntry.id,
+                            props.discussionEntry.rootEntryId,
+                            props.discussionEntry.rootEntryId,
                             false,
-                            props.discussionEntry.rootEntry.id
+                            props.discussionEntry.rootEntryId
                           )
                         }}
                         goToTopic={props.goToTopic}

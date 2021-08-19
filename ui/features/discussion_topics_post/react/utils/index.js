@@ -97,6 +97,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
       }
 
       data.subentriesCount += 1
+      data.rootEntryParticipantCounts.repliesCount += 1
 
       cache.writeFragment({
         ...discussionEntryOptions,
