@@ -95,6 +95,18 @@ class WikiPage < ActiveRecord::Base
     self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
   end
 
+  def context
+    unless association(:context).loaded?
+      if association(:wiki).loaded? &&
+        wiki.context_loaded? &&
+        context_type == wiki.context_type &&
+        context_id == wiki.context_id
+        self.context = wiki.context
+      end
+    end
+    super
+  end
+
   def touch_context
     self.context.touch
   end

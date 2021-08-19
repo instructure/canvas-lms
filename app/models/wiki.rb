@@ -131,9 +131,11 @@ class Wiki < ActiveRecord::Base
   end
 
   def context
-    shard.activate do
-      @context ||= self.id && (self.course || self.group)
-    end
+    @context ||= id && (course || group)
+  end
+
+  def context_loaded?
+    @context || association(:course).loaded? || association(:@group).loaded?
   end
 
   def context_type
