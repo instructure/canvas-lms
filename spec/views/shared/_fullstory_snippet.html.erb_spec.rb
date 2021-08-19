@@ -21,16 +21,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "shared/_fullstory_snippet.html.erb" do
+describe 'shared/_fullstory_snippet.html.erb' do
   before do
     controller.singleton_class.class_eval do
-
       protected
+
       def fullstory_app_key
-        "fak"
+        'fak'
       end
       helper_method :fullstory_app_key
-
     end
 
     @context = {}
@@ -41,17 +40,26 @@ describe "shared/_fullstory_snippet.html.erb" do
     assign(:domain_root_account, @domain_root_account)
   end
 
-  it "should render" do
-    render partial: "shared/fullstory_snippet", locals: { }
+  it 'should render' do
+    render partial: 'shared/fullstory_snippet', locals: {}
     expect(response).not_to be_nil
   end
 
-  it "includes the homeroom variable when set" do
-    allow(@current_user).to receive(:global_id).and_return(1)
-    allow(@current_user).to receive(:id).and_return(1)
-    allow(@domain_root_account).to receive(:settings).and_return( { enable_fullstory: true} )
-    render partial: "shared/fullstory_snippet", locals: { }
-    expect(response.body).to include("feature_homeroom_course_bool")
+  describe 'with fullstory enabled' do
+    before(:each) do
+      allow(@current_user).to receive(:global_id).and_return(1)
+      allow(@current_user).to receive(:id).and_return(1)
+      allow(@domain_root_account).to receive(:settings).and_return({ enable_fullstory: true })
+    end
+
+    it 'includes the homeroom variable when set' do
+      render partial: 'shared/fullstory_snippet', locals: {}
+      expect(response.body).to include('feature_homeroom_course_bool')
+    end
+
+    it 'sets the k5_user variable when set' do
+      render partial: 'shared/fullstory_snippet', locals: {}
+      expect(response.body).to include('k5_user_bool')
+    end
   end
 end
-
