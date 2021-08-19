@@ -219,13 +219,13 @@ export const onFocusedUserChange = (focusedUser, ed) => {
     activeDescendant: focusedUser?.ariaActiveDescendantId,
     user: {
       shortName: focusedUser?.name,
-      id: focusedUser?.id
+      id: focusedUser?._id
     }
   }
 
   markerEl?.setAttribute('aria-activedescendant', focusedUser?.ariaActiveDescendantId || '')
   markerEl?.setAttribute('data-displayname', focusedUser?.name || '')
-  markerEl?.setAttribute('data-userId', focusedUser?.id || '')
+  markerEl?.setAttribute('data-userId', focusedUser?._id || '')
 
   currentMentionsSelection = temp
 }

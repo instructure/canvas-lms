@@ -279,7 +279,7 @@ describe('events', () => {
             {
               ariaActiveDescendantId: '#foo',
               name: 'Test User',
-              id: '12345'
+              _id: '12345'
             },
             editor
           )
@@ -437,7 +437,7 @@ describe('events', () => {
       focusedUser = {
         ariaActiveDescendantId: '#foo',
         name: 'Test User',
-        id: '12345'
+        _id: '12345'
       }
 
       editor.setContent(
