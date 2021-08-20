@@ -50,6 +50,17 @@ export const DiscussionEntry = {
       }
       rootEntryId
       parentId
+      quotedEntry {
+        createdAt
+        previewMessage
+        author {
+          shortName
+        }
+        editor {
+          shortName
+        }
+        deleted
+      }
     }
     ${DiscussionEntryPermissions.fragment}
   `,
@@ -79,7 +90,18 @@ export const DiscussionEntry = {
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
-    parentId: string
+    parentId: string,
+    quotedEntry: shape({
+      createdAt: string,
+      previewMessage: string,
+      author: shape({
+        shortName: string
+      }),
+      editor: shape({
+        shortName: string
+      }),
+      deleted: bool
+    })
   }),
 
   mock: ({
@@ -114,7 +136,8 @@ export const DiscussionEntry = {
       __typename: 'DiscussionSubentriesConnection'
     },
     rootEntryId = '77',
-    parentId = '77'
+    parentId = '77',
+    quotedEntry = null
   } = {}) => ({
     id,
     _id,
@@ -137,6 +160,7 @@ export const DiscussionEntry = {
     discussionSubentriesConnection,
     rootEntryId,
     parentId,
+    quotedEntry,
     __typename: 'DiscussionEntry'
   })
 }
