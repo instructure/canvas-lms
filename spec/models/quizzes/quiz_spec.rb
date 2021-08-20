@@ -1658,9 +1658,16 @@ describe Quizzes::Quiz do
       quiz.destroy
       expect(assignment.deleted?).to be_truthy
     end
+
     it 'should raise an error on validation error' do
       quiz = Quizzes::Quiz.new
       expect {quiz.destroy}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not create a new assignment if one doesn't exist" do
+      quiz = @course.quizzes.create!(title: 'test quiz')
+      quiz.destroy
+      expect(quiz.assignment).to be_nil
     end
   end
 
