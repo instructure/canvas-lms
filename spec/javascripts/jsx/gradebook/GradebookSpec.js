@@ -45,6 +45,10 @@ import {
 import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
+import {
+  getAssignmentColumnId,
+  getAssignmentGroupColumnId
+} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 import {
   createGradebook,
@@ -739,86 +743,9 @@ QUnit.module('Gradebook#makeColumnSortFn', {
 
   setup() {
     this.gradebook = createGradebook()
-    sandbox.stub(this.gradebook, 'wrapColumnSortFn')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
   }
-})
-
-QUnit.module('Gradebook#wrapColumnSortFn')
-
-test('returns -1 if second argument is of type total_grade', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({}, {type: 'total_grade'}), -1)
-})
-
-test('returns 1 if first argument is of type total_grade', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({type: 'total_grade'}, {}), 1)
-})
-
-test('returns -1 if second argument is an assignment_group and the first is not', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({}, {type: 'assignment_group'}), -1)
-})
-
-test('returns 1 if first arg is an assignment_group and second arg is not', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({type: 'assignment_group'}, {}), 1)
-})
-
-test('returns difference in object.positions if both args are assignement_groups', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  const a = {type: 'assignment_group', object: {position: 10}}
-  const b = {type: 'assignment_group', object: {position: 5}}
-
-  equal(sortFn(a, b), 5)
-})
-
-test('calls wrapped function when either column is not total_grade nor assignment_group', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn)
-  sortFn({}, {})
-  ok(wrappedFn.called)
-})
-
-test('calls wrapped function with arguments in given order when no direction is given', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn)
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [first, second]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
-})
-
-test('calls wrapped function with arguments in given order when direction is ascending', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'ascending')
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [first, second]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
-})
-
-test('calls wrapped function with arguments in reverse order when direction is descending', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'descending')
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [second, first]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
 })
 
 QUnit.module('Gradebook#rowFilter', {
@@ -4148,27 +4075,6 @@ QUnit.module('Gradebook Grid Events', () => {
   })
 })
 
-QUnit.module('Gradebook#getCustomColumnId')
-
-test('returns a unique key for the custom column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getCustomColumnId('2401'), 'custom_col_2401')
-})
-
-QUnit.module('Gradebook#getAssignmentColumnId')
-
-test('returns a unique key for the assignment column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getAssignmentColumnId('201'), 'assignment_201')
-})
-
-QUnit.module('Gradebook#getAssignmentGroupColumnId')
-
-test('returns a unique key for the assignment group column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getAssignmentGroupColumnId('301'), 'assignment_group_301')
-})
-
 QUnit.module('Gradebook#updateColumnHeaders', {
   setup() {
     const columns = [
@@ -4993,7 +4899,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
     test('sets the column definition postAssignmentGradesTrayOpenForAssignmentId', () => {
       gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
-      const columnId = gradebook.getAssignmentColumnId('2301')
+      const columnId = getAssignmentColumnId('2301')
       const definition = gradebook.gridData.columns.definitions[columnId]
       strictEqual(definition.postAssignmentGradesTrayOpenForAssignmentId, true)
     })
@@ -9414,7 +9320,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
       '{}'
     ])
     gradebook = createGradebook(options)
-    columnId = gradebook.getAssignmentColumnId('2301')
+    columnId = getAssignmentColumnId('2301')
   })
 
   hooks.afterEach(() => {
@@ -9436,11 +9342,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
 
   test('when sorted by assignment group of an anonymous assignment, gradebook changes sort', () => {
     const groupId = '7'
-    gradebook.setSortRowsBySetting(
-      gradebook.getAssignmentGroupColumnId(groupId),
-      'grade',
-      'ascending'
-    )
+    gradebook.setSortRowsBySetting(getAssignmentGroupColumnId(groupId), 'grade', 'ascending')
     gradebook.handleSubmissionPostedChange({
       id: '2301',
       anonymize_students: true,
@@ -9463,7 +9365,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
   })
 
   test('when gradebook is sorted by an unrelated column, gradebook does not change sort', () => {
-    gradebook.setSortRowsBySetting(gradebook.getAssignmentColumnId('2222'), 'grade', 'ascending')
+    gradebook.setSortRowsBySetting(getAssignmentColumnId('2222'), 'grade', 'ascending')
     const sortSettings = gradebook.getSortRowsBySetting()
     gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: true})
     deepEqual(gradebook.getSortRowsBySetting(), sortSettings)

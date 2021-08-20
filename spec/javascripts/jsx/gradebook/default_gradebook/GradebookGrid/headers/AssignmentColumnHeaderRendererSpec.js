@@ -18,8 +18,9 @@
 
 import ReactDOM from 'react-dom'
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import AssignmentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import AssignmentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
+import {getAssignmentColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
@@ -100,7 +101,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       {id: '2201', position: 1, name: 'Assignments', assignments: [assignment]}
     ])
 
-    column = {id: gradebook.getAssignmentColumnId('2301'), assignmentId: '2301'}
+    column = {id: getAssignmentColumnId('2301'), assignmentId: '2301'}
     renderer = new AssignmentColumnHeaderRenderer(gradebook)
   }
 

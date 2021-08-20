@@ -21,11 +21,13 @@ import {
   getStudentGradeForColumn,
   getGradeAsPercent,
   onGridKeyDown,
-  isDefaultSortOrder,
-  localeSort,
   getDefaultSettingKeyForColumnType,
-  sectionList
+  sectionList,
+  getCustomColumnId,
+  getAssignmentColumnId,
+  getAssignmentGroupColumnId
 } from '../Gradebook.utils'
+import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
 
@@ -243,5 +245,23 @@ describe('sectionList', () => {
   it('unescapes section names', () => {
     const results = sectionList(sections)
     expect(results[1].name).toStrictEqual('Hello <script>while(1);</script> world!')
+  })
+})
+
+describe('getCustomColumnId', () => {
+  it('returns a unique key for the custom column', () => {
+    expect(getCustomColumnId('2401')).toStrictEqual('custom_col_2401')
+  })
+})
+
+describe('getAssignmentColumnId', () => {
+  it('returns a unique key for the assignment column', () => {
+    expect(getAssignmentColumnId('201')).toStrictEqual('assignment_201')
+  })
+})
+
+describe('getAssignmentGroupColumnId', () => {
+  it('returns a unique key for the assignment column', () => {
+    expect(getAssignmentGroupColumnId('301')).toStrictEqual('assignment_group_301')
   })
 })

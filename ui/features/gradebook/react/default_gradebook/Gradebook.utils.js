@@ -23,7 +23,6 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import I18n from 'i18n!gradebook'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
-import natcompare from '@canvas/util/natcompare'
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
@@ -114,15 +113,6 @@ export function renderComponent(reactClass, mountPoint, props = {}, children = n
   return ReactDOM.render(component, mountPoint)
 }
 
-export function compareAssignmentPositions(a, b) {
-  const diffOfAssignmentGroupPosition =
-    a.object.assignment_group.position - b.object.assignment_group.position
-  const diffOfAssignmentPosition = a.object.position - b.object.position
-  // order first by assignment_group position and then by assignment position
-  // will work when there are less than 1000000 assignments in an assignment_group
-  return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
-}
-
 export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
   const showDialog = () =>
     showConfirmationDialog({
@@ -141,27 +131,8 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
   }
 }
 
-export function isDefaultSortOrder(sortOrder) {
-  return !['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder)
-}
-
 export function hiddenStudentIdsForAssignment(studentIds, assignment) {
   return _.difference(studentIds, assignment.assignment_visibility)
-}
-
-export function localeSort(a, b, {asc = true, nullsLast = false} = {}) {
-  if (nullsLast) {
-    if (a != null && b == null) {
-      return -1
-    }
-    if (a == null && b != null) {
-      return 1
-    }
-  }
-  if (!asc) {
-    ;[b, a] = [a, b]
-  }
-  return natcompare.strings(a || '', b || '')
 }
 
 export function getDefaultSettingKeyForColumnType(columnType) {
@@ -186,6 +157,14 @@ export function sectionList(sections) {
     })
 }
 
-export function compareAssignmentPointsPossible(a, b) {
-  return a.object.points_possible - b.object.points_possible
+export function getCustomColumnId(customColumnId) {
+  return `custom_col_${customColumnId}`
+}
+
+export function getAssignmentColumnId(assignmentId) {
+  return `assignment_${assignmentId}`
+}
+
+export function getAssignmentGroupColumnId(assignmentGroupId) {
+  return `assignment_group_${assignmentGroupId}`
 }
