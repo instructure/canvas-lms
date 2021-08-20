@@ -54,6 +54,8 @@ const FindOutcomeItem = ({
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
   const importStatus = [importGroupStatus, importOutcomeStatus]
+  const shouldShowSpinner =
+    !isImported && importOutcomeStatus !== IMPORT_COMPLETED && importStatus.includes(IMPORT_PENDING)
   const isOutcomeImported = isImported || importStatus.includes(IMPORT_COMPLETED)
   const onAddHandler = () => importOutcomeHandler(id, 1, false, sourceContextId, sourceContextType)
 
@@ -67,7 +69,7 @@ const FindOutcomeItem = ({
           flexFlow: 'row-reverse nowrap'
         }}
       >
-        {importStatus.includes(IMPORT_PENDING) ? (
+        {shouldShowSpinner ? (
           <View as="div" margin="0 medium" data-testid="outcome-import-pending">
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </View>
