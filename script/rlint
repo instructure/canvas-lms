@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+exit 0 if ENV['DISABLE_RUBOCOP'] == '1'
+
 require_relative './linter'
 require 'optparse'
 
@@ -30,4 +32,4 @@ OptionParser.new do |opts|
 end.parse!
 
 rlint = Linter.new(linter_options)
-rlint.run
+exit(rlint.run ? 0 : 1)
