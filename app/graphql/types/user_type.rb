@@ -133,7 +133,7 @@ module Types
     def notification_preferences
       Loaders::AssociationLoader.for(User, :communication_channels).load(object).then do |comm_channels|
         {
-          channels: comm_channels.unretired,
+          channels: comm_channels.supported.unretired,
           user: object
         }
       end

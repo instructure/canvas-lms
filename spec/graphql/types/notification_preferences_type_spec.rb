@@ -29,9 +29,11 @@ describe Types::NotificationPreferencesType do
   let!(:sms_channel) { communication_channel(user, {username: 'sms', path_type: CommunicationChannel::TYPE_SMS}) }
 
   describe "channels" do
-    it "returns the user's channels" do
+    it "returns the user's supported channels" do
       result = preferences_type.resolve('notificationPreferences { channels { path } }', domain_root_account: Account.default)
-      expect(result).to match_array [email_channel.path, push_channel.path, sms_channel.path]
+      # sms is not considered a supported communication channel
+      expect(result).to_not include sms_channel.path
+      expect(result).to match_array [email_channel.path, push_channel.path]
     end
 
     context "push notifications are disabled on the account" do
@@ -42,23 +44,7 @@ describe Types::NotificationPreferencesType do
       it "does not return push channels" do
         result = preferences_type.resolve('notificationPreferences { channels { path } }', domain_root_account: Account.default)
         expect(result).to_not include push_channel.path
-        expect(result).to match_array [email_channel.path, sms_channel.path]
-      end
-    end
-
-    context "deprecate_sms feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:deprecate_sms)
-      end
-
-      after do
-        Account.site_admin.disable_feature!(:deprecate_sms)
-      end
-
-      it "does not return sms channels" do
-        result = preferences_type.resolve('notificationPreferences { channels { path } }', domain_root_account: Account.default)
-        expect(result).to_not include sms_channel.path
-        expect(result).to match_array [email_channel.path, push_channel.path]
+        expect(result).to match_array [email_channel.path]
       end
     end
 

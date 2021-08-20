@@ -41,10 +41,6 @@ module Types
         channels = channels.reject { |cc| cc.path_type == CommunicationChannel::TYPE_PUSH }
       end
 
-      if Account.site_admin.feature_enabled?(:deprecate_sms)
-        channels = channels.reject { |cc| cc.path_type == CommunicationChannel::TYPE_SMS }
-      end
-
       channels
     end
 

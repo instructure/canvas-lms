@@ -813,4 +813,13 @@ describe CommunicationChannel do
       end
     end
   end
+
+  describe ".supported" do
+    let(:user) { User.create! }
+    let!(:sms_channel) { communication_channel(user, {username: 'sms', path_type: CommunicationChannel::TYPE_SMS}) }
+
+    it "filters sms channels" do
+      expect(CommunicationChannel.supported).to match_array []
+    end
+  end
 end
