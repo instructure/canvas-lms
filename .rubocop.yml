@@ -1,4 +1,5 @@
 require:
+  - rubocop-rails
   - rubocop-rspec
   - rubocop-performance
   # this odd relative path is so that rubocop works when run without "bundle
@@ -8,9 +9,10 @@ require:
 
 AllCops:
   TargetRubyVersion: 2.6
+  NewCops: enable
 
 # our style changes: disabling style rules we aren't interested in
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 Layout/ElseAlignment:
   Enabled: false
@@ -28,7 +30,7 @@ Layout/EmptyLinesAroundMethodBody:
   Enabled: false
 Layout/EmptyLinesAroundModuleBody:
   Enabled: false
-Layout/IndentFirstHashElement:
+Layout/FirstHashElementIndentation:
   Enabled: false
 Layout/IndentationConsistency:
   Enabled: false
@@ -58,7 +60,7 @@ Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 Layout/SpaceInsideReferenceBrackets:
   Enabled: false
-Layout/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: false
 Layout/TrailingWhitespace:
   Enabled: false
@@ -70,8 +72,6 @@ Style/StringLiterals:
 Style/SignalException:
   Enabled: false
 Style/NumericLiterals:
-  Enabled: false
-Style/BracesAroundHashParameters:
   Enabled: false
 Style/PercentLiteralDelimiters:
   Enabled: false
@@ -103,7 +103,7 @@ Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/MethodCallWithArgsParentheses:
   Enabled: false
-Layout/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 Style/Lambda:
   Enabled: false
@@ -220,22 +220,8 @@ Style/RescueModifier:
   Severity: warning
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
-
-# these don't make sense pre-Rails 4
-Rails/FindBy:
-  Enabled: false
-Rails/ActionFilter:
-  Enabled: false
-
-# these are invalid pre-Rails 5
-Rails/HttpPositionalArguments:
-  Enabled: false
-
-# these are invalid pre-Ruby 2.4
-Performance/RegexpMatch:
-  Enabled: false
 
 # SnR is just too low to have this enabled
 Metrics:
@@ -268,7 +254,3 @@ Specs/EnsureSpecExtension:
   Enabled: true
   Exclude:
     - spec/shared_examples/**/*
-
-# this cops is crashing; https://github.com/rubocop-hq/rubocop/issues/6992
-Layout/IndentFirstParameter:
-  Enabled: false
