@@ -87,36 +87,8 @@ describe GraphQLController do
     context "datadog metrics" do
       before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
 
-      it "counts each query top-level field for the request" do
-        test_query = <<~GQL
-          query {
-            course(id: "1") { name }
-            assignment(id: "1") { name }
-            legacyNode(type: User, id: "1") {
-              ... on User { email }
-            }
-          }
-        GQL
-        expect(InstStatsd::Statsd).to receive(:increment).with("graphql.query.course.count", tags: anything)
-        expect(InstStatsd::Statsd).to receive(:increment).with("graphql.query.assignment.count", tags: anything)
-        expect(InstStatsd::Statsd).to receive(:increment).with("graphql.query.legacyNode.count", tags: anything)
-        post :execute, params: {query: test_query}, format: :json
-      end
-
-      it "counts each mutation top-level field for the request" do
-        test_query = <<~GQL
-          mutation {
-            createAssignment(input: {courseId: "1", name: "Do my bidding"}) {
-              assignment { name }
-            }
-            updateAssignment(input: {id: "1", name: "Do it good"}) {
-              assignment { name }
-            }
-          }
-        GQL
-        expect(InstStatsd::Statsd).to receive(:increment).with("graphql.mutation.createAssignment.count", tags: anything)
-        expect(InstStatsd::Statsd).to receive(:increment).with("graphql.mutation.updateAssignment.count", tags: anything)
-        post :execute, params: {query: test_query}, format: :json
+      def expect_increment(metric, tags)
+        expect(InstStatsd::Statsd).to receive(:increment).with(metric, tags: tags)
       end
 
       context "for first-party queries" do
@@ -124,31 +96,67 @@ describe GraphQLController do
           request.headers["GraphQL-Metrics"] = "true"
         end
 
-        it "tags stats for named queries with a hash of the query" do
-          expected_tags = hash_including(:query_md5)
-          expect(InstStatsd::Statsd).to receive(:increment).with("graphql.MyTestQuery.count", tags: expected_tags)
+        it "counts each operation and query top-level field" do
           mark_first_party(request)
-          post :execute, params: {query: 'query MyTestQuery { course(id: "1") { id } }'}, format: :json
+          test_query = <<~GQL
+            query GetStuff {
+              course(id: "1") { name }
+              assignment(id: "1") { name }
+              legacyNode(type: User, id: "1") {
+                ... on User { email }
+              }
+            }
+          GQL
+          expect_increment("graphql.operation.count", operation_name: 'GetStuff', domain: 'test.host', operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'course', operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'assignment', operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'legacyNode', operation_md5: String)
+          post :execute, params: {query: test_query}, format: :json
         end
 
-        it "does not tag stats for unnamed queries with a hash of the query" do
-          expected_tags = hash_not_including(:query_md5)
-          expect(InstStatsd::Statsd).to receive(:increment).with("graphql.unnamed.count", tags: expected_tags)
+        it "counts unnamed operations" do
           mark_first_party(request)
-          post :execute, params: {query: 'query { course(id: "1") { id } }'}, format: :json
+          test_query = <<~GQL
+            query {
+              course(id: "1") { name }
+              assignment(id: "1") { name }
+            }
+          GQL
+          expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'course', operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'assignment', operation_md5: String)
+          post :execute, params: {query: test_query}, format: :json
+        end
+
+        it "counts each mutation top-level field" do
+          mark_first_party(request)
+          test_query = <<~GQL
+            mutation {
+              createAssignment(input: {courseId: "1", name: "Do my bidding"}) {
+                assignment { name }
+              }
+              updateAssignment(input: {id: "1", name: "Do it good"}) {
+                assignment { name }
+              }
+            }
+          GQL
+          expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
+          expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'createAssignment', operation_md5: String)
+          expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'updateAssignment', operation_md5: String)
+          post :execute, params: {query: test_query}, format: :json
         end
       end
 
       context "for third-party queries" do
-        it "buckets stats together under graphql.3rdparty" do
-          expect(InstStatsd::Statsd).to receive(:increment).with("graphql.3rdparty.count", tags: anything)
-          post :execute, params: {query: 'query MyTestQuery { course(id: "1") { id } }'}, format: :json
-        end
-
-        it "does not tag stats with a hash of the query" do
-          expected_tags = hash_not_including(:query_md5)
-          expect(InstStatsd::Statsd).to receive(:increment).with("graphql.3rdparty.count", tags: expected_tags)
-          post :execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+        it "names all operations '3rdparty' and omits hashes" do
+          test_query = <<~GQL
+            query GetStuff {
+              course(id: "1") { name }
+            }
+          GQL
+          expect_increment("graphql.operation.count", operation_name: '3rdparty', domain: 'test.host')
+          expect_increment("graphql.query.count", operation_name: '3rdparty', field: 'course')
+          post :execute, params: {query: test_query}, format: :json
         end
       end
     end
