@@ -31,12 +31,12 @@ class GraphQLController < ApplicationController
   # This action is for use only with the federated API Gateway. See
   # `app/graphql/README.md` for details.
   def subgraph_execute
-    result = execute_on(CanvasSchema.for_federation)
+    result = execute_on(CanvasSchema.for_federation, "subgraph")
     render json: result
   end
 
   def execute
-    result = execute_on(CanvasSchema)
+    result = execute_on(CanvasSchema, "original")
     render json: result
   end
 
@@ -47,7 +47,7 @@ class GraphQLController < ApplicationController
 
   private
 
-  def execute_on(schema)
+  def execute_on(schema, interface_name)
     query = params[:query]
     variables = params[:variables] || {}
     context = {
@@ -62,8 +62,11 @@ class GraphQLController < ApplicationController
       request_id: (Thread.current[:context] || {})[:request_id],
       tracers: [
         Tracers::DatadogTracer.new(
-          request.host_with_port.sub(':', '_'),
-          request.headers["GraphQL-Metrics"] == "true"
+          request.headers["GraphQL-Metrics"] == "true",
+          {
+            domain: request.host_with_port.sub(':', '_'),
+            interface: interface_name
+          }
         )
       ]
     }
