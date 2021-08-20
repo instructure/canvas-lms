@@ -14297,6 +14297,7 @@ hy:
   select_one_8e0af564: "Ընտրել մեկը"
   select_students_for_review_6e004a12: "Ընտրել ունկնդիրներ կարծիքներ ներկայացնելու համար"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Ընտրել այն ֆայլը, որը ցանկանում եք կապակցել կամ ավելացնել ֆայլը, ընտրելով \"Նոր ֆայլը\":"
+  select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Ընտրեք այն ֆայլը, որը ցանկանում եք կապակցել կամ ավելացրեք ֆայլըն, ընտրելով \"Նոր ֆայլ\": "
   select_video_file_35b61d4e: "Ընտրել վիդեո ֆայլ"
   selected_answer: "Դուք ընտրել եք այս պատասխանը:"
   selected_subtree_a7693937: "Ընտրված %{subtree}"
