@@ -7323,7 +7323,7 @@ sv:
   course_grades_22adc27e: "Kursens omdömen"
   course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Bedömningsscheman för kurser kan aktiveras/inaktiveras i Kursinställningar."
   course_groups_e8239a1e: Kursgrupper
-  course_has_no_active_instructors_with_this_id_74f1d8a: "kursen har inga aktiva lärare/instruktörer med detta ID"
+  course_has_no_active_instructors_with_this_id_74f1d8a: "kursen har inga aktiva lärare med detta ID"
   course_has_not_started_yet_ed525dcc: "Kursen har inte startat än"
   course_home_4c4c0107: "Kursens startsida"
   course_home_page_5c61dba7: Kursstartsida
@@ -9784,7 +9784,7 @@ sv:
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Aktivera Gradezilla (namnet är endast tillgällit och kommer ersättas av Gradebook i framtiden)"
   enable_gravatar_8a865b41: "Aktivera Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivera i18n-funktioner i lärandemålexporter"
-  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Aktivera migrering av ärendebanker till New Quizzes under import/kopiering av kurs"
+  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Aktivera migrering av frågebanker till New Quizzes under import/kopiering av kurs"
   enable_moderated_grading_bacd20d8: "Aktivera modererad bedömning."
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Aktivera modererad omdömessättning Endast relevant om flaggan Anonym modererad märkning är aktiverad."
   enable_multiple_grading_periods: |-
@@ -12798,12 +12798,12 @@ sv:
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hur ändrar jag ett kursnamn och kurskod?"
   how_do_i_change_the_course_home_page_326cee50: "Hur ändrar jag vad som ska vara startsida?"
   how_do_i_conclude_a_conference_689d60dc: "Hur avslutar jag en konferens?"
-  how_do_i_contact_my_instructor_184e35ed: "Hur kontaktar jag min instruktör?"
+  how_do_i_contact_my_instructor_184e35ed: "Hur kontaktar jag min lärare?"
   how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: "Hur kopierar jag en Canvas-kurs in i ett nytt kursskal?"
   how_do_i_create_a_conference_in_a_course_69affbf4: "Hur skapar jag en konferens i en kurs?"
-  how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Hur skapar jag en diskussion som instruktör?"
-  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "Hur skapar jag ett Google Drive-samarbete som instruktör?"
-  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "Hur skapar jag ett Microsoft Office 365-samarbete som instruktör?"
+  how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Hur skapar jag en diskussion som lärare?"
+  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "Hur skapar jag ett Google Drive-samarbete som lärare?"
+  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "Hur skapar jag ett Microsoft Office 365-samarbete som lärare?"
   how_do_i_create_a_new_page_in_a_course_37a87285: "Hur skapar jag en ny sida i en kurs?"
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Hur skapar jag ett quiz med individuella frågor?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Hur skapar jag en bedömning med New Quizzes?"
@@ -12846,7 +12846,7 @@ sv:
   how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "Hur stänger jag av och sätter på min kamera och hur använder jag Zoom-reglagen?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Hur laddar jag upp en fil till en kurs?"
   how_do_i_use_course_settings_1e8467e6: "Hur använder jag kursinställningarna?"
-  how_do_i_use_files_as_an_instructor_70a996b: "Hur använder jag filer som instruktör?"
+  how_do_i_use_files_as_an_instructor_70a996b: "Hur använder jag filer som lärare?"
   how_do_i_use_speedgrader_e18e4ca2: "Hur använder jag SpeedGrader?"
   how_do_i_use_the_announcements_index_page_94a14011: "Hur använder jag indexsidan för meddelanden?"
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Hur använder jag indexsidan för samarbeten?"
@@ -12857,7 +12857,7 @@ sv:
   how_do_i_use_the_pages_index_page_dafb986c: "Hur använder jag indexsidan för sidor?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Hur använder jag sidan för personer i en kurs som lärare?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Hur använder jag indexsidan för quiz?"
-  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Hur använder jag kursöversikten som instruktör?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Hur använder jag kursöversikten som lärare?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Hur ser jag ett användarinformation för en student i en kurs?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Hur visar jag analyser för en enskild student?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Hur får jag överblick över och sorterar diskussionsinlägg som lärare?"
@@ -13006,7 +13006,7 @@ sv:
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Om måluppfyllelseskalor är aktiverade kommer rapporten att trunkeras så att den inte innehåller beräkningsmetod, beräkningsheltal, måluppfyllelsepoäng eller bedömningar."
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
       Om New Quizzes är aktiverat kan du skapa och hantera
-      ärendebanker som ägs av specifika kurser och rotkontot i New Quizzes.
+      frågebanker som ägs av specifika kurser och rotkontot i New Quizzes.
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(om inga väljs ska du skicka till alla på hela kontot)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(om ingen väljs ska du skicka till alla på hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Om ingen väljs, visa för alla i hela underkontot)"
@@ -13246,7 +13246,7 @@ sv:
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Förbättrat stöd för New Quizzes i Moduler, däribland skapande av New Quizzes från Moduler"
   improved_outcomes_management_4692f886: "Förbättrad hantering av lärandemål"
   improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Förbättrat stöd för att ta New Quizzes inifrån Moduler."
-  improved_visual_reminders_to_encourage_instructors_f203c7f: "Förbättrade visuella påminnelser som uppmuntrar instruktörer att publicera kurser"
+  improved_visual_reminders_to_encourage_instructors_f203c7f: "Förbättrade visuella påminnelser som uppmuntrar lärare att publicera kurser"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Förbättringar i användarupplevelsen i översikten för lärandemål."
   in_a_few_seconds_538ddff3: "om några sekunder"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "I %{asset_link}, klickar studenter på %{bad_link} som pekar på en sida som inte finns i din kurs."
@@ -13369,8 +13369,8 @@ sv:
     authorize_google_docs: "Innan du kan samarbeta på dokument måste du ge Canvas tillåtelse att hantera ditt Google Docs-konto:"
     authorize_google_drive: "Innan du kan samarbeta på dokument måste du ge Canvas tillåtelse att hantera ditt Google Drive konto:"
   instructions_2f88ee72: Instruktioner
-  instructor_comments_205e0ec8: Instruktörs-kommentarer
-  instructor_has_not_posted_this_grade_3b4c4124: "Instruktören har inte publicerat det här omdömet"
+  instructor_comments_205e0ec8: Lärarkommentarer
+  instructor_has_not_posted_this_grade_3b4c4124: "Läraren har inte publicerat det här omdömet"
   instructor_id_ed9c0d8b: Instruktörs-ID
   instructor_is_working_on_grades_135388d2: "En lärare håller på med bedömningarna"
   instructor_messages_a4c28674: "Instruktörs meddelanden"
@@ -13571,7 +13571,7 @@ sv:
   italy_39_cfad867a: "Italien (+39)"
   italy_daec3097: Italien
   item_banks_1db48044: Frågebanker
-  item_banks_manage_account_e8040580: "Objektbanker – hantera konto"
+  item_banks_manage_account_e8040580: "Frågebanker – hantera konto"
   item_cannot_be_duplicated_cebf3109: "Objekt kan inte kopieras"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} kategoriikon för objektsnamnet %{item_name}"
   item_complete_d334fd43: "(objektet färdigt)"
@@ -14045,8 +14045,8 @@ sv:
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Prenumerationstjänsten för live evenemang har inte konfigurerats"
   liveassessments_92d9edc0: Livebedömningar
   load_bank: 
-    error_loading_banks: "Fel vid inläsning av banker"
-    loading_banks: "Läser in banker ..."
+    error_loading_banks: "Fel vid inläsning av frågebanker"
+    loading_banks: "Läser in frågebanker ..."
   load_gradebook_assignments_by_grading_period_919dfd3c: "Läs in uppgifter från omdömesboken efter omdömesperiod"
   load_more_35d33c7: "Läs in mer"
   load_more_9ca37ccc: "Ladda mer..."
@@ -14425,7 +14425,7 @@ sv:
   manual_8c2665de: Manuell
   manual_configuration_b586fe54: "Manuell konfiguration"
   manual_entry_e4a4f99a: "Manuell inmatning"
-  manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting} (resultat dolda för instruktörer)"
+  manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting} (resultat dolda för lärare)"
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "Manuella synkroniseringar finns tillgängliga var %{coolDown} minut. Vänta %{minutesRemaining} minuter innan du synkroniserar igen."
   manually_9de23e1f: Manuellt
   manually_mark_posts_as_read_afa5d035: "Markera inlägg som lästa manuellt"
@@ -16753,9 +16753,9 @@ sv:
   modules_tutorial_tray_d58ac3cb: "Självstudiefack för moduler"
   month_s_5c17590e: Månad(er)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} som börjar %{time}"
-  moodle_dropdown_many_warning_title: "Det finns %{count} flera rullgardinsmenyfrågor i den här banken som kan ha importerats fel"
+  moodle_dropdown_many_warning_title: "Det finns %{count} flera rullgardinsmenyfrågor i den här frågebanken som kan ha importerats fel"
   moodle_dropdown_warning_title: "Flera rullgardinsmenyfrågor kan ha importerats fel"
-  moodle_formula_many_warning_title: "Det finns %{count} formulärfrågor i den här banken som kan behöva få sina möjliga svar genererade på nytt"
+  moodle_formula_many_warning_title: "Det finns %{count} formulärfrågor i den här frågebanken som kan behöva få sina möjliga svar genererade på nytt"
   moodle_formula_warning_title: "Möjliga svar måste genereras på nytt för formulärfrågor"
   more_cf9cc661: Mer
   more_courses_5ebbe998: "Fler kurser"
@@ -17069,9 +17069,9 @@ sv:
   new_question_group_d9306280: "Ny frågegrupp"
   new_quiz_34aacba6: "Ny quiz"
   new_quiz_statistics_desc: "Aktivera den nya quiz-statistikssidan för en kurs"
-  new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes-konto och ärendebanker på kursnivå"
+  new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes-konto och frågebanker på kursnivå"
   new_quizzes_assignment_build_button_72b6531a: "Versionsknapp för New Quizzes-uppgifter"
-  new_quizzes_banks_migrations_9ab4de4a: "Bankmigrering för New Quizzes"
+  new_quizzes_banks_migrations_9ab4de4a: "Frågebanksmigreringar för New Quizzes"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_embedded_module_progression_cd2307b6: "Förlopp för inbäddad modul i New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes-import"
@@ -17392,7 +17392,7 @@ sv:
       student_appointment_signups: "Ny bokning för mötestillfälle"
       submission_comment: Inlämningskommentar
     content_link_error_description: |-
-        *Endast instruktör och admin:*
+        *Endast lärare och admin:*
         
         Plats och innehåll för en skadad länk som en student har använt
     content_link_error_display: "Fel på innehållslänk"
@@ -18091,7 +18091,7 @@ sv:
   outcomes_and_rubrics_account_course_68d0bf1d: "Lärandemål och matriser (konto/kurs)"
   outcomes_and_rubrics_account_course_f0d23419: "Lärandemål och matriser (konto, kurs)"
   outcomes_and_rubrics_f893d141: "Lärandemål och matriser"
-  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Här kan du skapa lärandemål som tillåter dig att spåra måluppfyllelse i en kurs. För att komma igång, se menyfältet längst upp. Klicka på knappen Nytt lärandemål för att skapa ett nytt lärandemål, eller på knappen Ny grupp för att skapa en ny grupp att organisera dina lärandemål i. Sök-knappen gör det möjligt för dig att använda lärandemål som har skapats av ditt lärosäte eller din institution. När du skapar och använder lärandemål kan du använda panelen till vänster för att navigera genom dina lärandemål. Du kan organisera dina lärandemål genom att organisera dem mellan de olika nivåerna."
+  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Här kan du lägga in lärandemål som gör det möjligt för dig att följa upp måluppfyllelse i en kurs. För att komma igång, klicka på knappen Nytt lärandemål, för att lägga till ett nytt lärandemål, eller på Ny grupp för att organisera dina lärandemål. Sök-funktionen gör det möjligt att hitta och använda lärandemål som redan har skapats av ditt lärosäte. Du använder panelen till vänster för att navigera bland dina tillagda lärandemål. Du kan även organisera lärandemålen genom att dra-flytta dem mellan de olika nivåerna."
   outcomes_csv_format_9005acfb: "Lärandemål i CSV-format"
   outcomes_d1b18d33: Lärandemål
   outcomes_for_student_9f91d4d: "Lärandemål för student"
@@ -19546,7 +19546,7 @@ sv:
       submit_retry_copying: "Det gick inte att kopiera frågan, försök igen ..."
       submit_retry_moving: "Det gick inte att flytta frågan, försök igen ..."
     default_name: "Inget namn"
-    delete_are_you_sure: "Vill du verkligen radera den här banken av frågor?"
+    delete_are_you_sure: "Vill du verkligen radera den här frågebanken av frågor?"
     error_loading_banks: "Fel vid laddande av banker"
     links: 
       more_questions: "fler frågor"
@@ -19556,7 +19556,7 @@ sv:
     move_questions: "Flytta frågor"
     multiple_questions: "Flera frågor"
     question_bank: Frågebank
-    remove_outcome_from_bank: "Vill du verkligen ta bort den här bedömningen från banken?"
+    remove_outcome_from_bank: "Vill du verkligen ta bort den här bedömningen från frågebanken?"
     title: 
       move_copy_questions: "Flytta/kopiera frågor"
     update_outcomes_fail: "Uppdatering av lärandemål misslyckades"
@@ -19565,7 +19565,7 @@ sv:
   question_banks: 
     bank_fail: "Frågebanken skapades inte."
     bank_success: "Frågebanken skapades!"
-    delete_question_bank_prompt: "Vill du verkligen radera den här banken av frågor?"
+    delete_question_bank_prompt: "Vill du verkligen radera den här frågebanken av frågor?"
     index: 
       account_question_banks: "Konto frågebanker"
       add_bank: "Lägg till frågebank"
@@ -19573,7 +19573,7 @@ sv:
       labels: 
         title: "Namn på frågebank"
       page_title: Frågebanker
-      see_bookmarked_banks: "Visa bokmärkta banker"
+      see_bookmarked_banks: "Visa bokmärkta frågebanker"
       user_question_banks: "Användare frågebanker"
     question_bank: 
       bookmark_bank: "Bokmärk den här frågebanken"
@@ -19591,7 +19591,7 @@ sv:
       links: 
         delete_question: "Ta bort den här frågan"
         edit_question: "Ändra den här frågan"
-      move_bank: "flytta/kopiera frågan till en annan bank"
+      move_bank: "flytta/kopiera frågan till en annan frågebank"
     show: 
       button: 
         cancel: Avbryt
@@ -19599,9 +19599,9 @@ sv:
       buttons: 
         add_a_question: "Lägg till en fråga"
         already_bookmarked: "Redan bokmärkt"
-        bookmark: "Bokmärk den här banken"
-        delete: "Radera banken"
-        edit: "Redigera bankdetaljer"
+        bookmark: "Bokmärk den här frågebanken"
+        delete: "Radera frågebanken"
+        edit: "Redigera information om frågebanken"
         move_questions: "Flytta flera frågor"
       edit_warning: "Kom ihåg, ändringar av frågemallar kommer inte automatiskt uppdatera quiz som redan använder frågorna."
       headings: 
@@ -19614,7 +19614,7 @@ sv:
       links: 
         align_outcome: "Tilldela lärandemål"
         more_questions: "fler frågor"
-      loading_banks: "Laddar banker ..."
+      loading_banks: "Laddar frågebanker ..."
       mastery_threshold: "måluppfyllelse vid %{threshold_percentage}"
       move_copy: Flytta/kopiera
       select_bank: "Välj frågebank för frågan:"
@@ -20118,7 +20118,7 @@ sv:
         links: 
           delete_question: "Ta bort den här frågan"
           edit_question: "Ändra den här frågan"
-          move_copy_question: "flytta/kopiera frågan till en annan bank"
+          move_copy_question: "flytta/kopiera frågan till en annan frågebank"
         not_yet_graded: "Inte bedömd än"
         original_score: "Ursprunglig poäng:"
         points_possible: "%{points_possible} poäng"
@@ -20156,7 +20156,7 @@ sv:
         buttons: 
           add_questions: "Lägg till frågor"
           create_group: "Skapa grupp"
-          select_bank: "Välj bank"
+          select_bank: "Välj frågebank"
         group_pick_count: "%{pick_count} frågor"
         group_points: "%{points} per fråga"
         headers: 
@@ -20493,7 +20493,7 @@ sv:
           group_name: Gruppnamn
           number_of_questions: "Antal frågor"
           points_per_question: "Poäng per fråga"
-          question_bank: "Frågor kommer dras från banken"
+          question_bank: "Frågor kommer att hämtas från frågebanken"
         links: 
           link_to_a_question_bank: "Länka till en frågebank"
         show_questions_and_points: "Välj *%{num_questions}* frågor, #%{num_points}# poäng per fråga"
@@ -21518,7 +21518,7 @@ sv:
       create_collaborations: "Skapa studentsamarbeten"
       create_conferences: "Skapa webbkonferenser"
       manage_: "Hantera – (lägg till/redigera/ta bort) "
-      manage_account_banks: "Hantera objektbanker på kontonivå"
+      manage_account_banks: "Hantera frågebanker på kontonivå"
       manage_account_memberships: "Lägg till/ta bort andra admin för kontot"
       manage_account_settings: "Hantera konto-nivå-inställningar"
       manage_admin_users: "Lägg till/ta bort lärare, kursdesigners eller lärarassistenter till/från kursen"
@@ -22297,7 +22297,7 @@ sv:
   send_assignment_name_to_another_user_e2ca494d: "Skicka uppgiften %{name} till en annan användare"
   send_authorization_url_in_lti2_registration_287fcb33: "Skicka auktorisations URL i LTI2 registrering"
   send_comment_4e05f2fb: "Skicka kommentar"
-  send_comment_to_instructor_only_4295a109: "Skicka endast kommentar till instruktör"
+  send_comment_to_instructor_only_4295a109: "Skicka endast kommentar till lärare"
   send_comment_to_the_whole_group_8d41e63a: "Skicka kommentar till hela gruppen"
   send_comment_to_this_student_only_e3d9ca1: "Skicka kommentar endast till den här studenten"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Skicka custom-fält (avmarkera om du inte anväder Canvas zendesk)"
@@ -23217,7 +23217,7 @@ sv:
   show_final_grade_overrides_only_c3017aaa: "Visa endast åsidosättningar av slutliga bedömningar"
   show_groups_navigation_menu_1521d38d: "Visa grupp-navigeringsmeny"
   show_inactive_enrollments_8f4c4824: "Visa inaktiva registreringar"
-  show_instructure_provided_release_notes_filtered_b_f3c285c9: "Visa versionsinformation som tillhandahålls av Instructure filtrerade efter användarroll i hjälpmenyn. Tillgängligt för användare med rollerna administratör, lärare (instruktör) och observatör. Tillämpliga funktioner för studentroller är inkluderade i observatörskommentarer."
+  show_instructure_provided_release_notes_filtered_b_f3c285c9: "Visa versionsinformation som tillhandahålls av Instructure filtrerade efter användarroll i hjälpmenyn. Tillgängligt för användare med rollerna administratör, lärare och observatör. Tillämpliga funktioner för studentroller är inkluderade i observatörskommentarer."
   show_key_1fbf0c64: "Visa nyckel"
   show_less_d5bbf728: "visa färre"
   show_links_to_unpublished_content_30c0450d: "Visa länkar till opublicerat innehåll"
@@ -23594,7 +23594,7 @@ sv:
   starred_no_subject_click_to_unstar_bff04bce: "Favoritmarkerat \"(No subject)\". Klicka för att ta bort favoritmarkeringen."
   starred_subject_click_to_unstar_6aafcddc: "Stjärnmärkt \"%{subject}\". Klicka för att ta bort stjärnmärkningen."
   start_5a4cfcd6: Start
-  start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Starta ett samtal med din instruktör i Canvas-inkorgen."
+  start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Starta ett samtal med din lärare i Canvas-inkorgen."
   start_a_new_course_1f5f2266: "Starta en ny kurs"
   start_a_new_subject_7271b3ec: "Starta ett nytt ämne"
   start_assignment_d56256d3: "Starta uppgift"
@@ -23824,12 +23824,12 @@ sv:
       other: "%{count} under-konton"
   sub_accounts_can_choose_one_of_three_options_b0dfe46a: "Underkonton kan välja ett av tre alternativ:"
   subaccount_91f4c279: Underkonto
-  subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en instruktörsroll i kursen."
-  subaccount_admins_cannot_view_sis_information_with_15a41444: "Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom instruktörsrollen har behörigheten att läsa SIS-data på kontonivå."
+  subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en lärarroll i kursen."
+  subaccount_admins_cannot_view_sis_information_with_15a41444: "Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom lärarrollen har behörigheten att läsa SIS-data på kontonivå."
   subaccount_navigation_account_settings_add9eff9: "Underkontonavigering (Kontoinställningar)"
   subaccount_settings_8549eff7: Underkontoinställningar
   subaccounts_efd02bd4: Underkonton
-  subaccounts_only_have_ownership_of_courses_and_sec_56385a91: "Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata. Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en instruktörsroll i kursen."
+  subaccounts_only_have_ownership_of_courses_and_sec_56385a91: "Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata. Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en lärarroll i kursen."
   subdomain_url_1e43b6f0: "Underdomän URL"
   subject_114b2e98: Ämne
   subject_1bc03dea: "Ämne:"
@@ -24115,7 +24115,7 @@ sv:
       networking_academy_description: "Visa Ciscos svar på de vanligaste frågorna."
       networking_academy_faqs: "Networking Academys vanliga frågor"
       student_support: "NetAcad Support – student"
-      student_support_description: "Din instruktör är din huvudkontaktperson De kan svara på dina frågor om Networking Academy eller kontakta supporten för din räkning. Du kan kontakta din instruktör via inkorgsfunktionen."
+      student_support_description: "Din lärare är din huvudkontaktperson De kan svara på dina frågor om Networking Academy eller kontakta supporten för din räkning. Du kan kontakta din lärare via inkorgsfunktionen."
       support_desk_livechat: "Livechatt med supportdesk"
   support_favorite_lti_tools_in_the_rce_1680436d: "Stöd favorit-LTI-verktyg i RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Få stöd för LaTex matematiska ekvationer nästan överallt"
@@ -24721,7 +24721,7 @@ sv:
   this_assignment_is_complete_5e096a06: "Uppgiften är slutförd!"
   this_assignment_is_currently_being_moderated_ffd280f2: "Den här uppgiften modereras för närvarande"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Den här uppgiften är för närvarande tystad. Det innebär att studenter kan se sina betyg och sin feedback. Vill du av-tysta den nu?"
-  this_assignment_is_currently_unavailable_because_y_129792e0: "Uppgiften är för närvarande inte tillgänglig eftersom du ännu inte uppfyller förhandskraven som din instruktör har angett."
+  this_assignment_is_currently_unavailable_because_y_129792e0: "Uppgiften är för närvarande inte tillgänglig eftersom du ännu inte uppfyller förhandskraven som din lärare har angett."
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Den här uppgiften har utelämnats och kommer inte att räknas in i den totala uträkningen."
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Den här uppgiften är ursäktad och tas inte med i totalbedömningen"
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "Uppgiften är i stängd bedömningsperiod för den här studenten"
@@ -24838,7 +24838,7 @@ sv:
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Det är det nuvarande omdömet för den här studenten."
   this_is_the_default_email_address_f3c421fb: "Detta är de förinställda e-postadresserna"
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "Detta är det nya gränssnittet för förhandsvisning av funktioner. Den är för närvarande i skrivskyddat läge. För att återgå till det gamla användargränssnittet, klicka på knappen. Detta kommer att inaktivera funktionen ”nya funktionsflaggor” och uppdatera sidan."
-  this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: "Här kan du lämna en kommentar och visa feedback från instruktören."
+  this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: "Här kan du lämna en kommentar och visa feedback från läraren."
   this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "När din startsida är klar landar du här."
   this_is_your_course_landing_page_33d445ec: "Detta är startsidan för din kurs"
   this_is_your_course_landing_page_f87a920d: "Detta är din kurs landningssida!"
@@ -25360,7 +25360,7 @@ sv:
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Om du vill korsreferera till en sektion måste även Kurs – lägg till/redigera/ta bort vara aktiverat."
   to_cross_list_sections_course_sections_edit_and_co_6db155a6: "För att korsreferera sektioner måste Kurssektioner – redigera och Kurser – hantera/uppdatera vara aktiverade."
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "För att korsreferera sektioner måste även Kurssektioner – redigera och Hantera kurser: Administratör – hantera/uppdatera vara aktiverade."
-  to_cross_list_sections_course_sections_edit_must_b_4ffea833: "För att korsreferera en sektion måste Kurssektioner – redigera vara aktiverat. Användare måste även vara registrerad som instruktör i kursen som ska korsrefereras."
+  to_cross_list_sections_course_sections_edit_must_b_4ffea833: "För att korsreferera en sektion måste Kurssektioner – redigera vara aktiverat. Användare måste även vara registrerad som lärare i kursen som ska korsrefereras."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "För att korslista sektioner måste även Kurser – lägg till/redigera/ta bort aktiveras."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"Till datum\" kan inte komma före \"Från datum\""
   to_date_cannot_come_before_from_date_3eeb2633: "Till datum kan inte komma före Från datum"
@@ -26934,7 +26934,7 @@ sv:
   we_re_sending_your_message_d586da: "Vi skickar ditt meddelande ..."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Vi ber om ursäkt, ett inloggningsfel har uppstått, kontrollera ditt barns inloggningsuppgifter och försök igen."
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "Vi skickade en fyrsiffrig bekräftelsekod till %{sms_number}. Ange koden nedanför för att aktivera detta sms-nummer."
-  we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Vi har informerat din instruktör om att granska den här länken så fort som möjligt."
+  we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Vi har informerat din lärare om att granska den här länken så fort som möjligt."
   we_were_unable_to_activate_the_app_578defe7: "Vi kunde inte aktivera appen."
   we_were_unable_to_add_the_access_token_1f471fe6: "Vi kunde inte lägga till åtkomsttoken."
   we_were_unable_to_add_the_app_418877ef: "Vi kunde inte lägga till appen."
@@ -27548,13 +27548,13 @@ sv:
   your_group_is_being_created_88c0c024: "Din grupp skapas"
   your_groups_are_being_created_50156e34: "Dina grupper skapas."
   your_homeroom_is_currently_unpublished_93c14f4f: "Ditt fjärrundervisningsrum är för närvarande inte publicerat."
-  your_instructor_has_not_posted_the_grade_while_you_c5cd731c: "Din instruktör har inte publicerat omdömet. Omdömet och kommentarer är inte tillgängliga eftersom din instruktör inte har publicerat omdömet."
+  your_instructor_has_not_posted_the_grade_while_you_c5cd731c: "Din lärare har inte publicerat omdömet. Omdömet och kommentarer är inte tillgängliga eftersom din lärare inte har publicerat omdömet."
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
-      Din instruktör har publicerats ändringar i omdömen och nya kommentare för %{title}, %{course}.
+      Din lärare har publicerats ändringar i omdömen och nya kommentare för %{title}, %{course}.
       
       Mer information finns på %{url}
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
-      Din instruktör har publicerats ändringar i omdömen och nya kommentarer för %{title}. Dessa ändringar kan nu visas.
+      Din lärare har publicerats ändringar i omdömen och nya kommentarer för %{title}. Dessa ändringar kan nu visas.
       
       Du kan se det här: 
       %{url}

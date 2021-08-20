@@ -53,7 +53,6 @@ class ApplicationController < ActionController::Base
   around_action :set_locale
   around_action :enable_request_cache
   around_action :batch_statsd
-  around_action :report_to_datadog
   around_action :compute_http_cost
 
   before_action :clear_idle_connections
@@ -618,19 +617,6 @@ class ApplicationController < ActionController::Base
     if CanvasHttp.cost > 0
       cost_weight = Setting.get('canvas_http_cost_weight', '1.0').to_f
       increment_request_cost(CanvasHttp.cost * cost_weight)
-    end
-  end
-
-  def report_to_datadog(&block)
-    if (metric = params[:datadog_metric]) && metric.present?
-      tags = {
-        domain: request.host_with_port.sub(':', '_'),
-        action: "#{controller_name}.#{action_name}",
-      }
-      InstStatsd::Statsd.increment("graphql.rest_comparison.#{metric}.count", tags: tags)
-      InstStatsd::Statsd.time("graphql.rest_comparison.#{metric}.time", tags: tags, &block)
-    else
-      yield
     end
   end
 
