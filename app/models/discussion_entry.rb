@@ -79,7 +79,7 @@ class DiscussionEntry < ActiveRecord::Base
     mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]').map(&:values)
     user_ids = mention_data.map(&:first)
     User.where(id: user_ids).each do |u|
-      mentions.create!(user: u, root_account_id: root_account_id)
+      mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
     end
   end
 

@@ -113,6 +113,31 @@ describe DiscussionEntry do
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
     end
+
+    describe "edits to an entry" do
+      let!(:entry) {
+        topic.discussion_entries.create(
+          user: student,
+          message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>"
+        )
+      }
+
+      context "a new user is mentioned" do
+        it "should create a mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
+          }.to change {entry.mentions.count}.by 1
+        end
+      end
+
+      context "the same user is mentioned" do
+        it "should not create a new mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude?!</p>")
+          }.to not_change {entry.mentions.count}
+        end
+      end
+    end
   end
 
   context "reply preview" do
