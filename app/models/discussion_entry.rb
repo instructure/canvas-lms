@@ -76,8 +76,8 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def parse_and_create_mentions
-    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]').map(&:values)
-    user_ids = mention_data.map(&:first)
+    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]')
+    user_ids = mention_data.map { |l| l['data-mention'] }
     User.where(id: user_ids).each do |u|
       mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
     end
