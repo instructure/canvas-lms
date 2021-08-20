@@ -489,36 +489,47 @@ class UsersController < ApplicationController
     k5_user = k5_user?(false)
     js_env({K5_USER: k5_user && !k5_disabled}, true)
 
+    # things needed on both k5 and classic dashboards
+    js_env({
+      PREFERENCES: {
+        dashboard_view: @current_user.dashboard_view(@domain_root_account),
+        hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+        custom_colors: @current_user.custom_colors
+      },
+      STUDENT_PLANNER_ENABLED: planner_enabled?,
+      STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
+      STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
+      CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user
+    })
+
     if k5_user?
+      # things needed only for k5 dashboard
       # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
       active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
 
-      # K5-only env variables
       js_env({
         HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) },
-        OBSERVER_LIST: observed_users(@current_user, session)
+        OBSERVER_LIST: observed_users(@current_user, session),
+        SELECTED_CONTEXT_CODES: @current_user.get_preference(:selected_calendar_contexts),
+        SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
+        INITIAL_NUM_K5_CARDS: Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
+        PERMISSIONS: {
+          create_courses_as_admin: @current_user.roles(@domain_root_account).include?('admin'),
+          create_courses_as_teacher: @domain_root_account.grants_right?(@current_user, session, :create_courses)
+        }
       })
-    end
 
-    js_env({
-      :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :PREFERENCES => {
-        :dashboard_view => @current_user.dashboard_view(@domain_root_account),
-        :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
-        :custom_colors => @current_user.custom_colors
-      },
-      :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
-      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups),
-      :INITIAL_NUM_K5_CARDS => Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
-      :PERMISSIONS => {
-        :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
-        :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
-      },
-      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user,
-      :SELECTED_CONTEXT_CODES => @current_user.get_preference(:selected_calendar_contexts),
-      :SELECTED_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10
-    })
+      css_bundle :k5_common, :k5_dashboard, :dashboard_card
+      js_bundle :k5_dashboard
+    else
+      # things needed only for classic dashboard
+      js_env({
+        DASHBOARD_SIDEBAR_URL: dashboard_sidebar_url
+      })
+
+      css_bundle :dashboard
+      js_bundle :dashboard
+    end
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
@@ -527,13 +538,6 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
-    if k5_user?
-      css_bundle :k5_common, :k5_dashboard, :dashboard_card
-      js_bundle :k5_dashboard
-    else
-      css_bundle :dashboard
-      js_bundle :dashboard
-    end
     add_body_class "dashboard-is-planner" if show_planner?
   end
 

@@ -1708,15 +1708,14 @@ describe CoursesController do
         expect(observers[0][:name]).to eq(@student.name)
         expect(observers[0][:id]).to eq(@student.id)
       end
-    end
 
+      it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
+        @course.enable_feature!(:student_outcome_gradebook)
+        user_session(@student)
 
-    it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
-      @course.enable_feature!(:student_outcome_gradebook)
-      user_session(@student)
-
-      get 'show', params: {:id => @course.id}
-      expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+      end
     end
 
     context 'COURSE.latest_announcement' do

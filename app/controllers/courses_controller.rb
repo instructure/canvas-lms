@@ -2091,43 +2091,23 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
-        # Only compute all this for k5 subjects
-        if @context.elementary_subject_course? && @context.grants_right?(@current_user, session, :read_announcements)
-          start_date = 14.days.ago.beginning_of_day
-          end_date = start_date + 28.days
-          scope = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
-            .ordered_between(start_date, end_date)
-          unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
-            scope = scope.visible_to_student_sections(@current_user)
-          end
-          latest_announcement = scope.limit(1).first
+        course_env_variables = {}
+        # env.COURSE variables that apply to both classic and k5 courses
+        course_env_variables.merge!({
+          id: @context.id.to_s,
+          long_name: "#{@context.name} - #{@context.short_name}",
+          pages_url: polymorphic_url([@context, :wiki_pages]),
+          is_student: @context.user_is_student?(@current_user),
+          is_instructor: @context.user_is_instructor?(@current_user) || @context.grants_right?(@current_user, session, :read_as_admin)
+        })
+        # env.COURSE variables that only apply to classic courses
+        unless @context.elementary_subject_course?
+          course_env_variables.merge!({
+            front_page_title: @context&.wiki&.front_page&.title,
+            default_view: default_view
+          })
         end
-
-        js_env({
-                 COURSE: {
-                   id: @context.id.to_s,
-                   name: @context.nickname_for(@current_user),
-                   long_name: "#{@context.name} - #{@context.short_name}",
-                   image_url: @context.image,
-                   banner_image_url: @context.elementary_subject_course? ? @context.banner_image : nil,
-                   color: @context.elementary_subject_course? ? @context.course_color : nil,
-                   pages_url: polymorphic_url([@context, :wiki_pages]),
-                   front_page_title: @context&.wiki&.front_page&.title,
-                   default_view: default_view,
-                   is_student: @context.user_is_student?(@current_user),
-                   is_instructor: @context.user_is_instructor?(@current_user) || @context.grants_right?(@current_user, session, :read_as_admin),
-                   course_overview: @context&.wiki&.front_page&.body,
-                   hide_final_grades: @context.hide_final_grades?,
-                   student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
-                   outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
-                   show_student_view: can_do(@context, @current_user, :use_student_view),
-                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
-                   settings_path: course_settings_path(@context.id),
-                   latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
-                   has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
-                   has_syllabus_body: @context.syllabus_body.present?
-                 }
-               })
+        js_env({COURSE: course_env_variables})
 
         # make sure the wiki front page exists
         if @course_home_view == 'wiki' && @context.wiki.front_page.nil?
@@ -2224,6 +2204,18 @@ class CoursesController < ApplicationController
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
+          if @context.grants_right?(@current_user, session, :read_announcements)
+            start_date = 14.days.ago.beginning_of_day
+            end_date = start_date + 28.days
+            scope = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+                                .ordered_between(start_date, end_date)
+            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
+              scope = scope.visible_to_student_sections(@current_user)
+            end
+            latest_announcement = scope.limit(1).first
+          end
+
+          # env variables that apply only to k5 subjects
           js_env(
             CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
             PERMISSIONS: {
@@ -2235,6 +2227,24 @@ class CoursesController < ApplicationController
             OBSERVER_LIST: observed_users(@current_user, session, @context.id)
           )
 
+          course_env_variables.merge!({
+            name: @context.nickname_for(@current_user),
+            image_url: @context.image,
+            banner_image_url: @context.banner_image,
+            color: @context.course_color,
+            course_overview: @context&.wiki&.front_page&.body,
+            hide_final_grades: @context.hide_final_grades?,
+            student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+            outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
+            show_student_view: can_do(@context, @current_user, :use_student_view),
+            student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
+            settings_path: course_settings_path(@context.id),
+            latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
+            has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
+            has_syllabus_body: @context.syllabus_body.present?
+          })
+
+          js_env({COURSE: course_env_variables}, true)
           js_bundle :k5_course, :context_modules
           css_bundle :k5_common, :k5_course, :content_next, :context_modules2, :grade_summary
         when 'announcements'
