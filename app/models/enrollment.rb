@@ -58,6 +58,7 @@ class Enrollment < ActiveRecord::Base
 
   validate :valid_role?
   validate :valid_course?
+  validate :not_template_course?
   validate :valid_section?
   validate :not_student_view
 
@@ -103,6 +104,12 @@ class Enrollment < ActiveRecord::Base
   def valid_course?
     if !deleted? && course.deleted?
       self.errors.add(:course_id, "is not a valid course")
+    end
+  end
+
+  def not_template_course?
+    if course.template?
+      self.errors.add(:course_id, "is a template course")
     end
   end
 
