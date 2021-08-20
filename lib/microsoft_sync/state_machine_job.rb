@@ -44,7 +44,8 @@
 #   job_state_record.job_state is information about the step that failed,
 #       and data it may need to continue where it left off. There may be other
 #       temporary data in the DB with retry info (e.g. saved with a stash block
-#       and cleaned up in after_failure())
+#       and cleaned up in after_failure()). If a record has been deleted and then
+#       restored, job_state should be set to {restored: true}
 # After a job has hit a final error (error raised, or max `Retry`s surpassed):
 #   job_state_record.workflow_state is "errored"
 #   job_state_record.last_error will have a user-friendly/safe error message
@@ -201,6 +202,15 @@ module MicrosoftSync
         # state/jobs and reset state below). This can happen if jobs were
         # paused for longer than STALE_JOB_TIME and a new job in the queue
         # comes and wipes out the state
+        #
+        # It can also happen if the job_state_record was deleted and then restored
+        # while the job was waiting to be retried. Check that case here and ignore.
+        # job_state will get reset the next time the job completes/retries/errors.
+        if job_state&.dig(:restored)
+          log { "In-progress job starting again but job state record was deleted & restored since" }
+          return
+        end
+
         err = InternalError.new(
           "Job step doesn't match state: #{step.inspect} != #{step_from_job_state.inspect}. " \
           "workflow_state: #{job_state_record.workflow_state}, job_state: #{job_state.inspect}"
