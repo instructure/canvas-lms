@@ -141,6 +141,28 @@ describe('events', () => {
       })
     })
 
+    describe('when the key is tab', () => {
+      beforeEach(() => {
+        event.which = 9
+
+        editor.setContent(
+          `<div data-testid="fake-body" contenteditable="false">
+            <span id="test"> @
+              <span id="mentions-marker" contenteditable="true" aria-activedescendant="test"->wes</span>
+              <span id="mention-menu"></span>
+            </span>
+          </div>`
+        )
+      })
+
+      afterEach(() => (document.body.innerHTML = ''))
+
+      it('does make the body editable', () => {
+        subject()
+        expect(makeBodyEditable).toHaveBeenCalled()
+      })
+    })
+
     describe('when the the key is "enter"', () => {
       beforeEach(() => {
         event.which = 13
@@ -265,6 +287,37 @@ describe('events', () => {
         examplesForMentionsEvents()
       })
 
+      describe('when the key is "tab"', () => {
+        beforeEach(() => {
+          event.which = 9
+
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          expectedValue = 'Tab'
+          expectedMessageType = 'mentions.SelectionEvent'
+
+          onFocusedUserChange(
+            {
+              ariaActiveDescendantId: '#foo',
+              name: 'Test User',
+              _id: '12345'
+            },
+            editor
+          )
+        })
+
+        it('prevents the event default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('inserts the mention', () => {
+          subject()
+          expect(insertMentionFor).toHaveBeenCalled()
+        })
+      })
+
       describe('when the key is "enter"', () => {
         beforeEach(() => {
           event.which = 13
@@ -369,6 +422,16 @@ describe('events', () => {
       })
 
       it('does not broadcast the message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the "tab" key is pressed', () => {
+      beforeEach(() => (event.which = 9))
+
+      it('does not broadcast an input change method', () => {
         subject()
         expect(global.postMessage).not.toHaveBeenCalled()
         expect(global.postMessage).not.toHaveBeenCalled()

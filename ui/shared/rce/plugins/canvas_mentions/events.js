@@ -36,7 +36,7 @@ function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
 
   // Enter key was pressed
-  if (which === KEY_CODES.enter) {
+  if (which === KEY_CODES.enter || which === KEY_CODES.tab) {
     const activeDescendant = editor.dom
       .select(MARKER_SELECTOR)[0]
       ?.getAttribute('aria-activedescendant')
@@ -72,6 +72,7 @@ function isMentionsNavigationEvent(event, editor) {
     which === KEY_CODES.up ||
     which === KEY_CODES.down ||
     which === KEY_CODES.enter ||
+    which === KEY_CODES.tab ||
     which === KEY_CODES.escape
   )
 }
@@ -104,7 +105,6 @@ export const onSetContent = e => {
       const elm = document.createElement('span')
       elm.id = MENTION_MENU_ID
       editor.getContainer().parentNode.appendChild(elm)
-      console.log(editor.getContainer().parentNode)
       ReactDom.render(
         <MentionsUI
           rceRef={editor.getBody()}
@@ -155,7 +155,7 @@ export const onKeyDown = e => {
     }
 
     // Do nothing if the user was selecting a suggestion
-    if (e.which === KEY_CODES.enter) return
+    if (e.which === KEY_CODES.enter || e.which === KEY_CODES.tab) return
 
     // Broadcast the event to mentions components
     broadcastMessage(navigationMessage(e), [editor.getWin(), window])
@@ -178,8 +178,8 @@ export const onKeyUp = e => {
   // Prevent message duplication by returning early
   if (isMentionsNavigationEvent(e, editor)) return
 
-  // "Enter" indicates a selection, not an input change
-  if (e.which === KEY_CODES.enter) return
+  // "Enter" and "Tab" indicates a selection, not an input change
+  if (e.which === KEY_CODES.enter || e.white === KEY_CODES.tab) return
 
   if (inMentionsMarker(editor)) {
     broadcastMessage(inputChangeMessage(editor.selection.getNode().textContent), [
