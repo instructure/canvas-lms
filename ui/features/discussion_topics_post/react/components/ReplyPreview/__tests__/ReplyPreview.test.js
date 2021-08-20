@@ -21,12 +21,17 @@ import {render} from '@testing-library/react'
 
 import {ReplyPreview} from '../ReplyPreview'
 
-const mockProps = {
-  authorName: 'Albus Dumbledore',
-  createdAt: '2021-08-10T12:10:38-06:00',
-  message:
-    'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.'
-}
+const mockProps = ({
+  createdAt = '2021-08-10T12:10:38-06:00',
+  previewMessage = 'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
+  author = {
+    shortName: 'Albus Dumbledore'
+  },
+  editor = {
+    shortName: 'Harry Potter'
+  },
+  deleted = false
+} = {}) => ({createdAt, previewMessage, author, editor, deleted})
 
 const setup = props => {
   return render(<ReplyPreview {...props} />)
@@ -34,26 +39,31 @@ const setup = props => {
 
 describe('Reply Preview', () => {
   it('should render', () => {
-    const container = setup(mockProps)
+    const container = setup(mockProps())
     expect(container).toBeTruthy()
   })
 
   it('author name renders', () => {
-    const container = setup(mockProps)
+    const container = setup(mockProps())
     expect(container.getByText('Albus Dumbledore')).toBeTruthy()
   })
 
   it('created at timestamp renders', () => {
-    const container = setup(mockProps)
+    const container = setup(mockProps())
     expect(container.getByText('Aug 10 6:10pm')).toBeTruthy()
   })
 
   it('message renders', () => {
-    const container = setup(mockProps)
+    const container = setup(mockProps())
     expect(
       container.getByText(
         'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.'
       )
     ).toBeTruthy()
+  })
+
+  it('shows deleted message when deleted', () => {
+    const container = setup(mockProps({deleted: true}))
+    expect(container.getByText('Deleted by Harry Potter')).toBeTruthy()
   })
 })

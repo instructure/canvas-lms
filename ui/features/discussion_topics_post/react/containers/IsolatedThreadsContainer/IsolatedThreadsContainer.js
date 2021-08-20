@@ -351,6 +351,7 @@ const IsolatedThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     <View as="div" padding="x-small none none">
                       <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>

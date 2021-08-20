@@ -43,12 +43,6 @@ module Types
     def message
       if object.deleted?
         nil
-      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
-        load_association(:parent_entry).then do |parent|
-          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
-            parent.quoted_reply_html + object.message
-          end
-        end
       else
         object.message
       end

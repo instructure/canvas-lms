@@ -23,21 +23,32 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import I18n from 'i18n!discussion_topics_post'
 
 export const ReplyPreview = ({...props}) => {
+  const message = props.deleted
+    ? I18n.t('Deleted by %{editor}', {editor: props.editor.shortName})
+    : props.previewMessage
+
   return (
-    <View as="div" borderWidth="0 0 0 large" padding="x-small 0 x-small medium">
+    <View
+      as="div"
+      borderWidth="0 0 0 large"
+      data-testid="reply-preview"
+      margin="0 0 medium 0"
+      padding="x-small 0 x-small medium"
+    >
       <Flex direction="column">
         <Flex.Item>
           <View>
-            <Text weight="bold">{props.authorName}</Text>
+            <Text weight="bold">{props.author.shortName}</Text>
           </View>
           <View margin="0 0 0 small">
             <Text>{DateHelper.formatDatetimeForDiscussions(props.createdAt)}</Text>
           </View>
         </Flex.Item>
         <Flex.Item margin="small 0 0 0">
-          <Text>{props.message}</Text>
+          <Text>{message}</Text>
         </Flex.Item>
       </Flex>
     </View>
@@ -48,7 +59,11 @@ ReplyPreview.propTypes = {
   /**
    * Quoted author
    */
-  authorName: PropTypes.string,
+  author: PropTypes.object,
+  /**
+   * Editor of the quoted message
+   */
+  editor: PropTypes.object,
   /**
    * Quoted reply created at date
    */
@@ -56,5 +71,9 @@ ReplyPreview.propTypes = {
   /**
    * Quoted message
    */
-  message: PropTypes.string
+  previewMessage: PropTypes.string,
+  /**
+   * True if the quoted message has been deleted
+   */
+  deleted: PropTypes.bool
 }
