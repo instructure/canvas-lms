@@ -27,6 +27,9 @@ development:
       live-events:
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events
+        aws_access_key_id: key
+        aws_secret_access_key_dec: secret
+        # stub_credentials: true # can be used in dev to print creds to stdout
       live-events-subscription-service:
         app-host: "http://les.docker"
         sad-panda: null

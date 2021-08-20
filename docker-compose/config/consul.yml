@@ -45,6 +45,8 @@
 #     live-events:
 #       aws_endpoint: http://kinesis.canvaslms.docker
 #       kinesis_stream_name: live-events
+#       aws_access_key_id: key
+#       aws_secret_access_key_dec: secret
 #   init_values:
 #     math-man:
 #       base_url: 'http://mathman.docker'

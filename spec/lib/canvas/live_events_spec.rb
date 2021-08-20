@@ -63,7 +63,9 @@ describe Canvas::LiveEvents do
     def call
       {
         'kinesis_stream_name' => 'fake_stream',
-        'aws_region' => 'us-east-1'
+        'aws_region' => 'us-east-1',
+        'aws_access_key_id' => 'key',
+        'aws_secret_access_key_dec' => 'secret'
       }
     end
   end

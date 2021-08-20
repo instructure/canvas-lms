@@ -61,7 +61,7 @@ describe LiveEvents::Client do
   let(:test_stream_name) { 'my_stream' }
   let(:fclient) { FakeStreamClient.new(test_stream_name) }
 
-  before(:each) do
+  def prep_client_and_worker
     stub_config
     LiveEvents.logger = LELogger.new
     LiveEvents.max_queue_size = -> { 100 }
@@ -79,7 +79,9 @@ describe LiveEvents::Client do
     expect(stream_client.stream).to eq test_stream_name
   end
 
-  describe "config" do
+  describe ".aws_config" do
+    before { prep_client_and_worker }
+
     it "should correctly parse the endpoint" do
       res = LiveEvents::Client.aws_config({
         "aws_endpoint" => "http://example.com:6543/"
@@ -113,10 +115,58 @@ describe LiveEvents::Client do
     end
   end
 
+  describe ".config" do
+    subject { LiveEvents::Client.config }
+    before { allow(LiveEvents).to receive(:settings).and_return(settings) }
+
+    let(:settings) do
+      {
+        'aws_region' => 'us-east-1',
+        'kinesis_stream_name' => 'abc',
+      }
+    end
+
+    context 'when custom_aws_crendentials is present' do
+      let(:settings) { super().merge('custom_aws_credentials' => true) }
+
+      it { is_expected.to eq(settings) }
+    end
+
+    context 'when no custom_aws_credentials or aws access key are given' do
+      let(:settings) { super().merge('aws_secret_access_key_dec' => 'foo') }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when no custom_aws_credentials or aws secret key are given' do
+      let(:settings) { super().merge('aws_access_key_id' => 'bar') }
+
+      it { is_expected.to be_nil }
+    end
+
+    if defined?(Rails)
+      context 'when running in prod even with no custom_aws_credentials or aws access/secret key' do
+        before { allow(Rails.env).to receive(:production?).and_return(true) }
+
+        it { is_expected.to eq(settings) }
+      end
+    end
+
+    context 'when aws access and secret key are given' do
+      let(:settings) do
+        super().merge('aws_secret_access_key_dec' => 'foo', 'aws_access_key_id' => 'bar')
+      end
+
+      it { is_expected.to eq(settings) }
+    end
+  end
+
   describe "post_event" do
-    now = Time.now
+    before { prep_client_and_worker }
 
     it "should call put_records on the kinesis stream" do
+      now = Time.now
+
       @client.post_event('event', {}, now, {}, "123")
       LiveEvents.worker.stop!
       expect_put_records([{
@@ -180,6 +230,8 @@ describe LiveEvents::Client do
   end
 
   describe "LiveEvents helper" do
+    before { prep_client_and_worker }
+
     it "should set context info via set_context and send it with events" do
       LiveEvents.set_context({ user_id: 123 })
 
