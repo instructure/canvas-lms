@@ -44,7 +44,7 @@ class NotificationMessageCreator
     course_ids ||= [@message_data&.dig(:course_id)]
     root_account_id = @message_data&.dig(:root_account_id)
     if course_ids.any? && root_account_id
-      @account = Account.new(id: root_account_id)
+      @account = Account.find_cached(root_account_id)
       @courses = course_ids.map { |id| Course.new(id: id, root_account_id: @account&.id) }
     end
   end
