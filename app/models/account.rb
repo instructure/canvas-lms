@@ -351,6 +351,7 @@ class Account < ActiveRecord::Base
   # Allow accounts with strict data residency requirements to turn off mobile
   # push notifications which may be routed through US datacenters by Google/Apple
   add_setting :enable_push_notifications, boolean: true, root_only: true, default: true
+  add_setting :allow_last_page_on_course_users, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)

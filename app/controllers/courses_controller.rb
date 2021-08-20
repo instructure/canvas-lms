@@ -1057,8 +1057,9 @@ class CoursesController < ApplicationController
           users = users.where(uuid: user_uuids)
         end
 
+        page_opts = {}
         # don't calculate a total count/last page for this endpoint.
-        page_opts = { total_entries: nil }
+        page_opts[:total_entries] = nil unless @domain_root_account.allow_last_page_on_course_users? # doesn't calculate a total count
         users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
         includes = Array(params[:include]).concat(['sis_user_id', 'email'])
 
