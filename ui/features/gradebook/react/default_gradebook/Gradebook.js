@@ -1926,7 +1926,9 @@ class Gradebook extends React.Component {
   }
 
   renderViewOptionsMenu() {
-    // TODO: if enhanced_gradebook_filters is on, don't render the menu at all
+    // TODO: if enhanced_gradebook_filters is enabled, we can skip rendering
+    // this menu when we have the filters in place. Until then, keep rendering
+    // it so we can still filter when we have the flag on.
 
     const mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
     return (this.viewOptionsMenu = renderComponent(
@@ -2064,8 +2066,7 @@ class Gradebook extends React.Component {
     return {
       allowSortingByModules: modulesEnabled,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
-      // TODO: actually save the updated settings
-      onViewOptionsUpdated: () => Promise.resolve(),
+      onViewOptionsUpdated: this.handleViewOptionsUpdated,
       viewOptions: {
         columnSortSettings: {criterion, direction},
         showNotes: this.isTeacherNotesColumnShown(),
@@ -2074,6 +2075,161 @@ class Gradebook extends React.Component {
         viewUngradedAsZero
       }
     }
+  }
+
+  handleViewOptionsUpdated = ({
+    columnSortSettings: {criterion, direction} = {},
+    showNotes,
+    showUnpublishedAssignments,
+    statusColors: colors,
+    viewUngradedAsZero
+  }) => {
+    // We may have to save changes to more than one endpoint, depending on
+    // which options have changed. Additionally, a couple options require us to
+    // update the grid when they change. Let's sort out which endpoints we
+    // actually need to call and return a single promise encapsulating all of
+    // them.
+    const promises = []
+
+    // Column sort settings have their own endpoint.
+    const {criterion: oldCriterion, direction: oldDirection} =
+      this.getColumnSortSettingsViewOptionsMenuProps()
+    const columnSortSettingsChanged = criterion !== oldCriterion || direction !== oldDirection
+    if (columnSortSettingsChanged) {
+      promises.push(this.saveUpdatedColumnOrder({criterion, direction}))
+    }
+
+    // We save changes to the notes column using the custom column API.
+    if (showNotes !== this.isTeacherNotesColumnShown()) {
+      promises.push(this.saveUpdatedTeacherNotesSetting({showNotes}))
+    }
+
+    // Finally, the remaining options are saved to the user's settings.
+    const {
+      showUnpublishedAssignments: oldShowUnpublished,
+      viewUngradedAsZero: oldViewUngradedAsZero
+    } = this.gridDisplaySettings
+
+    const viewUngradedAsZeroChanged =
+      this.courseFeatures.allowViewUngradedAsZero && oldViewUngradedAsZero !== viewUngradedAsZero
+    const showUnpublishedChanged = oldShowUnpublished !== showUnpublishedAssignments
+    const colorsChanged = !_.isEqual(this.getGridColors(), colors)
+
+    if (colorsChanged || showUnpublishedChanged || viewUngradedAsZeroChanged) {
+      const changedSettings = {
+        colors: colorsChanged ? colors : undefined,
+        showUnpublishedAssignments: showUnpublishedChanged ? showUnpublishedAssignments : undefined,
+        viewUngradedAsZero: viewUngradedAsZeroChanged ? viewUngradedAsZero : undefined
+      }
+      promises.push(this.saveUpdatedUserSettings(changedSettings))
+    }
+
+    return Promise.all(promises)
+      .catch(FlashAlert.showFlashError(I18n.t('There was an error updating view options.')))
+      .finally(() => {
+        // Regardless of which options we changed, we most likely need to
+        // update the columns and grid.
+        this.updateColumns()
+        this.updateGrid()
+      })
+  }
+
+  saveUpdatedColumnOrder = ({criterion, direction}) => {
+    const newSortOrder = {direction, sortType: criterion}
+    const {freezeTotalGrade} = this.getColumnOrder()
+
+    return GradebookApi.updateColumnOrder(this.options.context_id, {
+      ...newSortOrder,
+      freezeTotalGrade
+    }).then(() => {
+      this.setColumnOrder(newSortOrder)
+      const columns = this.gridData.columns.scrollable.map(
+        columnId => this.gridData.columns.definitions[columnId]
+      )
+      columns.sort(this.makeColumnSortFn(newSortOrder))
+      this.gridData.columns.scrollable = columns.map(column => column.id)
+    })
+  }
+
+  saveUpdatedUserSettings = ({colors, showUnpublishedAssignments, viewUngradedAsZero}) => {
+    return this.saveSettings({
+      colors,
+      showUnpublishedAssignments,
+      viewUngradedAsZero
+    }).then(() => {
+      // Make various updates to the grid depending on what changed.  These
+      // triple-equals checks are deliberate: null could be an actual value for
+      // the setting, so we use undefined to indicate that the setting hasn't
+      // changed and hence we don't need to update it.
+
+      if (colors !== undefined) {
+        this.setGridColors(colors)
+        this.renderGridColor()
+      }
+
+      if (showUnpublishedAssignments !== undefined) {
+        this.gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments
+      }
+
+      if (viewUngradedAsZero !== undefined) {
+        this.gridDisplaySettings.viewUngradedAsZero = viewUngradedAsZero
+        this.courseContent.students.listStudents().forEach(student => {
+          this.calculateStudentGrade(student, true)
+        })
+        this.updateAllTotalColumns()
+      }
+    })
+  }
+
+  saveUpdatedTeacherNotesSetting = ({showNotes}) => {
+    let promise
+
+    const existingColumn = this.getTeacherNotesColumn()
+    if (existingColumn != null) {
+      promise = GradebookApi.updateTeacherNotesColumn(this.options.context_id, existingColumn.id, {
+        hidden: !showNotes
+      })
+    } else {
+      promise = GradebookApi.createTeacherNotesColumn(this.options.context_id).then(response => {
+        this.gradebookContent.customColumns.push(response.data)
+        const teacherNotesColumn = this.buildCustomColumn(response.data)
+        this.gridData.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
+      })
+    }
+
+    return promise.then(() => {
+      if (showNotes) {
+        this.showNotesColumn()
+        this.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
+      } else {
+        this.hideNotesColumn()
+      }
+    })
+  }
+
+  renderSettingsButton() {
+    const iconSettingsSolid = React.createElement(IconSettingsSolid)
+    const buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
+    const buttonProps = {
+      icon: iconSettingsSolid,
+      id: 'gradebook-settings-button',
+      variant: 'icon',
+      onClick: () => {
+        let ref1
+        return (ref1 = this.gradebookSettingsModal.current) != null ? ref1.open() : undefined
+      }
+    }
+    const screenReaderContent = React.createElement(
+      ScreenReaderContent,
+      {},
+      I18n.t('Gradebook Settings')
+    )
+    return (this.gradebookSettingsModalButton = renderComponent(
+      Button,
+      buttonMountPoint,
+      buttonProps,
+      screenReaderContent
+    ))
   }
 
   renderStatusesModal() {
@@ -2619,7 +2775,12 @@ class Gradebook extends React.Component {
         colors
       }
     }
-    return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
+
+    if (this.options.enhanced_gradebook_filters) {
+      return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
+    } else {
+      return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
+    }
   }
 
   // # Grid Sorting Methods
