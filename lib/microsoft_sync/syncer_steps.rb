@@ -386,6 +386,13 @@ module MicrosoftSync
       retry_object_for_error(e)
     end
 
+    # Only serialize Group (AR model, so really just Group id) when enqueueing
+    # a job. The rest of the instance variables should be reloaded when the job
+    # starts again.
+    def encode_with(coder)
+      coder['group'] = @group
+    end
+
     private
 
     attr_writer :sync_type

@@ -919,4 +919,15 @@ describe MicrosoftSync::SyncerSteps do
   describe '::MAX_PARTIAL_SYNC_CHANGES' do
     it { expect(described_class::MAX_PARTIAL_SYNC_CHANGES).to eq 500 }
   end
+
+  describe 'YAML encoding' do
+    it 'only serializes the group so other values are reloaded when the job runs' do
+      syncer_steps.send(:account_settings)
+      syncer_steps.send(:tenant)
+      expect(syncer_steps.instance_variables).to include *%i[@group @account_settings @tenant]
+      serialized = syncer_steps.to_yaml
+      deserialized = YAML.unsafe_load(serialized)
+      expect(deserialized.instance_variables).to eq %i[@group]
+    end
+  end
 end
