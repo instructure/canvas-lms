@@ -22,23 +22,28 @@ require 'datadog/statsd'
 
 module Tracers
   class DatadogTracer
-    def initialize(first_party, base_tags = {})
+    def initialize(first_party, domain)
       @third_party = !first_party
-      @tags = base_tags
+      @domain = domain
     end
 
     def trace(key, metadata)
       if key == "validate"
-        operation_name = metadata[:query].operation_name
-        query_name = @third_party ? "3rdparty" : operation_name || "unnamed"
+        tags = {}
 
-        @tags[:query_md5] = Digest::MD5.hexdigest(metadata[:query].query_string).to_s unless @third_party || operation_name.nil?
-
-        operation_and_fields(metadata).each do |op_and_field|
-          InstStatsd::Statsd.increment("graphql.#{op_and_field}.count", tags: @tags)
+        if @third_party
+          tags[:operation_name] = "3rdparty"
+        else
+          tags[:operation_name] = metadata[:query].operation_name || "unnamed"
+          tags[:operation_md5] = Digest::MD5.hexdigest(metadata[:query].query_string).to_s
         end
-        InstStatsd::Statsd.increment("graphql.#{query_name}.count", tags: @tags)
-        InstStatsd::Statsd.time("graphql.#{query_name}.time", tags: @tags) do
+
+        op, fields = op_type_and_fields(metadata)
+        fields.each do |field|
+          InstStatsd::Statsd.increment("graphql.#{op}.count", tags: tags.merge(field: field))
+        end
+        InstStatsd::Statsd.increment("graphql.operation.count", tags: tags.merge(domain: @domain))
+        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain)) do
           yield
         end
       else
@@ -51,7 +56,7 @@ module Tracers
     #      course(id: "1") { name }
     #      legacyNode(type: User, id: "5") { sisId }
     #    }
-    # then this will return ["query.course", "query.legacyNode"]
+    # then this will return ["query", ["course", "legacyNode"]]
     #
     # if the operation is:
     #    mutation MyMutation {
@@ -61,11 +66,11 @@ module Tracers
     #        }
     #      }
     #    }
-    # then this will return ["mutation.createAssignment"]
-    def operation_and_fields(metadata)
+    # then this will return ["mutation", ["createAssignment"]]
+    def op_type_and_fields(metadata)
       op = metadata[:query].selected_operation
       op_type = op.operation_type || "query"
-      op.selections.map { |field| "#{op_type}.#{field.name}" }
+      [op_type, op.selections.map(&:name)]
     end
   end
 end
