@@ -1194,10 +1194,12 @@ class ExternalToolsController < ApplicationController
   #      { ...  }]
   #
   def all_visible_nav_tools
-    courses = api_find_all(Course, @course_ids)
-    return unless courses.all? { |course| authorized_action(course, @current_user, :read) }
+    GuardRail.activate(:secondary) do
+      courses = api_find_all(Course, @course_ids)
+      return unless courses.all? { |course| authorized_action(course, @current_user, :read) }
 
-    render :json => external_tools_json_for_courses(courses)
+      render :json => external_tools_json_for_courses(courses)
+    end
   end
 
   # @API Get visible course navigation tools for a single course
@@ -1212,10 +1214,12 @@ class ExternalToolsController < ApplicationController
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/visible_course_nav_tools' \
   #        -H "Authorization: Bearer <token>"
   def visible_course_nav_tools
-    return unless authorized_action(@context, @current_user, :read)
-    return render :json => { :message => 'Only course context is supported' }, :status => :bad_request unless context.is_a?(Course)
+    GuardRail.activate(:secondary) do
+      return unless authorized_action(@context, @current_user, :read)
+      return render :json => { :message => 'Only course context is supported' }, :status => :bad_request unless context.is_a?(Course)
 
-    render :json => external_tools_json_for_courses([@context])
+      render :json => external_tools_json_for_courses([@context])
+    end
   end
 
   private
