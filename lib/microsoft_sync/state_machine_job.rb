@@ -397,14 +397,14 @@ module MicrosoftSync
 
     # Find a delayed job on the strand with arguments that match the selector
     # IMPORTANT: To avoid unnecessary database loads of the state_record
-    # object, this uses SafeYAML to avoid instantiating objects in the YAML;
+    # object, this uses YAML to avoid instantiating objects in the YAML;
     # this also means that the args passed into the selector will be only Ruby
     # primitives. So if you use non-primitives in initial_mem_state, duplicate
     # job detection won't work.
     def find_delayed_job(strand, &args_selector)
       Delayed::Job.where(strand: strand).find_each.find do |job|
         job != Delayed::Worker.current_job && args_selector[
-          SafeYAML.load(job.handler, nil, raise_on_unknown_tag: false)['args']
+          YAML.unsafe_load(job.handler)['args']
         ]
       end
     end

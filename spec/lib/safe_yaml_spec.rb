@@ -21,80 +21,80 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "safe_yaml" do
-  let(:test_yaml) {
-    yaml = <<-YAML
----
-hwia: !map:HashWithIndifferentAccess
-  a: 1
-  b: 2
-float: !float
-  5.1
-float_with_exp: -1.7763568394002505e-15
-float_inf: .inf
-os: !ruby/object:OpenStruct
-  modifiable: true
-  table:
-    :a: 1
-    :b: 2
-    :sub: !ruby/object:OpenStruct
-      modifiable: true
-      table:
-        :c: 3
-str: !str
-  hai
-mime: !ruby/object:Mime::Type
-  string: png
-  symbol:
-  synonyms: []
-http: !ruby/object:URI::HTTP
-  fragment:
-  host: example.com
-  opaque:
-  parser:
-  password:
-  path: /
-  port: 80
-  query:
-  registry:
-  scheme: http
-  user:
-https: !ruby/object:URI::HTTPS
-  fragment:
-  host: example.com
-  opaque:
-  parser:
-  password:
-  path: /
-  port: 443
-  query:
-  registry:
-  scheme: https
-  user:
-ab: !ruby/object:Class AcademicBenchmark::Converter
-qt: !ruby/object:Class Qti::Converter
-verbose_symbol: !ruby/symbol blah
-oo: !ruby/object:OpenObject
-  table:
-    :a: 1
+  let(:test_yaml) do
+    <<~YAML
+      ---
+      hwia: !map:HashWithIndifferentAccess
+        a: 1
+        b: 2
+      float: !float
+        5.1
+      float_with_exp: -1.7763568394002505e-15
+      float_inf: .inf
+      os: !ruby/object:OpenStruct
+        modifiable: true
+        table:
+          :a: 1
+          :b: 2
+          :sub: !ruby/object:OpenStruct
+            modifiable: true
+            table:
+              :c: 3
+      str: !str
+        hai
+      mime: !ruby/object:Mime::Type
+        string: png
+        symbol:
+        synonyms: []
+      http: !ruby/object:URI::HTTP
+        fragment:
+        host: example.com
+        opaque:
+        parser:
+        password:
+        path: /
+        port: 80
+        query:
+        registry:
+        scheme: http
+        user:
+      https: !ruby/object:URI::HTTPS
+        fragment:
+        host: example.com
+        opaque:
+        parser:
+        password:
+        path: /
+        port: 443
+        query:
+        registry:
+        scheme: https
+        user:
+      ab: !ruby/object:Class AcademicBenchmark::Converter
+      qt: !ruby/object:Class Qti::Converter
+      verbose_symbol: !ruby/symbol blah
+      oo: !ruby/object:OpenObject
+        table:
+          :a: 1
     YAML
-  }
+  end
 
   it "should be used by default" do
-    yaml = <<-YAML
---- !ruby/object:ActionController::Base
-real_format:
-YAML
-    expect { YAML.load yaml }.to raise_error("Unknown YAML tag '!ruby/object:ActionController::Base'")
+    yaml = <<~YAML
+      --- !ruby/regexp /regex/
+    YAML
+    expect { YAML.load yaml }.to raise_error(Psych::DisallowedClass)
     result = YAML.unsafe_load yaml
-    expect(result.class).to eq ActionController::Base
+    expect(result.class).to eq Regexp
   end
 
   it "doesn't allow deserialization of arbitrary classes" do
-    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error("YAML deserialization of constant not allowed: ActionController::Base")
+    expect { YAML.load(YAML.dump(/regex/)) }.to raise_error(Psych::DisallowedClass)
   end
 
   it "allows deserialization of arbitrary classes when unsafe_loading" do
-    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
+    regex = /regex/
+    expect(YAML.unsafe_load(YAML.dump(regex))).to eq regex
   end
 
   it "should allow some whitelisted classes" do

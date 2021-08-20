@@ -109,7 +109,6 @@ RUN --mount=target=/tmp/src \
     gems/plugins/.i18n* \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
-    lib/canvas_yaml.rb \
     lib/logging_filter.rb \
     lib/request_cache.rb \
     lib/temp_cache.rb \

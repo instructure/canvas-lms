@@ -130,7 +130,6 @@ gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby2_keywords', '0.0.3'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
-gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.1.0'
   gem 'nokogiri-xmlsec-instructure', '0.10.1', require: false
 gem 'sanitize', '5.2.3', require: false

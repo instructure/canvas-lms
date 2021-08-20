@@ -55,7 +55,7 @@ group :test do
   gem 'testrailtagging', '0.3.8.7', require: false
 
   gem 'webmock', '3.8.2', require: false
-    gem 'crack', '0.4.3', require: false
+    gem 'crack', '0.4.5', require: false
   gem 'timecop', '0.9.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
@@ -70,8 +70,8 @@ group :test do
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
-  gem 'axe-core-selenium', '4.1.0', require: false
-  gem 'axe-core-rspec', '4.1.0', require: false
-  gem 'axe-core-api', '4.1.0', require:false
-  gem 'stormbreaker', '0.0.3', require: false
+  gem 'axe-core-selenium', '4.2.1', require: false
+  gem 'axe-core-rspec', '4.2.1', require: false
+  gem 'axe-core-api', '4.2.1', require:false
+  gem 'stormbreaker', '0.0.4', require: false
 end
