@@ -17,6 +17,7 @@
  */
 
 import {createGradebook} from './GradebookSpecHelper'
+import {compareAssignmentPositions, compareAssignmentPointsPossible} from '../Gradebook.utils'
 
 const assignments = [
   {
@@ -240,5 +241,47 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
     const a = {id: 'NO', object: {id: 5}}
     const b = {id: 'NOPE', object: {id: 11}}
     expect(sortFn(a, b)).toBe(-1)
+  })
+})
+
+describe('compareAssignmentPositions', () => {
+  it('sorts by position (1)', () => {
+    const a = {object: {position: 1, assignment_group: {position: 1}}}
+    const b = {object: {position: 2, assignment_group: {position: 1}}}
+    expect([a, b].sort(compareAssignmentPositions)).toStrictEqual([a, b])
+  })
+
+  it('sorts by position (2)', () => {
+    const a = {object: {position: 1, assignment_group: {position: 1}}}
+    const b = {object: {position: 2, assignment_group: {position: 1}}}
+    expect([b, a].sort(compareAssignmentPositions)).toStrictEqual([a, b])
+  })
+
+  it('sorts by assignment_group.position (1)', () => {
+    const a = {object: {position: 2, assignment_group: {position: 1}}}
+    const b = {object: {position: 1, assignment_group: {position: 2}}}
+    expect([a, b].sort(compareAssignmentPositions)).toStrictEqual([a, b])
+  })
+
+  it('sorts by assignment_group.position (2)', () => {
+    const a = {object: {position: 2, assignment_group: {position: 1}}}
+    const b = {object: {position: 1, assignment_group: {position: 2}}}
+    expect([b, a].sort(compareAssignmentPositions)).toStrictEqual([a, b])
+  })
+})
+
+describe('compareAssignmentPointsPossible', () => {
+  it('returns 0 if the points_possible field is the same in both records', function () {
+    expect(compareAssignmentPointsPossible(assignments[0], assignments[0])).toStrictEqual(0)
+  })
+
+  it('sorts by points_possible', () => {
+    let results = [...assignments].sort(compareAssignmentPointsPossible)
+    expect(results[0].object.points_possible).toBe(1)
+    expect(results[1].object.points_possible).toBe(2)
+
+    results = [...assignmentsReversed].sort(compareAssignmentPointsPossible)
+    expect(results[0].object.points_possible).toBe(1)
+    expect(results[1].object.points_possible).toBe(2)
   })
 })

@@ -36,7 +36,6 @@ import Spinner from 'spin.js'
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
-import natcompare from '@canvas/util/natcompare'
 import {camelize, underscore} from 'convert-case'
 import htmlEscape from 'html-escape'
 import * as EnterGradesAsSetting from '../shared/EnterGradesAsSetting'
@@ -109,7 +108,13 @@ import {
   htmlDecode,
   isAdmin,
   onGridKeyDown,
-  renderComponent
+  renderComponent,
+  isDefaultSortOrder,
+  hiddenStudentIdsForAssignment,
+  localeSort,
+  getDefaultSettingKeyForColumnType,
+  sectionList,
+  compareAssignmentPointsPossible
 } from './Gradebook.utils'
 
 import {
@@ -165,7 +170,6 @@ class Gradebook {
     this.updateStudentIds = this.updateStudentIds.bind(this)
     this.updateStudentsLoaded = this.updateStudentsLoaded.bind(this)
     this.isInvalidSort = this.isInvalidSort.bind(this)
-    this.isDefaultSortOrder = this.isDefaultSortOrder.bind(this)
     this.getColumnOrder = this.getColumnOrder.bind(this)
     this.saveCustomColumnOrder = this.saveCustomColumnOrder.bind(this)
     this.arrangeColumnsBy = this.arrangeColumnsBy.bind(this)
@@ -217,7 +221,6 @@ class Gradebook {
     this.updateCurrentGradingPeriod = this.updateCurrentGradingPeriod.bind(this)
     this.updateCurrentModule = this.updateCurrentModule.bind(this)
     this.initSubmissionStateMap = this.initSubmissionStateMap.bind(this)
-    this.delayedCall = this.delayedCall.bind(this)
     this.initPostGradesLtis = this.initPostGradesLtis.bind(this)
     this.updatePostGradesFeatureButton = this.updatePostGradesFeatureButton.bind(this)
     this.initHeader = this.initHeader.bind(this)
@@ -371,7 +374,6 @@ class Gradebook {
     this.getGradingPeriod = this.getGradingPeriod.bind(this)
     this.setSelectedPrimaryInfo = this.setSelectedPrimaryInfo.bind(this)
     this.toggleDefaultSort = this.toggleDefaultSort.bind(this)
-    this.getDefaultSettingKeyForColumnType = this.getDefaultSettingKeyForColumnType.bind(this)
     this.getSelectedPrimaryInfo = this.getSelectedPrimaryInfo.bind(this)
     this.setSelectedSecondaryInfo = this.setSelectedSecondaryInfo.bind(this)
     this.getSelectedSecondaryInfo = this.getSelectedSecondaryInfo.bind(this)
@@ -428,7 +430,6 @@ class Gradebook {
     this.requireStudentGroupForSpeedGrader = this.requireStudentGroupForSpeedGrader.bind(this)
     this.showSimilarityScore = this.showSimilarityScore.bind(this)
     this.viewUngradedAsZero = this.viewUngradedAsZero.bind(this)
-    this.destroy = this.destroy.bind(this)
     // # "PRIVILEGED" methods
 
     // The methods here are intended to support specs, but not intended to be a
@@ -691,7 +692,7 @@ class Gradebook {
     for (assignmentId in ref1) {
       a = ref1[assignmentId]
       if (a.only_visible_to_overrides) {
-        hiddenStudentIds = this.hiddenStudentIdsForAssignment(studentIds, a)
+        hiddenStudentIds = hiddenStudentIdsForAssignment(studentIds, a)
         for (j = 0, len = hiddenStudentIds.length; j < len; j++) {
           studentId = hiddenStudentIds[j]
           studentsWithHiddenAssignments.push(studentId)
@@ -711,12 +712,6 @@ class Gradebook {
       results.push(this.calculateStudentGrade(student))
     }
     return results
-  }
-
-  hiddenStudentIdsForAssignment(studentIds, assignment) {
-    // TODO: _.difference is ridic expensive.  may need to do something else
-    // for large courses with DA (does that happen?)
-    return _.difference(studentIds, assignment.assignment_visibility)
   }
 
   updateAssignmentVisibilities(hiddenSub) {
@@ -985,10 +980,6 @@ class Gradebook {
     return false
   }
 
-  isDefaultSortOrder(sortOrder) {
-    return !['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder)
-  }
-
   setColumnOrder(order) {
     if (this.gradebookColumnOrderSettings == null) {
       this.gradebookColumnOrderSettings = {
@@ -1074,7 +1065,7 @@ class Gradebook {
       case 'name':
         return this.wrapColumnSortFn(this.compareAssignmentNames, sortOrder.direction)
       case 'points':
-        return this.wrapColumnSortFn(this.compareAssignmentPointsPossible, sortOrder.direction)
+        return this.wrapColumnSortFn(compareAssignmentPointsPossible, sortOrder.direction)
       case 'custom':
         return this.makeCompareAssignmentCustomOrderFn(sortOrder)
       default:
@@ -1108,11 +1099,7 @@ class Gradebook {
   }
 
   compareAssignmentNames(a, b) {
-    return this.localeSort(a.object.name, b.object.name)
-  }
-
-  compareAssignmentPointsPossible(a, b) {
-    return a.object.points_possible - b.object.points_possible
+    return localeSort(a.object.name, b.object.name)
   }
 
   makeCompareAssignmentCustomOrderFn(sortOrder) {
@@ -1524,16 +1511,6 @@ class Gradebook {
     return this.gradebookGrid.gridSupport.state.blur()
   }
 
-  sectionList() {
-    return _.values(this.sections)
-      .sort((a, b) => {
-        return a.id - b.id
-      })
-      .map(section => {
-        return {...section, name: htmlEscape.unescape(section.name)}
-      })
-  }
-
   updateSectionFilterVisibility() {
     let props
     const mountPoint = document.getElementById('sections-filter-container')
@@ -1542,7 +1519,7 @@ class Gradebook {
       indexOf.call(this.gridDisplaySettings.selectedViewOptionsFilters, 'sections') >= 0
     ) {
       props = {
-        sections: this.sectionList(),
+        sections: sectionList(this.sections),
         onSelect: this.updateCurrentSection,
         selectedSectionId: this.getFilterRowsBySetting('sectionId') || '0',
         disabled: !this.contentLoadStates.studentsLoaded
@@ -1755,10 +1732,6 @@ class Gradebook {
     return this.postGradesStore.setSelectedSection(sectionId)
   }
 
-  delayedCall(delay, fn) {
-    return setTimeout(fn, delay)
-  }
-
   initPostGradesLtis() {
     return (this.postGradesLtis = this.options.post_grades_ltis.map(lti => {
       let postGradesLti
@@ -1770,13 +1743,16 @@ class Gradebook {
             returnFocusTo: document.querySelector("[data-component='ActionMenu'] button"),
             baseUrl: lti.data_url
           })
-          this.delayedCall(10, () => {
+          setTimeout(() => {
             return postGradesDialog.open()
           })
-          return (window.external_tool_redirect = {
-            ready: postGradesDialog.close,
-            cancel: postGradesDialog.close
-          })
+          return (
+            (window.external_tool_redirect = {
+              ready: postGradesDialog.close,
+              cancel: postGradesDialog.close
+            }),
+            10
+          )
         }
       })
     }))
@@ -1854,7 +1830,7 @@ class Gradebook {
 
   getColumnSortSettingsViewOptionsMenuProps() {
     const storedSortOrder = this.getColumnOrder()
-    const criterion = this.isDefaultSortOrder(storedSortOrder.sortType)
+    const criterion = isDefaultSortOrder(storedSortOrder.sortType)
       ? 'default'
       : storedSortOrder.sortType
     return {
@@ -2489,14 +2465,14 @@ class Gradebook {
         // input cell with no text, this focus() call will select the <body>
         // instead of the grades link.  Delaying the call (even with no actual
         // delay) fixes the issue.
-        return this.delayedCall(0, () => {
+        return setTimeout(() => {
           let ref1
           return (ref1 = this.gradebookGrid.gridSupport.state
             .getActiveNode()
             .querySelector('.student-grades-link')) != null
             ? ref1.focus()
             : undefined
-        })
+        }, 0)
       }
     })
     this.gradebookGrid.gridSupport.events.onKeyDown.subscribe((event, location) => {
@@ -2543,12 +2519,12 @@ class Gradebook {
       if (location.region === 'header') {
         // As above, "delay" the call so that we properly focus the header cell
         // when navigating from a grade input cell with no text.
-        return this.delayedCall(0, () => {
+        return setTimeout(() => {
           let ref1
           return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
             ? ref1.focusAtStart()
             : undefined
-        })
+        }, 0)
       }
     })
     return this.onGridInit()
@@ -2701,21 +2677,6 @@ class Gradebook {
     }
   }
 
-  localeSort(a, b, {asc = true, nullsLast = false} = {}) {
-    if (nullsLast) {
-      if (a != null && b == null) {
-        return -1
-      }
-      if (a == null && b != null) {
-        return 1
-      }
-    }
-    if (!asc) {
-      ;[b, a] = [a, b]
-    }
-    return natcompare.strings(a || '', b || '')
-  }
-
   idSort(a, b, {asc = true}) {
     return NumberCompare(Number(a.id), Number(b.id), {
       descending: !asc
@@ -2724,7 +2685,7 @@ class Gradebook {
 
   secondaryAndTertiarySort(a, b, {asc = true}) {
     let result
-    result = this.localeSort(a.sortable_name, b.sortable_name, {asc})
+    result = localeSort(a.sortable_name, b.sortable_name, {asc})
     if (result === 0) {
       result = this.idSort(a, b, {asc})
     }
@@ -2793,7 +2754,7 @@ class Gradebook {
     return this.sortRowsBy((a, b) => {
       let result
       const asc = direction === 'ascending'
-      result = this.localeSort(a[settingKey], b[settingKey], {
+      result = localeSort(a[settingKey], b[settingKey], {
         asc,
         nullsLast: true
       })
@@ -2808,7 +2769,7 @@ class Gradebook {
     return this.sortRowsBy((a, b) => {
       let result
       const asc = direction === 'ascending'
-      result = this.localeSort(a[columnId], b[columnId], {asc})
+      result = localeSort(a[columnId], b[columnId], {asc})
       if (result === 0) {
         result = this.secondaryAndTertiarySort(a, b, {asc})
       }
@@ -3759,7 +3720,7 @@ class Gradebook {
     let direction
     const sortSettings = this.getSortRowsBySetting()
     const columnType = this.getColumnTypeForColumnId(columnId)
-    const settingKey = this.getDefaultSettingKeyForColumnType(columnType)
+    const settingKey = getDefaultSettingKeyForColumnType(columnType)
     direction = 'ascending'
     if (
       sortSettings.columnId === columnId &&
@@ -3769,18 +3730,6 @@ class Gradebook {
       direction = 'descending'
     }
     return this.setSortRowsBySetting(columnId, settingKey, direction)
-  }
-
-  getDefaultSettingKeyForColumnType(columnType) {
-    if (
-      columnType === 'assignment' ||
-      columnType === 'assignment_group' ||
-      columnType === 'total_grade'
-    ) {
-      return 'grade'
-    } else if (columnType === 'student') {
-      return 'sortable_name'
-    }
   }
 
   getSelectedPrimaryInfo() {
@@ -4295,9 +4244,9 @@ class Gradebook {
 
   hideAnonymousSpeedGraderAlert() {
     // React throws an error if we try to unmount while the event is being handled
-    return this.delayedCall(0, () => {
+    return setTimeout(() => {
       return ReactDOM.unmountComponentAtNode(anonymousSpeedGraderAlertMountPoint())
-    })
+    }, 0)
   }
 
   requireStudentGroupForSpeedGrader(assignment) {

@@ -26,33 +26,30 @@ import qs from 'qs'
 
 import fakeENV from 'helpers/fakeENV'
 import UserSettings from '@canvas/user-settings'
-import natcompare from '@canvas/util/natcompare'
 import round from 'round'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
-import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
+import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
-import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert.js'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi.js'
-import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator.js'
-import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi.js'
+import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert'
+import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
+import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator'
+import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
-import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants.js'
+import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import {
   darken,
   statusColors,
   defaultColors
-} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
-import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu.js'
+} from 'ui/features/gradebook/react/default_gradebook/constants/colors'
+import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
-
-import {compareAssignmentDueDates} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils.js'
 
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -517,34 +514,6 @@ test('does not calculate when the student is not initialized', function () {
   notOk(CourseGradeCalculator.calculate.called)
 })
 
-QUnit.module('Gradebook#localeSort')
-
-test('delegates to natcompare.strings', () => {
-  sandbox.spy(natcompare, 'strings')
-  const gradebook = createGradebook()
-  gradebook.localeSort('a', 'b')
-  equal(natcompare.strings.callCount, 1)
-  deepEqual(natcompare.strings.getCall(0).args, ['a', 'b'])
-})
-
-test('substitutes falsy args with empty string', () => {
-  sandbox.spy(natcompare, 'strings')
-  const gradebook = createGradebook()
-  gradebook.localeSort(0, false)
-  equal(natcompare.strings.callCount, 1)
-  deepEqual(natcompare.strings.getCall(0).args, ['', ''])
-})
-
-test('returns 1 if nullsLast is true and only first item is null', function () {
-  const gradebook = createGradebook()
-  equal(gradebook.localeSort(null, 'fred', {nullsLast: true}), 1)
-})
-
-test('returns -1 if nullsLast is true and only second item is null', function () {
-  const gradebook = createGradebook()
-  equal(gradebook.localeSort('fred', null, {nullsLast: true}), -1)
-})
-
 QUnit.module('Gradebook#gradeSort by an assignment', {
   setup() {
     this.studentA = {
@@ -757,7 +726,6 @@ QUnit.module('Gradebook#makeColumnSortFn', {
     this.gradebook = createGradebook()
     sandbox.stub(this.gradebook, 'wrapColumnSortFn')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
-    sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
   }
 })
@@ -930,32 +898,6 @@ test('comparison does not group uppercase letters together', function () {
   const thirdRecord = this.getRecord('Omega')
 
   strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.secondRecord), 1)
-})
-
-QUnit.module('Gradebook#compareAssignmentPointsPossible', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.firstRecord = {object: {points_possible: 1}}
-    this.secondRecord = {object: {points_possible: 2}}
-  }
-})
-
-test('returns a negative number if the points_possible field is smaller in the first record', function () {
-  strictEqual(
-    this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord),
-    -1
-  )
-})
-
-test('returns 0 if the points_possible field is the same in both records', function () {
-  strictEqual(this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0)
-})
-
-test('returns a positive number if the points_possible field is greater in the first record', function () {
-  strictEqual(
-    this.gradebook.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord),
-    1
-  )
 })
 
 QUnit.module('Gradebook#compareAssignmentModulePositions - when both records have module info', {
@@ -1486,37 +1428,6 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       strictEqual(scrollToEndStub.callCount, 1)
     })
   })
-})
-
-QUnit.module('Gradebook#isDefaultSortOrder', {
-  setup() {
-    this.gradebook = createGradebook()
-  }
-})
-
-test('returns false if called with due_date', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('due_date'), false)
-})
-
-test('returns false if called with name', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('name'), false)
-})
-
-test('returns false if called with points', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('points'), false)
-})
-
-test('returns false if called with points', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('custom'), false)
-})
-
-test('returns false if called with module_position', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('module_position'), false)
-})
-
-test('returns true if called with anything else', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('alpha'), true)
-  strictEqual(this.gradebook.isDefaultSortOrder('assignment_group'), true)
 })
 
 QUnit.module('Gradebook#isInvalidSort', {
@@ -4642,17 +4553,6 @@ test('sorts by descending when asc is false', function () {
 
   equal(firstRow.id, '3', 'when fn is false, order first')
   equal(secondRow.id, '4', 'when fn is true, order second')
-})
-
-test('relies on localeSort when rows have equal sorting criteria results', function () {
-  const value = 0
-  this.gradebook.gridData.rows[0].someProperty = value
-  this.gradebook.gridData.rows[1].someProperty = value
-  this.gradebook.sortRowsWithFunction(this.sortFn)
-  const [firstRow, secondRow] = this.gradebook.gridData.rows
-
-  equal(firstRow.sortable_name, 'A Firstington', 'A Firstington sorts first')
-  equal(secondRow.sortable_name, 'Z Lastington', 'Z Lastington sorts second')
 })
 
 test('relies on idSort when rows have equal sorting criteria and the same sortable name', function () {

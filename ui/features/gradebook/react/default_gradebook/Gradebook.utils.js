@@ -21,6 +21,9 @@ import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import I18n from 'i18n!gradebook'
+import _ from 'lodash'
+import htmlEscape from 'html-escape'
+import natcompare from '@canvas/util/natcompare'
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
@@ -36,9 +39,9 @@ export function ensureAssignmentVisibility(assignment, submission) {
 }
 
 export function forEachSubmission(students, fn) {
-  Object.keys(students).forEach(function(studentIdx) {
+  Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
-    Object.keys(student).forEach(function(key) {
+    Object.keys(student).forEach(function (key) {
       const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
         fn(student[key])
@@ -48,7 +51,7 @@ export function forEachSubmission(students, fn) {
 }
 
 export function getAssignmentGroupPointsPossible(assignmentGroup) {
-  return assignmentGroup.assignments.reduce(function(sum, assignment) {
+  return assignmentGroup.assignments.reduce(function (sum, assignment) {
     return sum + (assignment.points_possible || 0)
   }, 0)
 }
@@ -136,4 +139,53 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
   if (userAccepted) {
     onAccepted()
   }
+}
+
+export function isDefaultSortOrder(sortOrder) {
+  return !['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder)
+}
+
+export function hiddenStudentIdsForAssignment(studentIds, assignment) {
+  return _.difference(studentIds, assignment.assignment_visibility)
+}
+
+export function localeSort(a, b, {asc = true, nullsLast = false} = {}) {
+  if (nullsLast) {
+    if (a != null && b == null) {
+      return -1
+    }
+    if (a == null && b != null) {
+      return 1
+    }
+  }
+  if (!asc) {
+    ;[b, a] = [a, b]
+  }
+  return natcompare.strings(a || '', b || '')
+}
+
+export function getDefaultSettingKeyForColumnType(columnType) {
+  if (
+    columnType === 'assignment' ||
+    columnType === 'assignment_group' ||
+    columnType === 'total_grade'
+  ) {
+    return 'grade'
+  } else if (columnType === 'student') {
+    return 'sortable_name'
+  }
+}
+
+export function sectionList(sections) {
+  return _.values(sections)
+    .sort((a, b) => {
+      return a.id - b.id
+    })
+    .map(section => {
+      return {...section, name: htmlEscape.unescape(section.name)}
+    })
+}
+
+export function compareAssignmentPointsPossible(a, b) {
+  return a.object.points_possible - b.object.points_possible
 }
