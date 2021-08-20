@@ -1269,6 +1269,44 @@ describe CoursesController, type: :request do
         expect(new_course.assignments.length).to eq 1
         expect(new_course.assignments.first.title).to eq 'my assignment'
       end
+
+      it "removes start and end dates when restrict_enrollments_to_course_dates is false and an enrollment_term is present" do
+        term = @account.enrollment_terms.create!
+
+        post_params = {
+          'account_id' => @account.id,
+          'course'     => {
+            'name'        => 'Test Course 📝',
+            'term_id'     => term.id,
+            'start_at'    => Time.now,
+            'conclude_at' => 16.weeks.from_now,
+          }
+        }
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        expect(new_course.start_at).to be_nil
+        expect(new_course.conclude_at).to be_nil
+      end
+
+      it "does not remove start and end dates when restrict_enrollments_to_course_dates is true" do
+        term = @account.enrollment_terms.create
+
+        post_params = {
+          'account_id' => @account.id,
+          'course'     => {
+            'name'                                 => 'Test Course 📝',
+            'term_id'                              => term.id,
+            'restrict_enrollments_to_course_dates' => true,
+            'start_at'                             => Time.now,
+            'conclude_at'                          => 16.weeks.from_now,
+
+          }
+        }
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        expect(new_course.start_at).not_to be_nil
+        expect(new_course.conclude_at).not_to be_nil
+      end
     end
 
     context "a user without permissions" do
@@ -1400,6 +1438,13 @@ describe CoursesController, type: :request do
       it "should allow a date to be deleted" do
         @course.update_attribute(:conclude_at, Time.now)
         @new_values['course']['end_at'] = nil
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        expect(@course.end_at).to be_nil
+      end
+
+      it "should remove end date when restrict_enrollments_to_course_dates is set to false" do
+        @new_values['course']['restrict_enrollments_to_course_dates'] = false
         api_call(:put, @path, @params, @new_values)
         @course.reload
         expect(@course.end_at).to be_nil

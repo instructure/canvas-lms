@@ -2497,7 +2497,7 @@ describe CoursesController do
     it "should render the show page with a flash on error" do
       user_session(@teacher)
       # cause the course to be invalid
-      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      Course.where(id: @course).update_all(restrict_enrollments_to_course_dates: true, start_at: Time.now.utc, conclude_at: 1.day.ago)
       put 'update', params: {:id => @course.id, :course => { :name => "name change" }}
       expect(flash[:error]).to match(/There was an error saving the changes to the course/)
     end

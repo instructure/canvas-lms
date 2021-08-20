@@ -694,9 +694,11 @@ class CoursesController < ApplicationController
   #
   # @argument course[start_at] [DateTime]
   #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #   This value is ignored unless 'restrict_enrollments_to_course_dates' is set to true.
   #
   # @argument course[end_at] [DateTime]
   #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #   This value is ignored unless 'restrict_enrollments_to_course_dates' is set to true.
   #
   # @argument course[license] [String]
   #   The name of the licensing. Should be one of the following abbreviations
@@ -743,7 +745,8 @@ class CoursesController < ApplicationController
   # @argument course[restrict_enrollments_to_course_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the
   #   course. This parameter is required when using the API, as this option is
-  #   not displayed in the Course Settings page.
+  #   not displayed in the Course Settings page. This value must be set to true
+  #   in order to specify a course start date and/or end date.
   #
   # @argument course[term_id] [String]
   #   The unique ID of the term to create to course in.
@@ -826,6 +829,9 @@ class CoursesController < ApplicationController
                    else
                      :conclude_at
                    end
+
+      # If Term enrollment is specified, don't allow setting enrollment dates
+      params_for_create = params_for_create.except(:start_at, :conclude_at) unless value_to_boolean(params_for_create[:restrict_enrollments_to_course_dates])
 
       unless @account.grants_right? @current_user, session, :manage_storage_quotas
         params_for_create.delete :storage_quota
@@ -2581,9 +2587,12 @@ class CoursesController < ApplicationController
   #
   # @argument course[start_at] [DateTime]
   #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #   This value is ignored unless 'restrict_enrollments_to_course_dates' is set to true,
+  #   or the course is already published.
   #
   # @argument course[end_at] [DateTime]
   #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #   This value is ignored unless 'restrict_enrollments_to_course_dates' is set to true.
   #
   # @argument course[license] [String]
   #   The name of the licensing. Should be one of the following abbreviations
@@ -2630,7 +2639,9 @@ class CoursesController < ApplicationController
   # @argument course[restrict_enrollments_to_course_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the
   #   course. This parameter is required when using the API, as this option is
-  #   not displayed in the Course Settings page.
+  #   not displayed in the Course Settings page. Setting this value to false will
+  #   remove the course end date (if it exists), as well as the course start date
+  #   (if the course is unpublished).
   #
   # @argument course[term_id] [Integer]
   #   The unique ID of the term to create to course in.
@@ -2954,6 +2965,15 @@ class CoursesController < ApplicationController
       update_image(params, "banner_image")
 
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
+
+      # Remove enrollment dates if "Term" enrollment is specified
+      if @course.enrollment_term
+        unless params_for_update.key?(:restrict_enrollments_to_course_dates) ? value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates]) : @course.restrict_enrollments_to_course_dates
+          params_for_update[:start_at] = nil if @course.unpublished?
+          params_for_update[:conclude_at] = nil
+        end
+      end
+
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
       if params[:course].key?(:blueprint)
