@@ -40,9 +40,9 @@ export const K5AddAnnouncementButton = ({courseUrl, courseName}) => {
     </Button>
   )
 }
-K5AddAnnouncementButton.PropTypes = {
+K5AddAnnouncementButton.propTypes = {
   courseUrl: string.isRequired,
-  courseNAme: string.isRequired
+  courseName: string.isRequired
 }
 
 export default function EmptyK5Announcement({courseUrl, courseName}) {
