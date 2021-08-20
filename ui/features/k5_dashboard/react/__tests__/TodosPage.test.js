@@ -66,6 +66,12 @@ describe('TodosPage', () => {
     const {findAllByText} = render(<TodosPage visible timeZone="America/Denver" />)
     expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
   })
+
+  it('ignores submitting-type todos', async () => {
+    const {findByRole, queryByText} = render(<TodosPage visible timeZone="America/Denver" />)
+    expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
+    expect(queryByText('Long essay', {exact: false})).not.toBeInTheDocument()
+  })
 })
 
 describe('Empty todos', () => {

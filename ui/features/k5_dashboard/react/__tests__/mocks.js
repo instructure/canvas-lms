@@ -36,7 +36,8 @@ export const MOCK_TODOS = [
     html_url: '/courses/7/gradebook/speed_grader?assignment_id=10',
     ignore: '/api/v1/users/self/todo/assignment_10/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_10/grading?permanent=1',
-    needs_grading_count: 2
+    needs_grading_count: 2,
+    type: 'grading'
   },
   {
     assignment: {
@@ -57,7 +58,8 @@ export const MOCK_TODOS = [
     html_url: '/courses/5/gradebook/speed_grader?assignment_id=11',
     ignore: '/api/v1/users/self/todo/assignment_11/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_11/grading?permanent=1',
-    needs_grading_count: 3
+    needs_grading_count: 3,
+    type: 'grading'
   },
   {
     assignment: {
@@ -78,6 +80,29 @@ export const MOCK_TODOS = [
     html_url: '/courses/2/gradebook/speed_grader?assignment_id=12',
     ignore: '/api/v1/users/self/todo/assignment_12/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_12/grading?permanent=1',
-    needs_grading_count: 1
+    needs_grading_count: 1,
+    type: 'grading'
+  },
+  {
+    assignment: {
+      id: '13',
+      due_at: '2021-07-15T23:59:59Z',
+      all_dates: [
+        {
+          base: true,
+          due_at: '2021-07-15T23:59:59Z'
+        }
+      ],
+      name: 'Long essay',
+      points_possible: 50
+    },
+    context_id: '2',
+    context_type: 'Course',
+    context_name: 'Oneirology',
+    html_url: '/courses/2/gradebook/speed_grader?assignment_id=13',
+    ignore: '/api/v1/users/self/todo/assignment_13/grading?permanent=0',
+    ignore_permanently: '/api/v1/users/self/todo/assignment_13/grading?permanent=1',
+    needs_grading_count: 1,
+    type: 'submitting'
   }
 ]
