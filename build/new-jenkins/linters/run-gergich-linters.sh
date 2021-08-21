@@ -23,12 +23,13 @@ fi
 
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'
 gergich capture i18nliner 'rake i18n:check'
-bundle exec ruby script/brakeman
-bundle exec ruby script/tatl_tael
-bundle exec ruby script/stylelint
-bundle exec ruby script/rlint
-[ "${SKIP_ESLINT-}" != "true" ] && bundle exec ruby script/eslint
-bundle exec ruby script/lint_commit_message
+# purposely don't run under bundler; they shell out and use bundler as necessary
+ruby script/brakeman
+ruby script/tatl_tael
+ruby script/stylelint
+ruby script/rlint
+[ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
+ruby script/lint_commit_message
 
 gergich status
 echo "LINTER OK!"
