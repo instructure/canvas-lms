@@ -165,8 +165,6 @@ Gemspec/RequiredRubyVersion:
   Enabled: false
 
 # Rails style changes
-Migration/ModelBehavior:
-  Enabled: false
 Migration/Tagged:
   Enabled: true
   Severity: error
