@@ -119,6 +119,16 @@ describe ConferencesController do
       expect(response).to be_successful
     end
 
+    it "should include group and section data in the js_env" do
+      group(context: @course)
+      user_session(@teacher)
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:groups]).to be_truthy
+      expect(assigns[:js_env][:sections]).to be_truthy
+      expect(assigns[:js_env][:group_user_ids_map]).to be_truthy
+      expect(assigns[:js_env][:section_user_ids_map]).to be_truthy
+    end
+
     context "sets render_alternatives variable" do
       it "should set to false by default" do
         user_session(@teacher)

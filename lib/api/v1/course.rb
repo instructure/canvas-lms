@@ -52,6 +52,11 @@ module Api::V1::Course
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
+    settings[:banner_image_url] = course.banner_image_url
+    settings[:banner_image_id] = course.banner_image_id
+    settings[:banner_image] = course.banner_image
+    settings[:course_color] = course.course_color
+    settings[:friendly_name] = course.friendly_name
 
     settings
   end
@@ -89,7 +94,7 @@ module Api::V1::Course
   #     "uuid" => "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5"
   #   }
   #
-  def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil, precalculated_permissions: nil)
+  def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil, precalculated_permissions: nil, prefer_friendly_name: true)
     if includes.include?('access_restricted_by_date') && enrollments&.all?(&:inactive?) && !course.grants_right?(user, :read_as_admin)
       return {'id' => course.id, 'access_restricted_by_date' => true}
     end
@@ -98,6 +103,11 @@ module Api::V1::Course
         precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
+      if includes.include?('grading_periods')
+        hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
+           api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+        end
+      end
       if includes.include?('course_progress')
         hash['course_progress'] = CourseProgress.new(course,
                                                      subject_user,
@@ -136,11 +146,17 @@ module Api::V1::Course
       # undocumented, but leaving for backwards compatibility.
       hash['subaccount_name'] = course.account.name if includes.include?('subaccount')
       add_helper_dependant_entries(hash, course, builder)
-      apply_nickname(hash, course, user) if user
+      apply_nickname(hash, course, user, prefer_friendly_name: prefer_friendly_name)
 
-      hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
+      hash['image_download_url'] = course.image if includes.include?('course_image')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
+      if course.root_account.feature_enabled?(:course_templates)
+        hash['template'] = course.template?
+        if course.template? && includes.include?('templated_accounts')
+          hash['templated_accounts'] = course.templated_accounts.map { |a| {id: a.id, name: a.name} }
+        end
+      end
 
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
@@ -171,8 +187,9 @@ module Api::V1::Course
     hash
   end
 
-  def apply_nickname(hash, course, user)
-    nickname = course.preloaded_nickname? ? course.preloaded_nickname : user.course_nickname(course)
+  def apply_nickname(hash, course, user, prefer_friendly_name: true)
+    nickname = course.friendly_name if prefer_friendly_name
+    nickname ||= course.preloaded_nickname? ? course.preloaded_nickname : user&.course_nickname(course)
     if nickname
       hash['original_name'] = hash['name']
       hash['name'] = nickname

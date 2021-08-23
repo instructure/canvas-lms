@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import AppointmentGroupList from 'jsx/calendar/scheduler/components/appointment_groups/AppointmentGroupList'
+import AppointmentGroupList from 'ui/features/calendar_appointment_group_edit/react/AppointmentGroupList.js'
 
 QUnit.module('AppointmentGroupList')
 
@@ -231,7 +231,7 @@ test('renders date at start of datestring to accommodate multi-date events', () 
           }
         ],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-19T110:00:00Z',
+        end_at: '2016-10-19T00:00:00Z',
         child_events_count: 1
       },
       {

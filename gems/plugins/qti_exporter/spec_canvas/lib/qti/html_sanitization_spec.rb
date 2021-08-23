@@ -23,7 +23,7 @@ describe "HTML Sanitization of" do
     it "should sanitize qti v2p1 escaped html" do
       manifest_node=get_manifest_node('multiple_answer')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
-      expect(hash[:question_text]).to match_ignoring_whitespace("The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course – you just add a link to it. <br><br><b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above? alert('test')")
+      expect(hash[:question_text]).to match_ignoring_whitespace "The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course – you just add a link to it. <br><br><b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above?"
     end
 
     it "should try to escape unmatched brackets" do
@@ -35,7 +35,7 @@ describe "HTML Sanitization of" do
     it "should sanitize other escaped html" do # e.g. angel proprietary
       qti_data = file_as_string(html_sanitization_question_dir('escaped'), 'angel_essay.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'essay_question', :custom_type=>'angel')
-      expect(hash[:question_text]).to eq "<div>Rhode Island is neither a road nor an island. Discuss. alert('total pwnage')</div>"
+      expect(hash[:question_text]).to eq "<div>Rhode Island is neither a road nor an island. Discuss. </div>"
     end
   end
   describe "multiple choice text" do
@@ -44,7 +44,7 @@ describe "HTML Sanitization of" do
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
       hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
       expect(hash[:answers]).to eq [
-        {:html=>"\302\240<img src=\"image0014c114649.jpg\" alt=\"\">",
+        {:html=>"&nbsp;<img src=\"image0014c114649.jpg\" alt=\"\">",
          :text=>"No answer text provided."},
         {:html=>nil, # script tag removed
          :text=>"No answer text provided."},
@@ -69,11 +69,11 @@ describe "HTML Sanitization of" do
       manifest_node=get_manifest_node('multiple_answer')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
       hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
-      expect(hash[:answers][0][:html]).to match_ignoring_whitespace("YouTube <br><object width=\"425\" height=\"344\"><param name=\"movie\" value=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\">\n<embed src=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\" type=\"application/x-shockwave-flash\" width=\"425\" height=\"344\"></embed></object>")
+      expect(hash[:answers][0][:html]).to match_ignoring_whitespace("YouTube <br><object width=\"425\" height=\"344\"><param name=\"movie\" value=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\">\n<embed src=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\" type=\"application/x-shockwave-flash\" width=\"425\" height=\"344\"></object>")
       expect(hash[:answers][0][:text]).to eq "YouTube"
-      expect(hash[:answers][1][:html]).to match_ignoring_whitespace("Google Picasa<br><span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" width=\"150\" height=\"59\"></span>\302\240")
+      expect(hash[:answers][1][:html]).to match_ignoring_whitespace("Google Picasa<br><span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" width=\"150\" height=\"59\"></span>&nbsp;")
       expect(hash[:answers][1][:text]).to eq "Google Picasa"
-      expect(hash[:answers][2][:html]).to eq nil # sanitized html == text, so we exclude it
+      expect(hash[:answers][2][:html]).to eq "Facebook"
       expect(hash[:answers][2][:text]).to eq "Facebook alert(0xFACE)" # no script tags
       expect(hash[:answers][3][:html]).to eq nil
       expect(hash[:answers][3][:text]).to eq "Twitter" # we've stripped off extraneous whitespace

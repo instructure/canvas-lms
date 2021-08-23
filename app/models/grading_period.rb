@@ -173,6 +173,30 @@ class GradingPeriod < ActiveRecord::Base
     ).fetch(:grading_period)
   end
 
+  def disable_post_to_sis
+    raise(RangeError, "The grading period is not yet closed.") if Time.zone.now < close_date
+    # This method is called from a job, to know if it is already processed we
+    # cache that the job has processed.
+    # If the look_back in the job is changed, the amount of time we cache needs
+    # to also follow, so using the same setting.
+    look_back = Setting.get('disable_post_to_sis_on_grading_period', '60').to_i + 10
+    due_at_range = start_date..end_date
+    Rails.cache.fetch(['disable_post_to_sis_in_completed', self].cache_key, expires_in: look_back.minutes) do
+      possible_assignments_scope = Assignment.active.
+        where(root_account_id: root_account_id, post_to_sis: true)
+      scope = possible_assignments_scope.
+        where(due_at: due_at_range).
+        union(possible_assignments_scope.where("EXISTS (?)",
+          AssignmentOverride.active.
+            where("assignment_id = assignments.id").
+            where(set_type: "CourseSection", due_at_overridden: true, due_at: due_at_range)))
+      # until all post_to_sis in scope are false, repeat.
+      while scope.limit(1_000).update_all(post_to_sis: false, updated_at: Time.zone.now) == 1_000 do; end
+      # caching that it has completed, so if this gets called again, it can skip.
+      true
+    end
+  end
+
   private
 
   def set_root_account_id

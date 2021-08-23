@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -177,6 +179,11 @@ require 'atom'
 #         "group": {
 #           "description": "If the event is a group-level reservation, this will contain the group participant JSON (refer to the Groups API).",
 #           "type": "string"
+#         },
+#         "important_dates": {
+#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -264,6 +271,11 @@ require 'atom'
 #         "assignment_overrides": {
 #           "description": "The list of AssignmentOverrides that apply to this event (See the Assignments API). This information is useful for determining which students or sections this assignment-due event applies to.",
 #           "$ref": "AssignmentOverride"
+#         },
+#         "important_dates": {
+#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -308,6 +320,10 @@ class CalendarEventsApiController < ApplicationController
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
+  # @argument important_dates [Boolean]
+  #   Defaults to false
+  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
+  #   feature flag to be turned on or it will be ignored.
   #
   # @returns [CalendarEvent]
   def index
@@ -349,6 +365,10 @@ class CalendarEventsApiController < ApplicationController
   # @argument exclude_submission_types[] [Array]
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
+  # @argument important_dates [Boolean]
+  #   Defaults to false
+  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
+  #   feature flag to be turned on or it will be ignored.
   #
   # @returns [CalendarEvent]
   def user_index
@@ -474,12 +494,8 @@ class CalendarEventsApiController < ApplicationController
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
-    if Account.site_admin.feature_enabled?(:calendar_conferences)
-      if params_for_create.key?(:web_conference)
-        web_conference = find_or_initialize_conference(@context, params_for_create[:web_conference])
-        return unless authorize_user_for_conference(@current_user, web_conference)
-        params_for_create[:web_conference] = web_conference
-      end
+    if params_for_create.key?(:web_conference)
+      params_for_create[:web_conference] = find_or_initialize_conference(@context, params_for_create[:web_conference])
     end
 
     @event = @context.calendar_events.build(params_for_create)
@@ -496,6 +512,8 @@ class CalendarEventsApiController < ApplicationController
       else
         events = [@event]
       end
+
+      return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render :json => {
@@ -663,12 +681,11 @@ class CalendarEventsApiController < ApplicationController
       if params_for_update[:description].present?
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
-      if Account.site_admin.feature_enabled?(:calendar_conferences)
-        if params_for_update.key?(:web_conference)
-          web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
-          return unless authorize_user_for_conference(@current_user, web_conference)
-          params_for_update[:web_conference] = web_conference
-        end
+      if params_for_update.key?(:web_conference)
+        web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
+        return unless authorize_user_for_conference(@current_user, web_conference)
+
+        params_for_update[:web_conference] = web_conference
       end
 
       if @event.update(params_for_update)
@@ -835,6 +852,8 @@ class CalendarEventsApiController < ApplicationController
     selected_contexts = @current_user.get_preference(:selected_calendar_contexts) || []
 
     contexts = @contexts.map do |context|
+      next if context.try(:concluded?)
+
       context_data = {
         id: context.id,
         name: context.nickname_for(@current_user),
@@ -855,7 +874,7 @@ class CalendarEventsApiController < ApplicationController
       end
 
       context_data
-    end
+    end.compact # remove any skipped contexts
 
     render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}
   end
@@ -1059,6 +1078,7 @@ class CalendarEventsApiController < ApplicationController
   def get_options(codes, user = @current_user)
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
+    @important_dates = Account.site_admin.feature_enabled?(:important_dates) && value_to_boolean(params[:important_dates])
     if !@all_events && !@undated
       validate_dates
       @start_date ||= Time.zone.now.beginning_of_day
@@ -1089,7 +1109,7 @@ class CalendarEventsApiController < ApplicationController
       codes.each do |c|
         unless pertinent_context_codes.include?(c)
           context = Context.find_by_asset_string(c)
-          @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth  || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
+          @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
           @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
         end
       end
@@ -1136,13 +1156,15 @@ class CalendarEventsApiController < ApplicationController
       scope = assignment_context_scope(user)
       next unless scope
 
-      scope = scope.active.order(:due_at, :id)
+      scope = scope.order(:due_at, :id)
+      scope = scope.active
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
         scope = scope.where(submission_types: submission_types)
       end
       scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
+      scope = scope.with_important_dates if @important_dates
 
       last_scope = scope
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
@@ -1160,20 +1182,15 @@ class CalendarEventsApiController < ApplicationController
     # contexts have to be partitioned into two groups so they can be queried effectively
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    sql = []
-    conditions = []
     unless view_unpublished.empty?
-      sql << '(assignments.context_code IN (?))'
-      conditions << view_unpublished.map(&:asset_string)
+      scope = Assignment.for_course(view_unpublished)
     end
 
     unless other.empty?
-      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
-      conditions << other.map(&:asset_string)
-      conditions << 'published'
+      scope2 = Assignment.published.for_course(other)
+      scope = scope ? scope.or(scope2) : scope2
     end
 
-    scope = Assignment.where([sql.join(' OR ')] + conditions)
     return scope if @public_to_auth || !user
 
     student_ids = Set.new
@@ -1215,14 +1232,16 @@ class CalendarEventsApiController < ApplicationController
         relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
+        relation = relation.with_important_dates if @important_dates
+        if includes.include?('web_conference')
+          relation = relation.preload(:web_conference)
+        end
         relation
       end
     else
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
-    end
-    if includes.include?('web_conference')
-      scope = scope.preload(:web_conference)
+      scope = scope.with_important_dates if @important_dates
     end
     scope
   end
@@ -1249,11 +1268,10 @@ class CalendarEventsApiController < ApplicationController
 
     courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
     events = events.inject([]) do |assignments, assignment|
-
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day(Time.zone)
-        assignments << assignment
+        assignments << assignment unless @important_dates && assignment.important_dates && assignment.due_at.nil?
       else
         dates_list = assignment.all_dates_visible_to(user,
           courses_user_has_been_enrolled_in: courses_user_has_been_enrolled_in)
@@ -1371,6 +1389,11 @@ class CalendarEventsApiController < ApplicationController
         new_child_event[:end_at] = Time.zone.parse(child_event[:end_at]) + offset unless child_event[:end_at].blank?
         new_child_event
       end
+    end
+
+    if event_attributes.key?(:web_conference)
+      override_params = { :user_settings => { :scheduled_date => event_attributes[:start_at] } }
+      event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
     end
 
     event_attributes

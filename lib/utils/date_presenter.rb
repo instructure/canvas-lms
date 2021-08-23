@@ -18,18 +18,21 @@
 
 module Utils
   class DatePresenter
-    attr_reader :date, :raw_date, :zone
+    attr_reader :date, :raw_date, :zone, :with_weekday
 
-    def initialize(date, zone=nil)
+    def initialize(date, zone=nil, with_weekday: false)
       zone ||= Time.zone
       @raw_date = date
       @date = RelativeDate.new(date, zone)
       @zone = zone
+      @with_weekday = with_weekday
     end
 
     def as_string(style=:normal)
       if style == :full
         return i18n_date(:full)
+      elsif style == :weekday
+        return i18n_date(:weekday)
       elsif style != :long
         if style != :no_words && special_value_type != :none
           string = special_string(special_value_type)
@@ -52,7 +55,8 @@ module Utils
     end
 
     def i18n_date(format)
-      I18n.l(raw_date, format: I18n.send(:t, :"date.formats.#{format}"))
+      # Use send to prevent i18nliner trying to parse this
+      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{with_weekday ? '_with_weekday' : ''}"))
     end
 
     def special_value_type

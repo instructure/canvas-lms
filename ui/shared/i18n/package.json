@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/i18n",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./i18nObj.js"
+}

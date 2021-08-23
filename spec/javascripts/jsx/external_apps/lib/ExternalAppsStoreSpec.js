@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('ExternalApps.ExternalAppsStore', {

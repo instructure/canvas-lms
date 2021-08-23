@@ -20,6 +20,7 @@
 
 module CdcFixtures
   def self.create_profile
+    Course.find_or_create_by!(id: 1)
     Profile.new(context_id: 1, context_type: 'Course', root_account_id: 1)
   end
 end

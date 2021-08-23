@@ -110,6 +110,13 @@ describe "admin settings tab" do
     wait_for_ajaximations
   end
 
+  def select_filter_option(option_text)
+    feature_filter_element = f("[placeholder='Filter Features']")
+    feature_filter_element.send_keys(option_text[0..3])
+    feature_filter_item = fj("[role='option']:contains('#{option_text}')")
+    feature_filter_item.click
+  end
+
   context "account settings" do
     before :each do
       get "/accounts/#{Account.default.id}/settings"
@@ -149,6 +156,10 @@ describe "admin settings tab" do
 
     it "should click on don't let teachers rename their courses" do
       check_box_verifier("#account_settings_prevent_course_renaming_by_teachers", :prevent_course_renaming_by_teachers)
+    end
+
+    it "should click on don't let teachers change availability on their courses" do
+      check_box_verifier("#account_settings_prevent_course_availability_editing_by_teachers", :prevent_course_availability_editing_by_teachers)
     end
 
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
@@ -348,6 +359,7 @@ describe "admin settings tab" do
 
   context "who can create new courses" do
     before :each do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
       get "/accounts/#{Account.default.id}/settings"
     end
 
@@ -359,16 +371,17 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
     end
 
+    it "should check on users with no enrollments (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
+    end
+
     it "should check on students" do
       check_box_verifier("#account_settings_students_can_create_courses", :students_can_create_courses)
     end
   end
 
   context "custom help links" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     def set_checkbox(checkbox, checked)
       selector = "##{checkbox['id']}"
       checkbox.click if is_checked(selector) != checked
@@ -499,6 +512,8 @@ describe "admin settings tab" do
     end
 
     it "edits a default link" do
+      Setting.set('show_feedback_link', 'true')
+
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
@@ -575,20 +590,59 @@ describe "admin settings tab" do
   end
 
   it "shows all feature flags that are expected to be visible" do
-    course_with_admin_logged_in(:account => Account.site_admin)
-    provision_quizzes_next(Account.site_admin)
-    get "/accounts/#{Account.site_admin.id}/settings"
+    user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
+    course_with_admin_logged_in(account: Account.default, user: user)
+    provision_quizzes_next(Account.default)
+    get "/accounts/#{Account.default.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations
 
-    Feature.applicable_features(Account.site_admin).each do |feature|
-      next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
+    features_text = f("#tab-features").text
+    Feature.applicable_features(Account.default).each do |feature|
+      next if feature.visible_on && !feature.visible_on.call(Account.default)
       # We don't want flags that are enabled in code to appear in the UI
-      if feature.enabled?
-        expect(f(".feature")).to_not contain_jqcss(".#{feature.feature}")
+      if feature.enabled? && !feature.can_override?
+        expect(features_text).not_to include(feature.display_name.call)
       else
-        expect(f(".feature.#{feature.feature}")).to be_displayed
+        expect(features_text).to include(feature.display_name.call)
       end
+    end
+  end
+
+  context 'feature flag search and filters' do
+    before :each do
+      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
+      course_with_admin_logged_in(account: Account.default, user: user)
+      Account.site_admin.enable_feature!(:feature_flag_filters)
+    end
+
+    it 'allows for searching and deleting a feature flag filter ' do
+      go_to_feature_options(Account.site_admin.id)
+      select_filter_option('Pending Enforcement')
+      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
+
+      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
+      f(pending_enforcement_filter_button_selector).click
+      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
+    end
+  end
+
+  context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
+    before :once do
+      @account = Account.default
+      @subaccount = Account.create!(name: "subaccount1", parent_account_id: @account.id)
+    end
+
+    it "is locked and enabled for subaccounts of an account where setting is enabled" do
+      account_admin_user(:account => @account)
+      user_session(@admin)
+      get "/accounts/#{@account.id}/settings"
+      checkbox = "#account_settings_enable_as_k5_account_value"
+      f(checkbox).click
+      click_submit
+      get "/accounts/#{@subaccount.id}/settings"
+      expect(is_checked(checkbox)).to be_truthy
+      expect(f(checkbox)).to be_disabled
     end
   end
 end

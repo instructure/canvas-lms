@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import DatetimeDisplay from 'jsx/shared/DatetimeDisplay'
-import tz from 'timezone'
+import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
+import tz from '@canvas/timezone'
 
 QUnit.module('DatetimeDisplay')
 

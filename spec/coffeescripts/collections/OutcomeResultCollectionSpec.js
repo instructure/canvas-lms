@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import OutcomeResultCollection from 'compiled/collections/OutcomeResultCollection'
+import Backbone from '@canvas/backbone'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
 import fakeENV from 'helpers/fakeENV'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 
 QUnit.module('OutcomeResultCollectionSpec', {
   setup() {

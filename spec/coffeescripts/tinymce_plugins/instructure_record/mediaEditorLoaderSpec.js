@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mediaEditorLoader from 'tinymce_plugins/instructure_record/mediaEditorLoader'
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
+import mediaEditorLoader from '@canvas/tinymce-record'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
 
 QUnit.module('mediaEditorLoader', {
   setup() {

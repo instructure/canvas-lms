@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense, useState} from 'react'
-import {arrayOf, func, number, object, oneOf, oneOfType, string} from 'prop-types'
+import {arrayOf, bool, func, number, object, oneOf, oneOfType, string} from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -68,7 +68,8 @@ const UploadFileModal = React.forwardRef(
       label,
       accept,
       modalBodyWidth,
-      modalBodyHeight
+      modalBodyHeight,
+      requireA11yAttributes = true
     },
     ref
   ) => {
@@ -172,7 +173,7 @@ const UploadFileModal = React.forwardRef(
                   return (
                     <Tabs.Panel
                       key={panel}
-                      renderTitle={function() {
+                      renderTitle={function () {
                         return formatMessage('Computer')
                       }}
                       selected={selectedPanel === 'COMPUTER'}
@@ -196,7 +197,7 @@ const UploadFileModal = React.forwardRef(
                   return (
                     <Tabs.Panel
                       key={panel}
-                      renderTitle={function() {
+                      renderTitle={function () {
                         return 'Unsplash'
                       }}
                       selected={selectedPanel === 'UNSPLASH'}
@@ -218,7 +219,7 @@ const UploadFileModal = React.forwardRef(
                   return (
                     <Tabs.Panel
                       key={panel}
-                      renderTitle={function() {
+                      renderTitle={function () {
                         return formatMessage('URL')
                       }}
                       selected={selectedPanel === 'URL'}
@@ -234,58 +235,62 @@ const UploadFileModal = React.forwardRef(
               return null
             })}
           </Tabs>
-          {// We shouldn't show the accordions until the session data is loaded.
-          Object.keys(contentProps.session || {}).length > 0 && (
-            <>
-              {selectedPanel === 'COMPUTER' && requiresUsageRights && (
-                <View
-                  as="div"
-                  role="group"
-                  borderColor="primary"
-                  borderWidth="0 0 small 0"
-                  padding="medium"
-                >
-                  <ToggleDetails
-                    defaultExpanded
-                    summary={<Text size="x-large">{formatMessage('Usage Rights (required)')}</Text>}
+          {
+            // We shouldn't show the accordions until the session data is loaded.
+            Object.keys(contentProps.session || {}).length > 0 && (
+              <>
+                {selectedPanel === 'COMPUTER' && requiresUsageRights && (
+                  <View
+                    as="div"
+                    role="group"
+                    borderColor="primary"
+                    borderWidth="0 0 small 0"
+                    padding="medium"
                   >
-                    <UsageRightsSelectBox
-                      usageRightsState={usageRightsState}
-                      setUsageRightsState={setUsageRightsState}
-                      contextType={trayProps.contextType}
-                      contextId={trayProps.contextId}
-                      showMessage={false}
-                    />
-                  </ToggleDetails>
-                </View>
-              )}
-              {/image/.test(accept) && (
-                <View
-                  as="div"
-                  role="group"
-                  borderColor="primary"
-                  borderWidth="0 0 small 0"
-                  padding="medium"
-                >
-                  <ToggleDetails
-                    defaultExpanded={!requiresUsageRights}
-                    summary={<Text size="x-large">{formatMessage('Attributes')}</Text>}
+                    <ToggleDetails
+                      defaultExpanded
+                      summary={
+                        <Text size="x-large">{formatMessage('Usage Rights (required)')}</Text>
+                      }
+                    >
+                      <UsageRightsSelectBox
+                        usageRightsState={usageRightsState}
+                        setUsageRightsState={setUsageRightsState}
+                        contextType={trayProps.contextType}
+                        contextId={trayProps.contextId}
+                        showMessage={false}
+                      />
+                    </ToggleDetails>
+                  </View>
+                )}
+                {/image/.test(accept) && requireA11yAttributes && (
+                  <View
+                    as="div"
+                    role="group"
+                    borderColor="primary"
+                    borderWidth="0 0 small 0"
+                    padding="medium"
                   >
-                    <ImageOptionsForm
-                      id="upload-file-form"
-                      altText={altText}
-                      isDecorativeImage={isDecorativeImage}
-                      displayAs={displayAs}
-                      handleAltTextChange={handleAltTextChange}
-                      handleIsDecorativeChange={handleIsDecorativeChange}
-                      handleDisplayAsChange={handleDisplayAsChange}
-                      hideDimensions
-                    />
-                  </ToggleDetails>
-                </View>
-              )}
-            </>
-          )}
+                    <ToggleDetails
+                      defaultExpanded={!requiresUsageRights}
+                      summary={<Text size="x-large">{formatMessage('Attributes')}</Text>}
+                    >
+                      <ImageOptionsForm
+                        id="upload-file-form"
+                        altText={altText}
+                        isDecorativeImage={isDecorativeImage}
+                        displayAs={displayAs}
+                        handleAltTextChange={handleAltTextChange}
+                        handleIsDecorativeChange={handleIsDecorativeChange}
+                        handleDisplayAsChange={handleDisplayAsChange}
+                        hideDimensions
+                      />
+                    </ToggleDetails>
+                  </View>
+                )}
+              </>
+            )
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
@@ -308,7 +313,8 @@ UploadFileModal.propTypes = {
   label: string.isRequired,
   accept: oneOfType([arrayOf(string), string]),
   modalBodyWidth: number,
-  modalBodyHeight: number
+  modalBodyHeight: number,
+  requireA11yAttributes: bool
 }
 
 export default UploadFileModal

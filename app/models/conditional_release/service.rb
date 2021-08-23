@@ -32,7 +32,8 @@ module ConditionalRelease
       return env unless enabled && user
 
       cyoe_env = {}
-      cyoe_env[:assignment] = assignment_attributes(assignment) if assignment
+      assignment_unlocked = !assignment&.locked_for?(user, check_policies: true, deep_check_if_needed: true)
+      cyoe_env[:assignment] = assignment_attributes(assignment) if assignment && assignment_unlocked
       if context.is_a?(Course)
         cyoe_env[:course_id] = context.id
         cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"
@@ -51,7 +52,7 @@ module ConditionalRelease
     end
 
     def self.enabled_in_context?(context)
-      Feature.definitions.key?('conditional_release') && context.is_a?(Course) && context.feature_enabled?(:conditional_release)
+      context.is_a?(Course) && context.feature_enabled?(:conditional_release)
     end
 
     def self.triggers_mastery_paths?(assignment, current_user, session = nil)
@@ -70,7 +71,7 @@ module ConditionalRelease
 
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
-      return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
+      return unless course.grants_any_right?(current_user, session, :read, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
         rules = course.conditional_release_rules.active.with_assignments.to_a

@@ -19,6 +19,8 @@
 #
 
 class LearningOutcomeResult < ActiveRecord::Base
+  include Canvas::SoftDeletable
+
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
@@ -135,7 +137,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_outcome_ids, lambda { |ids| where(:learning_outcome_id => ids) }
   scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
   scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
-  scope :active, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
+  scope :with_active_link, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
   # rubocop:disable Metrics/LineLength
   scope :exclude_muted_associations, -> {
     joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'").

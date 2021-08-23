@@ -78,5 +78,42 @@ describe Types::LearningOutcomeType do
       rubric_assessment_model(rubric: @rubric, user: @student)
       expect(outcome_type.resolve("assessed")).to eq true
     end
+
+    it "returns false when assessment deleted" do
+      assessment = rubric_assessment_model(rubric: @rubric, user: @student)
+      assessment.learning_outcome_results.destroy_all
+      expect(outcome_type.resolve("assessed")).to eq false
+    end
+  end
+
+  context "imported" do
+    let(:course) { Course.create! }
+    let(:root_group) { course.root_outcome_group }
+
+    it "returns false when not imported" do
+      expect(outcome_type.resolve("isImported(targetContextType: \"Course\", targetContextId: #{course.id})"))
+        .to eq false
+    end
+
+    it "returns true when imported" do
+      root_group.add_outcome(@outcome)
+      expect(outcome_type.resolve("isImported(targetContextType: \"Course\", targetContextId: #{course.id})"))
+        .to eq true
+    end
+  end
+
+  context "friendlyDescription" do
+    let(:course) { Course.create! }
+
+    it "resolves friendly description correctly" do
+      course_fd = OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: course,
+        description: "course's description"
+      })
+
+      expect(outcome_type.resolve("friendlyDescription(contextType: \"Course\", contextId: #{course.id}) { _id }"))
+        .to eq course_fd.id.to_s
+    end
   end
 end

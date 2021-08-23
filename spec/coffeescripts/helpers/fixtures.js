@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {send} from 'jsx/shared/rce/RceCommandShim'
+import {send} from '@canvas/rce/RceCommandShim'
 
 const $fixtures = $('#fixtures')
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -75,7 +77,8 @@ class CalendarsController < ApplicationController
         :can_update_todo_date => context.grants_right?(@current_user, session, :manage_content),
         :can_update_discussion_topic => context.grants_right?(@current_user, session, :moderate_forum),
         :can_update_wiki_page => context.grants_right?(@current_user, session, :update),
-        :concluded => (context.is_a? Course) ? context.concluded? : false
+        :concluded => (context.is_a? Course) ? context.concluded? : false,
+        :k5_subject => context.is_a?(Course) && context.elementary_subject_course?
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
@@ -110,9 +113,7 @@ class CalendarsController < ApplicationController
     content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")})
     js_env(@hash) if @hash
 
-    if Account.site_admin.feature_enabled?(:calendar_conferences)
-      calendar_contexts = (@contexts + [@domain_root_account]).uniq
-      add_conference_types_to_js_env(calendar_contexts)
-    end
+    calendar_contexts = (@contexts + [@domain_root_account]).uniq
+    add_conference_types_to_js_env(calendar_contexts)
   end
 end

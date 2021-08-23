@@ -20,8 +20,8 @@
 require 'bigdecimal'
 
 module CC
-  module QTI
-    module QTIItems
+  module Qti
+    module QtiItems
 
       CC_SUPPORTED_TYPES = ['multiple_choice_question',
                             'multiple_answers_question',

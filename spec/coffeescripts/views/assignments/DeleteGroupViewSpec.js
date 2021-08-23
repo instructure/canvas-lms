@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentCollection from 'compiled/collections/AssignmentCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import DeleteGroupView from 'compiled/views/assignments/DeleteGroupView'
+import Backbone from '@canvas/backbone'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentCollection from '@canvas/assignments/backbone/collections/AssignmentCollection.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import DeleteGroupView from 'ui/features/assignment_index/backbone/views/DeleteGroupView.coffee'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'

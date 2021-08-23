@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery/outerclick'
+import 'ui/features/manage_groups/jquery/outerclick.js'
 
 QUnit.module('outerclick')
 

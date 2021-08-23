@@ -733,6 +733,29 @@ describe Submission do
       end
     end
 
+    context 'when the submission is for a new quiz' do
+      before do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+      end
+
+      it 'subtracts 60 seconds from the submitted_at' do
+        Timecop.freeze(@date) do
+          submission = @assignment.submissions.find_by!(user: @student)
+          submission.update!(submitted_at: Time.now.utc)
+          expect(submission.seconds_late).to eql 59.minutes.to_i
+        end
+      end
+    end
+
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -1668,6 +1691,17 @@ describe Submission do
         submission_spec_model(submit_homework: true)
       end
 
+      it "updates 'graded_at' on the submission when the late_policy_status is changed" do
+        now = Time.zone.now
+        Timecop.freeze(1.hour.ago(now)) do
+          @submission.update!(late_policy_status: "late")
+        end
+        Timecop.freeze(now) do
+          @submission.update!(late_policy_status: "missing")
+        end
+        expect(@submission.graded_at).to eq now
+      end
+
       it "should create a message when the assignment has been graded and published" do
         communication_channel(@user, {username: 'somewhere@test.com'})
         @submission.reload
@@ -2201,6 +2235,27 @@ describe Submission do
     end
   end
 
+  describe "#can_read_submission_user_name?" do
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+      assignment = @course.assignments.create!(anonymous_grading: true)
+      @submission = assignment.submissions.find_by(user: @student)
+    end
+
+    context "anonymous assignments" do
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        teacher = User.create!
+        @course.enroll_teacher(teacher, enrollment_state: :active)
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+    end
+  end
+
   describe "#user_can_read_grade?" do
     before(:once) do
       @course = Course.create!
@@ -2239,7 +2294,6 @@ describe Submission do
     let(:group) { Group.create!(name: 'test group', context: course) }
 
     let(:originality_report) do
-      AttachmentAssociation.create!(context: submission, attachment_id: attachment)
       submission.update(attachment_ids: attachment.id.to_s)
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
     end
@@ -2259,22 +2313,80 @@ describe Submission do
         })
       end
 
-      it "prioritizes recent originality report if multiple exist for an attachment" do
-        AttachmentAssociation.create!(context: submission, attachment_id: attachment)
-        submission.update(attachment_ids: attachment.id.to_s)
-        first_report = OriginalityReport.create!(
-          attachment: attachment,
-          submission: submission,
-          workflow_state: 'pending'
-        )
-        second_report = OriginalityReport.create!(
-          attachment: attachment,
-          submission: submission,
-          originality_score: 50
-        )
+      context 'multiple originality reports for the same attachment' do
+        let(:preferred_report) do
+          OriginalityReport.create!(attachment: attachment,
+                                    submission: submission,
+                                    workflow_state: preferred_state,
+                                    originality_score: preferred_state == 'scored' ? 1 : nil)
+        end
+        let(:other_report) do
+          OriginalityReport.create!(attachment: attachment,
+                                    submission: submission, workflow_state: other_state,
+                                    originality_score: other_state == 'scored' ? 2 : nil)
+        end
 
-        report_data = submission.originality_data[attachment.asset_string]
-        expect(report_data[:similarity_score]).to eq second_report.originality_score
+        before(:each) do
+          submission.update(attachment_ids: attachment.id.to_s)
+        end
+
+        OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.each do |state|
+          context " and both reports have a workflow_state of #{state}" do
+            let(:preferred_state) { state }
+            let(:other_state) { state }
+
+            it 'chooses the more up-to-date report' do
+              preferred_report.update!(updated_at: Time.zone.now + 1.minute)
+              other_report.update!(updated_at: Time.zone.now)
+              report_data = submission.originality_data[attachment.asset_string]
+              expect(report_data[:similarity_score]).to eq preferred_report.originality_score
+            end
+          end
+        end
+
+        shared_examples_for 'submission with duplicate reports with different states' do
+          it 'uses the preferred report' do
+            preferred_report
+            other_report
+            report_data = submission.originality_data[attachment.asset_string]
+            expect(report_data[:similarity_score]).to eq preferred_report.originality_score
+            expect(report_data[:status]).to eq preferred_report.workflow_state
+          end
+
+          it 'uses the preferred report even if the other report was updated later' do
+            preferred_report.update(updated_at: Time.zone.now)
+            other_report.update(updated_at: Time.zone.now + 1.minute)
+
+            report_data = submission.originality_data[attachment.asset_string]
+            expect(report_data[:similarity_score]).to eq preferred_report.originality_score
+            expect(report_data[:status]).to eq preferred_report.workflow_state
+          end
+        end
+
+        context "and the reports have differing workflow_states" do
+          context "of scored and error" do
+            let(:preferred_state) { 'scored' }
+            let(:other_state) { 'error' }
+
+            it_behaves_like 'submission with duplicate reports with different states'
+
+          end
+
+          context "of scored and pending" do
+            let(:preferred_state) { 'scored' }
+            let(:other_state) { 'pending' }
+
+            it_behaves_like 'submission with duplicate reports with different states'
+
+          end
+
+          context "of error and pending" do
+            let(:preferred_state) { 'error' }
+            let(:other_state) { 'pending' }
+
+            it_behaves_like 'submission with duplicate reports with different states'
+          end
+        end
       end
 
       it "includes tii data" do
@@ -2460,12 +2572,12 @@ describe Submission do
       let_once(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
       let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
       let_once(:report_url) { 'http://www.test-score.com' }
-      let!(:originality_report) {
+      let(:originality_report) do
         OriginalityReport.create!(attachment: attachment,
-                                  submission: submission,
-                                  originality_score: 0.5,
-                                  originality_report_url: report_url)
-      }
+          submission: submission,
+          originality_score: 0.5,
+          originality_report_url: report_url)
+      end
 
       it 'returns nil if no originality report exists for the submission' do
         originality_report.destroy
@@ -2478,6 +2590,7 @@ describe Submission do
       end
 
       it 'returns the originality_report_url if present' do
+        originality_report
         expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
       end
 
@@ -2486,66 +2599,197 @@ describe Submission do
         expect(submission.originality_report_url(submission.asset_string, test_teacher)).to eq report_url
       end
 
-      context 'when there are multiple originality reports' do
-        let(:submission2) { assignment.submit_homework(test_student, body: 'hello world') }
-        let(:report_url2) { 'http://www.another-test-score.com/' }
-        let(:originality_report2) {
-          OriginalityReport.create!(attachment: nil,
-                                    submission: submission2,
-                                    originality_score: 0.4,
-                                    originality_report_url: report_url2)
-        }
-
-        it 'can use attempt number to find the report url for text entry submissions' do
-          originality_report2
-          originality_report.update!(attachment: nil)
-          expect(submission2.attempt).to be > submission.attempt
-          expect(submission.originality_report_url(submission.asset_string, test_teacher, submission.attempt.to_s)).to eq report_url
-          expect(submission.originality_report_url(submission.asset_string, test_teacher, submission2.attempt.to_s)).to eq report_url2
-        end
-      end
-
       it 'requires the :grade permission' do
         unauthorized_user = User.new
         expect(submission.originality_report_url(attachment.asset_string, unauthorized_user)).to be_nil
       end
 
-      it 'treats attachments in submission history as valid' do
-        first_attachment = attachment_model(filename: "submission-b.doc", :context => test_student)
-        submission = Timecop.freeze(2.days.ago) do
-          assignment.submit_homework(test_student, submission_type: 'online_upload',
-            attachments: [first_attachment])
+      context 'when there are multiple originality reports' do
+        context 'for text entry submissions' do
+          let(:other_submission) { assignment.submit_homework(test_student, body: 'hello world') }
+          let(:other_report_url) { 'https://another-report.com' }
+          let(:other_report) {
+            OriginalityReport.create!(attachment: nil,
+                                      submission: other_submission,
+                                      originality_score: 0.4,
+                                      originality_report_url: other_report_url)
+          }
+
+          it 'can use attempt number to find the report url' do
+            originality_report.update!(attachment: nil)
+            other_report
+
+            expect(other_submission.attempt).to be > submission.attempt
+            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+              submission.attempt.to_s)).to eq report_url
+            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+              other_submission.attempt.to_s)).to eq(other_report_url)
+          end
         end
-        OriginalityReport.create!(attachment: first_attachment, submission: submission, originality_score: 0.4,
-          originality_report_url: report_url)
 
-        attachment = attachment_model(filename: "submission-b.doc", :context => test_student)
-        Timecop.freeze(1.day.ago) do
-          assignment.submit_homework test_student, attachments: [attachment]
+        context 'for multiple attachments' do
+          let(:other_attachment) { attachment_model(filename: "submission-b.doc", :context => test_student) }
+          let(:other_report_url) { 'http://another-report.com' }
+          let(:other_report) do
+            OriginalityReport.create!(attachment: other_attachment, submission: submission,
+              originality_score: 0.4, originality_report_url: other_report_url)
+          end
+
+          it 'considers all attachments in submission history valid' do
+            Timecop.freeze(2.days.ago) do
+              assignment.submit_homework(test_student, submission_type: 'online_upload',
+                attachments: [attachment])
+            end
+
+            Timecop.freeze(1.day.ago) do
+              assignment.submit_homework(test_student, submission_type: 'online_upload',
+                attachments: [other_attachment])
+            end
+
+            originality_report
+            other_report
+            expect(submission.originality_report_url(attachment.asset_string, test_teacher))
+              .to eq(report_url)
+            expect(submission.originality_report_url(other_attachment.asset_string, test_teacher))
+              .to eq(other_report_url)
+          end
+
+          it 'gives the correct url for each attachment' do
+            assignment.submit_homework(test_student, submission_type: 'online_upload',
+              attachments: [attachment, other_attachment])
+            originality_report
+            other_report
+            expect(submission.originality_report_url(attachment.asset_string, test_teacher))
+              .to eq(report_url)
+            expect(submission.originality_report_url(other_attachment.asset_string, test_teacher))
+              .to eq(other_report_url)
+          end
+
+          # This combines having multiple attachments with some duplicate OriginalityReports.
+          context 'with some duplicate reports for an attachment' do
+            let(:duplicate_url) { 'http://duplicate.com' }
+            let(:duplicate_report) do
+              OriginalityReport.create!(attachment: attachment, submission: submission,
+                                        workflow_state: 'pending',
+                                        originality_report_url: duplicate_url)
+            end
+
+            before(:each) do
+              assignment.submit_homework(test_student, submission_type: 'online_upload',
+                                         attachments: [attachment, other_attachment])
+            end
+
+            it "uses the scored report's URL" do
+              originality_report
+              other_report
+              duplicate_report
+              expect(submission.originality_report_url(attachment.asset_string, test_teacher))
+                .to eq(report_url)
+            end
+
+            it "uses the scored report's URL even if the other report is newer" do
+              originality_report.update(updated_at: 1.day.ago)
+              other_report
+              duplicate_report.update(updated_at: 1.day.from_now)
+
+              expect(submission.originality_report_url(attachment.asset_string, test_teacher))
+                .to eq(report_url)
+            end
+
+            it "can still get other attachment's URLs" do
+              originality_report
+              other_report
+              duplicate_report
+
+              expect(submission.originality_report_url(other_attachment.asset_string, test_teacher))
+                .to eq(other_report_url)
+            end
+          end
         end
 
-        attachment = attachment_model(filename: "submission-c.doc", :context => test_student)
-        submission = Timecop.freeze(1.second.ago) do
-          assignment.submit_homework test_student, attachments: [attachment]
+        # If we have multiple reports for the same attachment-submission combo, then
+        # those reports are considered duplicates. However, they might have different states
+        # so we have to be sure we're using the correct report.
+        context "and the reports are for the same attachment" do
+          let(:preferred_url) { 'http://preferred-score.com' }
+          let(:other_url) { 'http://other-score.com' }
+          let(:preferred_report) do
+            OriginalityReport.create!(attachment: attachment,
+                                      submission: submission,
+                                      originality_score: preferred_state == 'scored' ? 1 : nil,
+                                      workflow_state: preferred_state,
+                                      originality_report_url: preferred_url)
+          end
+          let(:other_report) do
+            OriginalityReport.create!(attachment: attachment,
+              submission: submission,
+              originality_score: other_state == 'scored' ? 2 : nil,
+              workflow_state: other_state,
+              originality_report_url: other_url)
+          end
+
+          before(:each) do
+            submission.update(attachment_ids: attachment.id.to_s)
+          end
+
+          OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.each do |state|
+            context "and have the same workflow_state of #{state}" do
+              let(:preferred_state) { state }
+              let(:other_state) { state }
+
+              it "chooses the more up-to-date report's URL" do
+                preferred_report.update(updated_at: Time.zone.now + 1.minute)
+                other_report.update(updated_at: Time.zone.now)
+                expect(submission.originality_report_url(attachment.asset_string,
+                  test_teacher)).to eq preferred_url
+              end
+            end
+          end
+
+          shared_examples_for 'submission with duplicate reports with different states' do
+            it "chooses the preferred report's URL" do
+              preferred_report
+              other_report
+              expect(submission.originality_report_url(attachment.asset_string,
+                test_teacher)).to eq preferred_url
+            end
+
+            it "chooses the preferred report's URL even when the other report is newer" do
+              preferred_report.update(updated_at: Time.zone.now)
+              other_report.update(updated_at: Time.zone.now + 1.minute)
+              expect(submission.originality_report_url(attachment.asset_string,
+                test_teacher)).to eq preferred_url
+            end
+          end
+
+          context 'and the reports have differing workflow_states' do
+            context 'of scored and error' do
+              let(:preferred_state) { 'scored' }
+              let(:other_state) { 'error' }
+
+              it_behaves_like 'submission with duplicate reports with different states'
+            end
+
+            context 'of scored and pending' do
+              let(:preferred_state) { 'scored' }
+              let(:other_state) { 'pending' }
+
+              it_behaves_like 'submission with duplicate reports with different states'
+            end
+
+            context 'of error and pending' do
+              let(:preferred_state) { 'error' }
+              let(:other_state) { 'pending' }
+
+              it_behaves_like 'submission with duplicate reports with different states'
+            end
+          end
         end
-
-        expect(submission.originality_report_url(first_attachment.asset_string, test_teacher)).to eq(report_url)
-      end
-
-      it 'gives the correct url for multiple attachments' do
-        attachment2 = attachment_model(filename: "submission-b.doc", :context => test_student)
-        originality_report2 = OriginalityReport.create!(attachment: attachment2, submission: submission,
-          originality_score: 0.4, originality_report_url: 'http://www.another-test-score.com/')
-        assignment.submit_homework(test_student, submission_type: 'online_upload',
-          attachments: [attachment, attachment2])
-        expect(submission.originality_report_url(attachment.asset_string, test_teacher, 1)).to eq(report_url)
-        expect(submission.originality_report_url(attachment2.asset_string, test_teacher, 1)).to eq('http://www.another-test-score.com/')
       end
     end
   end
 
   context "turnitin" do
-
     context "Turnitin LTI" do
       let(:lti_tii_data) do
         {
@@ -2882,6 +3126,32 @@ describe Submission do
 
     it "is not available when the plagiarism report is from vericite" do
       @submission.turnitin_data[:provider] = 'vericite'
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it 'is available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for something else' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'turnitin-lti',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'turnitin.com'
+      )
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it 'is not available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for vericite' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'vericite',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'vericite'
+      )
       expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
     end
 
@@ -4162,6 +4432,43 @@ describe Submission do
     end
   end
 
+  describe "#annotation_context" do
+    before(:once) do
+      @attachment = attachment_model(context: @user)
+      @assignment.update!(annotatable_attachment_id: @attachment.id)
+      @submission = @assignment.submissions.find_by(user: @user)
+    end
+
+    it "creates a canvadocs_annotation_context if draft is true" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+
+      expect {
+        new_submission.annotation_context(draft: true)
+      }.to change {
+        new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
+      }.by(1)
+    end
+
+    it "returns the already existing canvadocs_annotation_context when passed draft multiple times" do
+      existing_context = @submission.annotation_context(draft: true)
+      expect(@submission.annotation_context(draft: true)).to eq existing_context
+    end
+
+    it "returns nil if a canvadocs_annotation_context does not exist" do
+      expect(@submission.annotation_context(attempt: 1)).to be_nil
+    end
+
+    it "returns the annotation_context if one exists for the attempt" do
+      @submission.update!(attempt: 1)
+      context = @submission.canvadocs_annotation_contexts.create!(
+        attachment: @attachment,
+        submission_attempt: @submission.attempt
+      )
+      expect(@submission.annotation_context(attempt: @submission.attempt)).to eq context
+    end
+  end
+
   describe '.process_bulk_update' do
     before(:once) do
       course_with_teacher active_all: true
@@ -4233,6 +4540,88 @@ describe Submission do
                                      })
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
+    end
+
+    it "does not explode if the assignment is deleted" do
+      @a1.destroy
+      expect{
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          @a1.id.to_s => {
+            @u1.id => {posted_grade: 5},
+            @u2.id => {posted_grade: 10}
+          }
+        })
+      }.to_not raise_error
+      expect(@progress.reload.failed?).to be_truthy
+
+      expect(@a1.submission_for_student(@u1).grade).to be_nil
+      expect(@a1.submission_for_student(@u2).grade).to be_nil
+    end
+
+    describe "submitting comments via bulk update" do
+      let(:auto_assignment) { @a1 }
+      let(:manual_assignment) do
+        @a2.post_policy.update!(post_manually: true)
+        @a2
+      end
+
+      it "sets the comment to visible if the assignment is automatically posted" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if the relevant submission has already been posted" do
+        auto_assignment.grade_student(@u1, grade: 0, grader: @teacher)
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if a grade is also included in the update" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {posted_grade: 0, text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      context "for a manually-posted assignment" do
+        let(:submission) { manual_assignment.submission_for_student(@u1) }
+
+        it "shows the comment if the associated submission is already posted" do
+          manual_assignment.post_submissions(submission_ids: [submission.id])
+
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "hello there"}
+            }
+          })
+          expect(submission.submission_comments.last).not_to be_hidden
+        end
+
+        it "leaves the comment hidden if the associated submission is not posted" do
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "clandestine comment"}
+            }
+          })
+          expect(submission.submission_comments.last).to be_hidden
+        end
+      end
     end
   end
 
@@ -4465,7 +4854,13 @@ describe Submission do
       expect(@submission.moderation_allow_list_for_user(other_student)).to be_empty
     end
 
-    context 'when grades are not published' do
+    it 'always includes the submission owner when the assignment is of type Student Annotation' do
+      ta = @course.enroll_ta(User.create!).user
+      @assignment.update!(grader_count: 2, submission_types: 'student_annotation')
+      expect(@submission.moderation_allow_list_for_user(ta)).to eq [@student]
+    end
+
+    context 'when the submission is not posted' do
       context 'when the user is the final grader' do
         let(:allow_list) { @submission.moderation_allow_list_for_user(@teacher) }
 
@@ -4691,13 +5086,14 @@ describe Submission do
       end
     end
 
-    context 'when grades are published' do
+    context 'when the submission is posted' do
       before(:once) do
         provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
         selection = @assignment.moderated_grading_selections.find_by(student: @student)
         selection.update!(provisional_grade: provisional_grade)
         provisional_grade.publish!
         @assignment.update!(grades_published_at: 1.hour.ago)
+        @assignment.post_submissions
         @submission.reload
       end
 
@@ -5023,6 +5419,33 @@ describe Submission do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: nil)
         ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
+
+      it "specifically returns assessments with a nil artifact_attempt if an attempt of 0 is specified" do
+        assignment = @course.assignments.create!(submission_types: "online_text_entry")
+        rubric_association = rubric_association_model(association_object: assignment, purpose: 'grading')
+        submission = assignment.submission_for_student(@student)
+
+        assessment_before_submitting = rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: 'grading',
+          assessor: @student,
+          rubric: rubric_association.rubric,
+          user: @student
+        })
+
+        submission = assignment.submit_homework(@student, body: "hi")
+
+        rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: 'grading',
+          assessor: @teacher,
+          rubric: rubric_association.rubric,
+          user: @student
+        })
+
+        expect(submission.visible_rubric_assessments_for(@student, attempt: 0))
+          .to contain_exactly(assessment_before_submitting)
       end
     end
   end
@@ -5482,6 +5905,35 @@ describe Submission do
 
       sub = Submission.find(Submission.connection.create(create_sql))
       expect(sub.submission_history).to eq([sub])
+    end
+  end
+
+  describe "#comments_excluding_drafts_for" do
+    before(:each) do
+      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+      ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
+      student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+      assignment = @course.assignments.create!(name: "plain assignment")
+      assignment.ensure_post_policy(post_manually: true)
+      @submission = assignment.submissions.find_by(user: student)
+      @student_comment = @submission.add_comment(author: student, comment: "Student comment")
+      @teacher_comment = @submission.add_comment(author: @teacher, comment: "Teacher comment", draft_comment: true)
+      @ta_comment = @submission.add_comment(author: ta, comment: "Ta comment")
+    end
+
+    it "returns non-draft comments, filtering out draft comments" do
+      comments = @submission.comments_excluding_drafts_for(@teacher)
+      expect(comments).to include @student_comment, @ta_comment
+      expect(comments).not_to include @teacher_comment
+    end
+
+    context "when comments are preloaded" do
+      it "returns non-draft comments, filtering out draft comments" do
+        preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
+        comments = preloaded_submission.comments_excluding_drafts_for(@teacher)
+        expect(comments).to include @student_comment, @ta_comment
+        expect(comments).not_to include @teacher_comment
+      end
     end
   end
 
@@ -6626,15 +7078,21 @@ describe Submission do
       let(:submission) { lti_result.submission }
 
       it 'does nothing if score has not changed' do
-        lti_result
-        expect(lti_result).not_to receive(:update)
-        submission.save!
+        expect {
+          submission.save!
+        }.to_not change { lti_result.result_score }
       end
 
       it 'updates the lti_result score_given if the score has changed' do
-        expect(lti_result.result_score).to eq submission.score
-        submission.update!(score: 1)
-        expect(lti_result.reload.result_score).to eq submission.score
+        expect {
+          submission.update!(score: 1.3)
+        }.to change { lti_result.reload.result_score }.from(nil).to(1.3)
+      end
+
+      it 'does nothing if the lti_result was updated by a tool' do
+        expect {
+          submission.update!(score: 1.3, grader_id: -123)
+        }.to_not change { lti_result.reload.result_score }
       end
     end
   end
@@ -7139,6 +7597,15 @@ describe Submission do
     it "is set to the root account ID of the owning course" do
       assignment = course.assignments.create!
       expect(assignment.submission_for_student(student).root_account_id).to eq root_account.id
+    end
+  end
+
+  describe "redo request" do
+    subject(:submission) { @assignment.submissions.new user: User.create, workflow_state: 'submitted', redo_request: true, attempt: 1 }
+
+    it "redo request is reset on an updated submission" do
+      submission.update!(attempt: 2)
+      expect(submission.redo_request).to eq false
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ class DropOldCollationKeyIndexes < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
-    return unless connection.extension_installed?(:pg_collkey)
+    return unless connection.extension(:pg_collkey)
 
     if connection.index_name_exists?(:users, :index_users_on_sortable_name_old)
       remove_index :users, name: :index_users_on_sortable_name_old
@@ -34,7 +36,7 @@ class DropOldCollationKeyIndexes < ActiveRecord::Migration[5.0]
   end
 
   def down
-    collkey = connection.extension_installed?(:pg_collkey)
+    collkey = connection.extension(:pg_collkey)&.schema
     return unless collkey
 
     add_index :attachments, "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 0, true)",

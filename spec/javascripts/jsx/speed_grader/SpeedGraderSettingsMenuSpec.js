@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
+import SpeedGraderSettingsMenu from 'ui/features/speed_grader/react/SpeedGraderSettingsMenu.js'
 
 QUnit.module('SpeedGraderSettingsMenu', hooks => {
   let $container

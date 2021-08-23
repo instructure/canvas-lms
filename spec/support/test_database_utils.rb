@@ -19,13 +19,6 @@
 
 module TestDatabaseUtils
   class << self
-    # for when we fork
-    def reconnect!
-      ::ActiveRecord::Base.configurations['test']['database'] = "canvas_test_#{ENV["TEST_ENV_NUMBER"]}"
-      ::Switchman::DatabaseServer.remove_instance_variable(:@database_servers)
-      ::ActiveRecord::Base.establish_connection(:test)
-    end
-
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
@@ -101,10 +94,10 @@ module TestDatabaseUtils
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?
+
         connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
       end
-      Account.find_or_create_by!(id: 0).
-        update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+      Account.ensure_dummy_root_account
     end
 
     def get_sequences(connection)

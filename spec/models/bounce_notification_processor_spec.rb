@@ -38,12 +38,31 @@ describe BounceNotificationProcessor do
   end
 
   describe ".process" do
+    it "calls process n times from #process" do
+      Setting.set('bounce_processors_for_region_us-east-1', '3')
+      allow(BounceNotificationProcessor).to receive(:config).and_return(
+        {
+          region: 'us-east-1',
+          access_key: 'key',
+          secret_access_key: 'secret'
+        })
+      queue = double
+      expectation = receive(:poll)
+      @all_bounce_messages_json.each { |m| expectation.and_yield(mock_message(m)) }
+      expect(queue).to expectation.exactly(4).times # Setting + 1
+      allow_any_instance_of(BounceNotificationProcessor).to receive(:bounce_queue).and_return(queue)
+      BounceNotificationProcessor.process
+      run_jobs
+    end
+
     it "processes each notification in the queue" do
       bnp = BounceNotificationProcessor.new
-      allow(BounceNotificationProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+      allow(BounceNotificationProcessor).to receive(:config).and_return(
+        {
+          region: 'us-east-1',
+          access_key: 'key',
+          secret_access_key: 'secret'
+        })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|

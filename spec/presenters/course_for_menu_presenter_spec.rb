@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe CourseForMenuPresenter do
+  include K5Common
+
   let_once(:account) { Account.default }
   let_once(:course) { Course.create!(account: account) }
   let_once(:user) { User.create! }
@@ -89,19 +92,61 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
-    context 'with the `unpublished_courses` FF enabled' do
-      before(:each) do
-        course.root_account.enable_feature!(:unpublished_courses)
+    it 'sets the published value' do
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      expect(cs_presenter.to_h.key?(:published)).to eq true
+    end
+
+    it 'sets additional keys' do
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      h = cs_presenter.to_h
+      expect(h.key?(:published)).to eq true
+      expect(h.key?(:canChangeCoursePublishState)).to eq true
+      expect(h.key?(:defaultView)).to eq true
+      expect(h.key?(:pagesUrl)).to eq true
+      expect(h.key?(:frontPageTitle)).to eq true
+    end
+
+    context 'isK5Subject' do
+      it 'is set for k5 subjects' do
+        toggle_k5_setting(course.account)
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:isK5Subject]).to be_truthy
       end
 
-      it 'sets additional keys' do
+      it 'is false for classic courses' do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:isK5Subject]).to be_falsey
+      end
+    end
+
+    context 'with `homeroom_course` setting enabled' do
+      before do
+        course.update! homeroom_course: true
+      end
+
+      it 'sets `isHomeroom` to `true`' do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h.key?(:published)).to eq true
-        expect(h.key?(:canChangeCourseState)).to eq true
-        expect(h.key?(:defaultView)).to eq true
-        expect(h.key?(:pagesUrl)).to eq true
-        expect(h.key?(:frontPageTitle)).to eq true
+        expect(h[:isHomeroom]).to eq true
+      end
+    end
+
+    context 'course color' do
+      before do
+        course.update! settings: course.settings.merge(course_color: '#789')
+      end
+
+      it 'sets `color` to nil if the course is not associated with a K-5 account' do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to be_nil
+      end
+
+      it 'sets `color` if the course is associated with a K-5 account' do
+        toggle_k5_setting(course.account)
+
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to eq '#789'
       end
     end
 
@@ -121,8 +166,7 @@ describe CourseForMenuPresenter do
     end
 
     context 'Using courses from a trusted account' do
-      it 'returns correct published value if the current account has FF enabled' do
-        account.enable_feature!(:unpublished_courses)
+      it 'returns correct published value' do
         a2 = account_model(name: "second account")
         a2.trust_links.create!(managing_account: account)
         account.trust_links.create!(managing_account: a2)

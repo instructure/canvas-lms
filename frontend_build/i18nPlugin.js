@@ -23,7 +23,7 @@
 // before the pitching i18n loader catches it, so we replace
 // i18n!some-scope requires with i18n?some-scope!dummyI18nResource,
 // and that file actually does exist over in
-// public/javascripts/dummyI18nResource
+// ui/shims/dummyI18nResource
 
 class I18nPlugin {
   apply(compiler) {

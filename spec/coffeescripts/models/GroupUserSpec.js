@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Group from 'compiled/models/Group'
-import GroupUser from 'compiled/models/GroupUser'
-import GroupCategory from 'compiled/models/GroupCategory'
+import Backbone from '@canvas/backbone'
+import Group from '@canvas/groups/backbone/models/Group.coffee'
+import GroupUser from '@canvas/groups/backbone/models/GroupUser.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import $ from 'jquery'
 
 QUnit.module('GroupUser', {

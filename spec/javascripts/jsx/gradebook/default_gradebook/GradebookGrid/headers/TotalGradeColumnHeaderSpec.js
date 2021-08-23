@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import TotalGradeColumnHeader from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeader'
+import TotalGradeColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeader.js'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */

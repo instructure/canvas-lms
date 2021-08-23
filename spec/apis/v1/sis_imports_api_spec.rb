@@ -70,6 +70,7 @@ describe SisImportsApiController, type: :request do
           "batch_mode" => opts[:batch_mode] ? true : nil,
           "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
           "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
+          "update_sis_id_if_login_claimed" => opts[:update_sis_id_if_login_claimed] ? true : false,
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
           "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
@@ -122,6 +123,7 @@ describe SisImportsApiController, type: :request do
           "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
+          "update_sis_id_if_login_claimed" => false,
           "skip_deletes" => false,
           "change_threshold" => nil,
     })
@@ -192,6 +194,7 @@ describe SisImportsApiController, type: :request do
           "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
+          "update_sis_id_if_login_claimed" => false,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diff_row_count_threshold" => nil,
@@ -358,6 +361,26 @@ describe SisImportsApiController, type: :request do
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
   end
 
+  it "should enable updating SIS ID, when a pseudonym is found" do
+    json = api_call(
+      :post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      {
+        controller: 'sis_imports_api',
+        action: 'create',
+        format: 'json',
+        account_id: @account.id.to_s
+      },
+      {
+        import_type: 'instructure_csv',
+        attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+        update_sis_id_if_login_claimed: true
+      }
+    )
+    batch = SisBatch.find(json["id"])
+    expect(batch.options[:update_sis_id_if_login_claimed]).to be_truthy
+  end
+
   it "should enable diffing mode" do
     json = api_call(:post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -434,7 +457,7 @@ describe SisImportsApiController, type: :request do
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({skip_deletes: false})
+    expect(batch.options).to eq({skip_deletes: false, update_sis_id_if_login_claimed: false})
     batch.destroy
 
     json = api_call(:post,
@@ -445,7 +468,11 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :override_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({override_sis_stickiness: true, skip_deletes: false})
+    expect(batch.options).to eq({
+      override_sis_stickiness: true,
+      skip_deletes: false,
+      update_sis_id_if_login_claimed: false
+    })
     batch.destroy
 
     json = api_call(:post,
@@ -457,7 +484,12 @@ describe SisImportsApiController, type: :request do
             :override_sis_stickiness => "1",
             :add_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({override_sis_stickiness: true, add_sis_stickiness: true, skip_deletes: false})
+    expect(batch.options).to eq({
+      override_sis_stickiness: true,
+      add_sis_stickiness: true,
+      skip_deletes: false,
+      update_sis_id_if_login_claimed: false
+    })
     batch.destroy
 
     json = api_call(:post,
@@ -469,7 +501,12 @@ describe SisImportsApiController, type: :request do
             :override_sis_stickiness => "1",
             :clear_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({override_sis_stickiness: true, clear_sis_stickiness: true, skip_deletes: false})
+    expect(batch.options).to eq({
+      override_sis_stickiness: true,
+      clear_sis_stickiness: true,
+      skip_deletes: false,
+      update_sis_id_if_login_claimed: false
+    })
     batch.destroy
 
     json = api_call(:post,
@@ -480,7 +517,7 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :add_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({skip_deletes: false})
+    expect(batch.options).to eq({skip_deletes: false, update_sis_id_if_login_claimed: false})
     batch.destroy
 
     json = api_call(:post,
@@ -491,7 +528,7 @@ describe SisImportsApiController, type: :request do
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :clear_sis_stickiness => "1"})
     batch = SisBatch.find(json["id"])
-    expect(batch.options).to eq({skip_deletes: false})
+    expect(batch.options).to eq({skip_deletes: false, update_sis_id_if_login_claimed: false})
     batch.destroy
   end
 
@@ -772,19 +809,20 @@ describe SisImportsApiController, type: :request do
                       "progress" => 100,
                       "id" => batch.id,
                       "workflow_state"=>"imported",
-          "batch_mode" => nil,
-          "batch_mode_term_id" => nil,
-          "multi_term_batch_mode" => nil,
-          "override_sis_stickiness" => nil,
-          "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil,
-          "diffing_data_set_identifier" => nil,
-          "diff_row_count_threshold" => nil,
-          "diffed_against_import_id" => nil,
-          "skip_deletes" => false,
-          "diffing_drop_status" => nil,
-          "change_threshold" => nil,
-      }]
+                      "batch_mode" => nil,
+                      "batch_mode_term_id" => nil,
+                      "multi_term_batch_mode" => nil,
+                      "override_sis_stickiness" => nil,
+                      "add_sis_stickiness" => nil,
+                      "update_sis_id_if_login_claimed" => false,
+                      "clear_sis_stickiness" => nil,
+                      "diffing_data_set_identifier" => nil,
+                      "diff_row_count_threshold" => nil,
+                      "diffed_against_import_id" => nil,
+                      "skip_deletes" => false,
+                      "diffing_drop_status" => nil,
+                      "change_threshold" => nil,
+                                     }]
     }
     expect(json).to eq expected_data
 
@@ -842,6 +880,19 @@ describe SisImportsApiController, type: :request do
                       :format => 'json', :account_id => @account.id.to_s, :created_since => 1.day.ago.iso8601 })
 
     expect(json["sis_imports"].count).to eq 1
+  end
+
+  it "filters sis imports by an end date" do
+    batch = @account.sis_batches.create
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s, :created_before => 1.day.from_now.iso8601 })
+    expect(json["sis_imports"].count).to eq 1
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s, :created_before => 1.day.ago.iso8601 })
+    expect(json["sis_imports"].count).to eq 0
   end
 
   it "should not fail when options are empty" do

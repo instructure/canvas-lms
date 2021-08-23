@@ -19,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../conditional_release_spec_helper'
 
 describe ContextModule do
   def course_module
@@ -446,7 +447,7 @@ describe ContextModule do
 
     it "appends items to the end of a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool])
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one two three attach assign page quiz topic tool))
     end
 
@@ -457,14 +458,14 @@ describe ContextModule do
 
     it "inserts items into a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one attach assign page quiz topic tool two three))
     end
 
     it "adds things to an empty module" do
       empty = @course.context_modules.create! name: 'empty'
       empty.insert_items([@attach, @assign])
-      expect(empty.content_tags.order(:position).pluck(:title)).to eq(%w(attach assign))
+      expect(empty.content_tags.ordered.pluck(:title)).to eq(%w(attach assign))
     end
 
     it "sets the indent to 0" do
@@ -475,7 +476,7 @@ describe ContextModule do
 
     it "doesn't add weird things to a module" do
       @module.insert_items([@attach, user_model, 'foo', @assign])
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one two three attach assign))
     end
 
@@ -1343,6 +1344,43 @@ describe ContextModule do
       @submission.save!
       expect(@module.evaluate_for(@student).requirements_met).to be_include({id: @tag.id, type: 'must_submit'})
     end
+
+    context 'with conditional release' do
+      before(:once) do
+        setup_course_with_native_conditional_release
+        student_in_course(course: @course, active_all: true)
+        teacher_in_course(course: @course, active_all: true)
+      end
+
+      it 'should update completion status on grading events' do
+        @set1_assmt1.update!(points_possible: 10, submission_types: "online_text_entry")
+        @module = @course.context_modules.create!
+        @trigger_tag = @module.add_item(type: 'assignment', id: @trigger_assmt.id)
+        @set1_assmt1_tag = @module.add_item(type: 'assignment', id: @set1_assmt1.id)
+        @page = @course.wiki_pages.create!(title: 'My Page')
+        @page_tag = @module.add_item(type: 'wiki_page', id: @page.id)
+        @module.completion_requirements = [
+          { id: @trigger_tag.id, type: 'min_score', min_score: 8 },
+          { id: @set1_assmt1_tag.id, type: 'must_submit' },
+        ]
+        @module.require_sequential_progress = true
+        @module.save!
+        @module.reload.relock_progressions
+
+        # the page and the released assignment are both locked behind the trigger assignment
+        expect(@set1_assmt1.reload).to be_locked_for @student
+        expect(@page.reload).to be_locked_for @student
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+
+        # the released assignment is now available and the page is now locked behind the set assignment
+        expect(@set1_assmt1.reload).not_to be_locked_for @student
+        expect(@page.reload).to be_locked_for @student
+
+        @set1_assmt1.submit_homework(@student, body: 'hi')
+        expect(@page.reload).not_to be_locked_for @student
+      end
+    end
   end
 
   context 'unpublished completion requirements' do
@@ -1541,7 +1579,7 @@ describe ContextModule do
         @p2.save!
       end
       @module.restore
-      tags = @module.content_tags.not_deleted.order(:position).to_a
+      tags = @module.content_tags.not_deleted.ordered.to_a
       expect(tags.size).to eq 4
       expect(tags.map(&:content_id)).to eq([0, @a1.id, @a2.id, @p2.id])
       expect(tags.map(&:title)).to eq(['foo', 'a1', 'a2', 'p2-renamed'])

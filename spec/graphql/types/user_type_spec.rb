@@ -35,6 +35,7 @@ describe Types::UserType do
     @course = course
     @student = student
     @teacher = teacher
+    @ta = ta_in_course(active_all: true).user
   end
 
   let(:user_type) do
@@ -73,6 +74,21 @@ describe Types::UserType do
 
       @student.enrollments.update_all workflow_state: "completed"
       expect(user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+    end
+  end
+
+  context "shortName" do
+    before(:once) do
+      @student.update! short_name: 'new display name'
+    end
+
+    it "is displayed if set" do
+      expect(user_type.resolve("shortName")).to eq 'new display name'
+    end
+
+    it "returns full name if shortname is not set" do
+      @student.update! short_name: nil
+      expect(user_type.resolve("shortName")).to eq @student.name
     end
   end
 
@@ -175,6 +191,19 @@ describe Types::UserType do
           current_user: @admin
         )
       ).to match_array @student.enrollments.map(&:to_param)
+    end
+
+    it "excludes deleted course enrollments for a user" do
+      @course1.enroll_student(@student, enrollment_state: "active")
+      @course2.destroy
+
+      site_admin_user
+      expect(
+        user_type.resolve(
+          "enrollments { _id }",
+          current_user: @admin
+        )
+      ).to eq [@student.enrollments.first.to_param]
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do
@@ -313,27 +342,31 @@ describe Types::UserType do
     end
 
     it 'has createdAt field for conversationMessagesConnection' do
-      c = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      expect(
-        type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
-      ).to eq c.conversation.conversation_messages.first.created_at.iso8601
+      Timecop.freeze do
+        c = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        expect(
+          type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
+        ).to eq c.conversation.conversation_messages.first.created_at.iso8601
+      end
     end
 
     it 'has updatedAt field for conversations and conversationParticipants' do
-      skip 'VICE-1115 (01/27/2021)'
-
-      convo = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
-      expect(res_node).to eq convo.conversation.updated_at.iso8601
+      Timecop.freeze do
+        convo = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
+        expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+      end
     end
 
     it 'has updatedAt field for conversationParticipantsConnection' do
-      convo = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
-      expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+      Timecop.freeze do
+        convo = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
+        expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+      end
     end
 
     it 'does not return conversations for other users' do
@@ -409,7 +442,7 @@ describe Types::UserType do
     end
 
     it 'returns known users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 3)
+      known_users = @student.address_book.search_users().paginate(per_page: 4)
       result = type.resolve('recipients { usersConnection { nodes { _id } } }')
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
@@ -497,4 +530,178 @@ describe Types::UserType do
       expect(result).to match_array([@group.id.to_s])
     end
   end
+
+  context 'CommentBankItemsConnection' do
+    before do
+      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course, comment: 'great comment!')
+    end
+
+    let(:type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it 'returns comment bank items for the queried user' do
+      expect(
+        type.resolve('commentBankItemsConnection { nodes { _id } }')
+      ).to eq [@comment_bank_item.id.to_s]
+    end
+
+    describe 'cross sharding' do
+      specs_require_sharding
+
+      it 'returns comments across shards' do
+        @shard1.activate do
+          account = Account.create!(name: 'new shard account')
+          @course2 = course_factory(account: account)
+          @course2.enroll_user(@teacher)
+          @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: 'shard 2 comment')
+        end
+
+        expect(
+          type.resolve('commentBankItemsConnection { nodes { comment } }').sort
+        ).to eq ['great comment!', 'shard 2 comment']
+      end
+    end
+
+    describe 'with the limit argument' do
+      it 'returns a limited number of results' do
+        comment_bank_item_model(user: @teacher, context: @course, comment: '2nd great comment!')
+        expect(
+          type.resolve('commentBankItemsConnection(limit: 1) { nodes { comment } }').length
+        ).to eq 1
+      end
+    end
+
+    describe 'with a search query' do
+      before do
+        @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: 'new comment!')
+      end
+
+      it 'returns results that match the query' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"new\") { nodes { _id } }").length
+        ).to eq 1
+      end
+
+      it 'strips leading/trailing white space' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"    new   \") { nodes { _id } }").length
+        ).to eq 1
+      end
+
+      it 'does not query results if query.strip is blank' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"  \") { nodes { _id } }").length
+        ).to eq 2
+      end
+    end
+  end
+
+  context "courseBuiltInRoles" do
+    before do
+      @teacher_with_multiple_roles = user_factory(name: "blah")
+      @course.enroll_user(@teacher_with_multiple_roles, "TeacherEnrollment")
+      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", :allow_multiple_enrollments => true)
+
+      @custom_teacher = user_factory(name: "blah")
+      role = custom_teacher_role('CustomTeacher', :account => @course.account)
+      @course.enroll_user(@custom_teacher, 'TeacherEnrollment', role: role)
+
+      @teacher_with_duplicate_roles = user_factory(name: "blah")
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", :allow_multiple_enrollments => true)
+    end
+
+    let(:user_ta_type) do
+      GraphQLTypeTester.new(@ta, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:user_teacher_type) do
+      GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:teacher_ta_type) do
+      GraphQLTypeTester.new(@teacher_with_multiple_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:teacher_with_duplicate_role_types) do
+      GraphQLTypeTester.new(@teacher_with_duplicate_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:custom_teacher_type) do
+      GraphQLTypeTester.new(@custom_teacher, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    it "correctly returns default teacher role" do
+      expect(
+        user_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TeacherEnrollment"]
+    end
+
+    it "correctly returns default TA role" do
+      expect(
+        user_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TaEnrollment"]
+    end
+
+    it "does not return student role" do
+      expect(
+        user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "returns empty array when no course id is given" do
+      expect(
+        user_type.resolve(%|courseRoles(roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "returns empty array when course id is null" do
+      expect(
+        user_type.resolve(%|courseRoles(courseId: null, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "does not return custom roles based on teacher" do
+      expect(
+        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "Returns multiple roles when mutiple enrollments exist" do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to include("TaEnrollment", "TeacherEnrollment")
+    end
+
+    it "does not return duplicate roles when mutiple enrollments exist" do
+      expect(
+        teacher_with_duplicate_role_types.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TeacherEnrollment"]
+    end
+
+    it "returns all roles if no role types are specified " do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
+      ).to include("TaEnrollment", "TeacherEnrollment")
+    end
+
+    it "returns only the role specified" do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment"])|)
+      ).to eq ["TaEnrollment"]
+    end
+
+    it "returns custom role's base_type if built_in_only is set to false" do
+      expect(
+        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TeacherEnrollment"], builtInOnly: false)|)
+      ).to eq ["TeacherEnrollment"]
+    end
+  end
+
 end

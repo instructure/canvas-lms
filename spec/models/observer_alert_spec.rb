@@ -407,6 +407,14 @@ describe ObserverAlert do
       expect(alert.first.title).to include('Institution announcement:')
     end
 
+    it 'does not duplicate alerts' do
+      notification = account_notification(account: @account)
+      alert = ObserverAlert.where(context: notification)
+      expect(alert.count).to eq 1
+      notification.save!
+      expect(alert.count).to eq 1
+    end
+
     it 'creates an alert if student role is selected but not observer' do
       role_ids = ["StudentEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id}
       notification = account_notification(account: @account, role_ids: role_ids)

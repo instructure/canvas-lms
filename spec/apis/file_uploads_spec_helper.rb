@@ -67,7 +67,7 @@ shared_examples_for "file uploads api" do
     }
 
     if options[:include] && options[:include].include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User) || attachment.context.is_a?(Group))
-      json.merge!({ 'preview_url' => context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0) })
+      json['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0, verifier: attachment.uuid)
     end
 
     unless options[:no_doc_preview]
@@ -135,7 +135,7 @@ shared_examples_for "file uploads api" do
     }
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
-      expected_json.merge!({ 'preview_url' => context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0) })
+      expected_json['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0, verifier: attachment.uuid)
     end
 
     expect(json).to eq(expected_json)
@@ -268,7 +268,7 @@ shared_examples_for "file uploads api" do
     run_download_job
     json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
     expect(json['workflow_state']).to eq 'failed'
-    expect(json['message']).to eq  "Invalid response code, expected 200 got 404"
+    expect(json['message']).to include  "Invalid response code, expected 200 got 404"
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
@@ -311,7 +311,7 @@ shared_examples_for "file uploads api" do
     run_download_job
     json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
     expect(json['workflow_state']).to eq 'failed'
-    expect(json['message']).to eq "Too many redirects"
+    expect(json['message']).to include "Too many redirects"
     expect(attachment.reload.file_state).to eq 'errored'
   end
 

@@ -23,19 +23,23 @@
   @collapse_course_menu = true
   @show_embedded_chat = false
   css_bundle :slickgrid, :learning_mastery
-  js_bundle :learning_mastery
 %>
 
 <div id="gradebook_wrapper">
   <h1 class="screenreader-only"><%= t('Learning Mastery') %></h1>
+    <% if @domain_root_account.feature_enabled?(:improved_lmgb) %>
+      <% js_bundle :learning_mastery_v2 %>
+      <div id="learning_mastery_gradebook"></div>
+  <% else %>
+    <% js_bundle :learning_mastery %>
+    <div class="outcome-gradebook-container">
+      <div class="outcome-menus" style="text-align: <%= direction('right') %>;">
+        <span data-component="SectionFilter"></span>
+        <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
+      </div>
 
-  <div class="outcome-gradebook-container">
-    <div class="outcome-menus" style="text-align: <%= direction('right') %>;">
-      <span data-component="SectionFilter"></span>
-      <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
+      <div class="outcome-gradebook"></div>
+      <div id="outcome-gradebook-paginator" style="height: 2.375em"></div>
     </div>
-
-    <div class="outcome-gradebook"></div>
-    <div id="outcome-gradebook-paginator" style="height: 2.375em"></div>
-  </div>
+  <% end %>
 </div>

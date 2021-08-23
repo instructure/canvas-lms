@@ -370,49 +370,6 @@ table.full_assignment_table {
   select { width: 140px !important; }
 }
 
-#submit_from_external_tool_form {
-  #external_tool_submission_details {
-    padding-#{direction(left)}: 10px;
-    &.not_selected {
-      color: #777766;
-      font-style: italic;
-    }
-    &.file_submission {
-      font-weight: bold;
-      padding-#{direction(left)}: 28px;
-      background: url(/images/file.png) no-repeat 10px center;
-      @include fontSize($ic-font-size--medium);
-    }
-    &.url_submission {
-      font-weight: bold;
-      padding-#{direction(left)}: 28px;
-      background: url(/images/link.png) no-repeat 10px center;
-      @include fontSize($ic-font-size--medium);
-    }
-  }
-  &.has_submission {
-    .tools {
-      opacity: 0.7;
-    }
-  }
-  .tools {
-    list-style-type: none;
-    margin-#{direction(right)}: 20px;
-    .tool {
-      display: block;
-      padding: 2px 5px;
-      @include fontSize($ic-font-size--small);
-      img {
-        vertical-align: middle;
-      }
-      &:hover {
-        background: #eee;
-        border-radius: 3px;
-      }
-    }
-  }
-}
-
 /*== Multiple Due Dates Tooltip ==*/
 .vdd_tooltip_link {
   cursor: pointer

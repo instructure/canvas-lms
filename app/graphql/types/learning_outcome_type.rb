@@ -22,9 +22,26 @@ module Types
   class LearningOutcomeType < ApplicationObjectType
     class AssessedLoader < GraphQL::Batch::Loader
       def perform(outcomes)
-        assessed_ids = LearningOutcomeResult.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
+        assessed_ids = LearningOutcomeResult.active.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
         outcomes.each do |outcome|
           fulfill(outcome, assessed_ids.include?(outcome.id))
+        end
+      end
+    end
+
+    class ImportedLoader < GraphQL::Batch::Loader
+      def initialize(target_context_id, target_context_type)
+        @target_context_id = target_context_id
+        @target_context_type = target_context_type.downcase.capitalize
+      end
+
+      def perform(outcomes)
+        imported_ids = ContentTag.learning_outcome_links.active
+          .where(content_id: outcomes, context_id: @target_context_id, context_type: @target_context_type)
+          .pluck(:content_id)
+
+        outcomes.each do |outcome|
+          fulfill(outcome, imported_ids.include?(outcome.id))
         end
       end
     end
@@ -46,9 +63,9 @@ module Types
     field :can_edit, Boolean, null: false
     def can_edit
       if outcome.context_id
-        return outcome_context_promise.then {|context|
+        return outcome_context_promise.then do |context|
           context.grants_right?(current_user, session, :manage_outcomes)
-        }
+        end
       end
 
       Account.site_admin.grants_right?(current_user, session, :manage_global_outcomes)
@@ -57,6 +74,26 @@ module Types
     field :assessed, Boolean, null: false
     def assessed
       AssessedLoader.load(outcome)
+    end
+
+    field :is_imported, Boolean, null: true do
+      argument :target_context_id, ID, required: true
+      argument :target_context_type, String, required: true
+    end
+    def is_imported(**args) # rubocop:disable Naming/PredicateName
+      ImportedLoader.for(args[:target_context_id], args[:target_context_type]).load(outcome)
+    end
+
+    field :friendly_description, Types::OutcomeFriendlyDescriptionType, null: true do
+      argument :context_id, ID, required: true
+      argument :context_type, String, required: true
+    end
+    def friendly_description(context_id:, context_type:)
+      Loaders::OutcomeFriendlyDescriptionLoader.for(
+        context_id, context_type
+      ).load(
+        object.id
+      )
     end
 
     private

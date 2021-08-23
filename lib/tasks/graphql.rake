@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
@@ -7,7 +9,7 @@ namespace :graphql do
       f.puts CanvasSchema.to_definition
     }
 
-    File.open("#{Rails.root}/app/jsx/fragmentTypes.json", "w") { |f|
+    File.open("#{Rails.root}/ui/shared/apollo/fragmentTypes.json", "w") { |f|
       types = CanvasSchema.execute(<<~GQL)
         {
           __schema {

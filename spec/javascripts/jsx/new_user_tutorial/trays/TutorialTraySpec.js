@@ -19,8 +19,8 @@
 /* global QUnit */
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import TutorialTray from 'jsx/new_user_tutorial/trays/TutorialTray'
-import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
+import TutorialTray from 'ui/features/new_user_tutorial/react/trays/TutorialTray.js'
+import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore.js'
 
 QUnit.module('TutorialTray Spec', {
   setup() {

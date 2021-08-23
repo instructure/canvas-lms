@@ -18,13 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/ims/concerns/advantage_services_shared_context')
-require File.expand_path(File.dirname(__FILE__) + '/ims/concerns/lti_services_shared_examples')
+require_relative '../../spec_helper'
+require_relative '../../feature_flag_helper'
+require_relative './ims/concerns/advantage_services_shared_context'
+require_relative './ims/concerns/lti_services_shared_examples'
 require_dependency "lti/public_jwk_controller"
 
 describe Lti::FeatureFlagsController do
   include WebMock::API
+  include FeatureFlagHelper
 
   include_context 'advantage services context'
 
@@ -32,6 +34,7 @@ describe Lti::FeatureFlagsController do
   let(:course) { course_model(root_account: account) }
 
   before do
+    silence_undefined_feature_flag_errors
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true),

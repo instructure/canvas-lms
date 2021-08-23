@@ -78,7 +78,6 @@ RSpec.describe Mutations::AddConversationMessage do
               title
             }
           }
-          messageQueued
           errors {
             attribute
             message
@@ -135,8 +134,8 @@ RSpec.describe Mutations::AddConversationMessage do
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This should be delayed', recipients: [@teacher.id.to_s])
 
     expect(result.dig('errors')).to be nil
+    # a nil result with no errors implies that the message was delayed and will be processed later
     expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
-    expect(result.dig('data', 'addConversationMessage', 'messageQueued')).to be true
     expect(@conversation.reload.messages.count(:all)).to eq 1
     run_jobs
     expect(@conversation.reload.messages.count(:all)).to eq 2

@@ -99,7 +99,7 @@ describe DiscussionTopic::MaterializedView do
     expect(json[0]['replies'][1]['replies'][0]['attachment']['url']).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     # verify the api_user_content functionality in a non-request context
     html_message = json[0]['replies'][1]['message']
-    html = Nokogiri::HTML::DocumentFragment.parse(html_message)
+    html = Nokogiri::HTML5.fragment(html_message)
     expect(html.at_css('a')['href']).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
     expect(html.at_css('video')['src']).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
@@ -132,7 +132,7 @@ describe DiscussionTopic::MaterializedView do
     view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
     entry_json = JSON.parse(structure).last
-    html = Nokogiri::HTML::DocumentFragment.parse(entry_json['message'])
+    html = Nokogiri::HTML5.fragment(entry_json['message'])
     expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
   end
 

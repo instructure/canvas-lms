@@ -31,6 +31,7 @@ module Types
     online_text_entry
     online_upload
     online_url
+    student_annotation
     wiki_page
   ].to_set
 

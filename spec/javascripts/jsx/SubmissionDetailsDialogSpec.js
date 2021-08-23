@@ -19,7 +19,7 @@
 import $ from 'jquery'
 
 import fakeENV from 'helpers/fakeENV'
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog'
+import SubmissionDetailsDialog from 'ui/features/screenreader_gradebook/jquery/SubmissionDetailsDialog.js'
 
 let assignment
 let student

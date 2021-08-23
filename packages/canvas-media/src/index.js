@@ -22,7 +22,7 @@ import RocketSVG from './RocketSVG'
 import useComputerPanelFocus from './useComputerPanelFocus'
 import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 import LoadingIndicator from './shared/LoadingIndicator'
-import saveMediaRecording from './saveMediaRecording'
+import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 
 export {
   UploadMedia as default,
@@ -34,5 +34,6 @@ export {
   isPreviewable,
   sizeMediaPlayer,
   LoadingIndicator,
-  saveMediaRecording
+  saveMediaRecording,
+  saveClosedCaptions
 }

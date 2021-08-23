@@ -18,9 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../sharding_spec_helper.rb'
+require_relative '../feature_flag_helper.rb'
 
 describe FeatureFlags do
+  include FeatureFlagHelper
+
   let(:t_site_admin) { Account.site_admin }
   let(:t_root_account) { account_model }
   let(:t_user) { user_with_pseudonym account: t_root_account }
@@ -28,6 +31,7 @@ describe FeatureFlags do
   let(:t_course) { course_with_teacher(user: t_user, account: t_sub_account, active_all: true).course }
 
   before do
+    silence_undefined_feature_flag_errors
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
       'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'allowed'),
@@ -44,10 +48,28 @@ describe FeatureFlags do
   })
   end
 
-  it "should report feature_enabled? correctly" do
-    expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
-    expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
-    expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
+  describe "#feature_enabled?" do
+    it "should report correctly" do
+      expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
+      expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
+      expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
+      Account.ensure_dummy_root_account
+      expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
+    end
+
+    it "should log feature enablement" do
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", tags: {
+        feature: :course_feature,
+        enabled: 'false'
+      }).exactly(:once)
+      t_sub_account.feature_enabled?(:course_feature)
+
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", tags: {
+        feature: :account_feature,
+        enabled: 'true'
+      }).exactly(:once)
+      t_sub_account.feature_enabled?(:account_feature)
+    end
   end
 
   describe "#feature_allowed?" do
@@ -61,10 +83,6 @@ describe FeatureFlags do
   end
 
   describe "lookup_feature_flag" do
-    it "should raise an error if the feature isn't defined" do
-      expect { t_root_account.lookup_feature_flag('blah') }.to raise_error("no such feature - blah")
-    end
-
     it "should return nil if the feature is currently disabled" do
       expect(t_course.lookup_feature_flag('disabled_feature')).to be_nil
     end

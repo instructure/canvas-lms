@@ -136,7 +136,7 @@ describe "oauth2 flow" do
         redirect_uri: redirect_uri,
         code: code,
       }
-      expect(AccessToken.last.expires_at).to be_nil
+      expect(AccessToken.last.permanent_expires_at).to be_nil
     end
   end
 end

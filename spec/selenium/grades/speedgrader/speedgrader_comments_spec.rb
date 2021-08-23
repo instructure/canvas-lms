@@ -26,11 +26,11 @@ describe "speed grader" do
   include AssignmentsCommon
 
   before(:once) do
-    @teacher1 = course_with_teacher(name: 'Teacher Boss1', active_user: true, active_enrollment: true, active_course: true).user
-    @teacher2 = course_with_teacher(course: @course, name: 'Teacher Boss2', active_user: true, active_enrollment: true, active_course: true).user
+    @teacher1 = course_with_teacher(name: 'Dedicated Teacher1', active_user: true, active_enrollment: true, active_course: true).user
+    @teacher2 = course_with_teacher(course: @course, name: 'Dedicated Teacher2', active_user: true, active_enrollment: true, active_course: true).user
 
-    @student1 = student_in_course(name: 'Student Slave1', active_user: true).user
-    @student2 = student_in_course(name: 'Student Slave2', active_user: true).user
+    @student1 = student_in_course(name: 'Hardworking Student1', active_user: true).user
+    @student2 = student_in_course(name: 'Hardworking Student2', active_user: true).user
 
     @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
     submission_model(user: @student1, assignment: @assignment, body: "first student submission text")

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
+import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 
 const DATE_IN_FIRST_PERIOD = new Date('July 15, 2015')
 const DATE_IN_LAST_PERIOD = new Date('Sep 15, 2015')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'i18n_tasks'
 require 'i18n_extraction'
 require 'shellwords'
@@ -38,6 +40,22 @@ namespace :i18n do
 
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
+    def deep_sort_hash_by_keys(value)
+      sort = ->(node) do
+        case node
+        when Hash
+          node.keys.sort.reduce({}) do |acc, key|
+            acc[key] = sort[node[key]]
+            acc
+          end
+        else
+          node
+        end
+      end
+
+      sort[value]
+    end
+
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
@@ -51,7 +69,15 @@ namespace :i18n do
     }.freeze
 
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except(*special_keys)}.to_yaml(line_width: -1))
+      file.write(
+        {
+          'en' => deep_sort_hash_by_keys(
+            remove_dynamic_translations(
+              @translations.except(*special_keys)
+            )
+          )
+        }.to_yaml(line_width: -1)
+      )
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -77,7 +103,9 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
-
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
+    
+    I18n::Backend::Simple.send(:include, I18nTasks::CsvBackend)
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
     require 'i18nliner/extractors/translation_hash'
@@ -92,7 +120,7 @@ namespace :i18n do
   task :generate_js => :i18n_environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
-    locales = I18n.available_locales - [:en]
+    locales = I18n.available_locales
     all_translations = I18n.backend.send(:translations)
 
     flat_translations = all_translations.flatten_keys
@@ -355,6 +383,21 @@ namespace :i18n do
 
   def remove_unwanted_translations(translations)
     translations['date'].delete('order')
+  end
+
+  def remove_dynamic_translations(translations)
+    process = ->(node) do
+      case node
+      when Hash
+        node.delete_if { |k,v| process.call(v).nil? }
+      when Proc
+        nil
+      else
+        node
+      end
+    end
+
+    process.call(translations)
   end
 
   def autoimport(source_translations, new_translations)

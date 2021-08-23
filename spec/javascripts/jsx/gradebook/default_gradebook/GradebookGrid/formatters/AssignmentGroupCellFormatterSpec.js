@@ -19,8 +19,8 @@
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import AssignmentGroupCellFormatter from 'jsx/gradebook/default_gradebook/GradebookGrid/formatters/AssignmentGroupCellFormatter'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import AssignmentGroupCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/AssignmentGroupCellFormatter.js'
 
 QUnit.module('GradebookGrid AssignmentGroupCellFormatter', hooks => {
   let $fixture

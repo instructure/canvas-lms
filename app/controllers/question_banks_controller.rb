@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -79,7 +81,7 @@ class QuestionBanksController < ApplicationController
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
 
-    js_bundle :quizzes_bundle, :question_bank
+    js_bundle :quizzes, :question_bank
     css_bundle :quizzes, :learning_outcomes, :tinymce, :question_bank
     @page_title = @bank.title
   end

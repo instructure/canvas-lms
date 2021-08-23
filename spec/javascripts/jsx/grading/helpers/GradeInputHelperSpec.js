@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'compiled/util/round'
-import * as GradeInputHelper from 'jsx/grading/helpers/GradeInputHelper'
+import round from 'round'
+import * as GradeInputHelper from '@canvas/grading/GradeInputHelper'
 
 /* eslint-disable qunit/no-identical-names */
 

@@ -19,10 +19,61 @@
 
 require_relative "../../support/call_stack_utils"
 require_relative 'selenium_driver_setup'
+require_relative "common_helper_methods/custom_wait_methods"
 
 module SeleniumExtensions
   class Error < ::RuntimeError; end
   class NestedWaitError < Error; end
+
+  module UnexpectedPageReloadProtection
+    include CustomWaitMethods
+
+    def with_page_reload_protection(bridge)
+      yield
+
+      begin
+        wait_for_initializers(bridge)
+        wait_for_ajaximations(bridge)
+      rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError
+        # If there is an alert open, the calling code needs to accept it, so we won't be reloading
+        # as part of this event. Once the alert is accepted or discarded, we will then wait for
+        # page reloads or outstanding AJAX requests.
+        return
+      end
+    end
+  end
+
+  module UnexpectedPageReloadProtectionActionBuilder
+    include UnexpectedPageReloadProtection
+
+    def perform(*args)
+      with_page_reload_protection(@bridge) { super(*args) }
+    end
+  end
+
+  module UnexpectedPageReloadProtectionAlert
+    include UnexpectedPageReloadProtection
+
+    def accept(*args)
+      with_page_reload_protection(@bridge) { super(*args) }
+    end
+  end
+
+  module UnexpectedPageReloadProtectionElement
+    include UnexpectedPageReloadProtection
+
+    def click(*args)
+      with_page_reload_protection(driver) { super(*args) }
+    end
+
+    def send_keys(*args)
+      with_page_reload_protection(driver) { super(*args) }
+    end
+
+    def submit(*args)
+      with_page_reload_protection(driver) { super(*args) }
+    end
+  end
 
   module ElementNotInteractableProtection
     include SeleniumDriverSetup
@@ -194,8 +245,11 @@ module SeleniumExtensions
   end
 end
 
+Selenium::WebDriver::Alert.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionAlert)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::ElementNotInteractableProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::StaleElementProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::FinderWaiting)
+Selenium::WebDriver::Element.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionElement)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::PreventEarlyInteraction)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::FinderWaiting)
+Selenium::WebDriver::W3CActionBuilder.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionActionBuilder)

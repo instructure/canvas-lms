@@ -83,16 +83,6 @@ describe "/context_modules/index" do
     expect(page.css("#context_module_item_#{module_item.id}").length).to eq 0
   end
 
-  it "does not show download course content if setting is disabled" do
-    course_factory
-    view_context(@course, @user)
-    assign(:modules, @course.context_modules.active)
-    render 'context_modules/index'
-    expect(response).not_to be_nil
-    page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css(".offline_web_export").length).to eq 0
-  end
-
   it "shows download course content if settings are enabled" do
     course_factory
     acct = @course.root_account
@@ -115,19 +105,7 @@ describe "/context_modules/index" do
       @tag = @module.add_item(type: 'assignment', id: @assignment.id)
     end
 
-    it "does not show module sharing menu items if direct_share is disabled" do
-      view_context(@course, @user)
-      assign(:modules, @course.context_modules.active)
-      render 'context_modules/index'
-      page = Nokogiri('<document>' + response.body + '</document>')
-      expect(page.css(".module_copy_to").length).to eq 0
-      expect(page.css(".module_send_to").length).to eq 0
-      expect(page.css(".module_item_copy_to").length).to eq 0
-      expect(page.css(".module_item_send_to").length).to eq 0
-    end
-
     it "shows module sharing menu items if direct_share is enabled" do
-      @course.root_account.enable_feature!(:direct_share)
       view_context(@course, @teacher)
       assign(:modules, @course.context_modules.active)
       render 'context_modules/index'
@@ -139,7 +117,6 @@ describe "/context_modules/index" do
     end
 
     it "does not include item sharing menu items for things that can't stand alone" do
-      @course.root_account.enable_feature!(:direct_share)
       @tag.destroy
       @module.add_item type: 'context_module_sub_header', title: 'blah'
       view_context(@course, @teacher)

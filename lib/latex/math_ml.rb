@@ -47,11 +47,11 @@ module Latex
       Rails.cache.fetch(cache_key) do
         url = MathMan.url_for(latex: escaped, target: target)
         request_id = RequestContextGenerator.request_id.to_s
-        request_id_signature = Canvas::Security.sign_hmac_sha512(request_id)
+        request_id_signature = CanvasSecurity.sign_hmac_sha512(request_id)
         val = Canvas.timeout_protection("mathman") do
           response = CanvasHttp.get(url, {
-            'X-Request-Context-Id' => Canvas::Security.base64_encode(request_id),
-            'X-Request-Context-Signature' => Canvas::Security.base64_encode(request_id_signature)
+            'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
+            'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
           })
           if response.code.to_i == 200
             response.body

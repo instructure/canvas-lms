@@ -240,6 +240,30 @@ RSpec.describe SubmissionDraft do
       end
     end
 
+    context 'the assignment is a student_annotation type' do
+      before(:once) do
+        @submission.assignment.update!(submission_types: "student_annotation")
+      end
+
+      it 'returns true if there is an annotation context draft' do
+        annotatable_attachment = attachment_model
+        @submission.assignment.annotatable_attachment_id = annotatable_attachment.id
+        @submission.annotation_context(draft: true)
+        expect(@submission_draft).to be_meets_assignment_criteria
+      end
+
+      it 'returns false if the submission does not have an annotation context draft' do
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if drafts exist for a different type' do
+        attachment = attachment_model
+        @submission_draft.attachments = [attachment]
+
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+    end
+
     context 'there are multiple submission types' do
       before(:once) do
         @submission.assignment.submission_types = 'online_text_entry,online_upload'

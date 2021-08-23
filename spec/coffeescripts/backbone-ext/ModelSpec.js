@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Model} from 'Backbone'
+import {Model} from '@canvas/backbone'
 
 QUnit.module('Backbone.Model', {
   setup() {

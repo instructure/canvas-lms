@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fakeENV from 'helpers/fakeENV'
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import SpeedGraderProvisionalGradeSelector from 'ui/features/speed_grader/react/SpeedGraderProvisionalGradeSelector.js'
 
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   let $container
@@ -63,6 +64,14 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         }
       ]
     }
+
+    fakeENV.setup({
+      instructor_selectable_states: {
+        1: false,
+        2: true,
+        3: true
+      }
+    })
 
     document.documentElement.setAttribute('dir', 'ltr')
     $container = document.createElement('div')
@@ -214,6 +223,16 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         .includes('out of 123'),
       false
     )
+  })
+
+  test('enables option when the instructor_state is active', () => {
+    mountComponent()
+    strictEqual(getRadioInput({value: '2'}).prop('disabled'), false)
+  })
+
+  test('disables option when the instructor_state is deleted', () => {
+    mountComponent()
+    strictEqual(getRadioInput({value: '1'}).prop('disabled'), true)
   })
 
   test('sorts provisional grades by anonymous grader ID if present', () => {

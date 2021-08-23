@@ -19,10 +19,10 @@
 import React from 'react'
 import {Provider} from 'react-redux'
 import {shallow} from 'enzyme'
-import SearchForm from 'jsx/gradebook-history/SearchForm'
-import SearchResults from 'jsx/gradebook-history/SearchResults'
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp'
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore'
+import SearchForm from 'ui/features/gradebook_history/react/SearchForm.js'
+import SearchResults from 'ui/features/gradebook_history/react/SearchResults.js'
+import GradebookHistoryApp from 'ui/features/gradebook_history/react/GradebookHistoryApp.js'
+import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore.js'
 
 QUnit.module('GradebookHistoryApp has component', {
   setup() {

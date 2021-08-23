@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EventDataSource from 'compiled/calendar/EventDataSource'
-import fcUtil from 'compiled/util/fcUtil'
-import tz from 'timezone'
+import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 
 QUnit.module('EventDataSource: getEvents', {

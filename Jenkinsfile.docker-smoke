@@ -17,14 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
-
-def cleanupFn() {
-  libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
-}
 
 pipeline {
   agent none
@@ -35,34 +29,61 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.yml:docker-compose.override.yml'
     JENKINS = 'true'
+    DOCKER = 'true'
   }
 
   stages {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { cleanupFn() }) {
+          protectedNode('canvas-docker') {
             stage('Setup') {
-              cleanAndSetup()
               // always pull from gerrit refspec to test the changed docker dev code
-              checkoutRepo("canvas-lms", env.GERRIT_REFSPEC, 1)
+              checkoutRepo('canvas-lms', env.GERRIT_REFSPEC, 1)
+              sh '''#!/bin/bash
+              cat <<EOF > docker-compose.local.jenkins.yml
+version: '2.3'
+services:
+    web:
+      environment:
+        CANVAS_LMS_ADMIN_EMAIL: jenkins@fake.com
+        CANVAS_LMS_ADMIN_PASSWORD: iamjenkins
+        CANVAS_LMS_STATS_COLLECTION: opt_out
+        CANVAS_LMS_ACCOUNT_NAME: 'School of Butters'
+EOF
+              '''
             }
 
             stage('Copy Canvas Config') {
-              sh 'cp -vr docker-compose/config/*.yml config/'
-              sh 'cp -vr config/docker-compose.override.yml.example docker-compose.override.yml'
-              sh 'echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env'
+              sh '''#!/bin/bash
+                cp -vr docker-compose/config/*.yml config/
+                cp -vr config/docker-compose.override.yml.example docker-compose.override.yml
+                sed -i "/- .:\\/usr\\/src\\/app/d" ./docker-compose.override.yml
+                sed -i "s/instructure\\/ruby-passenger/local\\/ruby-passenger/g" ./Dockerfile
+                echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env
+              '''
+            }
+
+            stage('Copy App Directory') {
+              sh """#!/bin/bash
+                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.getString('ruby')})"
+                 docker cp ./ "\$CONTAINER:/usr/src/app/"
+                 docker start \$CONTAINER
+                 docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
+                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.getString('ruby')}"
+               """
             }
 
             stage('Build Canvas') {
               sh '''#!/bin/bash
                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                source build/common_docker_build_steps.sh
+                source script/common/canvas/build_helpers.sh
 
                 build_images
                 check_gemfile
+                docker_compose_up
                 build_assets
               '''
             }
@@ -70,7 +91,7 @@ pipeline {
             stage('Create DB and Migrate') {
               sh '''#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 source build/common_docker_build_steps.sh
+                 source script/common/canvas/build_helpers.sh
 
                  create_db
                '''
@@ -83,19 +104,19 @@ pipeline {
             stage('Test') {
               sh 'docker-compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
             }
-          }//protectedNode
-        }//script
-      }//steps
-    }//environment
-  }//stages
+          } //protectedNode
+        } //script
+      } //steps
+    } //environment
+  } //stages
 
   post {
     unsuccessful {
       script {
         def causes = currentBuild.getBuildCauses()[0].shortDescription
-        if (causes.contains("Started by timer")) {
+        if (causes.contains('Started by timer')) {
           slackSend(
-            channel: "#flaky-spec-alerts",
+            channel: '#flaky-spec-alerts',
             color: 'danger',
             message: "${env.JOB_NAME} failed! Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n"
           )
@@ -103,4 +124,4 @@ pipeline {
       }
     }
   }
-}//pipeline
+} //pipeline

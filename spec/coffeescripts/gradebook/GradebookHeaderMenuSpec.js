@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import GradebookHeaderMenu from 'jsx/gradebook/views/GradebookHeaderMenu'
-import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
-import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
+import GradebookHeaderMenu from 'ui/features/screenreader_gradebook/jquery/GradebookHeaderMenu.js'
+import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
+import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog.coffee'
 
 QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
   setup() {

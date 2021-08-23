@@ -22,10 +22,12 @@ const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
+const glob = require('glob')
+const { promisify } = require('util')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
-const CONTEXT_EMBER_GRADEBOOK_SPEC = 'app/coffeescripts/ember'
+const CONTEXT_EMBER_GRADEBOOK_SPEC = 'ui/features/screenreader_gradebook/ember'
 const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
 
 const RESOURCE_COFFEESCRIPT_SPEC = /Spec$/
@@ -36,6 +38,8 @@ const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
 const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
 const RESOURCE_JSH_SPLIT_SPEC = /^\.\/[h-z].*Spec$/
 
+const WEBPACK_PLUGIN_SPECS = path.resolve(__dirname, 'tmp/webpack-plugin-specs.js')
+
 testWebpackConfig.entry = undefined
 
 testWebpackConfig.plugins.push(
@@ -45,13 +49,16 @@ testWebpackConfig.plugins.push(
     CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
     RESOURCE_COFFEESCRIPT_SPEC,
     RESOURCE_EMBER_GRADEBOOK_SPEC,
-    RESOURCE_JSX_SPEC
+    RESOURCE_JSX_SPEC,
+    WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
   })
 )
 
 testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   JSPEC_PATH: null,
   JSPEC_GROUP: null,
+  JSPEC_RECURSE: '1',
+  JSPEC_VERBOSE: '0',
   A11Y_REPORT: false,
   SENTRY_DSN: null,
   GIT_COMMIT: null
@@ -203,9 +210,7 @@ if (process.env.SENTRY_DSN) {
   testWebpackConfig.plugins.push(new SentryCliPlugin({
     release: process.env.GIT_COMMIT,
     include: [
-      path.resolve(__dirname, 'public/javascripts'),
-      path.resolve(__dirname, 'app/jsx'),
-      path.resolve(__dirname, 'app/coffeescripts'),
+      path.resolve(__dirname, 'ui'),
       path.resolve(__dirname, 'spec/javascripts/jsx'),
       path.resolve(__dirname, 'spec/coffeescripts')
     ],
@@ -216,11 +221,41 @@ if (process.env.SENTRY_DSN) {
   }));
 }
 
+class PluginSpecsRunner {
+  constructor({ pattern, outfile }) {
+    this.pattern = pattern
+    this.outfile = outfile
+  }
+
+  apply(compiler) {
+    compiler.hooks.beforeCompile.tapAsync('PluginSpecsRunner', (_, callback) => {
+      glob(this.pattern, { absolute: true }, (e, files) => {
+        if (e) { return callback(e) }
+
+        fs.writeFile(
+          this.outfile,
+          files.map(x => `require("${x}")`).join('\n'),
+          'utf8',
+          callback
+        )
+      })
+    })
+  }
+}
+
+testWebpackConfig.plugins.push(new PluginSpecsRunner({
+  pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
+  outfile: WEBPACK_PLUGIN_SPECS
+}))
+
 testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__dirname, CONTEXT_EMBER_GRADEBOOK_SPEC)
 testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
 testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONTEXT_JSX_SPEC)
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
+testWebpackConfig.resolve.alias['ui/features'] = path.resolve(__dirname, 'ui/features')
+testWebpackConfig.resolve.alias['ui/ext'] = path.resolve(__dirname, 'ui/ext')
 testWebpackConfig.resolve.extensions.push('.coffee')
+testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.mode = 'development'
 testWebpackConfig.module.rules.unshift({
   test: [

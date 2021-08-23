@@ -47,15 +47,13 @@ describe "help dialog" do
     end
 
     it "should show the Help dialog when help is clicked and feedback is enabled" do
+      Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       expect(f("body")).not_to contain_css('#help_tray')
       expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       support_url = 'http://example.com/support'
       Account.default.update_attribute(:settings, {:support_url => support_url})
-
-      # the show_feedback_link setting should override the support_url account setting
-      Setting.set('show_feedback_link', 'true')
 
       get "/dashboard"
       expect(ff('#global_nav_help_link').length).to eq(1)
@@ -74,7 +72,7 @@ describe "help dialog" do
       Account.default.update_attribute(:settings, {:support_url => support_url})
       get "/dashboard"
       link = f("a[href='#{support_url}']")
-      expect(link['id']).not_to eq 'global_nav_help_link'
+      expect(link['id']).to eq 'global_nav_help_link'
     end
 
     it "should allow sending the teacher a message" do
@@ -130,7 +128,6 @@ describe "help dialog" do
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
-      Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
@@ -147,7 +144,6 @@ describe "help dialog" do
   context "customization link" do
     before :each do
       user_logged_in(:active_all => true)
-      Setting.set('show_feedback_link', 'true')
     end
 
     it "should show the link to root account admins" do
@@ -173,7 +169,6 @@ describe "help dialog" do
   context "featured and new links" do
     before :each do
       user_logged_in(:active_all => true)
-      Setting.set('show_feedback_link', 'true')
       Account.site_admin.enable_feature! :featured_help_links
       Account.default.account_users.create!(:user => @user)
     end
@@ -188,8 +183,7 @@ describe "help dialog" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       form = f('#account_settings')
-      form.submit
-      wait_for_ajaximations
+      expect_new_page_load { form.submit }
       f('#global_nav_help_link').click
       wait_for_ajaximations
       expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
@@ -205,14 +199,13 @@ describe "help dialog" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       form = f('#account_settings')
-      form.submit
-      wait_for_ajaximations
+      expect_new_page_load { form.submit }
       f('#global_nav_help_link').click
       wait_for_ajaximations
       expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
     end
   end
-  
+
   context 'welcome tour' do
     before :each do
       course_with_student_logged_in(active_all: true)
@@ -220,13 +213,11 @@ describe "help dialog" do
     end
 
     it 'opens up the welcome tour on page load and shows the welcome tour link and opens the tour when clicked' do
-      Setting.set('show_feedback_link', 'true')
-
       course_with_ta(course: @course)
       get "/"
       driver.local_storage.clear
       wait_for_ajaximations
-      
+
       get "/courses/#{@course.id}"
       wait_for_ajaximations
       wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
@@ -248,13 +239,11 @@ describe "help dialog" do
     end
 
     it 'shows the welcome tour for Account Admins' do
-      Setting.set('show_feedback_link', 'true')
-
       Account.default.account_users.create!(:user => @user)
       get "/"
       driver.local_storage.clear
       wait_for_ajaximations
-      
+
       # Reload so the local storage clearing take effect
       get "/"
       wait_for_ajaximations

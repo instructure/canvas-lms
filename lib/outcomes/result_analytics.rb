@@ -38,7 +38,7 @@ module Outcomes
       required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
-      results = LearningOutcomeResult.active.where(
+      results = LearningOutcomeResult.active.with_active_link.where(
         context_code:        context.asset_string,
         user_id:             users.map(&:id),
         learning_outcome_id: outcomes.map(&:id),

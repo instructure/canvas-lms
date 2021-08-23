@@ -229,6 +229,33 @@ describe CourseProgress do
       expect(progress.requirement_completed_count).to eq 1
     end
 
+    describe "dispatch_live_event" do
+      it "dispatches course_progress if partially complete" do
+        # turn in first two assignments (module 1)
+        submit_homework(@assignment)
+        submit_homework(@assignment2)
+
+        progression = @module.evaluate_for(@user)
+        expect(Canvas::LiveEvents).to receive(:course_progress)
+        expect(Canvas::LiveEvents).not_to receive(:course_completed)
+        CourseProgress.dispatch_live_event(progression)
+      end
+
+      it "dispatches course_completed if entirely complete" do
+        # turn in all assignments
+        submit_homework(@assignment)
+        submit_homework(@assignment2)
+        submit_homework(@assignment3)
+        submit_homework(@assignment4)
+        submit_homework(@assignment5)
+
+        progression = @module3.evaluate_for(@user)
+        expect(Canvas::LiveEvents).not_to receive(:course_progress)
+        expect(Canvas::LiveEvents).to receive(:course_completed)
+        CourseProgress.dispatch_live_event(progression)
+      end
+    end
+
     context "when the user is on a different shard than the course" do
       specs_require_sharding
 

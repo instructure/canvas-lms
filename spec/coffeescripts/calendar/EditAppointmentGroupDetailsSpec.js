@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import EditAppointmentGroupDetails from 'compiled/calendar/EditAppointmentGroupDetails'
-import fcUtil from 'compiled/util/fcUtil'
-import tz from 'timezone'
+import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails.js'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'

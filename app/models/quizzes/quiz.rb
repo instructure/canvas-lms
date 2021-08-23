@@ -75,7 +75,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :clear_availability_cache
   after_save :touch_context
   after_save :regrade_if_published
-
+  # We currently only create LORs for quizzes that are assignments. If we change the quiz_type,
+  # we should destroy or restore the results appropriately
+  after_save :destroy_learning_outcome_results, if: -> { saved_change_to_quiz_type?(from: 'assignment') }
+  after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: 'assignment') }
   serialize :quiz_data
 
   simply_versioned
@@ -405,6 +408,18 @@ class Quizzes::Quiz < ActiveRecord::Base
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
     self.quiz_submissions.each { |s| s.save! }
+  end
+
+  def update_learning_outcome_results(state)
+    LearningOutcomeResult.for_associated_asset(self).update_all(workflow_state: state, updated_at: Time.zone.now)
+  end
+
+  def destroy_learning_outcome_results
+    delay_if_production.update_learning_outcome_results('deleted')
+  end
+
+  def restore_learning_outcome_results
+    delay_if_production.update_learning_outcome_results('active')
   end
 
   def destroy_related_submissions
@@ -1046,13 +1061,34 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :manage and can :read and can :update and can :create and can :submit and can :preview
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    can :manage and can :read and can :update and can :submit and can :preview
 
     given do |user, session|
-      self.context.grants_right?(user, session, :manage_assignments) &&
-      (self.context.account_membership_allows(user) ||
-       !due_for_any_student_in_closed_grading_period?)
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
+    can :read and can :create
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_add)
+    end
+    can :read and can :create
+
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments) &&
+        (self.context.account_membership_allows(user) ||
+         !due_for_any_student_in_closed_grading_period?)
+    end
+    can :delete
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_delete) &&
+        (self.context.account_membership_allows(user) ||
+         !due_for_any_student_in_closed_grading_period?)
     end
     can :delete
 

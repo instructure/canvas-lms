@@ -21,12 +21,14 @@ const path = require('path')
 
 /**
  * This returns an index of all the translation files for a given package
+ * If packageName is omitted, then the base combined files.
  */
 async function getTranslationList(packageName) {
   const translationList = await fs.promises.readdir(
-    path.resolve(__dirname, `../lib/${packageName}`)
+    path.resolve(__dirname, `../lib/${packageName || ''}`),
+    {withFileTypes: true}
   )
-  return translationList
+  return translationList.filter(t => t.isFile()).map(t => t.name)
 }
 
 module.exports = getTranslationList

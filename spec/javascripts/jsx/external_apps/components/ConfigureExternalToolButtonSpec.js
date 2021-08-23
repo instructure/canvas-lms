@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import ConfigureExternalToolButton from 'jsx/external_apps/components/ConfigureExternalToolButton'
+import ConfigureExternalToolButton from 'ui/features/external_apps/react/components/ConfigureExternalToolButton.js'
 
 let tool
 let event

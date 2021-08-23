@@ -204,4 +204,17 @@ describe Canvas do
       end
     end
   end
+
+  describe ".infer_user" do
+    it "is generally safe to call even if nothing set" do
+      expect(Canvas.infer_user).to be_nil
+    end
+
+    it "infers the real user if the right pseudonym exists" do
+      root_account = Account.site_admin
+      user = user_model
+      pseudonym = pseudonym_model(user: user, account: root_account, unique_id: "someuser")
+      expect(Canvas.infer_user("someuser")).to eq(user)
+    end
+  end
 end

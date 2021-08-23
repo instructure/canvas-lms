@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -43,7 +45,7 @@ class ContentImportsController < ApplicationController
     authorized_action(
       @context,
       @current_user,
-      [:manage_content, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+      [:manage_content, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
     )
     js_env(return_or_context_url: return_or_context_url, return_to: params[:return_to])
   end

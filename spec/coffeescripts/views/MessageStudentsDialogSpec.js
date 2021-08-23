@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MessageStudentsDialog from 'compiled/views/MessageStudentsDialog'
+import MessageStudentsDialog from '@canvas/message-students-dialog'
 import $ from 'jquery'
 import {pluck} from 'underscore'
 

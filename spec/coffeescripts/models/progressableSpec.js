@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import progressable from 'compiled/models/progressable'
-import {Model} from 'Backbone'
+import progressable from '@canvas/progress/backbone/models/progressable.coffee'
+import {Model} from '@canvas/backbone'
 
 const progressUrl = '/progress'
 let server = null

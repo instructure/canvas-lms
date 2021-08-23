@@ -28,7 +28,7 @@ describe "OjbectPathConverter" do
     let(:assignment_id) { "i5f4cd2e04f1089c1c5060e9761400516" }
     let(:wiki_id) { "page-1" }
     let(:doc) do
-      Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+      Nokogiri::HTML5.fragment(<<-HTML)
         <div>
           <a href="#{ObjectPathConverterTest::OBJECT_TOKEN}/assignments/#{assignment_id}">
             Assignment Link

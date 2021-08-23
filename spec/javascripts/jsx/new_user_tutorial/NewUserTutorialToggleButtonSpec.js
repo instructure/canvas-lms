@@ -19,8 +19,8 @@
 /* global QUnit */
 import React from 'react'
 import {shallow} from 'enzyme'
-import NewUserTutorialToggleButton from 'jsx/new_user_tutorial/NewUserTutorialToggleButton'
-import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
+import NewUserTutorialToggleButton from 'ui/features/new_user_tutorial/react/NewUserTutorialToggleButton.js'
+import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore.js'
 
 QUnit.module('NewUserTutorialToggleButton Spec')
 

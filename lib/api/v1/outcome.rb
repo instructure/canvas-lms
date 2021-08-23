@@ -27,7 +27,7 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcomes_json(outcomes, user, session, opts = {})
     outcome_ids = outcomes.map(&:id)
-    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+    opts[:assessed_outcomes] = LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     outcomes.map { |o| outcome_json(o, user, session, opts) }
   end
 
@@ -70,6 +70,7 @@ module Api::V1::Outcome
       hash['has_updateable_rubrics'] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
+        hash['friendly_description'] = opts.dig(:friendly_descriptions, outcome.id)
         context = opts[:context]
         mastery_scale_opts = mastery_scale_opts(context)
         if mastery_scale_opts.any?
@@ -128,7 +129,7 @@ module Api::V1::Outcome
     #
     # Assumption:  All of the outcome links have the same context.
     #
-    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(
+    opts[:assessed_outcomes] = LearningOutcomeResult.active.distinct.where(
       context_type: outcome_links.first.context_type,
       context_id: outcome_links.map(&:context_id),
       learning_outcome_id: outcome_links.map(&:content_id)
@@ -157,7 +158,7 @@ module Api::V1::Outcome
         outcome_link.learning_outcome_content,
         user,
         session,
-        opts.slice(:outcome_style, :assessed_outcomes, :context)
+        opts.slice(:outcome_style, :assessed_outcomes, :context, :friendly_descriptions)
       )
 
       unless outcome_link.deleted?

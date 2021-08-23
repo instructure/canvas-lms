@@ -38,7 +38,8 @@ module SpeedGrader
       submission_json_fields = %i(id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
-                                  grading_period_id excused updated_at attempt posted_at)
+                                  grading_period_id excused updated_at attempt posted_at resource_link_lookup_uuid
+                                  redo_request cached_due_date)
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
 
@@ -179,7 +180,7 @@ module SpeedGrader
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        json[:has_postable_comments] = sub.all_submission_comments.any? { |comment| comment.hidden? }
+        json[:has_postable_comments] = sub.all_submission_comments.any?(&:allows_posting_submission?)
 
         json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: assignment,

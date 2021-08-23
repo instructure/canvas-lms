@@ -69,8 +69,8 @@ export default function ResizeHandle(props) {
       as="span"
       borderRadius="medium"
       display="inline-block"
-      focused={isFocused}
-      padding="0 0 0 xx-small"
+      withFocusOutline={isFocused}
+      padding="0 xx-small"
       position="relative"
       role="button"
       data-btn-id={props['data-btn-id']}

@@ -42,6 +42,14 @@ describe "discussions" do
       assignment_group: assignment_group
   ) }
 
+  before(:once) do
+    Account.default.enable_feature!(:rce_enhancements)
+  end
+
+  before(:each) do
+    stub_rcs_config
+  end
+
   context "on the new page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/new" }
 

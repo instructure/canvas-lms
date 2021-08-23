@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import Assignment from 'compiled/models/Assignment'
-import Submission from 'compiled/models/Submission'
-import DateGroup from 'compiled/models/DateGroup'
+import '@canvas/jquery/jquery.ajaxJSON'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Submission from '@canvas/assignments/backbone/models/Submission'
+import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Assignment#initialize with ENV.POST_TO_SIS set to false', {
@@ -1062,6 +1062,45 @@ test('includes htmlUrl', () => {
   const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
   const json = assignment.toView()
   equal(json.htmlUrl, 'http://example.com/assignments/1')
+})
+
+test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support enabled', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: true}
+  ENV.FLAGS = {new_quizzes_modules_support: true}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1/edit')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
+})
+
+test('uses htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support disabled', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: true}
+  ENV.FLAGS = {new_quizzes_modules_support: false}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
+})
+
+test('uses htmlUrl when not managing a quiz_lti assignment', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: false}
+  ENV.FLAGS = {new_quizzes_modules_support: true}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
 })
 
 test('includes htmlEditUrl', () => {

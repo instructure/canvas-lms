@@ -1,0 +1,2 @@
+alert|javascript
+<STYLE type="text/css">BODY{background:url("javascript:alert('XSS')")}</STYLE>

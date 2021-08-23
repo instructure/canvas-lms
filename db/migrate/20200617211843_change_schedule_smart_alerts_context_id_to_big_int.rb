@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeScheduleSmartAlertsContextIdToBigInt < ActiveRecord::Migration[5.2]
   tag :predeploy
 

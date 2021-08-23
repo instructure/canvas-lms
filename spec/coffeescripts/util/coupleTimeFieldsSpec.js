@@ -17,9 +17,9 @@
  */
 
 import london from 'timezone/Europe/London'
-import tz from 'timezone'
-import coupleTimeFields from 'compiled/util/coupleTimeFields'
-import DatetimeField from 'compiled/widget/DatetimeField'
+import tz from '@canvas/timezone'
+import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
+import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 

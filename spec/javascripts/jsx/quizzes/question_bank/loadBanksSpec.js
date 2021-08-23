@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import loadBanks from 'jsx/quizzes/question_bank/loadBanks'
+import loadBanks from 'ui/features/question_bank/jquery/loadBanks.js'
 
 QUnit.module('loadBanks')
 

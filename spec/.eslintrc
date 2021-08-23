@@ -11,13 +11,8 @@
     "sinon": true,
     "deepEqual": true
   },
-  "extends": [
-    "plugin:qunit/recommended",
-    "plugin:qunit/two"
-  ],
-  "plugins": [
-    "qunit"
-  ],
+  "extends": ["plugin:qunit/recommended", "plugin:qunit/two"],
+  "plugins": ["qunit"],
   "rules": {
     "func-names": "off",
     "prefer-arrow-callback": "off",
@@ -29,5 +24,8 @@
     "qunit/no-assert-logical-expression": "error",
     "qunit/no-commented-tests": "error",
     "qunit/no-compare-relation-boolean": "error"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
   }
 }

@@ -22,64 +22,67 @@ import {StyleSheet, css} from 'aphrodite'
 
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
+import formatMessage from '../../../../../format-message'
 
 export default function ExpandoText(props) {
   const [descExpanded, setDescExpanded] = useState(false)
   const [focused, setFocused] = useState(false)
+  const {text, title} = props
 
-  const {text} = props
+  const label = descExpanded
+    ? formatMessage('Hide {title} description', {title})
+    : formatMessage('View {title} description', {title})
+
   return (
-    <View
-      as="button"
-      className={css(styles.toggleButton)}
-      type="button"
-      position="relative"
-      aria-expanded={descExpanded}
-      focused={focused}
-      onClick={event => {
-        if (event.target.tagName !== 'A' || event.target.tagName !== 'BUTTON') {
-          // let the user click on links and buttons
+    <>
+      <View
+        as="button"
+        background="transparent"
+        display="block"
+        borderWidth="none"
+        textAlign="start"
+        type="button"
+        position="relative"
+        padding="none none none xx-small"
+        aria-expanded={descExpanded}
+        borderRadius="medium"
+        focused={focused}
+        onClick={() => {
           setDescExpanded(!descExpanded)
-        }
-      }}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-    >
-      <span style={{display: 'flex', alignItems: 'start'}}>
-        <span style={{marginRight: '.25rem', display: 'inline-block'}}>
-          <Text color="secondary">
-            {descExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine />}
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      >
+        <View as="span" aria-live="assertive" aria-relevant="text">
+          <Text color="brand" size="x-small" aria-label={label}>
+            {descExpanded ? formatMessage('Hide description') : formatMessage('View description')}
           </Text>
-        </span>
-        <span style={{flexGrow: '1', minWidth: '10rem'}}>
+        </View>
+      </View>
+      {descExpanded && (
+        <View
+          as="span"
+          margin="small none none xx-small"
+          display="block"
+          minWidth="10rem"
+          role="presentation"
+        >
           <Text as="span" color="secondary">
-            <div
-              className={css(styles.descriptionText, descExpanded ? null : styles.overflow)}
-              dangerouslySetInnerHTML={{__html: text}}
-            />
+            <div className={css(styles.descriptionText)} dangerouslySetInnerHTML={{__html: text}} />
           </Text>
-        </span>
-      </span>
-    </View>
+        </View>
+      )}
+    </>
   )
 }
 
 ExpandoText.propTypes = {
-  text: string.isRequired
+  text: string.isRequired,
+  title: string.isRequired
 }
 
 export const styles = StyleSheet.create({
-  toggleButton: {
-    background: 'transparent',
-    borderStyle: 'none',
-    display: 'block',
-    padding: '.25rem',
-    textAlign: 'start',
-    maxWidth: '100%'
-  },
   descriptionText: {
-    overflow: 'hidden',
     lineHeight: '1.2rem',
     p: {
       margin: '1rem 0'
@@ -91,11 +94,5 @@ export const styles = StyleSheet.create({
     ':nth-child(1n)> :last-child': {
       marginBottom: '0'
     }
-  },
-  overflow: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    height: '1.2rem',
-    textOverflow: 'ellipsis'
   }
 })

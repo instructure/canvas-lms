@@ -35,15 +35,22 @@ export function mockDocument() {
   return {
     activeElement: 'active-element',
     querySelector: jest.fn(),
+    getElementById: jest.fn(),
     body: {}
   }
 }
 
 export function mockComponent(name, date) {
   return {
+    uniqueId: 'unique-id',
     getFocusable: jest.fn(() => `${name}-focusable`),
     getScrollable: jest.fn(() => `${name}-scrollable`),
-    props: {date}
+    props: {
+      associated_item: 'Assignment',
+      courseName: 'Course X',
+      date,
+      title: name
+    }
   }
 }
 

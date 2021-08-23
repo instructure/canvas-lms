@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import SelectButton from 'jsx/choose_mastery_path/components/select-button'
+import SelectButton from 'ui/features/choose_mastery_path/react/components/select-button.js'
 
 QUnit.module('Select Button')
 

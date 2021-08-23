@@ -30,3 +30,8 @@ export const getTrayHeight = () => {
   }
   return trayHeight
 }
+
+export const isExternalUrl = url => {
+  const origin = window.location.origin
+  return new URL(url, origin).origin !== origin
+}

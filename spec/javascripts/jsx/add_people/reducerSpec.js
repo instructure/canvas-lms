@@ -17,8 +17,8 @@
  */
 
 import _ from 'underscore'
-import {actions} from 'jsx/add_people/actions'
-import reducer from 'jsx/add_people/reducer'
+import {actions} from '@canvas/add-people/react/actions'
+import reducer from '@canvas/add-people/react/reducer'
 
 // dummy test data ---------------
 // duplicates as returned by the api, search by unique_id/login

@@ -7,8 +7,8 @@ module DataFixup::PopulateRootAccountIdOnUserObservers
           where("user_id < ?", Shard::IDS_PER_SHARD). # otherwise it's a shadow record - handle it on the other side
           preload(:student, :observer).each do |link|
 
-        student_ra_ids = link.student.associated_root_accounts.shard(link.student).pluck(:id)
-        observer_ra_ids = link.observer.associated_root_accounts.shard(link.observer).pluck(:id)
+        student_ra_ids = link.student.associated_root_accounts.pluck(:id)
+        observer_ra_ids = link.observer.associated_root_accounts.pluck(:id)
 
         common_ra_ids = (student_ra_ids & observer_ra_ids)
         if common_ra_ids.empty? # boo

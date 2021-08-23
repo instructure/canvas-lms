@@ -155,7 +155,7 @@ function makeCalendarEvent(overrides = {}) {
   }
 }
 
-function makeAssessmentRequest(overrides = {}) {
+function makeAssessmentRequest(_overrides = {}) {
   return {
     workflow_state: 'assigned'
   }
@@ -461,6 +461,12 @@ describe('transformApiToInternalItem', () => {
     apiResponse.submissions.submitted = true
     result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result.completed).toBeTruthy()
+
+    // submitted but redo requested
+    apiResponse.submissions.redo_request = true
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+    expect(result.completed).toBeFalsy()
+    apiResponse.submissions.redo_request = false
 
     // !submitted but user marked complete => complete
     apiResponse.submissions.submitted = false

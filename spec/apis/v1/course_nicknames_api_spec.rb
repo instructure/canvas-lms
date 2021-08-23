@@ -56,6 +56,16 @@ describe 'Course Nicknames API', type: :request do
         expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => 'nickname' })
       end
 
+      it "returns the user's nickname, not the course's friendly_name if present" do
+        @student.set_preference(:course_nicknames, @course.id, 'nickname')
+        @course.account.enable_as_k5_account!
+        @course.friendly_name = 'friendly_name'
+        @course.save!
+        json = api_call(:get, "/api/v1/users/self/course_nicknames/#{@course.id}",
+                        @params.merge(:action => 'show', :course_id => @course.to_param))
+        expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => 'nickname' })
+      end
+
       it "returns a null nickname if no nickname exists" do
         json = api_call(:get, "/api/v1/users/self/course_nicknames/#{@course.id}",
                         @params.merge(:action => 'show', :course_id => @course.to_param))

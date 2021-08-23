@@ -1609,6 +1609,61 @@ describe AssignmentsApiController, type: :request do
         { :expected_status => 400 })
     end
 
+    it "creates audit events for the duplicated assignment if it is auditable" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
+    it "creates audit events even if assignments are inserted in the middle of the assignment group" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+      @course.assignments.create!(title: "placeholder so duplicated assignment isn't last")
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
     context "Quizzes.Next course copy retry" do
       let(:assignment) do
         @course.assignments.create(
@@ -2022,11 +2077,9 @@ describe AssignmentsApiController, type: :request do
     context 'LTI 2.x' do
       include_context 'lti2_spec_helper'
 
-      let(:root_account) { Account.create!(name: 'root account') }
+      let(:root_account) { account.root_account }
       let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
-
-      before { account.update(root_account: root_account) }
 
       it "checks for tool installation in entire account chain" do
         user_session teacher
@@ -2978,25 +3031,61 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "returns unauthorized for users who do not have permission" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @assignment = @course.assignments.create!({
         :name => "some assignment",
         :points_possible => 15
       })
 
-      api_call(:put,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-        {
-          :controller => 'assignments_api',
-          :action => 'update',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :id => @assignment.to_param
-        },
-        { 'points_possible' => 10 },
-        {},
-        {:expected_status => 401}
+      api_update_assignment_call(@course, @assignment, {'points_possible': 10})
+
+      expect(response.code).to eq "401"
+    end
+
+    it "allows user with grading rights to update assignment grading type" do
+      course_with_student(:active_all => true)
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
       )
+      @assignment.grade_student(@student, grade: 15, grader: @teacher)
+
+      @user = @teacher
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response).to be_successful
+      expect(@assignment.grading_type).to eq 'percent'
+    end
+
+    it "allows user to update grading_type without grading rights when no submissions have been graded" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
+      )
+
+      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
+      account_admin_user(active_all: true)
+
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response).to be_successful
+      expect(@assignment.grading_type).to eq 'percent'
+    end
+
+    it "returns unauthorized if user updates grading_type without grading rights when at least one submission has been graded" do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
+      )
+      @assignment.grade_student(@student, grade: 15, grader: @teacher)
+
+      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
+      account_admin_user(active_all: true)
+
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response.code).to eq "401"
     end
 
     it "should update published/unpublished" do
@@ -3118,6 +3207,138 @@ describe AssignmentsApiController, type: :request do
 
       expect(@assignment.grading_type).to eq 'not_graded'
       expect(@assignment.submission_types).to eq 'not_graded'
+    end
+
+    describe "annotatable attachment" do
+      before(:once) do
+        @assignment = @course.assignments.create!(name: "Some Assignment")
+        @attachment = attachment_model(content_type: "application/pdf", context: @course)
+      end
+
+      let(:endpoint_params) do
+        {
+          action: :update,
+          controller: :assignments_api,
+          course_id: @course.id,
+          format: :json,
+          id: @assignment.id
+        }
+      end
+
+      it "sets the assignment's annotatable_attachment_id when id is present and type is student_annotation" do
+        @attachment.update!(folder: @course.student_annotation_documents_folder)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
+      end
+
+      it "copies the given attachment to a special folder and uses that attachment instead of the supplied one" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
+        )
+
+        annotation_documents_folder = @course.student_annotation_documents_folder
+        clone_attachment = annotation_documents_folder.active_file_attachments.find_by(md5: @attachment.md5)
+        expect(@assignment.reload.annotatable_attachment_id).to be clone_attachment.id
+      end
+
+      it "does not set the assignment's annotatable_attachment_id when type is not student_annotation" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "returns bad_request when the user did not include an attachment id for an student_annotation type" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { submission_types: ["student_annotation"] } }
+        )
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "returns bad_request when the user doesn't have read access to the attachment" do
+        second_course = Course.create!
+        attachment_attrs = valid_attachment_attributes.merge(context: second_course)
+        second_attachment = Attachment.create!(attachment_attrs)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: second_attachment.id, submission_types: ["student_annotation"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "returns bad_request when the attachment doesn't exist" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: Attachment.last.id + 1, submission_types: ["student_annotation"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "removes the assignment's annotatable_attachment_id when an empty string is passed" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: "" } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "removes the assignment's annotatable_attachment_id when the type is not student_annotation" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "does not remove the assignment's annotatable_attachment_id when submission_types is not a param" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        expect {
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+            endpoint_params,
+            { assignment: { name: "unrelated change to attachment" } }
+          )
+        }.not_to change {
+          @assignment.reload.annotatable_attachment_id
+        }
+      end
     end
 
     describe 'final_grader_id' do
@@ -3751,6 +3972,68 @@ describe AssignmentsApiController, type: :request do
 
           api_update_assignment_call(@course, @assignment, @params)
           expect(@assignment.assignment_overrides.active.count).to eq 0
+        end
+      end
+
+      describe "for a group assignment with group overrides" do
+        let(:old_group_category) do
+          category = @course.group_categories.create!(name: "old")
+          category.create_groups(1)
+          category
+        end
+        let(:old_group) { old_group_category.groups.first }
+
+        let(:new_group_category) do
+          category = @course.group_categories.create!(name: "new")
+          category.create_groups(1)
+          category
+        end
+        let(:new_group) { new_group_category.groups.first }
+
+        it "removes overrides for groups in the old group category when changing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                due_at: nil,
+                group_id: new_group.id,
+                title: "group override"
+              }
+            ],
+            group_category_id: new_group_category.id,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["Group", new_group.id]
+          ]
+        end
+
+        it "removes overrides for groups in the old group category when removing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                course_section_id: @course.course_sections.first.id,
+                due_at: nil,
+                title: "section override instead"
+              }
+            ],
+            group_category_id: nil,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["CourseSection", @course.course_sections.first.id]
+          ]
         end
       end
     end

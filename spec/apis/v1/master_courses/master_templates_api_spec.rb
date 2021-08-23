@@ -33,12 +33,28 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     before :once do
       setup_template
       @url = "/api/v1/courses/#{@course.id}/blueprint_templates/default"
-      @params = @base_params.merge(:action => 'show')
+      @params = @base_params.merge(action: 'show')
+      @account = Account.default
     end
 
-    it "should require authorization" do
-      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_courses", :enabled => false)
-      api_call(:get, @url, @params, {}, {}, {:expected_status => 401})
+    it 'should require authorization' do
+      @account.disable_feature!(:granular_permissions_manage_courses)
+      @account.role_overrides.create!(
+        role: admin_role,
+        permission: 'manage_courses',
+        enabled: false
+      )
+      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
+    end
+
+    it 'should require authorization (granular permissions)' do
+      @account.enable_feature!(:granular_permissions_manage_courses)
+      @account.role_overrides.create!(
+        role: admin_role,
+        permission: 'manage_courses_admin',
+        enabled: false
+      )
+      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
     end
 
     it "should let teachers in the master course view details" do

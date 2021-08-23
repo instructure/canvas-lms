@@ -52,7 +52,7 @@ define(['jquery'], $ => {
   test('gets events from data on first element', assert => {
     const done = assert.async()
     const $el = [{}]
-    require(['quizzes'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
       isChangeMultiFuncBound($el)
       ok($._data.calledWithExactly($el[0], 'events'))
       done()
@@ -65,7 +65,7 @@ define(['jquery'], $ => {
     const events = {
       change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
     }
-    require(['quizzes'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
       ok(isChangeMultiFuncBound($el))
       done()
@@ -78,7 +78,7 @@ define(['jquery'], $ => {
     const events = {
       change: [{handler: {name: 'other'}}]
     }
-    require(['quizzes'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
       ok(!isChangeMultiFuncBound($el))
       done()
@@ -101,7 +101,7 @@ define(['jquery'], $ => {
       change: [{handler: {name: 'other'}}]
     }
     $._data.returns(events)
-    require(['quizzes'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})
@@ -117,7 +117,7 @@ define(['jquery'], $ => {
       change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
     }
     $._data.returns(events)
-    require(['quizzes'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})
@@ -133,7 +133,7 @@ define(['jquery'], $ => {
       change: [{handler: {name: 'other'}}]
     }
     $._data.returns(events)
-    require(['quizzes'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})

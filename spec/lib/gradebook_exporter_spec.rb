@@ -32,16 +32,20 @@ describe GradebookExporter do
     @course.update!(allow_final_grade_override: true)
   end
 
-  def enable_grading_period_in_column_headers!
-    Account.site_admin.enable_feature!(:gradebook_csv_headers_include_grading_period)
-  end
-
   describe "#to_csv" do
     def exporter(opts = {})
       GradebookExporter.new(@course, @teacher, opts)
     end
 
-    describe "assignment group order" do
+    describe "assignment order" do
+      def format_assignment_preferences(assignments)
+        assignments.map { |assignment| "assignment_#{assignment.id}" }
+      end
+
+      def format_assignment_headers(assignments)
+        assignments.map(&:title_with_id)
+      end
+
       before(:once) do
         student_in_course(course: @course, active_all: true)
 
@@ -53,28 +57,96 @@ describe GradebookExporter do
         @second_group = @course.assignment_groups.create!(name: "second group", position: 2)
 
         @assignments = []
-        @assignments[0] = @course.assignments.create!(name: "First group assignment", assignment_group: @first_group)
-        @assignments[2] = @course.assignments.create!(name: "last group assignment", assignment_group: @last_group)
-        @assignments[1] = @course.assignments.create!(name: "second group assignment", assignment_group: @second_group)
+        @first_group_assignment = @course.assignments.create!(name: "First group assignment", assignment_group: @first_group)
+        @assignments[0] = @first_group_assignment
+        @last_group_assignment = @course.assignments.create!(name: "last group assignment", assignment_group: @last_group)
+        @assignments[2] = @last_group_assignment
+        @second_group_assignment = @course.assignments.create!(name: "second group assignment", assignment_group: @second_group)
+        @assignments[1] = @second_group_assignment
       end
 
-      it "returns assignments ordered first by assignment group position" do
-        csv = GradebookExporter.new(@course, @teacher).to_csv
-        rows = CSV.parse(csv, headers: true)
+      let(:headers) { CSV.parse(exporter.to_csv, headers: true).headers }
 
-        # Our assignments should be columns 4, 5, and 6
-        assignment_headers = rows.headers[4,3]
-        expected_headers = @assignments.map { |a| "#{a.name} (#{a.id})" }
+      context "when assignment column order preferences exist" do
+        before(:once) do
+          user_preferences = {
+            direction: "ascending",
+            freezeTotalGrade: "false",
+            sortType: "custom",
+            customOrder: format_assignment_preferences([@last_group_assignment, @second_group_assignment, @first_group_assignment])
+          }
+          @teacher.set_preference(:gradebook_column_order, @course.global_id, user_preferences)
+        end
 
-        expect(assignment_headers).to eq(expected_headers)
+        it "returns assignments ordered by user's custom preferences" do
+          actual_assignment_headers = headers[4, 3]
+          expected_assignment_headers = format_assignment_headers [@last_group_assignment, @second_group_assignment, @first_group_assignment]
+
+          expect(actual_assignment_headers).to eq expected_assignment_headers
+        end
+
+        it "returns assignments ordered by assignment group position when feature is disabled" do
+          expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
+
+          actual_assignment_headers = headers[4, 3]
+          expected_assignment_headers = format_assignment_headers @assignments
+
+          expect(actual_assignment_headers).to eq expected_assignment_headers
+        end
+
+        it "orders assignments without preferences after the assignments with a preference" do
+          preferences_excluding_an_assignment = {
+            direction: "ascending",
+            freezeTotalGrade: "false",
+            sortType: "custom",
+            customOrder: format_assignment_preferences([@second_group_assignment, @first_group_assignment])
+          }
+          @teacher.set_preference(:gradebook_column_order, @course.global_id, preferences_excluding_an_assignment)
+
+          actual_assignment_headers = headers[4, 3]
+          expected_assignment_headers = format_assignment_headers [@second_group_assignment, @first_group_assignment, @last_group_assignment]
+
+          expect(actual_assignment_headers).to eq expected_assignment_headers
+        end
+
+        it "does not include deleted assignments that still have a preference saved" do
+          @last_group_assignment.destroy
+
+          actual_assignment_headers = headers[4, 2]
+          expected_assignment_headers = format_assignment_headers [@second_group_assignment, @first_group_assignment]
+
+          expect(actual_assignment_headers).to eq expected_assignment_headers
+        end
+
+        it "includes a column for anonymized assignments" do
+          @first_group_assignment.update!(anonymous_grading: true)
+
+          expect(headers).to include(/First group assignment/)
+        end
       end
 
-      it "includes a column for anonymized assignments" do
-        @assignments[0].update!(anonymous_grading: true)
-        csv = GradebookExporter.new(@course, @teacher).to_csv
-        headers = CSV.parse(csv, headers: true).headers
+      context "when assignment column order preferences do not exist" do
+        it "returns assignments ordered by assignment group position" do
+          actual_assignment_headers = headers[4,3]
+          expected_headers = format_assignment_headers @assignments
 
-        expect(headers).to include(/First group assignment/)
+          expect(actual_assignment_headers).to eq(expected_headers)
+        end
+
+        it "returns assignments ordered by assignment group position when feature is disabled" do
+          expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
+
+          actual_assignment_headers = headers[4,3]
+          expected_headers = format_assignment_headers @assignments
+
+          expect(actual_assignment_headers).to eq(expected_headers)
+        end
+
+        it "includes a column for anonymized assignments" do
+          @first_group_assignment.update!(anonymous_grading: true)
+
+          expect(headers).to include(/First group assignment/)
+        end
       end
     end
 
@@ -466,24 +538,14 @@ describe GradebookExporter do
           it "exports selected grading period's assignments" do
             expect(@headers).to include @no_due_date_assignment.title_with_id,
                                        @current_assignment.title_with_id
-            final_grade = @rows[1]["Final Score"].try(:to_f)
+            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
 
           it "exports assignments without due dates if exporting last grading period" do
             expect(@headers).to include @current_assignment.title_with_id,
                                        @no_due_date_assignment.title_with_id
-            final_grade = @rows[1]["Final Score"].try(:to_f)
-            expect(final_grade).to eq 20
-          end
-
-          it "includes the grading period in column headers when the relevant feature flag is enabled" do
-            enable_grading_period_in_column_headers!
-
-            csv = exporter(grading_period_id: @last_period.id).to_csv
-            rows = CSV.parse(csv, headers: true)
-
-            final_grade = rows[1]["Final Score (present day, present time)"].try(:to_f)
+            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
 
@@ -616,28 +678,18 @@ describe GradebookExporter do
       end
       let(:total_and_override_columns) { total_columns + ["Override Score", "Override Grade"] }
 
-      context "when adding grading periods to headers" do
-        before(:each) { enable_grading_period_in_column_headers! }
-
-        it "appends the grading period to overall total and override columns" do
-          columns_with_grading_period = total_and_override_columns.map do |column|
-            "#{column} (present day, present time)"
-          end
-
-          expect(exported_headers).to include(*columns_with_grading_period)
+      it "appends the grading period to overall total and override columns" do
+        columns_with_grading_period = total_and_override_columns.map do |column|
+          "#{column} (present day, present time)"
         end
 
-        it "appends the grading period to assignment group total columns" do
-          aggregate_failures do
-            expect(exported_headers).to include("my group Current Score (present day, present time)")
-            expect(exported_headers).not_to include("my group Current Score")
-          end
-        end
+        expect(exported_headers).to include(*columns_with_grading_period)
       end
 
-      context "when not adding grading periods to headers" do
-        it "does not append the grading period to column headers" do
-          expect(exported_headers).not_to include(a_string_including("(present day, present time)"))
+      it "appends the grading period to assignment group total columns" do
+        aggregate_failures do
+          expect(exported_headers).to include("my group Current Score (present day, present time)")
+          expect(exported_headers).not_to include("my group Current Score")
         end
       end
     end
@@ -836,14 +888,14 @@ describe GradebookExporter do
         it "includes the overridden score for the current grading period" do
           aggregate_failures do
             expect(enrollment).to receive(:override_score).with({ grading_period_id: grading_period.id }).and_return(64)
-            expect(parsed_csv[1]["Override Score"]).to eq("64")
+            expect(parsed_csv[1]["Override Score (#{grading_period.title})"]).to eq("64")
           end
         end
 
         it "includes the overridden grade for the current grading period if the course has a grading standard" do
           aggregate_failures do
             expect(enrollment).to receive(:override_grade).with({ grading_period_id: grading_period.id }).and_return("D")
-            expect(parsed_csv[1]["Override Grade"]).to eq("D")
+            expect(parsed_csv[1]["Override Grade (#{grading_period.title})"]).to eq("D")
           end
         end
 

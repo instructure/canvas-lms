@@ -50,24 +50,24 @@ describe TokensController do
       end
 
       it "should allow creating an access token" do
-        post 'create', params: {:access_token => {:purpose => "test", :expires_at => "jun 1 2011"}}
+        post 'create', params: {:access_token => {:purpose => "test", :permanent_expires_at => "jun 1 2011"}}
         expect(response).to be_successful
         expect(assigns[:token]).not_to be_nil
         expect(assigns[:token].developer_key).to eq DeveloperKey.default
         expect(assigns[:token].purpose).to eq "test"
-        expect(assigns[:token].expires_at.to_date).to eq Time.parse("jun 1 2011").to_date
+        expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
       it "should not allow creating an access token while masquerading" do
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym.id
 
-        post 'create', params: {:access_token => {:purpose => "test", :expires_at => "jun 1 2011"}}
+        post 'create', params: {:access_token => {:purpose => "test", :permanent_expires_at => "jun 1 2011"}}
         assert_status(401)
       end
 
       it "should not allow explicitly setting the token value" do
-        post 'create', params: {:access_token => {:purpose => "test", :expires_at => "jun 1 2011", :token => "mytoken"}}
+        post 'create', params: {:access_token => {:purpose => "test", :permanent_expires_at => "jun 1 2011", :token => "mytoken"}}
         expect(response).to be_successful
         expect(response.body).not_to match(/mytoken/)
         expect(assigns[:token]).not_to be_nil
@@ -75,7 +75,7 @@ describe TokensController do
         expect(response.body).to match(/#{assigns[:token].full_token}/)
         expect(assigns[:token].developer_key).to eq DeveloperKey.default
         expect(assigns[:token].purpose).to eq "test"
-        expect(assigns[:token].expires_at.to_date).to eq Time.parse("jun 1 2011").to_date
+        expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
       it "should allow deleting an access token" do
@@ -109,18 +109,18 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq false
+        expect(token.manually_created?).to eq true
         get 'show', params: {:id => token.id}
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should not include token for protected tokens" do
+      it "should not include token for non-manually-generated tokens" do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq true
+        expect(token.manually_created?).to eq false
         get 'show', params: {:id => token.id}
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -140,7 +140,7 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq false
+        expect(token.manually_created?).to eq true
         put 'update', params: {:id => token.id, :access_token => {:purpose => 'new purpose'}}
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -148,12 +148,12 @@ describe TokensController do
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should allow regenerating an unprotected token" do
+      it "should allow regenerating a manually generated token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq false
+        expect(token.manually_created?).to eq true
         put 'update', params: {:id => token.id, :access_token => {:regenerate => '1'}}
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -166,18 +166,18 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq false
+        expect(token.manually_created?).to eq true
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym.id
         put 'update', params: {:id => token.id, :access_token => {:regenerate => '1'}}
         assert_status(401)
       end
 
-      it "should not allow regenerating a protected token" do
+      it "should not allow regenerating a non-manually-generated token" do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
-        expect(token.protected_token?).to eq true
+        expect(token.manually_created?).to eq false
         put 'update', params: {:id => token.id, :access_token => {:regenerate => '1'}}
         expect(response).to be_successful
         expect(assigns[:token]).to eq token

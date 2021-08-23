@@ -18,8 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import GradePostingPolicyTabPanel from 'jsx/gradebook/default_gradebook/components/GradePostingPolicyTabPanel'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+import GradePostingPolicyTabPanel from 'ui/features/gradebook/react/default_gradebook/components/GradePostingPolicyTabPanel.js'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
   let postPoliciesOnChangeStub
@@ -30,6 +30,7 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     const componentProps = {
       anonymousAssignmentsPresent: true,
+      gradebookIsEditable: true,
       onChange: postPoliciesOnChangeStub,
       settings: {
         postManually: false,
@@ -82,6 +83,18 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
         const {checked} = manualPostingButton()
         strictEqual(checked, true)
       })
+    })
+
+    test('are disabled if gradebook cannot be edited by user', () => {
+      renderComponent({props: {gradebookIsEditable: false}})
+      strictEqual(automaticPostingButton().disabled, true)
+      strictEqual(manualPostingButton().disabled, true)
+    })
+
+    test('are enabled if gradebook can be edited by user', () => {
+      renderComponent({props: {gradebookIsEditable: true}})
+      strictEqual(automaticPostingButton().disabled, false)
+      strictEqual(manualPostingButton().disabled, false)
     })
 
     test('onChange is called when automatic posting is selected', () => {

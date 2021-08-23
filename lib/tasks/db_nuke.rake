@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :db do
   task :nuke => :environment do
     # dont kill db:nuke if it dies with destoying all the attachments.  

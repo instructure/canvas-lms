@@ -29,9 +29,9 @@ describe 'Moderation Page' do
   before(:once) do
     @moderated_course = course_factory(course_name: "Moderated Course")
     # create and enroll 4 teachers in course
-    @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Boss", enrollment_type: 'TeacherEnrollment')
+    @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Instructor", enrollment_type: 'TeacherEnrollment')
     # create 25 students enrolled in moderated_course
-    @students = create_users_in_course(@moderated_course, 25, return_type: :record, name_prefix: "Slave")
+    @students = create_users_in_course(@moderated_course, 25, return_type: :record, name_prefix: "Student")
 
     # create moderated assignment with teacher4 as final grader
     @assignment = @moderated_course.assignments.create!(

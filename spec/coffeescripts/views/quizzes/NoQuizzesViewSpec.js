@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import NoQuizzesView from 'compiled/views/quizzes/NoQuizzesView'
+import Backbone from '@canvas/backbone'
+import NoQuizzesView from 'ui/features/quizzes_index/backbone/views/NoQuizzesView.js'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
+import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert.js'
 
 QUnit.module('AnonymousSpeedGraderAlert', suiteHooks => {
   let $applicationElement

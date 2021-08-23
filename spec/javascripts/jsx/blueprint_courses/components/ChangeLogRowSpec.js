@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import ChangeLogRow, {ChangeRow} from 'jsx/blueprint_courses/components/ChangeLogRow'
+import ChangeLogRow, {ChangeRow} from 'ui/features/blueprint_course_child/react/components/ChangeLogRow.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('ChangeLogRow component')

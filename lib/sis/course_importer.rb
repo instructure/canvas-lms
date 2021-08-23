@@ -62,7 +62,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting, homeroom_course)
         state_changes = []
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
@@ -191,6 +191,10 @@ module SIS
               grade_passback_setting = nil if grade_passback_setting == 'not_set'
               course.grade_passback_setting = grade_passback_setting
             end
+          end
+
+          if homeroom_course
+            course.homeroom_course = Canvas::Plugin.value_to_boolean(homeroom_course)
           end
 
           if course.changed?

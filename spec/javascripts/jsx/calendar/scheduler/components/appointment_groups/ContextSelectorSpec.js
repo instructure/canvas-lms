@@ -19,7 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import {mount} from 'enzyme'
-import ContextSelector from 'jsx/calendar/scheduler/components/appointment_groups/ContextSelector'
+import ContextSelector from 'ui/features/calendar_appointment_group_edit/react/ContextSelector.js'
 
 let props
 

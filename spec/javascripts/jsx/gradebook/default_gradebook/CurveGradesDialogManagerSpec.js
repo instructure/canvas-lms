@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
-import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
-import CurveGradesDialogManager from 'jsx/gradebook/default_gradebook/CurveGradesDialogManager'
+import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog.coffee'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
+import CurveGradesDialogManager from 'ui/features/gradebook/react/default_gradebook/CurveGradesDialogManager.js'
 import I18n from 'i18n!gradebook'
-import 'compiled/jquery.rails_flash_notifications'
+import '@canvas/rails-flash-notifications'
 
 const {createCurveGradesAction} = CurveGradesDialogManager
 

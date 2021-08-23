@@ -20,10 +20,16 @@
 
 module Factories
   def outcome_model(opts={})
-    context = opts.delete(:context) || @context || course_model(:reusable => true)
-    outcome_context = opts.delete(:outcome_context) || context
-    outcome_group = opts.delete(:outcome_group) || context.root_outcome_group
-    @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
+    global = opts.delete(:global)
+    if global
+      outcome_group = opts.delete(:outcome_group) || LearningOutcomeGroup.find_or_create_root(nil, true)
+      @outcome = LearningOutcome.new(valid_outcome_attributes.merge(opts))
+    else
+      context = opts.delete(:context) || @context || course_model(:reusable => true)
+      outcome_context = opts.delete(:outcome_context) || context
+      outcome_group = opts.delete(:outcome_group) || context.root_outcome_group
+      @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
+    end
     @outcome.rubric_criterion = valid_outcome_data
     @outcome.save!
     outcome_group.add_outcome(@outcome)
@@ -127,5 +133,31 @@ module Factories
 
     @rubric = context.rubrics.build
     @rubric.update_criteria(rubric_params)
+  end
+
+  def make_group_structure(group_attrs, context, parent_group = nil)
+    outcomes = group_attrs.delete(:outcomes) || 0
+    groups = group_attrs.delete(:groups)
+
+    create_group_attrs = {
+      context: context,
+      **group_attrs
+    }
+
+    create_group_attrs[:outcome_group_id] = parent_group&.id if parent_group&.id
+
+    group = outcome_group_model(create_group_attrs)
+
+    outcomes.times.each do |c|
+      outcome_model(
+        title: "#{c} #{group_attrs[:title]} outcome",
+        outcome_group: group,
+        context: context
+      )
+    end
+
+    groups&.each do |child|
+      make_group_structure(child, context, group)
+    end
   end
 end

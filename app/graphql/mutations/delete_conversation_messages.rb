@@ -36,10 +36,16 @@ class Mutations::DeleteConversationMessages < Mutations::BaseMutation
     raise GraphQL::ExecutionError, "Insufficient permissions" if participant_record.nil?
 
     participant_record.remove_messages(*messages)
+    context[:deleted_models] = {conversation_messages: {}}
+    messages.each {|message| context[:deleted_models][:conversation_messages]["#{message.id}"] = message}
     {conversation_message_ids: input[:ids]}
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "Unable to find ConversationMessage"
+  end
+
+  def self.conversation_message_ids_log_entry(entry, context)
+    context[:deleted_models][:conversation_messages][entry]
   end
 end

@@ -125,7 +125,7 @@ class DueDateCacher
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
     if assignments.nil?
-      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::MD5.hexdigest(user_ids.sort.join(':'))}"
+      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::SHA256.hexdigest(user_ids.sort.join(':'))}"
     end
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
@@ -135,12 +135,7 @@ class DueDateCacher
     executing_user = inst_jobs_opts.delete(:executing_user) || self.current_executing_user
     due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
 
-    run_immediately = inst_jobs_opts.delete(:run_immediately) || false
-    if run_immediately
-      due_date_cacher.recompute
-    else
-      due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
-    end
+    due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
@@ -370,7 +365,11 @@ class DueDateCacher
     @quiz_lti_assignments ||=
       ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id").
         merge(ContextExternalTool.quiz_lti).
-        where(context_type: 'Assignment', context_id: @assignment_ids).
+        where(context_type: 'Assignment').#
+        # We're doing the following direct postgres any() rather than .where(context_id: @assignment_ids) on advice
+        # from our DBAs that the any is considerably faster in the postgres planner than the "IN ()" statement that
+        # AR would have generated.
+        where("content_tags.context_id = any('{?}'::int8[])", @assignment_ids).
         where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
   end
 

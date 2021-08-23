@@ -19,68 +19,7 @@
 
 module Canvas
   module Cassandra
-    module DatabaseBuilder
-      def self.configured?(config_name, environment = ::Rails.env)
-        raise ArgumentError, "config name required" if config_name.blank?
-        config = ConfigFile.load('cassandra', environment)
-        config = config && config[config_name]
-        config && config['servers'] && config['keyspace']
-      end
-
-      # If for a migration or a support week one has reason to override the settings that would come from cassandra.yml,
-      # you can pass them in overrride_options. Note, the keys from the yml will be strings so it'll be easier to hash
-      # rocket it.
-      #
-      # Example: from_config("auditors", override_options: { 'timeout' => 360 })
-      def self.from_config(config_name, environment = :current, override_options: nil)
-        @connections ||= {}
-        environment = Rails.env if environment == :current
-        key = [config_name, environment]
-        @connections.fetch(key) do
-          config = ConfigFile.load('cassandra', environment).dup
-          config = config && config[config_name]
-          unless config
-            @connections[key] = nil
-            return nil
-          end
-          config = config.merge(override_options) if override_options
-          servers = Array(config['servers'])
-          raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
-          keyspace = config['keyspace']
-          raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
-          opts = {:keyspace => keyspace, :cql_version => '3.0.0'}
-          opts[:retries] = config['retries'] if config['retries']
-          opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
-          opts[:timeout] = config['timeout'] if config['timeout']
-          fingerprint = "#{config_name}:#{environment}"
-          Bundler.require 'cassandra'
-          begin
-            @connections[key] = CanvasCassandra::Database.new(fingerprint, servers, opts, Rails.logger)
-          rescue Exception => exception
-            Rails.logger.error "Failed to create cassandra connection for #{key}: #{exception}"
-            nil # don't save this nil into @connections[key], so we can retry later
-          end
-        end
-      end
-
-      def self.configs
-        ConfigFile.load('cassandra') || {}
-      end
-
-      def self.reset_connections!
-        @connections = {}
-      end
-
-      def self.config_names
-        configs.keys
-      end
-
-      def self.read_consistency_setting(database_name = nil)
-        setting_key = 'event_stream.read_consistency'
-        setting_value = Setting.get("#{setting_key}.#{database_name}", nil) || Setting.get(setting_key, nil)
-
-        setting_value if setting_value.present?
-      end
-    end
+    # TODO: Remove this shim when all callsites have been updated
+    DatabaseBuilder = CanvasCassandra::DatabaseBuilder
   end
 end

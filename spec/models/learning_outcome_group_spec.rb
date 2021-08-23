@@ -35,6 +35,11 @@ describe LearningOutcomeGroup do
     text
   end
 
+  describe 'associations' do
+    it { is_expected.to belong_to(:source_outcome_group).class_name('LearningOutcomeGroup').inverse_of(:destination_outcome_groups) }
+    it { is_expected.to have_many(:destination_outcome_groups).class_name('LearningOutcomeGroup').inverse_of(:source_outcome_group).dependent(:nullify) }
+  end
+
   context 'object creation' do
     it "does not create multiple default groups" do
       group = @course.root_outcome_group
@@ -178,7 +183,7 @@ describe LearningOutcomeGroup do
   end
 
   describe '#adopt_outcome_link' do
-    it 'moves an existing outcome link from to this group if groups in same context' do
+    it 'moves an existing outcome link from to this group if groups in same context and touchs parent group' do
       group1 = @course.learning_outcome_groups.create!(:title => 'group1')
       group2 = @course.learning_outcome_groups.create!(:title => 'group2')
       outcome = @course.created_learning_outcomes.create!(:title => 'o1')
@@ -186,6 +191,7 @@ describe LearningOutcomeGroup do
 
       expect(outcome_link.associated_asset).to eq(group2)
 
+      expect(group1).to receive(:touch_parent_group)
       group1.adopt_outcome_link(outcome_link)
 
       expect(outcome_link.associated_asset).to eq(group1)
@@ -200,6 +206,19 @@ describe LearningOutcomeGroup do
 
       expect{ group1.adopt_outcome_link(outcome_link) }.
         not_to change{ outcome_link.associated_asset }
+    end
+
+    it "doesn't touch parent group if skip_parent_group_touch is true" do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      outcome_link = group2.add_outcome(outcome)
+
+      expect(outcome_link.associated_asset).to eq(group2)
+
+      expect(group1).not_to receive(:touch_parent_group)
+
+      group1.adopt_outcome_link(outcome_link, skip_parent_group_touch: true)
     end
   end
 
@@ -298,6 +317,85 @@ describe LearningOutcomeGroup do
     it 'sets root_acount_id 0 when global (context is nil)' do
       group = LearningOutcomeGroup.create!(title: 'group', context_id: nil)
       expect(group.root_account_id).to eq 0
+    end
+  end
+
+  context "sync_source_group" do
+    def assert_tree_exists(groups, db_parent_group)
+      group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
+      expect(group_titles.sort).to eql(groups.map {|g| g[:title]}.sort)
+
+      groups.each do |group|
+        outcome_titles = group[:outcomes] || []
+        title = group[:title]
+        childs = group[:groups]
+
+        db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+
+        db_outcomes = db_group.child_outcome_links.map(&:content)
+
+        expect(outcome_titles.sort).to eql(db_outcomes.map(&:title).sort)
+
+        assert_tree_exists(childs, db_group) if childs
+      end
+    end
+
+    before do
+      make_group_structure({
+        title: "Group A",
+        outcomes: 1,
+        groups: [{
+          title: "Group C",
+          outcomes: 1,
+          groups: [{
+            title: "Group D",
+            outcomes: 1
+          }, {
+            title: "Group E",
+            outcomes: 1
+          }]
+        }]
+      }, Account.default)
+
+      group_a = LearningOutcomeGroup.find_by(title: "Group A")
+      @course_group_a = LearningOutcomeGroup.create!(
+        title: 'Group A', context: @course,
+        source_outcome_group: group_a
+      )
+    end
+
+    it "sync all groups and outcomes from source" do
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: []
+      }], @root)
+
+      @course_group_a.sync_source_group
+
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: ["0 Group A outcome"],
+        groups: [{
+          title: "Group C",
+          outcomes: ["0 Group C outcome"],
+          groups: [{
+            title: "Group D",
+            outcomes: ["0 Group D outcome"]
+          }, {
+            title: "Group E",
+            outcomes: ["0 Group E outcome"]
+          }]
+        }]
+      }], @root)
+    end
+
+    it "restore previous deleted group" do
+      @course_group_a.sync_source_group
+      group_d = LearningOutcomeGroup.find_by(title: "Group D", context: @course)
+      group_d.destroy
+      @course_group_a.sync_source_group
+      group_d.reload
+      expect(group_d.workflow_state).to eql("active")
     end
   end
 end

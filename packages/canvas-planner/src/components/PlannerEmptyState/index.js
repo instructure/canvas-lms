@@ -33,10 +33,11 @@ import theme from './theme'
 
 class PlannerEmptyState extends Component {
   static propTypes = {
-    changeDashboardView: func.isRequired,
+    changeDashboardView: func,
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
-    responsiveSize: string
+    responsiveSize: string,
+    isWeekly: bool
   }
 
   static defaultProps = {
@@ -74,16 +75,24 @@ class PlannerEmptyState extends Component {
           <div className={styles.subtitle}>
             {formatMessage("Looks like there isn't anything here")}
           </div>
-          <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
-            {formatMessage('Go to Card View Dashboard')}
-          </Link>
-          |{this.renderAddToDoButton()}
+          {!this.props.isWeekly && this.props.changeDashboardView && (
+            <>
+              <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
+                {formatMessage('Go to Card View Dashboard')}
+              </Link>
+              |
+            </>
+          )}
+          {!this.props.isWeekly && this.renderAddToDoButton()}
         </div>
       </div>
     )
   }
 
   renderNothingLeft() {
+    const msg = this.props.isWeekly
+      ? formatMessage('Nothing Due This Week')
+      : formatMessage('Nothing More To Do')
     return (
       <div
         className={classnames(
@@ -94,12 +103,14 @@ class PlannerEmptyState extends Component {
       >
         <BalloonsSvg className={classnames(styles.balloons, 'balloons')} aria-hidden="true" />
         <div className={styles.title}>
-          <Heading>{formatMessage('Nothing More To Do')}</Heading>
+          <Heading>{msg}</Heading>
         </div>
-        <div className={styles.subtitlebox}>
-          <div className={styles.subtitle}>{formatMessage('Scroll up to see your history!')}</div>
-          {this.renderAddToDoButton()}
-        </div>
+        {!this.props.isWeekly && (
+          <div className={styles.subtitlebox}>
+            <div className={styles.subtitle}>{formatMessage('Scroll up to see your history!')}</div>
+            {this.renderAddToDoButton()}
+          </div>
+        )}
       </div>
     )
   }

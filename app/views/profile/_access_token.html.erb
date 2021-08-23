@@ -18,25 +18,25 @@
 
 <% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
-  <td class="app_name"><%= access_token.try(:app_name) || t(:default_app_name, "No App") %></td>
-  <td class="purpose"><%= access_token.try(:purpose) || nbsp %></td>
+  <td class="app_name"><%= access_token&.app_name || t(:default_app_name, "No App") %></td>
+  <td class="purpose"><%= access_token&.purpose || nbsp %></td>
   <td class="dates">
     <table class="subtable" role="presentation">
       <tr>
         <td><%= before_label(:token_expires, "Expires") %></td>
-        <td class="expires nobr"><%= datetime_string(access_token.try(:expires_at)) || t('profile.token_never_expires', 'never') %></td>
+        <td class="expires nobr"><%= datetime_string(access_token&.permanent_expires_at) || t('profile.token_never_expires', 'never') %></td>
       </tr><tr>
         <td class="nobr"><%= before_label(:token_last_used, "Last Used") %></td>
-        <td class="used nobr"><%= datetime_string(access_token.try(:last_used_at)) || '--' %></td>
+        <td class="used nobr"><%= datetime_string(access_token&.last_used_at) || '--' %></td>
       </tr>
     </table>
   </td>
   <td>
-    <a href="#" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
+    <a href="#" rel="<%= profile_token_url(access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
   </td>
   <td class="links">
     <% unless @real_current_user %>
-      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
+      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
     <% end %>
   </td>
 </tr>

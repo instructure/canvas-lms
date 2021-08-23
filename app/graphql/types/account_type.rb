@@ -70,5 +70,10 @@ module Types
     end
 
     field :root_outcome_group, LearningOutcomeGroupType, null: false
+
+    field :parent_accounts_connection, AccountType.connection_type, null: false
+    def parent_accounts_connection
+      account.account_chain - [account]
+    end
   end
 end

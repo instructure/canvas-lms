@@ -37,6 +37,7 @@ end
 require 'active_record'
 require 'canvas_partman'
 
+require 'uri'
 ActiveRecord::Base.establish_connection(ENV.fetch('DATABASE_URL', nil))
 require 'support/schema_helper'
 require 'fixtures/zoo'

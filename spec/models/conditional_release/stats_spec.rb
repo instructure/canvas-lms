@@ -204,6 +204,15 @@ module ConditionalRelease
         end
       end
 
+      it 'includes course_id for trigger_assignment' do
+        set_assignments
+        set_submissions [[@trigger, 50, 100]]
+        expected_assignment_set([@student_id], @as1)
+
+        details = Stats.student_details(@rule, @student_id).with_indifferent_access
+        expect(details.dig(:trigger_assignment, :assignment, :course_id)).to eq @course.id
+      end
+
       context 'trends per assignment' do
         before do
           @rule.scoring_ranges.destroy_all

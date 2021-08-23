@@ -35,3 +35,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+a:hover > [id^='MathJax'],
+a:focus > [id^='MathJax'] {
+  border-bottom-color: var(--ic-brand-font-color-dark);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}

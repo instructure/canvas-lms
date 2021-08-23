@@ -664,12 +664,7 @@ describe DeveloperKey do
     describe 'after_save' do
       describe 'set_root_account' do
         context 'when account is not root account' do
-          let(:account) {
-            a = account_model
-            a.root_account = Account.create!
-            a.save!
-            a
-          }
+          let(:account) {account_model(root_account: Account.create!) }
 
           it 'sets root account equal to account\'s root account' do
             expect(developer_key_not_saved.root_account).to be_nil
@@ -743,7 +738,7 @@ describe DeveloperKey do
       context 'when binding state is "allow"' do
         before do
           site_admin_key.developer_key_account_bindings.create!(
-            account: root_account, workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE
+            account: root_account, workflow_state: 'allow'
           )
         end
 
@@ -753,7 +748,7 @@ describe DeveloperKey do
         end
 
         it 'finds the root account binding when requesting root account' do
-          site_admin_key.developer_key_account_bindings.first.update!(workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE)
+          site_admin_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
           binding = site_admin_key.account_binding_for(root_account)
           expect(binding.account).to eq root_account
         end
@@ -1003,6 +998,13 @@ describe DeveloperKey do
       expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+    end
+
+    it "requires scheme to match on lenient matches" do
+      developer_key_not_saved.redirect_uri = "http://example.com/a/b"
+
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq true
+      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to eq false
     end
   end
 

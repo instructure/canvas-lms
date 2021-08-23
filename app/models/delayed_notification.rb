@@ -41,7 +41,7 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
 
-  
+
   def self.process(asset, notification, recipient_keys, data = {}, **kwargs)
     # RUBY 2.7 this can go away (**{} will work at the caller)
     raise ArgumentError, "Only send one hash" if !data&.empty? && !kwargs.empty?
@@ -84,9 +84,17 @@ class DelayedNotification < ActiveRecord::Base
     end
 
     lookups.each do |klass, ids|
-      includes = []
-      includes = [ :notification_policies, :notification_policy_overrides, { user: :pseudonyms } ] if klass == CommunicationChannel
-      includes = [ :pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] } ] if klass == User
+      # notification_policies, and notification_policy_overrides are included in
+      # each of the preloads twice intentionally.
+      # rails de-dups them and only does one query, but if not included twice,
+      # they will not show as loaded against both objects.
+      includes = if klass == CommunicationChannel
+        [:notification_policies, :notification_policy_overrides, { user: [:pseudonyms, :notification_policies, :notification_policy_overrides] }]
+      elsif klass == User
+        [:pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] }, :notification_policies, :notification_policy_overrides]
+      else
+        []
+      end
 
       ids.each_slice(100) do |slice|
         yield klass.where(:id => slice).preload(includes).to_a

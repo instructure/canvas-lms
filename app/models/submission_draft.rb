@@ -89,6 +89,10 @@ class SubmissionDraft < ActiveRecord::Base
     end
   end
 
+  def meets_student_annotation_criteria?
+    self.submission.annotation_context(in_progress: true).present?
+  end
+
   # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
     submission_types = self.submission.assignment.submission_types.split(',')
@@ -102,6 +106,8 @@ class SubmissionDraft < ActiveRecord::Base
         return true if meets_upload_criteria?
       when 'online_url'
         return true if meets_url_criteria?
+      when 'student_annotation'
+        return true if meets_student_annotation_criteria?
       end
     end
 

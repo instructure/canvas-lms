@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
+import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 
 QUnit.module('accessibleDateFormat', {
   setup() {}

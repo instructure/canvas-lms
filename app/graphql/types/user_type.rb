@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPreferencesContextType < Types::BaseEnum
-  graphql_name 'NotificationPreferencesContextType'
-  description 'Context types that can be associated with notification preferences'
-  value 'Course'
-  value 'Account'
-end
-
 module Types
   class UserType < ApplicationObjectType
     #
@@ -245,7 +238,7 @@ module Types
       if object == current_user
         # FIXME: this only returns groups on the current shard.  it should
         # behave like the REST API (see GroupsController#index)
-        load_association(:current_groups)
+        current_user.visible_groups
       end
     end
 
@@ -288,6 +281,52 @@ module Types
         end
       end
     end
+
+    field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
+      argument :query, String, <<~DOC, required: false
+        Only include comments that match the query string.
+      DOC
+      argument :limit, Integer, required: false
+    end
+    def comment_bank_items_connection(query: nil, limit: nil)
+      return unless object == current_user
+
+      comments = current_user.comment_bank_items.shard(object)
+
+      comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
+      # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
+      # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
+      # and use the 'first' argument on the connection instead of 'limit'.
+      # Note that limit: 5 is currently being used by the Comment Library.
+      if limit.present?
+        comments = comments.limit(limit).to_a.first(limit)
+      end
+
+      comments
+    end
+
+    field :course_roles, [String], null: true do
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :role_types, [String], "Return only requested base role types", required: false
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
+    end
+    def course_roles(course_id: nil, role_types: nil, built_in_only: true)
+      # The discussion only role "Author" will be handled with a front-end check because graphql 
+      # currently does not support type inheritance. If graphql starts supporting type inheritance
+      # this field can be replaced by a discussionAuthor type that inherits from User type and
+      # contains a discussionRoles field
+
+      return [] if course_id.nil?
+
+      course_roles = []
+
+      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object).then do |roles|
+        roles.each do |role|
+          course_roles.push(role[:type])
+        end
+        course_roles
+      end
+    end
   end
 end
 
@@ -295,8 +334,8 @@ module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
     def initialize(course_ids:)
       scope = Enrollment.joins(:course).
-        where.not(enrollments: {workflow_state: "deleted"},
-                  courses: {workflow_state: "deleted"})
+        where.not(enrollments: {workflow_state: "deleted"}).
+        where.not(courses: {workflow_state: "deleted"})
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
 

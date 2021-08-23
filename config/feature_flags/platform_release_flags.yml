@@ -1,11 +1,4 @@
 ---
-system_and_user_generated_event_types:
-  state: hidden
-  display_name: System- and User-Generated Events
-  description: |-
-    Differentiate between system- and user-generated live events
-    in the Canvas Data Services tool
-  applies_to: SiteAdmin
 live_event_subscription_webhooks:
   state: hidden
   display_name: Live Event Subscription Webhooks
@@ -49,4 +42,17 @@ disable_graphql_authentication:
   description: |-
     If enabled, GraphQL queries will not require
     users to be signed in or use an access token.
+  applies_to: SiteAdmin
+microsoft_group_enrollments_syncing:
+  state: hidden
+  display_name: Microsoft Group enrollment syncing
+  description: |-
+    If enabled, syncing course enrollments to Microsoft Groups will be
+    available. Account admins may enable this in account settings.
+  applies_to: RootAccount
+lti_multiple_assignment_deep_linking:
+  state: hidden
+  display_name: LTI Multiple Assignment Deep Linking
+  description: |-
+    If enabled, allows multiple deep link support for assignments and modules.
   applies_to: SiteAdmin

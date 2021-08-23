@@ -148,13 +148,15 @@ describe Pseudonym do
     expect(@pseudonym).to be_deleted
   end
 
-  it "should change a blank sis_user_id to nil" do
+  it "should default to nil for blank integration_id and sis_user_id" do
     user_factory
-    pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
+    pseudonym = Pseudonym.new(user: @user, unique_id: 'test@example.com', password: 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''
+    pseudonym.integration_id = ''
     expect(pseudonym).to be_valid
     expect(pseudonym.sis_user_id).to be_nil
+    expect(pseudonym.integration_id).to be_nil
   end
 
   context "LDAP errors" do
@@ -312,12 +314,28 @@ describe Pseudonym do
       expect(u.email_channel.path).to eq 'jt@instructure.com'
       expect(u.email_channel).to be_active
     end
+
+    it "does not persist the auth provider if inferred" do
+      account = Account.create!
+      ap = account.authentication_providers.create!(:auth_type => 'ldap')
+      u = User.create!
+      u.register
+      pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
+      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
+
+      pseudonym.infer_auth_provider(ap)
+      pseudonym.add_ldap_channel
+      expect(pseudonym.reload.authentication_provider).to be_nil
+    end
   end
 
   describe 'valid_arbitrary_credentials?' do
     it "should ignore password if canvas authentication is disabled" do
       user_with_pseudonym(:password => 'qwertyuiop')
       expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_truthy
+      # once auth provider is required, this whole spec can go away, because the situation will
+      # not be possible
+      @pseudonym.update!(authentication_provider: nil)
 
       Account.default.authentication_providers.scope.delete_all
       Account.default.authentication_providers.create!(:auth_type => 'ldap')
@@ -335,17 +353,22 @@ describe Pseudonym do
     context "sharding" do
       specs_require_sharding
       let_once(:account2) { @shard1.activate { Account.create! } }
+      before(:once) do
+        # need these instantiated before we set up our mocks
+        Account.default
+        account2
+      end
 
       it "should only query the pertinent shard" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([@shard1])
-        expect(Pseudonym).to receive(:active).once.and_return(Pseudonym.none)
+        expect(Pseudonym).to receive(:active_only).once.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
 
       it "should query all pertinent shards" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([Shard.default, @shard1])
-        expect(Pseudonym).to receive(:active).twice.and_return(Pseudonym.none)
+        expect(Pseudonym).to receive(:active_only).twice.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
@@ -698,13 +721,25 @@ describe Pseudonym do
   end
 
   describe ".find_all_by_arbtrary_credentials" do
-    it "doesn't choke on if global lookups is down" do
+    let_once(:p) do
       u = User.create!
-      p = u.pseudonyms.create!(unique_id: 'a', account: Account.default, password: 'abcdefgh', password_confirmation: 'abcdefgh')
+      u.pseudonyms.create!(unique_id: 'a', account: Account.default, password: 'abcdefgh', password_confirmation: 'abcdefgh')
+    end
+
+    it "finds a valid pseudonym" do
+      expect(Pseudonym.find_all_by_arbitrary_credentials(
+               { unique_id: 'a', password: 'abcdefgh' },
+               [Account.default.id], '127.0.0.1'
+             )).to eq [p]
+    end
+
+    it "doesn't choke on if global lookups is down" do
       expect(GlobalLookups).to receive(:enabled?).and_return(true)
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
-      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: 'a', password: 'abcdefgh' },
-        [Account.default.id], '127.0.0.1')).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials(
+               { unique_id: 'a', password: 'abcdefgh' },
+               [Account.default.id], '127.0.0.1'
+             )).to eq [p]
     end
 
     it "throws an error if your credentials are absurd" do
@@ -713,6 +748,21 @@ describe Pseudonym do
       creds = { unique_id: unique_id, password: 'foobar' }
       expect{ Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
     end
+
+    it "doesn't find deleted pseudonyms" do
+      p.update!(workflow_state: 'deleted')
+      expect(Pseudonym.find_all_by_arbitrary_credentials(
+               { unique_id: 'a', password: 'abcdefgh' },
+               [Account.default.id], '127.0.0.1'
+             )).to eq []
+    end
+
+    it "doesn't find suspended pseudonyms" do
+      p.update!(workflow_state: 'suspended')
+      expect(Pseudonym.find_all_by_arbitrary_credentials(
+               { unique_id: 'a', password: 'abcdefgh' },
+               [Account.default.id], '127.0.0.1'
+             )).to eq []
+    end
   end
 end
-

@@ -549,11 +549,11 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def visibility_for_user(user)
+  def visibility_for_user(user, session=nil)
     opts = {}
-    opts[:can_read] = self.context.grants_right?(user, :read)
+    opts[:can_read] = self.context.grants_right?(user, session, :read)
     if opts[:can_read]
-      opts[:can_read_as_admin] = self.context.grants_right?(user, :read_as_admin)
+      opts[:can_read_as_admin] = self.context.grants_right?(user, session, :read_as_admin)
     end
     opts
   end
@@ -689,7 +689,8 @@ class ContextModule < ActiveRecord::Base
         # of the added item fails, no orphaned resource link is created
         added_item.associated_asset = context.lti_resource_links.new(
           custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
-          context_external_tool: content
+          context_external_tool: content,
+          lookup_uuid: params[:lti_resource_link_lookup_uuid]
         )
       end
       added_item.save

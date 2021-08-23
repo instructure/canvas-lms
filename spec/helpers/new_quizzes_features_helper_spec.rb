@@ -25,7 +25,7 @@ describe NewQuizzesFeaturesHelper do
 
   before :once do
     course_with_student(active_all: true)
-    @context = @course.account
+    @context = @course
   end
 
   describe '#new_quizzes_import_enabled?' do
@@ -38,14 +38,20 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_import_enabled?).to eq false
     end
 
-    it 'should be false when new_quizzes disabled, but importing enabled' do
-      @context.root_account.enable_feature!(:import_to_quizzes_next)
+    it 'should be false when new_quizzes disabled' do
+      @context.root_account.enable_feature!(:quizzes_next)
       expect(new_quizzes_import_enabled?).to eq false
     end
 
-    it 'should be true when new_quizzes enabled, and importing enabled' do
-      allow(@context.root_account).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
-      @context.root_account.enable_feature!(:import_to_quizzes_next)
+    it 'should be false when new_quizzes disabled and allowed' do
+      allow(@course).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
+      allow(@course).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_import_enabled?).to eq false
+    end
+
+    it 'should be true when new_quizzes enabled' do
+      allow(@course).to receive(:feature_allowed?).with(:quizzes_next).and_return(false)
+      allow(@course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
       expect(new_quizzes_import_enabled?).to eq true
     end
   end
@@ -118,6 +124,33 @@ describe NewQuizzesFeaturesHelper do
     it 'should be true when default is enabled' do
       @context.root_account.enable_feature!(:require_migration_to_new_quizzes)
       expect(new_quizzes_require_migration?).to eq true
+    end
+  end
+
+  describe "#new_quizzes_navigation_placements_enabled" do
+    before(:each) do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
+    end
+
+    it 'should be true when new_quizzes_account_course_level_item_banks and quizzes_next are true' do
+      expect(new_quizzes_navigation_placements_enabled?).to eq true
+    end
+
+    it 'should be false when new_quizzes_account_course_level_item_banks is disabled' do
+      Account.site_admin.disable_feature!(:new_quizzes_account_course_level_item_banks)
+      expect(new_quizzes_navigation_placements_enabled?).to eq false
+    end
+
+    it 'should be false when quizzes_next is disabled' do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_navigation_placements_enabled?).to eq false
+    end
+
+    it 'should accept a context' do
+      fake_context = Course.create(name: 'fake context')
+      fake_context.disable_feature!(:quizzes_next)
+      expect(new_quizzes_navigation_placements_enabled?(fake_context)).to eq false
     end
   end
 end

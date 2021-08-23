@@ -26,6 +26,8 @@
 //
 //============================================================================================
 
+@use 'sass:math';
+
 // This imports the variables needed to support accessibility ($use_high_contrast)
 // You can also use the sass function that helps ensure color contrast ratio.
 // Look in /sass-functions/ for more information on how that is used
@@ -115,7 +117,7 @@ $ic-bg-light-danger-text:   #EE0612;
 // DEPRECATED COLORS - DO NOT USE
 //====================================
 
-$ic-color-neutral:       hsl(0,0, 90%);
+$ic-color-neutral:       hsl(0, 0%, 90%);
 $gray-darker:            $ic-color-dark;
 $gray-dark:              $ic-color-medium-darker;
 $gray:                   $ic-color-medium;
@@ -131,7 +133,7 @@ $left_side_width:           175px;
 $min_main_width:            510px;
 $max_main_width:            1100px;
 $ic-sp:                     12px;
-$ic-border-radius:          $ic-sp/2;
+$ic-border-radius:          math.div($ic-sp, 2);
 $spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
 $borderRadius:              4px;
 $contentBoxPadding:         8px;

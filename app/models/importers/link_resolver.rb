@@ -80,7 +80,7 @@ module Importers
         # see LinkParser for details
 
         rel_path = link[:rel_path]
-        node = Nokogiri::HTML::DocumentFragment.parse(link[:old_value]).children.first
+        node = Nokogiri::HTML5.fragment(link[:old_value]).children.first
         new_url = resolve_media_comment_data(node, rel_path)
         new_url ||= resolve_relative_file_url(rel_path)
 
@@ -93,7 +93,7 @@ module Importers
         else
           node['href'] = new_url
         end
-        link[:new_value] = node.to_xml
+        link[:new_value] = node.to_s
       when :file
         rel_path = link[:rel_path]
         new_url = resolve_relative_file_url(rel_path)

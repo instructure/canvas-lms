@@ -18,11 +18,7 @@
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
-// terser-webpack-plugin is a dependency of 'webpack'. It's not in our package.json
-// because we always want to use the same version as whatever webpack would use
-// by default and if webpack ever stops using it by default we _want_ an
-// `Error: Cannot find module` here so we know we need to change things
-// eslint-disable-next-line import/no-extraneous-dependencies
+// keep this in sync with webpack's dep version
 const TerserPlugin = require('terser-webpack-plugin')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
@@ -30,11 +26,11 @@ const glob = require('glob')
 const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
-const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
+
 require('./bundles')
 
 // We have a bunch of things (like our selenium jenkins builds) that have
@@ -51,40 +47,43 @@ const skipSourcemaps = Boolean(
 )
 
 const root = path.resolve(__dirname, '..')
+const createBundleAnalyzerPlugin = (...args) => {
+  const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+  return new BundleAnalyzerPlugin(...args)
+}
 
 module.exports = {
   mode: process.env.NODE_ENV,
   performance: skipSourcemaps
     ? false
     : {
-        // This just reflects how big the 'main' entry is at the time of writing. Every
-        // time we get it smaller we should change this to the new smaller number so it
-        // only goes down over time instead of growing bigger over time
-        maxEntrypointSize: 1200000,
-        // This is how big our biggest js bundles are at the time of writing. We should
-        // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
-        // tracking them too. Then, as we work to get all chunks smaller, we should change
-        // this number to the size of our biggest known asset and hopefully someday get
-        // to where they are all under the default value of 250000 and then remove this
-        // TODO: decrease back to 1200000 LS-1222
-        maxAssetSize: 1400000,
-        assetFilter: assetFilename => {
-          const thingsWeKnowAreWayTooBig = [
-            'canvas-rce-async-chunk',
-            'canvas-rce-old-async-chunk',
-            'permissions_index',
-            'screenreader_gradebook',
-            // This bundle got pushed over the limit by translations being added and
-            // the simplest fix was to ignore it at the moment, to unblock selenium
-            // tests for everyone. CORE-3106 will resolve this.
-            'quizzes_bundle'
-          ]
-          return (
-            assetFilename.endsWith('.js') &&
-            !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
-          )
-        }
-      },
+      // This just reflects how big the 'main' entry is at the time of writing. Every
+      // time we get it smaller we should change this to the new smaller number so it
+      // only goes down over time instead of growing bigger over time
+      maxEntrypointSize: 1240000,
+      // This is how big our biggest js bundles are at the time of writing. We should
+      // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
+      // tracking them too. Then, as we work to get all chunks smaller, we should change
+      // this number to the size of our biggest known asset and hopefully someday get
+      // to where they are all under the default value of 250000 and then remove this
+      // TODO: decrease back to 1200000 LS-1222
+      maxAssetSize: 1400000,
+      assetFilter: assetFilename => {
+        const thingsWeKnowAreWayTooBig = [
+          'assignment_edit',
+          'canvas-rce-async-chunk',
+          'canvas-rce-old-async-chunk',
+          'discussion_topic_edit',
+          'k5_dashboard',
+          'permissions',
+          'discussion_topics_post',
+        ]
+        return (
+          assetFilename.endsWith('.js') &&
+          !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
+        )
+      }
+    },
   optimization: {
     // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
@@ -139,11 +138,13 @@ module.exports = {
 
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1' || process.env.SENTRY_DSN
-    ? 'source-map'
-    : 'eval',
+    : process.env.NODE_ENV === 'production' ||
+    process.env.COVERAGE === '1' ||
+    process.env.SENTRY_DSN
+      ? 'source-map'
+      : 'eval',
 
-  entry: {main: 'jsx/main'},
+  entry: {main: path.resolve(__dirname, '../ui/index.js')},
 
   output: {
     // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
@@ -176,38 +177,28 @@ module.exports = {
       // `require('newless')` to make it work
       './themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '../themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '@instructure/ui-themeable/es/themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
-
-      'node_modules-version-of-backbone': require.resolve('backbone'),
-      'node_modules-version-of-react-modal': require.resolve('react-modal'),
-
-      backbone: 'Backbone',
-      timezone$: 'timezone_core',
-      jst: path.resolve(__dirname, '../app/views/jst'),
-      jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
-      coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
-      'lodash.underscore$': path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore.js'),
-      jsx: path.resolve(__dirname, '../app/jsx'),
-
-      'jquery.qtip$': path.resolve(__dirname, '../public/javascripts/vendor/jquery.qtip.js'),
+      'node_modules-version-of-backbone$': require.resolve('backbone'),
+      'node_modules-version-of-react-modal$': require.resolve('react-modal')
     },
 
     modules: [
+      path.resolve(__dirname, '../ui/shims'),
       path.resolve(__dirname, '../public/javascripts'),
       path.resolve(__dirname, '../gems/plugins'),
       'node_modules'
     ],
 
-    extensions: ['.mjs', '.js']
+    extensions: ['.mjs', '.js', '.ts', '.tsx']
   },
 
   module: {
@@ -218,25 +209,25 @@ module.exports = {
       /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce$/, // has 'require' and 'define' but they are from it's own internal closure
-      /i18nliner\/dist\/lib\/i18nliner/, // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
         include: [
-          path.resolve(__dirname, '../public/javascripts'),
-          path.resolve(__dirname, '../app/jsx'),
-          path.resolve(__dirname, '../app/coffeescripts'),
+          path.resolve(__dirname, '../ui'),
+          path.resolve(__dirname, '../packages/jquery-kyle-menu'),
+          path.resolve(__dirname, '../packages/jquery-sticky'),
+          path.resolve(__dirname, '../packages/jquery-popover'),
+          path.resolve(__dirname, '../packages/jquery-selectmenu'),
+          path.resolve(__dirname, '../packages/mathml'),
+          path.resolve(__dirname, '../packages/slickgrid'),
+          path.resolve(__dirname, '../packages/with-breakpoints'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
           path.resolve(__dirname, '../spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
         ],
-        exclude: [
-          path.resolve(__dirname, '../public/javascripts/translations'),
-          path.resolve(__dirname, '../public/javascripts/react-dnd-test-backend'),
-          path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore'),
-          /bower\//
-        ],
+        exclude: [/bower\//, /node_modules/],
         use: {
           loader: 'babel-loader',
           options: {
@@ -247,27 +238,28 @@ module.exports = {
       {
         test: /\.coffee$/,
         include: [
-          path.resolve(__dirname, '../app/coffeescript'),
+          path.resolve(__dirname, '../ui'),
           path.resolve(__dirname, '../spec/coffeescripts'),
-          /app\/coffeescripts\//,
-          /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
+          path.resolve(__dirname, '../packages/backbone-input-filter-view/src'),
+          path.resolve(__dirname, '../packages/backbone-input-view/src'),
+          /gems\/plugins\/.*\/(app|spec_canvas)\/coffeescripts\//
         ],
         loaders: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,
-        include: [
-          path.resolve(__dirname, '../app/views/jst'),
-          /gems\/plugins\/.*\/app\/views\/jst\//
-        ],
-        loaders: ['i18nLinerHandlebars']
+        include: [path.resolve(__dirname, '../ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
+        loaders: [{
+          loader: 'i18nLinerHandlebars',
+          options: {
+            // brandable_css assets are not available in test
+            injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
+          }
+        }]
       },
       {
         test: /\.hbs$/,
-        include: [
-          /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
-          /app\/coffeescripts\/ember\/shared\/templates\//
-        ],
+        include: [path.join(root, 'ui/features/screenreader_gradebook/jst')],
         loaders: [path.join(root, 'frontend_build/emberHandlebars')]
       },
       {
@@ -282,20 +274,6 @@ module.exports = {
   },
 
   plugins: [
-    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
-    function() {
-      this.plugin('done', ({compilation}) => {
-        if (compilation.warnings && compilation.warnings.length) {
-          console.error(compilation.warnings)
-          // If there's a bad import, webpack doesn't say where.
-          // Only if we let the compilation complete do we get
-          // the callstack where the import happens
-          // If you're having problems, comment out the following
-          throw new Error('webpack build had warnings. Failing.')
-        }
-      })
-    },
-
     // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
     // debug/propType checking in prod.
@@ -316,15 +294,11 @@ module.exports = {
     // handles our custom i18n stuff
     new I18nPlugin(),
 
-    // tells webpack to look for 'compiled/foobar' at app/coffeescripts/foobar.coffee
-    // instead of public/javascripts/compiled/foobar.js
-    new CompiledReferencePlugin(),
-
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
       context: root,
-      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), { absolute: true }),
-      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions'),
+      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), {absolute: true}),
+      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions')
     }),
 
     new WebpackHooks(),
@@ -334,29 +308,57 @@ module.exports = {
     // be removed when that issue is fixed
     new webpack.IgnorePlugin(/\.flow$/),
 
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
   ].concat(
+    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
+    process.env.WEBPACK_PEDANTIC !== '0' ? function () {
+      this.plugin('done', ({compilation}) => {
+        if (compilation.warnings && compilation.warnings.length) {
+          console.error(compilation.warnings)
+          // If there's a bad import, webpack doesn't say where.
+          // Only if we let the compilation complete do we get
+          // the callstack where the import happens
+          // If you're having problems, comment out the following
+          throw new Error('webpack build had warnings. Failing.')
+        }
+      })
+    } : []
+  ).concat(
+    process.env.WEBPACK_ANALYSIS === '1' ? createBundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: process.env.WEBPACK_ANALYSIS_FILE ? (
+        path.resolve(process.env.WEBPACK_ANALYSIS_FILE)
+      ) : (
+        path.resolve(__dirname, '../tmp/webpack-bundle-analysis.html')
+      ),
+      openAnalyzer: false,
+      generateStatsFile: false,
+      statsOptions: {
+        source: false
+      }
+    }) : []
+  ).concat(
     process.env.NODE_ENV === 'test'
       ? []
       : [
-          // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-          // we load them explicitly onto the page in include_js_bundles from rails.
-          new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+        // we load them explicitly onto the page in include_js_bundles from rails.
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-          // outputs a json file so Rails knows which hash fingerprints to add
-          // to each script url and so it knows which split chunks to make a
-          // <link rel=preload ... /> for for each `js_bundle`
-          new StatsWriterPlugin({
-            filename: 'webpack-manifest.json',
-            fields: ['namedChunkGroups'],
-            transform(data) {
-              const res = {}
-              Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
-                res[key] = value.assets.filter(a => a.endsWith('.js'))
-              })
-              return JSON.stringify(res, null, 2)
-            }
-          })
-        ]
+        // outputs a json file so Rails knows which hash fingerprints to add
+        // to each script url and so it knows which split chunks to make a
+        // <link rel=preload ... /> for for each `js_bundle`
+        new StatsWriterPlugin({
+          filename: 'webpack-manifest.json',
+          fields: ['namedChunkGroups'],
+          transform(data) {
+            const res = {}
+            Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
+              res[key] = value.assets.filter(a => a.endsWith('.js'))
+            })
+            return JSON.stringify(res, null, 2)
+          }
+        })
+      ]
   )
 }

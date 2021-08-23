@@ -18,7 +18,7 @@
 
 import fakeENV from 'helpers/fakeENV'
 
-import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 
 const cyoeEnv = () => ({
   CONDITIONAL_RELEASE_SERVICE_ENABLED: true,

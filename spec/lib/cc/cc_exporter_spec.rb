@@ -28,6 +28,7 @@ describe "Common Cartridge exporting" do
   end
 
   it "should collect errors and finish running" do
+    skip("skip and fix with LS-2168")
     course = course_model
     user = user_model
     message = "fail"
@@ -318,7 +319,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
       check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
@@ -380,7 +381,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"%24IMS-CC-FILEBASE%24/media_objects/some-kaltura-id\"></a></p></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"$IMS-CC-FILEBASE$/media_objects/some-kaltura-id\"></a></p></div>"
 
       resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
       expect(resource_node).to_not be_nil
@@ -423,7 +424,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/not_actually_first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
 
@@ -433,13 +434,13 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1"})
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1">})
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
       description = doc.at_css('description').to_s
-      expect(description).not_to include 'https://example.com%24IMS-CC-FILEBASE%24'
-      expect(description).to include 'img src="%24IMS-CC-FILEBASE%24/unfiled/first.png'
+      expect(description).not_to include 'https://example.com$IMS-CC-FILEBASE$'
+      expect(description).to include 'img src="$IMS-CC-FILEBASE$/unfiled/first.png'
     end
 
     it "should not fail when answers are missing for FIMB" do
@@ -601,7 +602,7 @@ describe "Common Cartridge exporting" do
 
       # validate cc1.3 assignment xml document
       assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
-      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="%24IMS-CC-FILEBASE%24/unfiled/test.txt">what?</a>'
+      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="$IMS-CC-FILEBASE$/unfiled/test.txt">what?</a>'
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'
@@ -619,6 +620,92 @@ describe "Common Cartridge exporting" do
       expect(variant_tag.next_element.name).to eq 'file'
       html_file = variant_tag.next_element.attribute('href').value
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
+    end
+
+    context 'LTI 1.3 Assignments' do
+      subject do
+        run_export(version: version)
+        @manifest_doc
+      end
+
+      let(:assignment) do
+        @course.assignments.new(
+          name: 'test assignment',
+          submission_types: 'external_tool',
+          points_possible: 10
+        )
+      end
+
+      let(:non_assignment_link) do
+        Lti::ResourceLink.create!(
+          context: @course,
+          context_external_tool: tool,
+          custom: custom_params
+        )
+      end
+
+      let(:custom_params) { { foo: 'bar '} }
+      let(:version) { '1.1.0' }
+      let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
+      let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
+      let(:tool) { external_tool_model(context: @course, opts: { use_1_3: true }) }
+
+      before do
+        non_assignment_link
+        tool.update!(developer_key: developer_key)
+        assignment.external_tool_tag = tag
+        assignment.save!
+        assignment.primary_resource_link.update!(custom: { foo: 'assignment' })
+      end
+
+      shared_examples_for 'an export that includes lti resource links' do
+        it 'includes a "resource" element in the manifest for each link' do
+          expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+        end
+
+        it 'includes a "file" element pointing to the resource link document' do
+          resource_links = subject.css "resource[type='imsbasiclti_xmlv1p3']"
+
+          resource_links.each do |rl|
+            identifier = rl.get_attribute 'identifier'
+            expect(rl.css('file').first.get_attribute('href')).to eq "lti_resource_links/#{identifier}.xml"
+          end
+        end
+
+        context 'when an associated tool is not present' do
+          before { tool.destroy! }
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+
+        context 'when the resource link does not include custom parameters' do
+          let(:custom_params) { nil }
+
+          it 'exports resource links that have custom params and those that do not' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+          end
+        end
+
+        context 'when the resource link is not active' do
+          before do
+            Lti::ResourceLink.active.update_all(workflow_state: 'deleted')
+          end
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+      end
+
+      it_behaves_like 'an export that includes lti resource links'
+
+      context 'with common cartridge 1.3' do
+        let(:version) { '1.3' }
+
+        it_behaves_like 'an export that includes lti resource links'
+      end
     end
 
     context 'similarity detection tool associations' do

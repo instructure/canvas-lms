@@ -21,17 +21,8 @@
 module Lti
   module MembershipService
     class CourseGroupCollator < CollatorBase
-      attr_reader :role, :per_page, :page, :context, :user
 
-      def initialize(context, opts={})
-        super()
-        @role = opts[:role]
-        @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
-        @page = [opts[:page].to_i, 1].max
-        @context = context
-      end
-
-      def memberships(context: nil)
+      def memberships
         @_memberships ||= collate_memberships
       end
 
@@ -42,7 +33,7 @@ module Lti
       end
 
       def collate_memberships
-        groups.to_a.slice(0, @per_page).map do |user|
+        groups.map do |user|
           generate_membership(user)
         end
       end
@@ -52,7 +43,7 @@ module Lti
       end
 
       def scope
-        @context.groups.active
+        context.groups.active
       end
 
       def generate_member(group)

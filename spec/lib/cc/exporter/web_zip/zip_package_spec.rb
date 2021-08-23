@@ -799,6 +799,62 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{type: "file", name: "amazing_file.txt", size: 26, files: nil}]
       end
 
+      it 'should export media files linked from other linked items' do
+        media = add_file(fixture_file_upload('files/292.mp3', 'audio/mpeg'), @course, '292.mp3')
+        image =
+          add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, 'cn_image.jpg')
+        text =
+          add_file(
+            fixture_file_upload('files/amazing_file.txt', 'plain/txt'),
+            @course,
+            'amazing_file.txt'
+          )
+        page =
+          @course.wiki_pages.create!(
+            title: 'Home Page',
+            wiki: @course.wiki,
+            body:
+              "<p><iframe style=\"width: 320px; height: 14.25rem; display: inline-block;\" title=\"Audio player for 292.mp3\" data-media-type=\"audio\" src=\"/media_objects_iframe?mediahref=/files/#{media.id}/download&amp;type=audio?type=audio\" data-media-id=\"maybe\"></iframe><img src=\"/courses/#{@course.id}/files/#{image.id}/preview\" alt=\"cn_image.jpg\"</p>" \
+                "<p><a class=\"instructure_file_link instructure_scribd_file\" title=\"amazing_file.txt\" href=\"/courses/#{@course.id}/files/#{text.id}?wrap=1\" target=\"_blank\" data-canvas-previewable=\"true\">amazing_file.txt</a>&nbsp;</p>"
+          )
+        @module.content_tags.create!(content: page, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:pages].length).to eq 1
+        expect(course_data[:files]).to include(
+          { type: 'file', name: '292.mp3', size: 123716, files: nil },
+          { type: 'file', name: 'cn_image.jpg', size: 30339, files: nil },
+          { type: 'file', name: 'amazing_file.txt', size: 26, files: nil }
+        )
+      end
+
+      it 'should not blow up when exporting linked recorded media files' do
+        media_id = "m_media-id"
+        file_data = { type: 'file', name: 'video.mp4', size: 172780, files: nil }
+        att = Attachment.create!(
+          filename: 'video.mp4',
+          uploaded_data: StringIO.new('recorded stuff'),
+          folder: Folder.media_folder(@course),
+          context: @course,
+          content_type: "video/mp4"
+        )
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
+        allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
+
+        path = CGI.escape(att.full_path)
+        body = "<p><iframe style=\"width: 400px; height: 225px; display: inline-block;\" title=\"Video player for video.mp4\" data-media-type=\"video\" src=\"%24IMS-CC-FILEBASE%24/#{path}\" allowfullscreen=\"allowfullscreen\" allow=\"fullscreen\" data-media-id=\"m-mediaid\"></iframe></p>" \
+                 "<p><iframe style=\"width: 400px; height: 225px; display: inline-block;\" title=\"Video player for [Untitled Mon Jun 28 2021 14:55:55 GMT-0600 (Mountain Daylight Time)]\" data-media-type=\"video\" src=\"/media_objects_iframe/m-SbQWe5NjTGGuDLX3upVytB1jxMjNCnB?type=video\" allowfullscreen=\"allowfullscreen\" allow=\"fullscreen\" data-media-id=\"m-SbQWe5NjTGGuDLX3upVytB1jxMjNCnB\"></iframe>&nbsp;</p>"
+        page =
+          @course.wiki_pages.create!(
+            title: 'Home Page',
+            wiki: @course.wiki,
+            body: body
+          )
+        @module.content_tags.create!(content: page, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:pages].length).to eq 1
+        expect(course_data[:files]).to include(file_data)
+      end
+
       it "should handle circle-linked items" do
         assign = @course.assignments.create!(title: 'Assignment 1',
           description: "<a href=\"/courses/#{@course.id}/pages/page-1\">Link</a>")

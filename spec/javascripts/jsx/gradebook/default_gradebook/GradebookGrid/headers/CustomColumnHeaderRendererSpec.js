@@ -21,8 +21,8 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import CustomColumnHeaderRenderer from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer.js'
 
 QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
   let $container

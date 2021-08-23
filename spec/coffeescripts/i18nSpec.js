@@ -20,9 +20,9 @@
 // for a little bit though
 
 import $ from 'jquery'
-import I18n from 'i18nObj'
+import I18n from '@canvas/i18n'
 import I18nStubber from 'helpers/I18nStubber'
-import 'jquery.instructure_misc_helpers' // for $.raw
+import '@canvas/jquery/jquery.instructure_misc_helpers' // for $.raw
 
 const scope = I18n.scoped('foo')
 const t = (...args) => scope.t(...Array.from(args || []))
@@ -34,7 +34,7 @@ QUnit.module('I18n', {
   },
 
   teardown() {
-    return I18nStubber.popFrame()
+    return I18nStubber.clear()
   }
 })
 
@@ -159,7 +159,7 @@ QUnit.module('I18n localize number', {
   },
 
   teardown() {
-    return I18nStubber.popFrame()
+    return I18nStubber.clear()
   }
 })
 

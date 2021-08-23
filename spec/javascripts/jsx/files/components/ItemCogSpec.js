@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import ItemCog from 'jsx/files/ItemCog'
-import Folder from 'compiled/models/Folder'
+import ItemCog from 'ui/features/files/react/components/ItemCog.js'
+import Folder from '@canvas/files/backbone/models/Folder'
 
 const {Simulate} = TestUtils
 

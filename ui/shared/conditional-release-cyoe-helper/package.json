@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/conditional-release-cyoe-helper",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./index.js"
+}

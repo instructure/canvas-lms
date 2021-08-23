@@ -161,6 +161,50 @@ describe "Announcements API", type: :request do
         expect(json).to be_empty
       end
     end
+
+    describe "latest_only" do
+      before :once do
+        course_with_teacher :active_all => true, :user => @teacher
+        student_in_course :active_enrollment => true, :user => @student
+        @course3 = @course
+        @ann3 = @course3.announcements.build :title => "Announcement New", :message => '<p>This is the latest</p>'
+        @ann3.posted_at = 2.days.ago
+        @ann3.save!
+        old = @course3.announcements.build :title => "Announcement Old", :message => '<p>This is older</p>'
+        old.posted_at = 5.days.ago
+        old.save!
+      end
+
+      let(:start_date) { 10.days.ago.iso8601 }
+      let(:end_date) { 30.days.from_now.iso8601 }
+
+      it "only returns the latest announcement by posted date" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                                @params.merge(:context_codes => %W[course_#{@course1.id} course_#{@course2.id} course_#{@course3.id}],
+                                              start_date => start_date, :end_date => end_date, :latest_only => true))
+
+        expect(json.length).to be 3
+        expect(json.map{|a| a['id']}).to include(@anns.last[:id], @ann2[:id], @ann3[:id])
+      end
+
+      it "excludes courses not in the context_ids list" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                              @params.merge(:context_codes => %W[course_#{@course1.id} course_#{@course3.id}],
+                                            start_date => start_date, :end_date => end_date, :latest_only => true))
+
+        expect(json.length).to be 2
+        expect(json.map{|a| a['id']}).to include(@anns.last[:id], @ann3[:id])
+      end
+
+      it "works properly in conjunction with the active_only param" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                                @params.merge(:context_codes => %W[course_#{@course1.id} course_#{@course2.id} course_#{@course3.id}],
+                                              start_date => start_date, :end_date => end_date, :active_only => true, :latest_only => true))
+
+        expect(json.length).to be 2
+        expect(json.map{|a| a['id']}).to include(@anns.last[:id], @ann3[:id])
+      end
+    end
   end
 
   context "as student" do

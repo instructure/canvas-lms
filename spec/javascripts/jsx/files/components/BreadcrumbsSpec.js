@@ -20,10 +20,10 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Breadcrumbs from 'jsx/files/Breadcrumbs'
-import Folder from 'compiled/models/Folder'
+import Breadcrumbs from 'ui/features/files/react/components/Breadcrumbs.js'
+import Folder from '@canvas/files/backbone/models/Folder'
 import fakeENV from '../../../../coffeescripts/helpers/fakeENV'
-import filesEnv from 'compiled/react_files/modules/filesEnv'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 QUnit.module('Files Breadcrumbs Component', {
   setup() {

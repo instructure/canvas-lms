@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import elementToggler from 'compiled/behaviors/elementToggler'
+import elementToggler from '../../../ui/boot/initializers/activateElementToggler.js'
 
 QUnit.module('elementToggler', {
   teardown() {

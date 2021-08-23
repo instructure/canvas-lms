@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import PaginatedList from 'compiled/PaginatedList'
+import PaginatedList from 'ui/features/section/jquery/PaginatedList.js'
 
 const paginatedListFixture = `
   <h3>Paginated List Spec</h3>

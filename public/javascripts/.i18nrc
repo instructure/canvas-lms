@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "pattern": "**/*.js",
+      "processor": "js"
+    }
+  ]
+}

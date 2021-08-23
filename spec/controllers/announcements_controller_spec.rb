@@ -55,7 +55,7 @@ describe AnnouncementsController do
       get 'index', params: { :group_id => group.id }
       expect(response).to be_successful
       expect(assigns[:js_bundles].length).to eq 1
-      expect(assigns[:js_bundles].first).to include :announcements_index_v2
+      expect(assigns[:js_bundles].first).to include :announcements
       expect(assigns[:js_bundles].first).not_to include :announcements_index
     end
 
@@ -65,7 +65,7 @@ describe AnnouncementsController do
       get 'index', params: { :course_id => @course.id }
       expect(response).to be_successful
       expect(assigns[:js_bundles].length).to eq 1
-      expect(assigns[:js_bundles].first).to include :announcements_index_v2
+      expect(assigns[:js_bundles].first).to include :announcements
       expect(assigns[:js_bundles].first).not_to include :announcements_index
     end
   end

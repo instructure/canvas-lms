@@ -21,9 +21,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import _ from 'lodash'
-import axios from 'axios'
-import GradingPeriodSet from 'jsx/grading/GradingPeriodSet'
-import gradingPeriodsApi from 'compiled/api/gradingPeriodsApi'
+import axios from '@canvas/axios'
+import GradingPeriodSet from 'ui/features/account_grading_standards/react/GradingPeriodSet.js'
+import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 
 const wrapper = document.getElementById('fixtures')
 

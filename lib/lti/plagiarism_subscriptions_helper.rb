@@ -49,9 +49,9 @@ module Lti
     end
 
     def plagiarism_subscription(tool_proxy, product_family)
-      enabled = Account.site_admin.feature_enabled?(:system_and_user_generated_event_types)
-      sub = {
-        EventTypes: EVENT_TYPES,
+      {
+        SystemEventTypes: EVENT_TYPES,
+        UserEventTypes: EVENT_TYPES,
         ContextType: 'root_account',
         ContextId: tool_proxy.context.root_account.uuid,
         Format: format,
@@ -59,9 +59,6 @@ module Lti
         TransportMetadata: transport_metadata,
         AssociatedIntegrationId: tool_proxy.guid
       }.with_indifferent_access
-      sub[:SystemEventTypes] = EVENT_TYPES if enabled
-      sub[:UserEventTypes] = EVENT_TYPES if enabled
-      sub
     end
 
     def destroy_subscription(subscription_id)

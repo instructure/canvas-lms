@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import ContentFilter from 'jsx/gradebook/default_gradebook/components/content-filters/ContentFilter'
+import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {

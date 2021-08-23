@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -376,6 +378,8 @@ class SisImportsApiController < ApplicationController
   #
   # @argument created_since [Optional, DateTime]
   #   If set, only shows imports created after the specified date (use ISO8601 format)
+  # @argument created_before [Optional, DateTime]
+  #   If set, only shows imports created before the specified date (use ISO8601 format)
   #
   # @argument workflow_state[] [String, "initializing"|"created"|"importing"|"cleanup_batch"|"imported"|"imported_with_messages"|"aborted"|"failed"|"failed_with_messages"|"restoring"|"partially_restored"|"restored"]
   #   If set, only returns imports that are in the given state.
@@ -390,6 +394,9 @@ class SisImportsApiController < ApplicationController
       scope = @account.sis_batches.order('created_at DESC')
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
+      end
+      if (created_before = CanvasTime.try_parse(params[:created_before]))
+        scope = scope.where("created_at < ?", created_before)
       end
 
       state = Array(params[:workflow_state])&['initializing', 'created', 'importing', 'cleanup_batch', 'imported', 'imported_with_messages',
@@ -506,6 +513,11 @@ class SisImportsApiController < ApplicationController
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
   #
+  # @argument update_sis_id_if_login_claimed [Boolean]
+  #   This option, if present, will override the old (or non-existent)
+  #   non-matching SIS ID with the new SIS ID in the upload,
+  #   if a pseudonym is found from the login field and the SIS ID doesn't match.
+  #
   # @argument diffing_data_set_identifier [String]
   #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
   #   comparing this set of CSVs to the previous set that has the same data set
@@ -521,6 +533,14 @@ class SisImportsApiController < ApplicationController
   # @argument diffing_drop_status [String, "deleted"|"completed"|"inactive"]
   #   If diffing_drop_status is passed, this SIS import will use this status for
   #   enrollments that are not included in the sis_batch. Defaults to 'deleted'
+  #
+  # @argument batch_mode_enrollment_drop_status [String, "deleted"|"completed"|"inactive"]
+  #   If batch_mode_enrollment_drop_status is passed, this SIS import will use
+  #   this status for enrollments that are not included in the sis_batch. This
+  #   will have an effect if multi_term_batch_mode is set. Defaults to 'deleted'
+  #   This will still mark courses and sections that are not included in the
+  #   sis_batch as deleted, and subsequently enrollments in the deleted courses
+  #   and sections as deleted.
   #
   # @argument change_threshold [Integer]
   #   If set with batch_mode, the batch cleanup process will not run if the
@@ -628,6 +648,7 @@ class SisImportsApiController < ApplicationController
         end
 
         batch.options[:skip_deletes] = value_to_boolean(params[:skip_deletes])
+        batch.options[:update_sis_id_if_login_claimed] = value_to_boolean(params[:update_sis_id_if_login_claimed])
 
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true
@@ -638,6 +659,10 @@ class SisImportsApiController < ApplicationController
         if params[:diffing_drop_status].present?
           batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
+        end
+        if params[:batch_mode_enrollment_drop_status].present?
+          batch.options[:batch_mode_enrollment_drop_status] = (Array(params[:batch_mode_enrollment_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
+          return render json: {message: 'Invalid batch_mode_enrollment_drop_status'}, status: :bad_request unless batch.options[:batch_mode_enrollment_drop_status]
         end
       end
 

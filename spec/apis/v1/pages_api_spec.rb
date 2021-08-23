@@ -874,7 +874,7 @@ describe "Pages API", type: :request do
                    :url => @hidden_page.url },
                  { :wiki_page => { :body => "<p>lolcats</p><script>alert('what')</script>" }})
         @hidden_page.reload
-        expect(@hidden_page.body).to eq "<p>lolcats</p>alert('what')"
+        expect(@hidden_page.body).to eq "<p>lolcats</p>"
       end
 
       it 'should process body with process_incoming_html_content' do

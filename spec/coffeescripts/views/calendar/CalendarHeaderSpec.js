@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import CalendarHeader from 'compiled/views/calendar/CalendarHeader'
+import CalendarHeader from 'ui/features/calendar/backbone/views/CalendarHeader.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CalendarHeader', {

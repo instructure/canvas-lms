@@ -1,0 +1,97 @@
+{{#if course_home}}
+  <h2 class="screenreader-only">
+    {{#t "assignments"}}Assignments{{/t}}
+  </h2>
+{{else}}
+  <h1 class="screenreader-only">
+    {{#t "assignments"}}Assignments{{/t}}
+  </h1>
+{{/if}}
+
+{{#if bulkEditMode}}
+  <div id="bulkEditRoot"></div>
+{{else}}
+
+{{#if ENV.PERMISSIONS.manage}}
+  <div tabindex="0" class="drag_and_drop_warning screenreader-only">
+    {{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}
+  </div>
+{{/if}}
+<div class="header-bar">
+  <div class="header-bar-left ic-Form-control assignment-search">
+    <div class="ic-Multi-input">
+      {{#if ENV.HAS_GRADING_PERIODS}}
+        <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
+          <option value="all">{{#t}}All Grading Periods{{/t}}</option>
+          {{#each ENV.active_grading_periods}}
+            <option id="grading_period_{{id}}" value="{{@index}}">{{title}}</option>
+          {{/each}}
+        </select>
+      {{/if}}
+      <label for="search_term" class="screenreader-only">
+        {{#t "search_for_assignment"}}Search for Assignment{{/t}}
+      </label>
+      <input
+        class="ic-Input"
+        id="search_term"
+        name="search_term"
+        type="search"
+        value=""
+        disabled
+        placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+      >
+    </div>
+  </div>
+
+  <div class="header-bar-right">
+    {{#ifAny ENV.PERMISSIONS.manage_assignments ENV.PERMISSIONS.manage_assignments_add}}
+      {{#if ENV.PERMISSIONS.manage_assignments_add}}
+        {{#if ENV.QUIZ_LTI_ENABLED}}
+          <span class="new_quiz_lti_wrapper">
+            <a
+              href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
+              class="new_quiz_lti btn icon-plus"
+              title='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
+              aria-label='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
+            >{{#t "add_quiz_lti"}}Quiz/Test{{/t}}</a>
+          </span>
+        {{/if}}
+
+        <button
+          class="btn Button"
+          id="addGroup"
+          title='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
+          aria-label='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
+        ><i class="icon-plus">{{#t "add_group"}}Group{{/t}}</i></button>
+
+        <a
+          href="{{ENV.URLS.new_assignment_url}}"
+          class="new_assignment btn btn-primary icon-plus"
+          title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
+          aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
+        >{{#t "add_assignment"}}Assignment{{/t}}</a>
+      {{/if}}
+
+      {{#if ENV.PERMISSIONS.manage_assignments}}
+        <span id="settingsMountPoint"></span>
+      {{/if}}
+    {{else}}
+      <div data-view="showBy"></div>
+    {{/ifAny}}
+  </div>
+</div>
+
+<div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
+<div id="copy-to-mount-point" />
+<div id="send-to-mount-point" />
+<div id="external-tool-mount-point" />
+
+{{#if ENV.PERMISSIONS.manage_assignments_add}}
+  <form data-view="createGroup" class="form-dialog"></form>
+{{/if}}
+{{#if ENV.PERMISSIONS.manage_assignments}}
+  <form data-view="assignmentSettings" class="form-dialog"></form>
+  <form data-view="assignmentSyncSettings" class="form-dialog"></form>
+{{/if}}
+
+{{/if}}

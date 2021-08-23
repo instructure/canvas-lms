@@ -30,7 +30,7 @@ describe "shared/_originality_score_icon" do
   def render_element(data:, additional_params: {})
     params = { plagiarism_data: data }.merge(additional_params)
     render partial: "shared/originality_score_icon", locals: params
-    Nokogiri::HTML(response.body)
+    Nokogiri::HTML5(response.body)
   end
 
   describe "similarity icon" do

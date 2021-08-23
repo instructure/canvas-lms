@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameSwitchmanShardsFkIfNecessary < ActiveRecord::Migration[5.1]
   tag :predeploy
 

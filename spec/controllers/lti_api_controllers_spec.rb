@@ -86,7 +86,6 @@ describe LtiApiController, type: :request do
     post "https://www.example.com#{req.path}",
       params: req.body,
       headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
-
   end
 
   def source_id
@@ -111,6 +110,12 @@ describe LtiApiController, type: :request do
   it "should require a content-type of application/xml" do
     make_call('content-type' => 'application/other')
     assert_status(415)
+  end
+
+  it "fail when the XML encoding is invalid" do
+    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    make_call('body' => body)
+    check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
   end
 
   context "OAuth Requests" do
@@ -264,7 +269,7 @@ XML
   end
 
   def check_failure(failure_type = 'unsupported', error_message = nil)
-    expect(response).to be_successful
+    expect(response.code.to_i).to eq 422
     expect(response.media_type).to eq 'application/xml'
     xml = Nokogiri::XML.parse(response.body)
     expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
@@ -349,7 +354,7 @@ XML
 
     it "should fail if no score and not submission data" do
       make_call('body' => replace_result(score: nil, sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^No score given/
@@ -359,7 +364,7 @@ XML
 
     it "should fail if bad score given" do
       make_call('body' => replace_result(score: '1.5', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Score is not between 0 and 1/
@@ -370,7 +375,7 @@ XML
     it "should fail if assignment has no points possible" do
       @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Assignment has no points possible\./
@@ -393,7 +398,7 @@ XML
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       submissions = @assignment.submissions.where(user_id: @student).to_a
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
@@ -431,9 +436,9 @@ to because the assignment has no points possible.
     end
 
     context "pass_fail zero point assignments" do
-      it "should succeed with incomplete grade when score < 1" do
+      it "should succeed with incomplete grade when score = 0" do
         @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
-        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        make_call('body' => replace_result(score: '0', sourceid: nil))
         check_success
 
         verify_xml(response)
@@ -447,7 +452,7 @@ to because the assignment has no points possible.
         expect(submission.grade).to eq 'incomplete'
       end
 
-      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
+      it "should succeed with complete grade when score < 1 for a 0 point assignment" do
         @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
@@ -460,7 +465,7 @@ to because the assignment has no points possible.
         expect(submission).to be_submitted_at
         expect(submission.submission_type).to eql 'external_tool'
         expect(submission.score).to eq 0
-        expect(submission.grade).to eq 'incomplete'
+        expect(submission.grade).to eq 'complete'
       end
 
       it "should succeed with complete grade when score = 1" do

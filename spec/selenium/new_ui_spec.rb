@@ -19,10 +19,12 @@
 
 require_relative 'common'
 require_relative 'helpers/files_common'
+require_relative 'rcs/pages/rce_next_page'
 
 describe 'new ui' do
   include_context "in-process server selenium tests"
   include FilesCommon
+  include RCENextPage
 
   context 'as teacher' do
 
@@ -116,11 +118,8 @@ describe 'new ui' do
 
     it 'should not override high contrast theme', priority: "2", test_id: 244898 do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
+      @user.enable_feature!('high_contrast')
       get '/profile/settings'
-      f('.high_contrast .ic-Super-toggle__switch').click
-      wait_for_ajaximations
-      f = FeatureFlag.find_by(feature: 'high_contrast')
-      expect(f.state).to eq 'on'
       menu_link = f('.profile_settings.active')
       expect(menu_link.css_value('border-left')).to eq('2px solid rgb(45, 59, 69)')
       expect(menu_link.css_value('color')).to eq('rgba(45, 59, 69, 1)')
@@ -144,7 +143,7 @@ describe 'new ui' do
     it 'should not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
-      f('div#mceu_20.mce-widget.mce-btn').click
+      select_math_equation_from_toolbar
       wait_for_ajaximations
       expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed
     end

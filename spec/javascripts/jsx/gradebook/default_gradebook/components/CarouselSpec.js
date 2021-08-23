@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Carousel from 'jsx/gradebook/default_gradebook/components/Carousel'
+import Carousel from 'ui/features/gradebook/react/default_gradebook/components/Carousel.js'
 
 function mountComponent(props) {
   const defaultProps = {

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadFileView from 'compiled/views/profiles/UploadFileView'
-import BlobFactory from 'compiled/util/BlobFactory'
+import UploadFileView from '@canvas/avatar-dialog-view/backbone/views/UploadFileView'
+import BlobFactory from '@canvas/avatar-dialog-view/BlobFactory'
 
 QUnit.module('UploadFileView', {
   setup() {

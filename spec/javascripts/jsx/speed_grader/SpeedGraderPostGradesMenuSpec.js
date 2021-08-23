@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
+import SpeedGraderPostGradesMenu from 'ui/features/speed_grader/react/SpeedGraderPostGradesMenu.js'
 
 QUnit.module('SpeedGraderPostGradesMenu', hooks => {
   let $container

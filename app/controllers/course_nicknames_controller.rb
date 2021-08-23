@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -176,7 +178,7 @@ class CourseNicknamesController < ApplicationController
     {
       course_id: course.id,
       name: course.name,
-      nickname: nickname || course.nickname_for(user, nil)
+      nickname: nickname || course.nickname_for(user, nil, prefer_friendly_name: false)
     }
   end
 end

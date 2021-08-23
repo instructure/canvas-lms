@@ -36,7 +36,7 @@ describe ContextExternalToolsHelper do
 
     before :each do
       html = helper.external_tools_menu_items(@mock_tools_hash, @menu_item_options)
-      @parsed_html = Nokogiri::HTML::DocumentFragment.parse(html)
+      @parsed_html = Nokogiri::HTML5.fragment(html)
     end
 
     it "returns the right number of tool links" do

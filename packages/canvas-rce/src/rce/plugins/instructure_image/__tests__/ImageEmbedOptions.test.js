@@ -373,35 +373,21 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
     })
 
     describe('.isDecorativeImage', () => {
-      describe('when "data-is-decorative" is "true" on the image element', () => {
-        beforeEach(() => {
-          $image.setAttribute('data-is-decorative', true)
-        })
-
+      describe('when have some attributes on the image element', () => {
         it('is true when the image has no alt text', () => {
           $image.alt = ''
           expect(getImageOptions().isDecorativeImage).toEqual(true)
         })
-      })
-
-      describe('when "data-is-decorative" is "false" on the image element', () => {
-        beforeEach(() => {
-          $image.setAttribute('data-is-decorative', false)
-        })
-
-        it('is false when the image has no alt text', () => {
-          $image.alt = ''
-          expect(getImageOptions().isDecorativeImage).toEqual(false)
-        })
 
         it('is false when the image has alt text', () => {
+          $image.alt = 'Example image'
           expect(getImageOptions().isDecorativeImage).toEqual(false)
         })
       })
 
       it('is blank when absent on the image', () => {
         $image.alt = ''
-        expect(getImageOptions().isDecorativeImage).toEqual(false)
+        expect(getImageOptions().isDecorativeImage).toEqual(true)
       })
 
       describe('when role="presentation"', () => {
@@ -412,6 +398,26 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
         it('is true', () => {
           $image.alt = ''
           expect(getImageOptions().isDecorativeImage).toEqual(true)
+        })
+      })
+
+      describe('when role != "presentation"', () => {
+        beforeEach(() => {
+          $image.setAttribute('role', 'menuitem')
+        })
+
+        it('is false', () => {
+          expect(getImageOptions().isDecorativeImage).toEqual(false)
+        })
+      })
+
+      describe('when there is no role', () => {
+        beforeEach(() => {
+          $image.removeAttribute('role')
+        })
+
+        it('is false', () => {
+          expect(getImageOptions().isDecorativeImage).toEqual(false)
         })
       })
     })

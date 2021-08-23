@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAction, createActions} from 'jsx/conditional_release_stats/helpers/actions'
+import {createAction, createActions} from '@canvas/conditional-release-stats/react/helpers/actions'
 
 QUnit.module('Conditional Release Stats action helpers')
 

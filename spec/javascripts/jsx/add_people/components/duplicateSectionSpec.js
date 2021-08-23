@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import DuplicateSection from 'jsx/add_people/components/duplicate_section'
+import DuplicateSection from '@canvas/add-people/react/components/duplicate_section'
 
 QUnit.module('DuplicateSection')
 

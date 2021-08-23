@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -269,31 +271,35 @@ class CommunicationChannelsController < ApplicationController
       end
 
       # load merge opportunities
-      merge_users = cc.merge_candidates
-      merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
-      observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
-      merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
-      # remove users that don't have a pseudonym for this account, or one can't be created
-      merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
-      @merge_opportunities = []
-      merge_users.each do |user|
-        account_to_pseudonyms_hash = {}
-        root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
-        if root_account_pseudonym
-          @merge_opportunities << [user, [root_account_pseudonym]]
-        else
-          user.all_active_pseudonyms.each do |p|
-            # populate reverse association
-            p.user = user
-            (account_to_pseudonyms_hash[p.account] ||= []) << p
+      if @domain_root_account.feature_enabled?(:self_service_user_merge)
+        merge_users = cc.merge_candidates
+        merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
+        observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
+        merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
+        # remove users that don't have a pseudonym for this account, or one can't be created
+        merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
+        @merge_opportunities = []
+        merge_users.each do |user|
+          account_to_pseudonyms_hash = {}
+          root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
+          if root_account_pseudonym
+            @merge_opportunities << [user, [root_account_pseudonym]]
+          else
+            user.all_active_pseudonyms.each do |p|
+              # populate reverse association
+              p.user = user
+              (account_to_pseudonyms_hash[p.account] ||= []) << p
+            end
+            @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
+              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
+            end]
+            @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
-          @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
-          end]
-          @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
+        @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
+      else
+        @merge_opportunities = []
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 
@@ -331,7 +337,7 @@ class CommunicationChannelsController < ApplicationController
         return unless @merge_opportunities.empty?
         failed = true
       elsif cc.active?
-        pseudonym = @root_account.pseudonyms.active.where(:user_id => @user).exists?
+        pseudonym = @root_account.pseudonyms.active_only.where(:user_id => @user).exists?
         if @user.pre_registered? && pseudonym
           @user.register
           return redirect_with_success_flash
@@ -341,12 +347,12 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.active_only.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(:user => @user, :unique_id => cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
         # up with something new
-        @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.by_unique_id(@pseudonym.unique_id).exists?
+        @pseudonym.unique_id = '' if @pseudonym&.new_record? && @root_account.pseudonyms.active_only.by_unique_id(@pseudonym.unique_id).exists?
 
         # Have to either have a pseudonym to register with, or be looking at merge opportunities
         return render :confirm_failed, status: :bad_request if !@pseudonym && @merge_opportunities.empty?

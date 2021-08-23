@@ -17343,6 +17343,7 @@ he:
       add_to_module: "הוספת %{item} ל *מודול*"
       assignment_item: משימה
       assignment_item_select_label: "בחירת המשימה אותה רוצים לשייך, או הוספת משימה ע\"י בחירת \"משימה חדשה\"."
+      assignment_notice: "בחירת המשימה אותה רוצים לשייך למודול זה, או הוספת משימה ע\"י בחירת \"משימה חדשה\"."
       content_page_item: דף
       discussion_item: דיון
       discussion_topic_select_label: "בחירת הנושא אותו רוצים לשייך, או הוספת הנושא ע\"י בחירת \"נושא חדש\"."

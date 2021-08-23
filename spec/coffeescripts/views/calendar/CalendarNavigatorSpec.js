@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import CalendarNavigator from 'compiled/views/calendar/CalendarNavigator'
+import CalendarNavigator from 'ui/features/calendar/backbone/views/CalendarNavigator.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CalendarNavigator', {

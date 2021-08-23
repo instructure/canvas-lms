@@ -127,7 +127,9 @@ module Importers
         end
 
         migration.update_import_progress(35)
-        question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+        unless migration.quizzes_next_banks_migration?
+          question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+        end
         Importers::GroupImporter.process_migration(data, migration); migration.update_import_progress(48)
         Importers::LearningOutcomeImporter.process_migration(data, migration); migration.update_import_progress(50)
         Importers::RubricImporter.process_migration(data, migration); migration.update_import_progress(52)
@@ -159,6 +161,7 @@ module Importers
         migration.update_import_progress(85)
         Importers::WikiPageImporter.process_migration_course_outline(data, migration)
         Importers::CalendarEventImporter.process_migration(data, migration)
+        Importers::LtiResourceLinkImporter.process_migration(data, migration)
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])

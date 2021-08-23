@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -48,7 +50,7 @@ module Lti
 #           "type": "string"
 #         },
 #         "submission_type": {
-#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
 #           "example": "online_text_entry",
 #           "type": "string",
 #           "allowableValues": {
@@ -56,7 +58,8 @@ module Lti
 #               "online_text_entry",
 #               "online_url",
 #               "online_upload",
-#               "media_recording"
+#               "media_recording",
+#               "student_annotation"
 #             ]
 #           }
 #         },

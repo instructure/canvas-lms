@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -47,6 +49,7 @@ if settings.present?
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
       Rack::QueryParser::InvalidParameterError
+      PG::UnableToSend
     }
   end
 
@@ -58,7 +61,7 @@ if settings.present?
     # This error can be caused by LTI tools.
     SentryProxy.register_ignorable_error("Grade pass back failure")
 
-    Canvas::Errors.register!(:sentry_notification) do |exception, data, level|
+    CanvasErrors.register!(:sentry_notification) do |exception, data, level|
       setting = Setting.get("sentry_error_logging_enabled", 'true')
       SentryProxy.capture(exception, data, level) if setting == 'true'
     end

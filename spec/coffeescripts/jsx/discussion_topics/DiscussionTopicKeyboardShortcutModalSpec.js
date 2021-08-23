@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
+import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal.js'
 import React from 'react'
 import {mount} from 'enzyme'
 

@@ -1,6 +1,6 @@
-# syntax = docker/dockerfile:1.0-experimental
+# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
 
-FROM busybox AS cache-helper-collect-gems
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-gems
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -14,12 +14,22 @@ RUN --mount=target=/tmp/src \
     -name "Gemfile" -o \
     -name "Gemfile.d" -o \
     -name "Gemfile.lock" -o \
+    -name "Gemfile.lock.next" -o \
+    -name "*.gemspec" -o \
+    -name "gem_version.rb" -o \
+    -name "version.rb" \
+  \) -exec cp --parents -rf {} /tmp/dst \; && \
+  find engines \( \
+    -name "Gemfile" -o \
+    -name "Gemfile.d" -o \
+    -name "Gemfile.lock" -o \
+    -name "Gemfile.lock.next" -o \
     -name "*.gemspec" -o \
     -name "gem_version.rb" -o \
     -name "version.rb" \
   \) -exec cp --parents -rf {} /tmp/dst \;
 
-FROM busybox AS cache-helper-collect-yarn
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-yarn
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -32,12 +42,13 @@ RUN --mount=target=/tmp/src \
   find \
     gems/canvas_i18nliner \
     gems/plugins/* \
+    ui/shared/* \
     packages/* \
     \
     -name 'package.json' \
     -exec cp --parents {} /tmp/dst \;
 
-FROM busybox AS cache-helper-collect-packages
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-packages
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -47,7 +58,7 @@ RUN --mount=target=/tmp/src \
     \
     /tmp/dst
 
-FROM busybox AS cache-helper-collect-webpack
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-webpack
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -69,11 +80,13 @@ RUN --mount=target=/tmp/src \
     -path "*/app/views/jst" -o \
     -path "*/public" -o \
   \) -exec cp -rf --parents {} /tmp/dst \; && \
+  find gems/config_file \
+    -not -path "gems/config_file" \
+    -not -path "gems/config_file/spec" \
+    -not -path "gems/config_file/spec/*" \
+    -exec cp -rf --parents {} /tmp/dst \; && \
   cp --parents -rf \
-    app/coffeescripts \
-    app/jsx \
     app/stylesheets \
-    app/views/jst \
     bin \
     config/environments \
     config/locales \
@@ -82,6 +95,7 @@ RUN --mount=target=/tmp/src \
     lib/rake \
     lib/tasks \
     public \
+    ui \
     \
     config/application.rb \
     config/boot.rb \
@@ -89,20 +103,18 @@ RUN --mount=target=/tmp/src \
     config/browsers.yml \
     config/canvas_rails_switcher.rb \
     config/environment.rb \
-    config/initializers/plugin_symlinks.rb \
     config/initializers/json.rb \
     config/initializers/revved_asset_urls.rb \
     db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb \
+    gems/plugins/.i18n* \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
     lib/canvas_yaml.rb \
-    lib/config_file.rb \
     lib/logging_filter.rb \
     lib/request_cache.rb \
     lib/temp_cache.rb \
     lib/canvas/cdn.rb \
     lib/canvas/reloader.rb \
-    .bowerrc \
     .i18nignore \
     .i18nrc \
     Rakefile \

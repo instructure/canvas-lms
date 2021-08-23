@@ -1,0 +1,11 @@
+@startuml
+Browser --> Controller: GET request for tool launch
+Controller -> "LTI Outbound Adapter": Construct a "tool launch" object
+"LTI Outbound Adapter" -> "LTI Outbound Adapter": Populate gem models
+"LTI Outbound Adapter" -> "LTI Outbound Gem": Generate "tool launch" object
+"LTI Outbound Gem" -> "IMS LTI Gem": Sign launch parameters in "tool launch" object
+"IMS LTI Gem" -> "LTI Outbound Gem": Signed launch parameters
+"LTI Outbound Gem" -> "LTI Outbound Adapter": Complete "tool launch" object with signed launch parameters
+"LTI Outbound Adapter" -> Controller: Complete "tool launch" object with signed launch parameters
+Controller --> Browser: Auto-posting HTML form with launch params that targets an iframe
+@enduml

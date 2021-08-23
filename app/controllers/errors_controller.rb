@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -155,7 +157,7 @@ class ErrorsController < ApplicationController
       end
       report.backtrace = backtrace
       report.http_env ||= Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
-      report.request_context_id = RequestContextGenerator.request_id
+      report.request_context_id = RequestContext::Generator.request_id
       report.assign_data(error)
       report.save
       report.delay.send_to_external

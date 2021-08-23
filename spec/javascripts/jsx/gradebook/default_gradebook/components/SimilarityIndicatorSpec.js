@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SimilarityIndicator from 'jsx/gradebook/default_gradebook/GradebookGrid/editors/SimilarityIndicator'
+import SimilarityIndicator from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/SimilarityIndicator.js'
 
 QUnit.module('SimilarityIndicator', moduleHooks => {
   let $container

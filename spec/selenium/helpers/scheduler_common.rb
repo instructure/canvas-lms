@@ -175,12 +175,6 @@ module SchedulerCommon
     expect(f('.ag-location')).to include_text(location_name)
   end
 
-  def open_edit_dialog
-    driver.action.move_to(f('.appointment-group-item')).perform
-    click_al_option('.edit_link')
-    wait_for_ajaximations
-  end
-
   def open_edit_appointment_group_event_dialog
     f('.agenda-event__item .agenda-event__item-container').click
     expect(f('.edit_event_link')).to be_displayed

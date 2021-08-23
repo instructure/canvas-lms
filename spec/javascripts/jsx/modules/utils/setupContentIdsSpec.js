@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import setupContentIds from 'jsx/modules/utils/setupContentIds'
+import setupContentIds from '@canvas/context-modules/jquery/setupContentIds'
 
 QUnit.module('Modules Utilities: setupContentIds')
 

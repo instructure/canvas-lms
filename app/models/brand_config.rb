@@ -195,9 +195,9 @@ class BrandConfig < ActiveRecord::Base
     end
   end
 
-  def sync_to_s3_and_save_to_account!(progress, account_id)
+  def sync_to_s3_and_save_to_account!(progress, account_or_id)
     save_and_sync_to_s3!(progress)
-    account = Account.find(account_id)
+    account = account_or_id.is_a?(Account) ? account_or_id : Account.find(account_or_id)
     old_md5 = account.brand_config_md5
     account.brand_config_md5 = md5
     account.save!
@@ -205,9 +205,13 @@ class BrandConfig < ActiveRecord::Base
     progress&.increment_completion!(1)
   end
 
-  def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_id)
+  def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_or_id)
     save_and_sync_to_s3!(progress)
-    shared_brand_config = SharedBrandConfig.find(shared_brand_config_id)
+    shared_brand_config = if shared_brand_config_or_id.is_a?(SharedBrandConfig)
+        shared_brand_config_or_id
+      else
+        SharedBrandConfig.find(shared_brand_config_or_id)
+      end
     old_md5 = shared_brand_config.brand_config_md5
     shared_brand_config.brand_config_md5 = md5
     shared_brand_config.save!

@@ -17,10 +17,10 @@
  */
 
 import {isUndefined} from 'lodash'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import OutcomeResultCollection from 'compiled/collections/OutcomeResultCollection'
-import OutcomeLineGraphView from 'compiled/views/grade_summary/OutcomeLineGraphView'
-import tz from 'timezone'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
+import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView.coffee'
+import tz from '@canvas/timezone'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OutcomeLineGraphViewSpec', {

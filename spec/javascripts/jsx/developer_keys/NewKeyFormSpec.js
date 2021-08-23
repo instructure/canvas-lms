@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
+import DeveloperKeyFormFields from 'ui/features/developer_keys_v2/react/NewKeyForm.js'
 import fakeENV from 'helpers/fakeENV'
 import {mount} from 'enzyme'
 
@@ -164,5 +164,49 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
     />
   )
   ok(wrapper.find('Scopes').exists())
+  wrapper.unmount()
+})
+
+test('render a not require `Redirect URIs:` field if isRedirectUriRequired is false', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey
+      isRedirectUriRequired={false}
+    />
+  )
+
+  const match = wrapper.html().match(new RegExp(/<span.*>Redirect URIs:<\/span>/))
+
+  ok(match)
+
+  wrapper.unmount()
+})
+
+test('render a require `* Redirect URIs:` field if isRedirectUriRequired is true', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey
+      isRedirectUriRequired
+    />
+  )
+
+  const match1 = wrapper.html().match(new RegExp(/<span class=.*>Redirect URIs:<\/span>/))
+
+  notOk(match1)
+
+  const match2 = wrapper.html().match(new RegExp(/<span class=.*>* Redirect URIs:<\/span>/))
+
+  ok(match2)
+
   wrapper.unmount()
 })

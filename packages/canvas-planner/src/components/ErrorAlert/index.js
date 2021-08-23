@@ -17,12 +17,14 @@
  */
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+import {ThemeablePropTypes} from '@instructure/ui-themeable'
 import {Alert} from '@instructure/ui-alerts'
 
 export default class ErrorAlert extends Component {
   static propTypes = {
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Error)]),
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    margin: ThemeablePropTypes.spacing
   }
 
   static defaultProps = {
@@ -40,7 +42,7 @@ export default class ErrorAlert extends Component {
 
   render() {
     return (
-      <Alert variant="error" margin="small">
+      <Alert variant="error" margin={this.props.margin || 'small'}>
         {this.props.children}
         {this.renderDetail()}
       </Alert>

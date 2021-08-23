@@ -19,11 +19,15 @@
 
 require_relative '../common'
 require_relative '../helpers/gradebook_common'
+require_relative '../helpers/wiki_and_tiny_common'
+require_relative 'pages/rce_next_page'
 
 
 describe 'Canvadoc' do
   include_context "in-process server selenium tests"
   include GradebookCommon
+  include WikiAndTinyCommon
+  include RCENextPage
 
   before :once do
     PluginSetting.create! :name => 'canvadocs',
@@ -50,6 +54,7 @@ describe 'Canvadoc' do
 
   context 'as an admin' do
     before :each do
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
       site_admin_logged_in
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
@@ -74,14 +79,10 @@ describe 'Canvadoc' do
       file.context = @course
       file.save!
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fj('[role="presentation"]:contains("Files")').click
-      fj("aside li:contains('unfiled')").click
-      wait_for_ajaximations
-      fj("aside button:contains('some test file')").click
-      wait_for_ajaximations
-      f(".btn-primary").click
-      wait_for_ajaximations
-      expect(f(".file_preview_link")).to be_present
+      add_file_to_rce_next
+      force_click('form.edit-form button.submit')
+      wait_for_ajax_requests
+      expect(fln("text_file.txt")).to be_displayed
     end
   end
 end

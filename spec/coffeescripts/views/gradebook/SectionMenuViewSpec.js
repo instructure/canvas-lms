@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import SectionMenuView from 'jsx/gradebook/views/SectionMenuView'
-import 'vendor/jquery.ba-tinypubsub'
+import SectionMenuView from 'ui/features/learning_mastery/backbone/views/SectionMenuView.js'
+import 'jquery-tinypubsub'
 
 const sections = [
   {

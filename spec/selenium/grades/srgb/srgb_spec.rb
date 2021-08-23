@@ -174,6 +174,7 @@ describe "Screenreader Gradebook" do
     SRGB.default_grade.click
     replace_content(grading_value, assign1_default_points)
     button_type_submit.click
+    accept_alert
 
     get default_gradebook
     expect(Gradebook::Cells.get_grade(@students[0], @assign1)).to eq('1')

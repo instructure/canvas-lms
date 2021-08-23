@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,19 +24,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
   def self.up
     connection.transaction(:requires_new => true) do
-      begin
-        execute("CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA #{connection.shard.name}")
-      rescue ActiveRecord::StatementInvalid
-        raise ActiveRecord::Rollback
-      end
+      create_extension(:pg_collkey, schema: connection.shard.name, if_not_exists: true)
+    rescue ActiveRecord::StatementInvalid
+      raise ActiveRecord::Rollback
     end
 
     connection.transaction(:requires_new => true) do
-      begin
-        execute("CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA #{connection.shard.name}")
-      rescue ActiveRecord::StatementInvalid
-        raise ActiveRecord::Rollback
-      end
+      create_extension(:pg_trgm, schema: connection.shard.name, if_not_exists: true)
+    rescue ActiveRecord::StatementInvalid
+      raise ActiveRecord::Rollback
     end
 
     # everything else is alphabetical,
@@ -558,7 +556,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "attachments", ["user_id"], :name => "index_attachments_on_user_id"
     add_index "attachments", ["workflow_state", "updated_at"], :name => "index_attachments_on_workflow_state_and_updated_at"
     execute %{create index index_attachments_on_root_attachment_id_not_null on #{Attachment.quoted_table_name} (root_attachment_id) where root_attachment_id is not null}
-    if collkey = connection.extension_installed?(:pg_collkey)
+    if collkey = connection.extension(:pg_collkey)&.schema
       execute("CREATE INDEX index_attachments_on_folder_id_and_file_state_and_display_name ON #{Attachment.quoted_table_name} (folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 0, true)) WHERE folder_id IS NOT NULL")
     else
       execute("CREATE INDEX index_attachments_on_folder_id_and_file_state_and_display_name ON #{Attachment.quoted_table_name} (folder_id, file_state, CAST(LOWER(replace(display_name, '\\', '\\\\')) AS bytea)) WHERE folder_id IS NOT NULL")
@@ -726,7 +724,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "communication_channels", ["pseudonym_id", "position"]
     add_index "communication_channels", ["user_id", "position"]
     connection.execute("CREATE INDEX index_communication_channels_on_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (LOWER(path), path_type)")
-    if (trgm = connection.extension_installed?(:pg_trgm))
+    if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :communication_channels, "lower(path) #{trgm}.gist_trgm_ops", name: "index_trgm_communication_channels_path", using: :gist
     end
     add_index :communication_channels, :confirmation_code
@@ -1088,7 +1086,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :courses, [:self_enrollment_code], :unique => true, :where => "self_enrollment_code IS NOT NULL"
     add_index :courses, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
     add_index :courses, :wiki_id, where: "wiki_id IS NOT NULL"
-    if (trgm = connection.extension_installed?(:pg_trgm))
+    if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :courses, "LOWER(name) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_name", using: :gist
       add_index :courses, "LOWER(course_code) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_course_code", using: :gist
       add_index :courses, "LOWER(sis_source_id) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_sis_source_id", using: :gist
@@ -2374,7 +2372,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "pseudonyms", ["persistence_token"], :name => "index_pseudonyms_on_persistence_token"
     add_index "pseudonyms", ["single_access_token"], :name => "index_pseudonyms_on_single_access_token"
     add_index "pseudonyms", ["user_id"], :name => "index_pseudonyms_on_user_id"
-    if (trgm = connection.extension_installed?(:pg_trgm))
+    if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :pseudonyms, "lower(sis_user_id) #{trgm}.gist_trgm_ops", name: "index_trgm_pseudonyms_sis_user_id", using: :gist
       add_index :pseudonyms, "lower(unique_id) #{trgm}.gist_trgm_ops", name: "index_trgm_pseudonyms_unique_id", using: :gist
     end
@@ -3093,12 +3091,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], :name => "index_users_on_avatar_state_and_avatar_image_updated_at"
     add_index "users", ["uuid"], :name => "index_users_on_uuid"
-    if (collkey = connection.extension_installed?(:pg_collkey))
+    if (collkey = connection.extension(:pg_collkey)&.schema)
       execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', false, 0, true))")
     else
       execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea))")
     end
-    if (trgm = connection.extension_installed?(:pg_trgm))
+    if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :users, "lower(name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist
       add_index :users, "LOWER(short_name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_short_name", using: :gist
       add_index :users, "LOWER(short_name) #{trgm}.gist_trgm_ops",

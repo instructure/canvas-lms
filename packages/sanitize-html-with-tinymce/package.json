@@ -1,0 +1,10 @@
+{
+  "name": "sanitize-html-with-tinymce",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./index.js",
+  "dependencies": {
+    "tinymce": "^5"
+  }
+}

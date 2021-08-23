@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -448,7 +450,7 @@
 #           "type": "number"
 #         },
 #         "submission_types": {
-#           "description": "the types of submissions allowed for this assignment list containing one or more of the following: 'discussion_topic', 'online_quiz', 'on_paper', 'none', 'external_tool', 'online_text_entry', 'online_url', 'online_upload' 'media_recording'",
+#           "description": "the types of submissions allowed for this assignment list containing one or more of the following: 'discussion_topic', 'online_quiz', 'on_paper', 'none', 'external_tool', 'online_text_entry', 'online_url', 'online_upload', 'media_recording', 'student_annotation'",
 #           "example": ["online_text_entry"],
 #           "type": "array",
 #           "items": {"type": "string"},
@@ -463,7 +465,8 @@
 #               "online_text_entry",
 #               "online_url",
 #               "online_upload",
-#               "media_recording"
+#               "media_recording",
+#               "student_annotation"
 #             ]
 #           }
 #         },
@@ -634,7 +637,7 @@
 #           "$ref": "ScoreStatistic"
 #         },
 #         "can_submit": {
-#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter.",
+#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter. Not available when observed_users are included.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -689,6 +692,27 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate assignnment
+  #
+  # Duplicate an assignment and return a json based on result_type argument.
+  #
+  # @argument result_type [String, "Quiz"]
+  #   Optional information:
+  #   When the root account has the feature `newquizzes_on_quiz_page` enabled
+  #   and this argument is set to "Quiz" the response will be serialized into a
+  #   quiz format({file:doc/api/quizzes.html#Quiz});
+  #   When this argument isn't specified the response will be serialized into an
+  #   assignment format;
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate?result_type=Quiz
+  #
+  # @returns Assignment
   def duplicate
     # see private methods for definitions
     old_assignment = old_assignment_for_duplicate
@@ -720,6 +744,10 @@ class AssignmentsApiController < ApplicationController
       new_assignment.assignment_group = target_assignment.assignment_group
     end
 
+    # Specify the updating user to ensure that audit events are created
+    # for anonymous or moderated assignments (we need to do it before the
+    # insert_at since that could save the record)
+    new_assignment.updating_user = @current_user
     new_assignment.insert_at(target_assignment.position + 1)
     new_assignment.save!
     positions_in_group = Assignment.active.where(
@@ -771,7 +799,7 @@ class AssignmentsApiController < ApplicationController
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
-      scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis] && authorized_action(@context, user, :manage_assignments)
+      scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
@@ -806,7 +834,7 @@ class AssignmentsApiController < ApplicationController
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
       include_all_dates = include_params.include?('all_dates')
-      include_override_objects = include_params.include?('overrides') && @context.grants_any_right?(user, :manage_assignments)
+      include_override_objects = include_params.include?('overrides') && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -820,7 +848,7 @@ class AssignmentsApiController < ApplicationController
         end
       end
 
-      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       if include_visibility
         assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
@@ -897,10 +925,10 @@ class AssignmentsApiController < ApplicationController
           submissions_hash(included_params, [@assignment])[@assignment.id]
       end
 
-      include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       include_all_dates = value_to_boolean(params[:all_dates] || false)
 
-      include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, :manage_assignments)
+      include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -946,7 +974,7 @@ class AssignmentsApiController < ApplicationController
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
-  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"|"student_annotation"]
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -965,6 +993,7 @@ class AssignmentsApiController < ApplicationController
   #     "online_text_entry"
   #     "online_url"
   #     "media_recording" (Only valid when the Kaltura plugin is enabled)
+  #     "student_annotation"
   #
   # @argument assignment[allowed_extensions][] [String]
   #   Allowed extensions if submission_types includes "online_upload"
@@ -1107,6 +1136,11 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[allowed_attempts] [Integer]
   #   The number of submission attempts allowed for this assignment. Set to -1 for unlimited attempts.
   #
+  # @argument assignment[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated.
+  #
+  #   Only applies when submission_types includes "student_annotation".
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -1128,7 +1162,9 @@ class AssignmentsApiController < ApplicationController
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
-  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"|"student_annotation"]
+  #   Only applies if the assignment doesn't have student submissions.
+  #
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -1147,6 +1183,10 @@ class AssignmentsApiController < ApplicationController
   #     "online_text_entry"
   #     "online_url"
   #     "media_recording" (Only valid when the Kaltura plugin is enabled)
+  #     "student_annotation"
+  #
+  # @deprecated_argument assignment[submission_types][] [String] NOTICE 2021-02-18 EFFECTIVE 2021-05-26
+  #   Only applies if the assignment doesn't have student submissions.
   #
   # @argument assignment[allowed_extensions][] [String]
   #   Allowed extensions if submission_types includes "online_upload"
@@ -1291,10 +1331,21 @@ class AssignmentsApiController < ApplicationController
   #   The number of submission attempts allowed for this assignment. Set to -1 or null for
   #   unlimited attempts.
   #
+  # @argument assignment[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated.
+  #
+  #   Only applies when submission_types includes "student_annotation".
+  #
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])
+
+    if needs_grading_permission? && !@assignment.grants_right?(@current_user, :grade)
+      render_unauthorized_action and return
+    end
+
     if authorized_action(@assignment, @current_user, :update)
+      increment_request_cost(Setting.get('assignments_api_update_request_cost', '50').to_i)
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
@@ -1396,6 +1447,11 @@ class AssignmentsApiController < ApplicationController
     end
     # self, observer
     authorized_action(@user, @current_user, %i(read_as_parent read))
+  end
+
+  def needs_grading_permission?
+    grading_attributes = [:points_possible, :grading_type, :grading_standard_id]
+    grading_attributes.any? { |attribute| params[:assignment][attribute] != @assignment[attribute] } && @assignment.submissions.graded.exists?
   end
 
   # old_assignment is the assignement we want to copy from

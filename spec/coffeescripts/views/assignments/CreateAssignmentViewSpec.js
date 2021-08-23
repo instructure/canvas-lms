@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import CreateAssignmentView from 'compiled/views/assignments/CreateAssignmentView'
-import DialogFormView from 'compiled/views/DialogFormView'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
-import 'compiled/behaviors/tooltip'
-
-const fixtures = $('#fixtures')
+import '../../../../ui/boot/initializers/activateTooltips.js'
 
 function buildAssignment1() {
   const date1 = {
@@ -144,14 +144,13 @@ QUnit.module('CreateAssignmentView', {
     this.assignment4 = new Assignment(buildAssignment4())
     this.assignment5 = new Assignment(buildAssignment5())
     this.group = assignmentGroup()
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
     fakeENV.setup()
   },
   teardown() {
     fakeENV.teardown()
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
@@ -323,6 +322,36 @@ test('openAgain adds datetime picker', function() {
   const view = createView(this.assignment2)
   view.openAgain()
   ok($.fn.datetime_field.called)
+})
+
+test('adjust datetime to the end of a day for midnight time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.useInitialTranslations()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('.datetime_field')
+    .val('Feb 2, 2021')
+    .trigger('change')
+  equal(view.$el.find('.datetime_field').val(), 'Feb 2 11:59pm')
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('it does not adjust datetime for other date time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.useInitialTranslations()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('#assign_3_assignment_due_at')
+    .val('Feb 2, 2021, 1:27pm')
+    .trigger('change')
+  equal(view.$el.find('#assign_3_assignment_due_at').val(), 'Feb 2 1:27pm')
+  $.screenReaderFlashMessageExclusive = tmp
 })
 
 test("openAgain doesn't add datetime picker if disableDueAt is true", function() {
@@ -515,7 +544,10 @@ test('validates due date for lock and unlock', function() {
 })
 
 test('renders due dates with locale-appropriate format string', function() {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -533,7 +565,13 @@ test('renders due dates with locale-appropriate format string', function() {
 })
 
 test('renders due dates in appropriate time zone', function() {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
+
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.abbr_month_names.8': 'Aug'

@@ -34,7 +34,7 @@ module Canvas
         @req = request
         @account = root_account
         @user = user
-        @rci = opts.fetch(:request_context_id, RequestContextGenerator.request_id)
+        @rci = opts.fetch(:request_context_id, RequestContext::Generator.request_id)
         @type = opts.fetch(:type, nil)
         @canvas_error_info = opts.fetch(:canvas_error_info, {})
       end
@@ -75,6 +75,9 @@ module Canvas
         "SERVER_NAME",
         "SERVER_PORT",
         "SERVER_PROTOCOL",
+        "HTTP_X_FORWARDED_HOST",
+        "HTTP_X_FORWARDED_PROTO",
+        "HTTP_X_FORWARDED_FOR",
       ].freeze
 
       def self.useful_http_env_stuff_from_request(req)

@@ -17,37 +17,49 @@
  */
 
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
+import kolkata from 'timezone/Asia/Kolkata'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
-import 'jquery.instructure_date_and_time'
+import '@canvas/datetime'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
-test('should produce a date that formats via toString same as the original formats via tz', function() {
+test('should produce a date that formats via toString same as the original formats via tz', function () {
   const fudged = $.fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
 
 test('should parse dates before the year 1000', () => {
   // using specific string (and specific timezone to guarantee it) since tz.format has a bug pre-1000
-  tz.changeZone(detroit, 'America Detroit')
+  //
+  // TODO: in 2021, this appears to be bogus as it's never actually specifying
+  // the timezone as the comment above states because "America Detroit" doesn't
+  // resolve to one (America/Detroit does) and tz just ends up using UTC
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America Detroit'),
+    tzData: {
+      'America Detroit': detroit,
+    }
+  })
+
   const oldDate = new Date(Date.UTC(900, 1, 1, 0, 0, 0))
   const oldFudgeDate = $.fudgeDateForProfileTimezone(oldDate)
   equal(oldFudgeDate.toString('yyyy-MM-dd HH:mm:ss'), '0900-02-01 00:00:00')
 })
 
-test('should work on non-date date-like values', function() {
+test('should work on non-date date-like values', function () {
   let fudged = $.fudgeDateForProfileTimezone(+this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
   fudged = $.fudgeDateForProfileTimezone(this.original.toISOString())
@@ -63,31 +75,40 @@ test('should return null for invalid values', () => {
 test('should not return treat 0 as invalid', () =>
   equal(+$.fudgeDateForProfileTimezone(0), +$.fudgeDateForProfileTimezone(new Date(0))))
 
-test('should be sensitive to profile time zone', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+test('should be sensitive to profile time zone', function () {
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   let fudged = $.fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau,
+    }
+  })
   fudged = $.fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
 
 QUnit.module('unfudgeDateForProfileTimezone', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
-test('should produce a date that formats via tz same as the original formats via toString()', function() {
+test('should produce a date that formats via tz same as the original formats via toString()', function () {
   const unfudged = $.unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
-test('should work on non-date date-like values', function() {
+test('should work on non-date date-like values', function () {
   let unfudged = $.unfudgeDateForProfileTimezone(+this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
   unfudged = $.unfudgeDateForProfileTimezone(this.original.toISOString())
@@ -103,21 +124,29 @@ test('should return null for invalid values', () => {
 test('should not return treat 0 as invalid', () =>
   equal(+$.unfudgeDateForProfileTimezone(0), +$.unfudgeDateForProfileTimezone(new Date(0))))
 
-test('should be sensitive to profile time zone', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+test('should be sensitive to profile time zone', function () {
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
+
   let unfudged = $.unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau,
+    }
+  })
   unfudged = $.unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
 QUnit.module('sameYear', {
-  setup() {
-    this.snapshot = tz.snapshot()
-  },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -130,7 +159,12 @@ test('should return true iff both dates from same year', () => {
 })
 
 test('should compare relative to profile timezone', () => {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   const date1 = new Date(5 * 3600000) // 5am UTC = 12am EST
   const date2 = new Date(+date1 + 1000) // Jan 1, 1970 at 11:59:59pm EST
   const date3 = new Date(+date1 - 1000) // Jan 2, 1970 at 00:00:01am EST
@@ -139,11 +173,8 @@ test('should compare relative to profile timezone', () => {
 })
 
 QUnit.module('sameDate', {
-  setup() {
-    this.snapshot = tz.snapshot()
-  },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -156,7 +187,12 @@ test('should return true iff both times from same day', () => {
 })
 
 test('should compare relative to profile timezone', () => {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   const date1 = new Date(86400000 + 5 * 3600000)
   const date2 = new Date(+date1 + 1000)
   const date3 = new Date(+date1 - 1000)
@@ -166,35 +202,43 @@ test('should compare relative to profile timezone', () => {
 
 QUnit.module('dateString', {
   setup() {
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
   },
   teardown() {
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
 test('should format in profile timezone', () => {
   I18nStubber.stub('en', {'date.formats.medium': '%b %-d, %Y'})
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   equal($.dateString(new Date(0)), 'Dec 31, 1969')
 })
 
 QUnit.module('timeString', {
   setup() {
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
   },
   teardown() {
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
 test('should format in profile timezone', () => {
   I18nStubber.stub('en', {'time.formats.tiny': '%l:%M%P'})
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   equal($.timeString(new Date(60000)), '7:01pm')
 })
 
@@ -206,23 +250,46 @@ test('should format according to profile locale', () => {
 
 test('should use the tiny_on_the_hour format on the hour', () => {
   I18nStubber.stub('en', {'time.formats.tiny_on_the_hour': '%l%P'})
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   equal($.timeString(new Date(0)), '7pm')
+})
+
+test('should use the tiny format on the hour, when timezone difference is not in whole hours', () => {
+  I18nStubber.stub('en', {'time.formats.tiny': '%l:%M%P'})
+  I18nStubber.stub('en', {'time.formats.tiny_on_the_hour': '%l%P'})
+  // kolkata: +05:30
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(kolkata, 'Asia/Kolkata'),
+    tzData: {
+      'Asia/Kolkata': kolkata,
+      'America/Detroit': detroit
+    }
+  })
+  equal($.timeString(new Date(30 * 60 * 1000), {timezone: 'America/Detroit'}), '7:30pm')
 })
 
 QUnit.module('datetimeString', {
   setup() {
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
   },
   teardown() {
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
 test('should format in profile timezone', () => {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit,
+    }
+  })
   I18nStubber.stub('en', {
     'date.formats.medium': '%b %-d, %Y',
     'time.formats.tiny': '%l:%M%P',
@@ -232,7 +299,11 @@ test('should format in profile timezone', () => {
 })
 
 test('should translate into the profile locale', () => {
-  tz.changeLocale(portuguese, 'pt_PT', 'pt')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(portuguese, 'pt_PT'),
+    momentLocale: 'pt'
+  })
+
   I18nStubber.setLocale('pt')
   I18nStubber.stub('pt', {
     'date.formats.medium': '%-d %b %Y',
@@ -244,18 +315,23 @@ test('should translate into the profile locale', () => {
 
 QUnit.module('$.datepicker.parseDate', {
   setup() {
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
   },
   teardown() {
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
 test('should accept localized strings and return them fudged', () => {
-  tz.changeZone(detroit, 'America/Detroit')
-  tz.changeLocale(portuguese, 'pt_PT', 'pt')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit', portuguese, 'pt_PT'),
+    tzData: {
+      'America/Detroit': detroit
+    },
+    momentLocale: 'pt'
+  })
+
   I18nStubber.setLocale('pt')
   I18nStubber.stub('pt', {
     // this isn't the real format, but we want the %Y in here to make it
@@ -286,22 +362,22 @@ QUnit.module('$.datepicker time picker', {
   }
 })
 
-test('sets ampm select to am if empty and hour is changed to 0', function() {
+test('sets ampm select to am if empty and hour is changed to 0', function () {
   this.$hour.val('0').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to am if empty and hour is changed to 00', function() {
+test('sets ampm select to am if empty and hour is changed to 00', function () {
   this.$hour.val('00').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to pm if empty and hour is changed to > 0', function() {
+test('sets ampm select to pm if empty and hour is changed to > 0', function () {
   this.$hour.val('1').trigger('change')
   equal(this.$ampm.val(), 'pm')
 })
 
-test('sets hour to 12 if ampm exists and hour is changed to 0', function() {
+test('sets hour to 12 if ampm exists and hour is changed to 0', function () {
   this.$hour.val('0').trigger('change')
   equal(this.$hour.val(), '12')
 })

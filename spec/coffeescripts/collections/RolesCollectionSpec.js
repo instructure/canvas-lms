@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Role from 'compiled/models/Role'
-import RolesCollection from 'compiled/collections/RolesCollection'
+import Role from 'ui/features/roster/backbone/models/Role.js'
+import RolesCollection from 'ui/features/roster/backbone/collections/RolesCollection.js'
 
 QUnit.module('RolesCollection', {
   setup() {

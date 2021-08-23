@@ -28,7 +28,14 @@
   cache(['recent_feedback_render3', @current_user&.course_nickname_hash, recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     assignment = recent_feedback.assignment
     context = recent_feedback.assignment.context
-    url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
+    if recent_feedback.assignment.a2_enabled?
+      context_symbol = :context_assignment_url
+      context_params = {:id => recent_feedback.assignment_id}
+    else
+      context_symbol = :context_assignment_submission_url
+      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @current_user.id}
+    end
+    url = context_url(context, context_symbol, context_params)
     grade = readable_grade(recent_feedback)
     score = recent_feedback.score
     comment = recent_feedback.last_teacher_comment

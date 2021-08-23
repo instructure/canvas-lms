@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 
 .ToDoSidebarItem {
   line-height: 1.1;
   display: flex;
   align-items: flex-start;
-  margin: 0 0 $ic-sp / 2;
+  margin: 0 0 $ic-sp * 0.5;
 }
 
 .ToDoSidebarItem__Icon {
@@ -33,12 +35,12 @@
 .ToDoSidebarItem__Info {
   min-width: 0;
   flex: 1;
-  padding: direction-sides(0 $ic-sp / 2 0 $ic-sp * 0.75);
+  padding: direction-sides(0 $ic-sp * 0.5 0 $ic-sp * 0.75);
 }
 
 .ToDoSidebarItem__Info,
 .ToDoSidebarItem__Icon {
-  margin-top: $ic-sp / 3;
+  margin-top: math.div($ic-sp, 3);
 }
 
 .ToDoSidebarItem__CloseIcon {
@@ -46,5 +48,5 @@
 }
 
 .ToDoSidebarItem__Title {
-  margin-bottom: $ic-sp / 4;
+  margin-bottom: $ic-sp * 0.25;
 }

@@ -24,7 +24,7 @@ class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target
       DeveloperKey.find_cached(owner._read_attribute(reflection.foreign_key))
-    end  
+    end
   end
 
   include CustomValidations
@@ -61,6 +61,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_redirect_uris
   validate :validate_public_jwk
   validate :validate_lti_fields
+  validate :validate_flag_combinations
 
   attr_reader :private_jwk
 
@@ -120,7 +121,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_redirect_uris
-    uris = redirect_uris.map do |value|
+    uris = redirect_uris&.map do |value|
       value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)
       value
     end
@@ -249,9 +250,13 @@ class DeveloperKey < ActiveRecord::Base
     return true if redirect_uris.include?(redirect_uri)
 
     # legacy deprecated
-    self_domain = URI.parse(self.redirect_uri).host
-    other_domain = URI.parse(redirect_uri).host
-    result = self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    self_uri = URI.parse(self.redirect_uri)
+    self_domain = self_uri.host
+    other_uri = URI.parse(redirect_uri)
+    other_domain = other_uri.host
+    result = self_domain.present? && other_domain.present? &&
+       self_uri.scheme == other_uri.scheme &&
+       (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
     if result && redirect_uri != self.redirect_uri
       Rails.logger.info("Allowed lenient OAuth redirect uri #{redirect_uri} on developer key #{global_id}")
     end
@@ -286,7 +291,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)
@@ -341,6 +346,12 @@ class DeveloperKey < ActiveRecord::Base
     return unless self.is_lti_key?
     return if self.public_jwk.present? || self.public_jwk_url.present?
     errors.add(:lti_key, "developer key must have public jwk or public jwk url")
+  end
+
+  def validate_flag_combinations
+    return unless auto_expire_tokens && force_token_reuse
+
+    errors.add(:auto_expire_tokens, "auto_expire_tokens cannot be set if force_token_reuse is set")
   end
 
   def normalize_public_jwk_url

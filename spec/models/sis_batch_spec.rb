@@ -1187,6 +1187,76 @@ test_1,u1,student,active}
           expect(@c2.reload).to be_created
         end
 
+        it 'should set enrollment workflow_state to completed' do
+          batch = create_csv_data([
+            %{term_id,name,status
+              term1,term1,active
+              term2,term2,active},
+            %{course_id,short_name,long_name,account_id,term_id,status
+              test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status},
+          ]) do |item|
+            item.options = {}
+            item.batch_mode = true
+            item.options[:multi_term_batch_mode] = true
+            item.options[:batch_mode_enrollment_drop_status] = 'completed'
+            item.save!
+            item.process_without_send_later
+            run_jobs
+          end
+          expect(@e1.reload.workflow_state).to eq 'completed'
+          expect(@e2.reload.workflow_state).to eq 'completed'
+          old_time = @e1.updated_at
+          expect(@c2.reload).to be_deleted
+          expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 1
+          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+          expect(batch.reload.workflow_state).to eq 'imported'
+          # there will be no progress for this batch, but it should still work
+          batch.restore_states_for_batch
+          run_jobs
+          expect(batch.reload).to be_restored
+          expect(@e1.reload).to be_active
+          expect(@e1.updated_at == old_time).to eq false
+          expect(@e2.reload).to be_active
+          expect(@c1.reload).to be_created
+          expect(@c2.reload).to be_created
+        end
+
+        it 'should set enrollment workflow_state to inactive' do
+          batch = create_csv_data([
+            %{term_id,name,status
+              term1,term1,active
+              term2,term2,active},
+            %{course_id,short_name,long_name,account_id,term_id,status
+              test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status},
+          ]) do |item|
+            item.options = {}
+            item.batch_mode = true
+            item.options[:multi_term_batch_mode] = true
+            item.options[:batch_mode_enrollment_drop_status] = 'inactive'
+            item.save!
+            item.process_without_send_later
+            run_jobs
+          end
+          expect(@e1.reload.workflow_state).to eq 'inactive'
+          expect(@e2.reload.workflow_state).to eq 'inactive'
+          old_time = @e1.updated_at
+          expect(@c2.reload).to be_deleted
+          expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 1
+          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+          expect(batch.reload.workflow_state).to eq 'imported'
+          # there will be no progress for this batch, but it should still work
+          batch.restore_states_for_batch
+          run_jobs
+          expect(batch.reload).to be_restored
+          expect(@e1.reload).to be_active
+          expect(@e1.updated_at == old_time).to eq false
+          expect(@e2.reload).to be_active
+          expect(@c1.reload).to be_created
+          expect(@c2.reload).to be_created
+        end
+
         it 'should not use multi_term_batch_mode if no terms are passed' do
           batch = create_csv_data([
                                     %{course_id,short_name,long_name,account_id,term_id,status},

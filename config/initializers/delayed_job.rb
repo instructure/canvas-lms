@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,7 +28,8 @@ Delayed::Backend::Base.class_eval do
 
   def root_account_id
     return nil if account.nil?
-    account.root_account_id.nil? ? account.id : account.root_account_id
+
+    account.resolved_root_account_id
   end
 
   def to_log_format
@@ -42,20 +45,6 @@ Delayed::Backend::Base.class_eval do
     log_hash.with_indifferent_access.to_json
   end
 end
-
-Delayed::Pool.on_fork = -> {
-  # because it's possible to accidentally share an open http
-  # socket between processes shortly after fork.
-  Imperium::Agent.reset_default_client
-  Imperium::Catalog.reset_default_client
-  Imperium::Client.reset_default_client
-  Imperium::Events.reset_default_client
-  Imperium::KV.reset_default_client
-  # it's really important to reset the default clients
-  # BEFORE letting dynamic setting pull a new one.
-  # do not change this order.
-  Canvas::DynamicSettings.on_fork!
-}
 
 # if the method was defined by a previous module, use the existing
 # implementation, but provide a default otherwise
@@ -139,6 +128,9 @@ end
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
   Canvas::Redis.clear_idle_connections
+  job.current_shard.activate do
+    LoadAccount.check_schema_cache
+  end
 
   # context for our custom logger
   Thread.current[:context] = {

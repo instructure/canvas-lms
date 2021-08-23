@@ -35,7 +35,7 @@ module DataFixup::DeleteExtraPlaceholderSubmissions
 
     Course.where(:id => assignment_ids_by_course_id.keys).to_a.each do |course|
       course_assignment_ids = assignment_ids_by_course_id[course.id]
-      StudentEnrollment.where(course: course).in_batches do |relation|
+      StudentEnrollment.where(course: course).select(:user_id).in_batches(strategy: :cursor) do |relation|
         batch_student_ids = relation.pluck(:user_id)
         edd = EffectiveDueDates.for_course(course).filter_students_to(batch_student_ids)
         course_assignment_ids.each do |assignment_id|

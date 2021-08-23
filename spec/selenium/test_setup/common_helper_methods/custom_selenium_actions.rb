@@ -88,9 +88,11 @@ module CustomSeleniumActions
   # can (but wait if necessary), e.g.
   #
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
-  def fj(selector, scope = nil)
+  def fj(selector, scope = nil, timeout: nil)
+    wait_opts = { method: :fj }
+    wait_opts[:timeout] = timeout if timeout
     stale_element_protection do
-      wait_for(method: :fj) do
+      wait_for(**wait_opts) do
         find_with_jquery selector, scope
       end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}"
     end
@@ -199,6 +201,15 @@ module CustomSeleniumActions
   end
 
   # Find an element with reference to another element, via xpath
+  def find_from_element_css(element, css)
+    stale_element_protection do
+      element.find_element(:css, css)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "No element with reference to given element was found. Please recheck the css : #{css}"
+  end
+
+  # Find an element with reference to another element, via xpath
   def find_from_element_fxpath(element, xpath)
     stale_element_protection do
       element.find_element(:xpath, xpath)
@@ -243,8 +254,8 @@ module CustomSeleniumActions
     Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
-  # this is a smell; you should know what's on the page you're testing,
-  # so conditionally doing stuff based on elements == :poop:
+  # conditionally doing stuff based on what elements are on the page
+  # is a smell; you should know what's on the page you're testing.
   def element_exists?(selector, xpath = false)
     disable_implicit_wait { xpath ? fxpath(selector) : f(selector) }
     true
@@ -257,6 +268,10 @@ module CustomSeleniumActions
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
+  end
+
+  def get_parent_element(element)
+    driver.execute_script("return arguments[0].parentNode;", element)
   end
 
   def first_selected_option(select_element)
@@ -310,14 +325,23 @@ module CustomSeleniumActions
   end
 
   def switch_editor_views(tiny_controlling_element)
-    if !tiny_controlling_element.is_a?(String)
-      tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+    if Account.default.feature_enabled?(:rce_enhancements)
+      switch_new_editor_views
+    else
+      if !tiny_controlling_element.is_a?(String)
+        tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+      end
+      selector = tiny_controlling_element.to_s.to_json
+      assert_can_switch_views!
+      driver.execute_script(%Q{
+        $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
+      })
     end
-    selector = tiny_controlling_element.to_s.to_json
-    assert_can_switch_views!
-    driver.execute_script(%Q{
-      $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
-    })
+  end
+
+  # Used for Enhanced RCE
+  def switch_new_editor_views
+    force_click('[data-btn-id="rce-edit-btn"]')
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id=nil)
@@ -346,7 +370,6 @@ module CustomSeleniumActions
     end
 
     iframe_id = driver.execute_script("return $(#{selector}).siblings('#{mce_class}').find('iframe')[0];")['id']
-
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
     if text.length > 100 || text.lines.size > 1
@@ -418,8 +441,12 @@ module CustomSeleniumActions
 
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
-    select = Selenium::WebDriver::Support::Select.new(element)
-    select.select_by(select_by, option_text)
+    if element.tag_name == 'input'
+      click_INSTUI_Select_option(element, option_text, select_by)
+    else
+      select = Selenium::WebDriver::Support::Select.new(element)
+      select.select_by(select_by, option_text)
+    end
   end
 
   def INSTUI_select(elem_or_css)
@@ -427,11 +454,16 @@ module CustomSeleniumActions
   end
 
   # implementation of click_option for use with INSTU's Select
-  # (tested with the CanvasSelect wrapper, untested with a raw instui Select)
+  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
+  # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
     cselect = INSTUI_select(select)
-    cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
+    if option_list_id.blank?
+      cselect.click
+      option_list_id = cselect.attribute('aria-controls')
+    end
+
     if select_by == :text
       fj("##{option_list_id} [role='option']:contains(#{option_text})").click
     else
@@ -444,6 +476,12 @@ module CustomSeleniumActions
     cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
     ff("##{option_list_id} [role='option']")
+  end
+
+  def INSTUI_Menu_options(menu)
+    menu = INSTUI_select(menu)
+    menu.click # option the options list
+    ff("[aria-labelledby='#{menu.attribute('id')}'] [role='menuitemradio']")
   end
 
   def close_visible_dialog
@@ -576,6 +614,7 @@ module CustomSeleniumActions
     dy = target_location.y - source_location.y
 
     drag_with_js source_selector, dx, dy
+    wait_for_ajaximations
   end
 
   ##
@@ -655,7 +694,7 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
   end
 
-  # see public/javascripts/vendor/jquery.scrollTo.js
+  # see packages/jquery-scroll-to-visible
   # target can be:
   #  - A number position (will be applied to all axes).
   #  - A string position ('44', '100px', '+=90', etc ) will be applied to all axes

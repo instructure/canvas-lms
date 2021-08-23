@@ -28,7 +28,7 @@ class CoverageTool
       # no formatting by default, just get the json
       SimpleCov.at_exit {
         # generate an HTML report if this is running locally / not on jenkins:
-        SimpleCov.result.format! unless ENV['DOCKER_PROCESSES']
+        SimpleCov.result.format! unless ENV['RSPEC_PROCESSES']
         SimpleCov.result
       }
     end

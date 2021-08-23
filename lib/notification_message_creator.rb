@@ -128,7 +128,8 @@ class NotificationMessageCreator
     return unless channel.bouncing? || too_many_messages_for?(user)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
-      fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
+      # notification_policies are already loaded, so use find instead of generating a query
+      fallback_policy = channel.notification_policies.find{ |np| np.frequency == 'daily' && np.notification_id == nil }
       fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
     end
 
@@ -152,7 +153,7 @@ class NotificationMessageCreator
   def build_summary_for(user, policy)
     user.shard.activate do
       message = user.messages.build(message_options_for(user))
-      message.parse!('summary')
+      message.parse!('summary', root_account: @account)
       delayed_message = policy.delayed_messages.build(:notification => @notification,
                                     :frequency => policy.frequency,
                                     # policy.communication_channel should
@@ -178,7 +179,7 @@ class NotificationMessageCreator
     return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
-    message&.parse!
+    message&.parse!(root_account: @account)
     message.workflow_state = 'bounced' if channel.bouncing?
     message
   end
@@ -204,7 +205,7 @@ class NotificationMessageCreator
     # if a user has never logged in, let's not spam the dashboard for no reason.
     return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
     message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
-    message.parse!
+    message.parse!(root_account: @account)
     message
   end
 
@@ -280,6 +281,10 @@ class NotificationMessageCreator
 
   # only send emails to active channels or registration notifications to default users' channel
   def add_channel?(user, channel)
+    if Account.site_admin.feature_enabled?(:deprecate_sms) && channel.path_type == CommunicationChannel::TYPE_SMS
+      return false
+    end
+
     channel.active? || (@notification.registration? && default_email?(user, channel))
   end
 
@@ -364,7 +369,6 @@ class NotificationMessageCreator
       end_partition = Message.infer_partition_table_name('created_at' => end_time)
       if first_partition == start_partition &&
         start_partition == end_partition
-        Message.infer_partition_table_name('created_at' => end_time)
         scope = scope.where(created_at: start_time..end_time)
         break_this_loop = true
       elsif start_time == first_start_time
@@ -374,7 +378,7 @@ class NotificationMessageCreator
         break_this_loop = true
       # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled')
+      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
       start_time = end_time

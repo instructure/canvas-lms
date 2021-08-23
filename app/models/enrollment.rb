@@ -59,6 +59,7 @@ class Enrollment < ActiveRecord::Base
   validate :valid_role?
   validate :valid_course?
   validate :valid_section?
+  validate :not_student_view
 
   # update bulk destroy if changing or adding an after save
   before_save :assign_uuid
@@ -70,7 +71,6 @@ class Enrollment < ActiveRecord::Base
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
-  after_save :restore_submissions_and_scores
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
@@ -83,6 +83,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
   after_update :needs_grading_count_updated, if: :active_student_changed?
+  after_commit :sync_microsoft_group
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -108,6 +109,13 @@ class Enrollment < ActiveRecord::Base
   def valid_section?
     unless deleted? || course_section.active?
       self.errors.add(:course_section_id, "is not a valid section")
+    end
+  end
+
+  def not_student_view
+    if type != 'StudentViewEnrollment' && (new_record? || association(:user).loaded?) &&
+      user.fake_student?
+      self.errors.add(:user_id, "cannot add a student view student in a regular role")
     end
   end
 
@@ -245,6 +253,10 @@ class Enrollment < ActiveRecord::Base
 
   scope :of_content_admins, -> { where(:type => ['TeacherEnrollment', 'DesignerEnrollment']) }
 
+  scope :of_observer_type, -> { where(:type => "ObserverEnrollment") }
+
+  scope :not_of_observer_type, -> { where.not(:type => "ObserverEnrollment") }
+
   scope :student, -> {
     select(:course_id).
         joins(:course).
@@ -308,21 +320,6 @@ class Enrollment < ActiveRecord::Base
 
   def self.valid_type?(type)
     SIS_TYPES.has_key?(type)
-  end
-
-  def self.types_with_indefinite_article
-    {
-      'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
-      'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
-      'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
-      'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-      'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-      'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
-    }
-  end
-
-  def self.type_with_indefinite_article(type)
-    types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
   end
 
   def reload(options = nil)
@@ -875,7 +872,7 @@ class Enrollment < ActiveRecord::Base
     can_remove = [StudentEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students) &&
       context.id == ((context.is_a? Course) ? self.course_id : self.course_section_id)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove || context.grants_right?(user, session, manage_admin_users_perm)
   end
 
   # Determine if a user has permissions to delete this enrollment.
@@ -888,11 +885,16 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     return context.grants_right?(user, session, :use_student_view) if fake_student?
 
-    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
-      context.grants_right?(user, session, :manage_students)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
-    can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
-    can_remove &&= context.id == ((context.is_a? Course) ? self.course_id : self.course_section_id)
+    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) && context.grants_right?(user, session, :manage_students)
+
+    if self.root_account.feature_enabled? :granular_permissions_manage_users
+      can_remove ||= can_delete_via_granular(user, session, context)
+      can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :allow_course_admin_actions)
+    else
+      can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
+      can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
+    end
+    can_remove && context.id == (context.is_a?(Course) ? self.course_id : self.course_section_id)
   end
 
   def pending?
@@ -1214,7 +1216,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users, :read_roster)}
+    given { |user, session| self.course.grants_any_right?(user, session, :manage_students, manage_admin_users_perm, :read_roster) }
     can :read
 
     given { |user| self.user == user }
@@ -1267,6 +1269,8 @@ class Enrollment < ActiveRecord::Base
     where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')") }
   scope :not_inactive_by_date_ignoring_access, -> { joins(:enrollment_state).
     where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')") }
+  scope :new_or_active_by_date, -> { joins(:enrollment_state).
+    where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active', 'creation_pending')") }
 
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
@@ -1448,12 +1452,6 @@ class Enrollment < ActiveRecord::Base
     ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
   end
 
-  def self.restore_submissions_and_scores_for_enrollments(enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if enrollments.count > 1_000
-    restore_deleted_submissions_for_enrollments(enrollments)
-    restore_deleted_scores_for_enrollments(enrollments)
-  end
-
   private
 
   def enrollments_exist_for_user_in_course?
@@ -1470,57 +1468,6 @@ class Enrollment < ActiveRecord::Base
     student_or_fake_student? && other_enrollment_of_same_type.present?
   end
 
-  def restore_submissions_and_scores
-    return unless being_restored?(to_state: "completed")
-
-    # running in an n_strand to handle situations where a SIS import could
-    # update a ton of enrollments from "deleted" to "completed".
-    delay_if_production(n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
-        priority: Delayed::LOW_PRIORITY).
-      restore_submissions_and_scores_now
-  end
-
-  def restore_submissions_and_scores_now
-    restore_deleted_submissions
-    restore_deleted_scores
-  end
-
-  def restore_deleted_submissions
-    Enrollment.restore_deleted_submissions_for_enrollments([self])
-  end
-
-  def self.restore_deleted_submissions_for_enrollments(student_enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if student_enrollments.count > 1_000
-    student_enrollments.group_by(&:course_id).each do |course_id, students|
-      Submission.
-        joins(:assignment).
-        where(user_id: students.map(&:user_id), workflow_state: "deleted", assignments: { context_id: course_id }).
-        merge(Assignment.active).
-        in_batches.
-        update_all("workflow_state = #{DueDateCacher::INFER_SUBMISSION_WORKFLOW_STATE_SQL}")
-    end
-  end
-
-  def restore_deleted_scores
-    Enrollment.restore_deleted_scores_for_enrollments([self])
-  end
-
-  def self.restore_deleted_scores_for_enrollments(student_enrollments)
-    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if student_enrollments.count > 1_000
-    student_enrollments.group_by(&:course_id).each do |_course_id, students|
-      course = students.first.course
-      assignment_groups = course.assignment_groups.active.except(:order)
-      grading_periods = GradingPeriod.for(course)
-
-      Score.where(course_score: true).or(
-        Score.where(assignment_group: assignment_groups)
-      ).or(
-        Score.where(grading_period: grading_periods)
-      ).where(enrollment_id: students.map(&:id), workflow_state: "deleted").
-        update_all(workflow_state: "active")
-    end
-  end
-
   def other_enrollment_of_same_type
     return @other_enrollment_of_same_type if defined?(@other_enrollment_of_same_type)
 
@@ -1533,6 +1480,17 @@ class Enrollment < ActiveRecord::Base
       user_id: user,
       type: Array.wrap(types)
     ).where.not(id: id).where.not(workflow_state: :deleted)
+  end
+
+  def manage_admin_users_perm
+    self.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users
+  end
+
+  def can_delete_via_granular(user, session, context)
+    self.teacher? && context.grants_right?(user, session, :remove_teacher_from_course) ||
+    self.ta? && context.grants_right?(user, session, :remove_ta_from_course) ||
+    self.designer? && context.grants_right?(user, session, :remove_designer_from_course) ||
+    self.observer? && context.grants_right?(user, session, :remove_observer_from_course)
   end
 
   def remove_user_as_final_grader?
@@ -1558,5 +1516,13 @@ class Enrollment < ActiveRecord::Base
 
   def being_deleted?
     workflow_state == 'deleted' && workflow_state_before_last_save != 'deleted'
+  end
+
+  def sync_microsoft_group
+    return if self.type == 'StudentViewEnrollment'
+    return unless self.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
+    return unless self.root_account.settings[:microsoft_sync_enabled]
+
+    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_partial_sync self
   end
 end

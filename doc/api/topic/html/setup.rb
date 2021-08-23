@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -94,7 +96,7 @@ end
 
 def render_properties(json)
   if (properties = json['properties'])
-    result = ''
+    result = +''
     if json['description'].present?
       result << render_comment(json)
     end

@@ -65,6 +65,7 @@ describe "student planner" do
     end
 
     it "shows the new activity button", priority: "1", test_id: 3263164 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       # create discussions in the future and in the past to be able to see the new activity button
       past_discussion = graded_discussion_in_the_past
       graded_discussion_in_the_future

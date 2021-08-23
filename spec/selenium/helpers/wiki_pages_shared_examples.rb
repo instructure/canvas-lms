@@ -46,7 +46,6 @@ RSpec.shared_examples "course_pages_granular_permissions" do
           visit_wiki_page_view(@course.id, @page.title)
           expect(published_status_published).to be_displayed
           expect(wiki_page_show).not_to contain_css(edit_btn_selector)
-          expect(wiki_page_show).not_to contain_css(more_options_btn_selector)
         end
       end
 

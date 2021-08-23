@@ -21,7 +21,12 @@ module Auditors::ActiveRecord
   class Partitioner
     cattr_accessor :logger
 
-    AUDITOR_CLASSES = [ AuthenticationRecord, CourseRecord, GradeChangeRecord ].freeze
+    AUDITOR_CLASSES = [
+      AuthenticationRecord,
+      CourseRecord,
+      GradeChangeRecord,
+      FeatureFlagRecord
+    ].freeze
 
     def self.precreate_tables
       Setting.get('auditors_precreate_tables', 2).to_i

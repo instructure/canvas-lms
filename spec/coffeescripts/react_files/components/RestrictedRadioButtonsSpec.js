@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
-import Folder from 'compiled/models/Folder'
+import RestrictedRadioButtons from '@canvas/files/react/components/RestrictedRadioButtons'
+import Folder from '@canvas/files/backbone/models/Folder'
 
 QUnit.module('RestrictedRadioButtons', {
   setup() {

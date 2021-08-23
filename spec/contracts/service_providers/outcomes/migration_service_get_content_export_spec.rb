@@ -60,7 +60,14 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
       },
       "data": {
         "format": "canvas",
-        "alignments": Pact.each_like(1)
+        "alignments": Pact.each_like({
+          "artifact": Pact.like({
+            "$canvas_wiki_page_id": "1"
+          }),
+          "outcomes": Pact.each_like({
+            "$canvas_learning_outcome_id": "external-id-1"
+          })
+        })
       }
     }
     end

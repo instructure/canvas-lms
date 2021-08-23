@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow, mount} from 'enzyme'
-import StatusesModal from 'jsx/gradebook/default_gradebook/components/StatusesModal'
-import {statusColors} from 'jsx/gradebook/default_gradebook/constants/colors'
+import StatusesModal from 'ui/features/gradebook/react/default_gradebook/components/StatusesModal.js'
+import {statusColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
 
 let clock
 

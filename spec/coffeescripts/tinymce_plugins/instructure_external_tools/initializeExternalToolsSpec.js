@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ExternalToolsPlugin from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
+import ExternalToolsPlugin from '@canvas/tinymce-external-tools'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 

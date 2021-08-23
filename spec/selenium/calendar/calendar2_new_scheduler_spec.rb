@@ -97,6 +97,7 @@ describe "scheduler" do
     end
 
     it 'reserves appointment slots in find appointment mode', priority: "1", test_id: 2936790 do
+      skip('Skip for flakiness and fix with: LS-2145')
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       f('.fc-content').click

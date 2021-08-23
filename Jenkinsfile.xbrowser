@@ -66,7 +66,7 @@ pipeline {
           allowMissing: false,
           alwaysLinkToLastBuild: false,
           keepAll: true,
-          reportDir: "tmp",
+          reportDir: 'tmp',
           reportFiles: htmlFiles.join(','),
           reportName: 'Test Failures'
         ]

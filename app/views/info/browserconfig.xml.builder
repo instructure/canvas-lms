@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # read: http://msdn.microsoft.com/en-us/library/ie/dn455106.aspx to learn more about browserconfig.xml
 xml.instruct!
 xml.browserconfig do

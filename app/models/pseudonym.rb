@@ -26,7 +26,7 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :account
   include Canvas::RootAccountCacher
   belongs_to :user
-  has_many :communication_channels, -> { order(:position) }
+  has_many :communication_channels, -> { ordered }
   has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
   has_many :auditor_authentication_records,
     class_name: "Auditors::ActiveRecord::AuthenticationRecord",
@@ -60,7 +60,7 @@ class Pseudonym < ActiveRecord::Base
   alias_method :context, :account
 
   include StickySisFields
-  are_sis_sticky :unique_id
+  are_sis_sticky :unique_id, :workflow_state
 
   validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
             length: { within: 1..MAX_UNIQUE_ID_LENGTH },
@@ -156,15 +156,17 @@ class Pseudonym < ActiveRecord::Base
 
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
-    active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-      AuthenticationProvider.active.where(auth_type: ['canvas', 'ldap']).
-        where("authentication_provider_id=authentication_providers.id")).first
+
+    active_only.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
+      AuthenticationProvider.active.where(auth_type: ['canvas', 'ldap'])
+        .where("authentication_provider_id=authentication_providers.id"))
+        .order("authentication_provider_id NULLS LAST").first
   end
 
   def self.for_auth_configuration(unique_id, aac)
     auth_id = aac.try(:auth_provider_filter)
-    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).
-      order("authentication_provider_id NULLS LAST").take
+    active_only.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
+      .order("authentication_provider_id NULLS LAST").take
   end
 
   def set_password_changed
@@ -189,6 +191,8 @@ class Pseudonym < ActiveRecord::Base
     if (!crypted_password || crypted_password == "") && !@require_password
       self.generate_temporary_password
     end
+    # treat empty or whitespaced strings as nullable
+    self.integration_id = nil if self.integration_id.blank?
     self.sis_user_id = nil if self.sis_user_id.blank?
   end
 
@@ -201,6 +205,8 @@ class Pseudonym < ActiveRecord::Base
     end
 
     user = self.user
+    return nil if user.unavailable?
+
     user.workflow_state = 'registered' unless user.registered?
 
     add_ldap_channel
@@ -270,6 +276,7 @@ class Pseudonym < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+    state :suspended
   end
 
   set_policy do
@@ -378,6 +385,13 @@ class Pseudonym < ActiveRecord::Base
     user.sms
   end
 
+  def infer_auth_provider(ap)
+    previously_changed = changed?
+    @inferred_auth_provider = true if ap && authentication_provider_id.nil?
+    self.authentication_provider ||= ap
+    save! if !previously_changed && changed?
+  end
+
   # managed_password? and passwordable? differ in their treatment of pseudonyms
   # not linked to an authentication_provider. They both err towards the
   # "positive" case matching their name. I.e. if you have both Canvas and
@@ -399,15 +413,17 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def valid_arbitrary_credentials?(plaintext_password)
-    return false if self.deleted?
+    return false unless active?
     return false if plaintext_password.blank?
+
     require 'net/ldap'
     res = false
     res ||= valid_ldap_credentials?(plaintext_password)
-    if passwordable?
+    if !res && passwordable?
       # Only check SIS if they haven't changed their password
-      res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+      res = valid_ssha?(plaintext_password) if password_auto_generated?
       res ||= valid_password?(plaintext_password)
+      infer_auth_provider(account.canvas_authentication_provider) if res
     end
     res
   end
@@ -428,7 +444,6 @@ class Pseudonym < ActiveRecord::Base
     digest == digested_password
   end
 
-  attr_reader :ldap_authentication_provider_used
   def ldap_bind_result(password_plaintext)
     aps = case authentication_provider
           when AuthenticationProvider::LDAP
@@ -441,12 +456,12 @@ class Pseudonym < ActiveRecord::Base
     end
     aps.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
-      if res
-        @ldap_authentication_provider_used = config
-        return res
-      end
+      next unless res
+
+      infer_auth_provider(config)
+      return res
     end
-    return nil
+    nil
   end
 
   def add_ldap_channel
@@ -462,6 +477,25 @@ class Pseudonym < ActiveRecord::Base
       self.communication_channel = cc
       self.save_without_session_maintenance if self.changed?
     end
+  end
+
+  def changed?
+    !strip_inferred_authentication_provider(changed_attribute_names_to_save).empty?
+  end
+  alias has_changes_to_save? changed?
+
+  def attribute_names_for_partial_writes
+    strip_inferred_authentication_provider(super)
+  end
+
+  def strip_inferred_authentication_provider(attribute_names)
+    if attribute_names.include?('authentication_provider_id') &&
+      @inferred_auth_provider &&
+      authentication_provider_id &&
+      !account.feature_enabled?(:persist_inferred_authentication_providers)
+      attribute_names.delete('authentication_provider_id')
+    end
+    attribute_names
   end
 
   attr_reader :ldap_result
@@ -483,8 +517,11 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :active_only, -> { where(workflow_state: 'active') }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
 
+  
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
   def self.associated_shards(unique_id_or_sis_user_id)
@@ -500,6 +537,7 @@ class Pseudonym < ActiveRecord::Base
       # a failed login instead of an error.
       raise ImpossibleCredentialsError, "pseudonym cannot have a unique_id of length #{credentials[:unique_id].length}"
     end
+
     too_many_attempts = false
     begin
       associated_shards = associated_shards(credentials[:unique_id])
@@ -508,19 +546,21 @@ class Pseudonym < ActiveRecord::Base
       # by searching all accounts the slow way
       Canvas::Errors.capture(e)
     end
-    pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
+    pseudonyms = Shard.partition_by_shard(account_ids) do |shard_account_ids|
       next if GlobalLookups.enabled? && associated_shards && !associated_shards.include?(Shard.current)
-      active.
-        by_unique_id(credentials[:unique_id]).
-        where(:account_id => account_ids).
-        preload(:user).
-        select { |p|
+
+      active_only
+        .by_unique_id(credentials[:unique_id])
+        .where(account_id: shard_account_ids)
+        .preload(:user)
+        .select do |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
           too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts
           valid
-        }
+        end
     end
     return :too_many_attempts if too_many_attempts
+
     pseudonyms
   end
 
@@ -542,14 +582,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def audit_login(remote_ip, valid_password)
-    return :too_many_attempts unless Canvas::Security.allow_login_attempt?(self, remote_ip)
-
-    if valid_password
-      Canvas::Security.successful_login!(self, remote_ip)
-    else
-      Canvas::Security.failed_login!(self, remote_ip)
-    end
-    nil
+    Canvas::Security::LoginRegistry.audit_login(self, remote_ip, valid_password)
   end
 
   def self.cas_ticket_key(ticket)

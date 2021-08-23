@@ -26,9 +26,9 @@ describe "global announcements" do
     course_with_student_logged_in
   end
 
-  it 'shows empty message for both tabs', ignore_js_errors: true do
+  it 'shows empty message for both tabs' do
     get '/account_notifications'
-    expect(fj("#tab-currentTab[aria-selected='true']:contains('Current')")).to be
+    expect(fj("#tab-currentTab[aria-selected='true']:contains('Current')")).to be_truthy
     expect(fj("span:contains('Active Announcements')")).to be_displayed
     expect(fj("span:contains('No announcements to display')")).to be_displayed
     past_tab = f("#tab-pastTab")
@@ -37,7 +37,7 @@ describe "global announcements" do
     expect(fj("span:contains('No announcements to display')")).to be_displayed
   end
 
-  it 'shows notifications', ignore_js_errors: true do
+  it 'shows notifications' do
     account_notification(:start_at => 2.days.ago, :end_at => 5.days.from_now, :send_message => true)
     account_notification(:message => 'from the past', :start_at => 6.days.ago, :end_at => 5.days.ago, :send_message => true)
     get '/account_notifications'

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {actions} from 'jsx/conditional_release_stats/actions'
-import reducer from 'jsx/conditional_release_stats/reducers/root-reducer'
+import {actions} from '@canvas/conditional-release-stats/react/actions'
+import reducer from '@canvas/conditional-release-stats/react/reducers/root-reducer'
 
 QUnit.module('Conditional Release Stats reducer')
 

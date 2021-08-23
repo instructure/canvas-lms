@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :db do
   desc "migrate the page views in the database to cassandra"
   task :migrate_pageviews_to_cassandra, [:shard_id] => :environment do |t,args|

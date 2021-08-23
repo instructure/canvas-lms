@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddRootAccountIdToUserObserver < ActiveRecord::Migration[5.0]
   tag :predeploy
   disable_ddl_transaction!

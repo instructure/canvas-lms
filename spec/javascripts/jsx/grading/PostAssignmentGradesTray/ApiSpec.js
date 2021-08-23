@@ -17,7 +17,7 @@
  */
 
 import MockCanvasClient from '../../../support/MockCanvasClient'
-import * as Api from 'jsx/grading/PostAssignmentGradesTray/Api'
+import * as Api from '@canvas/post-assignment-grades-tray/react/Api'
 
 QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
   const ASSIGNMENT_ID = '23'

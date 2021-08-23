@@ -12,13 +12,16 @@
 .bundle/
 .byebug_history
 .env
+.mutagen
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
 /config/*.yml
+/config/credentials.yml.enc
+!/config/credentials.test.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS6_0
+/config/RAILS6_1
 /coverage/
 /coverage-js/
 /db/schema.rb
@@ -40,25 +43,26 @@ npm-debug.log
 /storybook-static/
 /tmp/*
 !/tmp/.keep
-/vendor/bundle
+/vendor/bundle/
+/vendor/cache/
 yarn-error.log
-
-# generated plugin stuff
-/app/coffeescripts/plugins/
-/app/stylesheets/plugins/
-/app/views/jst/plugins/
-/public/javascripts/plugins/
-/public/plugins/
-/spec/coffeescripts/plugins/
-/spec/plugins/
 
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
 /gems/*/node_modules
+/gems/plugins/*
+!/gems/plugins/academic_benchmark/
+!/gems/plugins/account_reports/
+!/gems/plugins/moodle_importer/
+!/gems/plugins/qti_exporter/
+!/gems/plugins/respondus_soap_endpoint/
+!/gems/plugins/simply_versioned/
 
 # user docker compose overrides
 docker-compose.local.*
+# experimental api gateway config
+docker-compose/api-gateway.override.yml
 
 # sub-packages
 /packages/*/node_modules
@@ -84,3 +88,6 @@ coverage-karma
 
 # generated graphql schema
 schema.graphql
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key

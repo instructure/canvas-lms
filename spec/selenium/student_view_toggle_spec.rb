@@ -24,7 +24,6 @@ describe "student view toggle" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Account.default.enable_feature!(:easy_student_view)
     course_with_teacher :active_all => true
   end
 
@@ -71,7 +70,6 @@ describe "student view toggle" do
   end
 
   it "should hide and show on assignments index when switching to and from bulk edit mode" do
-    Account.site_admin.enable_feature!(:assignment_bulk_edit)
     get "/courses/#{@course.id}/assignments"
     expect(student_view_toggle).to be_displayed
     f("#course_assignment_settings_link").click

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -85,7 +87,7 @@
 #           "items": { "$ref": "SubmissionComment" }
 #         },
 #         "submission_type": {
-#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
 #           "example": "online_text_entry",
 #           "type": "string",
 #           "allowableValues": {
@@ -93,7 +95,8 @@
 #               "online_text_entry",
 #               "online_url",
 #               "online_upload",
-#               "media_recording"
+#               "media_recording",
+#               "student_annotation"
 #             ]
 #           }
 #         },
@@ -186,6 +189,17 @@
 #           "description": "The date this submission was posted to the student, or nil if it has not been posted.",
 #           "example": "2020-01-02T11:10:30Z",
 #           "type": "datetime"
+#         },
+#         "read_status" : {
+#           "description": "The read status of this submission for the given user (optional). Including read_status will mark submission(s) as read.",
+#           "example": "read",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "read",
+#               "unread"
+#             ]
+#           }
 #         }
 #       }
 #     }
@@ -202,7 +216,7 @@ class SubmissionsApiController < ApplicationController
   #
   # A paginated list of all existing submissions for an assignment.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"|"read_status"]
   #   Associations to include with the group.  "group" will add group_id and group_name.
   #
   # @argument grouped [Boolean]
@@ -445,7 +459,7 @@ class SubmissionsApiController < ApplicationController
     assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
 
     # unless teacher, filter assignments down to only assignments current user can see
-    unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+    unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades)
       assignments = assignments.select{ |a| (assignment_visibilities.fetch(a.id,[]) & student_ids).any?}
     end
 
@@ -484,15 +498,9 @@ class SubmissionsApiController < ApplicationController
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
 
-      submission_preloads = [:originality_reports, {:quiz_submission => :versions}]
+      submission_preloads = [:originality_reports, {:quiz_submission => :versions}, :submission_comments]
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
-
-      ActiveRecord::Associations::Preloader.new.preload(
-        submissions,
-        :submission_comments,
-        SubmissionComment.select(:hidden, :submission_id)
-      )
 
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -557,6 +565,9 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, {:quiz_submission => :versions})
       submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
+      if includes.include?("has_postable_comments") || includes.include?("submission_comments")
+        submissions = submissions.preload(:submission_comments)
+      end
 
       # this will speed up pagination for large collections when order_direction is asc
       if order_by == 'graded_at' && order_direction == 'asc'
@@ -585,7 +596,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
   #   Associations to include with the group.
   def show
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
@@ -594,7 +605,7 @@ class SubmissionsApiController < ApplicationController
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
-      if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
+      if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades) ||
            @submission.assignment_visible_to_user?(@current_user)
         includes = Array(params[:include])
         @submission.visible_to_user = includes.include?("visibility") ? @assignment.visible_to_user?(@submission.user) : true
@@ -620,9 +631,9 @@ class SubmissionsApiController < ApplicationController
   def create_file
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
+
     if @assignment.allowed_extensions.any?
-      filename = infer_upload_filename(params)
-      extension = filename&.split('.')&.last&.downcase || File.mime_types[infer_upload_content_type(params)]
+      extension = infer_file_extension(params)
       reject!(t('unable to find extension')) unless extension
       reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
     end
@@ -1083,6 +1094,15 @@ class SubmissionsApiController < ApplicationController
     unless @assignments.all?(&:published?) &&
            @context.grants_right?(@current_user, session, :manage_grades)
       return render_unauthorized_action
+    end
+
+    # this needs to happen AFTER we've done the authorization check on ":manage_grades" above
+    # so we're only leaking information about which assignments exist and don't
+    # to users who are entitled to that information
+    if assignment_ids.size > @assignments.size
+      inactive_ids = assignment_ids - @assignments.map(&:id)
+      error_message = "Some assignments could not be found: ( #{inactive_ids.join(", ")} )"
+      return render(json: { error: error_message }, status: :bad_request)
     end
 
     progress = Submission.queue_bulk_update(@context, @section, @current_user, grade_data)

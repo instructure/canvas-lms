@@ -18,10 +18,10 @@
 
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@instructure/js-utils'
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import StudentIdsLoader from 'jsx/gradebook/default_gradebook/DataLoader/StudentIdsLoader'
-import {NetworkFake} from 'jsx/shared/network/NetworkFake'
-import {RequestDispatch} from 'jsx/shared/network'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import StudentIdsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/StudentIdsLoader.js'
+import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {RequestDispatch} from '@canvas/network'
 
 QUnit.module('Gradebook > DataLoader > StudentIdsLoader', suiteHooks => {
   const url = '/courses/1201/gradebook/user_ids'

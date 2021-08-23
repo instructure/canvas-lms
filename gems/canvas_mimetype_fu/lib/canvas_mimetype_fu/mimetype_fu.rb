@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class File
-
   def self.mime_type?(file)
     # INSTRUCTURE: added condition, file.class can also be Tempfile
     if file.class == File || file.class == Tempfile
@@ -46,21 +45,25 @@ class File
     mime = mime && mime.split(";").first
     mime = nil unless mime_types[mime]
 
-     if mime
-       return mime
-     else
-       'unknown/unknown'
-     end
-   end
-
-   def self.mime_types
-    extensions.invert
-   end
-
-  private
-
-  def self.extensions
-    ::MimetypeFu::EXTENSIONS
+    if mime
+      return mime
+    else
+      'unknown/unknown'
+    end
   end
 
+  def self.mime_types
+    @@mime_types ||=
+      extensions.each_with_object({}) do |(extension, mimes), new_hash|
+        mimes.split(';').each { |mime| new_hash[mime] = extension }
+      end
+  end
+
+  class << self
+    private
+
+    def extensions
+      @@extensions ||= ::MimetypeFu::EXTENSIONS
+    end
+  end
 end

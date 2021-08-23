@@ -144,8 +144,10 @@ describe('RCE "Links" Plugin > LinkOptionsDialog', () => {
         it('includes the Link', () => {
           dialog.setLink('http://example.instructure.com/files/3299/download')
           dialog.$doneButton.click()
-          const [{href}] = props.onSave.mock.calls[0]
-          expect(href).toEqual('http://example.instructure.com/files/3299/download')
+          const [linkAttrs] = props.onSave.mock.calls[0]
+          expect(linkAttrs.href).toEqual('http://example.instructure.com/files/3299/download')
+          expect(linkAttrs.class).toEqual('inline_disabled')
+          expect(linkAttrs.embed).toBeUndefined()
         })
 
         it('sets the text to the url when missing', () => {

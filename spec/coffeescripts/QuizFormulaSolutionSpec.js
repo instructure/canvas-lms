@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizFormulaSolution from 'quiz_formula_solution'
+import QuizFormulaSolution from 'ui/features/quizzes/quiz_formula_solution.js'
 
 QUnit.module('QuizFormulaSolution', () => {
   test('sets .result to the given formula', () => {

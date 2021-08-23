@@ -79,6 +79,7 @@ module AddressBook
       when 'course' then Course
       when 'section' then CourseSection
       when 'group' then Group
+      when 'discussion_topic' then DiscussionTopic
       end
     context_class.find(context_id)
   end

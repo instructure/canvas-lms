@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CalendarEvent from 'compiled/calendar/CommonEvent.CalendarEvent'
+import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
 
 let calendarEvent
 

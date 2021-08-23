@@ -768,9 +768,9 @@ describe ContentMigration do
 
   context 'Quizzes.Next CC import' do
     before do
-      allow(@cm.root_account).
+      allow(@cm.context).
         to receive(:feature_enabled?).
-        with(:import_to_quizzes_next).
+        with(:quizzes_next).
         and_return(true)
       allow(@cm.migration_settings).
         to receive(:[]).
@@ -789,6 +789,57 @@ describe ContentMigration do
         to receive(:new).and_return(importer)
       expect(importer).to receive(:import_content)
       @cm.import!({})
+    end
+  end
+
+  context 'importing to NQ with the new_quizzes_bank_migrations FF enabled' do
+    before do
+      allow_any_instance_of(ContentMigration).to receive(:quizzes_next_banks_migration?).and_return(true)
+    end
+
+    it "imports assignments from a qti zip file without creating assessment_question_banks" do
+      cm = @cm
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/plaintext_qti.zip")
+      attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      expect(@course.assessment_question_banks.count).to eq 0
+      expect(AssessmentQuestion.count).to eq 0
+      expect(@course.quiz_questions.count).to eq 0
+
+      expect(@course.assignments.count).to eq 1
+    end
+
+    it "imports assignments from a common_cartridge zip file without creating assessment_question_banks" do
+      cm = @cm
+      cm.migration_type = 'common_cartridge_importer'
+      cm.migration_settings['import_immediately'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_nested.zip")
+      attachment = Attachment.new(:context => cm, :filename => 'file.zip')
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.save!
+
+      cm.update_attribute(:attachment, attachment)
+      cm.queue_migration
+      run_jobs
+
+      expect(cm.reload.migration_issues).to be_empty
+
+      expect(@course.assessment_question_banks.count).to eq 0
+      expect(AssessmentQuestion.count).to eq 0
+      expect(@course.quiz_questions.count).to eq 0
+
+      expect(@course.assignments.count).to eq 1
     end
   end
 

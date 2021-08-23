@@ -42,15 +42,13 @@ describe 'course wiki pages' do
       @course2 = Course.create!(:name => "Second Course2")
       @course2.enroll_teacher(@teacher, :enrollment_state => 'active')
       @module2 = @course2.context_modules.create!(:name => "module 2")
-      # enable direct share
-      Account.default.enable_feature!(:direct_share)
       user_session(@teacher)
     end
 
     it 'displays direct share options in index page' do
       visit_course_wiki_index_page(@course.id)
       manage_wiki_page_item_button(@wiki_page1.title).click
-      
+
       expect(wiki_page_item_settings_menu.text).to include('Send to...')
       expect(wiki_page_item_settings_menu.text).to include('Copy to...')
     end
@@ -85,28 +83,8 @@ describe 'course wiki pages' do
         course_search_dropdown.send_keys(:tab)
         module_search_dropdown.click
 
-        expect(module_dropdown_list.text).to include 'module 1'      
+        expect(module_dropdown_list.text).to include 'module 1'
       end
-    end
-  end
-
-  context 'with direct share FF OFF' do
-    before(:each) do
-      course_with_teacher_logged_in
-      @course.save!
-      @module1 = @course.context_modules.create!
-      @wiki_page1 = @course.wiki_pages.create!(:title => "Here-is-the-first-wiki")
-      @module1.add_item(:id => @wiki_page1.id, :type => 'wiki_page')
-      Account.default.disable_feature!(:direct_share)
-      user_session(@teacher)
-      visit_course_wiki_index_page(@course.id)
-    end
-
-    it 'hides direct share options' do
-      manage_wiki_page_item_button(@wiki_page1.title).click
-      
-      expect(wiki_page_item_settings_menu.text).not_to include('Send to...')
-      expect(wiki_page_item_settings_menu.text).not_to include('Copy to...')
     end
   end
 

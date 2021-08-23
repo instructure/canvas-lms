@@ -59,7 +59,7 @@ module Lti::Ims::Concerns
       lti_resource_links.each do |content_item|
         resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom])
 
-        content_item[:lookup_id] = resource_link&.lookup_id
+        content_item[:lookup_uuid] = resource_link&.lookup_uuid
       end
     end
 

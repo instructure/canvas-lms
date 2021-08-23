@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -29,7 +31,7 @@ module Lti::Ims
         label: @line_item.label,
         resourceId: @line_item.resource_id,
         tag: @line_item.tag,
-        resourceLinkId: @line_item.resource_link&.resource_link_id
+        resourceLinkId: @line_item.resource_link&.resource_link_uuid
       }.merge(@line_item.extensions).compact
     end
   end

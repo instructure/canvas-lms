@@ -46,8 +46,8 @@
 
 .ig-header {
   min-height: 30px;
-  padding-top: $ic-sp/2;
-  padding-bottom: $ic-sp/2;
+  padding-top: $ic-sp*0.5;
+  padding-bottom: $ic-sp*0.5;
 
   .ig-header-title {
     text-decoration: none;
@@ -80,7 +80,7 @@
 }
 
 .ig-list li {
-  margin: $ic-sp/2 0;
+  margin: $ic-sp*0.5 0;
 }
 
 .ig-row__layout {
@@ -105,7 +105,7 @@
 .ig-list .ig-row {
   position: relative;
   display: block;
-  padding: direction-sides($ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4)); // add 4px for width of published-state border
+  padding: direction-sides($ic-sp $ic-sp*0.5 $ic-sp ($ic-sp*0.5 + 4)); // add 4px for width of published-state border
   box-sizing: border-box;
   border-radius: 0;
   color: $ic-font-color--subdued;
@@ -193,7 +193,7 @@
   font-weight: bold;
   padding-#{direction(right)}: $ic-sp;
   line-height: $ic-label-line-height;
-  margin-bottom: $ic-sp/4;
+  margin-bottom: $ic-sp*0.25;
   min-width: 1px; // firefox flex breaks the parent container
 }
 
@@ -226,7 +226,7 @@
   @include breakpoint(desktop) { padding-#{direction(left)}: 0; }
 
   .publish-icon, .lock-icon {
-    margin-#{direction(right)}: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp*0.5;
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }
   }

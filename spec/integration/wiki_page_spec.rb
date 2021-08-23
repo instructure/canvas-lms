@@ -58,7 +58,7 @@ describe WikiPagesController do
       get url
       expect(response).to be_successful
 
-      html = Nokogiri::HTML(response.body)
+      html = Nokogiri::HTML5(response.body)
       html.css('#breadcrumbs a').each do |link|
         href = link.attr('href')
         next if href == "/"

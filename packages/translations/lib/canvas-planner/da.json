@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begyndelsen af ​​din Opgaveliste-historik"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Nedenfor er et eksempel på, hvordan studerende vil se deres tidsplan"
+  },
   "calendar_a8563bb2": { "message": "Kalender:" },
   "calendar_event_89aadc1c": { "message": "Kalenderbegivenhed" },
   "canvas_planner_98ed106": { "message": "Canvas-planlægger" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# muligheder}\n    one {# mulighed}\n  other {# muligheder}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Skjul # manglende element}\n  other {Skjul # manglende elementer}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # afsluttet element}\n  other {Vis # afsluttede elementer}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Vis # manglende element}\n  other {Vis # manglende elementer}\n}"
   },
   "course_8a63b4a3": { "message": "Fag" },
   "course_to_do_bcbbab54": { "message": "{ course } OPGAVELISTE" },
@@ -84,6 +93,9 @@
   "error_loading_grades_e0b38f4d": {
     "message": "Fejl ved indlæsning af karakterer"
   },
+  "error_loading_items_5218438e": {
+    "message": "Fejl ved indlæsning af elementer"
+  },
   "error_loading_more_items_3f109d9f": {
     "message": "Fejl ved indlæsning af flere elementer"
   },
@@ -91,6 +103,18 @@
     "message": "Fejl ved indlæsning af forrige elementer"
   },
   "excused_cf8792eb": { "message": "Undskyldt" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Mislykkedes at kigge ind i din fremtid"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Mislykkedes at kigge ind i din fortid"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Kunne ikke gemme ændringerne { name }."
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "Kunne ikke slette { name }."
+  },
   "failed_to_delete_to_do_64edff49": { "message": "Kunne ikke slette opgave" },
   "failed_to_get_new_activity_17e7ec7c": {
     "message": "Kunne ikke hente ny aktivitet"
@@ -109,10 +133,11 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } afsluttet { items, plural,\n     =1 {element}\n  other {elementer}\n}"
   },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Gå til navigationsværktøjslinjen"
+  },
+  "jump_to_today_254ccf41": { "message": "Spring til i dag" },
   "late_2be42b88": { "message": "Sen" },
-  "list_collapsed_9ac35920": { "message": "Listen skjult." },
-  "list_collapsed_dde87718": { "message": "Listen skjult" },
-  "list_expanded_efec2d0": { "message": "Liste udvidet." },
   "load_more_a36f9cf9": { "message": "Indlæs mere" },
   "load_prior_dates_f2b0f6f0": { "message": "Indlæs tidligere datoer" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -145,6 +170,9 @@
     "message": "Ingen afleveringsdatoer tildelt"
   },
   "no_grade_3b4d7f3e": { "message": "Ingen karakter" },
+  "nothing_due_this_week_d45c9ef9": {
+    "message": "Intet skal afleveres denne uge"
+  },
   "nothing_for_now_e3e3ce2a": { "message": "Ikke noget nu" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Intet her har brug for opmærksomhed."
@@ -165,9 +193,6 @@
     "message": "*Kun seneste karakterperiode vist."
   },
   "opportunities_popup_f6703842": { "message": "muligheder popup" },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } valgt. Listen skjult."
-  },
   "optional_add_course_ef0d70fc": { "message": "Valgfrit: Tilføj fag" },
   "page_50c4823d": { "message": "Side" },
   "peer_review_74f26a13": { "message": "Peer review" },
@@ -179,9 +204,11 @@
   "previous_month_bb1e3c84": { "message": "Forrige måned" },
   "pts_699bd9aa": { "message": "point" },
   "quiz_e0dcce8f": { "message": "Test" },
+  "redo_363c58b7": { "message": "Annuller fortryd" },
   "reminder_date_4564d12d": { "message": "Påmindelse: { date }" },
   "replies_4a8577c8": { "message": "Svar" },
   "save_11a80ec3": { "message": "Gem" },
+  "schedule_preview_3bcda153": { "message": "Forhåndsvisning af tidsplan" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Rul op for at se din historik!"
   },
@@ -213,6 +240,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Der er ingen point associeret med dette element"
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "Der er ikke planlagt noget i dag."
+  },
   "time_2b5aac58": { "message": "Tidspunkt" },
   "title_ee03d132": { "message": "Titel" },
   "title_is_required_6ddcab69": { "message": "titel er påkrævet" },
@@ -230,6 +260,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Brug piletasterne til at navigere indstillinger."
+  },
+  "view_next_week_7f61f755": { "message": "Vis næste uge" },
+  "view_previous_week_6f83849f": { "message": "Vis forrige uge" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Ugentlig tidsplannavigation"
   },
   "yesterday_at_date_1aa6d18e": { "message": "I går kl. { date }" },
   "yesterday_c6bd6abf": { "message": "I går" },

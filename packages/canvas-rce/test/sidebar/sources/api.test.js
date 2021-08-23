@@ -18,7 +18,7 @@
 
 import assert from 'assert'
 import sinon from 'sinon'
-import RceApiSource from '../../../src/sidebar/sources/api'
+import RceApiSource, {headerFor, originFromHost} from '../../../src/sidebar/sources/api'
 import fetchMock from 'fetch-mock'
 import * as fileUrl from '../../../src/common/fileUrl'
 
@@ -211,21 +211,6 @@ describe('sources/api', () => {
       })
     })
 
-    it('can parse while-wrapped page data', () => {
-      const whileFakePageBody = 'while(1);' + fakePageBody
-      const uri = 'theURI'
-      fetchMock.mock(uri, whileFakePageBody)
-      return apiSource.fetchPage(uri).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'newBookmark',
-          links: [
-            {href: 'link1', title: 'Link 1'},
-            {href: 'link2', title: 'Link 2'}
-          ]
-        })
-      })
-    })
-
     it('retries once on 401 with a renewed token', () => {
       const uri = 'theURI'
 
@@ -276,6 +261,153 @@ describe('sources/api', () => {
           assert.strictEqual(body.files[i].href, wrapUrl)
         })
       })
+    })
+  })
+
+  describe('fetchSubFolders()', () => {
+    let bookmark, props
+
+    const subject = () => apiSource.fetchSubFolders(props, bookmark)
+
+    beforeEach(() => {
+      props = {host: 'canvas.rce', folderId: 2}
+      bookmark = undefined
+      sinon.stub(apiSource, 'apiFetch').returns(Promise.resolve({}))
+    })
+
+    afterEach(() => apiSource.apiFetch.reset())
+
+    it('makes a request to the folders api with the given host and ID', () => {
+      subject()
+      sinon.assert.calledWith(apiSource.apiFetch, 'about://canvas.rce/api/folders/2', {
+        Authorization: 'Bearer theJWT'
+      })
+    })
+
+    describe('fetchFilesForFolder()', () => {
+      let bookmark, props
+
+      const subject = () => apiSource.fetchFilesForFolder(props, bookmark)
+
+      beforeEach(() => {
+        props = {host: 'canvas.rce', filesUrl: 'https://canvas.rce/api/files/2'}
+        bookmark = undefined
+      })
+
+      afterEach(() => apiSource.apiFetch.reset())
+
+      it('makes a request to the files api with given host and folder ID', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2?', {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+
+      describe('with perPage set', () => {
+        beforeEach(() => {
+          props.perPage = 50
+        })
+
+        it('includes the "per_page" query param', () => {
+          subject()
+          sinon.assert.calledWith(
+            apiSource.apiFetch,
+            'https://canvas.rce/api/files/2?per_page=50',
+            {
+              Authorization: 'Bearer theJWT'
+            }
+          )
+        })
+      })
+    })
+
+    describe('with a provided bookmark', () => {
+      beforeEach(() => (bookmark = 'https://canvas.rce/api/folders/2?page=2'))
+
+      it('makes a request to the bookmark', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, bookmark, {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+    })
+  })
+
+  describe('fetchBookmarkedData', () => {
+    let fetchFunction, properties, onSuccess, onError
+
+    beforeEach(() => {
+      fetchFunction = sinon
+        .stub()
+        .onFirstCall()
+        .returns(Promise.resolve({bookmark: 'https://canvas.rce/api/thing/1?page=2'}))
+        .onSecondCall()
+        .returns(Promise.resolve({data: 'foo'}))
+      properties = {foo: 'bar'}
+      onSuccess = sinon.stub()
+      onError = sinon.stub()
+    })
+
+    afterEach(() => {
+      fetchFunction.reset()
+      onSuccess.reset()
+      onError.reset()
+    })
+
+    const subject = () =>
+      apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
+
+    it('calls the "fetchFunction", passing "properties"', () => {
+      subject().then(() => {
+        sinon.assert.alwaysCalledWith(fetchFunction, properties)
+        sinon.assert.calledTwice(fetchFunction)
+      })
+    })
+
+    it('calls "onSuccess" for each page', () => {
+      return subject().then(() => {
+        sinon.assert.calledTwice(onSuccess)
+      })
+    })
+
+    describe('when "fetchFunction" throws an exception', () => {
+      beforeEach(() => {
+        fetchFunction.onFirstCall().returns(Promise.reject('error'))
+      })
+
+      it('calls "onError"', () => {
+        return subject().then(() => {
+          sinon.assert.calledOnce(onError)
+        })
+      })
+    })
+  })
+
+  describe('fetchButtonsAndIconsFolder', () => {
+    let folders
+
+    beforeEach(() => {
+      folders = [{id: 24}]
+      const body = {folders}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+
+    it('calls fetchPage with the proper params', () => {
+      return apiSource
+        .fetchButtonsAndIconsFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/buttons_and_icons?contextType=course&contextId=22'
+          )
+        })
     })
   })
 
@@ -652,6 +784,42 @@ describe('sources/api', () => {
         assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
         assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
       })
+    })
+  })
+
+  describe('headerFor', () => {
+    it('returns an authorization header', () => {
+      assert.deepStrictEqual(headerFor('the_jwt'), {
+        Authorization: 'Bearer the_jwt'
+      })
+    })
+  })
+
+  describe('originFromHost', () => {
+    // this logic was factored out from baseUri, so the logic is tested
+    // there too.
+    it('uses the incoming http(s) protocol if present', () => {
+      assert.strictEqual(originFromHost('http://host:port'), 'http://host:port', 'echoes http')
+      assert.strictEqual(originFromHost('https://host:port'), 'https://host:port', 'echoes https')
+      assert.strictEqual(originFromHost('host:port', {}), '//host:port', 'no protocol')
+    })
+
+    it('uses the windowOverride protocol if present', () => {
+      const win = {
+        location: {
+          protocol: 'https:'
+        }
+      }
+      assert.strictEqual(
+        originFromHost('http://host:port', win),
+        'http://host:port',
+        'use provided protocol'
+      )
+      assert.strictEqual(
+        originFromHost('host:port', win),
+        'https://host:port',
+        'use window protocol'
+      )
     })
   })
 })

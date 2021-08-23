@@ -93,7 +93,6 @@ describe "analytics in Canvas" do
     describe "course people page for teacher role" do
       context "with A2 FF enabled" do
         before :each do
-          @admin.account.enable_feature!(:student_context_cards)
           user_session(@teacher)
           @course.root_account.enable_feature!(:analytics_2)
         end
@@ -110,7 +109,6 @@ describe "analytics in Canvas" do
 
       context "with A2 FF disabled" do
         before :each do
-          @admin.account.enable_feature!(:student_context_cards)
           user_session(@teacher)
           @course.root_account.disable_feature!(:analytics_2)
         end

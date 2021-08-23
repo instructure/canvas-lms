@@ -1,0 +1,7 @@
+FROM local/linters-runner
+
+ARG DST_WORKDIR
+ENV DST_WORKDIR=${DST_WORKDIR}
+
+RUN mkdir -p ${DST_WORKDIR}
+COPY --chown=docker:docker . ${DST_WORKDIR}

@@ -89,7 +89,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         #{"accountId: #{account_id}" if account_id}
       )" if context_type && (course_id || account_id)}
       notificationPreferences {
-        sendScoresInEmails(courseId: #{course_id})
+        sendScoresInEmails#{"(courseId: #{course_id})" if course_id}
         sendObservedNamesInNotifications
         readPrivacyNoticeDate
         channels {
@@ -119,7 +119,11 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
   end
 
   def run_mutation(opts = {}, current_user = @teacher)
-    result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user, request: ActionDispatch::TestRequest.create})
+    result = CanvasSchema.execute(mutation_str(opts), context: {
+      current_user: current_user,
+      request: ActionDispatch::TestRequest.create,
+      domain_root_account: @account
+    })
     result.to_h.with_indifferent_access
   end
 
@@ -304,6 +308,21 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         account_id: @account.id,
         communication_channel_id: @teacher.communication_channels.first.id,
         notification_category: 'Due_Date',
+        frequency: 'immediately'
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(
+        result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicies, 0, :frequency)
+      ).to eq('immediately')
+    end
+
+    it 'creates notification policies for newly created notification types' do
+      Notification.create!(name: "Discussion Mention", subject: "Test", category: 'DiscussionMention')
+      result = run_mutation(
+        context_type: 'Account',
+        account_id: @account.id,
+        communication_channel_id: @teacher.communication_channels.first.id,
+        notification_category: 'DiscussionMention',
         frequency: 'immediately'
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil

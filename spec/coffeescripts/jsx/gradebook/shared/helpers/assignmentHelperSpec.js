@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import assignmentHelper from 'jsx/gradebook/shared/helpers/assignmentHelper'
+import assignmentHelper from 'ui/features/gradebook/react/shared/helpers/assignmentHelper.js'
 
 QUnit.module('assignmentHelper#getComparator', {
   setup() {},

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizArrowApplicator from 'quiz_arrows'
+import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('QuizArrowApplicator', {

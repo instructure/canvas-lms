@@ -527,6 +527,19 @@ describe DiscussionTopicsController, type: :request do
         expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
+      it "should raise error when trying to lock before Due Date" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+
+        @assignment = @topic2.context.assignments.build
+        @assignment.due_at = 3.days.from_now
+        @topic2.assignment = @assignment
+        @topic2.save!
+
+        expect {
+          @topic2.lock
+        }.to raise_error DiscussionTopic::Errors::LockBeforeDueDate
+      end
+
       it "should only include topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
@@ -2513,6 +2526,14 @@ describe DiscussionTopicsController, type: :request do
       expect(call_subscribe(@topic1, @student)).to eq 204
     end
 
+    it "should not 500 when user is not related to a child topic" do
+      gc = @course.group_categories.create!(name: 'children')
+      gc.groups.create!(name: 'first', context: @course, root_account_id: @course.root_account_id)
+      @topic1.group_category_id = gc
+      @topic1.save!
+      expect(call_subscribe(@topic1, @student)).to eq 400
+    end
+
     context "when initial_post_required" do
       it "should allow subscription with an initial post" do
         @user = @student
@@ -2749,7 +2770,7 @@ describe DiscussionTopicsController, type: :request do
       expect(v0_r1['id']).to eq @reply2.id
       expect(v0_r1['user_id']).to eq @teacher.id
 
-      message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
+      message = Nokogiri::HTML5.fragment(v0_r1["message"])
 
       a_tag = message.css("p a").first
       expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
@@ -3065,6 +3086,34 @@ describe DiscussionTopicsController, type: :request do
         {},
         {},
         :expected_status => 200)
+    end
+
+    it "duplicate doesn't work if student" do
+      @user = student_in_course(active_all: true).user
+
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@group_topic.id}/duplicate",
+               { :controller => "discussion_topics_api",
+                 :action => "duplicate",
+                 :format => "json",
+                 :course_id => @course.to_param,
+                 :topic_id => @group_topic.to_param },
+               {},
+               {},
+               :expected_status => 401)
+    end
+
+    it "duplicate work if admin" do
+      @user = account_admin_user
+
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@group_topic.id}/duplicate",
+               { :controller => "discussion_topics_api",
+                 :action => "duplicate",
+                 :format => "json",
+                 :course_id => @course.to_param,
+                 :topic_id => @group_topic.to_param },
+               {},
+               {},
+               :expected_status => 200)
     end
 
     it "duplicate carries sections over" do

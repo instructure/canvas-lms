@@ -514,6 +514,11 @@ describe ConversationsController do
         @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
 
+      it "should _not_ create user notes if asked not to" do
+        post 'create', params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: '0' }
+        @students.each{|x| expect(x.user_notes.size).to be(0)}
+      end
+
       it "should include the domain root account in the user note" do
         post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
         note = UserNote.last
@@ -627,6 +632,15 @@ describe ConversationsController do
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it "should refrain from duplicating the RCE-created media_comment" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @student.media_objects.where(media_id: 'm-whatever', media_type: 'video/mp4').first_or_create!
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world", media_comment_id: 'm-whatever', media_comment_type: 'video' }
+      expect(response).to be_successful
+      expect(@student.media_objects.by_media_id('m-whatever').count).to eq 1
     end
   end
 

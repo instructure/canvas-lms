@@ -379,7 +379,23 @@ export default {
   /* HTML */
   jumpToToday: '<a href="#" class="jump_to_today_link">Jump to Today</a>',
 
-  syllabusContainer: '<div id="syllabusContainer"/>',
+  syllabusContainer: `
+    <div id="syllabusContainer">
+      <div id="syllabus_links">
+      </div>
+      <table id="syllabus" class="ic-Table ic-Table--condensed">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Details</th>
+            <th scope="col" class='due'>Due</th>
+          </tr>
+        </thead>
+        <tbody id="syllabusTableBody">
+        </tbody>
+      </table>
+    </div>
+  `,
 
   miniMonthDay(year, month, day, currentMonth, currentDay) {
     if (currentMonth == null) {

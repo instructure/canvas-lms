@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -93,6 +95,8 @@ class SubmissionsController < SubmissionsBaseController
   before_action :get_course_from_section, :only => :create
   before_action :require_context
 
+  include K5Mode
+
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)
@@ -134,7 +138,8 @@ class SubmissionsController < SubmissionsBaseController
     "online_url" => ["url"].freeze,
     "online_upload" => ["file_ids"].freeze,
     "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
-    "basic_lti_launch" => ["url"].freeze
+    "basic_lti_launch" => ["url"].freeze,
+    "student_annotation" => ["annotatable_attachment_id"].freeze
   }.freeze
 
   # @API Submit an assignment
@@ -152,7 +157,7 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
@@ -194,6 +199,12 @@ class SubmissionsController < SubmissionsBaseController
   #
   # @argument submission[user_id] [Integer]
   #   Submit on behalf of the given user. Requires grading permission.
+  #
+  # @argument submission[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated. This should match
+  #   the annotatable_attachment_id on the assignment.
+  #
+  #   Requires a submission_type of "student_annotation".
   #
   # @argument submission[submitted_at] [DateTime]
   #   Choose the time the submission is listed as submitted at.  Requires grading permission.
@@ -246,13 +257,25 @@ class SubmissionsController < SubmissionsBaseController
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      elsif params[:submission][:submission_type] == 'student_annotation' && params[:submission][:annotatable_attachment_id].blank?
+        flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
+        return redirect_to(course_assignment_url(@context, @assignment))
+      end
+
+      unless @assignment.accepts_submission_type?(params[:submission][:submission_type])
+        flash[:error] = t("Assignment does not accept this submission type")
+        return redirect_to(course_assignment_url(@context, @assignment))
       end
     end
+
+    # When the `resource_link_lookup_uuid` is given, we need to validate if it exists,
+    # in case not, we'll return an error and won't record the submission.
+    return unless valid_resource_link_lookup_uuid?
 
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :attachment_ids => []
+      :resource_link_lookup_uuid, :annotatable_attachment_id, attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
@@ -315,6 +338,14 @@ class SubmissionsController < SubmissionsBaseController
     @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
     @user = @context.all_students.find(params.fetch(:id))
     @submission = @assignment.find_or_create_submission(@user)
+
+    super
+  end
+
+  def redo_submission
+    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
+    @user = get_user_considering_section(params.fetch(:submission_id))
+    @submission = @assignment.submission_for_student(@user)
 
     super
   end
@@ -408,10 +439,7 @@ class SubmissionsController < SubmissionsBaseController
   private :verify_api_call_has_attachment
 
   def allowed_api_submission_type?(submission_type)
-    valid_for_api = API_SUBMISSION_TYPES.key?(submission_type)
-    allowed_for_assignment = @assignment.submission_types_array.include?(submission_type)
-    basic_lti_launch = (@assignment.submission_types.include?('online') && submission_type == 'basic_lti_launch')
-    valid_for_api && (allowed_for_assignment || basic_lti_launch)
+    API_SUBMISSION_TYPES.key?(submission_type) && @assignment.accepts_submission_type?(submission_type)
   end
   private :allowed_api_submission_type?
 
@@ -552,10 +580,35 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = [:eula_agreement_timestamp, :submitted_at].freeze
+    always_permitted_params = [:eula_agreement_timestamp, :submitted_at, :resource_link_lookup_uuid].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
+
+  def valid_resource_link_lookup_uuid?
+    return true if params[:submission][:resource_link_lookup_uuid].nil?
+
+    resource_link = Lti::ResourceLink.find_by(
+      lookup_uuid: params[:submission][:resource_link_lookup_uuid],
+      context: @context
+    )
+
+    return true if resource_link
+
+    message = t('Resource link not found for given `resource_link_lookup_uuid`')
+
+    # Homework submission is done by API request, but I saw other parts of code
+    # that are handling HTML and JSON format. So, I kept the same logic here...
+    if api_request?
+      render(json: { message: message }, status: 400)
+    else
+      flash[:error] = message
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+    end
+
+    false
+  end
+  private :valid_resource_link_lookup_uuid?
 
   protected
 

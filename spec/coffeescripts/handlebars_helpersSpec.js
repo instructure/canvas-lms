@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Handlebars from 'compiled/handlebars_helpers'
+import Handlebars from '@canvas/handlebars-helpers'
 import $ from 'jquery'
 import _ from 'underscore'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'
-import numberFormat from 'jsx/shared/helpers/numberFormat'
-import tz from 'timezone'
+import numberFormat from '@canvas/i18n/numberFormat'
+import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import chicago from 'timezone/America/Chicago'
 import newYork from 'timezone/America/New_York'
@@ -125,12 +127,11 @@ test('supports truncation left', () => {
 
 QUnit.module('friendlyDatetime', {
   setup() {
-    this.snapshot = tz.snapshot()
     return tz.changeZone(detroit, 'America/Detroit')
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -166,16 +167,20 @@ test('includes a visible version', () =>
 
 QUnit.module('contextSensitive FriendlyDatetime', {
   setup() {
-    this.snapshot = tz.snapshot()
     fakeENV.setup()
     ENV.CONTEXT_TIMEZONE = 'America/Chicago'
-    tz.changeZone(detroit, 'America/Detroit')
-    return tz.preload('America/Chicago', chicago)
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Chicago': chicago,
+        'America/Detroit': detroit,
+      }
+    })
   },
 
   teardown() {
     fakeENV.teardown()
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -216,14 +221,19 @@ QUnit.module('contextSensitiveDatetimeTitle', {
     this.snapshot = tz.snapshot()
     fakeENV.setup()
     ENV.CONTEXT_TIMEZONE = 'America/Chicago'
-    tz.changeZone(detroit, 'America/Detroit')
-    tz.preload('America/Chicago', chicago)
-    return tz.preload('America/New_York', newYork)
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Chicago': chicago,
+        'America/Detroit': detroit,
+        'America/New_York': newYork
+      }
+    })
   },
 
   teardown() {
     fakeENV.teardown()
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -244,7 +254,13 @@ test('splits title text to both zones', () => {
 
 test('properly spans day boundaries', () => {
   ENV.TIMEZONE = 'America/Chicago'
-  tz.changeZone(chicago, 'America/Chicago')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(chicago, 'America/Chicago'),
+    tzData: {
+      'America/Chicago': chicago,
+      'America/New_York': newYork
+    }
+  })
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 05:30:00Z', {
     hash: {justText: true}

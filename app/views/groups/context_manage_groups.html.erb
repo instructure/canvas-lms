@@ -17,4 +17,4 @@
 %>
 
 <% provide :page_title do %><%= join_title (@context.is_a?(Account) ? t(:page_title_accounts, 'Account Groups') : t(:page_title, 'Course Groups')), @context.name %><% end %>
-<% js_bundle :manage_groups2 %>
+<% js_bundle :manage_groups %>

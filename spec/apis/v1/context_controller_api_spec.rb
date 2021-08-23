@@ -25,8 +25,10 @@ describe ContextController, type: :request do
   end
 
   describe "POST '/api/v1/media_objects'" do
+    let(:user) { @student }
+
     before :each do
-      user_session(@student)
+      user_session(user)
     end
 
     it "should match the create_media_object api route" do
@@ -52,6 +54,50 @@ describe ContextController, type: :request do
       expect(json["media_object"]["id"]).to eq @media_object.id
       expect(json["media_object"]["title"]).to eq @media_object.title
       expect(json["media_object"]["media_type"]).to eq @media_object.media_type
+    end
+
+    context 'when the context is a cross-shard user' do
+      specs_require_sharding
+
+      let(:user_shard) { @shard2 }
+      let(:default_shard) { Account.default.shard }
+      let(:user_root_account) { account_model }
+
+      let(:user) do
+        u = nil
+
+        user_shard.activate do
+          u = user_model
+          u.user_account_associations.create!(account: user_root_account)
+          u
+        end
+      end
+
+      let(:media_object_request) do
+        api_call(
+          :post,
+          '/api/v1/media_objects',
+          {
+            controller: 'context',
+            action: 'create_media_object',
+            format: 'json',
+            context_code: "user_#{user.id}",
+            id: 'new_object',
+            type: 'video',
+            title: 'title'
+          }
+        )
+      end
+
+      it 'sets the MediaObject root account to the domain root account' do
+        new_object = default_shard.activate { MediaObject.find(media_object_request.dig('media_object', 'id')) }
+        expect(new_object.root_account).to eq Account.default
+      end
+
+      it "creates the MediaObject on the domain root account's shard" do
+        new_object = default_shard.activate { MediaObject.find(media_object_request.dig('media_object', 'id')) }
+        expect(new_object.shard).to eq Account.default.shard
+      end
     end
   end
 end

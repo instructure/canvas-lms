@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
   let store

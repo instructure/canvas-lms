@@ -95,13 +95,13 @@ module Lti
             expect(account.lti_resource_links.first.context).to eq account
           end
 
-          it 'add the lookup_id to the to the content item' do
+          it 'add the lookup_uuid to the to the content item' do
             subject
 
             content_items = controller.content_items
             lti_resource_links = account.lti_resource_links
 
-            expect(content_items.first['lookup_id']).to eq lti_resource_links.first.lookup_id
+            expect(content_items.first['lookup_uuid']).to eq lti_resource_links.first.lookup_uuid
           end
         end
 

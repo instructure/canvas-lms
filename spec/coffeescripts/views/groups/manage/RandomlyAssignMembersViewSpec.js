@@ -18,15 +18,14 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import GroupCategoryView from 'compiled/views/groups/manage/GroupCategoryView'
-import RandomlyAssignMembersView from 'compiled/views/groups/manage/RandomlyAssignMembersView'
-import GroupCategory from 'compiled/models/GroupCategory'
+import GroupCategoryView from 'ui/features/manage_groups/backbone/views/GroupCategoryView.js'
+import RandomlyAssignMembersView from 'ui/features/manage_groups/backbone/views/RandomlyAssignMembersView.js'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import 'helpers/fakeENV'
 
 let server = null
 let view = null
 let model = null
-const globalObj = this
 let clock = null
 
 const queueResponse = (method, url, json) =>
@@ -175,6 +174,7 @@ QUnit.module('RandomlyAssignMembersView', {
     this._ENV = window.ENV
     window.ENV = {
       group_user_type: 'student',
+      permissions: {can_manage_groups: true},
       IS_LARGE_ROSTER: false
     }
 

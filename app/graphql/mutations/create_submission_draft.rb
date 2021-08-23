@@ -39,7 +39,10 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   argument :url, String, required: false
 
   field :submission_draft, Types::SubmissionDraftType, null: true
+
   def resolve(input:)
+    @retried ||= false
+
     submission = find_submission(input[:submission_id])
 
     file_ids = (input[:file_ids] || []).compact.uniq
@@ -73,6 +76,23 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => invalid
+    # activerecord validation is not robust to race condition
+    #   multiple concurrent requests may penetrate activerecord validations
+    #   and save dup records for a combination of submission_id and attempt
+    # If it happened, following saves will be blocked by activerecord validation
+    # Ideally, an unique index should be defined, but with many existing records,
+    #   creating unique index may fail without cleaning data first.
+    if submission_draft.present?
+      submission_drafts = SubmissionDraft.where(
+        submission: submission_draft.submission,
+        submission_attempt: submission_draft.submission_attempt
+      )
+      if submission_drafts.count > 1 && !@retried
+        @retried = true
+        submission_drafts.where.not(id: submission_draft.id).destroy_all
+        retry
+      end
+    end
     errors_for(invalid.record)
   rescue SubmissionError => e
     return validation_error(e.message)

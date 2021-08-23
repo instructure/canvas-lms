@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import SpeedGraderHelpers from 'speed_grader_helpers'
-import SpeedGraderSelectMenu from 'speed_grader_select_menu'
+import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
+import SpeedGraderSelectMenu from 'ui/features/speed_grader/jquery/speed_grader_select_menu.js'
 
 QUnit.module('SpeedGraderSelectMenu', () => {
   QUnit.module('#updateSelectMenuStatus', updateSelectMenuStatusHooks => {

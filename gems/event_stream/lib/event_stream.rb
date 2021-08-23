@@ -28,6 +28,7 @@ module EventStream
   require 'event_stream/backend'
   require 'event_stream/record'
   require 'event_stream/failure'
+  require 'event_stream/logger'
   require 'event_stream/stream'
   require 'event_stream/index'
 

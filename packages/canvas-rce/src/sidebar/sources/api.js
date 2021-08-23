@@ -18,12 +18,28 @@
 
 import 'isomorphic-fetch'
 import {parse} from 'url'
+import {saveClosedCaptions} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../../common/fileUrl'
 import formatMessage from '../../format-message'
 import alertHandler from '../../rce/alertHandler'
 
-function headerFor(jwt) {
+export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
+}
+
+export function originFromHost(host, windowOverride) {
+  let origin = host
+
+  if (typeof origin !== 'string') {
+    origin = ''
+  } else if (origin && origin.substr(0, 4) !== 'http') {
+    origin = `//${origin}`
+    const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
+    if (origin.length > 0 && windowHandle?.location?.protocol) {
+      origin = `${windowHandle.location.protocol}${origin}`
+    }
+  }
+  return origin
 }
 
 // filter a response to raise an error on a 400+ status
@@ -35,23 +51,6 @@ function checkStatus(response) {
     error.response = response
     throw error
   }
-}
-
-// convert a successful response into the parsed out data
-function parseResponse(response) {
-  // NOTE: this returns a promise, not a synchronous result. since it's passed
-  // to a .then(), that's fine, but before reusing somewhere where intended to
-  // be synchronous, be aware of that
-  return response.text().then(text => {
-    let json = text
-    try {
-      json = text.replace(/^while\(1\);/, '')
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('Strange json package', err)
-    }
-    return JSON.parse(json)
-  })
 }
 
 function defaultRefreshTokenHandler() {
@@ -151,6 +150,19 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
+  fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, bookmark) {
+    return fetchFunction(properties, bookmark)
+      .then(result => {
+        onSuccess(result)
+        if (result.bookmark) {
+          this.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, result.bookmark)
+        }
+      })
+      .catch(error => {
+        onError(error)
+      })
+  }
+
   fetchDocs(props) {
     const documents = props.documents[props.contextType]
     const uri = documents.bookmark || this.uriFor('documents', props)
@@ -217,52 +229,16 @@ class RceApiSource {
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
   // receive back a 200 with the new subtitles, or a 4xx error
   updateClosedCaptions(apiProps, {media_object_id, subtitles}) {
-    // read all the subtitle files' contents
-    const file_promises = []
-    subtitles.forEach(st => {
-      if (st.isNew) {
-        const p = new Promise((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = function(e) {
-            resolve({locale: st.locale, content: e.target.result})
-          }
-          reader.onerror = function(e) {
-            e.target.abort()
-            reject(e)
-          }
-          reader.readAsText(st.file)
-        })
-        file_promises.push(p)
-      } else {
-        file_promises.push(Promise.resolve({locale: st.locale}))
-      }
+    return saveClosedCaptions(media_object_id, subtitles, {
+      origin: originFromHost(apiProps.host),
+      headers: headerFor(apiProps.jwt)
+    }).catch(e => {
+      console.error('Failed saving CC', e)
+      this.alertFunc({
+        text: formatMessage('Uploading closed captions/subtitles failed.'),
+        variant: 'error'
+      })
     })
-
-    // once all the promises from reading the subtitles' files
-    // have resolved, PUT the resulting subtitle objects to the RCS
-    // when that completes, the update_promise will resolve
-    const update_promise = new Promise((resolve, reject) => {
-      Promise.all(file_promises)
-        .then(closed_captions => {
-          const uri = `${this.baseUri(
-            'media_objects',
-            apiProps.host
-          )}/${media_object_id}/media_tracks`
-          return this.apiPost(uri, headerFor(this.jwt), closed_captions, 'PUT')
-            .then(resolve)
-            .catch(e => {
-              console.error('failed updating media_tracks') // eslint-disable-line no-console
-              reject(e)
-            })
-        })
-        .catch(_e => {
-          this.alertFunc({
-            text: formatMessage('Reading a media track file failed. Aborting.'),
-            variant: 'error'
-          })
-        })
-    })
-    return update_promise
   }
 
   // GET /media_objects/:mediaId/media_tracks
@@ -279,6 +255,28 @@ class RceApiSource {
     const headers = headerFor(this.jwt)
     const uri = bookmark || this.uriFor('folders/all', props)
     return this.apiFetch(uri, headers)
+  }
+
+  // Fetches all files for a given folder
+  fetchFilesForFolder(props, bookmark) {
+    let uri
+
+    if (!bookmark) {
+      const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
+      uri = `${props.filesUrl}?${perPageQuery}${getSearchParam(props.searchString)}`
+    }
+
+    return this.fetchPage(uri || bookmark, this.jwt)
+  }
+
+  fetchSubFolders(props, bookmark) {
+    const uri = bookmark || `${this.baseUri('folders', props.host)}/${props.folderId}`
+    return this.apiFetch(uri, headerFor(this.jwt))
+  }
+
+  fetchButtonsAndIconsFolder(props) {
+    const uri = this.uriFor('folders/buttons_and_icons', props)
+    return this.fetchPage(uri)
   }
 
   fetchMediaFolder(props) {
@@ -332,7 +330,7 @@ class RceApiSource {
     }
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
-      .then(parseResponse)
+      .then(res => res.json())
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
@@ -354,7 +352,7 @@ class RceApiSource {
       // require authentication
       return fetch(preflightProps.upload_params.success_url)
         .then(checkStatus)
-        .then(parseResponse)
+        .then(res => res.json())
     } else if (uploadResults.location) {
       // inst-fs upload, follow-up by fetching file identified by location in
       // response. we can't just fetch the location as would be intended because
@@ -435,7 +433,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(options.skipParse ? () => {} : parseResponse)
+      .then(options.skipParse ? () => {} : res => res.json())
       .catch(throwConnectionError)
       .catch(e => {
         this.alertFunc({
@@ -472,7 +470,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(parseResponse)
+      .then(res => res.json())
       .catch(throwConnectionError)
       .catch(e => {
         console.error(e) // eslint-disable-line no-console
@@ -509,20 +507,8 @@ class RceApiSource {
     if (!host && this.host) {
       host = this.host
     }
-    if (typeof host !== 'string') {
-      host = ''
-    } else if (host && host.substr(0, 4) !== 'http') {
-      host = `//${host}`
-      const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
-      if (
-        host.length > 0 &&
-        windowHandle &&
-        windowHandle.location &&
-        windowHandle.location.protocol
-      ) {
-        host = `${windowHandle.location.protocol}${host}`
-      }
-    }
+    host = originFromHost(host, windowOverride)
+
     const sharedEndpoints = ['images', 'media', 'documents', 'all'] // 'all' will eventually be something different
     const endpt = sharedEndpoints.includes(endpoint) ? 'documents' : endpoint
     return `${host}/api/${endpt}`
@@ -534,8 +520,10 @@ class RceApiSource {
   //   //rce.docker/api/wikiPages?context_type=course&context_id=42
   //
   uriFor(endpoint, props) {
-    const {host, contextType, contextId, sortBy, searchString} = props
+    const {host, contextType, contextId, sortBy, searchString, perPage} = props
     let extra = ''
+    const pageSizeParam = perPage ? `&per_page=${perPage}` : ''
+
     switch (endpoint) {
       case 'images':
         extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
@@ -563,10 +551,11 @@ class RceApiSource {
       default:
         extra = getSearchParam(searchString)
     }
+
     return `${this.baseUri(
       endpoint,
       host
-    )}?contextType=${contextType}&contextId=${contextId}${extra}`
+    )}?contextType=${contextType}&contextId=${contextId}${pageSizeParam}${extra}`
   }
 }
 

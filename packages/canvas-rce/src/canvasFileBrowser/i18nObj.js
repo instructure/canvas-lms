@@ -22,11 +22,11 @@ import I18n from 'i18n-js'
 import extend from 'i18nliner/dist/lib/extensions/i18n_js'
 
 import htmlEscape from './htmlEscape'
-import './date'
+
 // add i18nliner's runtime extensions to the global I18n object
 if (!I18n.translateWithoutI18nliner) {
-  // can't extend twice
-  extend(I18n)
+  // can't extend or load date-js twice
+  import('./date').then(() => extend(I18n))
 }
 
 /*

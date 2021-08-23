@@ -19,9 +19,10 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import {Img, Link} from '@instructure/ui-elements'
+import {Link} from '@instructure/ui-link'
+import {Img} from '@instructure/ui-img'
 
-import DeveloperKey from 'jsx/developer_keys/DeveloperKey'
+import DeveloperKey from 'ui/features/developer_keys_v2/react/DeveloperKey.js'
 
 class TestTable extends React.Component {
   render() {

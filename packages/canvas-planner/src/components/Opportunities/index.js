@@ -17,7 +17,8 @@
  */
 import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
-import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
+import {scopeTab} from '@instructure/ui-a11y-utils'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import keycode from 'keycode'
 
 import {Tabs} from '@instructure/ui-tabs'
@@ -103,11 +104,11 @@ export class Opportunities extends Component {
     return course[attr]
   }
 
-  // the only place on the TabList heirarchy where we can set a maxHeight is on
+  // the only place on the <Tabs> hierarchy where we can set a maxHeight is on
   // TabPanel, which puts the style on it's child content-holding div.
   // To keep the scrolling area w/in the TabPanel's content so that
-  // the TabList doesn't outgrow its parent and the user winds up scrolling the tabs
-  // out of view, we need to subtract out how much space the TabList's boilerplate takes
+  // the <Tabs> doesn't outgrow its parent and the user winds up scrolling the tabs
+  // out of view, we need to subtract out how much space the <Tabs>'s boilerplate takes
   // up to set the TabPanel's maxHeight appropriately.
   // Unfortunately TabPanel's tabRef returns a ref to the Tab, and TabPanel's ref returns
   // a ref to the TabPanel component. Even if we get it's div, it doesn't have it's padding
@@ -116,8 +117,9 @@ export class Opportunities extends Component {
     let mxht = 'auto'
     if (this.tabPanelContentDiv) {
       const style = window.getComputedStyle(this.tabPanelContentDiv)
-      const padding = parseInt(style['padding-top']) + parseInt(style['padding-bottom'])
-      const border = parseInt(style['border-top-width']) + parseInt(style['border-bottom-width'])
+      const padding = parseInt(style['padding-top'], 10) + parseInt(style['padding-bottom'], 10)
+      const border =
+        parseInt(style['border-top-width'], 10) + parseInt(style['border-bottom-width'], 10)
       mxht = `${props.maxHeight - this.tabPanelContentDiv.offsetTop - padding - border}px`
     }
     this.setState({innerMaxHeight: mxht})
@@ -206,18 +208,18 @@ export class Opportunities extends Component {
         style={{maxHeight: this.props.maxHeight}}
       >
         {this.renderCloseButton()}
-        <Tabs onRequestTabChange={this.handleTabChange}>
+        <Tabs id={styles.tabs_container} onRequestTabChange={this.handleTabChange}>
           <Tabs.Panel
             renderTitle={this.renderTitle('new')}
             maxHeight={this.state.innerMaxHeight}
-            selected={selectedIndex === 0}
+            isSelected={selectedIndex === 0}
           >
             {this.renderNewOpportunities()}
           </Tabs.Panel>
           <Tabs.Panel
             renderTitle={this.renderTitle('dismissed')}
             maxHeight={this.state.innerMaxHeight}
-            selected={selectedIndex === 1}
+            isSelected={selectedIndex === 1}
           >
             {this.renderDismissedOpportunities()}
           </Tabs.Panel>

@@ -103,7 +103,7 @@ const UsageRightsSelectBox = ({
     function getUsageRightsOptions() {
       fetch(apiUrl())
         .then(res => res.text())
-        .then(res => setLicenseOptions(JSON.parse(res.replace('while(1);', ''))))
+        .then(res => setLicenseOptions(JSON.parse(res)))
         .catch(() => {})
     }
 

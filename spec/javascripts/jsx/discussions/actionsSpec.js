@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/discussions/actions'
-import * as apiClient from 'jsx/discussions/apiClient'
+import actions from 'ui/features/discussion_topics_index/react/actions.js'
+import * as apiClient from 'ui/features/discussion_topics_index/react/apiClient.js'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications'
+import '@canvas/rails-flash-notifications'
 
 function getState() {
   return [{id: 1}, {id: 2, shouldGetFocus: true}]

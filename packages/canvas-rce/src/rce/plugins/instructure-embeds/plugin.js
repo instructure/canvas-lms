@@ -44,7 +44,7 @@ tinymce.create('tinymce.plugins.InstructureEmbedsPlugin', {
     })
 
     function isEmbeddable($element) {
-      return getContentFromElement($element).type === FILE_LINK_TYPE
+      return getContentFromElement($element, editor).type === FILE_LINK_TYPE
     }
 
     editor.ui.registry.addContextToolbar('instructure-embed-toolbar', {

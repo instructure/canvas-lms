@@ -20,6 +20,7 @@
 
 require_relative '../spec_helper'
 require_relative '../lti_1_3_spec_helper'
+require_relative '../helpers/k5_common'
 
 RSpec.describe ApplicationController do
   before :each do
@@ -148,40 +149,38 @@ RSpec.describe ApplicationController do
       end
     end
 
-    describe "DIRECT_SHARE_ENABLED feature flag" do
+    describe "ENV.DIRECT_SHARE_ENABLED" do
       before :each do
         allow(controller).to receive(:user_display_json)
+        allow(controller).to receive('api_v1_course_ping_url').and_return({})
         controller.instance_variable_set(:@domain_root_account, Account.default)
       end
 
-      it "sets the env var to true when FF is enabled and the user can use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to true when the user can use it" do
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
       end
 
-      it "sets the env var to false when FF is enabled but the user can't use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to false when the user can't use it" do
         course_with_student(:active_all => true)
         controller.instance_variable_set(:@current_user, @student)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
 
       it "sets the env var to false when the context is a group" do
-        Account.default.enable_feature!(:direct_share)
-
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
 
-      it "sets the env var to false when FF is disabled" do
-        course_with_teacher(:active_all => true)
-        controller.instance_variable_set(:@current_user, @teacher)
+      it "sets the env var to false when the user can't use it in a course context" do
+        course_with_student(:active_all => true)
+        course = @course
+        course_with_teacher(:active_all => true, user: @student)
+        controller.instance_variable_set(:@current_user, @student)
+        controller.instance_variable_set(:@context, course)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end
@@ -268,22 +267,6 @@ RSpec.describe ApplicationController do
         end
       end
 
-      context "module_dnd" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          Account.default.disable_feature!(:module_dnd)
-          expect(controller.js_env[:FEATURES][:module_dnd]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:module_dnd)
-          expect(controller.js_env[:FEATURES][:module_dnd]).to be_truthy
-        end
-      end
-
       context "files_dnd" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -300,22 +283,6 @@ RSpec.describe ApplicationController do
         end
       end
 
-      context "bulk_delete_pages" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          Account.default.disable_feature!(:bulk_delete_pages)
-          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:bulk_delete_pages)
-          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_truthy
-        end
-      end
-
       context "usage_rights_discussion_topics" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -329,34 +296,6 @@ RSpec.describe ApplicationController do
         it 'is true if the feature flag is on' do
           Account.default.enable_feature!(:usage_rights_discussion_topics)
           expect(controller.js_env[:FEATURES][:usage_rights_discussion_topics]).to be_truthy
-        end
-      end
-
-      context "unpublished_courses" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          Account.default.disable_feature!(:unpublished_courses)
-          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:unpublished_courses)
-          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
-        end
-      end
-
-      context "rce_lti_favorites" do
-        it 'is false if the feature flag is off' do
-          Account.site_admin.disable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.site_admin.enable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_truthy
         end
       end
     end
@@ -402,6 +341,90 @@ RSpec.describe ApplicationController do
         user = user_model
         user.enable_feature!(:disable_keyboard_shortcuts)
         expect(user.prefers_no_keyboard_shortcuts?).to be_truthy
+      end
+    end
+
+    context "comment_library_suggestions_enabled" do
+      before(:each) do
+        user_factory
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.instance_variable_set(:@current_user, @user)
+        allow(controller).to receive(:user_display_json).and_return({})
+      end
+
+      it "is false by default" do
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq false
+      end
+
+      it "is true if user enables suggestions" do
+        @user.preferences[:comment_library_suggestions_enabled] = true
+        @user.save!
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq true
+      end
+    end
+
+    context "canvas for elementary" do
+      let(:course) {create_course}
+
+      before(:each) do
+        controller.instance_variable_set(:@context, course)
+        allow(controller).to receive('api_v1_course_ping_url').and_return({})
+      end
+
+      describe "K5_HOMEROOM_COURSE" do
+        describe "with canvas_for_elementary account setting on" do
+          it "is true if the course is a homeroom course and in a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            course.homeroom_course = true
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_truthy
+          end
+
+          it "is false if the course is a homeroom course and not in a K-5 account" do
+            course.homeroom_course = true
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+          end
+
+          it "is false if the course is not a homeroom course and in a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+          end
+        end
+
+        it "is false with the canvas_for_elementary account setting off" do
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+
+          course.homeroom_course = true
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+
+          course.homeroom_course = false
+          course.account.settings[:enable_as_k5_account] = {value: true}
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+        end
+      end
+    end
+
+    context "api gateway" do
+      it 'defaults to nil' do
+        jsenv = controller.js_env({})
+        expect(jsenv[:API_GATEWAY_URI]).to be_nil
+      end
+
+      it 'loads gateway uri from dynamic settings' do
+        allow(Canvas::DynamicSettings).to receive(:find).and_return({
+          'api_gateway_enabled' => 'true',
+          'api_gateway_uri' => 'http://the-gateway/graphql'
+        })
+        jsenv = controller.js_env({})
+        expect(jsenv[:API_GATEWAY_URI]).to eq('http://the-gateway/graphql')
+      end
+
+      it 'will not expose gateway uri from dynamic settings if not enabled' do
+        allow(Canvas::DynamicSettings).to receive(:find).and_return({
+          'api_gateway_enabled' => 'false',
+          'api_gateway_uri' => 'http://the-gateway/graphql'
+        })
+        jsenv = controller.js_env({})
+        expect(jsenv[:API_GATEWAY_URI]).to be_nil
       end
     end
   end
@@ -694,7 +717,7 @@ RSpec.describe ApplicationController do
       allow(controller.request).to receive(:xhr?).and_return(0)
       allow(controller.request).to receive(:put?).and_return(true)
       allow(RequestContextGenerator).to receive(:store_interaction_seconds_update).and_return(true)
-      allow(PageView).to receive(:decode_token).and_return(page_view_info)
+      allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
       allow(PageView).to receive(:find_for_update).and_return(page_view)
       expect {controller.send(:add_interaction_seconds)}.not_to raise_error
     end
@@ -763,6 +786,24 @@ RSpec.describe ApplicationController do
       expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    context 'when manage and new_quizzes_modules_support enabled' do
+      let(:course){ course_model }
+
+      before do
+        controller.instance_variable_set(:"@context", course)
+        allow(course).to receive(:grants_right?).and_return true
+        Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      end
+
+      it 'redirects to edit for a quiz_lti assignment' do
+        tag = create_tag(content_type: 'Assignment')
+        allow(tag).to receive(:quiz_lti).and_return true
+        expect(controller).to receive(:named_context_url).with(Account.default, :edit_context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
+        allow(controller).to receive(:redirect_to)
+        controller.send(:content_tag_redirect, Account.default, tag, nil)
+      end
     end
 
     it 'redirects for a quiz' do
@@ -876,9 +917,36 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'display_type == "in_nav_context"' do
+          before do
+            tool.settings[:assignment_selection] = { "display_type" => "in_nav_context" }
+            tool.save!
+          end
+
+          it 'does not display the assignment lti header' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:prepend_template]).to be_blank
+          end
+
+          it 'does display the assignment edit sidebar' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:append_template]).to be_present
+          end
+        end
+
         it 'gives priority to the "display" parameter' do
           expect(Lti::AppUtil).to receive(:display_template).with('borderless')
           controller.params['display'] = 'borderless'
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+        end
+
+        it 'overrides the configured display_type for the quiz_lti in module context when feature flag is on' do
+          Account.site_admin.enable_feature!(:new_quizzes_in_module_progression)
+          allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
+          module1 = course.context_modules.create!(name: 'Module 1')
+          content_tag.context.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')
+
+          expect(Lti::AppUtil).to receive(:display_template).with('in_nav_context')
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 
@@ -1017,7 +1085,7 @@ RSpec.describe ApplicationController do
                 assignment.line_items.destroy_all
 
                 Lti::ResourceLink.where(
-                  resource_link_id: assignment.lti_context_id
+                  resource_link_uuid: assignment.lti_context_id
                 ).destroy_all
 
                 assignment.update!(lti_context_id: SecureRandom.uuid)
@@ -1031,7 +1099,7 @@ RSpec.describe ApplicationController do
 
               it 'creates the LTI resource link' do
                 expect(
-                  Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)
+                  Lti::ResourceLink.where(resource_link_uuid: assignment.lti_context_id)
                 ).to be_present
               end
             end
@@ -1109,6 +1177,39 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'is set to modules page when launched from modules page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from assignments page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+
         context 'is set to quizzes page when launched from quizzes page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
@@ -1124,6 +1225,55 @@ RSpec.describe ApplicationController do
             expect(assigns[:return_url]).to eq 'host/quizzes'
           end
         end
+
+        context 'is set to modules page when launched from edit page accessed from modules' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/100/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/1/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from edit page accessed from assignments' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+        context 'is set to quizzes page when launched from edit page accessed from quizzes' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+        end
+
 
         it 'is set to quizzes page when launched from assignments/new' do
           allow(controller.request).to receive(:referer).and_return('assignments/new')
@@ -1384,6 +1534,8 @@ RSpec.describe ApplicationController do
 end
 
 describe ApplicationController do
+  include K5Common
+
   describe "flash_notices" do
     it 'should return notice text for each type' do
       [:error, :warning, :info, :notice].each do |type|
@@ -1811,10 +1963,6 @@ describe ApplicationController do
   end
 
   describe "show_student_view_button? helper" do
-    before :once do
-      Account.default.enable_feature!(:easy_student_view)
-    end
-
     context "for teachers" do
       before :once do
         course_with_teacher :active_all => true
@@ -1836,13 +1984,6 @@ describe ApplicationController do
         controller.params[:controller] = 'context_modules'
         controller.params[:action] = 'index'
         expect(controller.send(:show_student_view_button?)).to be_truthy
-      end
-
-      it "should return false if flag is disabled" do
-        Account.default.disable_feature!(:easy_student_view)
-        controller.params[:controller] = 'courses'
-        controller.params[:action] = 'show'
-        expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
       it "should return false if context is not set" do
@@ -1892,6 +2033,145 @@ describe ApplicationController do
         controller.params[:controller] = 'assignments'
         controller.params[:action] = 'syllabus'
         expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+    end
+  end
+
+  describe "new math equation handling feature" do
+    let(:root_account) {Account.default}
+
+    before(:each) do
+      controller.instance_variable_set(:@domain_root_account, root_account)
+    end
+
+    it "should put false in ENV when disabled at site_admin" do
+      Account.site_admin.disable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_falsey
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+    end
+
+    it "should put false in ENV when enabled at site_admin but disabled at the root account" do
+      Account.site_admin.enable_feature!(:new_math_equation_handling)
+      root_account.disable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_falsey
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+    end
+
+    it "should put true in ENV when enabled at site_admin and the root account" do
+      Account.site_admin.enable_feature!(:new_math_equation_handling)
+      root_account.enable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_truthy
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
+    end
+  end
+
+  describe "k5_user? helper" do
+    before :once do
+      course_with_teacher :active_all => true
+      student_in_course :context => @course
+      toggle_k5_setting(@course.account)
+    end
+
+    before :each do
+      user_session(@student)
+      @controller.instance_variable_set(:@current_user, @student)
+      @controller.instance_variable_set(:@domain_root_account, @course.root_account)
+    end
+
+    it "caches the result after computing" do
+      enable_cache do
+        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @student, batched_keys: [:k5_user]) do
+          "cached :)"
+        end
+        expect(@controller.send(:k5_user?)).to eq "cached :)"
+      end
+    end
+
+    it "caches the eligibility computation at the request level" do
+      RequestCache.enable do
+        expect(@controller).to receive(:k5_disabled?).once
+        expect(@controller.send(:k5_user?)).to eq true
+        expect(@controller.send(:k5_user?)).to eq true
+      end
+    end
+
+    it "returns true if associated with a k5 account" do
+      expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns true if enrolled in a subaccount of a k5 account" do
+      sub = Account.create!(parent_account_id: @course.account)
+      course_factory(account: sub)
+      student_in_course(active_all: true)
+      @controller.instance_variable_set(:@current_user, @student)
+      expect(@controller.send(:k5_user?)).to eq true
+    end
+
+    it "returns false if all k5 enrollments are concluded" do
+      @student.enrollments.where(course_id: @course.id).take.complete
+      expect(@controller.send(:k5_user?)).to eq false
+    end
+
+    it "returns false if not associated with a k5 account" do
+      @course.account.settings[:enable_as_k5_account] = {value: false}
+      @course.account.save!
+      @course.root_account.settings[:k5_accounts] = []
+      @course.root_account.save!
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns false if a teacher or admin has opted-out of the k5 dashboard" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns true for an admin without enrollments" do
+      account_admin_user(account: @account)
+      user_session(@admin)
+      @controller.instance_variable_set(:@current_user, @admin)
+      expect(@controller.send(:k5_user?)).to eq true
+    end
+
+    it "ignores the disabled preference if check_disabled = false" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?, false)).to be_truthy
+    end
+
+    it "returns true even if a student has opted-out of the k5 dashboard" do
+      @student.preferences[:elementary_dashboard_disabled] = true
+      @student.save!
+      expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns false if no current user" do
+      @controller.instance_variable_set(:@current_user, nil)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    context "with sharding" do
+      require_relative '../sharding_spec_helper'
+      specs_require_sharding
+
+      before :once do
+        @shard2.activate do
+          @student2 = User.create!
+        end
+        @course.enroll_student(@student2)
+      end
+
+      before :each do
+        user_session(@student2)
+        @controller.instance_variable_set(:@current_user, @student2)
+      end
+
+      it "returns true for user on another shard if associated with a k5 account" do
+        expect(@controller.send(:k5_user?)).to be_truthy
       end
     end
   end

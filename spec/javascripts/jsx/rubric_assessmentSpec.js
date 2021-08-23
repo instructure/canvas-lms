@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications'
+import '@canvas/rails-flash-notifications'
 
 import fakeENV from 'helpers/fakeENV'
-import rubric_assessment from 'rubric_assessment'
+import rubric_assessment from '@canvas/rubrics/jquery/rubric_assessment'
 import I18n from 'i18n!rubric_assessment'
 
 QUnit.module('RubricAssessment#roundAndFormat')
@@ -52,13 +52,7 @@ test('properly adds the "selected" class to a rating when score is equal', () =>
       '</span>'
   )
   rubric_assessment.highlightCriterionScore($criterion, 3)
-  strictEqual(
-    $criterion
-      .find('.selected')
-      .find('.points')
-      .text(),
-    '3'
-  )
+  strictEqual($criterion.find('.selected').find('.points').text(), '3')
 })
 
 test('properly adds the "selected" class to proper rating when score is in range', () => {
@@ -72,13 +66,7 @@ test('properly adds the "selected" class to proper rating when score is in range
   )
   rubric_assessment.highlightCriterionScore($criterion, 4)
   strictEqual($criterion.find('.selected').length, 1)
-  strictEqual(
-    $criterion
-      .find('.selected')
-      .find('.points')
-      .text(),
-    '5'
-  )
+  strictEqual($criterion.find('.selected').find('.points').text(), '5')
 })
 
 QUnit.module('RubricAssessment#checkScoreAdjustment')
@@ -128,6 +116,26 @@ QUnit.module('RubricAssessment', moduleHooks => {
 
   moduleHooks.afterEach(() => {
     fakeENV.teardown()
+  })
+
+  QUnit.module('#getCriteriaAssessmentId', () => {
+    test('returns undefined if id is null', () => {
+      const id = rubric_assessment.getCriteriaAssessmentId(null)
+
+      strictEqual(id, undefined)
+    })
+
+    test('returns undefined if id is "null"', () => {
+      const id = rubric_assessment.getCriteriaAssessmentId('null')
+
+      strictEqual(id, undefined)
+    })
+
+    test('returns the id if id is not null and not "null"', () => {
+      const id = rubric_assessment.getCriteriaAssessmentId(5)
+
+      strictEqual(id, 5)
+    })
   })
 
   QUnit.module('#assessmentData', () => {

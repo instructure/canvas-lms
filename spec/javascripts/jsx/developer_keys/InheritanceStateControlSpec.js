@@ -19,7 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import DeveloperKeyStateControl from 'jsx/developer_keys/InheritanceStateControl'
+import DeveloperKeyStateControl from 'ui/features/developer_keys_v2/react/InheritanceStateControl.js'
 
 QUnit.module('InheritanceStateControl')
 

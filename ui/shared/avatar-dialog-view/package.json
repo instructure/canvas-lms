@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/avatar-dialog-view",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./AvatarWidget.js"
+}

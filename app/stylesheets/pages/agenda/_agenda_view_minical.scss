@@ -32,7 +32,7 @@ $mini-cal-highlight-border: #fa0;
     border-top: none;
     color: #666;
     text-shadow: none;
-    padding: $ic-sp/2 0; // padding for top/bottom of toolbar
+    padding: $ic-sp*0.5 0; // padding for top/bottom of toolbar
     display: flex; // allow divs below to flex
     align-items: center; // allow divs to center align vertically
     justify-content: space-around; // allows the divs to space evenly, regardless of content

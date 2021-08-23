@@ -31,8 +31,6 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
     end
 
     it 'keeps the contract' do
-      skip "INTEROP-6100 (11/5/2020)" unless run_live_events_specs?
-
       live_event.emit_with do
         # arrange
         params = {
@@ -49,7 +47,6 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         account.settings[:provision] = {'lti' => 'lti url'}
         account.lti_context_id = '1'
         account.enable_feature!(:quizzes_next)
-        account.enable_feature!(:import_to_quizzes_next)
         account.save!
 
         course_model(uuid: '100006')

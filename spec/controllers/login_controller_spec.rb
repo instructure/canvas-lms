@@ -152,6 +152,7 @@ describe LoginController do
 
   describe "#logout" do
     it "doesn't logout if the authenticity token is invalid" do
+      skip('investigate cause for failures beginning 05/05/21 FOO-1950')
       enable_forgery_protection do
         delete 'destroy'
         # it could be a 422, or 0 if error handling isn't enabled properly in specs

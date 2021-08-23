@@ -52,7 +52,7 @@ function renderLinks(files, handleClick, lastItemRef) {
 function renderLoadingError(_error) {
   return (
     <View as="div" role="alert" margin="medium">
-      <Text color="error">{formatMessage('Loading failed.')}</Text>
+      <Text color="danger">{formatMessage('Loading failed.')}</Text>
     </View>
   )
 }

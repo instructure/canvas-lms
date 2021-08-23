@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ChooseMasterPath from 'jsx/choose_mastery_path/components/choose-mastery-path'
+import ChooseMasterPath from 'ui/features/choose_mastery_path/react/components/choose-mastery-path.js'
 
 QUnit.module('Choose Mastery Path')
 

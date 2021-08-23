@@ -26,9 +26,20 @@ function mergeGradesIntoCourses(courses, action) {
   })
 }
 
+const getPlannerCourses = ({
+  payload: {
+    env: {COURSE, STUDENT_PLANNER_COURSES}
+  }
+}) => {
+  if (!STUDENT_PLANNER_COURSES.length && COURSE) {
+    return [COURSE]
+  }
+  return STUDENT_PLANNER_COURSES
+}
+
 export default handleActions(
   {
-    INITIAL_OPTIONS: (state, action) => action.payload.env.STUDENT_PLANNER_COURSES,
+    INITIAL_OPTIONS: (state, action) => getPlannerCourses(action),
     GOT_GRADES_SUCCESS: mergeGradesIntoCourses
   },
   []

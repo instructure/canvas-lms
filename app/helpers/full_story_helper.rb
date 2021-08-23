@@ -22,21 +22,19 @@ module FullStoryHelper
   # the feature determines if fullstory is turned on
   # then we enabled it only for every nth login
   def fullstory_init(account, session)
-    fullstory_enabled = Account.site_admin.feature_enabled?(:enable_fullstory) rescue false
-    return unless fullstory_enabled
     return unless account.settings.fetch(:enable_fullstory, true)
 
     # this session is already hooked up
     return if session.key?(:fullstory_enabled)
 
     fsconfig = Canvas::DynamicSettings.find('fullstory', tree: 'config', service: 'canvas')
-    rate = fsconfig[:sampling_rate].to_f
+    rate = fsconfig[:sampling_rate, failsafe: 0.0].to_f
     sample = rand()
     session[:fullstory_enabled] = rate >= 0.0 && rate <= 1.0 && sample < rate
   end
 
   def fullstory_app_key
-    Canvas::DynamicSettings.find('fullstory', tree: 'config', service: 'canvas')[:app_key] rescue nil
+    Canvas::DynamicSettings.find('fullstory', tree: 'config', service: 'canvas')[:app_key, failsafe: nil]
   end
 
   def fullstory_enabled_for_session?(session)

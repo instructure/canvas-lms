@@ -85,6 +85,10 @@ module Factories
     ]
   end
 
+  def test_submission_data
+    [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+  end
+
   def generate_quiz(course)
     quiz = course.quizzes.create(workflow_state: 'available')
     quiz.quiz_questions.create!(question_data: test_quiz_data().first)
@@ -102,7 +106,7 @@ module Factories
     if finished_at.nil?
       qsub.submission_data = {}
     else
-      qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+      qsub.submission_data = test_submission_data
       qsub.score = 0
       qsub.finished_at = finished_at || Time.now.utc
       qsub.workflow_state = 'complete'
@@ -196,7 +200,7 @@ module Factories
           "id"=>2159
         }
       ],
-      "question_text"=>"<p>there's no such thing as a _____ question</p>", 
+      "question_text"=>"<p>there's no such thing as a _____ question</p>",
       "id" => 1
     }.with_indifferent_access
   end
@@ -290,6 +294,22 @@ module Factories
       {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0.1, "weight"=>100, "text"=>"", "id"=>5450},
       {"numerical_answer_type"=>"precision_answer", "approximate"=>"1.23456e+21", "precision"=>"6", "comments"=>"", "weight"=>100, "text"=>"", "id"=>123}
     ], "question_text"=>"<p>abs(x) = 4</p>", "id" => 1}.with_indifferent_access
+  end
+
+  def numerical_without_precision_question_data
+    {"name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"numerical_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>26.2,
+      "answers"=>[
+        {"exact"=>4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>9333},
+      ],
+      "question_text"=>"<p>Numerical without precision answers</p>",
+      "id" => 1}.with_indifferent_access
   end
 
   def calculated_question_data
@@ -451,5 +471,40 @@ module Factories
     @quiz.workflow_state = "available" if active
     @quiz.save!
     @quiz
+  end
+
+  def question_data(reset=false, data={})
+    @qdc = reset || !@qdc ? 1 : @qdc + 1
+    {
+      :name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
+      [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
+    }.merge(data)
+  end
+
+  def find_the_answer_from_a_question(question)
+    question.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+  end
+
+  def answer_a_question(question, submission, correct: true)
+    return if question.question_data['answers'] == []
+
+    q_id = question.data[:id]
+    answer = if correct
+              find_the_answer_from_a_question(question)
+             else
+              find_the_answer_from_a_question(question) + 1
+    end
+    submission.submission_data["question_#{q_id}"] = answer
+  end
+
+  def build_course_quiz_questions_and_a_bank(data={}, opts={})
+    scoring_policy = opts[:scoring_policy] || "keep_highest"
+    course_with_student(:active_all => true)
+    @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
+    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
+    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
+    @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+    @bank = @q1.assessment_question.assessment_question_bank
+    @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
   end
 end

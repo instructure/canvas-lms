@@ -1,0 +1,49 @@
+<div class="form-dialog-content pad-box form-inline group-category-edit">
+  <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
+    <label>
+      {{#t "group_set_name"}}Group Set Name{{/t}} &nbsp;
+      <input type="text" id="category_{{id}}_name" name="name" value="{{name}}">
+    </label>
+  </fieldset>
+  {{#if ENV.allow_self_signup}}
+  <fieldset class="pad-box dotted-separator">
+    <div class="control-group">
+      <label class="checkbox" for="enable_self_signup-{{uniqid}}">
+        {{checkbox "enable_self_signup" uniqid=true class="self-signup-toggle"}}
+        {{#t "allow_self_signup"}}Allow self sign-up{{/t}}
+      </label>
+      {{> ui/shared/groups/jst/_selfSignupHelp.handlebars}}
+    </div>
+    <div class="self-signup-controls">
+      <div class="control-group">
+        <label class="checkbox" for="restrict_self_signup-{{uniqid}}">
+          {{checkbox "restrict_self_signup" uniqid=true}}
+          {{#t "require_same_section"}}Require group members to be in the same section{{/t}}
+        </label>
+      </div>
+      <div class="control-group">
+        <label>
+          {{#t "limit_group_size"}}
+            Limit groups to {{{group_limit}}} members
+          {{/t}}
+        </label>
+        <span class="hint-text">
+          ({{#t "leave_group_limit_blank"}}Leave blank for no limit{{/t}})
+        </span>
+        <div>
+          <strong>
+            <em>
+              {{#t "group_limit_override"}}Changing this will override any individually set group limits{{/t}}
+            </em>
+          </strong>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+  {{> ui/shared/groups/jst/_autoLeadershipControls.handlebars}}
+  {{/if}}
+</div>
+<div class="form-controls">
+  <button type="button" class="btn dialog_closer">{{#t "cancel"}}Cancel{{/t}}</button>
+  <button type="submit" class="btn btn-primary" data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'>{{#t "save"}}Save{{/t}}</button>
+</div>

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import EditorLinks from 'tinymce_plugins/instructure_links/links'
-import LinkableEditor from 'tinymce_plugins/instructure_links/linkable_editor'
+import EditorLinks from '@canvas/tinymce-links'
+import LinkableEditor from '@canvas/tinymce-links/linkable_editor'
 
 let selection = null
 const alt = 'preview alt text'

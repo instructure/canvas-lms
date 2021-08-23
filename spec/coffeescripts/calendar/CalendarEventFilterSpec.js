@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommonEvent from 'compiled/calendar/CommonEvent'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
-import CalendarEventFilter from 'compiled/calendar/CalendarEventFilter'
+import CommonEvent from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import CalendarEventFilter from 'ui/features/calendar/CalendarEventFilter.js'
 import fakeENV from 'helpers/fakeENV'
 
 const test_events = (

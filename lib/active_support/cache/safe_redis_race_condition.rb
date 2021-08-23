@@ -42,6 +42,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # use a nonce as a lock value so it's easy to tell on unlock
   # whether the lease has been re-issued
   def handle_expired_entry(entry, key, options)
+    @safe_redis_internal_options = {}
     return super unless options[:race_condition_ttl]
     lock_key = "lock:#{key}"
 
@@ -53,15 +54,15 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
           entry = read_entry(key, options)
           next
         else
-          options[:lock_nonce] = lock_nonce
+          @safe_redis_internal_options[:lock_nonce] = lock_nonce
           break
         end
       end
       entry
     else
       if entry.expired? && (lock_nonce = lock(lock_key, options))
-        options[:lock_nonce] = lock_nonce
-        options[:stale_entry] = entry
+        @safe_redis_internal_options[:lock_nonce] = lock_nonce
+        @safe_redis_internal_options[:stale_entry] = entry
         return nil
       end
       # just return the stale value; someone else is busy
@@ -77,17 +78,17 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   def save_block_result_to_cache(name, **options)
     super
   rescue => e
-    raise unless options[:stale_entry]
+    raise unless @safe_redis_internal_options[:stale_entry]
     # if we have old stale data, silently swallow any
     # errors fetching fresh data, and return the stale entry
     Canvas::Errors.capture(e)
-    return options[:stale_entry].value
+    return @safe_redis_internal_options[:stale_entry].value
   ensure
     # only unlock if we have an actual lock nonce, not just "true"
     # that happens on failure
-    if options[:lock_nonce].is_a?(String)
+    if @safe_redis_internal_options[:lock_nonce].is_a?(String)
       key = normalize_key(name, options)
-      unlock("lock:#{key}", options[:lock_nonce])
+      unlock("lock:#{key}", @safe_redis_internal_options[:lock_nonce])
     end
   end
 

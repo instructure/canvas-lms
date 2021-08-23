@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradingForm from 'quizzes/grading_form'
+import GradingForm from 'ui/features/quiz_history/jquery/grading_form.js'
 import $ from 'jquery'
 
 const gradingFormHtml = `

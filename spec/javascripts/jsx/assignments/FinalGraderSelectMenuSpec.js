@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import FinalGraderSelectMenu from 'jsx/assignments/FinalGraderSelectMenu'
+import FinalGraderSelectMenu from 'ui/features/assignment_edit/react/FinalGraderSelectMenu.js'
 
 QUnit.module('FinalGraderSelectMenu', hooks => {
   let props

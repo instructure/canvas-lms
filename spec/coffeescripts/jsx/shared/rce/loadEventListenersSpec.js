@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EquationEditorView from 'compiled/views/tinymce/EquationEditorView'
-import Links from 'tinymce_plugins/instructure_links/links'
-import InsertUpdateImageView from 'coffeescripts/views/tinymce/InsertUpdateImageView'
-import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
+import EquationEditorView from '@canvas/rce/backbone/views/EquationEditorView'
+import Links from '@canvas/tinymce-links'
+import InsertUpdateImageView from '@canvas/rce/backbone/views/InsertUpdateImageView'
+import loadEventListeners from '@canvas/rce/loadEventListeners'
 import 'jquery'
 import 'jqueryui/tabs'
-import 'INST'
+import 'browser-sniffer'
 
 let fakeEditor
 

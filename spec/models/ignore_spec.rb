@@ -70,22 +70,6 @@ describe Ignore do
       expect(@ignore_quiz.reload).to eq @ignore_quiz
     end
 
-    it 'should delete ignores for users with enrollments concluded for six months' do
-      @enrollment.update!(workflow_state: 'completed', completed_at: 7.months.ago)
-      Ignore.cleanup
-      expect {@ignore_assign.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {@ignore_quiz.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {@ignore_ar.reload}.to raise_error ActiveRecord::RecordNotFound
-    end
-
-    it 'should not delete ignores for users with enrollments concluded less than six months ago' do
-      @enrollment.conclude
-      Ignore.cleanup
-      expect(@ignore_assign.reload).to eq @ignore_assign
-      expect(@ignore_quiz.reload).to eq @ignore_quiz
-      expect(@ignore_ar.reload).to eq @ignore_ar
-    end
-
     it 'should delete ignores for users with deleted enrollments' do
       @enrollment.update!(workflow_state: 'deleted', updated_at: 2.months.ago)
       Ignore.cleanup

@@ -17,7 +17,7 @@
  */
 
 import jQuery from 'jquery'
-import 'jquery.instructure_misc_plugins'
+import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const $ = jQuery
 

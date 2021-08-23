@@ -278,6 +278,21 @@ describe Quizzes::QuizSubmission do
         expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 3) }.
           to change { qs.submission.versions.count }.by 1
       end
+
+      it "uses the grader_id parameter for the grade change event when updating a previous attempt" do
+        qs = @quiz.generate_submission(@user)
+        qs.submission_data = { "question_1" => "5124" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+
+        qs = @quiz.generate_submission(@user)
+        qs.backup_submission_data({ "question_1" => "" })
+
+        teacher_in_course(course: @course)
+        qs.update_scores(grader_id: @teacher.id, fudge_points: 100, submission_version_number: 1)
+
+        grade_change = Auditors::ActiveRecord::GradeChangeRecord.last
+        expect(grade_change.grader_id).to eq @teacher.id
+      end
     end
 
     describe '#backup_submission_data' do

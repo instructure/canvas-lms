@@ -122,4 +122,39 @@ describe "Importing Learning Outcome Groups" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 4
   end
+
+  context "source_outcome_group" do
+    it "should store source_outcome_group when titles are equal" do
+      source_group = outcome_group_model(context: Account.default, title: "Stuff")
+      log_data = group_data(source_outcome_group_id: source_group.id)
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+      imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
+      expect(imported_group.source_outcome_group).to eql(source_group)
+    end
+
+    it "should not store source_outcome_group when titles are different" do
+      source_group = outcome_group_model(context: Account.default, title: "Different")
+      log_data = group_data(source_outcome_group_id: source_group.id)
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+      imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
+      expect(imported_group.source_outcome_group).to be_nil
+    end
+
+    it "should not store source_outcome_group when it belongs to different account" do
+      source_group = outcome_group_model(context: Account.create!)
+      log_data = group_data(source_outcome_group_id: source_group.id)
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+      imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
+      expect(imported_group.source_outcome_group).to be_nil
+    end
+
+    it "should skip when source group cant be found" do
+      source_group = outcome_group_model(context: Account.default)
+      source_group.destroy
+      log_data = group_data(source_outcome_group_id: source_group.id)
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+      imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
+      expect(imported_group.source_outcome_group).to be_nil
+    end
+  end
 end

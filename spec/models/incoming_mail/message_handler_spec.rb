@@ -70,7 +70,7 @@ describe IncomingMail::MessageHandler do
   let(:original_message) { double("original message", original_message_attributes) }
 
   before do
-    allow(Canvas::Security).to receive(:verify_hmac_sha1).and_return(true)
+    allow(CanvasSecurity).to receive(:verify_hmac_sha1).and_return(true)
     allow_any_instance_of(Message).to receive(:save_using_update_all).and_return(true)
   end
 
@@ -114,7 +114,7 @@ describe IncomingMail::MessageHandler do
 
         it "silently fails on invalid secure id" do
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
-          allow(Canvas::Security).to receive(:verify_hmac_sha1).and_return(false)
+          allow(CanvasSecurity).to receive(:verify_hmac_sha1).and_return(false)
           expect(Mailer).to receive(:create_message).never
           expect(original_message.context).to receive(:reply_from).never
 

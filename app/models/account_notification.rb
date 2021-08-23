@@ -57,8 +57,9 @@ class AccountNotification < ActiveRecord::Base
     roles = self.account_notification_roles.map(&:role_name)
     return if roles.count > 0 && (roles & ['StudentEnrollment', 'ObserverEnrollment']).none?
 
-    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement')
-    thresholds.each do |threshold|
+    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement').
+      where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
+    thresholds.find_each do |threshold|
       ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
                            alert_type: 'institution_announcement', action_date: self.start_at,
@@ -206,7 +207,7 @@ class AccountNotification < ActiveRecord::Base
             preload({:account => :root_account}, account_notification_roles: :role)
           if Shard.current == root_account.shard
             if slice_account_ids != [root_account.id]
-              scope = scope.joins(:account).where("domain_specific=? OR COALESCE(accounts.root_account_id, accounts.id)=?", false, root_account.id)
+              scope = scope.joins(:account).where("domain_specific=? OR #{Account.resolved_root_account_id_sql}=?", false, root_account.id)
             end
           else
             scope = scope.where(domain_specific: false)
@@ -239,7 +240,7 @@ class AccountNotification < ActiveRecord::Base
     end
 
     if all_visible_account_ids || include_past
-      # Refreshes every 10 minutes at the longest    
+      # Refreshes every 10 minutes at the longest
       all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
       Rails.cache.fetch(['account_notifications5', root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
     else

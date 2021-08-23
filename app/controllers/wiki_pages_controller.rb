@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,6 +29,8 @@ class WikiPagesController < ApplicationController
   before_action :set_js_rights
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: [:edit, :index]
+
+  include K5Mode
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -163,11 +167,12 @@ class WikiPagesController < ApplicationController
 
   private
   def wiki_pages_js_env(context)
+    set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
     wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
       :wiki_index_menu_tools => wiki_index_menu_tools,
-      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
+      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}) && !@k5_details_view,
       :CAN_SET_TODO_DATE => context.grants_right?(@current_user, session, :manage_content),
       :IMMERSIVE_READER_ENABLED => context.account&.feature_enabled?(:immersive_reader_wiki_pages),
     }

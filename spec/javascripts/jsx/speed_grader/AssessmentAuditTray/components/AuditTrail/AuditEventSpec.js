@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AuditEvent from 'jsx/speed_grader/AssessmentAuditTray/components/AuditTrail/AuditEvent'
-import {auditEventStudentAnonymityStates} from 'jsx/speed_grader/AssessmentAuditTray/AuditTrailHelpers'
-import {buildEvent} from 'jsx/speed_grader/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
+import AuditEvent from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/AuditEvent.js'
+import {auditEventStudentAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers.js'
+import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
 
 const {NA, OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
 

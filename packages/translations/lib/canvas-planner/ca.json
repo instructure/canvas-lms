@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Principi de l''historial de tasques pendents"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "A continuació s’ofereix un exemple de com els estudiants veuran la seva planificació"
+  },
   "calendar_a8563bb2": { "message": "Calendari:" },
   "calendar_event_89aadc1c": { "message": "Esdeveniment al calendari" },
   "canvas_planner_98ed106": { "message": "Planificador de Canvas" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# oportunitats}\n    one {# oportunitat}\n  other {# oportunitats}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Amaga # element que falta}\n  other {Amaga # elements que falten}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostra # element completat}\n  other {Mostra # elements completats}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Mostra # element que falta}\n  other {Mostra # elements que falten}\n}"
   },
   "course_8a63b4a3": { "message": "Curs" },
   "course_to_do_bcbbab54": { "message": "{ course } TASQUES PENDENTS" },
@@ -84,6 +93,9 @@
   "error_loading_grades_e0b38f4d": {
     "message": "S''ha produït un error en carregar les qualificacions"
   },
+  "error_loading_items_5218438e": {
+    "message": "S''ha produït un error en carregar els elements"
+  },
   "error_loading_more_items_3f109d9f": {
     "message": "S''ha produït un error en carregar més elements"
   },
@@ -91,6 +103,18 @@
     "message": "S''ha produït un error en carregar els elements anteriors"
   },
   "excused_cf8792eb": { "message": "Excusat" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "S’ha produït un error en revisar el teu futur"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "S’ha produït un error en revisar el teu passat"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "S’ha produït un error en desar els canvis a { name }."
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "No s''ha pogut suprimir { name }."
+  },
   "failed_to_delete_to_do_64edff49": {
     "message": "No s''han pogut suprimir les tasques pendents"
   },
@@ -115,10 +139,11 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completats { items, plural,\n     =1 {element}\n  other {elements}\n}"
   },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Salta a la barra d''eines de navegació"
+  },
+  "jump_to_today_254ccf41": { "message": "Salta a avui" },
   "late_2be42b88": { "message": "Tardà" },
-  "list_collapsed_9ac35920": { "message": "Llista contreta." },
-  "list_collapsed_dde87718": { "message": "Llista contreta" },
-  "list_expanded_efec2d0": { "message": "Llista desplegada." },
   "load_more_a36f9cf9": { "message": "Carrega''n més" },
   "load_prior_dates_f2b0f6f0": { "message": "Carrega les dates anteriors" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -155,6 +180,9 @@
     "message": "No hi ha cap data de venciment assignada"
   },
   "no_grade_3b4d7f3e": { "message": "Sense qualificació" },
+  "nothing_due_this_week_d45c9ef9": {
+    "message": "No hi ha res que venci aquesta setmana"
+  },
   "nothing_for_now_e3e3ce2a": { "message": "Per ara no hi ha res" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Aquí no hi ha res a què s''hagi de prestar atenció."
@@ -179,9 +207,6 @@
   "opportunities_popup_f6703842": {
     "message": "finestra emergent d''oportunitats"
   },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } seleccionat. Llista contreta."
-  },
   "optional_add_course_ef0d70fc": { "message": "Opcional: Afegeix un curs" },
   "page_50c4823d": { "message": "Pàgina" },
   "peer_review_74f26a13": { "message": "Revisió entre companys" },
@@ -193,9 +218,13 @@
   "previous_month_bb1e3c84": { "message": "El mes passat" },
   "pts_699bd9aa": { "message": "punts" },
   "quiz_e0dcce8f": { "message": "Qüestionari" },
+  "redo_363c58b7": { "message": "Refés" },
   "reminder_date_4564d12d": { "message": "Recordatori: { date }" },
   "replies_4a8577c8": { "message": "Respostes" },
   "save_11a80ec3": { "message": "Desa" },
+  "schedule_preview_3bcda153": {
+    "message": "Visualització prèvia de la planificació"
+  },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Desplaceu la pantalla cap a dalt per consultar l''historial."
   },
@@ -227,6 +256,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "No hi ha cap punt associat a aquest element"
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "No hi ha res planificat per a avui."
+  },
   "time_2b5aac58": { "message": "Hora" },
   "title_ee03d132": { "message": "Títol" },
   "title_is_required_6ddcab69": { "message": "el títol és obligatori" },
@@ -244,6 +276,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Utilitzeu les tecles de fletxes per navegar per les opcions."
+  },
+  "view_next_week_7f61f755": { "message": "Mostra la setmana que ve" },
+  "view_previous_week_6f83849f": { "message": "Mostra la setmana passada" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Navegació per la planificació setmanal"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ahir a les { date }" },
   "yesterday_c6bd6abf": { "message": "Ahir" },

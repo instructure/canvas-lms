@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This migration comes from switchman (originally 20180828192111)
 class AddTimestampsToShards < ActiveRecord::Migration[4.2]
   tag :predeploy

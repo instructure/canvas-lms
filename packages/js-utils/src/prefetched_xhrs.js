@@ -125,6 +125,10 @@ export function checkStatus(response) {
   }
 }
 
+// these are duplicated in application_helper.rb#prefetch_xhr
+// because we don't have a good pattern for sharing them yet.
+// If you change these defaults, you should probably cascade that change
+// to that ruby location
 export const defaultFetchOptions = {
   credentials: 'same-origin',
   headers: {

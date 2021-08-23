@@ -23,8 +23,11 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'enrollment_registration' do
   before :once do
-    course_with_student
-    @user.workflow_state = 'creation_pending'
+    @root_account = Account.create(name: 'My Root Account')
+    @sub_account = Account.create(name:'My Sub-account', parent_account: @root_account)
+    @user1 = user_factory
+    course_with_student(:account => @sub_account, :user => @user1)
+    @user1.workflow_state = 'creation_pending'
   end
 
   let(:asset) { @enrollment }
@@ -37,7 +40,8 @@ describe 'enrollment_registration' do
     Notification.find_or_create_by!(category: "Registration", name: notification_name)
     msg = generate_message(notification_name, :email, asset)
     # this means the account name is not enclosed in a link
-    expect(msg.html_body).to include "participate in a class at Default Account."
+    expect(msg.html_body).to include "participate in a class at My Root Account."
+    expect(msg.html_body).not_to include "participate in a class at My Sub-account."
     expect(msg.html_body).not_to include "Update your notification settings"
     expect(msg.html_body).not_to include "Click here to view course page"
     expect(@message.body).not_to include 'To change or turn off email notifications,'

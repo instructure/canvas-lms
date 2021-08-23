@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
+import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromAxios'
 
 QUnit.module('parseLinkHeader', {
   setup() {

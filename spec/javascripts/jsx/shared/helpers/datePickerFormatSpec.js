@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!calendar'
-import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import datePickerFormat from '@canvas/datetime/datePickerFormat'
 
 QUnit.module('Date Picker Format Spec')
 

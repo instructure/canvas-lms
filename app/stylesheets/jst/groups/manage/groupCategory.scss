@@ -95,7 +95,7 @@
 }
 
 .group-category-summary__search {
-  margin-bottom: $ic-sp / 2;
+  margin-bottom: $ic-sp * 0.5;
 
   @include breakpoint(desktop) {
     margin-bottom: 0;
@@ -117,7 +117,7 @@
 
 .group-category-summary__messages {
   flex: 1;
-  margin-bottom: $ic-sp / 2;
+  margin-bottom: $ic-sp * 0.5;
 
   @include breakpoint(tablet) {
     margin-bottom: 0;
@@ -148,7 +148,7 @@ a.group-heading:hover {
   }
 
   input.filterable-unassigned-users {
-    margin-bottom: $ic-sp/2;
+    margin-bottom: $ic-sp*0.5;
   }
 
   .no-results {

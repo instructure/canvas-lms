@@ -25,11 +25,6 @@ outcome_alignments_course_migration:
   display_name: Outcomes Service Alignment Migration
   description: Includes Outcomes Service alignments when exporting and importing
     course content
-bulk_delete_pages:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Page Bulk Deleting
-  description: Allow pages to be deleted in bulk
 account_level_mastery_scales:
   state: hidden
   display_name: Account and Course Level Outcome Mastery Scales
@@ -49,8 +44,24 @@ improved_outcomes_management:
   display_name: Improved Outcomes Management
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
-inactive_concluded_lmgb_filters:
+assignment_comment_library:
   state: hidden
   applies_to: RootAccount
-  display_name: Student filters in LMGB
-  description: Allow inactive and/or concluded enrollments to be displayed in LMGB
+  display_name: Comment Library
+  description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
+improved_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Learning Mastery Gradebook Redesign
+  description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
+  environments:
+    production:
+      state: disabled
+    beta:
+      state: disabled
+outcomes_friendly_description:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Outcomes Friendly Description
+  description: Allows users to add a friendly description to outcomes for student and parent view
+    in the Student Learning Mastery Gradebook.

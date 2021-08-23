@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
-import I18n from 'i18nObj'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import I18n from '@canvas/i18n'
 import I18nStubber from 'helpers/I18nStubber'
 
 QUnit.module('FriendlyDatetime', {

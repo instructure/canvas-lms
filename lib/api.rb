@@ -114,18 +114,21 @@ module Api
                       },
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
-                      'lti_context_id' => 'users.lti_context_id',
-                      'lti_user_id' => 'users.lti_context_id',
+                      'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_1_1_id' => 'users.lti_context_id',
+                      'lti_1_3_id' => 'users.lti_id',
                       'uuid' => 'users.uuid' }.freeze,
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.uuid'].freeze,
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
         :scope => 'pseudonyms.account_id',
         :joins => :pseudonym }.freeze,
     'accounts' =>
       { :lookups => { 'sis_account_id' => 'sis_source_id',
                       'id' => 'id',
                       'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id' }.freeze,
-        :is_not_scoped_to_account => ['id', 'lti_context_id'].freeze,
+                      'lti_context_id' => 'lti_context_id',
+                      'uuid' => 'uuid' }.freeze,
+        :is_not_scoped_to_account => ['id', 'lti_context_id', 'uuid'].freeze,
         :scope => 'root_account_id' }.freeze,
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id',
@@ -155,7 +158,7 @@ module Api
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
-  USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -170,7 +173,7 @@ module Api
       sis_id = $2
     elsif id =~ ID_REGEX
       return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
-    elsif id =~ USER_UUID_REGEX
+    elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
@@ -293,17 +296,20 @@ module Api
     relation
   end
 
-  def self.max_per_page
-    Setting.get('api_max_per_page', '50').to_i
+  def self.max_per_page(action = nil)
+    result = Setting.get("api_max_per_page_#{action}", nil)&.to_i if action
+    result || Setting.get('api_max_per_page', '50').to_i
   end
 
-  def self.per_page
-    Setting.get('api_per_page', '10').to_i
+  def self.per_page(action = nil)
+    result = Setting.get("api_per_page_#{action}", nil)&.to_i if action
+    result || Setting.get('api_per_page', '10').to_i
   end
 
   def self.per_page_for(controller, options={})
-    per_page_requested = controller.params[:per_page] || options[:default] || per_page
-    max = options[:max] || max_per_page
+    action = "#{controller.params[:controller]}##{controller.params[:action]}"
+    per_page_requested = controller.params[:per_page] || options[:default] || per_page(action)
+    max = options[:max] || max_per_page(action)
     [[per_page_requested.to_i, 1].max, max.to_i].min
   end
 
@@ -366,7 +372,9 @@ module Api
     begin
       paginated = collection.paginate(pagination_args)
     rescue Folio::InvalidPage
-      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.build_page.ordinal_pages?
+      # Have to .try(:build_page) because we use some collections (like
+      # PaginatedCollection) that do not conform to the full will_paginate API.
+      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.try(:build_page)&.ordinal_pages?
         # for backwards compatibility we currently require returning [] for
         # pages beyond the end of an ordinal collection, rather than a 404.
         paginated = Folio::Ordinal::Page.create
@@ -516,7 +524,6 @@ module Api
     # checking on the context first can improve performance when checking many attachments for admins
     context&.grants_any_right?(
       user,
-      :manage_files,
       :read_as_admin,
       *RoleOverride::GRANULAR_FILE_PERMISSIONS
     ) || attachment&.grants_right?(user, nil, :download)

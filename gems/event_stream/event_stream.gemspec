@@ -1,12 +1,14 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "event_stream"
-  spec.version       = "0.0.1"
-  spec.authors       = ["Nick Cloward", "Mark Severson"]
-  spec.email         = ["ncloward@instructure.com", "markse@instructure.com"]
+  spec.version       = "0.1.0"
+  spec.authors       = ["Ethan Vizitei"]
+  spec.email         = ["evizitei@instructure.com"]
   spec.summary       = %q{Instructure event stream gem}
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
@@ -22,7 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rails', ">= 4.2"
 
-  spec.add_development_dependency 'bundler', '~> 1.5'
+  spec.add_development_dependency 'bundler', "~> 2.2"
   spec.add_development_dependency 'rspec', "~> 3.5.0"
   spec.add_development_dependency 'sqlite3'
 end

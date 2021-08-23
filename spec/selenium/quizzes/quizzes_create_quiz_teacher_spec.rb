@@ -22,6 +22,8 @@ require_relative '../helpers/quizzes_common'
 require_relative '../helpers/assignment_overrides'
 require_relative '../helpers/files_common'
 require_relative '../helpers/admin_settings_common'
+require_relative '../rcs/pages/rce_next_page'
+require_relative '../helpers/wiki_and_tiny_common'
 
 describe 'creating a quiz' do
   include_context 'in-process server selenium tests'
@@ -29,9 +31,12 @@ describe 'creating a quiz' do
   include AssignmentOverridesSeleniumHelper
   include FilesCommon
   include AdminSettingsCommon
+  include RCENextPage
+  include WikiAndTinyCommon
 
   context 'as a teacher' do
     before(:each) do
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
     end
@@ -97,7 +102,7 @@ describe 'creating a quiz' do
         'must have a student or section selected'
     end
 
-    it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785 do
+    it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785, custom_timeout: 30 do
       @quiz = course_quiz
       open_quiz_edit_form
 
@@ -148,8 +153,10 @@ describe 'creating a quiz' do
       end
       @quiz = course_quiz
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      insert_file_from_rce(:quiz, filename)
-      expect(fln('b_file.txt')).to be_displayed
+      add_file_to_rce_next
+      submit_form('.form-actions')
+      wait_for_ajax_requests
+      expect(fln("text_file.txt")).to be_displayed
     end
   end
 
@@ -160,7 +167,7 @@ describe 'creating a quiz' do
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 
-    it "should default to post grades if account setting is enabled" do
+    it "should default to post grades if account setting is enabled", custom_timeout: 30 do
       @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
       @account.save!
 
@@ -170,7 +177,7 @@ describe 'creating a quiz' do
       expect(is_checked('#quiz_post_to_sis')).to be_truthy
     end
 
-    it "should not default to post grades if account setting is not enabled" do
+    it "should not default to post grades if account setting is not enabled", custom_timeout: 30 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f('.new-quiz-link').click }
       expect(is_checked('#quiz_post_to_sis')).to be_falsey

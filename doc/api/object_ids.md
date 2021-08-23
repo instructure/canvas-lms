@@ -14,11 +14,16 @@ The following objects support SIS IDs in the API:
  * `sis_course_id`
  * `sis_group_id`
  * `sis_group_category_id`
- * `sis_integration_id` (for users)
+ * `sis_integration_id` (for users and courses)
  * `sis_login_id`
  * `sis_section_id`
  * `sis_term_id`
  * `sis_user_id`
+
+Some objects support LTI IDs:
+ * `lti_context_id` (for accounts, assignments, courses, and users)
+ * `lti_1_1_id` (for users, an alias of `lti_context_id`, which is sent in LTI 1.1 launches as `user_id`)
+ * `lti_1_3_id` (for users, a separate value from `lti_context_id`, sent in LTI 1.3 launches as `sub`)
 
 Additionally, some objects support special IDs:
 

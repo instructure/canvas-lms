@@ -135,6 +135,7 @@ class EnrollmentState < ActiveRecord::Base
         self.class.connection.after_transaction_commit do
           self.enrollment.user.touch unless User.skip_touch_for_type?(:enrollments)
           self.enrollment.user.clear_cache_key(:enrollments)
+          self.enrollment.user.clear_cache_key(:k5_user)
         end
       end
     end

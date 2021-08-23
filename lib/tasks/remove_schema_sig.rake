@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 desc 'Removes the schema line in fixtures, models, and specs.'
 task :remove_schema_signature do
   models = Dir.glob(File.join(File.dirname(__FILE__), %w(.. .. app models)) + "/*.rb")

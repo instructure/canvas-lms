@@ -22,22 +22,35 @@ module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
     '\\.svg$': '<rootDir>/jest/imageMock.js',
-    '^compiled/(.*)$': '<rootDir>/app/coffeescripts/$1',
-    '^coffeescripts/(.*)$': '<rootDir>/app/coffeescripts/$1',
-    '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
-    '^jst/(.*)$': '<rootDir>/app/views/jst/$1',
-    '^timezone$': '<rootDir>/public/javascripts/timezone_core.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
-    Backbone: '<rootDir>/public/javascripts/Backbone.js'
+    'node_modules-version-of-react-modal': require.resolve('react-modal'),
+    '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
+    // jest can't import the icons
+    '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
+    // redirect imports from es/rce to lib
+    '@instructure/canvas-rce/es/rce/tinyRCE': '<rootDir>/packages/canvas-rce/lib/rce/tinyRCE.js',
+    '@instructure/canvas-rce/es/rce/RCE': '<rootDir>/packages/canvas-rce/lib/rce/RCE.js',
+    // mock the tinymce-react Editor react component
+    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },
-  roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts', 'gems/plugins'],
-  moduleDirectories: ['node_modules', 'public/javascripts', 'public/javascripts/vendor'],
-  reporters: ['default', 'jest-junit'],
+  roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
+  moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        suiteName: 'Jest Tests',
+        outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
+        outputName: 'jest.xml'
+      }
+    ]
+  ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
-    './app/jsx/__tests__/ValidatedApolloCleanup'
+    './packages/validated-apollo/src/ValidatedApolloCleanup.js'
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
 
@@ -52,7 +65,7 @@ module.exports = {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
     '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.[jt]sx?$': 'babel-jest',
     '\\.graphql$': 'jest-raw-loader'
   }
 }

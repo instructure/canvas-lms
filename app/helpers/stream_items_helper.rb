@@ -33,12 +33,17 @@ module StreamItemsHelper
     categorized_items = {}
     return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
 
-    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest)
+    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic DiscussionEntry AssessmentRequest)
     supported_categories.each { |category| categorized_items[category] = [] }
 
     topic_types = %w{DiscussionTopic Announcement}
     ActiveRecord::Associations::Preloader.new.preload(
       stream_items.select{|i| topic_types.include?(i.asset_type)}.map{|item| item.data }, :context)
+
+    ActiveRecord::Associations::Preloader.new.preload(
+      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map{|item| item.data }, discussion_topic: :context
+    )
+    topic_types << 'DiscussionEntry'
 
     stream_items.each do |item|
       category = item.data.class.name
@@ -95,12 +100,16 @@ module StreamItemsHelper
   def extract_path(category, item, user)
     case category
     when "Announcement", "DiscussionTopic"
-      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id"\
+      polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
                        => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
+    when "DiscussionEntry"
+      polymorphic_path([item.context_type.underscore.to_sym, :discussion_topic],
+                       :"#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id),
+                       id: Shard.short_id_for(item.data['discussion_topic_id']))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
-      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id"\
+      polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
                        => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.context_id))
     when "AssessmentRequest"
       submission = item.data.asset
@@ -116,11 +125,11 @@ module StreamItemsHelper
     context = ContextPresenter.new
     asset = item.data
     case category
-    when "Announcement", "DiscussionTopic", "Assignment"
+    when "Announcement", "DiscussionEntry", "DiscussionTopic", "Assignment"
       context.type = item.context_type
       context.id = item.context_id
       context.name = asset.context_short_name
-      context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], :"#{context.type.underscore}_id" => Shard.short_id_for(context.id))
+      context.linked_to = polymorphic_path([context.type.underscore.to_sym, category.underscore.pluralize.to_sym], :"#{context.type.underscore}_id" => Shard.short_id_for(context.id))
     when "Conversation"
       context.type = "User"
       last_author = item.participant.last_message.author
@@ -148,6 +157,8 @@ module StreamItemsHelper
     when "AssessmentRequest"
       # TODO I18N should use placeholders, not concatenation
       asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
+    when "DiscussionEntry"
+      I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title']})
     else
       nil
     end

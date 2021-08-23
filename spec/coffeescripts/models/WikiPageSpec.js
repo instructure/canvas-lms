@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
 import _ from 'underscore'
 
 const wikiPageObj = function(options = {}) {

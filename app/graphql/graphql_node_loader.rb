@@ -137,7 +137,13 @@ module GraphQLNodeLoader
     when "AssignmentGroupBySis"
       Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"
-      Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
+      Loaders::IDLoader.for(DiscussionTopic).load(id).then do |topic|
+        next nil unless topic.grants_right?(ctx[:current_user], :read) && !topic.deleted?
+
+        topic
+      end
+    when "DiscussionEntry"
+      Loaders::IDLoader.for(DiscussionEntry).load(id).then(check_read_permission)
     when "Quiz"
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"
@@ -201,6 +207,18 @@ module GraphQLNodeLoader
         else
           next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
         end
+
+        record
+      end
+    when "CommentBankItem"
+      Loaders::IDLoader.for(CommentBankItem).load(id).then do |record|
+        next if !record || record.deleted? || !record.grants_right?(ctx[:current_user], :read)
+
+        record
+      end
+    when "OutcomeFriendlyDescriptionType"
+      Loaders::IDLoader.for(OutcomeFriendlyDescription).load(id).then do |record|
+        next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
 
         record
       end

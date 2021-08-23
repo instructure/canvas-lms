@@ -106,6 +106,22 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("rubric { _id }")).to eq @rubric.id.to_s
   end
 
+  describe "rubric association" do
+    before(:each) do
+      rubric_for_course
+      rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+    end
+
+    it "is returned if an association exists and is active" do
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq @rubric_association.id.to_s
+    end
+
+    it "is not returned if the association is soft-deleted" do
+      @rubric_association.destroy!
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq nil
+    end
+  end
+
   it "works with moderated grading" do
     assignment.moderated_grading = true
     assignment.grader_count = 1
@@ -129,6 +145,27 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("peerReviews { intraReviews }")).to eq assignment.intra_group_peer_reviews
     expect(assignment_type.resolve("peerReviews { anonymousReviews }")).to eq assignment.anonymous_peer_reviews
     expect(assignment_type.resolve("peerReviews { automaticReviews }")).to eq assignment.automatic_peer_reviews
+  end
+
+  it 'returns assessment requests for the current user' do
+    student2 = student_in_course(course: course, name: 'Matthew Lemon', active_all: true).user
+    student3 = student_in_course(course: course, name: 'Rob Orton', active_all: true).user
+
+    assignment.assign_peer_review(student, student2)
+    assignment.assign_peer_review(student2, student3)
+    assignment.assign_peer_review(student3, student)
+
+    result = assignment_type.resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student2.name
+
+    result = GraphQLTypeTester.new(assignment, current_user: student2).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student3.name
+
+    result = GraphQLTypeTester.new(assignment, current_user: student3).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student.name
   end
 
   it "works with timezone stuffs" do

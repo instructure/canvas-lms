@@ -19,13 +19,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import CreatorEventGroup from 'jsx/speed_grader/AssessmentAuditTray/components/AuditTrail/CreatorEventGroup'
+import CreatorEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/CreatorEventGroup.js'
 import {
   buildAssignmentCreatedEvent,
   buildAssignmentUpdatedEvent,
   buildEvent
-} from 'jsx/speed_grader/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
-import buildAuditTrail from 'jsx/speed_grader/AssessmentAuditTray/buildAuditTrail'
+} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
+import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail.js'
 
 QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
   let $container

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ThemeCard from 'jsx/theme_editor/ThemeCard'
+import ThemeCard from 'ui/features/brand_configs/react/ThemeCard.js'
 import {shallow} from 'enzyme'
 
 let props

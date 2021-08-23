@@ -517,6 +517,244 @@ describe "Accounts API", type: :request do
       expect(@a1.settings).to be_empty
     end
 
+    context 'Microsoft Teams Sync' do
+
+      let(:update_sync_settings_params) do
+        {
+          account: {
+            settings: {
+              microsoft_sync_enabled: sync_enabled,
+              microsoft_sync_tenant: tenant_name,
+              microsoft_sync_login_attribute: attribute,
+              microsoft_sync_login_attribute_suffix: suffix,
+              microsoft_sync_remote_attribute: remote_attribute
+            }
+          }
+        }
+      end
+      let(:expected_settings) do
+        update_sync_settings_params[:account][:settings].filter {|key, value| !value.nil? && value != '' }
+      end
+
+      let(:account) { @a1 }
+      let(:update_path) { "/api/v1/accounts/#{account.id}" }
+      # We want to make sure we have valid settings so that when we're testing for failed requests,
+      # it's actually because of the invalid setting we set, and not just cause we didn't have
+      # any settings set.
+      let(:sync_enabled) { true }
+      let(:tenant_name) { "canvastest2.onmicrosoft.com" }
+      let(:attribute) { "sis_user_id" }
+      let(:suffix) { "@example.com" }
+      let(:remote_attribute) { "mail" }
+      let(:header_options_hash) do
+        {
+            controller: 'accounts',
+            action: 'update',
+            id: account.to_param,
+            format: 'json'
+        }
+      end
+
+      before(:each) do
+        user_session(@user)
+      end
+
+      shared_examples_for 'a valid request' do
+        it "saves the settings" do
+          api_call(:put, update_path, header_options_hash,
+                 update_sync_settings_params, {}, { expected_status: 200 })
+          account.reload
+          expect(account.settings).to eq expected_settings
+        end
+      end
+
+      shared_examples_for "an invalid request" do
+        it "returns a 400 and doesn't change the account settings" do
+          api_call(:put, update_path, header_options_hash,
+                   update_sync_settings_params, {}, { expected_status: 400 })
+          account.reload
+          expect(account.settings.size).to be 0
+        end
+      end
+
+      context 'microsoft_group_enrollments_syncing flag disabled' do
+        before(:each) { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing)}
+
+        it_behaves_like 'an invalid request'
+
+        context 'subaccounts modifying settings' do
+          let(:account) { @a2 }
+
+          it_behaves_like 'an invalid request'
+        end
+      end
+
+      context 'microsoft_group_enrollments_syncing flag enabled' do
+        before(:each) { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+
+        context 'no Microsoft Teams settings provided' do
+          let(:tenant_name) { nil }
+          let(:attribute) { nil }
+          let(:suffix) { nil }
+          let(:remote_attribute) { nil }
+
+          it_behaves_like 'an invalid request'
+        end
+
+        context 'updating with valid settings' do
+          it_behaves_like 'a valid request'
+        end
+
+        context 'non-string value provided for a setting' do
+          let(:tenant_name) do
+            {
+              garbage: :input
+            }
+          end
+
+          it_behaves_like 'an invalid request'
+        end
+
+        context 'invalid tenant name supplied' do
+          let(:tenant_name) { '^&abcd.com' }
+
+          it_behaves_like "an invalid request"
+        end
+
+        context 'invalid login attribute' do
+          let(:attribute) { 'garbage' }
+
+          it_behaves_like "an invalid request"
+        end
+
+        context 'invalid suffix' do
+          let(:suffix) { '\thello there' }
+
+          it_behaves_like "an invalid request"
+        end
+
+        context 'invalid remote attribute' do
+          let(:remote_attribute) { "not-a-valid-remote-attribute" }
+
+          it_behaves_like "an invalid request"
+        end
+
+        context 'non-admin user' do
+
+          let(:generic_user) { user_factory }
+
+          it "can't update settings" do
+            api_call_as_user(generic_user, :put, update_path, header_options_hash,
+                             update_sync_settings_params, {}, { expected_result: 401 })
+            account.reload
+            expect(account.settings.size).to eq 0
+          end
+
+        end
+
+        context 'disabling sync' do
+
+          let(:sync_enabled) { false }
+
+          context 'specifying settings' do
+            it_behaves_like 'a valid request'
+          end
+
+          context('no settings specified') do
+
+            let(:tenant_name) { nil }
+            let(:attribute) { nil }
+            let(:suffix) { nil }
+            let(:remote_attribute) { nil }
+
+            it_behaves_like 'a valid request'
+          end
+        end
+
+        context "using strings for sync_enabled" do
+          let(:enabled) { "true" }
+
+          it_behaves_like 'a valid request'
+        end
+
+        MicrosoftSync::SettingsValidator::VALID_SYNC_LOGIN_ATTRIBUTES.each do |login_attr|
+          context "setting login attribute to #{login_attr}" do
+            let(:attribute) { login_attr }
+
+            it_behaves_like 'a valid request'
+          end
+        end
+
+        MicrosoftSync::SettingsValidator::VALID_SYNC_REMOTE_ATTRIBUTES.each do |remote|
+          context "setting the remote attribute to #{remote}" do
+            let(:remote_attribute) { remote }
+
+            it_behaves_like 'a valid request'
+          end
+        end
+
+        context 'empty suffix' do
+          let(:suffix) { '' }
+
+          it_behaves_like 'a valid request'
+        end
+
+        context 'account already has settings' do
+          before(:each) do
+            account.settings = {
+              microsoft_sync_enabled: true,
+              microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
+              microsoft_sync_login_attribute: 'email',
+              microsoft_sync_login_attribute_suffix: '',
+              microsoft_sync_remote_attribute: 'mail'
+            }
+            account.save!
+          end
+
+          context 'changing settings' do
+
+            let(:tenant_name) { "testing.123.onmicrosoft.com" }
+            let(:attribute) { "sis_user_id" }
+            let(:suffix) { "@testschool.edu" }
+            let(:remote_attribute) { 'mailNickname' }
+
+            it 'tries to cleanup UserMappings' do
+              expect(MicrosoftSync::UserMapping).to receive(:delete_old_user_mappings_later).with(account)
+              api_call(:put, update_path, header_options_hash,
+                        update_sync_settings_params, {}, { expected_status: 200 })
+            end
+
+            it_behaves_like 'a valid request'
+
+            context 'account has already has a suffix set' do
+              before(:each) do
+                account.settings[:microsoft_sync_login_attribute_suffix] = "@example.com"
+                account.save!
+              end
+
+              context 'and the request specifies a null suffix' do
+                let(:suffix) { nil }
+
+                it_behaves_like 'a valid request'
+              end
+
+              context 'and the request specifies an empty suffix' do
+                let(:suffix) { '' }
+
+                it_behaves_like 'a valid request'
+              end
+            end
+          end
+        end
+
+        context 'subaccounts' do
+          let(:account) { @a2 }
+
+          it_behaves_like 'a valid request'
+        end
+      end
+    end
+
     context 'with :manage_storage_quotas' do
       before(:once) do
         # remove the user from being an Admin
@@ -634,6 +872,75 @@ describe "Accounts API", type: :request do
         }
       end
     end
+
+    context 'with course_template_id' do
+      before do
+        @a2.root_account.enable_feature!(:course_templates)
+        @user.account_users.where(account: @a2).delete_all
+      end
+
+      let(:template) { @a2.courses.create!(template: true) }
+
+      it "updates" do
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }})
+        @a2.reload
+        expect(@a2.course_template).to eq template
+      end
+
+      it "returns unauthorized when you don't have permission to change it" do
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :add_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }},
+                 {},
+                 expected_status: 401)
+      end
+
+      it "returns bad request when you give a course that can't be a template" do
+        template.update!(template: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }},
+                 {},
+                 expected_status: 404)
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (template set)" do
+        @a2.update!(course_template: template)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :add_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }})
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (inherit)" do
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :delete_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: nil }})
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (no template)" do
+        Course.ensure_dummy_course
+        @a2.update!(course_template_id: 0)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :delete_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: 0 }})
+      end
+    end
   end
 
   it "should find accounts by sis in only this root account" do
@@ -716,6 +1023,19 @@ describe "Accounts API", type: :request do
       expect(json[0]["total_students"]).to eq 0
     end
 
+    it "should don't override name with friendly_name" do
+      @c1 = course_model(name: 'c1', account: @a1, root_account: @a1, friendly_name: 'barney')
+      @a1.enable_as_k5_account!
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+        { controller: 'accounts', action: 'courses_api', account_id: @a1.to_param,
+          format: 'json' }, {})
+      expect(json.size).to eq 1
+      expect(json[0]['name']).to eq 'c1'
+      expect(json[0]['friendly_name']).to eq 'barney'
+      expect(json[0]['original_name']).to be_nil
+    end
+
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
@@ -763,6 +1083,17 @@ describe "Accounts API", type: :request do
       [@c1, @c2].each do |c|
         expect(json.detect{|h| h['id'] == c.id}['teachers'].map{|t| t['id']}).to eq [@teacher.id]
       end
+    end
+
+    it "limits the response to homeroom courses if requested" do
+      @c1 = course_factory(account: @a1, course_name: 'c1')
+      @c2 = course_factory(account: @a1, course_name: 'c2')
+      @c2.homeroom_course = true
+      @c2.save!
+      json = api_call_as_user(account_admin_user(account: @a1), :get, "/api/v1/accounts/#{@a1.id}/courses?homeroom=1",
+                              controller: 'accounts', action: 'courses_api', account_id: @a1.to_param,
+                              format: 'json', homeroom: '1')
+      expect(json.map { |c| c['name'] }).to match_array(['c2'])
     end
 
     describe 'sort' do
@@ -1326,6 +1657,24 @@ describe "Accounts API", type: :request do
       api_call(:get, "/api/v1/accounts/#{@a3.id}/permissions?permissions[]=become_user",
                { :controller => 'accounts', :action => 'permissions', :account_id => @a3.to_param, :format => 'json',
                  :permissions => %w(become_user) }, {}, {}, { :expected_status => 401 })
+    end
+  end
+
+  context "show settings" do
+
+    let(:show_settings_path) { "/api/v1/accounts/#{@a1.id}/settings"}
+    let(:show_settings_header) { { controller: :accounts, action: :show_settings, account_id: @a1.to_param, format: :json} }
+    let(:generic_user) { user_factory }
+
+    it "shouldn't allow regular users to see settings" do
+      api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 401 })
+    end
+
+    it "should allow account admins to see settings" do
+      @a1.settings = { :microsoft_sync_enabled => true, :microsoft_sync_tenant => "testtenant.com" }
+      @a1.save!
+      json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+      expect(json).to eq(@a1.settings.with_indifferent_access)
     end
   end
 

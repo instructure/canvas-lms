@@ -120,6 +120,11 @@
     - name: New Discussion Entry
       delay_for: 0
 
+- category: DiscussionMention
+  notifications:
+    - name: Discussion Mention
+      delay_for: <%= 2*60 %>
+
 - category: Due Date
   notifications:
     - name: Assignment Due Date Changed

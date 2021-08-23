@@ -603,7 +603,6 @@ describe "admin_tools" do
         cc.last_bounce_at = 6.days.ago
         cc.last_bounce_details = {'bouncedRecipients' => [{'diagnosticCode' => '550 what a luser'}]}
       end
-      @account.enable_feature!(:bounced_emails_admin_tool)
       @user = @account_admin
     end
 

@@ -100,8 +100,14 @@ describe "student planner" do
     end
 
     it "shows missing tag for an assignment with missing submissions.", priority: "1", test_id: 3263153 do
-      @assignment.due_at = Time.zone.now - 2.days
+      @assignment.due_at = Time.zone.now - 2.weeks
       @assignment.save!
+      @course.assignments.create({
+        name: 'Assignment 2',
+        due_at: Time.zone.now + 1.day,
+        submission_types: 'online_text_entry'
+      })
+
       go_to_list_view
       force_click(load_prior_button_selector)
       expect(planner_app_div).to be_displayed

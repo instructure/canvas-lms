@@ -539,19 +539,18 @@ describe Types::CourseType do
   end
 
   describe 'imageUrl' do
-    before(:once) {
-      course.enable_feature! 'course_card_images'
-    }
-
-    it 'returns nil when the feature flag is disabled' do
-      course.disable_feature! 'course_card_images'
-      expect(course_type.resolve("imageUrl")).to be_nil
-    end
-
     it 'returns a url from an uploaded image' do
       course.image_id = attachment_model(context: @course).id
       course.save!
       expect(course_type.resolve("imageUrl")).to_not be_nil
+    end
+
+    it 'returns a url from id when url is blank' do
+      course.image_url = ''
+      course.image_id = attachment_model(context: @course).id
+      course.save!
+      expect(course_type.resolve("imageUrl")).to_not be_nil
+      expect(course_type.resolve("imageUrl")).to_not eq ""
     end
 
     it 'returns a url from settings' do

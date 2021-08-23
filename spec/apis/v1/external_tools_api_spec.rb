@@ -23,10 +23,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require 'nokogiri'
 
 describe ExternalToolsController, type: :request do
-  before(:once) do
-    Account.default.enable_feature!(:submission_type_tool_placement)
-  end
-
   describe "in a course" do
     before(:once) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
@@ -102,7 +98,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@course, 'course', {url: tool.url})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -111,7 +107,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@course, 'course', {id: tool.id.to_s})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -318,7 +314,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@account, 'account', {url: tool.url})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -327,7 +323,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@account, 'account', {id: tool.id.to_s})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end

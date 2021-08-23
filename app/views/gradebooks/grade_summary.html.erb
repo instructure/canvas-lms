@@ -23,7 +23,7 @@
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
-  hidden_text = t("Instructor is working on grades")
+  hidden_text = t("Instructor has not posted this grade")
 %>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
@@ -522,6 +522,9 @@
                       <td>
                       <% if comment.media_comment_id && comment.media_comment_type %>
                         <div class="comment_media">
+                          <% unless comment.comment.nil? %>
+                            <span style="white-space: pre-wrap;"><%= comment.comment %></span><br/>
+                          <% end %>
                           <%= t(:media_comment, "This is a media comment,") %><br/>
                           <a href="#" class="play_comment_link <%= comment.media_comment_type %>_comment"><%= t('links.click_to_view', "click here to view") %></a>
                           <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
@@ -581,8 +584,8 @@
     <% end %>
   </table>
   </div>
-  <% if @presenter.hidden_submissions? %>
-    <small><i class="icon-off" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+  <% if @presenter.hidden_submissions_for_published_assignments? %>
+    <small><i class="icon-off" role="presentation"></i><%= t("Your instructor has not posted the grade. While your instructor has not posted the grade, grade and comment information is unavailable.") %></small>
   <% end %>
   <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
   <%= render :partial => "shared/rubric_criterion_dialog" %>

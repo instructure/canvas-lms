@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import Assignment from 'compiled/models/Assignment'
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import SubmissionDetailsDialog from 'ui/features/screenreader_gradebook/jquery/SubmissionDetailsDialog.js'
 import qs from 'qs'
-import 'jst/SubmissionDetailsDialog'
+import 'ui/features/screenreader_gradebook/jst/SubmissionDetailsDialog.handlebars'
 
 QUnit.module('SubmissionDetailsDialog', {
   setup() {

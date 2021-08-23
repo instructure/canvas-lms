@@ -22,8 +22,8 @@ import {Provider} from 'react-redux'
 import * as enzyme from 'enzyme'
 import moxios from 'moxios'
 
-import {ConnectedCourseSidebar} from 'jsx/blueprint_courses/components/CourseSidebar'
-import MigrationStates from 'jsx/blueprint_courses/migrationStates'
+import {ConnectedCourseSidebar} from 'ui/features/blueprint_course_master/react/components/CourseSidebar.js'
+import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 import getSampleData from '../getSampleData'
 import mockStore from '../mockStore'
 

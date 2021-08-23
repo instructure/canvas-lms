@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import addAriaDescription from 'quiz_labels'
+import addAriaDescription from 'ui/features/quizzes/jquery/quiz_labels.js'
 import fixtures from 'helpers/fixtures'
 
 let $elem = null

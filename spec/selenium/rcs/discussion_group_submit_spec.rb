@@ -37,6 +37,7 @@ describe "discussion assignments" do
 
   before :each do
     user_session(@teacher)
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -85,7 +86,7 @@ describe "discussion assignments" do
       expect(f('.new-and-total-badge .new-items').text).to include ""
       user_session(@student1)
       get "/courses/#{@course.id}/discussion_topics"
-      expect_new_page_load{f('.discussion-title').click}
+      expect_new_page_load{f("[data-testid='discussion-link-#{@discussion_topic.id}']").click}
       expect(f('#breadcrumbs').text).to include('some group')
       f('.discussion-reply-action').click
       type_in_tiny 'textarea', 'something to submit'

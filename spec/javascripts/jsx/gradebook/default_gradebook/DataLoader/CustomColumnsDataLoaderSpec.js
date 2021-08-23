@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import CustomColumnsDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/CustomColumnsDataLoader'
-import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
-import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
-import {RequestDispatch} from 'jsx/shared/network'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import CustomColumnsDataLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/CustomColumnsDataLoader.js'
+import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls.js'
+import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
+import {RequestDispatch} from '@canvas/network'
 
 /* eslint-disable no-async-promise-executor */
 QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {

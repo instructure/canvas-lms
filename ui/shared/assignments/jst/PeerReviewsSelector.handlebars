@@ -1,0 +1,129 @@
+<div class="form-column-left">
+  {{#t 'peer_reviews_header'}}Peer Reviews{{/t}}
+</div>
+
+<div class="form-column-right">
+  <div class="border border-trbl border-round">
+    <label class="checkbox flush" for="assignment_peer_reviews">
+      {{checkbox "peer_reviews"
+      id="assignment_peer_reviews"
+      prefix=prefix
+      checked=peerReviews
+      aria-controls="peer_reviews_details"
+      disabled=peerReviewsFrozen}}
+      {{#t "labels.require_peer_reviews"}}Require Peer Reviews{{/t}}
+    </label>
+
+    <div id="peer_reviews_details"
+      aria-expanded="{{peerReviews}}"
+      style="{{hiddenUnless peerReviews}}">
+      <div class="nested">
+        <div class="subtitle">
+          <strong>
+            {{#t 'how_to_peer_review'}}How to Assign Peer Reviews{{/t}}
+          </strong>
+        </div>
+        <label class="radio" for="assignment_manual_peer_reviews">
+          <input name="{{#if nested}}assignment[automatic_peer_reviews]{{else}}automatic_peer_reviews{{/if}}"
+            id="assignment_manual_peer_reviews"
+            type="radio"
+            value="0"
+            aria-controls="automatic_peer_reviews_options"
+            {{checkedUnless automaticPeerReviews}}
+            {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          {{#t "labels.manually_assign_peer_reviews"}}
+            Manually Assign Peer Reviews
+          {{/t}}
+        </label>
+
+        <label class="radio" for="assignment_automatic_peer_reviews">
+          <input name="{{#if nested}}assignment[automatic_peer_reviews]{{else}}automatic_peer_reviews{{/if}}"
+            id="assignment_automatic_peer_reviews"
+            type="radio"
+            value="1"
+            aria-controls="automatic_peer_reviews_options"
+            {{checkedIf automaticPeerReviews}}
+            {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          {{#t "labels.automatically_assign_peer_reviews"}}
+            Automatically Assign Peer Reviews
+          {{/t}}
+        </label>
+
+        <div id="automatic_peer_reviews_options"
+          aria-enabled="{{automaticPeerReviews}}"
+          style="{{hiddenUnless automaticPeerReviews}}">
+
+          <label for="assignment_peer_review_count">
+            {{#t "reviews_per_user"}}Reviews Per User{{/t}}
+          </label>
+          <input id="assignment_peer_review_count"
+            name="{{#if nested}}assignment[peer_review_count]{{else}}peer_review_count{{/if}}"
+            value="{{n peerReviewCount}}"
+            type="text"
+            {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+
+          <label for="assignment_peer_reviews_assign_at">
+            {{#t "locked_until"}}Assign Reviews{{/t}}
+          </label>
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='assign_peer_review_at_accessible_label'>
+              {{#t}}Assign Reviews on Date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input id="assignment_peer_reviews_assign_at"
+              name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
+              class="date_field datetime_field hasDatePicker"
+              value="{{datetimeFormatted peerReviewsAssignAt}}"
+              type="text"
+              aria-labelledby="assign_peer_review_at_accessible_label"
+              aria-describedby="peer_reviews_assign_at_explanation"
+              data-tooltip
+              title="{{accessibleDateFormat}}"
+              {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          </div>
+          <div id="peer_reviews_assign_at_explanation" class="explanation nest">
+            {{#t "peer_reviews_assign_at_explanation"}}
+              If blank, uses due date.
+            {{/t}}
+          </div>
+          <div id="intra_group_peer_reviews_toggle"
+            aria-enabled="{{hasGroupCategory}}"
+            style="{{hiddenUnless hasGroupCategory}}">
+            <label class="checkbox" for="intra_group_peer_reviews">
+              {{checkbox "intra_group_peer_reviews"
+              id="intra_group_peer_reviews"
+              aria-controls="intra_group_peer_reviews"
+              checked=intraGroupPeerReviews
+              prefix=prefix}}
+              {{#t}}
+                Allow intra-group peer reviews
+              {{/t}}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {{#unless hideAnonymousPeerReview}}
+        <div class="nested">
+          <div class="subtitle">
+            <strong>
+              {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
+            </strong>
+          </div>
+
+          <label class="checkbox" for="anonymous_peer_reviews">
+            {{checkbox "anonymous_peer_reviews"
+            checked=anonymousPeerReviews
+            id="anonymous_peer_reviews"
+            aria-controls="anonymous_peer_reviews"
+            prefix=prefix
+            disabled=peerReviewsFrozen}}
+            {{#t "labels.anonymous_peer_reviews"}}
+              Peer Reviews Appear Anonymously
+            {{/t}}
+          </label>
+        </div>
+      {{/unless}}
+    </div>
+  </div>
+</div>

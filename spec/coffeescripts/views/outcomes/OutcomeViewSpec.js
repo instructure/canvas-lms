@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import Outcome from 'compiled/models/Outcome'
-import OutcomeView from 'compiled/views/outcomes/OutcomeView'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
+import OutcomeView from '@canvas/outcome-content-view/backbone/views/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
 
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>
@@ -667,7 +667,7 @@ test('validates i18n mastery points', function() {
   view.$('input[name="mastery_points"]').val('1 234,5')
   ok(view.isValid())
   view.remove()
-  I18nStubber.popFrame()
+  I18nStubber.clear()
 })
 
 test('getModifiedFields returns false for all fields when not modified', () => {

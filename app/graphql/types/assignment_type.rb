@@ -99,6 +99,7 @@ module Types
     end
 
     global_id_field :id
+    key_field_id
 
     field :name, String, null: true
 
@@ -120,7 +121,7 @@ module Types
 
       define_method(field_name) do |apply_overrides:|
         load_association(:context).then do |course|
-          if !apply_overrides && course.grants_right?(current_user, :manage_assignments)
+          if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
           else
             OverrideAssignmentLoader.for(current_user).load(assignment).then &field_name
@@ -154,6 +155,11 @@ module Types
     field :peer_reviews, AssignmentPeerReviews, null: true
     def peer_reviews
       assignment
+    end
+
+    field :assessment_requests_for_current_user, [AssessmentRequestType], null: true
+    def assessment_requests_for_current_user
+      Loaders::AssessmentRequestLoader.for(current_user: current_user).load(assignment)
     end
 
     field :moderated_grading, AssignmentModeratedGrading, null: true
@@ -191,6 +197,11 @@ module Types
     field :rubric, RubricType, null: true
     def rubric
       load_association(:rubric)
+    end
+
+    field :rubric_association, RubricAssociationType, null: true
+    def rubric_association
+      assignment.active_rubric_association? ? load_association(:rubric_association) : nil
     end
 
     def lock_info

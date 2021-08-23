@@ -73,7 +73,7 @@ module Api::V1::OutcomeResults
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
-      assessed_outcomes += LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+      assessed_outcomes += LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
     outcomes.map do |o|
       hash = outcome_json(
@@ -189,11 +189,7 @@ module Api::V1::OutcomeResults
     section_ids_func = if @section
                          ->(user) { [@section.id] }
                        else
-                        enrollments = if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
-                          @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
-                        else
-                          @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
-                        end
+                        enrollments = @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
                          ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
                        end
 

@@ -22,12 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "brandableCss JS integration specs" do
   include_context "in-process server selenium tests"
 
-  EXAMPLE_CDN_HOST = 'https://somecdn.example.com'
-
   it "sets ENV.asset_host correctly" do
-    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(EXAMPLE_CDN_HOST)
+    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(app_url)
     get "/login/canvas"
-    expect(driver.execute_script("return ENV.ASSET_HOST")).to eq(EXAMPLE_CDN_HOST)
+    expect(driver.execute_script("return ENV.ASSET_HOST")).to eq(app_url)
   end
 
   it "loads css from handlebars with variables correctly" do

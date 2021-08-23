@@ -61,7 +61,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AccountUser => :account,
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
-      AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
+      AssetUserAccess => [:context_course, :context_group, {context_account: Account.resolved_root_account_id_sql}],
       AssignmentGroup => :context,
       AssignmentOverride => [:assignment, :quiz],
       AssignmentOverrideStudent => [:assignment, :quiz],
@@ -91,7 +91,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Favorite => :context,
       Folder => [:account, :course, :group],
       GradingPeriod => :grading_period_group,
-      GradingPeriodGroup => [{root_account: [:root_account_id, :id]}, :course],
+      GradingPeriodGroup => [{root_account: Account.resolved_root_account_id_sql}, :course],
       GradingStandard => :context,
       GroupCategory => :context,
       GroupMembership => :group,
@@ -316,7 +316,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     case association
     when Hash
       association.each_with_object({}) do |(assoc, column), memo|
-        memo[assoc.to_sym] = column.is_a?(Array) ? column.map(&:to_sym) : column.to_sym
+        memo[assoc.to_sym] = column
       end
     when Array
       association.reduce({}){|memo, assoc| memo.merge(hash_association(assoc))}
@@ -347,7 +347,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   #   :context_quiz=>:root_account_id
   # }
   # Accounts are a special case, since subaccounts will have a root_account_id but root accounts
-  # have a nil root_account_id and will just use their id instead
+  # have a 0 root_account_id and will just use their id instead
   # Eg: ContextExternalTool with association of {context: :root_account_id} becomes
   # {
   #   :account=>[:root_account_id, :id],
@@ -363,11 +363,11 @@ module DataFixup::PopulateRootAccountIdOnModels
       if assoc_options[:polymorphic].present?
         assoc_options[:polymorphic].each do |poly_a|
           poly_a = poly_a.keys.first if poly_a.is_a? Hash
-          account_columns = [:root_account_id, :id] if poly_a == :account
+          account_columns = Account.resolved_root_account_id_sql if poly_a == :account
           memo[:"#{prefix}#{poly_a}"] = account_columns || columns
         end
       else
-        columns = [:root_account_id, :id] if assoc == :account
+        columns = Account.resolved_root_account_id_sql if assoc == :account
         memo[assoc] = columns
       end
     end
@@ -541,6 +541,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.create_column_names(assoc, columns)
+    return columns if columns.is_a?(String)
     names = Array(columns).map{|column| "#{assoc.klass.table_name}.#{column}"}
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end

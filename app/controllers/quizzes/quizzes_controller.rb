@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -32,6 +34,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   before_action :require_context
   before_action :rce_js_env, only: [:show, :new, :edit]
+
+  include K5Mode
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
@@ -121,13 +125,14 @@ class Quizzes::QuizzesController < ApplicationController
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           quiz_lti_enabled: quiz_lti_enabled?,
+          new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
               @context.quiz_lti_tool.present?,
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
-          DIRECT_SHARE_ENABLED: (can_manage || @context.grants_right?(@current_user, session, :read_as_admin)) && @domain_root_account.try(:feature_enabled?, :direct_share),
+          DIRECT_SHARE_ENABLED: can_manage || @context.grants_right?(@current_user, session, :read_as_admin),
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :quiz_index_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
@@ -364,7 +369,7 @@ class Quizzes::QuizzesController < ApplicationController
       conditional_release_js_env(@quiz.assignment)
       set_master_course_js_env_data(@quiz, @context)
 
-      js_bundle :quizzes_bundle
+      js_bundle :quizzes
       css_bundle :quizzes, :tinymce, :conditional_release_editor
       render :new, stream: can_stream_template?
     end
@@ -415,6 +420,9 @@ class Quizzes::QuizzesController < ApplicationController
         @quiz.assignment.post_to_sis = params[:post_to_sis] == '1'
       end
 
+      if Account.site_admin.feature_enabled?(:important_dates)
+        @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
+      end
 
       @quiz.did_edit if @quiz.created?
       @quiz.reload
@@ -483,6 +491,10 @@ class Quizzes::QuizzesController < ApplicationController
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == '1'
               @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
+
+              if Account.site_admin.feature_enabled?(:important_dates)
+                @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
+              end
             end
 
             auto_publish = @quiz.published?
@@ -813,7 +825,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def get_submission
-    submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first
+    submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first if @current_user
     if !@current_user || (params[:preview] && can_preview?)
       user_code = temporary_user_code
       submission = @quiz.quiz_submissions.where(temporary_user_code: user_code).first

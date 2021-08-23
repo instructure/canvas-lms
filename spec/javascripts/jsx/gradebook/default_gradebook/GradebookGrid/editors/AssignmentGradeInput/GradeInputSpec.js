@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import AssignmentGradeInput from 'jsx/gradebook/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
+import AssignmentGradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentGradeInput/index.js'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {

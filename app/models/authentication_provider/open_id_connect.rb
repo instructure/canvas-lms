@@ -29,7 +29,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
     self == OpenIDConnect ? 'OpenID Connect'.freeze : super
   end
 
-  def self.recognized_params
+  def self.open_id_connect_params
     [ :client_id,
       :client_secret,
       :authorize_url,
@@ -39,6 +39,10 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
       :end_session_endpoint,
       :userinfo_endpoint,
       :jit_provisioning ].freeze
+  end
+
+  def self.recognized_params
+    super + open_id_connect_params
   end
 
   def self.recognized_federated_attributes
@@ -114,6 +118,8 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
     token.options[:claims] ||= begin
       jwt_string = token.params['id_token']
       debug_set(:id_token, jwt_string) if instance_debugging
+      return {} if jwt_string.blank?
+
       id_token = begin
         ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
       rescue ::Canvas::Security::InvalidToken

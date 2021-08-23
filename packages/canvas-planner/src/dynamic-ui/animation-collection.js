@@ -27,7 +27,8 @@ import {
   ReturnFocusOnCancelEditing,
   // SetDismissedOpportunityFocus,
   ScrollToToday,
-  ScrollToLoadedToday
+  ScrollToLoadedToday,
+  JumpScrollToToday
 } from './animations'
 
 export class AnimationCollection {
@@ -79,6 +80,10 @@ export class AnimationCollection {
     {
       expected: ['START_LOADING_PAST_UNTIL_TODAY_SAGA', 'GOT_DAYS_SUCCESS'],
       animation: ScrollToLoadedToday
+    },
+    {
+      expected: ['JUMP_TO_THIS_WEEK'],
+      animation: JumpScrollToToday
     }
   ]
 

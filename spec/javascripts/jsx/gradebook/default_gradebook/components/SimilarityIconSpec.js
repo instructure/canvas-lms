@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SimilarityIcon from 'jsx/gradebook/default_gradebook/components/SimilarityIcon'
+import SimilarityIcon from 'ui/features/gradebook/react/default_gradebook/components/SimilarityIcon.js'
 
 QUnit.module('SimilarityIcon', moduleHooks => {
   let $container

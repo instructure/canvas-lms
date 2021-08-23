@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -64,13 +66,14 @@ module Lti::Ims::Concerns
       def verify_line_item_in_context
         line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
         raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?
-        return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_id == params[:resourceLinkId]
+        return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_uuid == params[:resourceLinkId]
+
         render_error("The specified LTI link ID is not associated with the line item.")
       end
 
       def user_id
         id = params.fetch(:userId, params[:user_id])
-        id == id.to_i.to_s ? id : nil
+        [id.to_i, id.to_i.to_s].include?(id) ? id : nil
       end
 
       def prepare_line_item_for_ags!

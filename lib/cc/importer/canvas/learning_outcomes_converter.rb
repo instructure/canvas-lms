@@ -47,6 +47,7 @@ module CC::Importer::Canvas
       group[:title] = get_val_if_child(node, 'title')
       group[:type] = 'learning_outcome_group'
       group[:description] = get_val_if_child(node, 'description')
+      group[:source_outcome_group_id] = get_val_if_child(node, 'source_outcome_group_id')
       group[:outcomes] = process_outcome_children(node.at_css('learningOutcomes'))
       group[:vendor_guid] = get_val_if_child(node, 'vendor_guid')
 

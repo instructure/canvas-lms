@@ -278,6 +278,79 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#matches_host?' do
+    subject { tool.matches_host?(given_url) }
+
+    let(:tool) { external_tool_model }
+    let(:given_url) { 'https://www.given-url.com/test?foo=bar' }
+
+    context 'when the tool has a url and no domain' do
+      let(:url) { 'https://app.test.com/foo' }
+
+      before do
+        tool.update!(
+          domain: nil,
+          url: url
+        )
+      end
+
+      context 'and the tool url host does not match that of the given url host' do
+        it { is_expected.to eq false }
+      end
+
+      context 'and the tool url host matches that of the given url host' do
+        let(:url) { 'https://www.given-url.com/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool url host matches except for case' do
+        let(:url) { 'https://www.GiveN-url.cOm/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+    end
+
+    context 'when the tool has a domain and no url' do
+      let(:domain) { 'app.test.com' }
+
+      before do
+        tool.update!(
+          url: nil,
+          domain: domain
+        )
+      end
+
+      context 'and the tool domain host does not match that of the given url host' do
+        it { is_expected.to eq false }
+
+        context 'and the tool url and given url are both nil' do
+          let(:given_url) { nil }
+
+          it { is_expected.to eq false }
+        end
+      end
+
+      context 'and the tool domain host matches that of the given url host' do
+        let(:domain) { 'www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain matches except for case' do
+        let(:domain) { 'www.gIvEn-URL.cOm' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain contains the protocol' do
+        let(:domain) { 'https://www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       subject { second_tool.duplicated_in_context? }
@@ -1222,6 +1295,18 @@ describe ContextExternalTool do
         tool.homework_submission = {enabled: true}
         expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
       end
+
+      it 'toggles not_selectable when placement is resource_selection' do
+        tool.resource_selection = {enabled: true}
+
+        tool.resource_selection = {enabled: false}
+        tool.save
+        expect(tool.not_selectable).to be_truthy
+
+        tool.resource_selection = {enabled: true}
+        tool.save
+        expect(tool.not_selectable).to be_falsy
+      end
     end
   end
 
@@ -1503,6 +1588,43 @@ describe ContextExternalTool do
         expect(tool.display_type(:course_navigation)).to eq 'other_display_type'
       end
 
+    end
+
+    describe "validation" do
+      def set_visibility(v)
+        tool.file_menu = {enabled: true, visibility: v}
+        tool.save!
+        tool.reload
+      end
+
+      context "when visibility is included in placement config" do
+        it 'accepts `admins`' do
+          set_visibility('admins')
+          expect(tool.file_menu[:visibility]).to eq 'admins'
+        end
+
+        it 'accepts `members`' do
+          set_visibility('members')
+          expect(tool.file_menu[:visibility]).to eq 'members'
+        end
+
+        it 'accepts `public`' do
+          set_visibility('public')
+          expect(tool.file_menu[:visibility]).to eq 'public'
+        end
+
+        it 'does not accept any other values' do
+          set_visibility('public')
+          set_visibility('fake')
+          expect(tool.file_menu[:visibility]).to eq 'public'
+        end
+
+        it 'accepts `nil` and removes visibility' do
+          set_visibility('members')
+          set_visibility(nil)
+          expect(tool.file_menu.key?(:visibility)).to be false
+        end
+      end
     end
   end
 
@@ -1828,7 +1950,8 @@ describe ContextExternalTool do
 
     it "should not let concluded teachers see admin tools" do
       course_with_teacher(:account => @account, :active_all => true)
-      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment", :end_at => 1.week.ago)
+      term = @course.enrollment_term
+      term.enrollment_dates_overrides.create!(enrollment_type: "TeacherEnrollment", end_at: 1.week.ago, context: term.root_account)
       expect(ContextExternalTool.global_navigation_granted_permissions(
         root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
     end

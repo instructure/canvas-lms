@@ -66,7 +66,7 @@ describe "blueprint courses assignments" do
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
       run_master_course_migration(@master)
       get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f('#edit_assignment_form')).to contain_css('.mce-tinymce.mce-container.mce-panel')
+      expect(f('#edit_assignment_form')).to contain_css('.tox-tinymce .tox-editor-container')
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
       expect(f("#assignment_points_possible")).to have_attribute('readonly', 'true')
       expect(f("#due_at")).to have_attribute('readonly', 'true')

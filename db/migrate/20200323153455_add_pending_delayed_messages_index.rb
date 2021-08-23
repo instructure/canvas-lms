@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPendingDelayedMessagesIndex < ActiveRecord::Migration[5.2]
   tag :postdeploy
   disable_ddl_transaction!

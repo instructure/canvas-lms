@@ -1,0 +1,12 @@
+<% next_window = database_server.next_maintenance_window %>
+<%= t("Maintenance windows: %{days} %{weekday} of the month from %{time_range} (%{utc_time_range} UTC )",
+            { days: database_server.maintenance_window_weeks_of_month.map(&:ordinalize).to_sentence,
+                weekday: I18n.t('date.day_names')[next_window[0].in_time_zone(local_zone).wday],
+                time_range: time_string(next_window[0], next_window[1], local_zone),
+                utc_time_range: datetime_string(next_window[0], :weekday_only, next_window[1], false, ActiveSupport::TimeZone['UTC']) }) %>
+<br/>
+<%= t("Next window: %{window}", {
+    window: datetime_string(next_window[0], :verbose, next_window[1], false, local_zone, with_weekday: true) }) %>
+<p>
+<%= Setting.get('global_maintenance_notice', '').html_safe %>
+<p/>

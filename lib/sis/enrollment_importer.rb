@@ -70,9 +70,13 @@ module SIS
         Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}").
           batch_add_to_favorites(sliced_ids)
       end
-      new_data = Enrollment::BatchStateUpdater.destroy_batch(i.enrollments_to_delete, sis_batch: @batch) if i.enrollments_to_delete.any?
-
-      i.roll_back_data.push(*new_data)
+      if i.enrollments_to_delete.any?
+        new_data = Enrollment::BatchStateUpdater.destroy_batch(
+          i.enrollments_to_delete,
+          sis_batch: @batch,
+          ignore_due_date_caching_for: i.courses_to_recache_due_dates)
+        i.roll_back_data.push(*new_data)
+      end
       SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data)
 
       i.success_count + i.enrollments_to_delete.count

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -14,6 +16,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require 'host_url'
 
 environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
@@ -60,6 +64,16 @@ environment_configuration(defined?(config) && config) do |config|
   config.active_record.schema_format = :sql
 
   config.eager_load = false
+
+  config.hosts << HostUrl
+
+  # allow docker dev setup to use http proxy
+  config.hosts << ENV['VIRTUAL_HOST'] if ENV['VIRTUAL_HOST']
+
+  # allow any additional hosts
+  ENV['ADDITIONAL_ALLOWED_HOSTS']&.split(',')&.each do |host|
+    config.hosts << host
+  end
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }

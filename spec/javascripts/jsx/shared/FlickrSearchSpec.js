@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import FlickrSearch from 'jsx/shared/FlickrSearch'
+import FlickrSearch from 'ui/features/course_settings/react/components/FlickrSearch.js'
 
 QUnit.module('FlickrSearch View')
 

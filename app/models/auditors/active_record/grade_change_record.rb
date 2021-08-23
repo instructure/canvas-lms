@@ -42,7 +42,7 @@ module Auditors::ActiveRecord
 
       def ar_attributes_from_event_stream(record)
         attrs_hash = record.attributes.except('id', 'version_number')
-        root_account_id = Account.where(id: record.account_id).pluck(:root_account_id).first
+        root_account_id = Account.where(id: record.account_id).select(:id, :root_account_id).take.resolved_root_account_id
         attrs_hash['request_id'] ||= "MISSING"
         attrs_hash['uuid'] = record.id
         attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)

@@ -65,10 +65,10 @@ module Api::V1::QuizQuestion
   end
 
   def question_json(question, user, session, _context=nil, includes=[], censored=false, quiz_data=nil, opts={})
-    hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS) do |json, q|
+    hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS).tap do |json|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
-        question_data = quiz_data&.find { |data_question| data_question[:id] == q[:id] } || q.question_data
-        json.send("#{field}=", question_data[field])
+        question_data = quiz_data&.find { |data_question| data_question[:id] == question[:id] } || question.question_data
+        json[field] = question_data[field]
       end
     end
 

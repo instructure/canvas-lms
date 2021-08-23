@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'compiled/handlebars_helpers'
-import developerKey from 'jst/developer_key'
+import '@canvas/handlebars-helpers'
+import developerKey from 'ui/features/developer_keys/jst/developer_key.handlebars'
 import $ from 'jquery'
-import 'jquery.instructure_date_and_time'
+import '@canvas/datetime'
 
 test('renders nothing in the notes field when the value is NULL', () => {
   const data = {

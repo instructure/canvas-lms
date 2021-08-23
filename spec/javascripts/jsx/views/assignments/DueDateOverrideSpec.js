@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import DateValidator from 'compiled/util/DateValidator'
-import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride'
+import DateValidator from '@canvas/datetime/DateValidator'
+import DueDateOverrideView from '@canvas/due-dates'
 import fakeENV from 'helpers/fakeENV'
-import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
-import 'jquery.instructure_forms' // errorBox
+import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
+import '@canvas/forms/jquery/jquery.instructure_forms' // errorBox
 
 QUnit.module('DueDateOverride#validateTokenInput', {
   setup() {

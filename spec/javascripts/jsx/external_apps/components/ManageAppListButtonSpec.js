@@ -18,8 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Modal from 'react-modal'
-import ManageAppListButton from 'jsx/external_apps/components/ManageAppListButton'
+import Modal from '@canvas/react-modal'
+import ManageAppListButton from 'ui/features/external_apps/react/components/ManageAppListButton.js'
 
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)

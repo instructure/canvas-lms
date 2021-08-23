@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/wiki_and_tiny_common'
+require_relative 'pages/rce_next_page'
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
+  include RCENextPage
 
   context "as a student" do
 
@@ -96,10 +98,22 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should not allow students to add links to new pages" do
+      skip("With new RCE you CAN select pages in this scenario")
       create_wiki_page("test_page", false, "public")
+      title = 'test_page'
+      unpublished = false
+      edit_roles = 'public'
+
+      create_wiki_page(title, unpublished, edit_roles)
+
       get "/courses/#{@course.id}/pages/test_page/edit"
-      fj('button:contains("Pages")').click
-      wait_for_ajax_requests
+      wait_for_tiny(edit_wiki_css)
+
+      click_links_toolbar_menu_button
+      click_course_links
+
+      click_pages_accordion
+      click_course_item_link(title)
 
       expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
     end
@@ -107,11 +121,21 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     it "should allow students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
-      get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
-      fj('button:contains("Pages")').click
-      wait_for_ajax_requests
+      title = 'test_page'
+      unpublished = false
+      edit_roles = 'public'
 
-      expect(f('#rcs-LinkToNewPage-btn-link')).to_not be_nil
+      create_wiki_page(title, unpublished, edit_roles)
+      get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
+
+      wait_for_tiny(edit_wiki_css)
+
+      click_links_toolbar_menu_button
+      click_course_links
+
+      click_pages_accordion
+      click_course_item_link(title)
+
       expect_new_page_load { f('form.edit-form button.submit').click }
       new_page = @course.wiki_pages.last
       expect(new_page).to be_published

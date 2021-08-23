@@ -61,10 +61,22 @@ module Api
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
         end
 
-        it "can produce a redirect route for announcements" do
+        it "has media redirect for messages" do
           course = course_model
+          topic = course.discussion_topics.create!
+          entry = DiscussionEntry.new
+          entry.id = 1
+          entry.discussion_topic = topic
+          notification = Notification.find_or_create_by(name: "New Discussion Entry", category: "DiscussionEntry")
+          message = Message.create(context: entry, user: User.create!(name: 'help'), notification: notification)
+          proxy = UrlProxy.new(StubUrlHelper.new, message, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
+        it "can produce a redirect route for announcements" do
           announcement = Announcement.new
           announcement.id = 1
+          course = course_model
           announcement.context = course
           proxy = UrlProxy.new(StubUrlHelper.new, announcement, "example.com", "http")
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
@@ -72,10 +84,56 @@ module Api
       end
 
       describe "#api_endpoint_info" do
-        it "maps good paths through to endpoints with return types" do
+        it 'maps quizzes' do
           endpoint_info = proxy.api_endpoint_info("/courses/42/quizzes/24")
           expect(endpoint_info['data-api-returntype']).to eq("Quiz")
           expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/courses/42/quizzes/24")
+        end
+
+        it 'maps course files' do
+          endpoint_info = proxy.api_endpoint_info('/courses/1/files/230/preview')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/courses/1/files/230")
+
+          endpoint_info = proxy.api_endpoint_info('/courses/1/files/230/download')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/courses/1/files/230")
+
+          endpoint_info = proxy.api_endpoint_info('/courses/1/files/230?wrap=1')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/courses/1/files/230")
+        end
+
+        it 'does not map folders' do
+          endpoint_info = proxy.api_endpoint_info('/courses/1/files/folder/this_is_a_folder')
+          expect(endpoint_info['data-api-returntype']).to be_nil
+          expect(endpoint_info['data-api-endpoint']).to be_nil
+        end
+
+        it 'maps user files' do
+          endpoint_info = proxy.api_endpoint_info('/users/1/files/2?wrap=1')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/users/1/files/2")
+
+          endpoint_info = proxy.api_endpoint_info('/users/1/files/2/preview')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/users/1/files/2")
+        end
+
+        it 'maps group files' do
+          endpoint_info = proxy.api_endpoint_info('/groups/1/files/2?wrap=1')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/groups/1/files/2")
+
+          endpoint_info = proxy.api_endpoint_info('/groups/1/files/2/preview')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/groups/1/files/2")
+        end
+
+        it 'maps root files' do
+          endpoint_info = proxy.api_endpoint_info('/files/1')
+          expect(endpoint_info['data-api-returntype']).to eq("File")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/files/1")
         end
 
         it 'unescapes urls for sessionless launch endpoints' do

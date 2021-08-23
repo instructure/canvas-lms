@@ -18,6 +18,8 @@
 
 // Global styles for any React modal.
 // Do not change these or your name will be cursed for generations.
+@use "sass:math";
+
 .ReactModal__Overlay {
   transition: opacity 0.2s ease-out;
   overflow-x: hidden;
@@ -39,7 +41,7 @@
 
 
 @mixin ReactModalPadding {
-  padding: $ic-sp/2;
+  padding: $ic-sp*0.5;
   @include breakpoint(tablet) { padding: $ic-sp; }
 }
 
@@ -71,7 +73,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding: $ic-sp/2;
+    padding: $ic-sp*0.5;
     @include breakpoint(mini-tablet) { padding: $ic-sp; }
     @include breakpoint(tablet) { padding: 0; }
 
@@ -161,7 +163,7 @@
         justify-content: flex-end;
       }
       .Button, .btn {
-        margin-#{direction(left)}: $ic-sp/3;
+        margin-#{direction(left)}: math.div($ic-sp, 3);
         &:first-of-type { margin-#{direction(left)}: 0; }
       }
     }

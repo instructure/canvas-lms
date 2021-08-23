@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# takes a filename that is a list of specs. the first spec
+# in the file is the one that will fail, if the other specs
+# are run first. it will run the other specs in groups of 16,
+# _and_ the target spec until it finds a single spec that
+# if run before the target will cause the specs to fail.
+#
+# this assumes that a) the target spec isn't simply flakey
+# (may or may not pass in isolation), and b) all other specs
+# reliably pass in isolation
+#
+# the spec list may contain timestamps and bin/rspec headers;
+# these will be ignored, allowing you to copy/paste the
+# Preceding Specs section from a Jenkins failure report
+
+specs = File.readlines(ARGV[0]).each do |line|
+  line.gsub!(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC: bin\/rspec)?/, '').strip!
+end
+specs = specs.reverse if specs.first.end_with?(' (failed)')
+specs.each do |line|
+  line.gsub!(/ \(failed\)$/, '')
+end
+target = specs.pop
+
+def find_leaky_spec(specs, target)
+  if specs.length <= 1
+    exit 0
+  end
+
+  group_size = [specs.length / 2, 16].min
+  specs.each_slice(group_size) do |sub_specs|
+    command = "bin/rspec --order=defined #{sub_specs.join(' ')} #{target}"
+    puts command
+    system(command)
+    unless $?.success?
+      find_leaky_spec(sub_specs, target)
+    end
+  end
+end
+
+find_leaky_spec(specs, target)

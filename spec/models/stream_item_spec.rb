@@ -182,6 +182,13 @@ describe StreamItem do
   end
 
   describe ".generate_all" do
+    context 'when there is no item generated' do
+      it 'does not cause error when item is not generated' do
+        allow(StreamItem).to receive(:generate_or_update).and_return(nil)
+        expect(StreamItem.generate_all(double, [1])).to eq []
+      end
+    end
+
     context "when the caller is a submission" do
       let(:student) { User.create! }
       let(:teacher) { User.create! }

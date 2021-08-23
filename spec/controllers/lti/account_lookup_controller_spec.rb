@@ -55,7 +55,7 @@ describe Lti::AccountLookupController do
           'name' => acct.name,
           'workflow_state' => acct.workflow_state,
           'parent_account_id' => acct.parent_account_id,
-          'root_account_id' => acct.root_account_id
+          'root_account_id' => nil
         )
         expect(body['id']).to be_a(Integer)
         expect(body['uuid']).to be_a(String)
@@ -100,7 +100,7 @@ describe Lti::AccountLookupController do
           'name' => acct.name,
           'workflow_state' => acct.workflow_state,
           'parent_account_id' => acct.parent_account_id,
-          'root_account_id' => acct.root_account_id
+          'root_account_id' => nil
         )
         expect(body['id']).to be_a(Integer)
       end

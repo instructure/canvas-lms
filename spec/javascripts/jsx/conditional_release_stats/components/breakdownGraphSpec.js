@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import BreakdownGraph from 'jsx/conditional_release_stats/components/breakdown-graphs'
+import BreakdownGraph from '@canvas/conditional-release-stats/react/components/breakdown-graphs'
 
 QUnit.module('Breakdown Graph')
 

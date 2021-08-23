@@ -503,7 +503,6 @@ class Group < ActiveRecord::Base
     can :participate and
     can :manage_calendar and
     can :manage_content and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete and
@@ -558,34 +557,48 @@ class Group < ActiveRecord::Base
       given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
       can :create
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-      can :create and
-      can :create_collaborations and
-      can :delete and
-      can :manage and
-      can :manage_admin_users and
-      can :allow_course_admin_actions and
-      can :manage_calendar and
-      can :manage_content and
-      can :manage_files and
-      can :manage_files_add and
-      can :manage_files_edit and
-      can :manage_files_delete and
-      can :manage_students and
-      can :manage_wiki_create and
-      can :manage_wiki_delete and
-      can :manage_wiki_update and
-      can :moderate_forum and
-      can :post_to_forum and
-      can :create_forum and
-      can :read and
-      can :read_forum and
-      can :read_announcements and
-      can :read_roster and
-      can :send_messages and
-      can :send_messages_all and
-      can :update and
-      can :view_unpublished_items
+      #################### Begin legacy permission block #########################
+
+      given do |user, session|
+        !self.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+          self.context.grants_right?(user, session, :manage_groups)
+      end
+      can :create and can :create_collaborations and can :delete and can :manage and
+        can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
+        can :manage_content and can :manage_files_add and can :manage_files_edit and
+        can :manage_files_delete and can :manage_students and can :manage_wiki_create and 
+        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
+        can :post_to_forum and can :create_forum and can :read and can :read_forum and
+        can :read_announcements and can :read_roster and can :send_messages and
+        can :send_messages_all and can :update and can :view_unpublished_items
+
+      ##################### End legacy permission block ##########################
+
+      given do |user, session|
+        self.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+          self.context.grants_right?(user, session, :manage_groups_add)
+      end
+      can :read and can :create
+
+      # permissions to update a group and manage actions within the context of a group
+      given do |user, session|
+        self.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+          self.context.grants_right?(user, session, :manage_groups_manage)
+      end
+      can :read and can :update and can :create_collaborations and can :manage and
+        can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
+        can :manage_content and can :manage_files_add and can :manage_files_edit and
+        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
+        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
+        can :post_to_forum and can :create_forum and can :read_forum and
+        can :read_announcements and can :read_roster and can :send_messages and
+        can :send_messages_all and can :view_unpublished_items
+
+      given do |user, session|
+        self.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+          self.context.grants_right?(user, session, :manage_groups_delete)
+      end
+      can :read and can :delete
 
       given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
       can :post_to_forum
@@ -702,7 +715,7 @@ class Group < ActiveRecord::Base
     ]
 
     if user && self.grants_right?(user, :read)
-      available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path }
+      available_tabs << { :id => TAB_CONFERENCES, :label => WebConference.conference_tab_name, :css_class => 'conferences', :href => :group_conferences_path }
       available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path }
       available_tabs << { :id => TAB_COLLABORATIONS_NEW, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_lti_collaborations_path }
     end

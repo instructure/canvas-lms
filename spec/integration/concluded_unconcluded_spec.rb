@@ -55,7 +55,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('#add_a_comment').length).to eq 1
     expect(html.css('#grade_container').length).to eq 1
   end
@@ -66,7 +66,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('#add_a_comment').length).to eq 0
     expect(html.css('#grade_container').length).to eq 0
   end
@@ -75,7 +75,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('.submission_details .grading_box').length).to eq 1
     expect(html.css('#add_comment_form').length).to eq 1
   end
@@ -86,7 +86,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('.submission_details .grading_box').length).to eq 0
     expect(html.css('#add_comment_form')[0]['style']).to match(/display: none/)
   end
@@ -95,7 +95,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('#fudge_points_entry').length).to eq 1
     expect(html.css('.quiz_comment textarea').length).to eq 1
     expect(html.css('.user_points .question_input').length).to eq 1
@@ -107,7 +107,7 @@ describe "concluded/unconcluded courses" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('#fudge_points_entry').length).to eq 0
     expect(html.css('.quiz_comment textarea').length).to eq 0
     expect(html.css('.user_points .question_input').length).to eq 0

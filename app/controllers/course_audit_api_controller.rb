@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -183,7 +185,7 @@ class CourseAuditApiController < AuditorApiController
   # @returns [CourseEvent]
   #
   def for_course
-    @course = @domain_root_account.all_courses.find(params[:course_id])
+    @course = api_find(@domain_root_account.all_courses, params[:course_id])
     if authorize
       events = Auditors::Course.for_course(@course, query_options)
       render_events(events, api_v1_audit_course_for_course_url(@course))

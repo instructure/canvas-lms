@@ -24,130 +24,186 @@
 
 <% provide :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
 <div style="padding: 0 20px;" id="stats">
-<h1><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h1>
+  <h1><%= t 'Statistics for %{course}', :course => @context.name %></h1>
 
-<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").distinct.count %>
-<% inactive_students = @context.student_enrollments.invited_by_date.distinct.count(:user_id) %>
+  <% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").distinct.count %>
+  <% inactive_students = @context.student_enrollments.invited_by_date.distinct.count(:user_id) %>
 
-<% active_topics =  @context.discussion_topics.active.pluck(:id) %>
-<% total_topics = active_topics.length %>
-<% total_entries = DiscussionEntry.active.where(:discussion_topic_id => active_topics).count %>
-<% total_assignments = @context.assignments.active.select{|a| a.expects_submission? }.length %>
-<% total_submissions = @context.submissions.having_submission.with_assignment.count %>
+  <% active_topics =  @context.discussion_topics.active.pluck(:id) %>
+  <% total_topics = active_topics.length %>
+  <%
+    active_assignments = @context.assignments.active
+    assignment_counts_by_type = active_assignments.group(:submission_types).except(:order).count
+    assignment_counts = assignment_counts_by_type.inject(Hash.new(0)) do |counts, (types, count)|
+      split_types = (types || '').split(',')
+      if split_types.length == 1
+        counts[types] += count
+      else
+        split_types.each { |type| counts[type] += count }
+      end
+      counts
+    end
+  %>
+  <% total_entries = DiscussionEntry.active.where(:discussion_topic_id => active_topics).count %>
+  <% total_assignments = active_assignments.select(&:expects_submission?).length %>
+  <% submission_counts = @context.submissions.having_submission.group(:submission_type).except(:order).count %>
+  <% total_submissions = submission_counts.values.sum %>
 
-<%
-  rubric_associations = @context.rubric_associations.bookmarked.distinct.pluck(:rubric_id)
-%>
-<div id="reports-tabs" style="display:none;">
-  <ul>
-    <li><a href="#tab-totals"><%= t('tabs.totals', %{Totals}) %></a></li>
-    <li><a href="#tab-assignments"><%= t('tabs.assignments', %{Assignments}) %></a></li>
-    <li><a href="#tab-students" id="students_stats_tab"><%= t('tabs.students', %{Students}) %></a></li>
-    <li><a href="#tab-files"><%= t('tabs.files', %{File Storage}) %></a></li>
-  </ul>
-  <div class="stats" id="tab-totals">
-    <h2><%= t('headings.totals', %{Running Totals}) %></h2>
-    <table>
-      <tr>
-        <td><%= t('discussions', %{Discussions}) %></td>
-        <td><%= total_topics %></td>
-      </tr><tr>
-        <td class="indent"><%= t('discussion_posts', %{Discussion Posts}) %></td>
-        <td class="indent"><%= total_entries %></td>
-      </tr><tr>
-        <td><%= t('assignments', %{Assignments}) %></td>
-        <td><%= @context.assignments.active.count %></td>
-      </tr><tr>
-        <td class="indent"><%= t('assignment_groups', %{Assignment Groups}) %></td>
-        <td class="indent"><%= @context.assignment_groups.active.count %></td>
-      </tr><tr>
-        <td class="indent"><%= t('course_rubrics', %{Course Rubrics}) %></td>
-        <td class="indent"><%= rubric_associations.count %></td>
-      </tr><tr>
-        <td class="indent"><%= t('all_rubrics', %{All Rubrics}) %></td>
-        <td class="indent"><%= @context.rubrics.active.count %></td>
-      </tr><tr>
-        <td><%= t('active_students', %{Active Students}) %></td>
-        <td><%= active_students %></td>
-      </tr><tr>
-        <td class="indent"><%= t('unaccepted_students', %{Unaccepted Students}) %></td>
-        <td class="indent"><%= inactive_students %></td>
-      </tr><tr>
-        <td><%= t('quizzes', %{Quizzes}) %></td>
-        <td class="quiz_count"><%= @context.quizzes.active.count %></td>
-      </tr><tr>
-        <td class="indent"><%= t('quiz_questions', %{Quiz Questions}) %></td>
-        <td class="indent quiz_question_count"><%= @context.quizzes.active.map{|q| (q.quiz_data || []).length}.sum %></td>
-      </tr><tr>
-        <td class="indent"><%= t('quiz_submissions', %{Quiz Submissions}) %></td>
-        <td class="indent quiz_submission_count"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.active).count %></td>
-      </tr>
-    </table>
+  <%
+    rubric_associations = @context.rubric_associations.bookmarked.distinct.pluck(:rubric_id)
+  %>
+  <div id="reports-tabs" style="display:none;">
+    <ul>
+      <li><a href="#tab-totals"><%= t('Totals') %></a></li>
+      <li><a href="#tab-assignments"><%= t('Assignments') %></a></li>
+      <li><a href="#tab-students" id="students_stats_tab"><%= t('Students') %></a></li>
+      <li><a href="#tab-files"><%= t('File Storage') %></a></li>
+    </ul>
+    <div class="stats" id="tab-totals">
+      <h2><%= t('Running Totals') %></h2>
+      <table>
+        <tr>
+          <td><%= t('Discussions') %></td>
+          <td><%= total_topics %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Discussion Posts') %></td>
+          <td class="indent"><%= total_entries %></td>
+        </tr>
+
+        <tr>
+          <td><%= t('Assignments') %></td>
+          <td><%= assignment_counts_by_type.values.sum %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Assignment Groups') %></td>
+          <td class="indent"><%= @context.assignment_groups.active.count %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Course Rubrics') %></td>
+          <td class="indent"><%= rubric_associations.count %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('All Rubrics') %></td>
+          <td class="indent"><%= @context.rubrics.active.count %></td>
+        </tr>
+
+        <tr>
+          <td><%= t('Active Students') %></td>
+          <td><%= active_students %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Unaccepted Students') %></td>
+          <td class="indent"><%= inactive_students %></td>
+        </tr>
+
+        <tr>
+          <td><%= t('Quizzes') %></td>
+          <td class="quiz_count"><%= @context.quizzes.active.count %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Quiz Questions') %></td>
+          <td class="indent quiz_question_count"><%= @context.quizzes.active.map{|q| (q.quiz_data || []).length}.sum %></td>
+        </tr>
+
+        <tr>
+          <td class="indent"><%= t('Quiz Submissions') %></td>
+          <td class="indent quiz_submission_count"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.active).count %></td>
+        </tr>
+      </table>
+    </div>
+    <div class="stats" id="tab-assignments">
+      <h2><%= t('Assignments Usage Report') %></h2>
+      <table>
+        <thead>
+          <tr>
+            <th><%= t('Submission Type') %></th>
+            <th><%= t('# Assignments') %></th>
+            <th><%= t('# Submissions') %></th>
+          </tr>
+        </thead>
+
+        <tfoot>
+          <tr>
+            <th><%= t('All Assignments') %></th>
+            <th><%= total_assignments %></th>
+            <th><%= total_submissions %></th>
+          </tr>
+        </tfoot>
+
+        <tbody>
+          <tr>
+            <td><%= t('File Upload') %></td>
+            <td><%= assignment_counts.fetch('online_upload', 0) %></td>
+            <td><%= submission_counts.fetch('online_upload', 0) %></td>
+          </tr>
+
+          <tr>
+            <td><%= t('Text Entry') %></td>
+            <td><%= assignment_counts.fetch('online_text_entry', 0) %></td>
+            <td><%= submission_counts.fetch('online_text_entry', 0) %></td>
+          </tr>
+
+          <tr>
+            <td><%= t('Website URL') %></td>
+            <td><%= assignment_counts.fetch('online_url', 0) %></td>
+            <td><%= submission_counts.fetch('online_url', 0) %></td>
+          </tr>
+
+          <tr>
+            <td><%= t('Quiz') %></td>
+            <td><%= assignment_counts.fetch('online_quiz', 0) %></td>
+            <td><%= submission_counts.fetch('online_quiz', 0) %></td>
+          </tr>
+
+          <tr>
+            <td><%= t('Discussion Topic') %></td>
+            <td><%= assignment_counts.fetch('discussion_topic', 0) %></td>
+            <td><%= submission_counts.fetch('discussion_topic', 0) %></td>
+          </tr>
+
+          <tr>
+            <td><%= t('Student Annotation') %></td>
+            <td id="student-annotation-assignment-count"><%= assignment_counts.fetch('student_annotation', 0) %></td>
+            <td id="student-annotation-submission-count"><%= submission_counts.fetch('student_annotation', 0) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="tab-students">
+      <h2><%= t('headings.students', %{Recently Logged-In Users}) %></h2>
+      <ul class="item_list"></ul>
+    </div>
+
+    <div class="stats" id="tab-files">
+      <h2><%= t('File Storage') %></h2>
+      <table>
+        <tr>
+          <td><%= before_label('Allotted Storage') %></td>
+          <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@context.quota) %></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td><%= before_label('Uploaded Files') %></td>
+          <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@files_size) %></td>
+          <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @file_count %></td>
+        </tr>
+
+        <tr>
+          <td><%= before_label('Media Files') %></td>
+          <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@media_files_size) %></td>
+          <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
+        </tr>
+      </table>
+    </div>
   </div>
-  <div class="stats" id="tab-assignments">
-    <h2><%= t('headings.assignments', %{Assignments Usage Report}) %></h2>
-    <table>
-      <thead><tr>
-        <th><%= t('submission_type', %{Submission Type}) %></th>
-        <th><%= t('number_of_assignments', %{# Assignments}) %></th>
-        <th><%= t('number_of_submissions', %{# Submissions}) %></th>
-      </tr>
-      </thead>
-      <tfoot>
-      <tr>
-        <th><%= t("All Assignments") %></th>
-        <th><%= total_assignments %></th>
-        <th><%= total_submissions %></th>
-      </tr></tfoot>
-      <tbody>
-      <tr>
-        <td><%= t('file_upload', %{File Upload}) %></td>
-        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_upload/) }.length %></td>
-        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_upload').count %></td>
-      </tr><tr>
-        <td><%= t('text_entry', %{Text Entry}) %></td>
-        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
-        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_text_entry').count %></td>
-      </tr><tr>
-        <td><%= t('website_url', %{Website URL}) %></td>
-        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_url/) }.length %></td>
-        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_url').count %></td>
-      </tr><tr>
-        <td><%= t('quiz', %{Quiz}) %></td>
-        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
-        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_quiz').count %></td>
-      </tr><tr>
-        <td><%= t('discussion_topic', %{Discussion Topic}) %></td>
-        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
-        <td><%= @context.submissions.with_assignment.where(:submission_type => 'discussion_topic').count %></td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-  <div id="tab-students">
-    <h2><%= t('headings.students', %{Recently Logged-In Users}) %></h2>
-    <ul class="item_list"></ul>
-  </div>
-  <div class="stats" id="tab-files">
-    <h2><%= t('headings.files', %{File Storage}) %></h2>
-    <table>
-      <tr>
-        <td><%= before_label('allotted_storage', %{Allotted Storage}) %></td>
-        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@context.quota) %></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><%= before_label('uploaded_files', %{Uploaded Files}) %></td>
-        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@files_size) %></td>
-        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @file_count %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('media_files', %{Media Files}) %></td>
-        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@media_files_size) %></td>
-        <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
-      </tr>
-    </table>
-  </div>
-</div>
 </div>
 <% js_bundle :course_statistics %>

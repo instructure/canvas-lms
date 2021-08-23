@@ -20,26 +20,31 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import fakeENV from 'helpers/fakeENV'
-import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
+import Lti2Iframe from 'ui/features/external_apps/react/components/Lti2Iframe.js'
 
 QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
   let $container
   let props
+  const originalPostMessageOrigin = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
 
   suiteHooks.beforeEach(() => {
     fakeENV.setup()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['media', 'midi']
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = window.origin
 
     $container = document.body.appendChild(document.createElement('div'))
 
     props = {
       handleInstall() {},
       registrationUrl: 'http://localhost/register',
-      reregistration: false
+      reregistration: false,
+      toolName: 'The best LTI tool ever'
     }
   })
 
   suiteHooks.afterEach(() => {
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = originalPostMessageOrigin
+
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
     fakeENV.teardown()
@@ -93,6 +98,11 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
       renderComponent()
       equal(getIframe().getAttribute('data-lti-launch'), 'true')
     })
+
+    test('sets the iframe title', () => {
+      renderComponent()
+      equal(getIframe().getAttribute('title'), 'The best LTI tool ever')
+    })
   })
 
   QUnit.module('"handleInstall" prop', hooks => {
@@ -120,6 +130,17 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
         await postMessage(JSON.stringify(message))
         const [, event] = props.handleInstall.lastCall.args
         equal(event.constructor, MessageEvent)
+      })
+
+      QUnit.module('when the message origin != DEEP_LINKING_POST_MESSAGE_ORIGIN', () => {
+        test('is not called', async () => {
+          ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://someothersite.example.com'
+          // ^ is set back in afterEach hook
+
+          const message = {subject: 'lti.lti2Registration'}
+          await postMessage(JSON.stringify(message))
+          strictEqual(props.handleInstall.callCount, 0)
+        })
       })
     })
 

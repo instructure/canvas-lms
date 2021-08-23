@@ -28,6 +28,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
 
   def resolve(input:)
     errors = {}
+    context[:deleted_models] = {conversations: {}}
     # rubocop:disable Style/BlockDelimiters
     resolved_ids = input[:ids].map { |id|
       conversation = Conversation.find_by(id: id)
@@ -43,6 +44,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
       end
 
       participant_record.remove_messages(:all)
+      context[:deleted_models][:conversations][conversation.id] = conversation
       conversation.id
     }.compact
     # rubocop:enable Style/BlockDelimiters
@@ -53,5 +55,9 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
     response
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)
+  end
+
+  def self.conversation_ids_log_entry(entry, context)
+    context[:deleted_models][:conversations][entry]
   end
 end

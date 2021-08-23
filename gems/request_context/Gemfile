@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gemspec
+
+path ".." do
+  gem 'canvas_security'
+  gem 'canvas_cache'
+  gem 'dynamic_settings'
+  gem 'config_file'
+end

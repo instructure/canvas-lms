@@ -443,7 +443,7 @@ describe "assignments" do
           Assignment.suspend_callbacks(kind: :save) do
             @count_to_make.times do |i|
               ag = @course.assignment_groups.create!(name: "AG #{i}")
-              ag.assignments.create!(context: @course, name: "assignment #{i}")
+              ag.assignments.create!(context: @course, name: "assignment #{i}", submission_types: "online_text_entry")
             end
           end
         end

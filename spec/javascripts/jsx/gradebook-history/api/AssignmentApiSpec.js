@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import AssignmentApi from 'jsx/gradebook-history/api/AssignmentApi'
+import axios from '@canvas/axios'
+import AssignmentApi from 'ui/features/gradebook_history/react/api/AssignmentApi.js'
 
 QUnit.module('AssignmentApi', {
   setup() {

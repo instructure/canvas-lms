@@ -45,10 +45,27 @@ describe "/users/user_dashboard" do
     assign(:topics, [])
     assign(:upcoming_events, [])
     assign(:stream_items, [])
-    assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Date.today - 1.day,
-                                                          :end_at => Date.today + 2.days, :user => User.create!,
+    assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
+                                                          :end_at => Time.zone.today + 2.days, :user => User.create!,
                                                           :subject => "My Global Announcement", :account => Account.default)])
     render "users/user_dashboard"
-    expect(response.body).to match /My Global Announcement/
+    expect(response.body).to match(/My\sGlobal\sAnnouncement/)
+    expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Default\sAccount)/)
+  end
+
+  it "should show announcements (site_admin) to users with no enrollments" do
+    user_factory
+    view_context
+    assign(:courses, [])
+    assign(:enrollments, [])
+    assign(:group_memberships, [])
+    assign(:topics, [])
+    assign(:upcoming_events, [])
+    assign(:stream_items, [])
+    assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
+                                                          :end_at => Time.zone.today + 2.days, :user => User.create!,
+                                                          :subject => "My Global Announcement", :account => Account.site_admin)])
+    render "users/user_dashboard"
+    expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Canvas\sAdministration)/)
   end
 end

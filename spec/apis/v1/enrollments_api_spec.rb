@@ -98,6 +98,41 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
+      it "does not allow enrolling a student view student" do
+        c2 = Account.default.courses.create!
+        user = c2.student_view_student
+
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id                            => user.id,
+              :type                               => 'StudentEnrollment',
+              :enrollment_state                   => 'active',
+              :course_section_id                  => @section.id,
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
+            }
+          }, {}, expected_status: 400
+          expect(@section.enrollments.count).to eq 0
+      end
+
+      it "does not allow enrolling a user as a student view student" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id                            => @unenrolled_user.id,
+              :type                               => 'StudentViewEnrollment',
+              :enrollment_state                   => 'active',
+              :course_section_id                  => @section.id,
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
+            }
+          }, {}, expected_status: 400
+          expect(@section.enrollments.count).to eq 0
+      end
+
       it "accepts sis_section_id" do
         @section.update_attribute(:sis_source_id, 'sis_id')
         json = api_call :post, @path, @path_options,
@@ -116,7 +151,8 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "should be unauthorized for users without manage_students permission" do
+      it "should be unauthorized for users without manage_students permission (non-granular)" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         json = api_call :post, @path, @path_options,
                         {
@@ -131,6 +167,25 @@ describe EnrollmentsApiController, type: :request do
                             }
                         }, {}, {:expected_status => 401}
       end
+
+      it "should be unauthorized for users without add_student_to_course permission (granular)" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
+        json = api_call :post, @path, @path_options,
+                        {
+                            :enrollment => {
+                                :user_id                            => @unenrolled_user.id,
+                                :type                               => 'StudentEnrollment',
+                                :enrollment_state                   => 'active',
+                                :course_section_id                  => @section.id,
+                                :limit_privileges_to_course_section => true,
+                                :start_at                           => nil,
+                                :end_at                             => nil
+                            }
+                        }, {}, {:expected_status => 401}
+      end
+
 
       it "should create a new teacher enrollment" do
         json = api_call :post, @path, @path_options,
@@ -431,7 +486,13 @@ describe EnrollmentsApiController, type: :request do
       it "should not enroll a user lacking a pseudonym on the course's account" do
         foreign_user = user_factory
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
-                 { expected_status: 404 }
+                         { expected_status: 404 }
+      end
+
+      it "does not allow adding users to a template course" do
+        @course.update!(template: true)
+        api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id } }, {},
+                 { expected_status: 401 }
       end
 
       context "custom course-level roles" do
@@ -788,7 +849,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     it "should deterministically order enrollments for pagination" do
-      Account.default.enable_feature!(:bookmarking_for_enrollments_index)
+      allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(true)
       enrollment_num = 10
       enrollment_num.times do
         u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
@@ -797,12 +858,12 @@ describe EnrollmentsApiController, type: :request do
 
       found_enrollment_ids = []
       enrollment_num.times do |i|
-        if i == 0
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
+        json = if i == 0
+          api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
             :controller => "enrollments_api", :action => "index", :format => "json",
             :course_id => @course.id.to_s, :per_page => 1)
         else
-          json = follow_pagination_link('next', {:controller => 'enrollments_api',
+          follow_pagination_link('next', {:controller => 'enrollments_api',
             :action => 'index', :format => 'json', :course_id => @course.id.to_s})
         end
         id = json[0]["id"]
@@ -813,6 +874,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     it "should deterministically order enrollments for pagination with bookmarking not enabled" do
+      allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(false)
       enrollment_num = 10
       enrollment_num.times do
         u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
@@ -821,12 +883,12 @@ describe EnrollmentsApiController, type: :request do
 
       found_enrollment_ids = []
       enrollment_num.times do |i|
-        if i == 0
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
+        json = if i == 0
+          api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
             :controller => "enrollments_api", :action => "index", :format => "json",
             :course_id => @course.id.to_s, :per_page => 1)
         else
-          json = follow_pagination_link('next', {:controller => 'enrollments_api',
+          follow_pagination_link('next', {:controller => 'enrollments_api',
             :action => 'index', :format => 'json', :course_id => @course.id.to_s})
         end
         id = json[0]["id"]
@@ -1248,8 +1310,8 @@ describe EnrollmentsApiController, type: :request do
         it "should include a users group_ids if group_ids are in include" do
           @path = "/api/v1/courses/#{@course.id}/enrollments"
           @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json", :include => ["group_ids"] }
-          json = api_call(:get, @path, @params)
-          expect(json[0]["user"]["group_ids"]).to eq([@group.id])
+          enrollments_json = api_call(:get, @path, @params)
+          expect(enrollments_json[0]["user"]["group_ids"]).to eq([@group.id])
         end
 
         it "should not include a users deleted memberships" do
@@ -1271,10 +1333,10 @@ describe EnrollmentsApiController, type: :request do
 
           @path = "/api/v1/courses/#{@course.id}/enrollments"
           @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json", :include => ["group_ids"] }
-          json = api_call(:get, @path, @params)
+          enrollments_json = api_call(:get, @path, @params)
 
-          expect(json[0]["user"]["group_ids"]).to include(@group.id)
-          expect(json[0]["user"]["group_ids"]).not_to include(group2.id)
+          expect(enrollments_json[0]["user"]["group_ids"]).to include(@group.id)
+          expect(enrollments_json[0]["user"]["group_ids"]).not_to include(group2.id)
         end
       end
 
@@ -1511,7 +1573,7 @@ describe EnrollmentsApiController, type: :request do
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res + @course.send("#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
         end
-        expect(json).to eq enrollments.map { |e|
+        expect(json).to match_array enrollments.map { |e|
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1529,9 +1591,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1552,6 +1611,11 @@ describe EnrollmentsApiController, type: :request do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user)
           } if e.student? && e.user_id != @user.id
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
 
           h
         }
@@ -1815,7 +1879,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should show enrollments for courses with future start dates if state[]=current_and_future" do
         course_factory
-        @course.update_attributes(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
+        @course.update(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
         enrollment = @course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
         expect(enrollment.enrollment_state.state).to eq "pending_active"
@@ -1869,6 +1933,7 @@ describe EnrollmentsApiController, type: :request do
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res + @course.send("#{type}_enrollments").preload(:user)
         end
+        enrollments = enrollments.sort_by {|e| [e.type, e.user.sortable_name] }
         expect(json).to eq(enrollments.map do |e|
           user_json = {
                         'name' => e.user.name,
@@ -2229,9 +2294,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2240,8 +2302,14 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
+
           link_header = response.headers['Link'].split(',')
           expect(link_header[0]).to match /page=1&per_page=1/ # current page
           expect(link_header[1]).to match /page=2&per_page=1/ # next page
@@ -2289,9 +2357,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2300,41 +2365,31 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
           link_header = response.headers['Link'].split(',')
-          expect(link_header[0]).to match /page=first&per_page=1/ # current page
-          md = link_header[1].match(/page=(bookmark.*)&per_page=1/)  # next page
+          expect(link_header[0]).to match /page=.*&per_page=1/ # current page
+          md = link_header[1].match(/page=(.*)&per_page=1/)  # next page
           bookmark = md[1]
           expect(bookmark).to be_present
-          expect(link_header[2]).to match /page=first&per_page=1/ # first page
+          expect(link_header[2]).to match /page=.*&per_page=1/ # first page
           expect(json).to eql [enrollments[0]]
 
           json = api_call(:get, "#{@path}?page=#{bookmark}&per_page=1", @params.merge(:page => bookmark, :per_page => 1.to_param))
           link_header = response.headers['Link'].split(',')
           expect(link_header[0]).to match /page=#{bookmark}&per_page=1/ # current page
-          expect(link_header[1]).to match /page=first&per_page=1/ # first page
-          expect(link_header[2]).to match /page=#{bookmark}&per_page=1/ # last page
+          expect(link_header[1]).to match /page=.*&per_page=1/ # first page
+          expect(link_header[2]).to match /page=.*&per_page=1/ # last page
           expect(json).to eql [enrollments[1]]
         end
       end
 
       context 'with normal settings' do
-        it_behaves_like 'numeric pagination'
-
-        context 'with developer key pagination override' do
-          before do
-            global_id = Shard.global_id_for(DeveloperKey.default.id)
-            Setting.set("pagination_override_key_list", global_id.to_s)
-          end
-
-          it_behaves_like 'numeric pagination'
-        end
-      end
-
-      context 'with bookmark flag enabled' do
-        before { Account.default.enable_feature!(:bookmarking_for_enrollments_index) }
-
         it_behaves_like 'bookmarked pagination'
 
         context 'with developer key pagination override' do
@@ -2673,7 +2728,9 @@ describe EnrollmentsApiController, type: :request do
         @course.enroll_user(@new_user, 'ObserverEnrollment', :enrollment_state => 'active')
         @user = request_user
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w{StudentEnrollment TeacherEnrollment}))
-        expect(json).to eq (@course.student_enrollments + @course.teacher_enrollments).map { |e|
+        enrollments = (@course.student_enrollments + @course.teacher_enrollments).sort_by {|e| [e.type, e.user.sortable_name] }
+        
+        expect(json).to eq(enrollments.map { |e|
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2691,9 +2748,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at'   => nil,
             'end_at'     => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -2709,8 +2763,13 @@ describe EnrollmentsApiController, type: :request do
             'final_grade' => nil,
             'current_grade' => nil,
           } if e.student?
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
           h
-        }
+        })
       end
 
       it "should return an empty array when no user enrollments match a filter" do

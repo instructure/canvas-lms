@@ -52,9 +52,9 @@ module UserLearningObjectScopes
   end
 
   def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin,
-                                                                       :manage_grades,
-                                                                       :manage_assignments)
+    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades,
+                                                                 *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
     published_visible_assignments = course.active_assignments.published
     published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
                                                                           self, course, is_teacher: false)
@@ -282,7 +282,7 @@ module UserLearningObjectScopes
 
   # opts forwaded to course_ids_for_todo_lists
   def submissions_needing_grading_count(**opts)
-    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
     course_ids = course_ids_for_todo_lists(:manage_grades, **opts)

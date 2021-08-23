@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import PostTypes from 'jsx/grading/PostAssignmentGradesTray/PostTypes'
+import PostTypes from '@canvas/post-assignment-grades-tray/react/PostTypes'
 
 QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
   let $container

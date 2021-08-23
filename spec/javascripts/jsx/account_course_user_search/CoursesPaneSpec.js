@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import CoursesPane from 'jsx/account_course_user_search/components/CoursesPane'
-import CoursesStore from 'jsx/account_course_user_search/store/CoursesStore'
-import TermsStore from 'jsx/account_course_user_search/store/TermsStore'
-import AccountsTreeStore from 'jsx/account_course_user_search/store/AccountsTreeStore'
+import CoursesPane from 'ui/features/account_course_user_search/react/components/CoursesPane.js'
+import CoursesStore from 'ui/features/account_course_user_search/react/store/CoursesStore.js'
+import TermsStore from 'ui/features/account_course_user_search/react/store/TermsStore.js'
+import AccountsTreeStore from 'ui/features/account_course_user_search/react/store/AccountsTreeStore.js'
 
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 

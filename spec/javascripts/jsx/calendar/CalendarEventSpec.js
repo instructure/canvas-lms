@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CalendarEvent from 'compiled/calendar/CalendarEvent'
-import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
+import CalendarEvent from 'ui/features/edit_calendar_event/backbone/models/CalendarEvent.js'
+import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {waitFor} from '../support/Waiters'
 
 QUnit.module('Calendar', () => {

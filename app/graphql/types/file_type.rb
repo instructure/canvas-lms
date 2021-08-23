@@ -54,10 +54,12 @@ module Types
     field :url, Types::UrlType, null: true
     def url
       return if object.locked_for?(current_user, check_policies: true)
+
       opts = {
         download: '1',
         download_frd: '1',
-        host: context[:request].host_with_port
+        host: context[:request].host_with_port,
+        protocol: context[:request].protocol
       }
       opts[:verifier] = object.uuid if context[:in_app]
       GraphQLHelpers::UrlHelpers.file_download_url(object, opts)

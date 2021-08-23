@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import SearchGradingPeriodsField from 'jsx/grading/SearchGradingPeriodsField'
+import SearchGradingPeriodsField from 'ui/features/account_grading_standards/react/SearchGradingPeriodsField.js'
 
 const wrapper = document.getElementById('fixtures')
 

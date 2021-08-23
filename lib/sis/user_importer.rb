@@ -150,9 +150,13 @@ module SIS
               next
             end
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
-              message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
+              if @batch.options[:update_sis_id_if_login_claimed]
+                pseudo.sis_user_id = user_row.user_id
+              else
+                message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              end
             end
             if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
               !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
@@ -248,7 +252,7 @@ module SIS
           pseudo.sis_user_id = user_row.user_id
           pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
           pseudo.account = @root_account
-          pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
+          pseudo.workflow_state = status_is_active ? 'active' : 'deleted' unless pseudo.stuck_sis_fields.include?(:workflow_state)
           if pseudo.new_record? && status_is_active
             should_add_account_associations = true
           elsif pseudo.workflow_state_changed?
@@ -368,7 +372,7 @@ module SIS
             end
             pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
-            if newly_active
+            if newly_active && @root_account.feature_enabled?(:self_service_user_merge)
               user_ids = ccs.map(&:user_id)
               pseudo_scope = Pseudonym.active.where(user_id: user_ids).group(:user_id)
               active_pseudo_counts = pseudo_scope.count

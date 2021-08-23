@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery/redirectClickTo'
+import 'ui/features/wiki_page_index/jquery/redirectClickTo.js'
 
 QUnit.module('redirectClickTo')
 const createClick = function() {

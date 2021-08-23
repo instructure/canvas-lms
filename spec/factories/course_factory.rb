@@ -22,7 +22,14 @@ module Factories
   def course_factory(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      @course = Course.create!(:sis_source_id => opts[:sis_source_id], :name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
+      @course = Course.create!(
+        :sis_source_id => opts[:sis_source_id],
+        :name => opts[:course_name],
+        :course_code => opts[:course_code],
+        :account => account,
+        :is_public => !!opts[:is_public],
+        :enrollment_term_id => opts[:enrollment_term_id]
+      )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
@@ -141,22 +148,22 @@ module Factories
   def create_courses(records, options = {})
     account = options[:account] || Account.default
     records = records.times.map{ |i| { name: "Course #{i}" } } if records.is_a?(Integer)
-    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id).merge(record) }
+    now = Time.now.utc
+    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id, created_at: now, updated_at: now).merge(record) }
     course_data = create_records(Course, records, options[:return_type])
     course_ids = options[:return_type] == :record ?
       course_data.map(&:id) :
       course_data
 
     if options[:account_associations]
-      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0}})
+      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0, root_account_id: account.resolved_root_account_id, created_at: now, updated_at: now }})
     end
     if user = options[:enroll_user]
-      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
+      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now}})
       type = options[:enrollment_type] || "TeacherEnrollment"
       role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id
-      result = create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => role_id}})
-      create_enrollment_states(result, {state: "active"})
-      result
+      result = create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', role_id: role_id, created_at: now, updated_at: now}})
+      create_enrollment_states(result, {state: "active", root_account_id: account.id})
     end
     course_data
   end

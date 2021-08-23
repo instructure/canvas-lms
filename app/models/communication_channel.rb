@@ -21,6 +21,7 @@
 class CommunicationChannel < ActiveRecord::Base
   # You should start thinking about communication channels
   # as independent of pseudonyms
+  include ManyRootAccounts
   include Workflow
 
   serialize :last_bounce_details
@@ -34,15 +35,18 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :delayed_messages, :dependent => :destroy
   has_many :messages
 
+  # IF ANY CALLBACKS ARE ADDED please check #bounce_for_path to see if it should
+  # happen there too.
   before_save :set_root_account_ids
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
+  validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
-  after_save :clear_user_email_cache
+  after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
 
   acts_as_list :scope => :user
 
@@ -62,6 +66,13 @@ class CommunicationChannel < ActiveRecord::Base
 
 
   RETIRE_THRESHOLD = 1
+
+  def under_user_cc_limit
+    max_ccs = Setting.get('max_ccs_per_user', '100').to_i
+    if self.user.communication_channels.limit(max_ccs + 1).count > max_ccs
+      self.errors.add(:user_id, 'user communication_channels limit exceeded')
+    end
+  end
 
   def clear_user_email_cache
     self.user.clear_email_cache! if self.path_type == TYPE_EMAIL
@@ -272,7 +283,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Returns a boolean.
   def imported?
     id.present? &&
-      Pseudonym.where(:sis_communication_channel_id => self).exists?
+      Pseudonym.where(:sis_communication_channel_id => self).shard(user).exists?
   end
 
   # Return the 'path' for simple communication channel types like email and sms.
@@ -374,6 +385,7 @@ class CommunicationChannel < ActiveRecord::Base
   scope :sms, -> { where(path_type: TYPE_SMS) }
 
   scope :active, -> { where(workflow_state: 'active') }
+  scope :bouncing, -> { where(bounce_count: RETIRE_THRESHOLD..) }
   scope :unretired, -> { where.not(workflow_state: 'retired') }
 
   # Get the list of communication channels that overrides an association's default order clause.
@@ -523,21 +535,40 @@ class CommunicationChannel < ActiveRecord::Base
   private :check_if_bouncing_changed
 
   def self.bounce_for_path(path:, timestamp:, details:, permanent_bounce:, suppression_bounce:)
+    # if there is a bounce on a channel that is associated to more than a few
+    # shards there is no reason to bother updating the channel with the bounce
+    # information, because its not a real user.
+    return if !permanent_bounce && CommunicationChannel.associated_shards(path).count > Setting.get("comm_channel_shard_count_too_high", '50').to_i
+
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
-      CommunicationChannel.unretired.email.by_path(path).each do |channel|
-        channel.bounce_count = channel.bounce_count + 1 if permanent_bounce
+      cc_scope = CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD)
+      # If alllowed to do this naively, trying to capture bounces on the same
+      # email address over and over can lead to serious db churn.  Here we
+      # try to capture only the newly created communication channels for this path,
+      # or the ones that have NOT been bounced in the last hour, to make sure
+      # we aren't doing un-helpful overwork.
+      debounce_window = Setting.get("comm_channel_bounce_debounce_window_in_min", "60").to_i
+      bounce_field = suppression_bounce ? "last_suppression_bounce_at" : (permanent_bounce ? "last_bounce_at" : "last_transient_bounce_at")
+      bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.minutes.ago)
+      bouncable_scope.find_in_batches do |batch|
+        update = if suppression_bounce
+                   { last_suppression_bounce_at: timestamp, updated_at: Time.zone.now }
+                 elsif permanent_bounce
+                   ["bounce_count = bounce_count + 1, updated_at=NOW(), last_bounce_at=?, last_bounce_details=?", timestamp, details.to_yaml]
+                 else
+                   { last_transient_bounce_at: timestamp, last_transient_bounce_details: details, updated_at: Time.zone.now }
+                 end
 
-        if suppression_bounce
-          channel.last_suppression_bounce_at = timestamp
-        elsif permanent_bounce
-          channel.last_bounce_at = timestamp
-          channel.last_bounce_details = details
-        else
-          channel.last_transient_bounce_at = timestamp
-          channel.last_transient_bounce_details = details
+        CommunicationChannel.where(id: batch).update_all(update)
+
+        # replacement for check_if_bouncing_changed callback.
+        # We know the channel is not and was not retired, we also know that the
+        # "bouncing? state" changed.
+        if permanent_bounce
+          CommunicationChannel.where(id: batch).preload(:user).find_each do |channel|
+            channel.user.update_bouncing_channel_message!(channel)
+          end
         end
-
-        channel.save!
       end
     end
   end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {reorderElements, backbone} from 'jsx/move_item'
+import {reorderElements, backbone} from '@canvas/move-item-tray'
 
 const container = document.getElementById('fixtures')
 

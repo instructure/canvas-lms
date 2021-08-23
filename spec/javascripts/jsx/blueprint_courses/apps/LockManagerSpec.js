@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 
 QUnit.module('LockManager class')
 

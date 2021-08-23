@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import apiUserContent from 'compiled/str/apiUserContent'
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
 let mathml_html
 let FEATURES

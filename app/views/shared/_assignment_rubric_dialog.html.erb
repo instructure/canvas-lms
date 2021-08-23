@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<div id="rubrics" class="rubric_dialog" style="display: none; margin-bottom: 10px;">
+<div id="rubrics" class="rubric_dialog mathjax_ignore" style="display: none; margin-bottom: 10px;">
   <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric %>
     <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric,
         :locals => {:association => @assignment,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {beforeCheck, afterCheck} from 'jsx/shared/rce/a11yCheckerHooks'
+import {beforeCheck, afterCheck} from '@canvas/rce/a11yCheckerHooks'
 
 let fakeEditor
 

@@ -38,20 +38,15 @@ class Ignore < ActiveRecord::Base
           OR (q.workflow_state = 'deleted' AND q.updated_at < :deletion_time)
           OR (ar.workflow_state = 'deleted' AND ar.updated_at < :deletion_time)
           OR (NOT EXISTS (
-            WITH enrollments AS (
-              SELECT id, completed_at
+              SELECT 1
               FROM #{Enrollment.quoted_table_name}
               WHERE enrollments.user_id = ignores.user_id
                 AND (enrollments.course_id = a.context_id
                  OR enrollments.course_id = q.context_id
                  OR enrollments.course_id = ara.context_id)
                 AND (enrollments.workflow_state <> 'deleted'
-                 OR enrollments.updated_at > :deletion_time)
-            )
-            SELECT 1 FROM enrollments WHERE enrollments.completed_at IS NULL
-            UNION
-            SELECT 1 FROM enrollments WHERE enrollments.completed_at > :conclude_time))",
-          {deletion_time: 1.month.ago, conclude_time: 6.months.ago}).find_in_batches do |batch|
+                 OR enrollments.updated_at > :deletion_time)))",
+          {deletion_time: 1.month.ago}).find_in_batches do |batch|
         GuardRail.activate(:primary) do
           Ignore.where(id: batch).delete_all
         end

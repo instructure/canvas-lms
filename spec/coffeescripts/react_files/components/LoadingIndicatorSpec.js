@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import LoadingIndicator from 'jsx/files/LoadingIndicator'
+import LoadingIndicator from 'ui/features/files/react/components/LoadingIndicator.js'
 
 QUnit.module('LoadingIndicator')
 

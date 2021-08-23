@@ -89,7 +89,7 @@ $kyle-menu-border-radius: $baseBorderRadius;
 
   a {
     color: #333;
-    padding: $ic-sp/2 $ic-sp;
+    padding: $ic-sp*0.5 $ic-sp;
     min-width: $ic-sp*12;
     line-height: 1.1;
   }

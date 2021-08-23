@@ -26,15 +26,15 @@ module Factories
     # make sure this is loaded first
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
-      ActiveSupport::HashWithIndifferentAccess.new({
-        "app-host":ENV['RCE_HOST'] || "http://localhost:3001",
-      })
+      DynamicSettings::FallbackProxy.new(
+        "app-host": ENV['RCE_HOST'] || "http://localhost:3001",
+      )
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
-      {
+      DynamicSettings::FallbackProxy.new(
         "signing-secret" => "astringthatisactually32byteslong",
         "encryption-secret" => "astringthatisactually32byteslong"
-      }
+      )
     )
   end
 

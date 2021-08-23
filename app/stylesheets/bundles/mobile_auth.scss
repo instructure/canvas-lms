@@ -97,14 +97,14 @@ input::-webkit-input-placeholder {
   color: $ic-color-danger;
   @include fontSize(14px);
   margin: $ic-sp 0;
-  padding: $ic-sp/2;
+  padding: $ic-sp*0.5;
   text-align: center;
 }
 .icon_url {
   display: none;
 }
 .button_box .Button {
-  padding-bottom: $ic-sp/2;
+  padding-bottom: $ic-sp*0.5;
 }
 
 .enrollment_link {

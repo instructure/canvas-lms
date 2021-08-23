@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -32,6 +34,8 @@ class GradebooksController < ApplicationController
   before_action :require_context
   before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics, :update_final_grade_overrides]
 
+  include K5Mode
+
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
@@ -47,7 +51,7 @@ class GradebooksController < ApplicationController
     # teacher in the course and they are not trying to view another
     # user's grades, redirect them to the gradebook
     if @presenter.user_needs_redirection?
-      return redirect_to polymorphic_url([@context, 'gradebook'])
+      return redirect_to polymorphic_url([@context, :gradebook])
     end
 
     if !@presenter.student || !student_enrollment
@@ -234,7 +238,7 @@ class GradebooksController < ApplicationController
       log_asset_access(['grades', @context], 'grades')
       if requested_gradebook_view.present?
         update_preferred_gradebook_view!(requested_gradebook_view) if requested_gradebook_view != preferred_gradebook_view
-        redirect_to polymorphic_url([@context, 'gradebook'])
+        redirect_to polymorphic_url([@context, :gradebook])
         return
       end
 
@@ -253,16 +257,13 @@ class GradebooksController < ApplicationController
     set_tutorial_js_env
 
     # Optimize initial data loading
-    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
-      prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
-    end
+    prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
 
-    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements) && grading_periods?
+    if grading_periods?
       prefetch_xhr(grading_period_assignments_course_gradebook_url(@context), id: 'grading_period_assignments')
     end
 
     set_default_gradebook_env
-    opt_in_datadog_rum_js
     render "gradebooks/gradebook"
   end
   private :show_default_gradebook
@@ -390,28 +391,13 @@ class GradebooksController < ApplicationController
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
-      # TODO: remove `api_max_per_page` with TALLY-831
-      api_max_per_page: per_page,
-
-      # TODO: remove `assignment_groups_url` with TALLY-831
-      assignment_groups_url: api_v1_course_assignment_groups_url(
-        @context,
-        include: %w[assignments assignment_visibility grades_published],
-        override_assignment_dates: "false",
-        exclude_assignment_submission_types: ['wiki_page']
-      ),
-
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
-      # TODO: remove `chunk_size` with TALLY-831
-      chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
       colors: gradebook_settings(:colors),
       context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
       context_code: @context.asset_string,
       context_id: @context.id.to_s,
-      # TODO: remove `context_modules_url` with TALLY-831
-      context_modules_url: api_v1_course_context_modules_url(@context),
       context_sis_id: @context.sis_source_id,
       context_url: named_context_url(@context, :context_url),
       course_is_concluded: @context.completed?,
@@ -424,15 +410,10 @@ class GradebooksController < ApplicationController
 
       course_url: api_v1_course_url(@context),
       current_grading_period_id: @current_grading_period_id,
-      # TODO: remove `custom_column_data_url` with TALLY-831
-      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
-      # TODO: remove `custom_columns_url` with TALLY-831
-      custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
-      # TODO: remove `dataloader_improvements` with TALLY-831
-      dataloader_improvements:  Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
+      enhanced_gradebook_filters: Account.site_admin.feature_enabled?(:enhanced_gradebook_filters),
       enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
       enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
       export_gradebook_csv_url: course_gradebook_csv_url,
@@ -467,6 +448,7 @@ class GradebooksController < ApplicationController
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
+      remove_gradebook_student_search_delay_enabled: Account.site_admin.feature_enabled?(:remove_gradebook_student_search_delay),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       setting_update_url: api_v1_course_settings_url(@context),
@@ -479,21 +461,13 @@ class GradebooksController < ApplicationController
       sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
-      # TODO: remove `students_stateless_url` with TALLY-831
-      students_stateless_url: custom_course_users_api_url(exclude_states: true, per_page: per_page),
-      # TODO: remove `submissions_url` with TALLY-831
-      submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
     }
 
     js_env({
-      GRADEBOOK_OPTIONS: gradebook_options,
-      # TODO: remove `performance_controls` with TALLY-831
-      performance_controls: {
-        active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,
-      }
+      GRADEBOOK_OPTIONS: gradebook_options
     })
   end
 
@@ -624,7 +598,7 @@ class GradebooksController < ApplicationController
         sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-        inactive_concluded_lmgb_filters: root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
+        IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb)
       }
     })
   end
@@ -870,6 +844,8 @@ class GradebooksController < ApplicationController
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
 
+    @can_reassign_submissions = @assignment.can_reassign?(@current_user)
+
     respond_to do |format|
 
       format.html do
@@ -886,6 +862,7 @@ class GradebooksController < ApplicationController
           settings_url: speed_grader_settings_course_gradebook_path,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
+          instructor_selectable_states: @assignment.instructor_selectable_states_by_provisional_grade_id,
           final_grader_id: @assignment.final_grader_id,
           grading_role: grading_role_for_user,
           grading_type: @assignment.grading_type,
@@ -901,8 +878,8 @@ class GradebooksController < ApplicationController
           outcome_proficiency: outcome_proficiency, # for outcome-based rubrics
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
-          show_help_menu_item: show_help_link?,
-          help_url: help_link_url,
+          show_help_menu_item: true,
+          help_url: I18n.t(:'community.instructor_guide_speedgrader'),
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string
@@ -928,6 +905,9 @@ class GradebooksController < ApplicationController
 
         env[:filter_speed_grader_by_student_group_feature_enabled] =
           @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group)
+
+        env[:assignment_comment_library_feature_enabled] =
+          @context.root_account.feature_enabled?(:assignment_comment_library)
 
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
@@ -1116,9 +1096,9 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_version
-    @current_user.preferences[:gradebook_version] = params[:version]
-    @current_user.save!
-    redirect_to polymorphic_url([@context, 'gradebook'])
+    @current_user.migrate_preferences_if_needed
+    @current_user.set_preference(:gradebook_version, params[:version])
+    redirect_to polymorphic_url([@context, :gradebook])
   end
 
   def visible_modules?
@@ -1435,6 +1415,6 @@ class GradebooksController < ApplicationController
   end
 
   def allow_view_ungraded_as_zero?
-    Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
+    @context.account.feature_enabled?(:view_ungraded_as_zero)
   end
 end

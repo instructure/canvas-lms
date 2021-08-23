@@ -19,7 +19,7 @@
 <% set_active_tab "terms" %>
 <% provide :page_title do %><%= t :page_title, "%{account} Terms", :account => @context.name %><% end %>
 
-<% js_bundle 'legacy/terms_index' %>
+<% js_bundle 'terms_index' %>
 <% css_bundle :terms %>
 
 <h1><%= t 'titles.term_details', "Term Details" %></h1>

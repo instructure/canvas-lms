@@ -26,7 +26,7 @@ module BrokenLinkHelper
     record = Context.find_asset_by_url(from_url)
     record ||= Context.get_front_wiki_page_for_course_from_url(from_url)
     return false unless record
-    body = Nokogiri::HTML(Context.asset_body(record))
+    body = Nokogiri::HTML5(Context.asset_body(record))
     anchor = body.css("a[href$='#{request.fullpath}']").text
     return false if anchor.blank?
 

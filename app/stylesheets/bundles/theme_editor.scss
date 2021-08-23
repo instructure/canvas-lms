@@ -381,7 +381,7 @@ $te-footer-height: 72px;
         transition: color 0.2s;
         border-radius: 0;
         transition: padding 0.2s;
-        padding: $ic-sp/2 0;
+        padding: $ic-sp*0.5 0;
         font-weight: bold;
         @include fontSize(14px);
         &:hover {
@@ -499,7 +499,7 @@ $te-footer-height: 72px;
     width: 75px;
     height: $te-input-height;
     margin: direction-sides(0 $ic-sp 0 0);
-    padding: 0 $ic-sp/2;
+    padding: 0 $ic-sp*0.5;
     color: $ic-font-color-dark;
     border: 1px solid $ic-color-neutral;
     border-radius: 3px;
@@ -567,7 +567,7 @@ $te-footer-height: 72px;
     display: block;
     @include fontSize(12px);
     font-weight: normal;
-    padding-top: $ic-sp/2;
+    padding-top: $ic-sp*0.5;
   }
   .Theme__editor_preview-img-container {
     padding: $ic-sp;
@@ -617,7 +617,7 @@ $te-footer-height: 72px;
     margin: 0;
     border: 1px solid $ic-color-neutral;
     border-top: none;
-    padding: $ic-sp/2 0;
+    padding: $ic-sp*0.5 0;
     display: flex;
     align-items: center;
     justify-content: space-around;

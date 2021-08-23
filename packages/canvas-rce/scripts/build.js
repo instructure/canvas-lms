@@ -37,6 +37,7 @@ shell.exec('mkdir -p es')
 // delete everything in it.
 shell.exec('rm -rf lib/*')
 shell.exec('rm -rf es/*')
+shell.exec('scripts/installTranslations.js')
 const npm_bin_path = shell.exec('npm bin').trim()
 
 shell.echo('Building CommonJS version')

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jquery.keycodes' // used by some SlickGrid editors
-import slickgrid from 'vendor/slickgrid'
-import GridSupport from 'jsx/gradebook/default_gradebook/GradebookGrid/GridSupport'
+import '@canvas/keycodes' // used by some SlickGrid editors
+import slickgrid from 'slickgrid'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
 
 const {Grid, Editors} = slickgrid
 

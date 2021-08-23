@@ -41,6 +41,23 @@ describe "Importers::QuizImporter" do
     expect(quiz.show_correct_answers).to eq data[:show_correct_answers]
   end
 
+  context "when importing to new quizzes" do
+    before do
+      allow(@migration).to receive(:quizzes_next_migration?).and_return(true)
+    end
+
+    it "should not set the description field for the classic quiz" do
+      context = course_model
+      question_data = import_example_questions context
+      data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+      Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+      quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+      expect(data["description"]).to be_present
+      expect(quiz.description).to be_nil
+    end
+  end
+
+
   it "should complete a quiz question reference" do
     context = course_model
     question_data = import_example_questions context
@@ -168,6 +185,23 @@ describe "Importers::QuizImporter" do
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
 
     expect(quiz.quiz_questions.active.first.question_data[:question_name]).to eq "Not Rocket Bee?"
+  end
+
+  it "should update quiz question on re-import even if the associated quiz is published" do
+    context = get_import_context
+    question_data = import_example_questions context
+    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+    quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+    quiz.publish!
+
+    expect(quiz.quiz_questions.active.first.question_data[:question_name]).to eq "Rocket Bee!"
+
+    question_data[:aq_data][data['questions'].first[:migration_id]]['question_name'] = "Not Rocket Bee?"
+    Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+
+    expect(quiz.reload.quiz_data).to include(hash_including("question_name" => "Not Rocket Bee?"))
+    expect(quiz.quiz_data).to_not include(hash_including("question_name" => "Rocket Bee!"))
   end
 
   it "should not clear dates if these are null in the source hash" do

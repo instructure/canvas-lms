@@ -31,8 +31,6 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
     end
 
     it 'keeps the contract' do
-      skip "INTEROP-6100 (11/5/2020)" unless run_live_events_specs?
-
       live_event.emit_with do
         # arrange
         params = {

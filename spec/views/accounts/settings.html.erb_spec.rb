@@ -115,6 +115,42 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "announcements" do
+    shared_examples "account notifications" do |text|
+      before do
+        assign(:account_users, [])
+        assign(:associated_courses_count, 0)
+        assign(:announcements, AccountNotification.none.paginate)
+
+
+        @account = account
+        assign(:account, @account)
+        assign(:root_account, @account)
+      end
+
+      it "renders the appropriate text" do
+        admin = account_admin_user
+        view_context(@account, admin)
+
+        assign(:announcements, [account_notification(account: @account)].paginate)
+        render
+        expect(response).to have_text(text)
+      end
+    end
+
+    describe "Root Account Announcements" do
+      let(:account) { Account.create!(name: "reading_rainbow") }
+
+      include_examples "account notifications", "This is a message from reading_rainbow"
+    end
+
+    describe "Site Admin Announcements" do
+      let(:account) { Account.site_admin }
+
+      include_examples "account notifications", "This is a message from Canvas Administration"
+    end
+  end
+
   describe "SIS Integration Settings" do
     before do
       assign(:account_users, [])
@@ -450,7 +486,7 @@ describe "accounts/settings.html.erb" do
   context 'privacy' do
     let(:account) { account_model }
     let(:account_admin) { account_admin_user(account: account) }
-    let(:dom) { Nokogiri::HTML(response) }
+    let(:dom) { Nokogiri::HTML5(response) }
     let(:enable_fullstory) { dom.at_css('#account_settings_enable_fullstory') }
     let(:enable_google_analytics) { dom.at_css('#account_settings_enable_google_analytics') }
     let(:site_admin) { site_admin_user }
@@ -516,6 +552,70 @@ describe "accounts/settings.html.erb" do
       render_for(account, site_admin) do
         expect(enable_fullstory).not_to be_checked
       end
+    end
+  end
+
+  context 'course templates' do
+    let_once(:account) { Account.default }
+    let_once(:admin) { account_admin_user(account: account) }
+
+    before do
+      account.enable_feature!(:course_templates)
+      view_context(account, admin)
+      assign(:current_user, admin)
+      assign(:context, account)
+      assign(:account, account)
+      assign(:account_users, [])
+      assign(:root_account, account)
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    it "shows no template only for root account" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq [""]
+    end
+
+    it "shows no template and inherit for sub accounts" do
+      a2 = account.sub_accounts.create!
+      view_context(a2, admin)
+      assign(:context, a2)
+      assign(:account, a2)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0"]
+    end
+
+    it "disables if you don't have permission" do
+      c = account.courses.create!(template: true)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :edit_course_template, enabled: false)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", c.id.to_s]
+      expect(select.css('option').map { |o| o['disabled'] }).to eq [nil, "disabled"]
+    end
+
+    it "disables if you don't have permission in a sub-account" do
+      c = account.courses.create!(template: true)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :edit_course_template, enabled: false)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :delete_course_template, enabled: false)
+
+      a2 = account.sub_accounts.create!
+      view_context(a2, admin)
+      assign(:context, a2)
+      assign(:account, a2)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0", c.id.to_s]
+      expect(select.css('option').map { |o| o['disabled'] }).to eq ["disabled", "disabled", "disabled"]
     end
   end
 end

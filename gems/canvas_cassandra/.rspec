@@ -1,2 +1,5 @@
 --color
 --format progress
+--format doc
+--format html
+--out ../../tmp/spec_results/canvas_cassandra_results.html

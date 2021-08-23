@@ -1,0 +1,11 @@
+{
+  "presets": [
+    [
+      "@instructure/ui-babel-preset",
+      {
+        "esModules": true,
+        "node": false
+      }
+    ]
+  ]
+}

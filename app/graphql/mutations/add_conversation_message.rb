@@ -25,7 +25,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
 
   argument :conversation_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Conversation')
   argument :body, String, required: true
-  argument :recipients, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('User')
+  argument :recipients, [String], required: true
   argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ConversationMessage')
   argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :media_comment_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('MediaObject')
@@ -33,7 +33,6 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
   argument :user_note, Boolean, required: false
 
   field :conversation_message, Types::ConversationMessageType, null: true
-  field :message_queued, Boolean, null: true
   # TODO: VICE-1037 logic is mostly duplicated in ConversationsController
   def resolve(input:)
     conversation = get_conversation(input[:conversation_id])
@@ -80,7 +79,9 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
     else
       conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").
         process_new_message(message_args, recipients, message_ids, tags)
-      return {message_queued: true}
+      # The message is delayed and will be processed later so there is nothing to return
+      # right now. If there is no error, success can be assumed.
+      return {conversation_message: nil}
     end
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'

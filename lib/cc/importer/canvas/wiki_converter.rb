@@ -27,7 +27,7 @@ module CC::Importer::Canvas
       wiki_dir = @package_root.item_path(WIKI_FOLDER)
       Dir["#{wiki_dir}/**/**"].each do |path|
         next if File.directory?(path)
-        doc = open_file(path)
+        doc = open_file_html5(path)
         wikis << convert_wiki(doc, path)
       end
 

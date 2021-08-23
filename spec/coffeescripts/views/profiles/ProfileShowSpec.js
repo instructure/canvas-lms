@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import ProfileShow from 'compiled/views/profiles/ProfileShow'
+import ProfileShow from 'ui/features/profile_show/backbone/views/ProfileShow.js'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ProfileShow', {

@@ -19,7 +19,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import merge from 'lodash/merge'
-import Paginator from 'jsx/shared/components/Paginator'
+import Paginator from '@canvas/instui-bindings/react/Paginator'
 
 QUnit.module('Paginator component')
 

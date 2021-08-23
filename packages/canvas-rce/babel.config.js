@@ -45,6 +45,14 @@ module.exports = {
     ],
     'minify-constant-folding',
     'minify-guarded-expressions',
-    'minify-dead-code-elimination'
+    'minify-dead-code-elimination',
+    // something changed in @instructure/ui-babel-preset that necessitated
+    // @babel/plugin-proposal-private-methods, {loose: true}
+    // to stop the build from flooding the console output with warnings.
+    // then that broke decorators, which RCEWrapper uses. The other
+    // 2 plugin-proposal-* plugins fix that and get rid of the wornings
+    ['@babel/plugin-proposal-decorators', {legacy: true}],
+    ['@babel/plugin-proposal-class-properties', {loose: true}],
+    ['@babel/plugin-proposal-private-methods', {loose: true}]
   ]
 }

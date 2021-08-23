@@ -9,8 +9,8 @@
 
     <code><b>bin/rspec <%= RerunArgument.for(example) %></b></code>
 
-    <h2>Failure/Error</h2>
-    <pre style="overflow:auto; max-height: 300px;"><%= escape_code formatted_exception %></pre>
+    <h2>Failure/Error <button onclick="maximizeElementHeight('failure-errors')">Maximize</button></h2>
+    <pre id="failure-errors" style="overflow: auto; resize: vertical;"><%= escape_code formatted_exception %></pre>
 
     <% if summary.js_errors.present? %>
       <h2>JS Errors</h2>
@@ -21,8 +21,8 @@
       </ul>
     <% end %>
 
-    <h2>Rails Log</h2>
-    <pre style="overflow:auto; max-height: 300px;"><%= escape_code summary.log_messages.join("\n") %></pre>
+    <h2>Rails Log <button onclick="maximizeElementHeight('rails-log')">Maximize</button></h2>
+    <pre id="rails-log" style="overflow: auto; resize: vertical;"><%= escape_code summary.log_messages.join("\n") %></pre>
 
     <h2>Preceding Specs</h2>
     <div style="overflow: auto; max-height: 300px;"><%= recent_spec_runs %></div>
@@ -38,6 +38,21 @@
         <pre><%= summary.page_html %></pre>
       </code>
     <% end %>
+    <script>
+      // CSS height: max(fit-content, 300px) doesn't seem to work, so use this instead to ensure the given element
+      // is either the size of its contents, or the max-height provided on initial load.
+      function clampElementHeight(id, maxHeight) {
+        if (document.getElementById(id).clientHeight >= maxHeight) {
+          document.getElementById(id).style.height = maxHeight + 'px'
+        }
+      }
+
+      function maximizeElementHeight(id) {
+        document.getElementById(id).style.height = 'fit-content'
+      }
+
+      clampElementHeight('failure-errors', 300)
+      clampElementHeight('rails-log', 300)
+    </script>
   </body>
 </html>
-

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
+import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore.js'
 
 QUnit.module('createTutorialStore test')
 

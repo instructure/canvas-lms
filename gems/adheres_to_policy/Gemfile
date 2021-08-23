@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 # Specify your gem's dependencies in adheres_to_policy.gemspec

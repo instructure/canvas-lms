@@ -42,7 +42,9 @@ describe('wrapInitCb', () => {
     }
     fakeEditor = {
       getElement: () => elStub,
-      addVisual: () => {}
+      addVisual: () => {},
+      on: () => {},
+      contentWindow: {}
     }
   })
 

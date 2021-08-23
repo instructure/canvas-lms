@@ -49,7 +49,7 @@ describe "blueprint courses discussions" do
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
       run_master_course_migration(@master)
       get "/courses/#{@minion.id}/discussion_topics/#{@copy_disc.id}/edit"
-      expect(f('#discussion-details-tab')).to contain_css('.mce-tinymce.mce-container.mce-panel')
+      expect(f('#discussion-details-tab')).to contain_css('.tox-tinymce .tox-editor-container')
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
       expect(f("#delayed_post_at")).to have_attribute('readonly', 'true')
       expect(f("#lock_at")).to have_attribute('readonly', 'true')

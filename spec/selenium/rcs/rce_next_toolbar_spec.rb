@@ -505,8 +505,8 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       before :each do
         body = <<-HTML
         <p><span id="ok">i am OK!</span></p>
-        <p><span id="ifr">cannot link <iframe/> me</span></p>
-        <p><span id="vid">nor <video/> me</span></p>
+        <p><span id="ifr">cannot link <iframe>me</iframe></span></p>
+        <p><span id="vid">nor <video>me</video></span></p>
         HTML
         @course.wiki_pages.create!(title: 'title', body: body)
         visit_existing_wiki_edit(@course, 'title')

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {arrayOf, func, object, oneOf, oneOfType, string} from 'prop-types'
+import {arrayOf, bool, func, object, oneOf, oneOfType, string} from 'prop-types'
 import {px} from '@instructure/ui-utils'
 import indicatorRegion from '../../../indicatorRegion'
 import {isImage, isAudioOrVideo} from '../fileTypeUtils'
@@ -116,6 +116,7 @@ export function UploadFile({
   label,
   panels,
   onDismiss,
+  requireA11yAttributes = true,
   trayProps,
   onSubmit = handleSubmit
 }) {
@@ -155,6 +156,7 @@ export function UploadFile({
           accept={accept}
           modalBodyWidth={modalBodyWidth}
           modalBodyHeight={modalBodyHeight}
+          requireA11yAttributes={requireA11yAttributes}
         />
       )}
     </StoreProvider>
@@ -168,5 +170,6 @@ UploadFile.propTypes = {
   editor: object.isRequired,
   label: string.isRequired,
   panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
+  requireA11yAttributes: bool,
   trayProps: object
 }

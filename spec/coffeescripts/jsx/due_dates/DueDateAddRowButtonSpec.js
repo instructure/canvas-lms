@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateAddRowButton from 'jsx/due_dates/DueDateAddRowButton'
+import DueDateAddRowButton from '@canvas/due-dates/react/DueDateAddRowButton'
 
 QUnit.module('DueDateAddRowButton with true display prop', {
   setup() {

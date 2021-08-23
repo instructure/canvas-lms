@@ -219,6 +219,16 @@ describe Eportfolio do
         @eportfolio.destroy
         expect(Eportfolio.new.grants_right?(@student, :create)).to be true
       end
+
+      it "can create if the user is an admin" do
+        admin = account_admin_user
+        expect(Eportfolio.new.grants_right?(admin, :create)).to be true
+      end
+
+      it "cannot create if the user has no enrollment/account_user" do
+        user = user_factory(active_all: true)
+        expect(Eportfolio.new.grants_right?(user, :create)).to be false
+      end
     end
   end
 

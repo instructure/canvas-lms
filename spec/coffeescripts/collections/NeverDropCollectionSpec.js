@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import NeverDropCollection from 'compiled/collections/NeverDropCollection'
+import Backbone from '@canvas/backbone'
+import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection.coffee'
 
 class AssignmentStub extends Backbone.Model {
   name() {

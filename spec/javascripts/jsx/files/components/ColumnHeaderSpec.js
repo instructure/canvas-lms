@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ColumnHeaders from 'jsx/files/ColumnHeaders'
+import ColumnHeaders from 'ui/features/files/react/components/ColumnHeaders.js'
 
 QUnit.module('ColumnHeaders')
 

@@ -54,7 +54,7 @@
       <!--<![endif]-->
     </object>
   <% elsif @attachment.inline_content? && !@attachment.canvadocable? %>
-    <% js_bundle :file_inline %>
+    <% js_bundle :file %>
     <iframe id="file_content" src="<%= safe_domain_file_url(@attachment, fallback_url: download_url, verifier: params[:verifier]) %>" style="width: 100%; height: 400px;" title="<%= t('File Content') %>"></iframe>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Aimage\//) %>
     <%= link_to(image_tag(download_url, :alt => @attachment.display_name), download_url) %>

@@ -160,7 +160,7 @@ $sp-table: $ic-sp + 2;
   border-spacing: 0;
 
   th, td {
-    padding: $sp-table $sp-table/2;
+    padding: $sp-table $sp-table*0.5;
     line-height: 1.3;
     text-align: direction(left);
     vertical-align: middle;
@@ -177,7 +177,7 @@ $sp-table: $ic-sp + 2;
 
   th {
     border-bottom-color: $ic-border-dark;
-    padding-bottom: $sp-table/2;
+    padding-bottom: $sp-table*0.5;
     font-weight: bold;
     // If you need to use headers for the row in order to kick in the bold font for the first cell of the row
     &.ic-Table--header-row {
@@ -201,15 +201,15 @@ $sp-table: $ic-sp + 2;
 
   &.ic-Table--condensed {
     td {
-      padding: $sp-table/2;
+      padding: $sp-table*0.5;
       @include fontSize($ic-font-size--xsmall);
     }
     th {
-      padding: $sp-table/2;
-      padding-bottom: $sp-table/4;
+      padding: $sp-table*0.5;
+      padding-bottom: $sp-table*0.25;
     }
     tbody th {
-      padding-bottom: $sp-table/2;
+      padding-bottom: $sp-table*0.5;
       @include fontSize($ic-font-size--xsmall);
     }
   }

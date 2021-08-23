@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 @import "components/ui.selectmenu";
 @import "vendor/_xflex.scss";
@@ -105,7 +107,7 @@ $icon-size: 1.4rem;
   // sizes the icon font
   .gradebookActions__Button {
     @include overwrite-default-icon-size($icon-size);
-    margin-#{direction(right)}: $ic-sp/3;
+    margin-#{direction(right)}: math.div($ic-sp, 3);
     color: var(--ic-brand-global-nav-ic-icon-svg-fill);
   }
 
@@ -411,6 +413,8 @@ $icon-size: 1.4rem;
   .submission-late-pill,
   .submission-missing-pill {
     font-size: 1rem;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -425,15 +429,6 @@ $icon-size: 1.4rem;
 }
 
 #rubric_full {
-  #rubric_full_resizer #rubric_full_resizer_handle {
-    position: absolute;
-    top: 50%;
-    #{direction(left)}: 0px;
-    background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-    cursor: pointer;
-    height: 20px;
-    width: 7px;
-  }
   a.big_link {
     display: none;
   }
@@ -446,6 +441,7 @@ $icon-size: 1.4rem;
 }
 #comments {
   overflow-y: auto;
+  word-break: break-word;
   .comment {
     .avatar {
       flex-grow: 0;
@@ -498,7 +494,7 @@ $icon-size: 1.4rem;
     }
   }
   #comment_attachments {
-    padding: $ic-sp/2 0;
+    padding: $ic-sp*0.5 0;
     display: block;
     a {
       float: direction(right);
@@ -683,7 +679,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   #submission_not_newest_notice {
     color: $orange;
     font-weight: bold;
-    padding: $ic-sp/2 0;
+    padding: $ic-sp*0.5 0;
   }
   .submission_attachment_viewed_at {
     display: inline;
@@ -705,7 +701,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     overflow: hidden;
     .submission-file {
       position: relative;
-      padding: $ic-sp/2 0;
+      padding: $ic-sp*0.5 0;
       .turnitin_score_container {
         float: direction(left);
         margin-#{direction(right)}: $ic-sp;
@@ -930,4 +926,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   .turnitin_similarity_score {
     color: $ic-color-dark;
   }
+}
+
+#library-suggestions {
+  float: direction(right);
 }

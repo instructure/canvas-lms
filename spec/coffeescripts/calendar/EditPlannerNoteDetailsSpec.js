@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import EditPlannerNoteDetails from 'compiled/calendar/EditPlannerNoteDetails'
-import tz from 'timezone'
+import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails.js'
+import tz from '@canvas/timezone'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 const fixtures = $('#fixtures')
 const note = {
@@ -49,6 +49,7 @@ QUnit.module('EditAssignmentDetails', {
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
     tz.restore(this.snapshot)
+    I18nStubber.clear()
   }
 })
 const createView = function(event = note) {
@@ -74,7 +75,6 @@ test('should localize start date', () => {
   })
   const view = createView(commonEvent())
   equal(view.$('.date_field').val(), '22 juil. 2017')
-  I18nStubber.popFrame()
 })
 
 test('requires name to save assignment note', () => {

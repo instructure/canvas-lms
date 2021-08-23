@@ -38,7 +38,7 @@ developed primarily in GraphQL and may not be back-ported to the REST API.
 Fields are being added to the GraphQL API on an as-needed basis.  The GraphQL
 API does not include everything that is currently in the REST API.  Feel free
 to submit pull requests on github to add additional features or talk about it
-in the `#canvas-lms` channel on freenode.
+in the `#canvas-lms` channel on libera.chat.
 
 ## GraphQL Endpoint
 
@@ -105,7 +105,7 @@ curl https://<canvas>/api/graphql \
 ### `id` vs `_id` and the `node` field
 
 The Canvas LMS GraphQL API follows the [Relay Object Identification
-spec](https://facebook.github.io/relay/docs/en/graphql-server-specification.html#object-identification).
+spec](https://relay.dev/graphql/objectidentification.htm).
 Querying for an object's `id` will return a global identifier instead of the
 numeric ids that are used in the REST API.  The traditional ids can be queried
 by requesting the `_id` field.

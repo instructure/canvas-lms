@@ -60,6 +60,33 @@ describe ContextModulesController do
       ]
     end
 
+    it "@combined_active_quizzes_includes_both_types should return true when classic and new quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq true
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only classic quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only new quizzes are included" do
+      user_session(@teacher)
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
     it "should touch modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do
@@ -482,9 +509,9 @@ describe ContextModulesController do
       expect(tagB).to be_published
       tagA = m1.add_item({type: "wiki_page", id: pageA.id}, nil, position: 2)
       expect(tagA).to be_unpublished
-      expect(m1.reload.content_tags.order(:position).pluck(:id)).to eq [tagB.id, tagA.id]
+      expect(m1.reload.content_tags.ordered.pluck(:id)).to eq [tagB.id, tagA.id]
       post 'reorder_items', params: {course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"}
-      tags = m1.reload.content_tags.order(:position).to_a
+      tags = m1.reload.content_tags.ordered.to_a
       expect(tags.map(&:position)).to eq [1, 2]
       expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end
@@ -721,6 +748,53 @@ describe ContextModulesController do
         json = json_parse(response.body)
         expect(json[@tag.id.to_s]["points_possible"].to_i).to eql 456
       end
+    end
+
+    it "should return due dates for Differentiated Assignments" do
+      course_with_teacher_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @assign = @course.assignments.create! title: "Differentiated Assignment", points_possible: 100, only_visible_to_overrides:true
+      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+
+      new_section = @course.course_sections.create!(:name => 'Section 1')
+      new_due_date = 1.week.from_now
+      override = @assign.assignment_overrides.build
+      override.set = new_section
+      override.due_at = new_due_date
+      override.due_at_overridden = true
+      override.save!
+
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"].to_date).to eq(new_due_date.to_date)
+    end
+
+    it "returns only applicable date to student" do
+      course_with_student_logged_in(active_all: true)
+      section1 = @course.course_sections.create!(:name => 'Section 1')
+
+      @mod = @course.context_modules.create!
+      @assign = @course.assignments.create! title: "Differentiated Assignment", points_possible: 100
+      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+
+      new_due_date = 1.week.from_now
+      override = @assign.assignment_overrides.build
+      override.set = section1
+      override.due_at = new_due_date
+      override.due_at_overridden = true
+      override.save!
+
+      # no date
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"]).to be_nil
+
+      # overridden date
+      student1 = student_in_course(course: @course, section: section1).user
+      user_session(student1)
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"].to_date).to eq new_due_date.to_date
     end
 
     it "should return too_many_overrides if applicable for assignments" do

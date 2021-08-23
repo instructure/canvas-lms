@@ -131,7 +131,6 @@ describe "course sections" do
   context "student tray" do
     before(:each) do
       @account = Account.default
-      @account.enable_feature!(:student_context_cards)
     end
 
     it "course section page should display student name in tray", priority: "1", test_id: 3022068 do

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/blueprint_courses/actions'
-import apiClient from 'jsx/blueprint_courses/apiClient'
-import LoadStates from 'jsx/blueprint_courses/loadStates'
-import MigrationStates from 'jsx/blueprint_courses/migrationStates'
+import actions from '@canvas/blueprint-courses/react/actions'
+import apiClient from '@canvas/blueprint-courses/react/apiClient'
+import LoadStates from '@canvas/blueprint-courses/react/loadStates'
+import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 let sandbox = null
 

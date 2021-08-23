@@ -1032,6 +1032,7 @@ form.question_form {
       margin-#{direction(left)}: 30px;
       padding: 10px 5px;
       margin-top: 5px;
+      cursor: pointer;
       .answer_comment_box {
         height: 2.5em;
       }
@@ -1195,6 +1196,11 @@ ul#question_list {
     font-weight: bold;
     color: #444;
   }
+}
+
+.alert-header {
+  font-size: inherit;
+  display: inline;
 }
 
 ul#quiz_versions {
@@ -2138,7 +2144,7 @@ ul#quiz_versions {
 }
 
 .user-regrade-points {
-  color: orange;
+  color: #C23C0D;
 }
 
 .regraded-warning {

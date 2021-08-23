@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellFormatter from 'jsx/gradebook/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter'
+import AssignmentCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter.js'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   let $fixture

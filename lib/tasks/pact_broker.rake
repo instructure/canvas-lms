@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless Rails.env.production?
   require 'pact_broker/client/tasks'
   require_relative '../../spec/contracts/service_consumers/pact_config'
@@ -14,7 +16,7 @@ unless Rails.env.production?
 
     def prepare_pact_files_for_publishing(task)
       task.pattern = 'pacts/**/*.json'
-      task.pact_broker_base_url = PactConfig.broker_host
+      task.pact_broker_base_url = "#{PactConfig.protocol}://#{PactConfig.broker_host}"
       task.pact_broker_basic_auth = {
         username: PactConfig.broker_username,
         password: PactConfig.broker_password

@@ -26,7 +26,7 @@ module DataFixup
           id: start_id..end_id,
           anonymous_grading: true,
           submission_types: ['discussion_topic', 'online_quiz']
-        ).in_batches { |batch| batch.update_all(anonymous_grading: false, updated_at: Time.zone.now) }
+        ).in_batches.update_all(anonymous_grading: false, updated_at: Time.zone.now)
       end
     end
   end

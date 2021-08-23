@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import FilesUsage from 'jsx/files/FilesUsage'
+import FilesUsage from 'ui/features/files/react/components/FilesUsage.js'
 
 QUnit.module('FilesUsage#update', {
   filesUpdateTest(props, test) {

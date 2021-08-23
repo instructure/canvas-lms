@@ -125,7 +125,7 @@ class AccountReport < ActiveRecord::Base
 
   def mark_as_errored
     self.workflow_state = :error
-    self.save
+    self.save!
   end
 
   def has_parameter?(key)

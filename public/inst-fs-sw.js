@@ -34,8 +34,16 @@
  * for Safari 13.1+.
  */
 
+// Ensure we take effect as quickly as possible.
 // eslint-disable-next-line no-restricted-globals
-self.addEventListener('fetch', function(event) {
+self.addEventListener('install', function (event) {
+  // The promise that skipWaiting() returns can be safely ignored.
+// eslint-disable-next-line no-restricted-globals
+  self.skipWaiting()
+})
+
+// eslint-disable-next-line no-restricted-globals
+self.addEventListener('fetch', function (event) {
   if (eligibleRequest(event.request)) {
     event.respondWith(fetchFile(event.request))
   }
@@ -43,10 +51,12 @@ self.addEventListener('fetch', function(event) {
 
 function eligibleRequest(request) {
   const url = new URL(request.url)
-  return request.method === 'GET'
-    && request.mode !== 'navigate'
-    && !imagePreviewWithoutInstfs(url)
-    && eligiblePath(url.pathname)
+  return (
+    request.method === 'GET' &&
+    request.mode !== 'navigate' &&
+    !imagePreviewWithoutInstfs(url) &&
+    eligiblePath(url.pathname)
+  )
 }
 
 // most files links we care about look like this regex fragment with a context
@@ -61,9 +71,11 @@ function imagePreviewWithoutInstfs(url) {
   // Image preview without inst-fs (files domain)
   // causes some CORS issues. We ignore that path here.
   const previewPath = new RegExp(`/files/[^/]+/preview(.\\w+)?`)
-  return previewPath.test(url.pathname)
-    && url.searchParams.has('instfs')
-    && url.searchParams.get('instfs') == 'false'
+  return (
+    previewPath.test(url.pathname) &&
+    url.searchParams.has('instfs') &&
+    url.searchParams.get('instfs') == 'false'
+  )
 }
 
 const eligiblePaths = [
@@ -85,7 +97,7 @@ const eligiblePaths = [
 ]
 
 function eligiblePath(pathname) {
-  return eligiblePaths.some(function(candidate) {
+  return eligiblePaths.some(function (candidate) {
     return candidate.test(pathname)
   })
 }
@@ -109,11 +121,10 @@ function fetchFile(request) {
   const mode = 'cors'
   const credentials = 'same-origin'
   const headers = new Headers({'X-Canvas-File-Location': 'True'})
-  return fetch(request, {mode, credentials, headers}).then(function(response) {
+  return fetch(request, {mode, credentials, headers}).then(function (response) {
     if (response.ok && response.headers.has('X-Canvas-File-Location')) {
-      return response.text().then(function(body) {
-        // strip off "while(1);"
-        const {location, token} = JSON.parse(body.substring(9))
+      return response.text().then(function (body) {
+        const {location, token} = JSON.parse(body)
         const instfsHeaders = new Headers({Authorization: `Bearer ${token}`})
         return fetch(location, {headers: instfsHeaders})
       })

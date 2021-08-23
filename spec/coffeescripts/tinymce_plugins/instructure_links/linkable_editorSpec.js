@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import LinkableEditor from 'tinymce_plugins/instructure_links/linkable_editor'
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
-import links from 'tinymce_plugins/instructure_links/links'
+import LinkableEditor from '@canvas/tinymce-links/linkable_editor'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
+import links from '@canvas/tinymce-links'
 
 let rawEditor = null
 

@@ -507,6 +507,188 @@ describe TabsController, type: :request do
       ])
     end
 
+    describe 'canvas for elementary' do
+      before(:once) do
+        course_with_teacher(:active_all => true)
+        @course.account.enable_as_k5_account!
+      end
+
+      it 'should list a select subset of tabs if it is an elementary course and has the include[]=course_subject_tabs param' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                        { :include => ['course_subject_tabs']})
+        expect(json).to eq [
+          {
+            "id" => "home",
+            "html_url" => "/courses/#{@course.id}",
+            "full_url" => "http://localhost/courses/#{@course.id}",
+            "position" => 1,
+            "visibility" => "public",
+            "label" => "Home",
+            "type" => "internal"
+          },
+          {
+            "id" => "schedule",
+            "html_url" => "/courses/#{@course.id}",
+            "full_url" => "http://localhost/courses/#{@course.id}",
+            "position" => 2,
+            "visibility" => "public",
+            "label" => "Schedule",
+            "type" => "internal"
+          },
+          {
+            "id" => "modules",
+            "html_url" => "/courses/#{@course.id}/modules",
+            "full_url" => "http://localhost/courses/#{@course.id}/modules",
+            "position" => 3,
+            "visibility" => "public",
+            "label" => "Modules",
+            "type" => "internal"
+          },
+          {
+            "id" => "grades",
+            "html_url" => "/courses/#{@course.id}/grades",
+            "full_url" => "http://localhost/courses/#{@course.id}/grades",
+            "position" => 4,
+            "visibility" => "public",
+            "label" => "Grades",
+            "type" => "internal"
+          }
+        ]
+      end
+
+      it 'should list navigation tabs without home for an elementary course' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'})
+        expect(json).to eq [
+          {
+            "id" => "announcements",
+            "html_url" => "/courses/#{@course.id}/announcements",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/announcements",
+            "position" => 1,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Announcements",
+            "type" => "internal"
+          },
+          {
+            "id" => "assignments",
+            "html_url" => "/courses/#{@course.id}/assignments",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments",
+            "position" => 2,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Assignments",
+            "type" => "internal"
+          },
+          {
+            "id" => "discussions",
+            "html_url" => "/courses/#{@course.id}/discussion_topics",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/discussion_topics",
+            "position" => 3,
+            "visibility" => "public",
+            "label" => "Discussions",
+            "type" => "internal"
+          },
+          {
+            "id" => "grades",
+            "html_url" => "/courses/#{@course.id}/grades",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/grades",
+            "position" => 4,
+            "visibility" => "public",
+            "label" => "Grades",
+            "type" => "internal"
+          },
+          {
+            "id" => "people",
+            "html_url" => "/courses/#{@course.id}/users",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/users",
+            "position" => 5,
+            "visibility" => "public",
+            "label" => "People",
+            "type" => "internal"
+          },
+          {
+            "id" => "pages",
+            "html_url" => "/courses/#{@course.id}/wiki",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/wiki",
+            "position" => 6,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Pages",
+            "type" => "internal"
+          },
+          {
+            "id" => "files",
+            "html_url" => "/courses/#{@course.id}/files",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/files",
+            "position" => 7,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Files",
+            "type" => "internal"
+          },
+          {
+            "id" => "syllabus",
+            "html_url" => "/courses/#{@course.id}/assignments/syllabus",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/syllabus",
+            "position" => 8,
+            "visibility" => "public",
+            "label" => "Important Info",
+            "type" => "internal"
+          },
+          {
+            "id" => "outcomes",
+            "html_url" => "/courses/#{@course.id}/outcomes",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/outcomes",
+            "position" => 9,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Outcomes",
+            "type" => "internal"
+          },
+          {
+            "id" => "rubrics",
+            "html_url" => "/courses/#{@course.id}/rubrics",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/rubrics",
+            "position" => 10,
+            "visibility" => "admins",
+            "label" => "Rubrics",
+            "type" => "internal"
+          },
+          {
+            "id" => "quizzes",
+            "html_url" => "/courses/#{@course.id}/quizzes",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/quizzes",
+            "position" => 11,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Quizzes",
+            "type" => "internal"
+          },
+          {
+            "id" => "modules",
+            "html_url" => "/courses/#{@course.id}/modules",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/modules",
+            "position" => 12,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Modules",
+            "type" => "internal"
+          },
+          {
+            "id" => "settings",
+            "html_url" => "/courses/#{@course.id}/settings",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
+            "position" => 13,
+            "visibility" => "admins",
+            "label" => "Settings",
+            "type" => "internal"
+          }
+        ]
+      end
+    end
+
     describe "teacher in a course" do
       before :once do
         course_with_teacher(active_all: true)
@@ -776,6 +958,32 @@ describe TabsController, type: :request do
       expect(result).to eq 401
     end
 
-  end
+    it 'allows updating tabs to a new LTI position when the penultimate tab is hidden' do
+      course_with_teacher(:active_all => true)
+      tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+      @course.tab_configuration = tab_ids.each_with_index.map do |id, i|
+        { 'id' => id, 'hidden' => (i == tab_ids.count - 2) }
+      end
+      @course.save!
 
+      @tool = @course.context_external_tools.new({
+          :name => 'Example',
+          :url => 'http://www.example.com',
+          :consumer_key => 'key',
+          :shared_secret => 'secret',
+          :course_navigation => {
+            :enabled => 'true',
+            :url => 'http://www.example.com',
+          }
+        })
+      @tool.save!
+      tab_id = 'rubrics'
+      position = 14
+
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+          :position => position, :course_id => @course.to_param, :tab_id => tab_id,
+          :format => 'json'})
+      expect(json['position']).to eq position
+    end
+  end
 end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsList from 'jsx/collaborations/CollaborationsList'
+import CollaborationsList from 'ui/features/lti_collaborations/react/CollaborationsList.js'
 
 QUnit.module('CollaborationsList')
 

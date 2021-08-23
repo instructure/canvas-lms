@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import {mount} from 'enzyme'
-import GradebookMenu from 'jsx/gradebook/default_gradebook/components/GradebookMenu'
+import GradebookMenu from '@canvas/gradebook-menu'
 
 QUnit.module('GradebookMenu', {
   setup() {

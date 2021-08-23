@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import CheckboxView from 'jsx/gradebook/views/CheckboxView'
+import CheckboxView from 'ui/features/learning_mastery/backbone/views/CheckboxView.js'
 
 QUnit.module('gradebook/CheckboxView', {
   setup() {

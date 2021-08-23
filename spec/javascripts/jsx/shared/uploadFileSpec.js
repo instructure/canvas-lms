@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {uploadFile, completeUpload} from 'jsx/shared/upload_file'
+import {uploadFile, completeUpload} from '@canvas/upload-file'
 
 QUnit.module('Upload File')
 

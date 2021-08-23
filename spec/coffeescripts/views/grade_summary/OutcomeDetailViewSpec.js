@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CollectionView from 'compiled/views/CollectionView'
-import OutcomeResultCollection from 'compiled/collections/OutcomeResultCollection'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import Group from 'compiled/models/grade_summary/Group'
-import OutcomeDetailView from 'compiled/views/grade_summary/OutcomeDetailView'
+import Backbone from '@canvas/backbone'
+import CollectionView from '@canvas/backbone-collection-view'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import Group from 'ui/features/grade_summary/backbone/models/Group.coffee'
+import OutcomeDetailView from 'ui/features/grade_summary/backbone/views/OutcomeDetailView.js'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OutcomeDetailViewSpec', {

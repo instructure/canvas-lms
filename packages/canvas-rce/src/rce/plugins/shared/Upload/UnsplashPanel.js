@@ -24,10 +24,8 @@ import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
 import {Img} from '@instructure/ui-img'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
-
 import {Button} from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
@@ -137,13 +135,19 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
   if (hasLoaded && results[page] && term.length >= 1) {
     if (totalResults < 1) {
       return (
-        <Alert variant="info" transition="none" liveRegion={liveRegion}>
+        <Alert variant="info" transition="none" liveRegion={liveRegion} timeout={1000}>
           {formatMessage('No results found for {term}.', {term})}
         </Alert>
       )
     }
     return (
-      <Alert variant="info" transition="none" screenReaderOnly liveRegion={liveRegion}>
+      <Alert
+        variant="info"
+        transition="none"
+        screenReaderOnly
+        liveRegion={liveRegion}
+        timeout={1000}
+      >
         {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', {
           totalResults,
           numDisplayed: results[page].length
@@ -160,7 +164,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
   const [focusedImageIndex, setFocusedImageIndex] = useState(0)
   const {totalPages, totalResults, results, loading, search, hasLoaded} = useUnsplashSearch(source)
 
-  const debouncedSearch = useCallback(debounce(search, 250), [])
+  const debouncedSearch = useCallback(debounce(search, 1000), [])
 
   const resultRefs = []
   const skipEffect = useRef(false)
@@ -190,7 +194,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
       />
       {loading ? (
         <Spinner
-          renderTitle={function() {
+          renderTitle={function () {
             return formatMessage('Loading')
           }}
           size="large"
@@ -198,7 +202,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
         />
       ) : (
         <>
-          <View margin="small">
+          <View margin="0 small">
             {renderAlert(term, hasLoaded, totalResults, results, page, liveRegion)}
           </View>
           <div className={css(styles.container)} data-testid="UnsplashResultsContainer">
@@ -235,11 +239,23 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                       }
                     >
                       {resultImage.id === selectedImage ? (
-                        <ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>
+                        <Alert
+                          variant="info"
+                          transition="none"
+                          screenReaderOnly
+                          liveRegion={liveRegion}
+                          timeout={1000}
+                        >
+                          {`${formatMessage('Selected')}: ${resultImage.alt_text}`}
+                        </Alert>
                       ) : null}
                       <Img
                         src={resultImage.urls.thumbnail}
-                        alt={resultImage.alt_text}
+                        alt={
+                          resultImage.id === selectedImage
+                            ? `${formatMessage('Selected')} ${resultImage.alt_text}`
+                            : resultImage.alt_text
+                        }
                         constrain="contain"
                         height="10em"
                       />
@@ -268,7 +284,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
             >
               {Array.from(Array(totalPages)).map((_v, i) => (
                 <Pagination.Page
-                  key={i}
+                  key={i} // eslint-disable-line react/no-array-index-key
                   onClick={() => {
                     setPage(i + 1)
                     search(term, i + 1)

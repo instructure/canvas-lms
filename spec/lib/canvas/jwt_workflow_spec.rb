@@ -51,8 +51,8 @@ module Canvas
       end
 
       it 'merges state of muliple workflows in order of array' do
-        JWTWorkflow.register(:foo) {{ a: 1, b: 2 }}
-        JWTWorkflow.register(:bar) {{ b: 3, c: 4 }}
+        JWTWorkflow.register(:foo) { { a: 1, b: 2 } }
+        JWTWorkflow.register(:bar) { { b: 3, c: 4 } }
         expect(JWTWorkflow.state_for(%i[foo bar], nil, nil)).to include({ a: 1, b: 3, c: 4 })
         expect(JWTWorkflow.state_for(%i[bar foo], nil, nil)).to include({ a: 1, b: 2, c: 4 })
       end
@@ -62,7 +62,7 @@ module Canvas
       describe ':rich_content' do
         before(:each) do
           allow(@c).to receive(:respond_to?).with(:usage_rights_required?).and_return(true)
-          allow(@c).to receive(:grants_any_right?)
+          allow(@c).to receive(:grants_right?)
           allow(@c).to receive(:feature_enabled?)
           @wiki = Wiki.new
           allow(@c).to receive(:wiki).and_return(@wiki)
@@ -72,17 +72,13 @@ module Canvas
         end
 
         it 'sets can_upload_files to false' do
-          expect(@c).to receive(:grants_any_right?).with(
-            @u, :manage_files, :manage_files_add
-          ).and_return(false)
+          expect(@c).to receive(:grants_right?).with(@u, :manage_files_add).and_return(false)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be false
         end
 
         it 'sets can_upload_files to true' do
-          expect(@c).to receive(:grants_any_right?).with(
-            @u, :manage_files, :manage_files_add
-          ).and_return(true)
+          expect(@c).to receive(:grants_right?).with(@u, :manage_files_add).and_return(true)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be true
         end

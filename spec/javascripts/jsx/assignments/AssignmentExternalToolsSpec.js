@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 
 QUnit.module('AssignmentExternalTools', hooks => {
   let toolDefinitions

@@ -108,8 +108,8 @@ class Attachments::GarbageCollector
     # Once you're confident and don't want to revert, clean up the DB rows
     def delete_rows
       raise "Cannot delete rows in dry_run mode" if dry_run
-      while deleted_scope.where.not(:root_attachment_id => nil).limit(1000).delete_all > 0; end
-      while deleted_scope.limit(1000).delete_all > 0; end
+      deleted_scope.where.not(root_attachment_id: nil).in_batches.delete_all
+      deleted_scope.in_batches.delete_all
     end
 
     private

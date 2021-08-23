@@ -81,38 +81,13 @@ class ContentExport < ActiveRecord::Base
     }
   end
 
-  def context_root_account(user = nil)
-    # Granular Permissions
-    #
-    # The primary use case for this method is for accurately checking
-    # feature flag enablement, given a user and the calling context.
-    # We want to prefer finding the root_account through the context
-    # of the authorizing resource or fallback to the user's active
-    # pseudonym's residing account.
-    return self.context.account if self.context.is_a?(User)
-
-    self.context.try(:root_account) || user&.account
-  end
-
   set_policy do
-    #################### Begin legacy permission block #########################
-
-    given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files) &&
-      [ZIP, USER_DATA].exclude?(self.export_type)
-    end
-    can :manage_files and can :read
-
-    ##################### End legacy permission block ##########################
-
     # file managers (typically course admins) can read all course exports (not zip or user-data exports)
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_any_right?(user, session, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS) &&
+      self.context.grants_any_right?(user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS) &&
       [ZIP, USER_DATA].exclude?(self.export_type)
     end
-    can :read and can :manage_files
+    can :read
 
     # admins can create exports of any type
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
@@ -174,7 +149,7 @@ class ContentExport < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
 
   def reset_and_start_job_progress
     self.job_progress.try :reset!
@@ -193,7 +168,13 @@ class ContentExport < ActiveRecord::Base
 
   def mark_failed
     self.workflow_state = 'failed'
-    self.job_progress.try :fail!
+    self.job_progress.fail! if self.job_progress&.queued? || self.job_progress&.running?
+  end
+
+  def fail_with_error!(exception_or_info = nil, error_message: I18n.t('Unexpected error while performing export'))
+    add_error(error_message, exception_or_info) if exception_or_info
+    mark_failed
+    save!
   end
 
   def export_course(opts={})
@@ -572,7 +553,9 @@ class ContentExport < ActiveRecord::Base
 
   def expired?
     return false unless ContentExport.expire?
-    return false if ContentShare.where(content_export: self).exists?
+    if self.user
+      return false if self.user.content_shares.where(content_export: self).exists?
+    end
     created_at < ContentExport.expire_days.days.ago
   end
 

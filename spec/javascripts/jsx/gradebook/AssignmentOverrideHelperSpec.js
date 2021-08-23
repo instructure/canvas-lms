@@ -18,8 +18,8 @@
 
 import _ from 'underscore'
 
-import tz from 'timezone'
-import AssignmentOverrideHelper from 'jsx/gradebook/AssignmentOverrideHelper'
+import tz from '@canvas/timezone'
+import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 
 const students = [
   {id: '1', group_ids: ['1'], sections: ['1']},

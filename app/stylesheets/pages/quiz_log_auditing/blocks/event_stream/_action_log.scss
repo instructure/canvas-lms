@@ -26,18 +26,6 @@
 
 .ic-ActionLog__Entry {
   margin: 0 0 $whitespace 0;
-
-  &.is-warning .ic-Icon {
-    color: $ic-color-danger;
-  }
-
-  &.is-ok .ic-Icon {
-    color: $ic-color-success;
-  }
-
-  &.is-neutral .ic-Icon {
-    color: $muteFg;
-  }
 }
 
 .ic-ActionLog__EntryTimestamp {

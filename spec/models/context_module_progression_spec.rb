@@ -170,10 +170,23 @@ describe ContextModuleProgression do
     context "when post policies enabled" do
       let(:assignment) { @course.assignments.create! }
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
+      let(:min_score) { 90 }
 
       before(:each) do
-        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
+        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: min_score}})
         @submission = assignment.submit_homework(@user, body: "my homework")
+      end
+
+      context 'when the score is close enough' do
+        let(:min_score) { 1 }
+        let(:score) { 0.9999999999999999 } # eg 0.3 + 0.3 + 0.3 + 0.1
+
+        it 'evaluates requirement as complete' do
+          @submission.update!(score: score, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = {id: tag.id, type: 'min_score', min_score: min_score}
+          expect(progression.requirements_met).to include requirement
+        end
       end
 
       it "doesn't mark students that haven't submitted as in-progress" do

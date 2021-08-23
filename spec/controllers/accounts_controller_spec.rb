@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe AccountsController do
+  include K5Common
+
   def account_with_admin_logged_in(opts = {})
     account_with_admin(opts)
     user_session(@admin)
@@ -235,13 +238,8 @@ describe AccountsController do
       user_to_remove = account_admin_user(account: a1)
       au_id = user_to_remove.account_users.first.id
       account_with_admin_logged_in(account: a2)
-      begin
-        post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
-        # rails3 returns 404 status
-        expect(response).to be_not_found
-      rescue ActiveRecord::RecordNotFound
-        # rails2 passes the exception through here
-      end
+      post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
+      expect(response).to be_not_found
       expect(AccountUser.where(id: au_id).first).not_to be_nil
     end
   end
@@ -395,6 +393,7 @@ describe AccountsController do
     end
 
     it "doesn't break I18n by setting customized text for default help links unnecessarily" do
+      Setting.set('show_feedback_link', 'true')
       account_with_admin_logged_in
       post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
         { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
@@ -498,6 +497,121 @@ describe AccountsController do
       expect([@subaccount.reload.default_dashboard_view,
               @teacher.dashboard_view(@subaccount),
               @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
+    end
+
+    describe "k5 settings" do
+      def toggle_k5_params(account_id, enable)
+        {:id => account_id,
+         :account => {
+           :settings => {
+             :enable_as_k5_account => {
+               :value => enable
+             }
+           }
+         }}
+      end
+
+      describe "enable_as_k5_account setting" do
+        before :once do
+          @account = Account.create!
+          @user = account_admin_user(account: @account)
+        end
+
+        before :each do
+          user_session(@user)
+        end
+
+        it "should be locked once the setting is enabled" do
+          post 'update', params: toggle_k5_params(@account.id, true)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
+        end
+
+        it "should be unlocked if the setting is disabled" do
+          @account.settings[:enable_as_k5_account] = {
+            value: true,
+            locked: true
+          }
+          post 'update', params: toggle_k5_params(@account.id, false)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
+        end
+      end
+
+      describe "k5_accounts set on root account" do
+        before :once do
+          @root_account = Account.create!
+          @subaccount1 = @root_account.sub_accounts.create!
+          @subaccount2 = @subaccount1.sub_accounts.create!
+          @user = account_admin_user(account: @root_account)
+        end
+
+        before :each do
+          user_session(@user)
+        end
+
+        it "is nil by default" do
+          expect(@root_account.settings[:k5_accounts]).to be_nil
+        end
+
+        it "contains root account id if k5 is enabled on root account" do
+          post 'update', params: toggle_k5_params(@root_account.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@root_account.id)
+        end
+
+        it "contains subaccount id (but not other ids) if k5 is enabled on subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount2.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount2.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount1.id)
+        end
+
+        it "contains middle subaccount id (but not other ids) if k5 is enabled on middle subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount1.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount1.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount2.id)
+        end
+
+        it "contains nothing once disabled" do
+          toggle_k5_setting(@root_account)
+          post 'update', params: toggle_k5_params(@root_account.id, false)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to be_empty
+        end
+
+        it "is not changed unless enable_as_k5_account is modified" do
+          @root_account.settings[:k5_accounts] = [@root_account.id] # in reality this wouldn't ever contain the account if enable_as_k5_account is off
+          @root_account.save!
+          post 'update', params: toggle_k5_params(@root_account.id, false) # already set to false, so shouldn't touch k5_accounts
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts][0]).to be @root_account.id
+          expect(@root_account.settings[:k5_accounts].length).to be 1
+        end
+      end
+
+      it "clears the cached k5_user value for all users when the setting is changed" do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
+        user_session(@user)
+        enable_cache(:redis_cache_store) do
+          Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            "cached!"
+          end
+          post 'update', params: toggle_k5_params(@account.id, true)
+          run_jobs
+          other_value = "something else"
+          cached_value = Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            other_value # only takes this value if the cache key is empty - i.e., its been cleared
+          end
+          expect(cached_value).to eq other_value
+        end
+      end
     end
 
     describe "quotas" do
@@ -735,6 +849,43 @@ describe AccountsController do
         :settings => {:outgoing_email_default_name_option => "default"}}}
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
     end
+
+  context "course_template_id" do
+      before do
+        account_with_admin_logged_in
+        @account.enable_feature!(:course_templates)
+      end
+
+      let(:template) { @account.courses.create!(template: true) }
+
+      it "does nothing when not passed" do
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: {} }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "sets to null when blank" do
+        @account.grants_right?(@admin, :edit_course_template)
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: { course_template_id: ''} }
+        @account.reload
+        expect(@account.course_template).to be_nil
+      end
+
+      it "sets it" do
+        post 'update', params: { id: @account.id, account: { course_template_id: template.id } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "supports lookup by sis id" do
+        template.update!(sis_source_id: 'sis_id')
+        post 'update', params: { id: @account.id, account: { course_template_id: 'sis_course_id:sis_id' } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+    end
   end
 
   describe "#settings" do
@@ -758,16 +909,22 @@ describe AccountsController do
         )
       end
 
-      it 'defaults new feature flags to false' do
+      it 'sets microsoft sync values' do
+        allow(MicrosoftSync::LoginService).to receive(:client_id).and_return('1234')
         get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(false)
+        expect(assigns.dig(:js_env, :MICROSOFT_SYNC)).to include(
+          CLIENT_ID: '1234',
+          REDIRECT_URI: 'https://www.instructure.com/',
+          BASE_URL: 'https://login.microsoftonline.com'
+        )
       end
+    end
 
-      it 'passes on correct value for new feature flags ui' do
-        Account.site_admin.enable_feature!(:new_features_ui)
-        get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
-      end
+    it "should not be accessible to teachers" do
+      course_with_teacher
+      user_session(@teacher)
+      get 'settings', params: {account_id: @course.root_account.id}
+      expect(response).to be_unauthorized
     end
 
     it "should load account report details" do
@@ -964,6 +1121,7 @@ describe AccountsController do
     end
 
     it "should return default help links" do
+      Setting.set('show_feedback_link', 'true')
       get 'help_links', params: {account_id: @account.id}
 
       expect(response).to be_successful
@@ -1041,6 +1199,14 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/#{@c1.id}/)
       expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "should not set pagination total_pages/last page link" do
+      admin_logged_in(@account)
+      get 'courses_api', params: {:account_id => @account.id, per_page: 1}
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
     it "should properly remove sections from includes" do
@@ -1299,7 +1465,7 @@ describe AccountsController do
       admin_logged_in(@account)
       get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach"}
 
-      expect(JSON.parse(response.body.sub("while(1)\;", '')).length).to eq 2
+      expect(JSON.parse(response.body).length).to eq 2
     end
 
     it "should exclude teachers that don't have an active enrollment workflow state" do
@@ -1517,6 +1683,65 @@ describe AccountsController do
         get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
         expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
       end
+    end
+  end
+
+  describe("manageable_accounts") do
+    before :once do
+      @account1 = Account.create!(:name => "Account 1", :root_account => Account.default)
+      account_with_admin(:account => @account1)
+      @admin1 = @admin
+      @account2 = Account.create!(:name => "Account 2", :root_account => Account.default)
+      account_admin_user(:account => @account2, :user => @admin1)
+      @subaccount1 = @account1.sub_accounts.create!(:name => "Subaccount 1")
+    end
+
+    it "includes all top-level and subaccounts" do
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts[0]["name"]).to eq "Account 1"
+      expect(accounts[1]["name"]).to eq "Subaccount 1"
+      expect(accounts[2]["name"]).to eq "Account 2"
+    end
+
+    it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
+      account3 = Account.create!(:name => "Account 3", :root_account => Account.default)
+      account_admin_user_with_role_changes(:account => account3, :user => @admin1, :role_changes => {:manage_courses => false, :create_courses => false})
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts.length).to be 3
+      accounts.each do |a|
+        expect(a["name"]).not_to eq "Account 3"
+      end
+    end
+
+    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      account3 = Account.create!(name: 'Account 3', root_account: Account.default)
+      account_admin_user_with_role_changes(
+        account: account3,
+        user: @admin1,
+        role_changes: {
+          manage_courses_admin: false,
+          manage_courses_add: false
+        }
+      )
+      user_session @admin1
+      get 'manageable_accounts'
+      accounts = json_parse(response.body)
+      expect(accounts.length).to be 3
+      accounts.each { |a| expect(a['name']).not_to eq 'Account 3' }
+    end
+
+    it "returns an empty list for students" do
+      student_in_course(:active_all => true, :account => @account1)
+      user_session @student
+      get "manageable_accounts"
+      expect(response).to be_successful
+      expect(json_parse(response.body).length).to be 0
     end
   end
 end

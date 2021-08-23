@@ -41,7 +41,7 @@ describe UserContent, type: :request do
       { :controller => 'assignments_api', :action => 'show',
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
@@ -61,7 +61,7 @@ describe UserContent, type: :request do
       { :controller => 'discussion_topics_api', :action => 'show',
         :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
@@ -82,7 +82,7 @@ describe UserContent, type: :request do
       { :controller => 'assignments_api', :action => 'show',
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
   end
 
@@ -98,7 +98,7 @@ describe UserContent, type: :request do
       "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       { :controller => 'discussion_topics_api', :action => 'show',
         :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
@@ -114,7 +114,7 @@ describe UserContent, type: :request do
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                     { :controller => 'discussion_topics_api', :action => 'show',
                       :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
   end
 
@@ -131,7 +131,7 @@ describe UserContent, type: :request do
       { :controller => 'assignments_api', :action => 'show',
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
   end
 
@@ -148,7 +148,7 @@ describe UserContent, type: :request do
     { :controller => 'assignments_api', :action => 'show',
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     video = doc.at_css('video')
     expect(video).to be_present
     expect(video['class']).to match(/\binstructure_inline_media_comment\b/)
@@ -176,7 +176,7 @@ describe UserContent, type: :request do
     { :controller => 'assignments_api', :action => 'show',
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     audio = doc.at_css('audio')
     expect(audio).to be_present
     expect(audio['class']).to match(/\binstructure_inline_media_comment\b/)
@@ -207,7 +207,7 @@ describe UserContent, type: :request do
     { :controller => 'assignments_api', :action => 'show',
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
   end
 
@@ -228,7 +228,7 @@ describe UserContent, type: :request do
     { :controller => 'assignments_api', :action => 'show',
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
-    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/equation_images/1234"
     expect(doc.css('a').map { |e| e['href'] }).to eq [
       "http://www.example.com/help",
@@ -281,7 +281,7 @@ describe UserContent, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
                         { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
-        doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
+        doc = Nokogiri::HTML5.fragment(json['body'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
@@ -330,7 +330,7 @@ describe UserContent, type: :request do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
                         { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
-        doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
+        doc = Nokogiri::HTML5.fragment(json['body'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
             "http://www.example.com/api/v1/groups/#{@group.id}/pages",
             "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
@@ -357,7 +357,7 @@ describe UserContent, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                         :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s)
-        doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+        doc = Nokogiri::HTML5.fragment(json['message'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
           "http://www.example.com/api/v1/users/#{@teacher.id}/files/789"
@@ -386,7 +386,7 @@ describe UserContent, type: :request do
       <a id='media_comment_test3' class='instructure_inline_media_comment'>id, no type, missing object</a>
       HTML
 
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5.fragment(html)
       anchors = doc.css('a')
       expect(anchors[0]['id']).to eq 'something-else'
       expect(anchors[0]['href']).to eq '/blah'
@@ -407,7 +407,7 @@ describe UserContent, type: :request do
       <audio class='instructure_inline_media_comment' src='/some/redirect/url' data-media_comment_id='test2'>with media id</video>
       HTML
 
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5.fragment(html)
       tags = doc.css('audio,video,a')
       expect(tags[0].name).to eq 'video'
       expect(tags[0]['src']).to eq '/other'
@@ -432,7 +432,7 @@ describe UserContent, type: :request do
       def confirm_url_stability(url)
         link = %Q{<a href="#{url}">what</a>}
         html = tester.process_incoming_html_content(link)
-        doc = Nokogiri::HTML::DocumentFragment.parse(html)
+        doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url
       end
 
@@ -456,7 +456,7 @@ describe UserContent, type: :request do
       def confirm_url_stability(url)
         link = %Q{<a href="#{url}">what</a>a>}
         html = tester.process_incoming_html_content(link)
-        doc = Nokogiri::HTML::DocumentFragment.parse(html)
+        doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url
       end
 
@@ -520,13 +520,13 @@ describe UserContent, type: :request do
 
         it "retains the alt attribute" do
           escaped = UserContent.escape(@html)
-          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first
+          node = Nokogiri::HTML5.fragment(escaped).css("img").first
           expect(node['alt']).to eql(@latex)
         end
 
         it "adds mathml in a span" do
           escaped = UserContent.escape(@html)
-          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first.next_sibling
+          node = Nokogiri::HTML5.fragment(escaped).css("img").first.next_sibling
           expect(node.node_name).to eql("span")
           expect(node.inner_html).to eql(Ritex::Parser.new.parse(@latex))
         end
@@ -544,13 +544,13 @@ describe UserContent, type: :request do
 
         it "retains the alt attribute" do
           escaped = UserContent.escape(@html)
-          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first
+          node = Nokogiri::HTML5.fragment(escaped).css("img").first
           expect(node['alt']).to eql(@latex)
         end
 
         it "doesn't add mathml span" do
           escaped = UserContent.escape(@html)
-          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("span").first
+          node = Nokogiri::HTML5.fragment(escaped).css("span").first
           expect(node).to be_nil
         end
       end

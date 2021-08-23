@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import {SearchFormComponent} from 'jsx/gradebook-history/SearchForm'
+import {SearchFormComponent} from 'ui/features/gradebook_history/react/SearchForm.js'
 import {Button} from '@instructure/ui-buttons'
-import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
-import CanvasAsyncSelect from 'jsx/shared/components/CanvasAsyncSelect'
+import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import Fixtures from './Fixtures'
 import fakeENV from 'helpers/fakeENV'

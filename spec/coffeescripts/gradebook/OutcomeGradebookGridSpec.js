@@ -17,7 +17,7 @@
  */
 
 import {isEqual} from 'underscore'
-import Grid from 'jsx/gradebook/OutcomeGradebookGrid'
+import Grid from '@canvas/outcome-gradebook-grid'
 import fakeENV from 'helpers/fakeENV'
 import 'i18n!gradebookOutcomeGradebookGrid'
 

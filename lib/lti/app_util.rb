@@ -24,6 +24,7 @@ module Lti
       'borderless'            => {template: 'lti/unframed_launch', layout: 'borderless_lti'}.freeze,
       'full_width'            => {template: 'lti/full_width_launch'}.freeze,
       'in_context'            => {template: 'lti/framed_launch'}.freeze,
+      'in_nav_context'        => {template: 'lti/full_width_in_context'}.freeze,
       'default'               => {template: 'lti/framed_launch'}.freeze,
       'full_width_in_context' => {template: 'lti/full_width_in_context'}.freeze,
     }.freeze

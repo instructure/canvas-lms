@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import LockToggle from 'jsx/blueprint_courses/components/LockToggle'
+import LockToggle from '@canvas/blueprint-courses/react/components/LockManager/LockToggle'
 
 QUnit.module('LockToggle component')
 

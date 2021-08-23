@@ -28,6 +28,22 @@ module ActiveSupport::Callbacks
         @callbacks = {}
       end
 
+      def any_registered?(kind)
+        unless kind.nil?
+          return true if any_registered?(nil)
+        end
+
+        types = @callbacks[kind]
+        return false if types.nil?
+        return false if types.empty?
+
+        types.each_value do |cbs|
+          return true unless cbs.empty?
+        end
+
+        false
+      end
+
       def [](kind, type)
         @callbacks.has_key?(kind) && @callbacks[kind].has_key?(type) ?
           @callbacks[kind][type] :

@@ -20,6 +20,8 @@
    provide :page_title, join_title(t(:page_title, "Course Link Validator"), @context.name)
    js_env({
     :validation_api_url => api_v1_course_link_validation_url(@context),
+    :validation_poll_timeout => Setting.get('link_validator_poll_timeout', 10000).to_f,
+    :validation_poll_timeout_initial => Setting.get('link_validator_poll_timeout_initial', 2000).to_f,
     :VALIDATION_CONFETTI_ENABLED => @domain_root_account&.feature_enabled?(:confetti_for_valid_links)
   })
    js_bundle :course_link_validator

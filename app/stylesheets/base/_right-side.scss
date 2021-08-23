@@ -1,0 +1,211 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#right-side-wrapper {
+  display: none;
+  position: relative;
+}
+
+#right-side {
+  position: relative;
+  // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
+  z-index: 10;
+  min-height: 20px;
+  hr {
+    border: dotted #aaa;
+    border-width: 1px 0 0;
+    margin: 17px 0 20px;
+  }
+  h2, .h2 {
+    @include fontSize($ic-font-size--small);
+    overflow: hidden;
+    border-bottom: 1px solid $ic-border-light;
+    padding-bottom: $ic-sp * 0.5;
+    margin: 0 0 $ic-sp * 0.5;
+    font-weight: bold;
+  }
+  .shared-space {
+    padding-bottom: 0;
+    h2 {
+      display: inline-block;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom-style: none;
+    }
+  }
+}
+
+.rs-margin-bottom {
+  margin-bottom: $right_side_margin;
+}
+
+#right-side .right-side-list {
+  @include reset-list;
+  margin: -($ic-sp * 0.5) 0 $ic-sp;
+  li {
+    a {
+      @include fontSize($ic-font-size--xsmall);
+      padding-top: $ic-sp;
+      padding-bottom: $ic-sp;
+      display: flex;
+
+      @if $use_high_contrast {
+        text-decoration: underline;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+
+        @if $use_high_contrast {
+          text-decoration: none;
+        }
+      }
+    }
+      // this is to give todo and event icons some breathing room
+      > i {
+          min-width: $ic-sp * 2;
+          padding-#{direction(right)}: $ic-sp;
+          box-sizing: border-box;
+          color: lighten( $grayDark, 15% );
+      }
+    }
+    &:last-child a {
+      border-bottom: none;
+      box-shadow: none;
+    }
+    // this is for things like "nothing for the next week"
+    small {
+      display: block;
+      @include fontSize(13px);
+    }
+    b, em, p {
+      font-weight: normal;
+      display: block;
+      line-height: $ic-label-line-height;
+    }
+    p, .more_link {
+      @include fontSize(12px);
+      margin-bottom: 0;
+    }
+    em, p {
+      @if $use_high_contrast {
+        color: #555;
+      }
+      @else {
+        color: #777;
+      }
+    }
+    .more_link {
+      padding-top: 6px;
+    }
+  }
+  .recent_feedback_icon {
+    background-position: 0 $ic-sp*.75;
+  }
+  .recent_feedback_title {
+    line-height: 1.3;
+    margin-bottom: $ic-sp*0.25;
+  }
+  .recent_feedback_comment {
+    color: $gray-light;
+    border: 0;
+    font-size: 100%;
+  }
+  .tooltip {
+    .tooltip_wrap {
+      #{direction(left)}: -185px;
+      width: 185px;
+      height: 70px;
+      top: 0;
+      font-size: 0.9em;
+      background-image: none;
+    }
+    .tooltip_text {
+      margin-#{direction(right)}: 15px;
+      min-height: 30px;
+    }
+    .tooltip-carat {
+      border-bottom: 7px solid transparent;
+      border-#{direction(left)}: 14px solid #444444;
+      border-top: 7px solid transparent;
+      display: block;
+      margin-top: 12px;
+      float: direction(right);
+      width: 1px;
+      height: 1px;
+    }
+  }
+
+  &.to-do-list {
+    li {
+      position: relative;
+      a.item {
+        display: flex;
+      }
+    }
+  }
+}
+
+#right-side .todo-list-header {
+  margin-top: 1.0625rem; // magic number to align with header bottom border
+}
+#right-side .right-side-list .todo-badge-wrapper {
+  display: inline-block;
+  vertical-align: top;
+  min-width: 40px;
+  text-align: direction(right);
+  padding-#{direction(right)}: $ic-sp;
+  box-sizing: border-box;
+}
+// this is the ignore x-icon on todo list
+#right-side .right-side-list .disable_item_link {
+  position: absolute;
+  #{direction(right)}: 0;
+  top: 0.5rem;
+  z-index: 2;
+  padding: 0;
+
+  @include overwrite-default-icon-size(0.75rem);
+}
+
+@mixin sidebar-logo {display: block;}
+
+.ic-sidebar-logo {
+  display: none;
+  margin-bottom: $ic-sp*2;
+  text-align: center;
+}
+.ic-sidebar-logo__image {
+  max-width: 180px;
+  max-height: 70px;
+  display: inline-block;
+}
+body:not(.course-menu-expanded) {
+  .ic-sidebar-logo {
+    @include breakpoint(desktop) {
+      @include sidebar-logo;
+    }
+  }
+}
+body.course-menu-expanded {
+  .ic-sidebar-logo {
+    @include breakpoint(desktop--nav-open) {
+      @include sidebar-logo;
+    }
+  }
+}

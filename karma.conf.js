@@ -40,7 +40,7 @@ const karmaConfig = {
 
   // this is to make a nice "spec failures" report in the jenkins build instead of having to look at the log output
   junitReporter: {
-    outputDir: 'coverage-js/junit-reports',
+    outputDir: process.env.TEST_RESULT_OUTPUT_DIR || 'coverage-js/junit-reports',
     outputFile: `karma-${process.env.JSPEC_GROUP || 'all'}.xml`,
     useBrowserName: false // don't add browser name to report and classes names
   },

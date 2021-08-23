@@ -18,7 +18,7 @@
 
 import sinon from 'sinon'
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook > DataLoader', () => {
   let dataLoader

@@ -21,12 +21,14 @@ require_relative '../common'
 require_relative '../helpers/files_common'
 require_relative '../helpers/submissions_common'
 require_relative '../helpers/gradebook_common'
+require_relative '../../helpers/k5_common'
 
 describe "submissions" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include GradebookCommon
   include SubmissionsCommon
+  include K5Common
 
   context 'as a student' do
 
@@ -44,13 +46,12 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
-      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
       type_in_tiny("#submission_body", 'text')
-      f('button[type="submit"]').click
+      wait_for_new_page_load { f('button[type="submit"]').click }
 
       expect(f("#sidebar_content")).to include_text("Submitted!")
       expect(f("#content")).not_to contain_css(".error_text")
@@ -60,9 +61,9 @@ describe "submissions" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
-      f("[aria-label='Rich Content Editor'] #submission_body_ifr")
-      f('#submit_assignment_tabs button[type="submit"]').click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
+      f('button[type="submit"]').click
+
       expect(f(".error_text")).to be
     end
 
@@ -124,6 +125,35 @@ describe "submissions" do
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
       expect(@submission.workflow_state).to eq 'submitted'
+    end
+
+    it "renders the webcam wraper", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "renders the webcam wraper when allowed_extensions has png", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["png"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "doesn't render the webcam wraper when allowed_extensions doens't have png", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["pdf"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(element_exists?('.attachment_wrapper')).to be_falsy
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
@@ -199,7 +229,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
       expect(f('#sidebar_content .details')).to include_text "Not Submitted!"
-      expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
+      expect(f('.submit_assignment_link')).to include_text "Start Assignment"
     end
 
     it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
@@ -458,6 +488,12 @@ describe "submissions" do
       end
     end
 
+    it "should not show course nav on submissions detail page in k5 subject" do
+      toggle_k5_setting(@course.account)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      expect(f("#back_to_subject")).to include_text "Back to Subject"
+      expect(f("#main")).not_to contain_css("#left-side")
+    end
   end
 
   context 'Excused assignment' do

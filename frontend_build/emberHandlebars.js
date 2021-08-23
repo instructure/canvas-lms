@@ -22,6 +22,7 @@
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
 
+const path = require('path')
 const Handlebars = require('handlebars')
 const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
@@ -57,15 +58,27 @@ function emitTemplate(path, name, result, dependencies) {
   return `
     import Ember from 'ember';
     ${dependencies.map(d => `import ${JSON.stringify(d)};`).join('\n')}
-
-    Ember.TEMPLATES['${name}'] = Ember.Handlebars.template(${result.template});
+    const template = Ember.Handlebars.template(${result.template});
+    Ember.TEMPLATES['${name}'] = template;
+    export default template;
   `
 }
 
+const withLeadingDotSlash = x => x.startsWith('.') ? x : `./${x}`
+const emberHelpers = path.resolve(__dirname, '../ui/features/screenreader_gradebook/ember/helpers/common.js')
+const emberJSTRoot = path.resolve(__dirname, '../ui/features/screenreader_gradebook/jst')
+
 module.exports = function(source) {
   this.cacheable()
-  const name = resourceName(this.resourcePath)
-  const dependencies = ['coffeescripts/ember/shared/helpers/common']
+
+  const pathFromMeToEmberHelpers = withLeadingDotSlash(
+    path.relative(this.context, emberHelpers)
+  )
+
+  const name = this.resourcePath.slice(emberJSTRoot.length + 1).replace(/\.hbs$/, '')
+  const dependencies = [
+    pathFromMeToEmberHelpers
+  ]
 
   const result = compileHandlebars({path: this.resourcePath, source, ember: true})
 

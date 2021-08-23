@@ -70,7 +70,7 @@
                        title: accessible_date_format %>
     </div>
   </div>
-  <% if can_do(@context.account, @current_user, :manage_courses) %>
+  <% if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin) %>
     <div class="control-group">
       <label class="control-label"><strong><%= t('enrollment_term_id', 'Term') %></strong></label>
 

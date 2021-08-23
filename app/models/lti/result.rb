@@ -30,9 +30,15 @@ class Lti::Result < ApplicationRecord
   self.record_timestamps = false
 
   validates :line_item, :user, presence: true
-  validates :result_maximum, presence: true, unless: proc { |r| r.result_score.blank? }
+  validates :result_maximum, presence: true, unless: proc { |r| r.read_attribute(:result_score).blank? }
   validates :result_score, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :result_maximum, numericality: { greater_than: 0 }, allow_nil: true
+  validates :result_maximum, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validate do |result|
+    if result.result_maximum == 0 && line_item&.score_maximum != 0
+      result.errors.add :result_maximum, :invalid, message:
+        "cannot be zero if line item's maximum is not zero"
+    end
+  end
   validates :activity_progress,
             inclusion: { in: ACTIVITY_PROGRESS_TYPES },
             allow_nil: true
@@ -59,7 +65,7 @@ class Lti::Result < ApplicationRecord
   def scaled_result_score
     raw_result_score = read_attribute(:result_score)
 
-    return raw_result_score if raw_result_score.blank? || submission.blank?
+    return raw_result_score if raw_result_score.blank? || submission.blank? || result_maximum.blank?
 
     # A negative grader_id indicates that no manual
     # adjustments were made by a Canvas user to the result.
@@ -67,9 +73,10 @@ class Lti::Result < ApplicationRecord
     # without additional scaling
     return raw_result_score if submission.grader_id.blank? || submission.grader_id < 0
 
-    # We can also return the result_score if the assignment
-    # has zero points possible
-    return raw_result_score if assignment.points_possible&.zero?
+    # We can also return the result_score if the assignment has zero points
+    # possible (scaling impossible), and/or the result_maximum is zero (scaling
+    # would make it zero so not useful)
+    return raw_result_score if assignment.points_possible.to_f.zero? || result_maximum.to_f.zero?
 
     # The result was manually updated by a Canvas user.
     # Because the result_maximum may not be the same as the
@@ -78,6 +85,27 @@ class Lti::Result < ApplicationRecord
     (raw_result_score * result_maximum) / assignment.points_possible.to_f
   end
   alias result_score scaled_result_score
+
+  # Updates score for submission safely (does not allow maximum score to be null, but
+  # if it's not already set, it will set it to assignment's points_possible)
+  def self.update_score_for_submission(submission, score)
+    update_query = <<~SQL
+      UPDATE #{Lti::Result.quoted_table_name} SET
+        result_score = #{connection.quote(score)},
+        result_maximum = COALESCE(
+          result_maximum,
+          (
+            SELECT assignments.points_possible
+            FROM #{Assignment.quoted_table_name} AS assignments,
+            #{Submission.quoted_table_name} AS submissions
+            WHERE assignments.id=submissions.assignment_id
+            AND submissions.id=#{submission.id.to_i}
+          ),
+          0)
+      WHERE submission_id=#{submission.id.to_i}
+    SQL
+    connection.execute(update_query)
+  end
 
   private
 

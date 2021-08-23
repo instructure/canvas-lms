@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,6 +24,7 @@ class RubricsController < ApplicationController
   before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
+  include K5Mode
 
   def index
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
@@ -52,8 +55,8 @@ class RubricsController < ApplicationController
         }
       mastery_scales_js_env
       @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
-      raise ActiveRecord::RecordNotFound unless @rubric_association
-      @actual_rubric = @rubric_association.rubric
+      @actual_rubric = @rubric_association&.rubric
+      raise ActiveRecord::RecordNotFound if !@actual_rubric || @actual_rubric.deleted?
     else
       raise ActiveRecord::RecordNotFound
     end

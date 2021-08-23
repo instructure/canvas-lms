@@ -52,12 +52,16 @@ describe DataFixup::PopulateRootAccountIdsOnLearningOutcomes do
   end
 
   context 'no context id' do
+    specs_require_sharding
+
     it 'sets root_account_ids when there is one root account on shard' do
-      account_model
-      lo = LearningOutcome.create!(context_id: nil, short_description: 'test')
-      lo.update_column(:root_account_ids, nil)
-      populate(lo)
-      expect(lo.reload.root_account_ids).to eq [Account.root_accounts.first.id]
+      @shard1.activate do
+        account_model
+        lo = LearningOutcome.create!(context_id: nil, short_description: 'test')
+        lo.update_column(:root_account_ids, nil)
+        populate(lo)
+        expect(lo.reload.root_account_ids).to eq [Account.root_accounts.first.id]
+      end
     end
 
     it 'sets root_account_ids when there are multiple root accounts on shard' do

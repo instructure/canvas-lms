@@ -350,6 +350,223 @@ describe "Importing assignments" do
       it 'creates a resource link' do
         expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
       end
+
+      describe 'line item creation' do
+        let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
+        let(:course) { Course.create! }
+        let(:migration) { course.content_migrations.create! }
+        let(:assignment) do
+          Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+          course.assignments.find_by(migration_id: migration_id)
+        end
+        let(:assignment_hash) do
+          {
+            migration_id: migration_id,
+            title: "my assignment",
+            grading_type: 'points',
+            points_possible: 123,
+            line_items: line_items_array,
+            external_tool_url: assignment_tool_url,
+            submission_types: assignment_submission_types,
+          }.compact.with_indifferent_access
+        end
+
+        let(:assignment_submission_types) { 'external_tool' }
+        let(:assignment_tool_url) { tool.url }
+
+        let(:line_items_array) { [line_item_hash] }
+        let(:line_item_hash) do
+          {
+            coupled: coupled,
+          }.merge(extra_line_item_params).with_indifferent_access
+        end
+        let(:extra_line_item_params) { {} }
+        let(:coupled) { false }
+
+        let(:created_resource_link_ids) { Lti::ResourceLink.where(context: assignment).pluck(:id) }
+
+        shared_examples_for 'a single imported line item' do
+          subject { assignment.line_items.take }
+
+          it 'creates exactly one line item' do
+            expect(assignment.line_items.count).to eq(1)
+          end
+
+          it 'sets the client_id' do
+            expect(subject.client_id).to eq(tool.global_developer_key_id)
+          end
+
+          it "defaults label to the assignment's name" do
+            expect(subject.label).to eq(assignment_hash[:title])
+          end
+
+          it "defaults score_maximum to the assignment's points possible" do
+            expect(subject.score_maximum).to eq(assignment_hash[:points_possible])
+          end
+
+          context 'when resource_id and tag are given' do
+            let(:extra_line_item_params) { super().merge(resource_id: 'abc', tag: 'def') }
+
+            it 'sets them on the line item' do
+              expect(subject.resource_id).to eq('abc')
+              expect(subject.tag).to eq('def')
+            end
+          end
+
+          context 'when label is given' do
+            let(:extra_line_item_params) { super().merge(label: 'ghi') }
+
+            it "sets label on the line item but doesn't affect the assignment name" do
+              expect(subject.label).to eq('ghi')
+              expect(assignment.name).to eq(assignment_hash[:title])
+            end
+          end
+
+          context 'when score_maximum is given' do
+            let(:extra_line_item_params) { super().merge(score_maximum: 98765) }
+
+            it "sets score_maximum on the line item but doesn't affect the assignment points_possible" do
+              expect(subject.score_maximum).to eq(98765)
+              expect(assignment.points_possible).to eq(assignment_hash[:points_possible])
+            end
+          end
+
+          context 'when extensions is set' do
+            let(:extra_line_item_params) { super().merge(extensions: {foo: 'bar'}.to_json) }
+
+            it 'sets extensions on the line item' do
+              expect(subject.extensions).to eq('foo' => 'bar')
+            end
+          end
+        end
+
+        describe 'an external tool assignment with no line items' do
+          let(:line_items_array) { [] }
+          let(:coupled) { true }
+
+          it 'creates a default coupled line item with an Lti::ResourceLink' do
+            expect(assignment.line_items.count).to eq(1)
+            expect(created_resource_link_ids.count).to eq(1)
+            expect(assignment.line_items.take.attributes.symbolize_keys).to include(
+              coupled: true,
+              label: assignment_hash[:title],
+              score_maximum: assignment_hash[:points_possible],
+              lti_resource_link_id: created_resource_link_ids.first,
+              extensions: {},
+              client_id: tool.global_developer_key_id
+            )
+          end
+        end
+
+        describe 'an external tool assignment with a coupled line item' do
+          let(:coupled) { true }
+
+          it_behaves_like 'a single imported line item'
+
+          it 'creates one Lti::ResourceLink for the assignment and the line item' do
+            expect(created_resource_link_ids).to eq([assignment.line_items.take.lti_resource_link_id])
+          end
+        end
+
+        describe 'a submission_type=none assignment (AGS-created) with a uncoupled line item' do
+          let(:assignment_submission_types) { 'none' }
+          let(:assignment_tool_url) { nil }
+          let(:extra_line_item_params) { {client_id: tool.global_developer_key_id} }
+
+          it_behaves_like 'a single imported line item'
+
+          it 'does not create an Lti::ResourceLink' do
+            expect(created_resource_link_ids).to eq([])
+            expect(assignment.line_items.take.lti_resource_link_id).to eq(nil)
+          end
+
+          context 'without an explicit client_id' do
+            let(:extra_line_item_params) { {} }
+
+            it 'fails to import' do
+              expect {
+                assignment
+              }.to raise_error(/Client can't be blank/)
+            end
+          end
+
+        end
+
+        describe 'an external tool assignment with an uncoupled line item (AGS-created assignment)' do
+          it_behaves_like 'a single imported line item'
+
+          it 'creates one Lti::ResourceLink for the assignment and the line item' do
+            expect(created_resource_link_ids).to eq([assignment.line_items.take.lti_resource_link_id])
+          end
+        end
+
+        describe 'an external tool assignment with multiple uncoupled line items' do
+          let(:line_items_array) do
+            [
+              { coupled: false, label: 'abc', score_maximum: 123 },
+              { coupled: false, label: 'def' },
+              { coupled: false },
+            ]
+          end
+
+          it 'creates all line items' do
+            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to eq([
+              ['abc', false, 123],
+              ['def', false, assignment_hash[:points_possible]],
+              [assignment_hash[:title], false, assignment_hash[:points_possible]],
+            ])
+          end
+
+          it 'creates the line items with the same Lti::ResourceLink' do
+            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
+              eq(created_resource_link_ids * 3)
+          end
+        end
+
+        describe 'an external tool assignment with a coupled line item and additional uncoupled line items' do
+          let(:line_items_array) do
+            [
+              { coupled: false, label: 'abc', score_maximum: 123 },
+              { coupled: false, label: 'abc', score_maximum: 123 },
+              { coupled: true, label: 'def' },
+              { coupled: false },
+            ]
+          end
+
+          let(:expected_created_line_items_fields) do
+            [
+              ['abc', false, 123],
+              ['abc', false, 123],
+              ['def', true, assignment_hash[:points_possible]],
+              [assignment_hash[:title], false, assignment_hash[:points_possible]],
+            ]
+          end
+
+          it 'creates all line items' do
+            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
+              eq(expected_created_line_items_fields)
+          end
+
+          it 'creates the line items with the same Lti::ResourceLink' do
+            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
+              eq(created_resource_link_ids * 4)
+          end
+
+          context 'when the same line items are imported again in an additional run' do
+            it "doesn't create the same line items over again" do
+              assignment
+              expect {
+                Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+                Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+              }.to_not change { Assignment.count }
+              expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
+                eq(expected_created_line_items_fields)
+            end
+          end
+        end
+
+      end
+
     end
   end
 
@@ -570,7 +787,6 @@ describe "Importing assignments" do
       expect(migration).to_not receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
-
   end
 
   describe "post_policy" do
@@ -619,6 +835,65 @@ describe "Importing assignments" do
     it "does not update the assignment's post policy if no post_policy element is present and not anonymous or moderated" do
       assignment_hash.delete(:post_policy)
       expect(imported_assignment.post_policy).not_to be_post_manually
+    end
+  end
+
+  describe "post_to_sis" do
+    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
+    let(:course) { Course.create! }
+    let(:account) { course.account }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        "migration_id" => migration_id,
+        "title" => "post_to_sis",
+        "post_to_sis" => false,
+        "date_shift_options" => {
+          "remove_dates": true
+        }
+      }.with_indifferent_access
+    end
+
+    let(:imported_assignment) do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      course.assignments.find_by(migration_id: migration_id)
+    end
+
+    it "adds a warning to the migration if the post_to_sis validation will fail without due dates" do
+      assignment_hash[:post_to_sis] = true
+      account.settings = {
+        sis_syncing: { value: true },
+        sis_require_assignment_due_date: { value: true }
+      }
+      account.save!
+      account.enable_feature!(:new_sis_integrations)
+
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
+      expect(migration).to receive(:add_warning).with("The Sync to SIS setting could not be enabled for the assignment \"#{assignment_hash['title']}\" without a due date.")
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+    end
+
+    it "sets post_to_sis if provided" do
+      assignment_hash[:post_to_sis] = true
+      expect(imported_assignment.post_to_sis).to eq(assignment_hash['post_to_sis'])
+    end
+
+    it "does not change the value set on the assignment if previously imported" do
+      imported_assignment
+      imported_assignment.update(post_to_sis: !assignment_hash['post_to_sis'])
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      imported_assignment.reload
+      expect(imported_assignment.post_to_sis).not_to eq(assignment_hash['post_to_sis'])
+    end
+
+    it "does change the value if the blueprint has been locked" do
+      imported_assignment
+      imported_assignment.update(post_to_sis: !assignment_hash['post_to_sis'])
+      allow(Assignment).to receive(:where).and_return([imported_assignment])
+      allow(imported_assignment).to receive(:editing_restricted?).with(:any).and_return(true)
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      imported_assignment.reload
+      expect(imported_assignment.post_to_sis).to eq(assignment_hash['post_to_sis'])
     end
   end
 end

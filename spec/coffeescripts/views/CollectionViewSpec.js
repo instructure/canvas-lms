@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import CollectionView from 'compiled/views/CollectionView'
+import Backbone from '@canvas/backbone'
+import CollectionView from '@canvas/backbone-collection-view'
 import fakeENV from 'helpers/fakeENV'
 
 let collection = null

@@ -31,7 +31,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_media_from_string!(html_string)
-      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
+      html_node = Nokogiri::HTML5.fragment(html_string)
       convert_media_from_node!(html_node).to_s
     end
 

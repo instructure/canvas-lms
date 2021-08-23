@@ -17,11 +17,11 @@
  */
 
 import {isUndefined} from 'lodash'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import OutcomePopoverView from 'compiled/views/grade_summary/OutcomePopoverView'
-import OutcomeDialogView from 'compiled/views/grade_summary/OutcomeDialogView'
-import OutcomeView from 'compiled/views/grade_summary/OutcomeView'
-import ProgressBarView from 'compiled/views/grade_summary/ProgressBarView'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import OutcomePopoverView from 'ui/features/grade_summary/backbone/views/OutcomePopoverView.coffee'
+import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView.coffee'
+import OutcomeView from 'ui/features/grade_summary/backbone/views/OutcomeView.coffee'
+import ProgressBarView from 'ui/features/grade_summary/backbone/views/ProgressBarView.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('OutcomeViewSpec', {

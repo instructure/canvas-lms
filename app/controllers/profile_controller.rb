@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -83,6 +85,11 @@
 #         "locale": {
 #           "description": "The users locale.",
 #           "type": "string"
+#         },
+#         "k5_user": {
+#           "description": "Optional: Whether or not the user is a K5 user. This field is nil if the user settings are not for the user making the request.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -200,7 +207,7 @@ class ProfileController < ApplicationController
     @other_channels = @channels.select{|c| c.path_type != "email"}
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
-    @pseudonyms = @user.pseudonyms.active
+    @pseudonyms = @user.pseudonyms.active_only
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = @user.profile
     set_active_tab "profile_settings"
@@ -213,7 +220,6 @@ class ProfileController < ApplicationController
         add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path)
         js_env(
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
-          NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
           CONTEXT_BASE_URL: "/users/#{@user.id}"
         )
         render :profile
@@ -228,47 +234,20 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
+    @page_title = t('account_notification_settings_title', 'Account Notification Settings')
     set_active_tab 'notifications'
 
-    # Render updated UI if feature flag is enabled
-    if Account.site_admin.feature_enabled?(:notification_update_account_ui)
-      add_crumb(@current_user.short_name, profile_path)
-      add_crumb(t("Account Notification Settings"))
-      js_env NOTIFICATION_PREFERENCES_OPTIONS: {
-        reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
-        allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
-        allowed_push_categories: Notification.categories_to_send_in_push,
-        send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
-        read_privacy_info: @user.preferences[:read_notification_privacy_info],
-        account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
-      }
-      js_bundle :account_notification_settings_show
-      render html: '', layout: true
-      return
-    end
-
-    # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
-    full_category_list = Notification.dashboard_categories(@user)
-    categories = full_category_list.map do |category|
-      category.as_json(only: %w{id name workflow_state user_id}, include_root: false).tap do |json|
-        # Add custom method result entries to the json
-        json[:category]             = category.category.underscore.gsub(/\s/, '_')
-        json[:display_name]         = category.category_display_name
-        json[:category_description] = category.category_description
-        json[:option]               = category.related_user_setting(@user, @domain_root_account)
-      end
-    end
-
-    js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
-      :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
-      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
-      :categories => categories,
-      :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
-      :update_url => communication_update_profile_path,
-      :show_observed_names => @user.observer_enrollments.any? || @user.as_observer_observation_links.any? ? @user.send_observed_names_in_notifications? : nil
-      },
-      :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
-      :ACCOUNT_PRIVACY_NOTICE => @domain_root_account.settings[:external_notification_warning]
+    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(t("Account Notification Settings"))
+    js_env NOTIFICATION_PREFERENCES_OPTIONS: {
+      allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+      allowed_push_categories: Notification.categories_to_send_in_push,
+      send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
+      read_privacy_info: @user.preferences[:read_notification_privacy_info],
+      account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
+    }
+    js_bundle :account_notification_settings
+    render html: '', layout: true
   end
 
   def communication_update
@@ -384,7 +363,6 @@ class ProfileController < ApplicationController
           old_password = params[:pseudonym].delete :old_password
           if params[:pseudonym][:password_id] && change_password
             pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
-            pseudonym_to_update.require_password = true if pseudonym_to_update
           end
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
@@ -398,6 +376,7 @@ class ProfileController < ApplicationController
             pseudonym_params.delete :password_confirmation
           end
           params[:pseudonym].delete :password_id
+          pseudonym_to_update.require_password = true if pseudonym_to_update
           if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update(pseudonym_params)
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
@@ -426,8 +405,9 @@ class ProfileController < ApplicationController
     @profile = @user.profile
     @context = @profile
 
-    if @domain_root_account.can_change_pronouns? && params[:pronouns].present? && @domain_root_account.pronouns.include?(params[:pronouns].strip)
-      @user.pronouns = params[:pronouns]
+    if @domain_root_account.can_change_pronouns?
+      valid_pronoun = @domain_root_account.pronouns.include?(params[:pronouns]&.strip) || params[:pronouns] == ""
+      @user.pronouns = params[:pronouns] if valid_pronoun
     end
 
     short_name = params[:user] && params[:user][:short_name]
@@ -502,7 +482,7 @@ class ProfileController < ApplicationController
   end
 
   def content_shares
-    raise not_found unless @domain_root_account.feature_enabled?(:direct_share) && @current_user.can_content_share?
+    raise not_found unless @current_user.can_content_share?
 
     @user ||= @current_user
     set_active_tab 'content_shares'

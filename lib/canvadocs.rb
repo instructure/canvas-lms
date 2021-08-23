@@ -255,9 +255,20 @@ module Canvadocs
         )
       ]
 
-      if assignment.peer_reviews? && submission.user == current_user
+      if assignment.peer_reviews?
         session_params[:user_filter] = session_params[:user_filter] | peer_review_user_filter(submission, current_user, enrollments)
       end
+    end
+
+    # For Student Annotation assignments, the Canvadoc won't have a
+    # relationship with the Submission through CanvadocsSubmission, so we set
+    # a blank user_filter here to avoid the default of restricting to only the
+    # viewing user's annotations (default is in Canvadocs::Session). If we the
+    # user_filter is nil here, then we know we didn't have any other reason to
+    # be restrictive.
+    if session_params[:user_filter].nil? && submission.submission_type == "student_annotation"
+      session_params[:restrict_annotations_to_user_filter] = false
+      session_params[:user_filter] = []
     end
 
     session_params
@@ -289,14 +300,30 @@ module Canvadocs
     end
 
     def peer_review_user_filter(submission, current_user, enrollments)
-      assessors = User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+      # Submitter, instructors, and admins should always see assessors' annotations.
+      is_instructor = submission.course.participating_instructors.include?(current_user)
+      is_admin = submission.course.account_membership_allows(current_user)
+      users_for_filter = if current_user == submission.user || is_instructor || is_admin
+        User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+      else
+        []
+      end
 
-      assessors.push(current_user).map do |assessor|
+      # The current user's annotations should always be visible.
+      users_for_filter.push(current_user)
+
+      # When the submission is for a Student Annotation assignment, the
+      # annotations are the submission, so add the submitter.
+      if submission.submission_type == "student_annotation"
+        users_for_filter.push(submission.user)
+      end
+
+      users_for_filter.map do |user|
         user_filter_entry(
-          assessor,
+          user,
           submission,
-          role: canvadocs_user_role(submission.assignment.course, assessor, enrollments),
-          anonymize: false
+          role: canvadocs_user_role(submission.assignment.course, user, enrollments),
+          anonymize: submission.assignment.anonymous_peer_reviews?
         )
       end
     end

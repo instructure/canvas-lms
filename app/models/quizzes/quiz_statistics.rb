@@ -156,7 +156,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
     given do |user, session|
       quiz.grants_right?(user, session, :read_statistics) &&
-        context.grants_right?(user, session, :manage_files)
+        context.grants_any_right?(user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
     end
     can :manage_files
   end

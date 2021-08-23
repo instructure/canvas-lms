@@ -69,6 +69,7 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_participation
   after_save :check_for_media_object
   after_update :publish_other_comments_in_this_group
+  after_update :post_submission_for_finalized_draft, if: -> { saved_change_to_draft?(from: true, to: false) }
   after_destroy :delete_other_comments_in_this_group
   after_commit :update_submission
 
@@ -123,6 +124,15 @@ class SubmissionComment < ActiveRecord::Base
     end
   end
 
+  def post_submission_for_finalized_draft
+    return if author_id.blank? || submission.posted? || submission.assignment.post_manually?
+
+    course = submission.assignment.course
+    if course.instructor_ids.include?(author.id) || course.account_membership_allows(author)
+      submission.update!(posted_at: Time.zone.now)
+    end
+  end
+
   has_a_broadcast_policy
 
   def provisional
@@ -145,7 +155,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def check_for_media_object
     if self.media_comment? && self.saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(self.media_comment_id, 
+      MediaObject.ensure_media_object(self.media_comment_id,
         user: self.author,
         context: self.author
       )
@@ -240,9 +250,10 @@ class SubmissionComment < ActiveRecord::Base
       end
     end
 
-    # The student who owns the submission can't see drafts or hidden comments (or,
-    # generally, any instructor comments if the assignment is muted)
-    if submission.user_id == user.id
+    # The student who owns the submission can't see draft or hidden comments (or,
+    # generally, any instructor comments if the assignment is muted); the same
+    # holds for anyone observing the student
+    if submission.user_id == user.id || User.observing_students_in_course(submission.user, assignment.context).include?(user)
       return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should
@@ -269,11 +280,12 @@ class SubmissionComment < ActiveRecord::Base
 
   def can_read_author?(user, session)
     RequestCache.cache('user_can_read_author', self, user, session) do
-      return false if self.submission.assignment.anonymize_students?
-      (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
-          self.author == user ||
-          self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-          self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+      return false if user.nil? || (self.author_id != user.id && self.submission.assignment.anonymize_students?)
+
+      self.author_id == user.id ||
+        (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
     end
   end
 
@@ -283,19 +295,16 @@ class SubmissionComment < ActiveRecord::Base
     message = opts[:text].strip
     user = nil unless user && self.submission.grants_right?(user, :comment)
     if !user
-      raise "Only comment participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
-        SubmissionComment.create!({
-          :comment => message,
-          :submission_id => self.submission_id,
-          :author => user,
-          :context_id => self.context_id,
-          :context_type => self.context_type,
-          :provisional_grade_id => self.provisional_grade_id
-        })
+        self.submission.add_comment(
+          author: user,
+          comment: message,
+          provisional: self.provisional_grade_id.present?
+        )
       end
     end
   end
@@ -421,6 +430,10 @@ class SubmissionComment < ActiveRecord::Base
 
   def auditable?
     !draft? && submission.assignment.auditable? && !grade_posting_in_progress
+  end
+
+  def allows_posting_submission?
+    hidden? && !draft?
   end
 
   protected

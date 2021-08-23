@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -360,18 +362,16 @@ class OutcomeResultsController < ApplicationController
     # which will inflate the pagination total count
     remove_users_with_no_results if excludes.include?('missing_user_rollups') && !aggregate
 
-    if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
-      exclude_concluded = excludes.include? 'concluded_enrollments'
-      exclude_inactive = excludes.include? 'inactive_enrollments'
-      return unless exclude_concluded || exclude_inactive
+    exclude_concluded = excludes.include? 'concluded_enrollments'
+    exclude_inactive = excludes.include? 'inactive_enrollments'
+    return unless exclude_concluded || exclude_inactive
 
-      filters = []
-      filters << 'completed' if exclude_concluded
-      filters << 'inactive' if exclude_inactive
+    filters = []
+    filters << 'completed' if exclude_concluded
+    filters << 'inactive' if exclude_inactive
 
-      ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
-      @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
-    end
+    ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
+    @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
   end
 
   def remove_users_with_no_results
@@ -534,7 +534,7 @@ class OutcomeResultsController < ApplicationController
 
     @outcome_groups = @context.learning_outcome_groups
     outcome_group_ids = @outcome_groups.pluck(:id)
-
+    @outcome_links = []
     if params[:outcome_group_id]
       group_id = params[:outcome_group_id].to_i
       reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
@@ -545,15 +545,15 @@ class OutcomeResultsController < ApplicationController
         outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
         # outcomes themselves are not duped when moved into a new group, so we
         # need to instead look at the uniqueness of the associating content tag's
-        # context and outcome id in order to ensure we get the correct result
+        # outcome id in order to ensure we get the correct result
         # from the query without rendering the reject! check moot
 
-        @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content).
-          where(content_id: outcome_ids, context_type: @context.class_name, context_id: @context.id).
-          to_a.uniq{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)
+        @outcome_links = ContentTag.learning_outcome_links.active.preload(:learning_outcome_content)
+          .where(content_id: outcome_ids, context: @context)
+          .select('DISTINCT ON (content_tags.content_id) content_tags.*')
+        @outcomes = @outcome_links.map(&:learning_outcome_content)
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
-        @outcome_links = []
         outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
           @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
         end
@@ -592,12 +592,7 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
-        # include all enrollment types which will be filtered later
-        apply_sort_order(@section.users).to_a
-      else
-        apply_sort_order(@section.students).to_a
-      end
+      @users = apply_sort_order(@section.users).to_a
     end
     @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]

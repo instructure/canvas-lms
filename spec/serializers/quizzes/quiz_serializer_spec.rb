@@ -53,6 +53,7 @@ describe Quizzes::QuizSerializer do
     allow(controller).to receive(:context).and_return context
     allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
     allow(@context).to receive(:grants_right?).at_least(:once).and_return true
+    allow(@context).to receive(:grants_any_right?).at_least(:once).and_return true
     @serializer = quiz_serializer
     @json = @serializer.as_json[:quiz]
   end
@@ -180,7 +181,7 @@ describe Quizzes::QuizSerializer do
     end
 
     it "is included if the user can manage" do
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
         at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
@@ -188,7 +189,7 @@ describe Quizzes::QuizSerializer do
     it "is not included if the user can't grade or manage" do
       expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
         at_least(:once).and_return false
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
         at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :access_code
     end
@@ -245,7 +246,7 @@ describe Quizzes::QuizSerializer do
 
     it "is not present unless the user can manage the quiz's assignments" do
       manage_result = true
-      allow(context).to receive(:grants_right?).with(@user, :manage_assignments) { manage_result }
+      allow(context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS) { manage_result }
       expect(serializer.filter(serializer.class._attributes)).to include :unpublishable
 
       manage_result = false
@@ -636,4 +637,22 @@ describe Quizzes::QuizSerializer do
   it "does not include question_types" do
     expect(json.keys).not_to include(:question_types)
   end
+
+  describe "important_dates" do
+    it "returns false if the quiz does not have an assignment" do
+      expect(quiz.assignment).to be_nil
+      expect(json[:important_dates]).to be false
+    end
+
+    it "returns the value of assignment#important_dates" do
+      assignment = Assignment.new
+      assignment.id = 1
+      assignment.context_id = @context.id
+      assignment.important_dates = true
+      allow(@quiz).to receive(:assignment).and_return assignment
+
+      expect(@serializer.as_json[:quiz][:important_dates]).to be true
+    end
+  end
+
 end

@@ -20,6 +20,7 @@ export default function generator({borders, colors, spacing, typography}) {
     fontFamily: typography.fontFamily,
     lineHeight: typography.lineHeightCondensed,
     color: colors.licorice,
+    secondaryColor: colors.ash,
 
     padding: `${spacing.small} ${spacing.xSmall}`,
     paddingMedium: `${spacing.small}`,
@@ -45,7 +46,7 @@ export default function generator({borders, colors, spacing, typography}) {
   }
 }
 
-generator.canvas = function(variables) {
+generator.canvas = function (variables) {
   return {
     iconColor: variables['ic-brand-primary']
   }

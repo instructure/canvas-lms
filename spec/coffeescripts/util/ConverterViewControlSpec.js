@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ConverterViewControl from 'compiled/views/content_migrations/ConverterViewControl'
+import Backbone from '@canvas/backbone'
+import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl.coffee'
 
 class BackboneSubView extends Backbone.View {
   template() {

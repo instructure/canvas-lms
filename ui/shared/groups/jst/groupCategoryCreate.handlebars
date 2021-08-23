@@ -1,0 +1,89 @@
+<div class="form-dialog-content pad-box form-horizontal group-category-create">
+  <fieldset class="pad-box no-top{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
+    <label class="control-label" for="new_category_name">
+      {{#t "group_set_name"}}Group Set Name{{/t}}
+    </label>
+    <div class="controls">
+      <input type="text" id="new_category_name" name="name">
+    </div>
+  </fieldset>
+  {{#if ENV.allow_self_signup}}
+  <fieldset class="pad-box dotted-separator">
+    <span class="control-label">{{#t "self_signup"}}Self Sign-Up{{/t}}</span>
+    <div class="controls">
+      <label class="checkbox" for="enable_self_signup">
+        {{checkbox "enable_self_signup" class="self-signup-toggle"}}
+        {{#t "allow_self_signup"}}Allow self sign-up{{/t}}
+        {{> ui/shared/groups/jst/_selfSignupHelp.handlebars}}
+      </label>
+    </div>
+    <input name="group_limit" type="hidden" value="">
+    <div class="controls">
+      <label class="checkbox self-signup-controls" for="restrict_self_signup">
+        {{checkbox "restrict_self_signup"}}
+        {{#t "require_same_section"}}Require group members to be in the same section{{/t}}
+      </label>
+    </div>
+  </fieldset>
+  <fieldset class="pad-box admin-signup-controls dotted-separator">
+    <span class="control-label">{{#t "group_structure"}}Group Structure{{/t}}</span>
+    <div class="controls" style="margin-top:-4px">
+      <label class="radio">
+        <input type="radio" id="split_groups" name="split_groups" value="1" style="margin-top:8px">
+        {{#t "split_into_groups"}}
+          Split students into {{{num_groups}}} groups
+        {{/t}}
+      </label>
+    </div>
+    <div class="controls" style="margin-top:-4px">
+      <label class="radio">
+        <input type="radio" id="num_students" name="split_groups" value="2" style="margin-top:8px">
+        {{#t "split_into_sized_groups"}}
+          Split students into groups with {{{num_members}}} students per group
+        {{/t}}
+      </label>
+    </div>
+    <div class="controls group-by-section-controls">
+      <label class="checkbox" for="group_by_section">
+        {{checkbox "group_by_section"}}
+        {{#t}}Require group members to be in the same section{{/t}}
+      </label>
+    </div>
+    <div class="controls">
+      <label class="radio">
+        <input type="radio" name="split_groups" value="0" checked>
+        {{#t "create_groups_later"}}
+          I'll create groups later
+        {{/t}}
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset class="pad-box self-signup-controls dotted-separator">
+    <span class="control-label">{{#t "group_structure"}}Group Structure{{/t}}</span>
+    <div class="controls">
+      <label>
+        {{#t "create_groups"}}
+          Create {{{num_groups}}} groups now
+        {{/t}}
+      </label>
+    </div>
+    <div class="controls">
+      <label>
+        {{#t "limit_group_size"}}
+          Limit groups to {{{group_limit}}} members
+        {{/t}}
+        <span class="hint-text">
+          ({{#t "leave_group_limit_blank"}}Leave blank for no limit{{/t}})
+        </span>
+      </label>
+    </div>
+  </fieldset>
+  {{> ui/shared/groups/jst/_autoLeadershipControls.handlebars}}
+
+  {{/if}}
+</div>
+<div class="form-controls">
+  <button type="button" class="btn dialog_closer">{{#t "cancel"}}Cancel{{/t}}</button>
+  <button id="newGroupSubmitButton" type="submit" class="btn btn-primary" data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'>{{#t "save"}}Save{{/t}}</button>
+</div>

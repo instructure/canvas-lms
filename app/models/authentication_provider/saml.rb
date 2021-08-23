@@ -30,7 +30,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    [
+    super + [
       :log_in_url,
       :log_out_url,
       :requested_authn_context,
@@ -103,6 +103,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   before_validation :set_saml_defaults
   before_validation :download_metadata
+
+  validate :validate_urls
+
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
     if ap.new_record?
@@ -131,6 +134,20 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def set_saml_defaults
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+
+  def validate_urls
+    begin
+      URI(log_in_url) if log_in_url
+    rescue URI::InvalidURIError
+      errors.add(:log_out_url, t("Log in URL is not a valid URI"))
+    end
+
+    begin
+      URI(log_out_url) if log_out_url
+    rescue URI::InvalidURIError
+      errors.add(:log_out_url, t("Log out URL is not a valid URI"))
+    end
   end
 
   def download_metadata
@@ -243,7 +260,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.idp_entity_id = entity.entity_id
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
-    self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).join(' ').presence || idp.keys.first&.fingerprint
+    self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).compact.join(' ').presence || idp.keys.first&.fingerprint
 
     recognized_formats = (idp.name_id_formats & self.class.name_id_formats)
     if recognized_formats.length == 1
@@ -253,7 +270,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
     end
 
-    self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
+    self.settings[:signing_certificates] = idp.signing_keys.map(&:x509).compact
+    self.settings[:signing_keys] = idp.signing_keys.map(&:key).compact.map(&:to_s)
     case idp.want_authn_requests_signed?
     when true
       # use ||= to not overwrite a specific algorithm that has otherwise been
@@ -305,6 +323,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
        Array.wrap(settings['signing_certificates']).each do |cert|
          idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
        end
+       Array.wrap(settings['signing_keys']).each do |key|
+         key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
+         key_descriptor.key = OpenSSL::PKey.read(key)
+         idp.keys << key
+       end
+
        entity.roles << idp
        entity
     end

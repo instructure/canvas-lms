@@ -407,9 +407,9 @@ describe Canvas::CacheRegister do
     end
 
     it "should use multi-cache delete when clearing a configured key" do
+      key = Account.base_cache_register_key_for(Account.default) + "/feature_flags"
       allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
       expect(Canvas::CacheRegister).to_not receive(:redis)
-      key = Account.base_cache_register_key_for(Account.default) + "/feature_flags"
       expect(MultiCache).to receive(:delete).with(key)
       Account.default.clear_cache_key(:feature_flags)
     end

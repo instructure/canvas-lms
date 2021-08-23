@@ -29,7 +29,6 @@ class Role < ActiveRecord::Base
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +
     ['StudentViewEnrollment',
-     'TeacherlessStudentEnrollment',
      'NilEnrollment',
      'teacher', 'ta', 'designer', 'student', 'observer'
     ]).freeze
@@ -98,7 +97,7 @@ class Role < ActiveRecord::Base
       self.errors.add(:account_id)
       throw :abort
     end
-    self.root_account_id = self.account.root_account_id || self.account.id
+    self.root_account_id = self.account.resolved_root_account_id
   end
 
   include Workflow
@@ -266,9 +265,6 @@ class Role < ActiveRecord::Base
     manageable = []
     if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
-      if context.is_a?(Course) && context.teacherless?
-        manageable << 'TeacherEnrollment'
-      end
     end
     if context.grants_right?(user, :manage_admin_users)
       manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
@@ -276,17 +272,46 @@ class Role < ActiveRecord::Base
     manageable.uniq.sort
   end
 
+  def self.add_delete_roles_by_user(user, context)
+    addable = []
+    deleteable = []
+    addable += ['TeacherEnrollment'] if context.grants_right?(user, :add_teacher_to_course)
+    deleteable += ['TeacherEnrollment'] if context.grants_right?(user, :remove_teacher_from_course)
+    addable += ['TaEnrollment'] if context.grants_right?(user, :add_ta_to_course)
+    deleteable += ['TaEnrollment'] if context.grants_right?(user, :remove_ta_from_course)
+    addable += ['DesignerEnrollment'] if context.grants_right?(user, :add_designer_to_course)
+    deleteable += ['DesignerEnrollment'] if context.grants_right?(user, :remove_designer_from_course)
+    addable += ['StudentEnrollment'] if context.grants_right?(user, :add_student_to_course)
+    deleteable += ['StudentEnrollment'] if context.grants_right?(user, :remove_student_from_course)
+    addable += ['ObserverEnrollment'] if context.grants_right?(user, :add_observer_to_course)
+    deleteable += ['ObserverEnrollment'] if context.grants_right?(user, :remove_observer_from_course)
+
+    [addable, deleteable]
+  end
+
   def self.compile_manageable_roles(role_data, user, context)
     # for use with the old sad enrollment dialog
-    manageable = self.manageable_roles_by_user(user, context)
+    granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
+    manageable = self.manageable_roles_by_user(user, context) unless granular_admin
+    addable, deleteable = self.add_delete_roles_by_user(user, context) if granular_admin
     role_data.inject([]) { |roles, role|
-      is_manageable = manageable.include?(role[:base_role_name])
-      role[:manageable_by_user] = is_manageable
+      is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
+      is_addable = addable.include?(role[:base_role_name]) if granular_admin
+      is_deleteable = deleteable.include?(role[:base_role_name]) if granular_admin
+      role[:manageable_by_user] = is_manageable unless granular_admin
+      if granular_admin
+        role[:addable_by_user] = is_addable
+        role[:deleteable_by_user] = is_deleteable
+      end
       custom_roles = role.delete(:custom_roles)
       roles << role
 
       custom_roles.each do |custom_role|
-        custom_role[:manageable_by_user] = is_manageable
+        custom_role[:manageable_by_user] = is_manageable unless granular_admin
+        if granular_admin
+          custom_role[:addable_by_user] = is_addable
+          custom_role[:deleteable_by_user] = is_deleteable
+        end
         roles << custom_role
       end
       roles

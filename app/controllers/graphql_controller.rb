@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -24,8 +26,28 @@ class GraphQLController < ApplicationController
   include Api::V1
 
   before_action :require_user, if: :require_auth?
+  before_action :require_inst_access_token_auth, only: :subgraph_execute, unless: :sdl_query?
+
+  # This action is for use only with the federated API Gateway. See
+  # `app/graphql/README.md` for details.
+  def subgraph_execute
+    result = execute_on(CanvasSchema.for_federation, "subgraph")
+    render json: result
+  end
 
   def execute
+    result = execute_on(CanvasSchema, "original")
+    render json: result
+  end
+
+  def graphiql
+    @page_title = "GraphiQL"
+    render :graphiql, layout: 'bare'
+  end
+
+  private
+
+  def execute_on(schema, interface_name)
     query = params[:query]
     variables = params[:variables] || {}
     context = {
@@ -40,33 +62,47 @@ class GraphQLController < ApplicationController
       request_id: (Thread.current[:context] || {})[:request_id],
       tracers: [
         Tracers::DatadogTracer.new(
-          request.host_with_port.sub(':', '_'),
-          request.headers["GraphQL-Metrics"] == "true"
+          request.headers["GraphQL-Metrics"] == "true",
+          {
+            domain: request.host_with_port.sub(':', '_'),
+            interface: interface_name
+          }
         )
       ]
     }
-    result = nil
 
     overall_timeout = Setting.get('graphql_overall_timeout', '60').to_i.seconds
     Timeout.timeout(overall_timeout) do
-      result = CanvasSchema.execute(query, variables: variables, context: context)
+      schema.execute(query, variables: variables, context: context)
     end
-
-    render json: result
   end
-
-  def graphiql
-    @page_title = "GraphiQL"
-    render :graphiql, layout: 'bare'
-  end
-
-  private
 
   def require_auth?
     if action_name == 'execute'
       return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
     end
 
+    if action_name == 'subgraph_execute' && sdl_query?
+      return false
+    end
+
     true
+  end
+
+  def sdl_query?
+    query = (params[:query] || '').strip
+    return false unless query.starts_with?('query') || query.starts_with?('{')
+    query = query[/{.*/] # slice off leading "query" keyword and/or query name, if any
+    query.gsub!(/\s+/, '') # strip all whitespace
+    query == '{_service{sdl}}'
+  end
+
+  def require_inst_access_token_auth
+    unless @authenticated_with_inst_access_token
+      render(
+        json: {errors: [{message: "InstAccess token auth required"}]},
+        status: 401
+      )
+    end
   end
 end

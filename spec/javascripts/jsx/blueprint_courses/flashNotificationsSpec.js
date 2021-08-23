@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/blueprint_courses/actions'
-import FlashNotifications from 'jsx/blueprint_courses/flashNotifications'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+import actions from '@canvas/blueprint-courses/react/actions'
+import FlashNotifications from '@canvas/blueprint-courses/react/flashNotifications'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const createMockStore = state => ({
   subs: [],

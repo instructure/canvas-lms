@@ -25,7 +25,7 @@ require 'nokogiri'
 describe UserContent do
   describe ".find_user_content" do
     it "should not yield non-string width/height fields" do
-      doc = Nokogiri::HTML::DocumentFragment.parse('<object width="100%" />')
+      doc = Nokogiri::HTML5.fragment('<object width="100%" />')
       UserContent.find_user_content(doc) do |_, uc|
         expect(uc.width).to eq '100%'
       end
@@ -37,7 +37,7 @@ describe UserContent do
       html = "<div><ul><li><img class='equation_image'/></li>"\
              "<li><img class='equation_image'/></li>"\
              "<li><img class='nothing_special'></li></ul></div>"
-      parsed = Nokogiri::HTML::DocumentFragment.parse(html)
+      parsed = Nokogiri::HTML5.fragment(html)
       yield_count = 0
       UserContent.find_equation_images(parsed) do
         yield_count += 1
@@ -200,11 +200,11 @@ describe UserContent do
         "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
         "</li>\n"\
         "<li>\n"\
-        "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
+        "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">∑</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
         "</li>\n"\
         "<li><img class=\"nothing_special\"></li>\n"\
         "</ul></div>"
-      expect(html).to eq(expected)
+      expect(html).to match_ignoring_whitespace(expected)
     end
 
     it "strips existing mathml before adding any new" do
@@ -216,7 +216,7 @@ describe UserContent do
       expected = "<div>\n"\
         "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>text node"\
         "</div>"
-      expect(html).to eq(expected)
+      expect(html).to match_ignoring_whitespace(expected)
     end
   end
 end

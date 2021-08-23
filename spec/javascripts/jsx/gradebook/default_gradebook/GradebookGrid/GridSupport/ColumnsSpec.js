@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import slickgrid from 'vendor/slickgrid'
-import GridSupport from 'jsx/gradebook/default_gradebook/GradebookGrid/GridSupport'
+import slickgrid from 'slickgrid'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
 import SlickGridSpecHelper from './SlickGridSpecHelper'
 
 const {Editors, Grid} = slickgrid

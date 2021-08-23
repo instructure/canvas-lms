@@ -21,6 +21,8 @@ require_dependency 'importers'
 
 module Importers
   class AssignmentImporter < Importer
+    # Used to avoid adding duplicate line items when doing a re-import
+    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag]
 
     self.item_class = Assignment
 
@@ -114,11 +116,12 @@ module Importers
       item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
+      new_record = item.new_record?
 
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
-      if item.new_record? || item.deleted? || master_migration
+      if new_record || item.deleted? || master_migration
         if item.can_unpublish?
           item.workflow_state = (hash[:workflow_state] || 'published')
         else
@@ -197,12 +200,11 @@ module Importers
 
       item.allowed_attempts = hash[:allowed_attempts] if hash[:allowed_attempts]
 
-      if !item.new_record? && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
+      if !new_record && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
         # is a date-restricted master course item - clear their old overrides because we're mean
         item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
-
-      item.needs_update_cached_due_dates = true if item.new_record? || item.update_cached_due_dates?
+      item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
       # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
       # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,
@@ -318,15 +320,18 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
-      if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
-        (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
-        # check if it's going to fail the weird post_to_sis validation requiring due dates
-        # either because the date is already nil or we're going to remove it later
-        migration.add_warning(
-          t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
-            :assignment_name => item.title))
-      elsif !hash[:post_to_sis].nil?
-        item.post_to_sis = hash[:post_to_sis]
+      # Only set post_to_sis if this is a new assignment or if the content is locked
+      if new_record || item.editing_restricted?(:any)
+        if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
+          (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
+          # check if it's going to fail the weird post_to_sis validation requiring due dates
+          # either because the date is already nil or we're going to remove it later
+          migration.add_warning(
+            t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
+              :assignment_name => item.title))
+        elsif !hash[:post_to_sis].nil?
+          item.post_to_sis = hash[:post_to_sis]
+        end
       end
 
       [:turnitin_enabled, :vericite_enabled].each do |prop|
@@ -351,6 +356,8 @@ module Importers
         item.turnitin_settings = settings
       end
 
+      set_annotatable_attachment(item, hash, context)
+
       migration.add_imported_item(item)
 
       if migration.date_shift_options
@@ -363,9 +370,58 @@ module Importers
         # is not scheduled, even though that's the date we want.
         item.skip_schedule_peer_reviews = true
       end
-      item.needs_update_cached_due_dates = true if item.new_record? || item.update_cached_due_dates?
+      item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
+      item.lti_resource_link_lookup_uuid = hash['resource_link_lookup_uuid']
+
+      create_lti_13_models(hash, context, migration, item)
+
+      if hash["similarity_detection_tool"].present?
+        similarity_tool = hash["similarity_detection_tool"]
+        vendor_code = similarity_tool["vendor_code"]
+        product_code = similarity_tool["product_code"]
+        resource_type_code = similarity_tool["resource_type_code"]
+        item.assignment_configuration_tool_lookups.find_or_create_by!(
+          tool_vendor_code: vendor_code,
+          tool_product_code: product_code,
+          tool_resource_type_code: resource_type_code,
+          tool_type: 'Lti::MessageHandler',
+          context_type: context.class.name
+        )
+        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
+          context: context, vendor_code: vendor_code, product_code: product_code
+        )
+
+
+        if active_proxies.blank?
+          migration.add_warning(I18n.t(
+            "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
+            vendor_code: vendor_code, product_code: product_code)
+          )
+        else
+          item.lti_context_id ||= SecureRandom.uuid
+          create_tool_settings(hash['tool_setting'], active_proxies.first, item)
+        end
+      end
+
+      # Ensure anonymous and moderated assignments always start out manually
+      # posted, even if the moderated assignment in the old course was switched
+      # to automatically post after it had grades published
+      post_manually = hash.dig(:post_policy, :post_manually) || item.anonymous_grading || item.moderated_grading
+      item.post_policy.update!(post_manually: !!post_manually)
+
+      item
+    end
+
+    # Create the interrelated LTI 1.3 models (ContentTag, Lti::ResourceLink,
+    # Lti::LineItem) for the assignment, if necessary. These are necessary if:
+    # * submission type is "external_tool", OR
+    # * there are line items (submission type is "external_tool" or "none")
+    def self.create_lti_13_models(hash, context, migration, item)
+      tool = nil
+      primary_line_item = nil
+      previously_existing_line_items = item.line_items.pluck(*LINE_ITEMS_EQUIVALENCY_FIELDS)
 
       if item.submission_types == 'external_tool' && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
         current_tag = item.external_tool_tag
@@ -412,44 +468,69 @@ module Importers
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
         end
+        # All external_tool assignments have at least one line item. Create the
+        # default one here; we may modify it or add more below if line items
+        # are explicitly provided in the imported data
         create_default_line_item(item, migration)
+        primary_line_item = item.line_items.order(:created_at).first
       end
 
-      if hash["similarity_detection_tool"].present?
-        similarity_tool = hash["similarity_detection_tool"]
-        vendor_code = similarity_tool["vendor_code"]
-        product_code = similarity_tool["product_code"]
-        resource_type_code = similarity_tool["resource_type_code"]
-        item.assignment_configuration_tool_lookups.find_or_create_by!(
-          tool_vendor_code: vendor_code,
-          tool_product_code: product_code,
-          tool_resource_type_code: resource_type_code,
-          tool_type: 'Lti::MessageHandler',
-          context_type: context.class.name
-        )
-        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context: context, vendor_code: vendor_code, product_code: product_code
-        )
+      if hash[:line_items].present?
+        any_coupled_line_items = hash["line_items"].any?{|li| li["coupled"]}
 
+        hash[:line_items].each do |li|
+          params = {
+            extensions: (li[:extensions] && JSON.parse(li[:extensions])) || {},
+            label: li[:label] || item.name,
+            resource_id: li[:resource_id],
+            score_maximum: li[:score_maximum] || item.points_possible,
+            tag: li[:tag],
+          }
 
-        if active_proxies.blank?
-          migration.add_warning(I18n.t(
-            "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-            vendor_code: vendor_code, product_code: product_code)
-          )
-        else
-          item.lti_context_id ||= SecureRandom.uuid
-          create_tool_settings(hash['tool_setting'], active_proxies.first, item)
+          # Do not create a line item if an equivalent one already existed
+          # before this import. Prevents re-imports from creating duplicate
+          # line items on existing assignments.
+          equivalency_field_values = LINE_ITEMS_EQUIVALENCY_FIELDS.map{|f| params[f]}
+          next if previously_existing_line_items.include?(equivalency_field_values)
+
+          params[:client_id] = li[:client_id] unless tool
+
+          if primary_line_item&.coupled && (li[:coupled] || !any_coupled_line_items)
+            # Modify the default coupled line item if:
+            # * We are processing a coupled line item (need to replace properties
+            #   if they are explicitly given)
+            # * There are no coupled line items listed in the imported data,
+            #   but there is a default coupled line item created above. Once we
+            #   update the default one, primary_line_item will have
+            #   coupled==false and subsequent line items will be added below
+            #   instead of modified here.
+            primary_line_item.update! params.compact.merge(coupled: !!li[:coupled])
+          else
+            # Add a new line item if we are processing an uncoupled line item AND:
+            # * There is another coupled line item that should stay
+            #   (any_coupled_line_items)
+            # * primary_line_item was already changed to be uncoupled above by
+            #   another line item we processed (!primary_line_item.coupled)
+            # * There is no primary_line_item -- this happens when
+            #   submission_types=none.
+            params[:resource_link] = primary_line_item&.resource_link
+            Lti::LineItem.create_line_item! item, nil, tool, params
+          end
         end
       end
+    end
 
-      # Ensure anonymous and moderated assignments always start out manually
-      # posted, even if the moderated assignment in the old course was switched
-      # to automatically post after it had grades published
-      post_manually = hash.dig(:post_policy, :post_manually) || item.anonymous_grading || item.moderated_grading
-      item.post_policy.update!(post_manually: !!post_manually)
+    def self.set_annotatable_attachment(assignment, hash, context)
+      return unless hash[:annotatable_attachment_migration_id].present? && assignment.annotated_document?
 
-      item
+      attachment = context.attachments.find_by(migration_id: hash[:annotatable_attachment_migration_id])
+      return if attachment.blank? || attachment.deleted?
+
+      # Move this to the correct folder (creating the folder in the process) if
+      # it's not already there
+      attachment.update!(folder: context.student_annotation_documents_folder)
+      attachment.move_to_bottom if attachment.saved_change_to_folder_id?
+      assignment.annotatable_attachment = attachment
     end
   end
 end

@@ -23,45 +23,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_select_content_dialog" do
 
-  describe "with module_dnd FF enabled" do
-    before(:each) do
-      course_with_teacher
-      view_context
-      @course.root_account.enable_feature!(:module_dnd)
-    end
-
-    after(:each) do
-      @course.root_account.disable_feature!(:module_dnd)
-    end
-
-    it "should indicate plural file upload" do
-      render partial: 'shared/select_content_dialog'
-      page = Nokogiri(response.body)
-      file_select = page.css("#file_select_label")
-      expect(file_select.inner_text).to match(/New File\(s\)\./)
-    end
-  end
-
-  describe "with module_dnd FF disabled" do
-    before(:each) do
-      course_with_teacher
-      view_context
-      @course.root_account.disable_feature!(:module_dnd)
-    end
-
-    it "should indicate singular file upload" do
-      render partial: 'shared/select_content_dialog'
-      page = Nokogiri(response.body)
-      file_select = page.css("#file_select_label")
-      expect(file_select.inner_text).to match(/New File\./)
-    end
-
-    it "should not allow multiple file upload" do
-      render partial: 'shared/select_content_dialog'
-      page = Nokogiri(response.body)
-      uploader = page.css("#module_attachment_uploaded_data")[0]
-      expect(uploader.keys).to_not include 'multiple'
-    end
+  it "should indicate plural file upload" do
+    course_with_teacher
+    view_context
+    render partial: 'shared/select_content_dialog'
+    page = Nokogiri(response.body)
+    file_select = page.css("#file_select_label")
+    expect(file_select.inner_text).to match(/New File\(s\)\./)
   end
 
   describe "with new_quizzes_modules_support disabled" do
@@ -102,6 +70,7 @@ describe "shared/_select_content_dialog" do
       course_with_teacher
       view_context
       Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_enabled?).and_return(true)
     end
 
     after(:each) do
@@ -114,10 +83,23 @@ describe "shared/_select_content_dialog" do
         [2, 'B', 'quiz'],
         [1, 'C', 'assignment']
       ])
+      assign(:combined_active_quizzes_includes_both_types, true)
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map(&:text)
-      expect(options).to eq(["[ Create Quiz ]", "A", "B", "C"])
+      expect(options).to eq(["[ Create Quiz ]", "A (classic)", "B (classic)", "C "])
+    end
+
+    it "does not render the (classic) identifier when there are only classic quizzes listed" do
+      assign(:combined_active_quizzes, [
+        [1, 'A', 'quiz'],
+        [2, 'B', 'quiz']
+      ])
+      assign(:combined_active_quizzes_includes_both_types, false)
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#quizs_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ Create Quiz ]", "A ", "B "])
     end
 
     it "does not render New Quizzes as Assignments" do
@@ -134,6 +116,19 @@ describe "shared/_select_content_dialog" do
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       expect(page.at_css('#quizs_select .new input[type="radio"]')).not_to be_nil
+    end
+
+    context "with new quizzes FF disabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_enabled?).and_return(false)
+      end
+
+      it "hides radios for quiz engine selection" do
+        assign(:combined_active_quizzes, [])
+        render partial: 'shared/select_content_dialog'
+        page = Nokogiri(response.body)
+        expect(page.at_css('#quizs_select .new input[type="radio"]')).to be_nil
+      end
     end
 
     context "with quiz engine selection saved" do

@@ -116,7 +116,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "iss" to "https://canvas.instructure.com"' do
       config = "test:\n  lti_iss: 'https://canvas.instructure.com'"
-      allow(Canvas::Security).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
+      allow(CanvasSecurity).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
       expect(decoded_jwt['iss']).to eq 'https://canvas.instructure.com'
     end
 
@@ -128,8 +128,18 @@ describe Lti::Messages::JwtMessage do
       expect(first_nonce).not_to eq second_nonce
     end
 
-    it 'sets the "sub" claim' do
-      expect(decoded_jwt['sub']).to eq user.lti_id
+    context 'when user is an authorized user' do
+      it 'sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to eq user.lti_id
+      end
+    end
+
+    context 'when user is an unauthorized user' do
+      let(:user) { nil }
+
+      it 'does not sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to be_nil
+      end
     end
 
     it 'sets the "sub" claim to past lti_id' do
@@ -726,7 +736,27 @@ describe Lti::Messages::JwtMessage do
     context 'when the user is blank' do
       let(:user) { nil }
 
-      it { is_expected.to eq User.public_lti_id }
+      it { is_expected.to be_empty }
+    end
+  end
+
+  describe 'lti1p1 claims' do
+    context 'when user does not have lti_context_id' do
+      before do
+        allow(user).to receive(:lti_context_id).and_return(nil)
+      end
+
+      it 'does not include the claim' do
+        expect(decoded_jwt).to_not include 'https://purl.imsglobal.org/spec/lti/claim/lti1p1'
+      end
+    end
+
+    context 'when user has lti_context_id' do
+      let(:message_lti1p1) { decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti1p1'] }
+
+      it 'adds user_id' do
+        expect(message_lti1p1['user_id']).to eq user.lti_context_id
+      end
     end
   end
 end

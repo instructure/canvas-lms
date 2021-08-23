@@ -35,7 +35,7 @@ describe 'filter speed grader by student group' do
       course_name: "Filter Speedgrader Course",
       active_course: true,
       active_enrollment: true,
-      name: "Teacher Boss1",
+      name: "Dedicated Teacher1",
       active_user: true
     )
     @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)

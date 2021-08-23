@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import {useOldDebounce, useNormalDebounce} from 'helpers/util'
 import fakeENV from 'helpers/fakeENV'
-import MessageFormDialog from 'compiled/views/conversations/MessageFormDialog'
-import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
-import CourseCollection from 'compiled/collections/CourseCollection'
-import GroupCollection from 'compiled/collections/GroupCollection'
+import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog.js'
+import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection.js'
+import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 
 const recipients = [
   {

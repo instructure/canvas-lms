@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -626,7 +628,7 @@ class ContextModuleItemsApiController < ApplicationController
     user = @student || @current_user
     @module = @context.modules_visible_to(user).find(params[:module_id])
     @item = @module.content_tags.find(params[:id])
-    raise ActiveRecord::RecordNotFound unless @item && @item.visible_to_user?(user)
+    raise ActiveRecord::RecordNotFound unless @item&.visible_to_user?(user, nil, session)
   end
 
   # @API Get module item sequence

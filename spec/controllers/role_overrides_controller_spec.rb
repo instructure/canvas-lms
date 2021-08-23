@@ -308,7 +308,7 @@ describe RoleOverridesController do
 
     describe "other permissions" do
       it "returns 400 with an error message" do
-        get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_groups'}
+        get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_content'}
         expect(response.code.to_i).to eq(400)
         expect(json['message']).to be
       end
@@ -319,7 +319,7 @@ describe RoleOverridesController do
         get 'index', params: {:account_id => @account.id}
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1
-        expect(assigns[:js_bundles].first).to include :permissions_index
+        expect(assigns[:js_bundles].first).to include :permissions
       end
 
       it 'does not load the manage_developer_keys role on sub account' do

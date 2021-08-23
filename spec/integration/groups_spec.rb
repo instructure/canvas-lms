@@ -31,7 +31,7 @@ describe GroupsController do
     get "/courses/#{@course.id}/groups/#{@group.id}"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('#right-side a#add-announcement').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
   end
 

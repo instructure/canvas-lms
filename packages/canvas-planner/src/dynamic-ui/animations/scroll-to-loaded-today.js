@@ -22,10 +22,6 @@ import {scrollAndFocusTodayItem} from './scroll-to-today'
 export class ScrollToLoadedToday extends Animation {
   uiDidUpdate() {
     const t = this.document().querySelector('.planner-today')
-    if (t) {
-      scrollAndFocusTodayItem(this.manager(), t)
-    } else {
-      this.animator().scrollToTop()
-    }
+    scrollAndFocusTodayItem(this.manager(), t, false)
   }
 }

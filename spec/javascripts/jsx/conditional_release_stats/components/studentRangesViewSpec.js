@@ -19,7 +19,7 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom'
-import RangesView from 'jsx/conditional_release_stats/components/student-ranges-view'
+import RangesView from '@canvas/conditional-release-stats/react/components/student-ranges-view'
 
 const container = document.getElementById('fixtures')
 

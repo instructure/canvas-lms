@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import Course from 'compiled/models/Course'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import AssignmentSettingsView from 'compiled/views/assignments/AssignmentSettingsView'
-import AssignmentGroupWeightsView from 'compiled/views/assignments/AssignmentGroupWeightsView'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView.coffee'
+import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

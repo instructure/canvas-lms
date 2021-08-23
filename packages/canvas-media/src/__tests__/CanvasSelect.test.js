@@ -18,7 +18,7 @@
  */
 
 /*
- ** Copied from canvas-lms/app/jsx/shared/components/test/CanvasSelect.test.js
+ ** Copied from canvas-lms/ui/shared/react/components/__test__/CanvasSelect.test.js
  */
 
 import React from 'react'
@@ -30,7 +30,7 @@ function selectProps(override = {}) {
   return {
     id: 'sel1',
     label: 'Choose one',
-    value: {undefined},
+    value: undefined,
     onChange: () => {},
     translatedStrings: {
       USE_ARROWS: 'Use arrow keys to navigate options.',
@@ -38,6 +38,7 @@ function selectProps(override = {}) {
       LIST_EXPANDED: 'List expanded.',
       OPTION_SELECTED: '{option} selected.'
     },
+    liveRegion: () => liveRegion,
     ...override
   }
 }

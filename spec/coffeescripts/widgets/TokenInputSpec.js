@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import TokenInput from 'compiled/widget/TokenInput'
+import TokenInput from 'ui/features/roster/jquery/TokenInput.js'
 
 test('allows the browse link to receive focus', () => {
   const $top = $('<div><div /></div>')

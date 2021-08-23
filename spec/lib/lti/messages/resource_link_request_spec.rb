@@ -311,7 +311,7 @@ describe Lti::Messages::ResourceLinkRequest do
   # these take `claims` as a method arg b/c we sometimes need to test two different jws structs in the same example where
   # it is not practical to define one or both with `let`
   def expect_assignment_resource_link_id(claims)
-    rlid = expected_assignment_line_item.resource_link.resource_link_id
+    rlid = expected_assignment_line_item.resource_link.resource_link_uuid
     expect(claims.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq rlid
   end
 

@@ -18,7 +18,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
+
+def msg = "`${env.JOB_NAME}` Build ${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -49,6 +51,9 @@ pipeline {
     }
   }
   post {
+    failure {
+      slackSend channel: '#i18n', color: '#FF0000', message: "Failed Translations Job: $msg"
+    }
     cleanup {
       script {
         libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'

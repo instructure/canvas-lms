@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ContentMigrationIssueCollection from 'compiled/collections/ContentMigrationIssueCollection'
+import ContentMigrationIssueCollection from 'ui/features/content_migrations/backbone/collections/ContentMigrationIssueCollection.coffee'
 
 QUnit.module('ContentMigrationIssueCollection')
 

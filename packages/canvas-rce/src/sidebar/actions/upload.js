@@ -17,6 +17,7 @@
  */
 
 import {saveMediaRecording} from '@instructure/canvas-media'
+import {headerFor, originFromHost} from '../sources/api'
 import * as files from './files'
 import * as images from './images'
 import bridge from '../../bridge'
@@ -135,10 +136,7 @@ export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
   if (selectedTabType === 'images' && isImage(embedData.type) && results.displayAs !== 'link') {
     // embed the image after any current selection rather than link to it or replace it
-    bridge
-      .activeEditor()
-      ?.mceInstance()
-      ?.selection.collapse()
+    bridge.activeEditor()?.mceInstance()?.selection.collapse()
     const file_props = {
       href: results.href || results.url,
       title: results.title,
@@ -153,10 +151,7 @@ export function embedUploadResult(results, selectedTabType) {
     bridge.insertImage(file_props)
   } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
     // embed media after any current selection rather than link to it or replace it
-    bridge
-      .activeEditor()
-      ?.mceInstance()
-      ?.selection.collapse()
+    bridge.activeEditor()?.mceInstance()?.selection.collapse()
 
     // when we record audio, notorious thinks it's a video. use the content type we got
     // from the recoreded file, not the returned media object.
@@ -183,7 +178,7 @@ export function embedUploadResult(results, selectedTabType) {
           results.title ||
           results.filename,
         content_type: results['content-type'],
-        embed: embedData,
+        embed: {...embedData, disablePreview: true},
         target: '_blank',
         contextType: results.contextType,
         contextId: results.contextId,
@@ -222,7 +217,7 @@ export function fetchFolders(bookmark) {
 
 // uploads handled via canvas-media
 export function mediaUploadComplete(error, uploadData) {
-  const {mediaObject, uploadedFile} = uploadData
+  const {mediaObject, uploadedFile} = uploadData || {}
   return (dispatch, _getState) => {
     if (error) {
       dispatch(failMediaUpload(error))
@@ -232,7 +227,7 @@ export function mediaUploadComplete(error, uploadData) {
         embedded_iframe_url: mediaObject.embedded_iframe_url,
         media_id: mediaObject.media_object.media_id,
         type: uploadedFile.type,
-        title: uploadedFile.name
+        title: uploadedFile.title || uploadedFile.name
       }
       dispatch(removePlaceholdersFor(uploadedFile.name))
       embedUploadResult(embedData, 'media')
@@ -252,6 +247,31 @@ export function createMediaServerSession() {
   }
 }
 
+export function uploadToButtonsAndIconsFolder(svg) {
+  return (_dispatch, getState) => {
+    const {source, jwt, host, contextId, contextType} = getState()
+    const svgAsFile = new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'})
+    const fileMetaProps = {
+      file: {
+        name: svg.name,
+        type: 'image/svg+xml'
+      },
+      name: svg.name
+    }
+
+    return source
+      .fetchButtonsAndIconsFolder({jwt, host, contextId, contextType})
+      .then(({folders}) => {
+        fileMetaProps.parentFolderId = folders[0].id
+        return source
+          .preflightUpload(fileMetaProps, {host, contextId, contextType})
+          .then(results => {
+            return source.uploadFRD(svgAsFile, results)
+          })
+      })
+  }
+}
+
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     const editorComponent = bridge.activeEditor()
@@ -263,8 +283,12 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
     if (tabContext === 'media' && fileMetaProps.domObject) {
       return saveMediaRecording(
         fileMetaProps.domObject,
-        contextId,
-        contextType,
+        {
+          contextId,
+          contextType,
+          origin: originFromHost(host),
+          headers: headerFor(jwt)
+        },
         (err, uploadData) => {
           dispatch(mediaUploadComplete(err, uploadData))
         }

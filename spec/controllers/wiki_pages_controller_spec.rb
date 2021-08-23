@@ -136,6 +136,18 @@ describe WikiPagesController do
             expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
           end
         end
+
+        context "K5 mode enabled" do
+          before do
+            @course.account.enable_as_k5_account!
+          end
+
+          it "should hide view_all_pages link" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:DISPLAY_SHOW_ALL_LINK]).to be_falsey
+          end
+        end
       end
     end
 

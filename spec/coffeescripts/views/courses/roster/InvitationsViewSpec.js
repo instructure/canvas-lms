@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import InvitationsView from 'compiled/views/courses/roster/InvitationsView'
-import RosterUser from 'compiled/models/RosterUser'
+import InvitationsView from 'ui/features/roster/backbone/views/InvitationsView.js'
+import RosterUser from 'ui/features/roster/backbone/models/RosterUser.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('InvitationsView', {

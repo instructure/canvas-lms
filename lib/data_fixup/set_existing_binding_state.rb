@@ -23,10 +23,10 @@ module DataFixup::SetExistingBindingState
       # This shouldn't ever happen, but strange things occur
       next if binding.developer_key.blank?
 
-      new_workflow_state = DeveloperKeyAccountBinding::ON_STATE
+      new_workflow_state = 'on'
 
       if binding.developer_key.workflow_state == 'deleted' || binding.developer_key.workflow_state == 'inactive'
-        new_workflow_state = DeveloperKeyAccountBinding::OFF_STATE
+        new_workflow_state = 'off'
       end
 
       binding.update!(workflow_state: new_workflow_state) unless binding.workflow_state == new_workflow_state

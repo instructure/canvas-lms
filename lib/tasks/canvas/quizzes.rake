@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :canvas do
   namespace :quizzes do
     desc 'Generate events from snapshots for submissions to a quiz.'

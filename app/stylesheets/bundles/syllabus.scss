@@ -26,6 +26,9 @@
     text-align: direction(left);
     @include fontSize(14px);
   }
+  thead th.due{
+    text-align: direction(right);
+  }
   tr.detail_list {
 
     td.dates {
@@ -65,7 +68,7 @@
         width: 1rem;  // size of the contained icon.
       }
     }
-    
+
     &.date_passed {
       td, th {
         background-color: $ic-color-medium-light;
@@ -89,7 +92,7 @@
 }
 .name {
   > i {
-    padding-#{direction(right)}: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp*0.5;
   }
 }
 

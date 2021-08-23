@@ -67,15 +67,17 @@ module AssignmentsHelper
     assignment.grants_right?(user, :update)
   end
 
-  def assignment_submission_button(assignment, user, user_submission)
+  def assignment_submission_button(assignment, user, user_submission, hidden)
     if assignment.expects_submission? && can_do(assignment, user, :submit)
-      submit_text = user_submission.try(:has_submission?) ? I18n.t("Re-submit Assignment") : I18n.t("Submit Assignment")
+      submit_text = user_submission.try(:has_submission?) ? I18n.t("New Attempt") : I18n.t("Start Assignment")
       late = user_submission.try(:late?) ? "late" : ""
       options = {
         type: 'button',
         class: "Button Button--primary submit_assignment_link #{late}",
         disabled: user_submission && user_submission.attempts_left == 0
       }
+      options[:style] = "display: none;" if hidden
+
       content_tag('button', submit_text, options)
     end
   end

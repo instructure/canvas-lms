@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'compiled/util/round'
+import round from 'round'
 
 QUnit.module('Util > .round()', () => {
   const x = 1234.56789

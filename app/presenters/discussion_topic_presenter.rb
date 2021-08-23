@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -29,26 +31,18 @@ class DiscussionTopicPresenter
     end
   end
 
-  # Public: Determine if the given user has permissions to manage this discussion.
-  #
-  # Returns a boolean.
-  def has_manage_actions?(user)
-    can_grade?(user) || show_peer_reviews?(user) || should_show_rubric?(user)
-  end
-
   # Public: Determine if the given user can grade the discussion's assignment.
   #
   # user - The user whose permissions we're testing.
   #
   # Returns a boolean.
-  def can_grade?(user=@user)
+  def show_all_dates?
     topic.for_assignment? &&
-    (assignment.grants_right?(user, :grade) ||
-      assignment.context.grants_right?(user, :manage_assignments))
+      (assignment.grants_right?(user, :grade) || assignment.context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
   end
 
   def can_direct_share?
-    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin) && topic.context.root_account.feature_enabled?(:direct_share)
+    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin)
   end
 
   # Public: Determine if the given user has permissions to view peer reviews.
@@ -78,7 +72,7 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def has_attached_rubric?
-    !!assignment.rubric_association.try(:rubric)
+    !!assignment.rubric
   end
 
   # Public: Determine if the given user can manage rubrics.
@@ -134,7 +128,7 @@ class DiscussionTopicPresenter
       if student_enrollment
         attrs[:"data-student_id"] = student_enrollment.user_id
         attrs[:"data-course_id"] = student_enrollment.course_id
-        attrs[:class] << " student_context_card_trigger"
+        attrs[:class] = "author student_context_card_trigger"
       end
     end
 

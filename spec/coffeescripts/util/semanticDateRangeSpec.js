@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import semanticDateRange from 'compiled/util/semanticDateRange'
+import semanticDateRange from '@canvas/datetime/semanticDateRange'
 
 QUnit.module('semanticDateRange')
 

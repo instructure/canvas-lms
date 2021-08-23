@@ -38,10 +38,6 @@ describe "Gradebook History Page" do
     GradeBookHistory.click_filter_button
     initial_row_count=GradeBookHistory.fetch_results_table_row_count
     scroll_page_to_bottom
-    # different waits failed adding sleep temporarily, will refactor in future
-    sleep 1 # sorry :'(
-    final_row_count=GradeBookHistory.fetch_results_table_row_count
-    paginated_rows_displayed=final_row_count-initial_row_count
-    expect(paginated_rows_displayed).to be > 0
+    expect { GradeBookHistory.fetch_results_table_row_count - initial_row_count }.to become > 0
   end
 end

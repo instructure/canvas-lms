@@ -21,7 +21,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
 import _ from 'underscore'
-import CourseTabContainer from 'jsx/grading/CourseTabContainer'
+import CourseTabContainer from 'ui/features/course_grading_standards/react/CourseTabContainer.js'
 import 'jqueryui/tabs'
 
 QUnit.module('CourseTabContainer', {

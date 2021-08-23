@@ -85,6 +85,22 @@ describe Login::Oauth2Controller do
       expect(session[:sentinel]).to be_nil
     end
 
+    it "doesn't allow deleted users to login" do
+      session[:oauth2_nonce] = 'bob'
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
+      user_with_pseudonym(username: 'user', active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      @user.update!(workflow_state: 'deleted')
+
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+      get :create, params: {state: jwt}
+      expect(response).to redirect_to(login_url)
+    end
+
     it "redirects to login if no user found" do
       expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
       expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')

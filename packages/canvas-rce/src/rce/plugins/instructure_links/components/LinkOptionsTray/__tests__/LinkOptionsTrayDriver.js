@@ -57,6 +57,7 @@ export default class LinkOptionsTrayDriver {
   }
 
   get $disablePreviewCheckbox() {
+    // valid only for rce_better_file_previewing off
     return queryHelpers.queryByAttribute('name', this.$element, 'disable-preview')
   }
 
@@ -64,6 +65,16 @@ export default class LinkOptionsTrayDriver {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
+  }
+
+  get $previewOptionOverlayRadioInput() {
+    // valid only for rce_better_file_previewing on
+    return queryHelpers.queryByAttribute('value', this.$element, 'overlay')
+  }
+
+  get $previewOptionInlineRadioInput() {
+    // valid only for rce_better_file_previewing on
+    return queryHelpers.queryByAttribute('value', this.$element, 'inline')
   }
 
   get doneButtonIsDisabled() {
@@ -86,6 +97,15 @@ export default class LinkOptionsTrayDriver {
     return this.$previewCheckbox.checked
   }
 
+  get previewOption() {
+    // only valid for rce_better_file_previewing on
+    const $overlay = this.$previewOptionOverlayRadioInput
+    const $inline = this.$previewOptionInlineRadioInput
+    if ($overlay.checked) return 'overlay'
+    if ($inline.checked) return 'inline'
+    throw new Error('something is wrong')
+  }
+
   setText(text) {
     fireEvent.change(this.$textField, {target: {value: text}})
   }
@@ -102,9 +122,15 @@ export default class LinkOptionsTrayDriver {
   }
 
   setDisablePreview(value) {
+    // only valid for rce_better_file_previewing off
     const $input = this.$disablePreviewCheckbox
     if ($input.checked !== value) {
       $input.click()
     }
+  }
+
+  setPreviewOption(value) {
+    // only valid for rce_better_file_previewing on
+    queryHelpers.queryByAttribute('value', this.$element, value).click()
   }
 }

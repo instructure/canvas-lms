@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import LockBanner from 'jsx/blueprint_courses/components/LockBanner'
+import LockBanner from '@canvas/blueprint-courses/react/components/LockManager/LockBanner'
 
 QUnit.module('LockBanner component')
 

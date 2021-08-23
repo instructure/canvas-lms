@@ -69,6 +69,15 @@ describe AuthenticationProvider::SAML do
     expect(@aac.requested_authn_context).to eq "anything"
   end
 
+  describe "validation" do
+    it "validates log_out_url if provided" do
+      ap = Account.default.authentication_providers.new(auth_type: 'saml')
+      ap.log_out_url = "https:// your.adfserverurl.com /adfs/ls/"
+      expect(ap).not_to be_valid
+      expect(ap.errors.keys).to eq [:log_out_url]
+    end
+  end
+
   describe "download_metadata" do
     it 'requires an entity id for InCommon' do
       saml = Account.default.authentication_providers.new(auth_type: 'saml',

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DashboardCardBackgroundStore from 'jsx/dashboard_card/DashboardCardBackgroundStore'
+import DashboardCardBackgroundStore from '@canvas/dashboard-card/react/DashboardCardBackgroundStore'
 import fakeENV from 'helpers/fakeENV'
 
 const TEST_COLORS = {

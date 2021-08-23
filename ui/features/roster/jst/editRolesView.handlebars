@@ -1,0 +1,19 @@
+{{#if has_multiple_roles}}
+  <p>
+    {{#t}}
+      This user has multiple roles in the course. Changing their role here will overwrite all of their current enrollments.
+    {{/t}}
+  </p>
+{{/if}}
+
+
+<div class="ic-Form-control">
+  <label class="ic-Label" for="role_id">{{#t}}Role:{{/t}}</label>
+  <select class="ic-Input" name="role_id" id="role_id" class="">
+    {{#each roles}}
+      {{#ifAny manageable_by_user addable_by_user}}
+        <option value="{{id}}" {{#ifEqual id ../../role_id}}selected{{/ifEqual}}>{{label}}</option>
+      {{/ifAny}}
+    {{/each}}
+  </select>
+</div>

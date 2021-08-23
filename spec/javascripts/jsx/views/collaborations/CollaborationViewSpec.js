@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import CollaborationView from 'compiled/views/collaborations/CollaborationView'
+import CollaborationView from 'ui/features/collaborations/backbone/views/CollaborationView.coffee'
 
 let fixtures
 let view

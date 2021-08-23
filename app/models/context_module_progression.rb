@@ -275,7 +275,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
     subs.any? do |sub|
       score = get_submission_score(sub)
-      requirement_met = (score.present? && score >= requirement[:min_score].to_f)
+      requirement_met = (score.present? && score.to_d >= requirement[:min_score].to_f)
       if requirement_met
         remove_incomplete_requirement(requirement[:id])
       else

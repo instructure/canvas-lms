@@ -1,0 +1,11 @@
+development:
+  encryption_key: 12345
+  lti_iss: 'https://canvas.instructure.com'
+  encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+  previous_encryption_keys:
+    - 0610afc39c93010e4e6f41b8898ddd131a3ddcaf
+
+test:
+  encryption_key: 12345
+  lti_iss: 'https://canvas.instructure.com'
+  encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160

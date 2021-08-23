@@ -19,8 +19,8 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import {FAILURE, STARTED} from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import PostToStudentsButton from 'jsx/assignments/GradeSummary/components/PostToStudentsButton'
+import {FAILURE, STARTED} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
+import PostToStudentsButton from 'ui/features/assignment_grade_summary/react/components/PostToStudentsButton.js'
 
 QUnit.module('GradeSummary PostToStudentsButton', suiteHooks => {
   let props

@@ -47,7 +47,7 @@ describe Quizzes::QuizzesController do
         it "should show a due date for 'Everyone'" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.css(".assignment_dates").text).to include "Everyone"
           expect(doc.css(".assignment_dates").text).not_to include "Everyone else"
         end
@@ -65,14 +65,14 @@ describe Quizzes::QuizzesController do
 
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.css("#quiz_student_details .value").first.text).to include(datetime_string(@due_at))
         end
 
         it "should show 'Everyone else' when some sections have a due date override" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.css(".assignment_dates").text).to include "Everyone else"
         end
       end
@@ -87,7 +87,7 @@ describe Quizzes::QuizzesController do
         it "should show multiple due dates to teachers" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.css(".assignment_dates tbody tr").count).to be 2
           expect(doc.css(".assignment_dates tbody tr > td:first-child").text).
             to include(datetime_string(@due_at1), datetime_string(@due_at2))
@@ -96,7 +96,7 @@ describe Quizzes::QuizzesController do
         it "should not show a date for 'Everyone else'" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.css(".assignment_dates").text).not_to include "Everyone"
         end
       end
@@ -138,7 +138,7 @@ describe Quizzes::QuizzesController do
       it "should show resume button in the center" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        doc = Nokogiri::HTML(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.css("#not_right_side .take_quiz_button").text).to include "Resume Quiz"
       end
     end
@@ -147,7 +147,7 @@ describe Quizzes::QuizzesController do
       it "should not show resume button on right_side" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        doc = Nokogiri::HTML(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.css("#right-side").text).not_to include "Resume Quiz"
       end
     end
@@ -172,7 +172,7 @@ describe Quizzes::QuizzesController do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
         expect(response.body).to match(%r{The following questions need review})
         expect(response.body).not_to match(%r{The quiz has changed significantly since this submission was made})
-        doc = Nokogiri::HTML(response.body)
+        doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present
         expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
@@ -195,7 +195,7 @@ describe Quizzes::QuizzesController do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
         expect(response.body).to match(%r{The following questions need review})
         expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
-        doc = Nokogiri::HTML(response.body)
+        doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present
         expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }

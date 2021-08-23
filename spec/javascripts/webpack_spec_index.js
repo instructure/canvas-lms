@@ -20,10 +20,16 @@ import Adapter from 'enzyme-adapter-react-16'
 import {canvas} from '@instructure/ui-themes'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
-import setupRavenConsoleLoggingPlugin from '../../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin'
+import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRavenConsoleLoggingPlugin.js'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import './jsx/spec-support/timezoneBackwardsCompatLayer'
+import {
+  up as configureDateTimeMomentParser
+} from '../../ui/boot/initializers/configureDateTimeMomentParser'
+
 
 filterUselessConsoleMessages(console)
+configureDateTimeMomentParser()
 
 Enzyme.configure({adapter: new Adapter()})
 
@@ -87,7 +93,15 @@ canvas.use({
   }
 })
 
-const requireAll = context => context.keys().map(context)
+const requireAll = context => {
+  const keys = context.keys()
+
+  if (process.env.JSPEC_VERBOSE === '1') {
+    console.log(`webpack_spec_index: running ${keys.length} files in ${process.env.JSPEC_PATH}`)
+  }
+
+  keys.map(context)
+}
 
 if (process.env.JSPEC_PATH) {
   let isFile = false
@@ -97,10 +111,11 @@ if (process.env.JSPEC_PATH) {
   if (isFile) {
     require(`../../${process.env.JSPEC_PATH}`)
   } else {
-    requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
+    requireAll(require.context(`../../${process.env.JSPEC_PATH}`, process.env.JSPEC_RECURSE !== '0', /\.js$/))
   }
 } else {
-  requireAll(require.context(CONTEXT_COFFEESCRIPT_SPEC, !!'includeSubdirectories', RESOURCE_COFFEESCRIPT_SPEC))
-  requireAll(require.context(CONTEXT_EMBER_GRADEBOOK_SPEC, !!'includeSubdirectories', RESOURCE_EMBER_GRADEBOOK_SPEC))
-  requireAll(require.context(CONTEXT_JSX_SPEC, !!'includeSubdirectories', RESOURCE_JSX_SPEC))
+  requireAll(require.context(CONTEXT_COFFEESCRIPT_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_COFFEESCRIPT_SPEC))
+  requireAll(require.context(CONTEXT_EMBER_GRADEBOOK_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_EMBER_GRADEBOOK_SPEC))
+  requireAll(require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC))
+  require(WEBPACK_PLUGIN_SPECS)
 }

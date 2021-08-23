@@ -18,13 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SectionTabHelper
+  # This should contain all the permissions that are checked in Course#uncached_tabs_available
   PERMISSIONS_TO_PRECALCULATE = %i[
     create_conferences
     create_forum
     manage_admin_users
     manage_assignments
+    manage_assignments_add
+    manage_assignments_delete
     manage_content
-    manage_files
+    manage_files_add
+    manage_files_edit
+    manage_files_delete
     manage_grades
     manage_students
     moderate_forum
@@ -76,6 +81,8 @@ module SectionTabHelper
   end
 
   class AvailableSectionTabs
+    include NewQuizzesFeaturesHelper
+
     def initialize(
       context, current_user, domain_root_account, session, precalculated_permissions = nil
     )
@@ -109,6 +116,8 @@ module SectionTabHelper
             !new_collaborations_enabled
           elsif tab_is?(tab, 'TAB_CONFERENCES')
             !WebConference.config(context: @context)
+          elsif quiz_lti_tab?(tab)
+            !new_quizzes_navigation_placements_enabled?(context)
           end
         end
       end
@@ -117,14 +126,19 @@ module SectionTabHelper
     private
 
     def cache_key
-      [
+      k = [
         context,
         current_user,
         domain_root_account,
         Lti::NavigationCache.new(domain_root_account),
         'section_tabs_hash',
         I18n.locale
-      ].cache_key
+      ]
+      if context.is_a?(Course)
+        k << 'homeroom_course' if context.elementary_homeroom_course?
+      end
+
+      k.cache_key
     end
 
     def tab_has_required_attributes?(tab)
@@ -133,6 +147,14 @@ module SectionTabHelper
 
     def tab_is?(tab, const_name)
       context.class.const_defined?(const_name) && tab[:id] == context.class.const_get(const_name)
+    end
+
+    def quiz_lti_tab?(tab)
+      if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+        return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
+      end
+
+      false
     end
   end
 

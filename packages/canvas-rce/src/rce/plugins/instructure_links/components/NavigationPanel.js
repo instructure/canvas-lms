@@ -29,6 +29,10 @@ function typeCollection(contextId, contextType) {
       return {
         links: [
           {
+            href: `/courses/${contextId}`,
+            title: formatMessage('Home')
+          },
+          {
             href: `/courses/${contextId}/announcements`,
             title: formatMessage('Announcements')
           },

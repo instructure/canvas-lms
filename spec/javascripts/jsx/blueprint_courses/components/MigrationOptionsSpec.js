@@ -18,8 +18,8 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import MigrationOptions from 'jsx/blueprint_courses/components/MigrationOptions'
-import MigrationStates from 'jsx/blueprint_courses/migrationStates'
+import MigrationOptions from 'ui/features/blueprint_course_master/react/components/MigrationOptions.js'
+import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 const noop = () => {}
 

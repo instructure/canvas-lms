@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveCourseCopyForeignKeys < ActiveRecord::Migration[5.1]
   tag :predeploy
 

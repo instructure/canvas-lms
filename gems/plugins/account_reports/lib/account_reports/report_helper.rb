@@ -255,6 +255,29 @@ module AccountReports::ReportHelper
     end
   end
 
+  def include_enrollment_filter
+    if @account_report.value_for_param "enrollment_filter"
+      @enrollment_filter = Enrollment.valid_types & Api.value_to_array(@account_report.parameters["enrollment_filter"])
+      if @enrollment_filter
+        add_extra_text("Include Enrollment Roles: #{@enrollment_filter.to_sentence};")
+      end
+    end
+  end
+
+  def include_enrollment_states
+    if @account_report.value_for_param "enrollment_states"
+      @enrollment_states = valid_enrollment_workflow_states
+      if @enrollment_states
+        add_extra_text("Include Enrollment States: #{@enrollment_states.to_sentence};")
+      end
+    end
+  end
+
+  def valid_enrollment_workflow_states
+    %w(invited creation_pending active completed inactive deleted rejected).freeze &
+      Api.value_to_array(@account_report.parameters["enrollment_states"])
+  end
+
   def report_title(account_report)
     AccountReports.available_reports[account_report.report_type].title
   end

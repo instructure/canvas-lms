@@ -150,7 +150,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       # tests in the live-events-lti repo. Make that key be the one that Canvas uses
       # to decode JWTs.
       lti_tool_key = OpenSSL::PKey::RSA.new(File.read('../../jwt_signing_key'))
-      allow(Canvas::Security).to receive(:encryption_keys).and_return([lti_tool_key])
+      allow(CanvasSecurity).to receive(:encryption_keys).and_return([lti_tool_key])
 
       # The JWT in the contracts will be expired; tell Canvas to accept it anyway.
       a_long_time = Time.zone.now.to_i + 3600
@@ -172,7 +172,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
         })
 
       # Always set ignore_expiration to true when calling the decode_jwt method.
-      Canvas::Security.class_eval do
+      CanvasSecurity.class_eval do
         @old_decode_jwt = self.method(:decode_jwt)
 
         def self.decode_jwt(body, keys = [])
@@ -182,7 +182,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
     end
 
     tear_down do
-      Canvas::Security.class_eval do
+      CanvasSecurity.class_eval do
         define_singleton_method(:decode_jwt, @old_decode_jwt)
         remove_instance_variable(:@old_decode_jwt)
       end

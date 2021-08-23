@@ -17,8 +17,8 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SubmissionCommentListItem from 'jsx/gradebook/default_gradebook/components/SubmissionCommentListItem'
-import SubmissionCommentUpdateForm from 'jsx/gradebook/default_gradebook/components/SubmissionCommentUpdateForm'
+import SubmissionCommentListItem from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentListItem.js'
+import SubmissionCommentUpdateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentUpdateForm.js'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 
 QUnit.module('SubmissionCommentListItem', {

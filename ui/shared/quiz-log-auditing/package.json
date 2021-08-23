@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/quiz-log-auditing",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./jquery/log_auditing.js"
+}

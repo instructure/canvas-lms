@@ -103,6 +103,65 @@ describe "account admin outcomes" do
       expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     end
 
+    describe 'with improved_outcome_management enabled' do
+      require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
+      include ImprovedOutcomeManagementPage
+
+      before(:each) do
+        enable_improved_outcomes_management(account)
+        @cm.export_content
+        run_jobs
+      end
+
+      it 'imports a state standard into an account via Find modal' do
+        goto_improved_state_outcomes
+        open_find_modal
+        state_standards_tree_button.click
+        job_count = Delayed::Job.count
+        outcome0_title = nth_find_outcome_modal_item_title(0)
+        add_button_nth_find_outcome_modal_item(0).click
+        click_done_find_modal
+
+        # ImportOutcomes operations enqueue jobs that will need to be manually processed
+        expect(Delayed::Job.count).to eq(job_count + 1)
+        run_jobs
+
+        # Verify by titles that the outcomes are imported into current root account
+        account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
+        expect(account_outcomes[0].short_description).to eq(outcome0_title)
+      end
+
+      it 'creates an initial outcome in the account level' do
+        goto_improved_state_outcomes
+        create_outcome('Test Outcome')
+
+        # Verify by titles that the outcomes are imported into current root account
+        account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
+        expect(account_outcomes[0].short_description).to eq('Test Outcome')
+      end
+
+      it 'searches across state standards in the Find modal and aligns a result' do
+        goto_improved_state_outcomes
+        open_find_modal
+        state_standards_tree_button.click
+        # Searching for the whole string will bring in several results and will make the test longer,
+        #  so we're just searching for one very specific thing that will load quickly
+        complete_title = 'CCSS.ELA-Literacy.CCRA.W.1'
+        search_title = 'CCRA.W.1'
+        search_state_standards(search_title)
+        wait_for_ajaximations
+        job_count = Delayed::Job.count
+        wait_for(method: nil, timeout: 2) { find_outcome_modal_items.count == 1 }
+        add_button_nth_find_outcome_modal_item(0).click
+
+        # ImportOutcomes operations enqueue jobs that will need to be manually processed
+        expect(Delayed::Job.count).to eq(job_count + 1)
+        run_jobs
+        account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
+        expect(account_outcomes[0].short_description).to eq(complete_title)
+      end
+    end
+
     describe "state standard pagination" do
       it "should not fail while filtering the common core group", priority: "2", test_id: 250010 do
         # setup fake state data, so that it has to paginate
@@ -110,7 +169,6 @@ describe "account admin outcomes" do
         fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
         11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
         last_group = root_group.child_outcome_groups.create!(:title => "Z is last")
-        allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: fake_cc.id })
 
         # go to the find panel
         get outcome_url
@@ -120,7 +178,7 @@ describe "account admin outcomes" do
 
         # click on state standards
         top_level_groups = ff(".outcome-level .outcome-group")
-        expect(top_level_groups.count).to eq 3
+        expect(top_level_groups.count).to eq 2
         top_level_groups[1].click
         wait_for_ajaximations
 

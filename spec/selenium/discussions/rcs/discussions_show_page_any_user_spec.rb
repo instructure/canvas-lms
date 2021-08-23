@@ -47,6 +47,7 @@ describe "discussions" do
 
       before(:each) do
         user_session(somebody)
+        Account.default.enable_feature!(:rce_enhancements)
         stub_rcs_config
       end
 
@@ -61,16 +62,6 @@ describe "discussions" do
             expect(f('.topic-unsubscribe-button')).to be_displayed
           end
         end
-      end
-
-      it "should not show keyboard shortcut modal during html editing", priority: "2", test_id: 846539 do
-        get url
-        f('.discussion-reply-action').click
-        wait_for_ajaximations
-        fln('HTML Editor').click
-        wait_for_ajaximations
-        f('.reply-textarea').send_keys("< , > , ?, /")
-        expect(f('.ui-dialog')).not_to be_displayed
       end
 
       it "should display the current username when adding a reply", priority: "1", test_id: 150485 do

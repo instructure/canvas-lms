@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import FileRenameForm from 'jsx/files/FileRenameForm'
+import FileRenameForm from '@canvas/files/react/components/FileRenameForm'
 
 QUnit.module('FileRenameForm', {
   setup() {

@@ -17,21 +17,21 @@
  */
 
 import $ from 'jquery'
-import GroupCategoriesView from 'compiled/views/groups/manage/GroupCategoriesView'
-import GroupCategoryCollection from 'compiled/collections/GroupCategoryCollection'
-import GroupCategory from 'compiled/models/GroupCategory'
+import GroupCategoriesView from 'ui/features/manage_groups/backbone/views/GroupCategoriesView.js'
+import GroupCategoryCollection from '@canvas/groups/backbone/collections/GroupCategoryCollection'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 let clock = null
 let view = null
 let categories = null
 let wrapper = null
-const sanbox = null
 
 QUnit.module('GroupCategoriesView', {
   setup() {
     fakeENV.setup()
     ENV.group_categories_url = '/api/v1/courses/1/group_categories'
+    ENV.permissions = {can_add_groups: true}
     clock = sinon.useFakeTimers()
     categories = new GroupCategoryCollection([
       {

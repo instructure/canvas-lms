@@ -113,6 +113,17 @@ describe Message do
       expect(msg.subject.length).to be > 255
     end
 
+    it "should truncate the body if it exceeds the maximum text length" do
+      allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
+      assignment_model(title: 'this is a message')
+      msg = generate_message(:assignment_created, :email, @assignment)
+      msg.body = msg.body + "1"* 64.kilobyte
+      expect(msg.valid?).to be_truthy
+      expect(msg.body).to eq 'message preview unavailable'
+      msg.save!
+      expect(msg.html_body).to eq 'message preview unavailable'
+    end
+
     it "should default to the account time zone if the user has no time zone" do
       original_time_zone = Time.zone
       Time.zone = 'UTC'
@@ -313,6 +324,7 @@ describe Message do
                                root_account: account)
 
 
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
       expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
                                                              {short_stat: "message.deliver",
                                                               tags: {path_type: "email", notification_name: 'my_name'}})
@@ -336,7 +348,10 @@ describe Message do
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
@@ -346,19 +361,14 @@ describe Message do
         expect(ne).to receive(:destroy).never
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
-      context 'with the reduce_push_notifications feature enabled' do
-        before :each do
-          Account.site_admin.enable_feature!(:reduce_push_notifications)
-        end
-
-        after :each do
-          Account.site_admin.disable_feature!(:reduce_push_notifications)
-        end
-
+      context 'with the reduce_push_notifications settings' do
         it "allows whitelisted notification types" do
           message_model(
             dispatch_at: Time.now,
@@ -373,6 +383,32 @@ describe Message do
         end
 
         it "does not deliver notification types not on the whitelist" do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'New Wiki Page',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push).never
+          @message.deliver
+        end
+      end
+
+
+      context 'with the enable_push_notifications account setting disabled' do
+        before :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = false
+        end
+
+        after :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = true
+        end
+
+        it 'does not deliver notifications' do
           message_model(
             dispatch_at: Time.now,
             workflow_state: 'staged',
@@ -409,6 +445,30 @@ describe Message do
         )
         expect(@message).to receive(:deliver_via_sms)
         @message.deliver
+      end
+
+      context 'deprecate_sms is enabled' do
+        before do
+          Account.site_admin.enable_feature!(:deprecate_sms)
+        end
+
+        after do
+          Account.site_admin.disable_feature!(:deprecate_sms)
+        end
+
+        it "doesn't allow sms notification" do
+          message_model(
+            dispatch_at: Time.zone.now,
+            workflow_state: 'staged',
+            to: '+18015550100',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'sms',
+            notification_name: 'Assignment Graded',
+            user: @user
+          )
+          expect(@message).to_not receive(:deliver_via_sms)
+          @message.deliver
+        end
       end
 
       it "does not deliver notification types not on the whitelist" do
@@ -727,6 +787,20 @@ describe Message do
       expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
     end
 
+    it "encodes a user's avatar_url when just a path" do
+      user.avatar_image_url = "path with spaces"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}/path%20with%20spaces"
+    end
+
+    it "encodes a user's avatar_url when a url" do
+      user.avatar_image_url = "http://localhost/path with spaces"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to eq "http://localhost/path%20with%20spaces"
+    end
+
     describe 'author_account' do
       it 'is nil if there is no author' do
         expect(authorless_message.author_account).to be_nil
@@ -818,6 +892,28 @@ describe Message do
       rescue Delayed::RetriableError => e
         expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
       end
+    end
+  end
+
+  describe ".infer_feature_account" do
+    it "is the root account for the message when available" do
+      ra = account_model
+      message = Message.new(root_account: ra)
+      expect(message.send(:infer_feature_account)).to eq(ra)
+    end
+
+    it "is the user's account if the RA is a dummy account" do
+      Account.ensure_dummy_root_account
+      root_account = Account.find(0)
+      user_account = Account.default
+      user = user_model
+      message = Message.new(root_account_id: root_account.id, user: user)
+      expect(message.send(:infer_feature_account)).to eq(user_account)
+    end
+
+    it "falls back to siteadmin" do
+      message = Message.new(root_account_id: nil, user_id: nil)
+      expect(message.send(:infer_feature_account)).to eq(Account.site_admin)
     end
   end
 end

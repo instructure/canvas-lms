@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CheckboxInput from 'jsx/external_apps/components/CheckboxInput'
+import CheckboxInput from 'ui/features/external_apps/react/components/CheckboxInput.js'
 
 QUnit.module('CheckboxInput#defaultState')
 

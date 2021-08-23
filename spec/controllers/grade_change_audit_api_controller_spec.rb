@@ -37,21 +37,24 @@ describe GradeChangeAuditApiController do
 
   before :each do
     user_session(admin)
+    allow(Audits).to receive(:write_to_cassandra?).and_return(CanvasCassandra::DatabaseBuilder.configured?(:auditors))
+    allow(Audits).to receive(:write_to_postgres?).and_return(true)
+    allow(Audits).to receive(:read_from_cassandra?).and_return(false)
+    allow(Audits).to receive(:read_from_postgres?).and_return(true)
   end
 
   describe "GET for_assignment" do
     let(:params) { { assignment_id: assignment.id } }
 
     before :each do
-      allow(Auditors).to receive(:write_to_cassandra?).and_return(true)
-      allow(Auditors).to receive(:write_to_postgres?).and_return(true)
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
     context "reading from cassandra" do
       before :each do
-        allow(Auditors).to receive(:read_from_cassandra?).and_return(true)
-        allow(Auditors).to receive(:read_from_postgres?).and_return(false)
+        skip unless CanvasCassandra::DatabaseBuilder.configured?(:auditors)
+        allow(Audits).to receive(:read_from_cassandra?).and_return(true)
+        allow(Audits).to receive(:read_from_postgres?).and_return(false)
       end
 
       it "returns events with the student's id included" do
@@ -86,11 +89,6 @@ describe GradeChangeAuditApiController do
     end
 
     context "reading from active_record" do
-      before :each do
-        allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
-        allow(Auditors).to receive(:read_from_postgres?).and_return(true)
-      end
-
       it "returns events" do
         get :for_assignment, params: params
         expect(events_for_assignment.count).to eq(1)
@@ -152,10 +150,10 @@ describe GradeChangeAuditApiController do
 
     describe "current_grade" do
       before(:each) do
-        allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
-        allow(Auditors).to receive(:write_to_cassandra?).and_return(false)
-        allow(Auditors).to receive(:read_from_postgres?).and_return(true)
-        allow(Auditors).to receive(:write_to_postgres?).and_return(true)
+        allow(Audits).to receive(:read_from_cassandra?).and_return(false)
+        allow(Audits).to receive(:write_to_cassandra?).and_return(false)
+        allow(Audits).to receive(:read_from_postgres?).and_return(true)
+        allow(Audits).to receive(:write_to_postgres?).and_return(true)
       end
 
       let(:returned_events) do
@@ -374,10 +372,10 @@ describe GradeChangeAuditApiController do
     end
 
     before :each do
-      allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
-      allow(Auditors).to receive(:write_to_cassandra?).and_return(false)
-      allow(Auditors).to receive(:read_from_postgres?).and_return(true)
-      allow(Auditors).to receive(:write_to_postgres?).and_return(true)
+      allow(Audits).to receive(:read_from_cassandra?).and_return(false)
+      allow(Audits).to receive(:write_to_cassandra?).and_return(false)
+      allow(Audits).to receive(:read_from_postgres?).and_return(true)
+      allow(Audits).to receive(:write_to_postgres?).and_return(true)
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 

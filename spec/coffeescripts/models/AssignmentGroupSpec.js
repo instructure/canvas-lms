@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Assignment from 'compiled/models/Assignment'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('AssignmentGroup')

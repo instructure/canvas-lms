@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tooltip from 'compiled/behaviors/tooltip'
+import tooltip from '../../../ui/boot/initializers/activateTooltips.js'
 
 QUnit.module('tooltip')
 

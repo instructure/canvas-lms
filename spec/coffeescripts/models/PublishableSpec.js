@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Publishable from 'compiled/models/Publishable'
+import Publishable from '@canvas/context-modules/backbone/models/Publishable'
 
 const buildModule = published => new Publishable({published}, {url: '/api/1/2/3'})
 

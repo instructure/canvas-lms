@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommonEvent from 'compiled/calendar/CommonEvent'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
+import CommonEvent from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('CommonEvent', {

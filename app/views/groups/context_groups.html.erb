@@ -24,7 +24,7 @@
       :STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE => @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups && can_do(@context.groups.temp_record, @current_user, :create),
       :CAN_VIEW_PAGES => @context.grants_right?(@current_user, :view_group_pages)
   %>
-  <% js_bundle :react_groups %>
+  <% js_bundle :groups %>
 <% else %>
 
 <div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all">

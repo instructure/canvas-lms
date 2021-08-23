@@ -39,7 +39,8 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     if options[:consul_event]
       datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
       datacenters.each do |dc|
-        Imperium::Events.fire(options[:consul_event], 'FLUSHDB', dc: dc)
+        # Diplomat is silly and doesn't use kwargs for some reason 
+        Diplomat::Event.fire(options[:consul_event], 'FLUSHDB', nil, nil, nil, dc)
       end
     end
   end
@@ -71,7 +72,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     if options[:consul_event]
       datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
       datacenters.each do |dc|
-        Imperium::Events.fire(options[:consul_event], key, dc: dc)
+        Diplomat::Event.fire(options[:consul_event], key, nil, nil, nil, dc)
       end
       # no idea if we actually cleared anything
       false

@@ -25,7 +25,7 @@ describe "/gradebooks/show_submissions_upload", type: :view do
   let(:assignment) { @course.assignments.create!(title: "Example Assignment") }
   let(:presenter) { Submission::UploadPresenter.for(@course, assignment) }
   let(:progress) { presenter.progress }
-  let(:document) { Nokogiri::HTML.parse(response.body) }
+  let(:document) { Nokogiri::HTML5(response.body) }
 
   before do
     course_with_student

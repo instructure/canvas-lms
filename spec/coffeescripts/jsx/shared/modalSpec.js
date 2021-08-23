@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import Modal from 'jsx/shared/modal'
+import Modal from '@canvas/modal'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import ModalContent from '@canvas/modal/react/content'
+import ModalButtons from '@canvas/modal/react/buttons'
 
 QUnit.module('Modal', {
   setup() {
@@ -115,6 +115,7 @@ test('updates modalIsOpen when props change', function() {
 })
 
 test('Sets the iframe allowances', function() {
+  expect(1)
   const spy = sinon.spy()
   this.component = TestUtils.renderIntoDocument(
     <Modal
@@ -127,7 +128,15 @@ test('Sets the iframe allowances', function() {
       <ModalButtons className="buttonContent">buttons here</ModalButtons>
     </Modal>
   )
-  ok(spy.called)
+
+  return new Promise(resolve => {
+    // see https://github.com/reactjs/react-modal/pull/887
+    // and https://github.com/facebook/jest/issues/5147
+    requestAnimationFrame(() => {
+      ok(spy.called)
+      resolve()
+    })
+  })
 })
 
 test('closeModal() set modal open state to false and calls onRequestClose', function() {

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import slickgrid from 'vendor/slickgrid'
-import GridSupport from 'jsx/gradebook/default_gradebook/GradebookGrid/GridSupport'
+import slickgrid from 'slickgrid'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
 
 const {Editors, Grid} = slickgrid
 const $fixtures = document.getElementById('fixtures')

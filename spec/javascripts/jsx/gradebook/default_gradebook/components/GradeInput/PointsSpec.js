@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradeInput from 'jsx/gradebook/default_gradebook/components/GradeInput'
+import GradeInput from 'ui/features/gradebook/react/default_gradebook/components/GradeInput.js'
 import GradeInputDriver from './GradeInputDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHooks => {

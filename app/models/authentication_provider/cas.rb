@@ -27,11 +27,16 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    [ :auth_base, :log_in_url, :jit_provisioning ].freeze
+    super + [ :auth_base, :log_in_url, :jit_provisioning ].freeze
   end
 
   def self.deprecated_params
     [ :unknown_user_url ].freeze
+  end
+
+  def self.recognized_federated_attributes
+    # we allow any attribute
+    nil
   end
 
   def self.supports_debugging?

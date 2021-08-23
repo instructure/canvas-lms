@@ -1,5 +1,10 @@
 {
   "plugins": [
     "@instructure/i18nliner-handlebars"
+  ],
+
+  "include": [
+    "gems/plugins",
+    "ui"
   ]
 }

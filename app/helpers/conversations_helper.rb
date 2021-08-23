@@ -113,14 +113,8 @@ module ConversationsHelper
   def valid_account_context?(account)
     return false unless account.root_account?
     return true if account.grants_right?(@current_user, session, :read_roster)
-    account.shard.activate do
-      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
-      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
-        return true
-      end
-    end
-
-    false
+    user_sub_accounts = @current_user.associated_accounts.shard(@current_user).where(root_account_id: account).to_a
+    user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
   end
 
   def build_message
@@ -144,7 +138,7 @@ module ConversationsHelper
       domain_root_account_id ||= @domain_root_account.id
       media_comment_id ||= params[:media_comment_id]
       media_comment_type ||= params[:media_comment_type]
-      user_note = params[:user_note] if user_note.nil?
+      user_note = value_to_boolean(params[:user_note]) if user_note.nil?
     end
     [
       current_user,
@@ -161,7 +155,7 @@ module ConversationsHelper
 
   def infer_media_comment(media_id, media_type)
     if media_id.present? && media_type.present?
-      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
+      media_comment = MediaObject.by_media_id(media_id).first
       unless media_comment
         media_comment ||= MediaObject.new
         media_comment.media_type = media_type

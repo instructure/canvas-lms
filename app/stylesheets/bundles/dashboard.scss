@@ -22,6 +22,10 @@
   margin-top: -($ic-sp * 2);
 }
 
+.ic-notification + .ic-dashboard-app {
+  margin-top: 0;
+}
+
 .ic-Dashboard-header__layout {
   display: flex;
   align-items: center;

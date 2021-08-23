@@ -17,10 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
@@ -35,7 +34,7 @@ def ignoreBuildNeverStartedError(block) {
     else {
       echo "ignored MissingContextVariableException: \n${ex.message}"
     }
-    // we can ignore this very noisy error
+  // we can ignore this very noisy error
   }
 }
 
@@ -85,12 +84,9 @@ pipeline {
       steps {
         script {
           def stages = [:]
-          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
 
           distribution.stashBuildScripts()
-
-          distribution.addRSpecSuites(stages)
-          distribution.addSeleniumSuites(stages)
+          rspecStage.createDistribution(stages)
 
           parallel(stages)
         }
@@ -100,8 +96,8 @@ pipeline {
     stage('Copy Files') {
       steps {
         script {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadParallelLog()
+          reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
+          archiveArtifacts(artifacts: 'parallel_logs/**')
         }
       }
     }
@@ -121,9 +117,9 @@ pipeline {
     always {
       script {
         ignoreBuildNeverStartedError {
-          failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
-          failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
-          failureReport.submit()
+          node('master') {
+            buildSummaryReport.publishReport('Build Summary Report', currentBuild.getResult() == 'SUCCESS' ? 'SUCCESS' : 'FAILURE')
+          }
         }
       }
     }

@@ -188,12 +188,9 @@ LDAP), this will be their username from the remote system.</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
-<p>Setting the password will in most cases log the user out of Canvas. If
-the user has managed to change their password in Canvas they will not be
-affected by this.  This latter case would happen if your institution
-transitioned from using Canvas authentication to a SSO solution.
-For this reason it is important to not set this if you are using LDAP or an
-SSO protocol.</p>
+<p>Setting the password will in most cases log the user out of Canvas. The
+password can only be set one time. If the password has been set by the user
+or a previous sis import, it will not be changed.</p>
 </td>
 </tr>
 <tr>
@@ -265,8 +262,9 @@ user's name, but you can customize it here.</td>
 <td>text</td>
 <td></td>
 <td></td>
-<td>The email address of the user. This might be the same as login_id, but should
-still be provided.</td>
+<td>The email address of the user. This might be the same as login_id but would
+be used to set email for user and will tie the email to the login. It is
+recommended to omit this field over using fake email addresses for testing.</td>
 </tr>
 <tr>
 <td>pronouns</td>
@@ -279,7 +277,7 @@ still be provided.</td>
 <td>status</td>
 <td>enum</td>
 <td>✓</td>
-<td></td>
+<td>✓</td>
 <td>active, deleted</td>
 </tr>
 </table>
@@ -546,6 +544,20 @@ Requires Blueprint Courses feature.
 To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
 </td>
 </tr>
+<tr>
+<td>grade_passback_setting</td>
+<td>text</td>
+<td></td>
+<td>✓</td>
+<td>nightly_sync, not_set</td>
+</tr>
+<tr>
+<td>homeroom_course</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>Whether the course is a homeroom course. Requires the courses to be associated with a "Canvas for Elementary"-enabled account.</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will
@@ -695,8 +707,7 @@ enrollments.csv
 <td>✓&#42;</td>
 <td></td>
 <td>student, teacher, ta, observer, designer, or a custom role defined
-by the account</td>
-</tr>
+by the account. When using a custom role, the name is case sensitive.</td></tr>
 <tr>
 <td>role_id</td>
 <td>text</td>
@@ -1080,7 +1091,8 @@ admins.csv
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>AccountAdmin, or a custom role defined by the account</td>
+<td>AccountAdmin, or a custom role defined by the account.
+ When using a custom role, the name is case sensitive.</td>
 </tr>
 <tr>
 <td>status</td>
@@ -1160,12 +1172,9 @@ LDAP), this will be their username from the remote system.</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
-<p>Setting the password will in most cases log the user out of Canvas. If
-the user has managed to change their password in Canvas they will not be
-affected by this.  This latter case would happen if your institution
-transitioned from using Canvas authentication to a SSO solution.
-For this reason it is important to not set this if you are using LDAP or an
-SSO protocol.</p>
+<p>Setting the password will in most cases log the user out of Canvas. The
+password can only be set one time. If the password has been set by the user
+or a previous sis import, it will not be changed.</p>
 </td>
 </tr>
 <tr>

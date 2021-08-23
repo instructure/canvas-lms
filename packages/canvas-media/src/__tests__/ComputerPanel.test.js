@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitForElement} from '@testing-library/react'
-import {act} from 'react-dom/test-utils'
+import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 
@@ -54,8 +53,8 @@ const uploadMediaTranslations = {
   }
 }
 
-function renderPanel(overrideProps = {}) {
-  return render(
+function createPanel(overrideProps) {
+  return (
     <ComputerPanel
       theFile={null}
       setFile={() => {}}
@@ -72,6 +71,10 @@ function renderPanel(overrideProps = {}) {
   )
 }
 
+function renderPanel(overrideProps = {}) {
+  return render(createPanel(overrideProps))
+}
+
 describe('UploadMedia: ComputerPanel', () => {
   it('shows a failure message if the file is rejected', () => {
     const notAMediaFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
@@ -85,42 +88,29 @@ describe('UploadMedia: ComputerPanel', () => {
     expect(getByText('Invalid File')).toBeVisible()
   })
 
-  it('accepts video files', () => {
+  it('shows an editable text input for title if a valid file is added', async () => {
     const aFile = new File(['foo'], 'foo.mov', {
       type: 'video/quicktime'
     })
-    const {getByLabelText, queryByText} = renderPanel()
+    const setFile = file =>
+      rerender(
+        createPanel({
+          setFile,
+          theFile: file,
+          hasUploadedFile: true
+        })
+      )
+    const {rerender, getByLabelText, getByPlaceholderText} = renderPanel({setFile})
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
         files: [aFile]
       }
     })
-    expect(queryByText('Invalid File')).toBeNull()
-  })
-
-  it('clears error messages if a valid file is added', () => {
-    const notAMediaFile = new File(['foo'], 'foo.txt', {
-      type: 'text/plain'
-    })
-    const aMediaFile = new File(['foo'], 'foo.mov', {
-      type: 'video/quicktime'
-    })
-    const {getByLabelText, getByText, queryByText} = renderPanel()
-    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-    fireEvent.change(dropZone, {
-      target: {
-        files: [notAMediaFile]
-      }
-    })
-    expect(getByText('Invalid File')).toBeVisible()
-    fireEvent.change(dropZone, {
-      target: {
-        files: [aMediaFile]
-      }
-    })
-
-    expect(queryByText('Invalid File')).toBeNull()
+    const titleInput = getByPlaceholderText('File name')
+    expect(titleInput.value).toEqual('foo.mov')
+    fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
+    expect(titleInput.value).toEqual('Awesome video')
   })
 
   describe('file preview', () => {
@@ -135,7 +125,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/mp4'
       })
       const {getAllByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const playButton = await waitForElement(() => getAllByText('Play'))
+      const playButton = await waitFor(() => getAllByText('Play'))
       expect(playButton[0].closest('button')).toBeInTheDocument()
     })
 
@@ -145,7 +135,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/avi'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -156,7 +146,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/x-ms-wma'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -167,7 +157,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/x-ms-wmv'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -184,7 +174,7 @@ describe('UploadMedia: ComputerPanel', () => {
         setHasUploadedFile,
         hasUploadedFile: true
       })
-      const clearButton = await waitForElement(() => getByText('Clear selected file'))
+      const clearButton = await waitFor(() => getByText('Clear selected file'))
       expect(clearButton).toBeInTheDocument()
       act(() => {
         fireEvent.click(clearButton)

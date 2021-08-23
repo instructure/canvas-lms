@@ -14,8 +14,7 @@ The easiest way to get a working development environment is to run:
 ./script/docker_dev_setup.sh
 ```
 
-This will guide you through the process of installing docker, dinghy/dory,
-building the docker images, and setting up Canvas.
+This will guide you through the process of building the docker images and setting up Canvas.
 
 If you would rather do things manually, read on! And be sure to check the [Troubleshooting](#Troubleshooting) section below.
 
@@ -285,6 +284,18 @@ Email is often sent through background jobs if you spin up the `jobs` container.
 If you would like to test or preview any notifications, simply trigger the email
 through its normal actions, and it should immediately show up in the emulated
 webmail inbox available here: http://mail.canvas.docker/
+
+### Canvas RCE API
+
+The Canvas RCE relies on the Canvas RCE API service.
+
+Add `docker-compose/rce-api.override.yml` to your `COMPOSE_FILE` var in `.env`.
+
+Set `rich-content-service` `app-host` to `"http://rce.canvas.docker:3000"` in `config/dynamic_settings.yml`.
+```
+rich-content-service:
+  app-host: "http://rce.canvas.docker:3000"
+```
 
 ## Tips
 

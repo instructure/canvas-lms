@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ExternalToolCollection from 'compiled/external_tools/ExternalToolCollection'
+import ExternalToolCollection from 'ui/features/submit_assignment/backbone/collections/ExternalToolCollection.js'
 
 const data = [
   {

@@ -45,12 +45,13 @@ module Quizzes
         where(user_id: @qs.user.id).
         first_or_initialize
 
+      quiz_result.workflow_state = :active
       quiz_result.user_uuid = @qs.user.uuid
 
       # get data from quiz submission's question result to ensure result should be generated
       cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
-      cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid question" unless cached_question
+      cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid answer" unless cached_answer
 
       # Create a question scoped outcome result linked to the quiz_result.
@@ -96,6 +97,9 @@ module Quizzes
           where(user_id: @qs.user.id).
           first_or_initialize
 
+        next if !result.new_record? && result.attempt.to_i > @qs.attempt.to_i
+
+        result.workflow_state = :active
         result.user_uuid = @qs.user.uuid
 
         result.artifact = @qs
@@ -105,8 +109,8 @@ module Quizzes
           question.assessment_question_bank_id == alignment.content_id
         end.map do |question|
           cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
-          cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
           raise "Could not find valid question" unless cached_question
+          cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
           raise "Could not find valid answer" unless cached_answer
           [cached_question, cached_answer]
         end

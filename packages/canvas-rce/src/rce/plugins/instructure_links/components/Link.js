@@ -120,7 +120,7 @@ export default function Link(props) {
     dragHtml(e, renderLinkHtml(props.link, props.link.title))
   }
 
-  function handleDragEnd(e) {
+  function handleDragEnd(_e) {
     document.body.click() // closes the tray
   }
 
@@ -147,7 +147,7 @@ export default function Link(props) {
             as="div"
             role="button"
             tabIndex="0"
-            background="default"
+            background="primary"
             display="block"
             width="100%"
             borderWidth="0 0 small 0"

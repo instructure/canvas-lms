@@ -18,7 +18,7 @@
 
 <% course_home ||= false %>
 <div id="sidebar_content">
-  <% if @context.syllabus_course_summary? || !Account.site_admin.feature_enabled?(:syllabus_course_summary_option) %>
+  <% if @context.syllabus_course_summary? %>
     <% current = Time.zone.today
       first_day_of_month = Date.new(y=current.year, m=current.month, d=1)
       last_day_of_previous_month = first_day_of_month - 1

@@ -71,12 +71,8 @@ describe Lti::PlagiarismSubscriptionsHelper do
     end
 
     it "includes all required event types" do
-      expect(subscription_helper.plagiarism_subscription(tool_proxy, product_family)[:EventTypes]).to match_array event_types
-
-      Account.site_admin.enable_feature!(:system_and_user_generated_event_types)
       expect(subscription_helper.plagiarism_subscription(tool_proxy, product_family)[:SystemEventTypes]).to match_array event_types
       expect(subscription_helper.plagiarism_subscription(tool_proxy, product_family)[:UserEventTypes]).to match_array event_types
-      Account.site_admin.disable_feature!(:system_and_user_generated_event_types)
     end
 
     it 'uses the live-event format' do
@@ -134,7 +130,8 @@ describe Lti::PlagiarismSubscriptionsHelper do
 
     it 'should have associated fields' do
       expect(subscription_helper.plagiarism_subscription(tool_proxy, tool_proxy.product_family)).to eq({
-        'EventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,
+        'SystemEventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,
+        'UserEventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,
         'ContextType' => 'root_account',
         'ContextId' => tool_proxy.context.root_account.uuid,
         'Format' => 'live-event',

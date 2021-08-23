@@ -49,7 +49,7 @@ module SIS
             begin
               importer.add_course(row['course_id'], row['term_id'], row['account_id'], row['fallback_account_id'], row['status'], start_date, end_date,
                                   row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], course_format, row['blueprint_course_id'],
-                                  grade_passback_setting)
+                                  grade_passback_setting, row['homeroom_course'])
             rescue ImportError => e
               messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
             end

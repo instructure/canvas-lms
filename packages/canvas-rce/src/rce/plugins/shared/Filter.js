@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {bool, useEffect, useState} from 'react'
-import {func, oneOf, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {bool, func, oneOf, string} from 'prop-types'
 import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -109,8 +109,9 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
   return options
 }
 
-function renderType(contentType, contentSubtype, onChange, userContextType) {
-  if (userContextType === 'course' || userContextType === 'group') {
+function renderType(contentType, contentSubtype, onChange, userContextType, containingContextType) {
+  // Check containingContextType so that we always show context links
+  if (containingContextType === 'course' || containingContextType === 'group') {
     return (
       <SimpleSelect
         renderLabel={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
@@ -142,9 +143,6 @@ function shouldSearch(searchString) {
   return searchString.length === 0 || searchString.length >= 3
 }
 
-const searchMessage = formatMessage('Enter at least 3 characters to search')
-const loadingMessage = formatMessage('Loading, please wait')
-
 export default function Filter(props) {
   const {
     contentType,
@@ -153,7 +151,8 @@ export default function Filter(props) {
     sortValue,
     searchString,
     userContextType,
-    isContentLoading
+    isContentLoading,
+    containingContextType
   } = props
   const [pendingSearchString, setPendingSearchString] = useState(searchString)
   const [searchInputTimer, setSearchInputTimer] = useState(0)
@@ -203,11 +202,12 @@ export default function Filter(props) {
     }
     return undefined
   }
-
+  const searchMessage = formatMessage('Enter at least 3 characters to search')
+  const loadingMessage = formatMessage('Loading, please wait')
   const msg = isContentLoading ? loadingMessage : searchMessage
   return (
     <View display="block" direction="column">
-      {renderType(contentType, contentSubtype, onChange, userContextType)}
+      {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
@@ -325,5 +325,10 @@ Filter.propTypes = {
   /**
    * Is my content currently loading?
    */
-  isContentLoading: bool
+  isContentLoading: bool,
+
+  /**
+   * The page context
+   */
+  containingContextType: oneOf(['user', 'course', 'group'])
 }

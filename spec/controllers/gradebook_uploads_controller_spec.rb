@@ -129,7 +129,7 @@ describe GradebookUploadsController do
 
       get 'data', params: {course_id: @course.id}
       expect(response).to be_successful
-      expect(response.body).to eq("while(1);{\"foo\":\"bar\"}")
+      expect(response.body).to eq("{\"foo\":\"bar\"}")
     end
 
     it "destroys an uploaded gradebook after retrieval" do

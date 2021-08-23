@@ -1,0 +1,5 @@
+{
+  "name": "ember",
+  "version": "1.4.0",
+  "main": "./ember.js"
+}

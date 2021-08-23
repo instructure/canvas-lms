@@ -1,0 +1,69 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+// We'll control the padding from react, especially because we want the important dates sidebar
+// to sit flush against the right edge
+.ic-Layout-contentMain {
+  padding: 0;
+}
+
+// Add some margin to dashboard notifications since we remove the padding around the whole app
+#dashboard > .ic-notification,
+#announcementWrapper > div:not(:empty) {
+  margin: $ic-sp;
+}
+
+// These overrides are only here because the Dashboard cards don't fully use InstUI.
+// Once they are on InstUI they can be removed
+.ic-DashboardCard__box {
+  font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  & h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+  }
+}
+
+.unpublished_courses_redesign .ic-DashboardCard__box {
+  padding: $ic-sp 0 $ic-sp $ic-sp*1.5 !important;
+}
+
+// Go to full width cards once there is not enough room for 2 cards plus the global nav bar,
+// but go back to 2 cards once the global nav goes away until there is not enough room again.
+@media only screen and (min-width: 768px) and (max-width: 804px),
+       only screen and (max-width: 682px) {
+  .ic-DashboardCard {
+    width: 100% !important;
+    margin-#{direction(left)}: 0 !important;
+  }
+
+  .ic-DashboardCard__box__container {
+    margin-#{direction(left)}: 0 !important;
+  }
+}
+
+// Make the important dates sidebar sticky
+#important-dates-sidebar {
+  background-color: #FAFAFA;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+}

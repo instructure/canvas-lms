@@ -40,13 +40,16 @@ const uploadMediaTranslations = {
     SUBMIT_TEXT: formatMessage('Submit'),
     UPLOADING_ERROR: formatMessage('An error occurred uploading your media.'),
     UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
-    MEDIA_RECORD_NOT_AVAILABLE: formatMessage('Audio and Video recording is not available.'),
+    MEDIA_RECORD_NOT_AVAILABLE: formatMessage(
+      'Audio and video recording not supported; please use a different browser.'
+    ),
     SUPPORTED_FILE_TYPES: formatMessage('Supported file types: SRT or WebVTT'),
     NO_FILE_CHOSEN: formatMessage('No file chosen'),
     REMOVE_FILE: 'Remove {lang} closed captions',
     ADD_NEW_CAPTION_OR_SUBTITLE: formatMessage('Add another'),
     ADDED_CAPTION: 'Captions for {lang} added',
-    DELETED_CAPTION: 'Deleted captions for {lang}'
+    DELETED_CAPTION: 'Deleted captions for {lang}',
+    PROGRESS_LABEL: formatMessage('Uploading')
   },
 
   SelectStrings: {

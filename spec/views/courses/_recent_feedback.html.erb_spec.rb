@@ -75,4 +75,27 @@ describe "/courses/_recent_feedback" do
     expect(response.body).to include("25,734 out of 25,734")
     expect(response.body).to include('something different')
   end
+
+  it 'contains the new url when assignments 2 student view is enabled' do
+    @course.enable_feature!(:assignments_2_student)
+    @assignment.update!(points_possible: 25734)
+    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @submission.reload
+
+    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    url = context_url(@assignment.context, :context_assignment_url, id: @assignment.id)
+    expect(response.body).to include("\"#{url}\"")
+  end
+
+  it 'contains the old url when assignments 2 student view is disabled' do
+    @assignment.update!(points_possible: 25734)
+    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @submission.reload
+
+    assign(:current_user, @user)
+
+    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id:@user.id)
+    expect(response.body).to include("\"#{url}\"")
+  end
 end

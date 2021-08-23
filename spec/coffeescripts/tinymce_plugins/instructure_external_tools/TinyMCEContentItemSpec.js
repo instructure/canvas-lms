@@ -26,7 +26,7 @@
 
 import $ from 'jquery'
 import tinymce from 'tinymce/tinymce'
-import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
+import TinyMCEContentItem from '@canvas/tinymce-external-tools/TinyMCEContentItem'
 import contentItems from './ContentItems'
 
 QUnit.module('TinyMCEContentItem LTI Link', {

@@ -256,7 +256,7 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production).
         with(
-          singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}",
+          singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::SHA256.hexdigest(student_1.id.to_s)}",
           max_attempts: 10
         ).
         and_return(@instance)

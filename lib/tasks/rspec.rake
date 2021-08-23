@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Don't load rspec if running "rake gems:*"
 unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 

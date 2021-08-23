@@ -56,7 +56,7 @@ describe "/eportfolios/show" do
   it "should show the share link explicitly" do
     assign(:owner_view, true)
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#eportfolio_share_link').text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
   end
 
@@ -66,7 +66,7 @@ describe "/eportfolios/show" do
     assign(:owner_view, true)
     @submission.update_column('workflow_state', 'submitted')
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url").attributes['href'].value).to match(
       %r{/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}}
     )
@@ -78,7 +78,7 @@ describe "/eportfolios/show" do
     assign(:owner_view, true)
     @submission.update_columns({workflow_state: 'graded', score: 0})
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_present
   end
 
@@ -89,7 +89,7 @@ describe "/eportfolios/show" do
     @submission.update_column('workflow_state', 'submitted')
     @assignment.update_column('workflow_state', 'unpublished')
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
   end
 
@@ -99,7 +99,7 @@ describe "/eportfolios/show" do
     assign(:owner_view, true)
     @submission.update_column('workflow_state', 'submitted')
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
   end
 
@@ -108,7 +108,7 @@ describe "/eportfolios/show" do
     submission_model(course: @course, user: @user)
     assign(:owner_view, true)
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
   end
 
@@ -118,7 +118,7 @@ describe "/eportfolios/show" do
     assign(:owner_view, true)
     @submission.update_column('workflow_state', 'pending_review')
     render "eportfolios/show"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
   end
 end

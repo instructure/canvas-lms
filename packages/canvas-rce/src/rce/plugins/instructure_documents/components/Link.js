@@ -44,7 +44,8 @@ export default function Link(props) {
   function linkAttrsFromDoc() {
     const canPreview = isPreviewable(props.content_type)
     const clazz = classnames('instructure_file_link', {
-      instructure_scribd_file: canPreview
+      instructure_scribd_file: canPreview,
+      inline_disabled: true
     })
 
     const attrs = {
@@ -114,7 +115,7 @@ export default function Link(props) {
         tabIndex="0"
         aria-describedby={props.describedByID}
         elementRef={elementRef}
-        background="default"
+        background="primary"
         borderWidth="0 0 small 0"
         padding="x-small"
         width="100%"

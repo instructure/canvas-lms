@@ -21,7 +21,7 @@ see these documents:
 1.1 Deep Linking v1.0 Documentation</a>
 
 * <a href="https://www.imsglobal.org/spec/lti-dl/v2p0" target="_blank">IMS LTI
-Advantage Deep Linking v2.0 Documentation</a>
+Advantage Deep Linking v2.0 Documentation (For LTI Advantage)</a>
 
 Deep Linking is not applicable to all placements in Canvas, but can be used with
  the following placements:
@@ -62,6 +62,49 @@ with a deep linking message type for certain placements. The specific details of
  href="https://www.imsglobal.org/spec/lti-dl/v2p0#lti-deep-linking-interaction"
  target="_blank">IMS LTI Deep Linking specification</a>.
  Instead this section will focus on tool configuration.
+
+
+## Supported Content Item Types
+The IMS LTI Deep Linking specification <a href="https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types">defines several content items types</a> that a tool may return to the platform via Deep linking. Canvas supports all of these
+content item types and their respective required properties with additional support for the optional properties listed here:
+
+### Link
+Full support for required properties.
+
+Support for the following optional properties:
+- title
+- text
+- icon
+- thumbnail
+- iframe
+
+### LTI Resource Link
+Full support for required properties.
+
+Support for the following optional properties:
+- url
+- title
+- text
+- icon
+- thumbnail
+- iframe
+- custom (allows for setting link-specific LTI launch parameters. See documentation <a href="https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link">here</a>.)
+
+### HTML fragment
+Full support for required properties.
+
+Full support for all optional properties.
+
+### Image
+Full support for required properties.
+
+Support for the following optional properties:
+- title
+- text
+- thumbnail
+- width
+- height
+
 
 ## Configuring Deep Linking
 Deep linking is configured by <a

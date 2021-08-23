@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import globalAnnouncements from 'global_announcements'
-import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
+import globalAnnouncements from 'ui/features/account_settings/jquery/global_announcements.js'
+import serviceRCELoader from '@canvas/rce/serviceRCELoader'
 
 QUnit.module('GlobalAnnouncements', {
   setup() {

@@ -192,7 +192,6 @@ module ContextModulesCommon
   end
 
   def add_existing_module_file_items(item_select_selector, file_names)
-    # requires module_dnd feature to be enabled
     f('.add_module_item_link').click
     wait_for_ajaximations
     select_module_item('#add_module_item_select', "File")
@@ -203,7 +202,6 @@ module ContextModulesCommon
   end
 
   def add_uploaded_file_items(item_select_selector, filepath)
-    # requires module_dnd feature to be enabled
     # would like to test multiple file upload,
     # but it's not supported by any of the selenium webdrivers
     f('.add_module_item_link').click
@@ -222,7 +220,6 @@ module ContextModulesCommon
   end
 
   def upload_file_item_with_selection(add_item_selector, item_select_selector, existing_filepath, click_button = 'Replace')
-    # requires module_dnd feature to be enabled
     f(add_item_selector).click
     wait_for_ajaximations
     select_module_item('#add_module_item_select', "File")

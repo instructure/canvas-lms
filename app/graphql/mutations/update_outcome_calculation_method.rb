@@ -30,7 +30,8 @@ class Mutations::UpdateOutcomeCalculationMethod < Mutations::OutcomeCalculationM
     record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")
     record = OutcomeCalculationMethod.find_by(id: record_id)
     raise GraphQL::ExecutionError, "Unable to find OutcomeCalculationMethod" if record.nil?
+
     check_permission(record.context)
-    upsert(input, record)
+    upsert(input, existing_record: record)
   end
 end

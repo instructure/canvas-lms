@@ -211,14 +211,54 @@ describe RubricAssociation do
       expect(request.reload).not_to be_nil
     end
 
-    it "should let account admins without manage_courses do things" do
+    it 'should soft delete learning outcome results when an association is replaced' do
+      student_in_course(active_all: true)
+      outcome_with_rubric
+      assessment = rubric_assessment_model(purpose: 'grading', rubric: @rubric, user: @student)
+      expect(assessment.learning_outcome_results.length).to eq 1
+
+      result = assessment.learning_outcome_results.first
+      expect(result).to be_active
+
+      # associate copy
+      rubric_association_model(purpose: 'grading', rubric: @rubric, association_object: @rubric_association.association_object)
+      expect(result.reload).to be_deleted
+    end
+
+    it 'should let account admins without manage_courses do things' do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)
       ra = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
 
-      admin = account_admin_user_with_role_changes(:active_all => true, :role_changes => {:manage_courses => false})
+      admin =
+        account_admin_user_with_role_changes(
+          active_all: true,
+          role_changes: {
+            manage_courses: false
+          }
+        )
 
-      [:manage, :delete].each do |permission|
+      %i[manage delete].each do |permission|
+        expect(ra.grants_right?(admin, permission)).to be_truthy
+      end
+    end
+
+    it 'should let account admins without manage_courses_admin do things (granular permissions)' do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      ra_params = rubric_association_params_for_assignment(@assignment)
+      ra = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
+
+      admin =
+        account_admin_user_with_role_changes(
+          active_all: true,
+          role_changes: {
+            manage_courses_admin: false
+          }
+        )
+
+      %i[manage delete].each do |permission|
         expect(ra.grants_right?(admin, permission)).to be_truthy
       end
     end

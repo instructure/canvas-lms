@@ -127,6 +127,13 @@ describe GroupAndMembershipImporter do
       expect(group1.reload.workflow_state).to eq 'available'
     end
 
+    it 'should work for invited students' do
+      @course.student_enrollments.update_all(workflow_state: 'invited')
+      import_csv_data(%{user_id,canvas_group_id
+                        user_4,#{group1.id}})
+      expect(@user.groups.pluck(:name)).to eq ["manual group"]
+    end
+
     it 'should create new group when named group is deleted' do
       group1.destroy
       import_csv_data(%{user_id,group_name

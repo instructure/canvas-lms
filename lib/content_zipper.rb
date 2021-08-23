@@ -189,12 +189,7 @@ class ContentZipper
     @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
-    if CANVAS_RAILS5_2
-      av = ActionView::Base.new()
-      av.view_paths = ActionController::Base.view_paths
-    else
-      av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
-    end
+    av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res
@@ -254,12 +249,7 @@ class ContentZipper
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
     attachments =
-      if !@check_user ||
-           folder.context.grants_any_right?(
-             @user,
-             :manage_files,
-             *RoleOverride::GRANULAR_FILE_PERMISSIONS
-           )
+      if !@check_user || folder.context.grants_any_right?(@user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
         folder.active_file_attachments
       else
         folder.visible_file_attachments

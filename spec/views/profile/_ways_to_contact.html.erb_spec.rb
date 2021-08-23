@@ -76,6 +76,21 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).not_to match /confirm_channel_link/
   end
 
+  it "should not show confirm link for push channels" do
+    account_admin_user
+    view_context
+    communication_channel(@user, {username: 'someone@somewhere.com', path_type: 'push', active_cc: true})
+    expect(@user.communication_channels.first.state).to eq :active
+    assign(:email_channels, [])
+    assign(:other_channels, @user.communication_channels.to_a)
+    assign(:sms_channels, [])
+    assign(:user, @user)
+
+    render :partial => "profile/ways_to_contact"
+    expect(response.body).to match(/<div.*>For All Devices<\/div>/)
+    expect(response.body).to_not match(/<a.*>For All Devices<\/a>/)
+  end
+
   it "shows the default email channel even when its position is greater than one" do
     course_with_student
     view_context

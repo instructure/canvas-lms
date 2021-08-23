@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TokenActions from 'jsx/due_dates/TokenActions'
-import AssignmentOverride from 'compiled/models/AssignmentOverride'
+import TokenActions from '@canvas/due-dates/react/TokenActions'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
 import {map} from 'lodash'
 
 QUnit.module('TokenActions is a thing', {

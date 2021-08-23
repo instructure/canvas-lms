@@ -16,17 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fcUtil from 'compiled/util/fcUtil'
-import tz from 'timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 
 QUnit.module('Calendar', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(denver, 'America/Denver')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(denver, 'America/Denver'),
+      tzData: {
+        'America/Denver': denver
+      }
+    })
   },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 

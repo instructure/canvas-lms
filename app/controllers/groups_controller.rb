@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -146,6 +148,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
   include Context
+  include K5Mode
 
   SETTABLE_GROUP_ATTRIBUTES = %w(
     name description join_level is_public group_category avatar_attachment
@@ -206,17 +209,18 @@ class GroupsController < ApplicationController
   #
   # @returns [Group]
   def index
+
     return context_index if @context
     includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
-        groups_scope = groups_scope.by_name
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
         groups_scope = groups_scope.preload(:group_category, :context, :root_account)
 
         groups = groups_scope.shard(@current_user).to_a
         groups.select!{|group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read)}
+        groups.sort_by! { |group| Canvas::ICU.collation_key(group&.name) }
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
@@ -258,6 +262,9 @@ class GroupsController < ApplicationController
                              eager_load(:group_category).preload(:root_account)
 
     unless api_request?
+      # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
+      return unless tab_enabled?(Course::TAB_PEOPLE)
+
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")
         set_active_tab "users"
@@ -282,7 +289,7 @@ class GroupsController < ApplicationController
         @categories  = @context.group_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key('name')).preload(:root_account)
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
-        if @context.grants_right?(@current_user, session, :manage_groups)
+        if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
           categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
@@ -291,9 +298,18 @@ class GroupsController < ApplicationController
             categories_json << json
           end
 
+          js_permissions = {
+            can_add_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_add),
+            can_manage_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_manage),
+            can_delete_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_delete)
+          }
+
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
-                 allow_self_signup: @allow_self_signup
+                 allow_self_signup: @allow_self_signup,
+                 context_class_name: @context.class.name,
+                 permissions: js_permissions
+
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
             js_env(:student_section_count => @context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id))
@@ -316,7 +332,7 @@ class GroupsController < ApplicationController
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
-        if value_to_boolean(params[:only_own_groups])
+        if value_to_boolean(params[:only_own_groups]) || !tab_enabled?(Course::TAB_PEOPLE, no_render: true)
           all_groups = all_groups.merge(@current_user.current_groups)
         end
         @paginated_groups = Api.paginate(all_groups, self, path)
@@ -415,7 +431,7 @@ class GroupsController < ApplicationController
   end
 
   def new
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       @group = @context.groups.build
     end
   end
@@ -462,14 +478,14 @@ class GroupsController < ApplicationController
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
         attrs[:group_category] = group_category
-        return unless authorized_action(group_category.context, @current_user, :manage_groups)
+        return unless authorized_action(group_category.context, @current_user, [:manage_groups, :manage_groups_add])
       else
         @context = @domain_root_account
         attrs[:group_category] = GroupCategory.communities_for(@context)
       end
     elsif params[:group]
       group_category_id = params[:group].delete :group_category_id
-      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
+      if group_category_id && @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_add)
         group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
         attrs[:group_category] = group_category

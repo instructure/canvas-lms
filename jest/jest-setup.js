@@ -19,18 +19,25 @@
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import {
+  up as configureDateTimeMomentParser
+} from '../ui/boot/initializers/configureDateTimeMomentParser'
 
 filterUselessConsoleMessages(console)
 
 require('jest-fetch-mock').enableFetchMocks()
 
 window.scroll = () => {}
-window.ENV = {}
+window.ENV = {
+  use_rce_enhancements: true
+}
 
 Enzyme.configure({adapter: new Adapter()})
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
+
+configureDateTimeMomentParser()
 
 // because everyone implements `flat()` and `flatMap()` except JSDOM 🤦🏼‍♂️
 if (!Array.prototype.flat) {
@@ -39,7 +46,7 @@ if (!Array.prototype.flat) {
     configurable: true,
     value: function flat(depth = 1) {
       if (depth === 0) return this.slice()
-      return this.reduce(function(acc, cur) {
+      return this.reduce(function (acc, cur) {
         if (Array.isArray(cur)) {
           acc.push(...flat.call(cur, depth - 1))
         } else {
@@ -75,8 +82,8 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
     }
   }).install()
 
-  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin')
-    .default
+  const setupRavenConsoleLoggingPlugin =
+    require('../ui/boot/initializers/setupRavenConsoleLoggingPlugin').default
   setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console-jest'})
 }
 
@@ -87,6 +94,46 @@ if (!('MutationObserver' in window)) {
   })
 }
 
+if (!('IntersectionObserver' in window)) {
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      disconnect() {
+        return null
+      }
+
+      observe() {
+        return null
+      }
+
+      takeRecords() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    }
+  })
+}
+
+if (!('ResizeObserver' in window)) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      observe() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    }
+  })
+}
+
 if (!('matchMedia' in window)) {
   window.matchMedia = () => ({
     matches: false,
@@ -94,4 +141,8 @@ if (!('matchMedia' in window)) {
     removeListener: () => {}
   })
   window.matchMedia._mocked = true
+}
+
+if (!('scrollIntoView' in window.HTMLElement.prototype)) {
+  window.HTMLElement.prototype.scrollIntoView = () => {}
 }

@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import ConditionalRelease from 'jsx/shared/conditional_release/ConditionalRelease'
+import ConditionalRelease from '@canvas/conditional-release-editor'
 
 let editor = null
 class ConditionalReleaseEditor {

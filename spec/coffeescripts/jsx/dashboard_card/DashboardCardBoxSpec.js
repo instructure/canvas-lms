@@ -18,17 +18,17 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
-import {wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
-import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
-import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
+import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
+import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
+import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container
-  let component
   let props
   let server
 
@@ -37,6 +37,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     document.body.appendChild($container)
 
     props = {
+      cardComponent: DashboardCard,
       courseCards: [
         {
           id: '1',
@@ -62,11 +63,8 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   })
 
   function mountComponent() {
-    const bindRef = ref => {
-      component = ref
-    }
-    const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
-    const CardBox = <Box connectDropTarget={el => el} ref={bindRef} {...props} />
+    const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
+    const CardBox = <Box connectDropTarget={el => el} ref={() => {}} {...props} />
     ReactDOM.render(CardBox, $container)
   }
 
@@ -180,7 +178,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       server.respond()
 
       removeCardFromFavorites(card)
-      await wait(() => waitForRerender(card))
+      await waitFor(() => waitForRerender(card))
 
       const rerendered = getDashboardCardElements()
       strictEqual(rerendered.length, 1)

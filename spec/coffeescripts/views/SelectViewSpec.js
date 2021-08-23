@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import SelectView from 'compiled/views/SelectView'
+import Backbone from '@canvas/backbone'
+import SelectView from 'ui/features/roster/backbone/views/SelectView.coffee'
 import 'helpers/jquery.simulate'
 
 let view = null

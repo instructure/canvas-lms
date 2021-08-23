@@ -23,6 +23,7 @@ const USE_ES_MODULES =
 
 module.exports = {
   presets: [
+    '@babel/preset-typescript',
     [
       '@instructure/ui-babel-preset',
       {
@@ -31,8 +32,17 @@ module.exports = {
       }
     ]
   ],
-  plugins: ['@babel/plugin-proposal-optional-chaining'],
+  plugins: [
+    '@babel/plugin-proposal-optional-chaining',
+    // something changed in @instructure/ui-babel-preset that necessitated
+    // this, if you don't get warnings from babel after removing it, it's
+    // time to keep it removed
+    ['@babel/plugin-proposal-private-methods', {loose: true}]
+  ],
   env: {
+    development: {
+      plugins: ['babel-plugin-typescript-to-proptypes']
+    },
     production: {
       plugins: [
         'transform-react-remove-prop-types',

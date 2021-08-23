@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as jwt from 'jsx/shared/jwt'
-import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
+import * as jwt from '@canvas/rce/jwt'
+import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('JWT', () => {
   QUnit.module('.refreshFn() returned function', hooks => {

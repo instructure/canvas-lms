@@ -36,7 +36,6 @@ describe 'modules' do
     @assignment1 = @course.assignments.create!(:title => 'Assignment First', :points_possible => 10)
     @module1 = @course.context_modules.create!(name: 'Test Module1')
     @item1 = @module1.add_item(id: @assignment1.id, type: 'assignment')
-    Account.default.enable_feature!(:direct_share)
   end
 
   before :each do

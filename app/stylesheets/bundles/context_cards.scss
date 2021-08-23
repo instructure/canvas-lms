@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 @import "components/message_students";
 
@@ -65,7 +67,7 @@
 }
 
 .StudentContextTray-Header__CourseName {
-  margin-bottom: $ic-sp / 3;
+  margin-bottom: math.div($ic-sp, 3);
 }
 
 .StudentContextTray__Section {
@@ -83,7 +85,7 @@
 .StudentContextTray-QuickLinks__Link {
   flex: 1;
   box-sizing: border-box;
-  padding: 0 $ic-sp / 2;
+  padding: 0 $ic-sp * 0.5;
 
   &:first-of-type {
     padding-#{direction(left)}: 0;
@@ -116,5 +118,5 @@
 }
 
 .StudentContextTray-Rating__Stars {
-  margin-top: $ic-sp / 3;
+  margin-top: math.div($ic-sp, 3);
 }

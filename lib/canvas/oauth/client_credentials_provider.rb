@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Oauth
+  CUSTOM_CLAIM_KEY = "canvas.instructure.com"
+
   class ClientCredentialsProvider < Provider
     def initialize(client_id, host, scopes = nil, protocol = 'http://')
       @client_id = client_id
@@ -68,7 +70,7 @@ module Canvas::Oauth
       if key.account_id
         # if developer key is account scoped, add namespaced custom claim about
         # account id
-        claims["canvas.instructure.com"] = { "account_uuid" => key.account.uuid }
+        claims[CUSTOM_CLAIM_KEY] = { "account_uuid" => key.account.uuid }
       end
       return claims, scopes, ttl
     end
@@ -136,6 +138,40 @@ module Canvas::Oauth
 
     def error_message
       valid? ? "" : "Unknown client_id"
+    end
+  end
+
+  # SiteAdmin-only Provider that performs no verification checks
+  # and gives a token back without question
+  # warning: make sure whatever calls this is behind a require_site_admin
+  # check, or anyone can get an access token for any tool
+  class SiteAdminClientCredentialsProvider < ClientCredentialsProvider
+    def initialize(client_id, host, scopes, user, protocol = 'https://')
+      @user = user
+      super(client_id, host, scopes, protocol)
+    end
+
+    def valid?
+      true
+    end
+
+    def error_message
+      ''
+    end
+
+    def generate_token
+      claims, scopes, ttl = generate_claims
+
+      claims[CUSTOM_CLAIM_KEY] ||= {}
+      claims[CUSTOM_CLAIM_KEY]['token_generated_for'] = "site_admin"
+      claims[CUSTOM_CLAIM_KEY]['token_generated_by'] = @user.global_id
+
+      {
+        access_token: key.issue_token(claims),
+        token_type: 'Bearer',
+        expires_in: ttl.seconds,
+        scope: scopes
+      }
     end
   end
 end

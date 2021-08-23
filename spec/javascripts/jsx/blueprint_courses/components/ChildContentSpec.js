@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import ChildContent from 'jsx/blueprint_courses/components/ChildContent'
+import ChildContent from 'ui/features/blueprint_course_child/react/components/ChildContent.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('ChildContent app')

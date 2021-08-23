@@ -25,7 +25,7 @@ describe "shared/_rubric" do
   let(:context) { course_model }
   let(:rubric) { rubric_model(context: context) }
   let(:rubric_association) { rubric_association_model(context: context, rubric: rubric) }
-  let(:html) { Nokogiri::HTML.fragment(response) }
+  let(:html) { Nokogiri::HTML5.fragment(response) }
 
   it "should render" do
     view_context(context)

@@ -91,7 +91,7 @@ module DataFixup
     end
 
     def database
-      @database ||= Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
+      @database ||= CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     end
 
     ResultStruct = Struct.new(:index, :record, :key)

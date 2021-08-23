@@ -303,8 +303,6 @@ class MediaObject < ActiveRecord::Base
   def ensure_attachment
     return if self.attachment_id
     return unless %w{Account Course Group User}.include?(self.context_type)
-    root_account = context.is_a?(User) ? context.account : context.root_account
-    return unless root_account.feature_enabled?(:autocreate_attachment_from_media_object)
 
     sources = self.media_sources
     return unless sources.present?
@@ -334,7 +332,7 @@ class MediaObject < ActiveRecord::Base
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id)) }
+  scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
 
   scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
 

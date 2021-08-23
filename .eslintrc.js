@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 const path = require('path')
 
 module.exports = {
@@ -15,16 +33,17 @@ module.exports = {
     'plugin:promise/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     ecmaFeatures: {
       jsx: true
     },
     sourceType: 'module'
   },
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
 
   globals: {
     ENV: true,
+    JSX: true,
     INST: true,
     tinyMCE: true,
     tinymce: true
@@ -39,7 +58,8 @@ module.exports = {
     'lodash',
     'react',
     'react-hooks',
-    'babel'
+    'babel',
+    '@typescript-eslint'
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -50,6 +70,7 @@ module.exports = {
 
     // These come from our extended configurations, but we don't care about them
     camelcase: 'off', // because we have a ton of `const $user_name = $('#user_name')`
+    'comma-dangle': 'off',
     'class-methods-use-this': 'off',
     'consistent-return': 'off',
     'default-case': 'off',
@@ -100,50 +121,51 @@ module.exports = {
 
     // don't restrict Math.pow for ** operator
     // ref: https://github.com/airbnb/javascript/blob/1f786e154f6c32385607e1688370d7f2d053f88f/packages/eslint-config-airbnb-base/rules/best-practices.js#L225
-    'no-restricted-properties': ['error',
+    'no-restricted-properties': [
+      'error',
       {
         object: 'arguments',
         property: 'callee',
-        message: 'arguments.callee is deprecated',
+        message: 'arguments.callee is deprecated'
       },
       {
         object: 'global',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead',
+        message: 'Please use Number.isFinite instead'
       },
       {
         object: 'self',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead',
+        message: 'Please use Number.isFinite instead'
       },
       {
         object: 'window',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead',
+        message: 'Please use Number.isFinite instead'
       },
       {
         object: 'global',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead',
+        message: 'Please use Number.isNaN instead'
       },
       {
         object: 'self',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead',
+        message: 'Please use Number.isNaN instead'
       },
       {
         object: 'window',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead',
+        message: 'Please use Number.isNaN instead'
       },
       {
         property: '__defineGetter__',
-        message: 'Please use Object.defineProperty instead.',
+        message: 'Please use Object.defineProperty instead.'
       },
       {
         property: '__defineSetter__',
-        message: 'Please use Object.defineProperty instead.',
-      },
+        message: 'Please use Object.defineProperty instead.'
+      }
     ],
 
     'no-restricted-syntax': [
@@ -166,7 +188,7 @@ module.exports = {
     'jest/no-large-snapshots': 'warn',
 
     // These are things we care about
-    'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
+    'react/jsx-filename-extension': ['error', {extensions: ['.js', 'ts', 'tsx']}],
     'no-unused-vars': [
       'error',
       {
@@ -177,7 +199,7 @@ module.exports = {
       }
     ],
     'eslint-comments/no-unused-disable': 'error',
-    'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
+    'import/extensions': ['error', 'ignorePackages', {js: 'never', ts: 'never', tsx: 'never'}],
     'import/no-commonjs': 'off', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
@@ -195,9 +217,18 @@ module.exports = {
       }
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
-    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}]
+    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
+
+    // These are for typescript
+    semi: 'off',
+    '@typescript-eslint/semi': ['error', 'never']
   },
   settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'] // add Typescript extensions
+      }
+    },
     react: {
       version: 'detect'
     }
@@ -218,7 +249,7 @@ module.exports = {
       }
     },
     {
-      files: ['app/**/*', 'spec/**/*', 'public/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
@@ -234,13 +265,18 @@ module.exports = {
       }
     },
     {
-      files: ['app/jsx/canvas_quizzes/**/*'],
+      files: [
+        'ui/features/quiz_log_auditing/**/*',
+        'ui/features/quiz_statistics/**/*',
+        'ui/shared/quiz-legacy-client-apps/**/*',
+        'ui/shared/quiz-log-auditing/**/*'
+      ],
       rules: {
         'react/prop-types': 'off',
         'prefer-const': 'warn',
         'prettier/prettier': 'off',
-        'react/no-string-refs': 'warn',
+        'react/no-string-refs': 'warn'
       }
-    },
+    }
   ]
 }

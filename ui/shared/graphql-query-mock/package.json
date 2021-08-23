@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/graphql-query-mock",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "index.js"
+}

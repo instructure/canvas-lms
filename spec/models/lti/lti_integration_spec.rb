@@ -58,12 +58,7 @@ describe "LTI integration tests" do
     end
   }
 
-  let_once(:root_account) {
-    Account.new.tap do |account|
-      account.name = 'root_account'
-      account.save!
-    end
-  }
+  let_once(:root_account) { Account.create!(name: 'root_account') }
 
   let(:controller) do
     request_mock = double('request')
@@ -80,9 +75,7 @@ describe "LTI integration tests" do
   it "generates the correct post payload" do
     canvas_user.email = 'user@email.com'
 
-    sub_account = Account.create!
-    sub_account.root_account = root_account
-    sub_account.save!
+    sub_account = root_account.sub_accounts.create!
     pseudonym = pseudonym(canvas_user, account: root_account, username: 'login_id')
 
     teacher_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
@@ -416,7 +409,7 @@ describe "LTI integration tests" do
     end
 
     it "should include assignment outcome service params for student" do
-      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
 

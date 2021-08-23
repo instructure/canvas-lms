@@ -192,7 +192,10 @@ module Importers
       item.scoring_policy = hash[:which_attempt_to_keep] if master_migration || hash[:which_attempt_to_keep]
 
       missing_links = []
-      item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
+
+      unless migration.quizzes_next_migration? # The description is mapped to "instructions" in NQ
+        item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
+      end
 
       %w[
         migration_id
@@ -277,8 +280,9 @@ module Importers
         end
       end
 
+      item.generate_quiz_data if hash[:available] || item.published?
+
       if hash[:available]
-        item.generate_quiz_data
         item.workflow_state = 'available'
         item.published_at = Time.now
       elsif item.can_unpublish? && (new_record || master_migration)
@@ -325,7 +329,7 @@ module Importers
             q[:questions].map{|qq| qq[:quiz_question_migration_id] || qq[:migration_id]} :
             q[:quiz_question_migration_id] || q[:migration_id]
           }.flatten
-          item.quiz_questions.active.where.not(:migration_id => importing_question_mig_ids).update_all(:workflow_state => 'deleted')
+          item.quiz_questions.not_deleted.where.not(migration_id: importing_question_mig_ids).update_all(workflow_state: 'deleted')
 
           # remove the quiz groups afterwards so any of their dependent quiz questions are deleted first and we don't run into any Restrictor errors
           importing_qgroup_mig_ids = hash[:questions].select{|q| q[:question_type] == "question_group"}.map{|qg| qg[:migration_id]}
@@ -345,7 +349,7 @@ module Importers
         end
       end
 
-      hash[:questions].each_with_index do |question, i|
+      !migration.quizzes_next_banks_migration? && hash[:questions].each_with_index do |question, i|
         case question[:question_type]
         when "question_reference"
           if aq = (question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])

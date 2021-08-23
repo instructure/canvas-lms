@@ -262,7 +262,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
           )
         }}
         messages={messages}
-        label={
+        renderLabel={
           <Billboard
             heading={label}
             hero={<RocketSVG width="3em" height="3em" />}

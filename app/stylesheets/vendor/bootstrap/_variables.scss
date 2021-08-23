@@ -248,13 +248,13 @@ $gridRowWidth768:         ($gridColumns * $gridColumnWidth768) + ($gridGutterWid
 
 // Fluid grid
 // -------------------------
-$fluidGridColumnWidth:    percentage($gridColumnWidth/$gridRowWidth) !default;
-$fluidGridGutterWidth:    percentage($gridGutterWidth/$gridRowWidth) !default;
+$fluidGridColumnWidth:    percentage(math.div($gridColumnWidth, $gridRowWidth)) !default;
+$fluidGridGutterWidth:    percentage(math.div($gridGutterWidth, $gridRowWidth)) !default;
 
 // 1200px min
-$fluidGridColumnWidth1200:     percentage($gridColumnWidth1200/$gridRowWidth1200) !default;
-$fluidGridGutterWidth1200:     percentage($gridGutterWidth1200/$gridRowWidth1200) !default;
+$fluidGridColumnWidth1200:     percentage(math.div($gridColumnWidth1200, $gridRowWidth1200)) !default;
+$fluidGridGutterWidth1200:     percentage(math.div($gridGutterWidth1200, $gridRowWidth1200)) !default;
 
 // 768px-979px
-$fluidGridColumnWidth768:      percentage($gridColumnWidth768/$gridRowWidth768) !default;
-$fluidGridGutterWidth768:      percentage($gridGutterWidth768/$gridRowWidth768) !default;
+$fluidGridColumnWidth768:      percentage(math.div($gridColumnWidth768, $gridRowWidth768)) !default;
+$fluidGridGutterWidth768:      percentage(math.div($gridGutterWidth768, $gridRowWidth768)) !default;

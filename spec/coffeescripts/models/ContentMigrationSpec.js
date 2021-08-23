@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ContentMigration from 'compiled/models/ContentMigration'
-import DaySubstitutionCollection from 'compiled/collections/DaySubstitutionCollection'
+import Backbone from '@canvas/backbone'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
+import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection.coffee'
 
 QUnit.module('ContentMigration', {
   setup() {

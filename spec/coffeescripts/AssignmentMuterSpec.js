@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentMuter from 'coffeescripts/AssignmentMuter'
+import AssignmentMuter from 'ui/features/screenreader_gradebook/jquery/AssignmentMuter.js'
 import $ from 'jquery'
 
 QUnit.module('AssignmentMuter', suiteHooks => {

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -28,7 +28,9 @@ import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, scaleToSize} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
 import {useDimensionsState} from '../../shared/DimensionsInput'
 import ImageOptionsForm from '../../shared/ImageOptionsForm'
-import {getTrayHeight} from '../../shared/trayUtils'
+import {getTrayHeight, isExternalUrl} from '../../shared/trayUtils'
+import validateURL from '../../instructure_links/validateURL'
+import UrlPanel from '../../shared/Upload/UrlPanel'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onEntered, onExited, onRequestClose, onSave, open} = props
@@ -37,6 +39,8 @@ export default function ImageOptionsTray(props) {
   const currentHeight = imageOptions.appliedHeight || naturalHeight
   const currentWidth = imageOptions.appliedWidth || naturalWidth
 
+  const [url, setUrl] = useState(imageOptions.url)
+  const [showUrlField, setShowUrlField] = useState(false)
   const [altText, setAltText] = useState(imageOptions.altText)
   const [isDecorativeImage, setIsDecorativeImage] = useState(imageOptions.isDecorativeImage)
   const [displayAs, setDisplayAs] = useState('embed')
@@ -48,6 +52,10 @@ export default function ImageOptionsTray(props) {
     minHeight: MIN_HEIGHT,
     minWidth: MIN_WIDTH
   })
+
+  function handleUrlChange(newUrl) {
+    setUrl(newUrl)
+  }
 
   function handleAltTextChange(event) {
     setAltText(event.target.value)
@@ -75,7 +83,7 @@ export default function ImageOptionsTray(props) {
 
   function handleSave(event) {
     event.preventDefault()
-    const savedAltText = isDecorativeImage ? altText || ' ' : altText
+    const savedAltText = isDecorativeImage ? '' : altText
 
     let appliedHeight = imageHeight
     let appliedWidth = imageWidth
@@ -85,6 +93,7 @@ export default function ImageOptionsTray(props) {
     }
 
     onSave({
+      url,
       altText: savedAltText,
       appliedHeight,
       appliedWidth,
@@ -93,6 +102,17 @@ export default function ImageOptionsTray(props) {
     })
   }
 
+  useEffect(() => {
+    let isValidURL
+    try {
+      isValidURL = validateURL(url)
+    } catch (error) {
+      isValidURL = false
+    } finally {
+      setShowUrlField(isValidURL ? isExternalUrl(url) : true)
+    }
+  }, [])
+
   const messagesForSize = []
   if (imageSize !== CUSTOM) {
     messagesForSize.push({
@@ -100,6 +120,12 @@ export default function ImageOptionsTray(props) {
       type: 'hint'
     })
   }
+
+  const saveDisabled =
+    url === '' ||
+    (displayAs === 'embed' &&
+      ((!isDecorativeImage && altText === '') ||
+        (imageSize === CUSTOM && !dimensionsState?.isValid)))
 
   return (
     <Tray
@@ -130,22 +156,39 @@ export default function ImageOptionsTray(props) {
         </Flex.Item>
 
         <Flex.Item as="form" grow margin="none" shrink>
-          <ImageOptionsForm
-            id="image-options-form"
-            imageSize={imageSize}
-            displayAs={displayAs}
-            isDecorativeImage={isDecorativeImage}
-            altText={altText}
-            isLinked={isLinked}
-            dimensionsState={dimensionsState}
-            handleAltTextChange={handleAltTextChange}
-            handleIsDecorativeChange={handleIsDecorativeChange}
-            handleDisplayAsChange={handleDisplayAsChange}
-            handleImageSizeChange={handleImageSizeChange}
-            messagesForSize={messagesForSize}
-            handleSave={handleSave}
-            flexHeight="100%"
-          />
+          <Flex justifyItems="space-between" direction="column" height="100%">
+            <Flex direction="column">
+              {showUrlField && (
+                <Flex.Item padding="small">
+                  <UrlPanel fileUrl={url} setFileUrl={handleUrlChange} />
+                </Flex.Item>
+              )}
+              <ImageOptionsForm
+                id="image-options-form"
+                imageSize={imageSize}
+                displayAs={displayAs}
+                isDecorativeImage={isDecorativeImage}
+                altText={altText}
+                isLinked={isLinked}
+                dimensionsState={dimensionsState}
+                handleAltTextChange={handleAltTextChange}
+                handleIsDecorativeChange={handleIsDecorativeChange}
+                handleDisplayAsChange={handleDisplayAsChange}
+                handleImageSizeChange={handleImageSizeChange}
+                messagesForSize={messagesForSize}
+              />
+            </Flex>
+            <Flex.Item
+              background="secondary"
+              borderWidth="small none none none"
+              padding="small medium"
+              textAlign="end"
+            >
+              <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
+                {formatMessage('Done')}
+              </Button>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
       </Flex>
     </Tray>

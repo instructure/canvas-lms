@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradingPeriodFilter from 'jsx/gradebook/default_gradebook/components/content-filters/GradingPeriodFilter'
+import GradingPeriodFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/GradingPeriodFilter.js'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {

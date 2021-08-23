@@ -31,7 +31,7 @@ describe "syllabus" do
     get "/courses/#{@course.id}/assignments/syllabus"
 
     expect(response).to be_successful
-    page = Nokogiri::HTML(response.body)
+    page = Nokogiri::HTML5(response.body)
     expect(page.css('#identity a[href="/login"]')).not_to be_nil
     expect(page.at_css('#syllabusContainer')).not_to be_nil
   end
@@ -55,7 +55,7 @@ describe "syllabus" do
       get "/courses/#{@course.id}/assignments/syllabus"
 
       expect(response).to be_successful
-      page = Nokogiri::HTML(response.body)
+      page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
       expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
@@ -74,7 +74,7 @@ describe "syllabus" do
       get "/courses/#{@course.id}/assignments/syllabus"
 
       expect(response).to be_successful
-      page = Nokogiri::HTML(response.body)
+      page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
       expect(link.attributes['href'].value).to_not include("verifier=#{@attachment.uuid}")
@@ -93,7 +93,7 @@ describe "syllabus" do
       get "/courses/#{@course.id}/assignments/syllabus"
 
       expect(response).to be_successful
-      page = Nokogiri::HTML(response.body)
+      page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
       expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
@@ -113,7 +113,7 @@ describe "syllabus" do
       get "/courses/#{@course.id}/assignments/syllabus"
 
       expect(response).to be_successful
-      page = Nokogiri::HTML(response.body)
+      page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
       expect(link.attributes['href'].value).to_not include("verifier=#{@attachment.uuid}")
@@ -161,7 +161,7 @@ describe "syllabus" do
     get "/courses/#{@course.id}"
 
     expect(response).to be_successful
-    page = Nokogiri::HTML(response.body)
+    page = Nokogiri::HTML5(response.body)
     expect(page.at_css('#course_syllabus').text).to include(syllabus_body)
   end
 end

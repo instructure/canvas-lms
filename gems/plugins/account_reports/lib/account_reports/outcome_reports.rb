@@ -177,7 +177,7 @@ module AccountReports
               AND sub.user_id = pseudonyms.user_id AND sub.workflow_state <> 'deleted'
               AND sub.workflow_state <> 'unsubmitted'", parameters])).
         where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
-            AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
+            AND (r.id IS NULL OR (r.workflow_state <> 'deleted' AND r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
         students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
@@ -249,7 +249,7 @@ module AccountReports
           LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
            AND qr.associated_asset_type = 'AssessmentQuestion'
         JOINS
-        where("ct.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
+        where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
       unless @include_deleted
         students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")

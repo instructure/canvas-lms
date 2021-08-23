@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery/ModuleSequenceFooter'
+import '@canvas/module-sequence-footer'
 
 const default_course_url =
   '/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true'

@@ -52,8 +52,11 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
 
     it 'should add a file to the page and validate a student can see it' do
       create_session(@teacher.pseudonym)
-
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      wait_for_tiny(f("form.edit-form .edit-content"))
       add_file_to_rce_next
+      force_click('form.edit-form button.submit')
+      wait_for_ajax_requests
       @course.wiki_pages.first.publish!
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}/pages/front-page"

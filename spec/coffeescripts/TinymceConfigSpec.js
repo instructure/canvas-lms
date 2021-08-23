@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import EditorConfig from 'tinymce.config'
+import EditorConfig from '@canvas/rce/tinymce.config'
 
 let INST = null
 const largeScreenWidth = 1300

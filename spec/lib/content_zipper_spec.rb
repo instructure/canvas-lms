@@ -339,7 +339,7 @@ describe ContentZipper do
 
         @attachment = Attachment.new(display_name: 'my_download.zip')
         @attachment.workflow_state = 'to_be_zipped'
-        @attachment.context = folder
+        @attachment.context = folder.reload
       end
 
       def zipped_files_for_user(user=nil, check_user=true)

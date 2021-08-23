@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import ExternalToolsHelper from 'tinymce_plugins/instructure_external_tools/ExternalToolsHelper'
+import ExternalToolsHelper from '@canvas/tinymce-external-tools/ExternalToolsHelper'
 import $ from 'jquery'
 
 QUnit.module('ExternalToolsHelper:buttonConfig', {

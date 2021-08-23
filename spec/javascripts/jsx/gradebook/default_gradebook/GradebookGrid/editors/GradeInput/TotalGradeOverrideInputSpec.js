@@ -19,8 +19,8 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import GradeInput from 'jsx/gradebook/default_gradebook/GradebookGrid/editors/GradeInput'
-import GradeOverrideEntry from 'jsx/grading/GradeEntry/GradeOverrideEntry'
+import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/index.js'
+import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid GradeInput', suiteHooks => {

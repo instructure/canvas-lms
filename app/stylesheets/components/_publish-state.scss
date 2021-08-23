@@ -19,7 +19,8 @@
 /* publish buttons */
 .btn-publish,
 .btn-published,
-.btn-unpublish {
+.btn-unpublish,
+.btn-unpublished {
   transition: none;
   padding-#{direction(left)}: 9px;
 
@@ -57,7 +58,7 @@
   color: #fff;
 }
 
-.btn-unpublish {
+.btn-unpublished {
   @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
   box-shadow: none;
   &:focus { @include button-focus-dark; }
@@ -65,8 +66,8 @@
 
 .btn-published.disabled,
 .btn-published.disabled:hover,
-.btn-unpublish.disabled,
-.btn-unpublish.disabled:hover {
+.btn-unpublished.disabled,
+.btn-unpublished.disabled:hover {
   @if $use_high_contrast { opacity: 1; }
 }
 

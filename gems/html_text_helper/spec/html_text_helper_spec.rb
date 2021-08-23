@@ -32,43 +32,43 @@ describe HtmlTextHelper do
   context "format_message" do
     it "should detect and linkify URLs" do
       str = th.format_message("click here: (http://www.instructure.com) to check things out\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com")
 
       str = th.format_message("click here: http://www.instructure.com\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com")
 
       str = th.format_message("click here: www.instructure.com/a/b?a=1&b=2\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/a/b?a=1&b=2")
 
       str = th.format_message("click here: http://www.instructure.com/\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/")
 
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages/informação").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/courses/1/pages/informação")
 
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages#anchor").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/courses/1/pages#anchor")
 
       str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/%27onclick=alert(document.cookie)//")
 
       # > ~15 chars in parens used to blow up the parser to take forever
       str = th.format_message("click here: http://www.instructure.com/(012345678901234567890123456789012345678901234567890)").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      html = Nokogiri::HTML5.fragment(str)
       link = html.css('a').first
       expect(link['href']).to eq("http://www.instructure.com/(012345678901234567890123456789012345678901234567890)")
     end

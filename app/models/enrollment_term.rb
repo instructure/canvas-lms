@@ -43,6 +43,11 @@ class EnrollmentTerm < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
 
+  def self.ensure_dummy_enrollment_term
+    Account.ensure_dummy_root_account
+    create_with(root_account_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
+  end
+
   def prevent_default_term_name_change
     if self.name_changed? && self.name_was == DEFAULT_TERM_NAME && self == self.root_account.default_enrollment_term
       self.errors.add(:name, t("Cannot change the default term name"))

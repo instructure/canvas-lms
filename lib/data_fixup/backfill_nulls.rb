@@ -51,7 +51,7 @@ module DataFixup
       end
 
       klass.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
-        update_count = scope.where(id: start_id..end_id).update_all(updates)
+        update_count = scope.where(klass.primary_key => start_id..end_id).update_all(updates)
         sleep_interval_per_batch = Setting.get("sleep_interval_per_backfill_nulls_batch", nil).presence&.to_f
         sleep(sleep_interval_per_batch) if update_count > 0 && sleep_interval_per_batch
       end

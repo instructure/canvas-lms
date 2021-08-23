@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import CollaborationsToolLaunch from 'jsx/collaborations/CollaborationsToolLaunch'
+import CollaborationsToolLaunch from 'ui/features/lti_collaborations/react/CollaborationsToolLaunch.js'
 
 let fixtures
 

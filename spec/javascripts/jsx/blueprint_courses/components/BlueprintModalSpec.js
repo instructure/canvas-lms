@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintModal from 'jsx/blueprint_courses/components/BlueprintModal'
+import BlueprintModal from '@canvas/blueprint-courses/react/components/BlueprintModal'
 
 QUnit.module('BlueprintModal component', {
   setup() {

@@ -64,47 +64,11 @@ class ContentMigration < ActiveRecord::Base
     exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
   end
 
-  def context_root_account(user = nil)
-    # Granular Permissions
-    #
-    # The primary use case for this method is for accurately checking
-    # feature flag enablement, given a user and the calling context.
-    # We want to prefer finding the root_account through the context
-    # of the authorizing resource or fallback to the user's active
-    # pseudonym's residing account.
-    return self.context.account if self.context.is_a?(User)
-
-    self.context.try(:root_account) || user&.account
-  end
-
   set_policy do
-    #################### Begin legacy permission block #########################
-
     given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files)
+      self.context.grants_any_right?(user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
     end
-    can :manage_files and can :read
-
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files_add)
-    end
-    can :read and can :manage_files_add
-
-    given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files_edit)
-    end
-    can :read and can :manage_files_edit
-
-    given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files_delete)
-    end
-    can :read and can :manage_files_delete
+    can :read
   end
 
   def trigger_live_events!
@@ -425,7 +389,9 @@ class ContentMigration < ActiveRecord::Base
           worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
           self.workflow_state = :exporting
           self.save
-          Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
+          self.class.connection.after_transaction_commit do
+            Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
+          end
         rescue NameError
           self.workflow_state = 'failed'
           message = "The migration plugin #{migration_type} doesn't have a worker."
@@ -574,6 +540,13 @@ class ContentMigration < ActiveRecord::Base
         self.master_course_subscription.load_tags! # load child content tags
         self.master_course_subscription.master_template.preload_restrictions!
 
+        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
+        data = prepare_data(data)
+
+        # handle deletions before files are copied
+        deletions = data['deletions'].presence
+        process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         if source_export.selective_export?
@@ -591,9 +564,6 @@ class ContentMigration < ActiveRecord::Base
         MasterCourses::FolderHelper.update_folder_names_and_states(self.context, source_export)
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
         MasterCourses::FolderHelper.recalculate_locked_folders(self.context)
-
-        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
-        data = prepare_data(data)
       else
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -613,11 +583,11 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-      deletions = self.for_master_course_import? && data['deletions'].presence
-      process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
       import!(data)
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
+
       if !self.import_immediately?
         update_import_progress(100)
       end
@@ -651,9 +621,13 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def quizzes_next_migration?
-    context.instance_of?(Course) && root_account &&
-      root_account.feature_enabled?(:import_to_quizzes_next) &&
+    context.instance_of?(Course) &&
+      context.feature_enabled?(:quizzes_next) &&
       migration_settings[:import_quizzes_next]
+  end
+
+  def quizzes_next_banks_migration?
+    self.quizzes_next_migration? && Account.site_admin.feature_enabled?(:new_quizzes_bank_migrations)
   end
 
   def import_quizzes_next!(data)

@@ -27,26 +27,34 @@ class DiscussionEntry < ActiveRecord::Base
   include HtmlTextHelper
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id
+  has_many :legacy_subentries, -> { where('legacy=true') }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
+  has_many :root_discussion_replies, -> { where('legacy=false OR legacy=true AND parent_id=root_entry_id') }, class_name: 'DiscussionEntry', foreign_key: "root_entry_id"
   has_many :discussion_subentries, -> { order(:created_at) }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: 'DiscussionEntry', foreign_key: 'root_entry_id'
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   # also null if a root entry
   belongs_to :root_entry, :class_name => 'DiscussionEntry', :foreign_key => :root_entry_id
   belongs_to :user
+  has_many :mentions, inverse_of: :discussion_entry
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
+  belongs_to :root_account, class_name: 'Account'
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
+  before_create :populate_legacy
   before_create :set_root_account_id
+  before_save :process_reply_preview
   after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
   after_create :clear_planner_cache_for_participants
+  after_create :update_topic
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
   before_validation :set_depth, :on => :create
@@ -56,6 +64,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
+  # parse_and_create_mentions has to run before has_a_broadcast_policy and the
+  # after_save hook it adds.
+  after_save :parse_and_create_mentions
   has_a_broadcast_policy
   attr_accessor :new_record_header
 
@@ -64,13 +75,37 @@ class DiscussionEntry < ActiveRecord::Base
     state :deleted
   end
 
+  def parse_and_create_mentions
+    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]')
+    user_ids = mention_data.map { |l| l['data-mention'] }
+    User.where(id: user_ids).each do |u|
+      mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
+    end
+  end
+
+  def mentioned_users
+    User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+  end
+
+  def process_reply_preview
+    reply_preview = Nokogiri::HTML.fragment(message).search('[data-discussion-reply-preview]')
+    if reply_preview.present?
+      self.include_reply_preview = true
+      new_message = Nokogiri::HTML.fragment(message)
+      new_message.search('[data-discussion-reply-preview]').remove
+      self.message = new_message.to_html
+    else
+      self.include_reply_preview = false
+    end
+  end
+
   def course_broadcast_data
     discussion_topic.context&.broadcast_data
   end
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { subscribers - [user] }
+    p.to { discussion_topic.subscribers - [user] - mentioned_users }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -144,9 +179,9 @@ class DiscussionEntry < ActiveRecord::Base
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
-      raise "Only context participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,
@@ -162,12 +197,23 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  def posters
-    self.discussion_topic.posters rescue [self.user]
+  def quoted_reply_html
+    "<div class=\"mceNonEditable reply_preview\" data-discussion-reply-preview=\"1\">
+      <blockquote cite=\"#\">
+        <span>
+          <strong>#{user.short_name}</strong> #{created_at.iso8601}
+        </span>
+        #{self.deleted? ? "<p>#{I18n.t('Deleted by %{user}', user: editor.short_name)}</p>" : "<p>#{summary}</p>"}
+      </blockquote>
+    </div>"
   end
 
-  def subscribers
-    subscribed_users = self.discussion_topic.subscribers
+  def reply_preview_data
+    {
+      author_name: user.short_name,
+      created_at: created_at,
+      message: self.deleted? ? "<p>'Deleted by #{editor.short_name}'</p>" : summary
+    }
   end
 
   def plaintext_message=(val)
@@ -249,11 +295,23 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where("discussion_entries.workflow_state<>'deleted'") }
-  scope :deleted, -> { where(:workflow_state => 'deleted') }
-
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
+  end
+
+  def populate_legacy
+    # TODO
+    # when this feature flag is removed, we should add a predeploy migration
+    # that changes the column default. Then just get rid of this method.
+    #
+    # class FlipLegacyDefaultOnDiscussionEntry < ActiveRecord::Migration[6.0]
+    #   tag :predeploy
+    #
+    #   def change
+    #     change_column_default :discussion_entries, :legacy, false
+    #   end
+    # end
+    self.legacy = !(context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:isolated_view))
   end
 
   def infer_root_entry_id
@@ -316,12 +374,21 @@ class DiscussionEntry < ActiveRecord::Base
     can :rate
   end
 
-  scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
-  scope :for_users, lambda { |users| where(:user_id => users) }
-  scope :after, lambda { |date| where("created_at>?", date) }
-  scope :top_level_for_topics, lambda { |topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
-  scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :for_user, ->(user) { where(:user_id => user).order("discussion_entries.created_at") }
+  scope :for_users, ->(users) { where(user_id: users) }
+  scope :after, ->(date) { where("created_at>?", date) }
+  scope :top_level_for_topics, ->(topics) { where(root_entry_id: nil, discussion_topic_id: topics) }
+  scope :all_for_topics, ->(topics) { where(discussion_topic_id: topics) }
   scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
+  # when there is no discussion_entry_participant for a user, it is considered unread
+  scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ['unread', nil] }) }
+
+  def self.participant_join_sql(current_user)
+    sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
+      AND discussion_entry_participants.user_id = ?", current_user.id])
+  end
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
@@ -364,6 +431,8 @@ class DiscussionEntry < ActiveRecord::Base
   end
   protected :context_module_action_later
 
+  # If this discussion topic is part of an assignment this method is what
+  # submits the assignment or updates the submission for the user
   def context_module_action
     if self.discussion_topic && self.user
       action = self.deleted? ? :deleted : :contributed
@@ -449,7 +518,7 @@ class DiscussionEntry < ActiveRecord::Base
   # opts         - Additional named arguments (default: {})
   #                :forced - Also set the forced_read_state to this value.
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # Returns nil if current_user is nil, the DiscussionEntryParticipant if the
   # read_state was changed, or true if the read_state was not changed. If the
   # read_state is not changed, a participant record will not be created.
   def change_read_state(new_state, current_user = nil, opts = {})
@@ -458,6 +527,7 @@ class DiscussionEntry < ActiveRecord::Base
 
     if new_state != self.read_state(current_user)
       entry_participant = self.update_or_create_participant(opts.merge(:current_user => current_user, :new_state => new_state))
+      StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
       if entry_participant.present? && entry_participant.valid?
         self.discussion_topic.update_or_create_participant(opts.merge(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1)))
       end
@@ -542,16 +612,17 @@ class DiscussionEntry < ActiveRecord::Base
   # Public: Find the existing DiscussionEntryParticipant, or create a default
   # participant, for the specified user.
   #
-  # user - The User to lookup the participant for.
+  # user - The User or user_id to lookup the participant for.
   #
   # Returns the DiscussionEntryParticipant for the user, or a participant with
   # default values set. The returned record is marked as readonly! If you need
   # to update a participant, use the #update_or_create_participant method
   # instead.
   def find_existing_participant(user)
+    user_id = user.is_a?(User) ? user.id : user
     participant = discussion_entry_participants.loaded? ?
-      discussion_entry_participants.detect{|dep| dep.user_id == user.id} :
-      discussion_entry_participants.where(:user_id => user).first
+      discussion_entry_participants.detect{|dep| dep.user_id == user_id} :
+      discussion_entry_participants.where(:user_id => user_id).first
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({
@@ -559,7 +630,7 @@ class DiscussionEntry < ActiveRecord::Base
         :forced_read_state => false,
         })
       participant.discussion_entry = self
-      participant.user = user
+      participant.user_id = user_id
     end
 
     # Do not save this record. Use update_or_create_participant instead if you need to save it

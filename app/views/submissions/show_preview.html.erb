@@ -16,6 +16,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  presenter = Submission::ShowPresenter.new(
+    submission: @submission,
+    current_user: @current_user,
+    assessment_request: @assessment_request,
+    current_host: request.host
+  )
+
+  # Calls to doc_preview_attributes will result in this hash getting some
+  # attributes deleted; dup this hash before passing it to any methods.
+  preview_url_opts = {
+    anonymous_instructor_annotations: @anonymous_instructor_annotations,
+    enable_annotations: true,
+    enrollment_type: @enrollment_type,
+    moderated_grading_allow_list: @moderated_grading_allow_list,
+    submission_id: @submission.id
+  }
+
+  if @submission.submission_type == "student_annotation"
+    annotation_context = @submission.annotation_context(attempt: @submission.attempt)
+    preview_url_opts[:annotation_context] = annotation_context.launch_id
+  end
+%>
+
 <% css_bundle :submission %>
 
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
@@ -109,7 +133,7 @@
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
-  <% js_bundle 'legacy/submissions_show_preview_text' %>
+  <% js_bundle 'submissions_show_preview_text' %>
   <div style="text-align: <%= direction('right') %>; margin-top: 15px;">
     <select class="data_view">
       <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
@@ -192,16 +216,7 @@
               data-attachment_id="<%= attachment.id %>"
               data-submission_id="<%= @submission.id %>"
               data-dialog-title="<%= attachment.display_name %>"
-              <%=
-                doc_preview_attributes(
-                  attachment,
-                  anonymous_instructor_annotations: @anonymous_instructor_annotations,
-                  enable_annotations: true,
-                  enrollment_type: @enrollment_type,
-                  moderated_grading_allow_list: @moderated_grading_allow_list,
-                  submission_id: @submission.id
-                )
-              %>
+              <%= doc_preview_attributes(attachment, preview_url_opts.dup) %>
             >
               <%= button_text %>
             </a>
@@ -213,8 +228,8 @@
 
   <% end %>
 
-  <% js_bundle 'legacy/submissions_show_preview_upload' %>
-<% elsif @submission.submission_type == "online_quiz" %>
+  <% js_bundle 'submissions_show_preview_upload' %>
+<% elsif @submission.submission_type == "online_quiz" and  @assignment&.quiz&.id %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <div style="text-align: center;">
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
@@ -227,9 +242,19 @@
   </div>
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
-  <% js_bundle 'legacy/submissions_show_preview_media' %>
+  <% js_bundle 'submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
-  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless', url: @submission.external_tool_url) %>"/>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
+<% elsif @submission.submission_type == "student_annotation" %>
+  <div class="ef-file-preview-stretch">
+    <iframe
+      allowfullscreen
+      title="<%= t "Student Annotation submission" %>"
+      src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts.dup) %>"
+      class="ef-file-preview-frame annotated-document-submission"
+      style="height: 100vh; width: 100%;">
+    </iframe>
+  </div>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

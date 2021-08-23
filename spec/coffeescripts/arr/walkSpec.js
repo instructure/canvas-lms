@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import walk from 'compiled/arr/walk'
+import walk from 'ui/features/discussion_topic/array-walk.js'
 
 QUnit.module('arr/walk')
 

@@ -79,6 +79,7 @@ class UserList
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
+      user.root_account_ids = [@root_account.id]
       user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
       user
@@ -216,11 +217,18 @@ class UserList
     associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
-      Pseudonym.active.
-          select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state').
-          joins(:user => :communication_channels).
-          where("communication_channels.workflow_state<>'retired' AND LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase}, account_ids).
-          map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
+      
+      pseudos = Pseudonym.active
+          .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
+          .joins(:user => :communication_channels)
+          .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase}, account_ids)
+      pseudos = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
+          pseudos.merge(CommunicationChannel.unretired)
+        else
+          pseudos.merge(CommunicationChannel.active)
+        end
+
+      pseudos.map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
         addresses.each do |address|
           # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule

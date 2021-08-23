@@ -15,21 +15,26 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
-notification_update_account_ui:
+react_discussions_post:
   state: hidden
-  display_name: Account level notification preferences UI update
+  beta: true
+  display_name: Discussions/Announcements Redesign
   description: |-
-    Updates account notification preferences UI to be a more current
-    and updated user experience
-  applies_to: SiteAdmin
+    This feature enhances the Canvas experience within Discussions and Announcements.
+    When this flag is enabled, early access to ongoing improvements will be
+    displayed automatically with every release. For full details,
+    please see the Discussions/Announcements Redesign user group 
+    in the Canvas Community.
+  applies_to: Course
 
-react_announcement_discussion_edit:
+isolated_view:
   state: hidden
-  display_name: Update announcement/discussion edit page to use react/instui
+  beta: true
+  display_name: Discussions Redesign - Isolated View
   description: |-
-    This refactor will make this page more maintainable and easily
-    allow us to make the page more accessible
-  applies_to: RootAccount
+    This feature flag enables Isolated View inside the new
+    Discussions Redesign work.
+  applies_to: SiteAdmin
 
 react_inbox:
   state: hidden
@@ -37,13 +42,6 @@ react_inbox:
   description: |-
     This refactor will make this page more maintainable
   applies_to: RootAccount
-
-reduce_push_notifications:
-  state: hidden
-  display_name: Restrict Push Notifications to Select Types
-  description: |-
-    Disables Push notifications for certain types.
-  applies_to: SiteAdmin
 
 smart_alerts:
   state: hidden
@@ -57,4 +55,18 @@ trophy_case:
   display_name: Trophy case
   description: |-
     Display historical view of achievements of users
+  applies_to: SiteAdmin
+
+show_push_notification_account_setting:
+  state: hidden
+  display_name: Allow push notification opt-out
+  description: |-
+    Enable an account setting which toggles push notifications for that account
+  applies_to: SiteAdmin
+
+deprecate_sms:
+  state: hidden
+  display_name: Deprecate SMS
+  description: |-
+    When enabled it deprecates the Short Message Service (SMS).
   applies_to: SiteAdmin

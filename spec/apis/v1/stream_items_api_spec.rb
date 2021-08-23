@@ -467,7 +467,9 @@ describe UsersController, type: :request do
         'uuid' => @course.uuid,
         'blueprint' => false,
         'license' => nil,
-        'homeroom_course' => false
+        'homeroom_course' => false,
+        'course_color' => nil,
+        'friendly_name' => nil
       },
 
       'user' => {
@@ -600,7 +602,9 @@ describe UsersController, type: :request do
         'uuid' => @course.uuid,
         'blueprint' => false,
         'license' => nil,
-        'homeroom_course' => false
+        'homeroom_course' => false,
+        'course_color' => nil,
+        'friendly_name' => nil
       },
 
       'user' => {

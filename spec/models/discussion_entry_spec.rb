@@ -58,6 +58,16 @@ describe DiscussionEntry do
     expect(topic.discussion_entries.active.length).to eq 1
   end
 
+  it "should check both feature flags for the legacy boolean" do
+    @course = course_model
+    Account.site_admin.enable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+    Account.site_admin.enable_feature!(:isolated_view)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be false
+    @course.disable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+  end
+
   it "should preserve parent_id if valid" do
     course_factory
     entry = topic.discussion_entries.create!
@@ -89,12 +99,93 @@ describe DiscussionEntry do
     expect(entry.grants_right?(@student, :read)).to be(false)
   end
 
+  context "mentions" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:student) { student_in_course(active_all: true).user }
+    let(:mentioned_student) { student_in_course(active_all: true).user }
+
+    it 'should create on entry save' do
+      entry = topic.discussion_entries.new(user: student)
+      allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
+      expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
+      expect(entry.mentions.take.user_id).to eq mentioned_student.id
+    end
+
+    describe "edits to an entry" do
+      let!(:entry) {
+        topic.discussion_entries.create(
+          user: student,
+          message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>"
+        )
+      }
+
+      context "a new user is mentioned" do
+        it "should create a mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
+          }.to change {entry.mentions.count}.by 1
+        end
+      end
+
+      context "the same user is mentioned" do
+        it "should not create a new mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude?!</p>")
+          }.to not_change {entry.mentions.count}
+        end
+      end
+    end
+  end
+
+  context "reply preview" do
+    before :once do
+      course_with_teacher(active_all: true, name: 'captain america', short_name: 'steve')
+      @entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
+      @entry.message = "<div data-discussion-reply-preview='23'>this is a reply preview</div><p>only this should stay</p>"
+      @entry.save!
+    end
+
+    let(:student) { student_in_course(active_all: true) }
+
+    it "should mark include_reply_preview as true" do
+      expect(@entry.include_reply_preview).to be true
+      expect(@entry.message).to eql("<p>only this should stay</p>")
+    end
+
+    it "should mark include_reply_preview as false" do
+      @entry.update({message: "<p>not a reply preview anymore</p>"})
+      @entry.save!
+      expect(@entry.include_reply_preview).to be false
+      expect(@entry.message).to eql("<p>not a reply preview anymore</p>")
+    end
+
+    it 'should show "Deleted by <user>" when deleted' do
+      entry = topic.discussion_entries.create!(user: student.user, message: "this is a message")
+      entry.editor_id = @teacher.id
+      entry.destroy
+      expect(entry.quoted_reply_html).not_to include("this is a message")
+      expect(entry.quoted_reply_html).to include("Deleted by steve")
+    end
+
+    it 'should truncate message' do
+      entry = topic.discussion_entries.create!(user: student.user, message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin neque purus, mattis accumsan ligula ac, pharetra auctor purus. Ut pretium vulputate nunc, a feugiat elit dignissim eget. Aenean imperdiet nec orci elementum congue. Quisque lacus metus, tempus a sem vel, varius aliquet metus. Vestibulum risus dolor, pellentesque at tincidunt porttitor, pretium nec dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla vel risus non metus lobortis tempor at a ex. Sed vel turpis id nisl facilisis elementum. Donec nisi risus, ornare at aliquet id, mattis non diam.")
+      expect(entry.quoted_reply_html).not_to include("nunc")
+    end
+  end
+
   context "entry notifications" do
     before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @non_posting_student = @student
       student_in_course(:active_all => true)
+
+      @notification_mention = "New Discussion Mention"
+      n = Notification.create(:name => @notification_mention, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
 
       @notification_name = "New Discussion Entry"
       n = Notification.create(:name => @notification_name, :category => "TestImmediately")
@@ -189,6 +280,17 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
       expect(entry.messages_sent[@notification_name]).to be_blank
       expect(entry.messages_sent["Announcement Reply"]).not_to be_blank
+    end
+
+    it "should send one notification to mentioned users" do
+      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.new(:user => @teacher, :message => "Oh, and another thing...")
+      mention = entry.mentions.new(user: @student, root_account_id: @course.root_account_id)
+      entry.save! # also saves the mention.
+      expect(mention.messages_sent[@notification_name]).to be_blank
+      expect(mention.messages_sent[@notification_mention]).not_to be_blank
+      expect(mention.messages_sent["Announcement Reply"]).to be_blank
     end
 
   end
@@ -568,6 +670,23 @@ describe DiscussionEntry do
         expect(participant.workflow_state).to eq 'unread'
         expect(participant.forced_read_state).to be_falsey
       end
+
+      it "should work with user_id or user" do
+        participant = @reply2.find_existing_participant(@student.id)
+        expect(participant.id).to be_nil
+        @reply2.change_read_state('read', @student, forced: true)
+        participant_from_id = @reply2.find_existing_participant(@student.id)
+        participant_from_user = @reply2.find_existing_participant(@student)
+        expect(participant_from_id.id).not_to be_nil
+        expect(participant_from_id.id).to eq participant_from_user.id
+      end
+
+      it "should update stream item from a mention" do
+        @reply2.mentions.create!(user_id: @student, root_account_id: @reply2.root_account_id)
+        expect(@student.stream_item_instances.last.workflow_state).to eq 'unread'
+        @reply2.change_read_state('read', @student, forced: true)
+        expect(@student.stream_item_instances.last.workflow_state).to eq 'read'
+      end
     end
 
   end
@@ -607,6 +726,15 @@ describe DiscussionEntry do
       @entry.reply_from(:user => @teacher, :text => "reply") # should not raise error
       student_in_course(:course => @course)
       expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
+    end
+
+    it 'raises BlankMessage for blank message' do
+      expect { @topic.reply_from(user: @teacher, text: '') }.to raise_error IncomingMail::Errors::BlankMessage
     end
   end
 

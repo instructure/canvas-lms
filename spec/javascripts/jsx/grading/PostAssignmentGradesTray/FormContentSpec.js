@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import FormContent from 'jsx/grading/PostAssignmentGradesTray/FormContent'
-import {EVERYONE} from 'jsx/grading/PostAssignmentGradesTray/PostTypes'
+import FormContent from '@canvas/post-assignment-grades-tray/react/FormContent'
+import {EVERYONE} from '@canvas/post-assignment-grades-tray/react/PostTypes'
 
 QUnit.module('PostAssignmentGradesTray FormContent', suiteHooks => {
   let $container

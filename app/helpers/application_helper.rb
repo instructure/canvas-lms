@@ -25,6 +25,7 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
   include DatadogRumHelper
+  include NewQuizzesFeaturesHelper
 
   def context_user_name_display(user)
     name = user.try(:short_name) || user.try(:name)
@@ -247,7 +248,7 @@ module ApplicationHelper
     capture do
       preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
 
-      # if you look the app/jsx/main.js, there is a function there that will
+      # if you look the ui/main.js, there is a function there that will
       # process anything on window.bundles and knows how to load everything it needs
       # to load that "js_bundle". And by the time that runs, the browser will have already
       # started downloading those script urls because of those preload tags above,
@@ -294,10 +295,18 @@ module ApplicationHelper
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
-    bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
+    bundle_path = plugin ?
+      "../../gems/plugins/#{plugin}/app/stylesheets/#{bundle_name}" :
+      "bundles/#{bundle_name}"
+
     cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
     base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant(opts)
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
+  end
+
+  def font_url_for(nominal_font_href)
+    cache = BrandableCSS.font_path_cache()
+    cache[nominal_font_href] || nominal_font_href
   end
 
   def brand_variable(variable_name)
@@ -329,11 +338,21 @@ module ApplicationHelper
     stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
+  def quiz_lti_tab?(tab)
+    if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+      return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
+    end
+
+    false
+  end
+
   def sortable_tabs
-    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
+    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account, :course_subject_tabs => @context.try(:elementary_subject_course?))
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
+      elsif (quiz_lti_tab?(tab) rescue false)
+        new_quizzes_navigation_placements_enabled?(@context)
       elsif (tab[:id] == @context.class::TAB_COLLABORATIONS_NEW rescue false)
         @context.feature_enabled?(:new_collaborations)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
@@ -430,8 +449,9 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user, account=nil)
-    return true if account && account.grants_any_right?(user, session, :create_courses, :manage_courses)
-    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
+    return true if account&.grants_any_right?(user, session, :manage_courses, :create_courses)
+
+    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :manage_courses, :create_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.
@@ -490,7 +510,6 @@ module ApplicationHelper
     {
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
-      :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -508,7 +527,7 @@ module ApplicationHelper
     return [] if contexts.empty?
     cached_tools = Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
       tools = ContextExternalTool.shard(@context.shard).active.
-          having_setting('editor_button').polymorphic_where(context: contexts)
+          having_setting('editor_button').where(context: contexts)
       tools.sort_by(&:id)
     end
     ContextExternalTool.shard(@context.shard).editor_button_json(cached_tools, @context, @current_user, session)
@@ -630,14 +649,10 @@ module ApplicationHelper
     support_url || '#'
   end
 
-  def show_help_link?
-    show_feedback_link? || support_url.present?
-  end
-
   def help_link_classes(additional_classes = [])
     css_classes = []
     css_classes << "support_url" if support_url
-    css_classes << "help_dialog_trigger" if show_feedback_link?
+    css_classes << "help_dialog_trigger"
     css_classes.concat(additional_classes) if additional_classes
     css_classes.join(" ")
   end
@@ -662,12 +677,10 @@ module ApplicationHelper
   end
 
   def help_link
-    if show_help_link?
-      link_content = help_link_name
-      link_to link_content.html_safe, help_link_url,
-        :class => help_link_classes,
-        :data => help_link_data
-    end
+    link_content = help_link_name
+    link_to link_content.html_safe, help_link_url,
+      :class => help_link_classes,
+      :data => help_link_data
   end
 
   def active_brand_config_cache
@@ -731,7 +744,6 @@ module ApplicationHelper
     end
     @brand_account
   end
-  private :brand_config_account
 
   def pseudonym_can_see_custom_assets
     # custom JS could be used to hijack user stuff.  Let's not allow
@@ -858,22 +870,6 @@ module ApplicationHelper
   def collection_cache_key(collection)
     keys = collection.map { |element| element.cache_key }
     Digest::MD5.hexdigest(keys.join('/'))
-  end
-
-  def translated_due_date(assignment)
-    if assignment.multiple_due_dates_apply_to?(@current_user)
-      t('Due: Multiple Due Dates')
-    else
-      assignment = assignment.overridden_for(@current_user)
-
-      if assignment.due_at
-        t('Due: %{assignment_due_date_time}',
-          assignment_due_date_time: datetime_string(force_zone(assignment.due_at))
-        )
-      else
-        t('Due: No Due Date')
-      end
-    end
   end
 
   def add_uri_scheme_name(uri)
@@ -1284,10 +1280,13 @@ module ApplicationHelper
 
   def prefetch_xhr(url, id: nil, options: {})
     id ||= url
+    # these are the same defaults set in js-utils/src/prefetched_xhrs.js as "defaultFetchOptions"
+    # and it would be nice to combine them so that they don't have to be copied here.
     opts = {
       credentials: 'same-origin',
       headers: {
-        Accept: 'application/json+canvas-string-ids, application/json'
+        Accept: 'application/json+canvas-string-ids, application/json',
+        'X-Requested-With' => 'XMLHttpRequest'
       }
     }.deep_merge(options)
     javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"

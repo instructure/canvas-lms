@@ -92,12 +92,7 @@ describe Api::V1::PlannerItem do
       @course.name = "test course name"
       expect(api.planner_item_json(@assignment, @student, session)[:context_name]).to eq "test course name"
 
-      # still no image if feature flag is off
       @course.image_url = "path/to/course/image.png"
-      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to be_nil
-
-      # ok, now that course has an image and the feature flag is on there should be an image
-      @course.enable_feature!(:course_card_images)
       expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
     end
 
@@ -159,8 +154,10 @@ describe Api::V1::PlannerItem do
     describe '#submission_statuses_for' do
       it 'should return the submission statuses for the learning object' do
         json = api.planner_item_json(@assignment, @student, session)
-        expect(json.has_key?(:submissions)).to be true
-        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback].all? { |k| json[:submissions].has_key?(k) }).to be true
+        expect(json.key?(:submissions)).to be true
+        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback, :redo_request].all? do |k|
+          json[:submissions].key?(k)
+        end).to be true
       end
 
       it 'should indicate that an assignment is submitted' do

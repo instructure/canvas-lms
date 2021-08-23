@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import 'compiled/jquery/mediaCommentThumbnail'
+import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 
 QUnit.module('mediaCommentThumbnail', {
   setup() {

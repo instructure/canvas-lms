@@ -42,7 +42,7 @@ describe "users/grades" do
       presenter = GradesPresenter.new(current_active_enrollments)
       assign(:presenter, presenter)
       render "users/grades"
-      expect(Nokogiri::HTML(response.body).css('.teacher_grades .percent').text).to include "73.00%"
+      expect(Nokogiri::HTML5(response.body).css('.teacher_grades .percent').text).to include "73.00%"
     end
   end
 end

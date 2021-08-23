@@ -39,8 +39,12 @@ class Mailer < ActionMailer::Base
     params[:reply_to] = reply_to if reply_to
 
     mail(params) do |format|
-      format.text{ render plain: m.body }
-      format.html{ render plain: m.html_body } if m.html_body
+      [:body, :html_body].each do |attr|
+        if m.send(attr)
+          body = m.send(attr).bytesize > Message.maximum_text_length ? Message.unavailable_message : m.send(attr)
+          attr == :body ? format.text{ render plain: body } : format.html{ render plain: body }
+        end
+      end
     end
   end
 

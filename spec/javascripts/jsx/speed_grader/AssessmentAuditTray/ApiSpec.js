@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Api from 'jsx/speed_grader/AssessmentAuditTray/Api'
-import FakeServer, {pathFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
+import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api.js'
+import FakeServer, {pathFromRequest} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('AssessmentAuditTray Api', suiteHooks => {
   let api

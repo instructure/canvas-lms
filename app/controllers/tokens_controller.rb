@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -59,6 +61,6 @@ class TokensController < ApplicationController
   private
 
   def access_token_params
-    params.require(:access_token).permit(:purpose, :expires_at, :regenerate,  :remember_access, :scopes => [])
+    params.require(:access_token).permit(:purpose, :permanent_expires_at, :regenerate, :remember_access, :scopes => [])
   end
 end

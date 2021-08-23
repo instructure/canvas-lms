@@ -55,8 +55,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte element}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
   "course_8a63b4a3": { "message": "Emne" },
   "course_to_do_bcbbab54": { "message": "{ course } Gjeremål" },
@@ -107,10 +113,8 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "jump_to_today_254ccf41": { "message": "Hopp til i dag" },
   "late_2be42b88": { "message": "Sein" },
-  "list_collapsed_9ac35920": { "message": "Liste er skjult." },
-  "list_collapsed_dde87718": { "message": "Liste er skjult" },
-  "list_expanded_efec2d0": { "message": "Liste er utvida." },
   "load_more_a36f9cf9": { "message": "Last opp meir" },
   "load_prior_dates_f2b0f6f0": { "message": "Last tidlegare datoar" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -159,9 +163,6 @@
     "message": "*Kun nyaste karaktersetjingsperiode viser."
   },
   "opportunities_popup_f6703842": { "message": "popup-menyen med val" },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } er valt. Liste er skjult."
-  },
   "optional_add_course_ef0d70fc": { "message": "Valfri: Legg til emne" },
   "page_50c4823d": { "message": "Side" },
   "peer_review_74f26a13": { "message": "Fagfellevurdering" },

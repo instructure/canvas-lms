@@ -19,10 +19,21 @@
 #
 
 class FeatureFlag < ActiveRecord::Base
+  # this field is used for audit logging.
+  # if a request is changing the state of a feature
+  # flag, it should set this value before persisting
+  # the change.
+  attr_writer :current_user
+
   belongs_to :context, polymorphic: [:account, :course, :user]
+
+  self.ignored_columns = %i[visibility manipulate]
 
   validate :valid_state, :feature_applies
   before_save :check_cache
+  after_create :audit_log_create # to make sure we have an ID, must be after
+  before_update :audit_log_update
+  before_destroy :audit_log_destroy
   before_destroy :clear_cache
 
   def default?
@@ -53,23 +64,64 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def clear_cache
-    if self.context
-      self.class.connection.after_transaction_commit { self.context.feature_flag_cache.delete(self.context.feature_flag_cache_key(feature)) }
-      self.context.touch if Feature.definitions[feature].try(:touch_context)
-      if self.context.is_a?(Account)
-        if self.context.site_admin?
-          Switchman::DatabaseServer.send_in_each_region(self.context, :clear_cache_key, {}, :feature_flags)
-        else
-          self.context.clear_cache_key(:feature_flags)
-        end
-      end
+    if context
+      self.class.connection.after_transaction_commit do
+        context.feature_flag_cache.delete(context.feature_flag_cache_key(feature))
+        context.touch if Feature.definitions[feature].try(:touch_context) || context.try(:root_account?)
 
-      if ::Rails.env.development? && self.context.is_a?(Account) && Account.all_special_accounts.include?(self.context)
-        Account.clear_special_account_cache!(true)
+          if context.is_a?(Account)
+          if context.site_admin?
+            Switchman::DatabaseServer.send_in_each_region(context, :clear_cache_key, {}, :feature_flags)
+          else
+            context.clear_cache_key(:feature_flags)
+          end
+        end
+
+        if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
+          Account.clear_special_account_cache!(true)
+        end
       end
     end
   end
 
+  def audit_log_update(operation: :update)
+    # kill switch in case something goes crazy in rolling this out.
+    # TODO: we can yank this guard clause once we're happy with it's stability.
+    return unless Setting.get('write_feature_flag_audit_logs', 'true') == 'true'
+
+    # User feature flags only get changed by the target user,
+    # are much higher volume than higher level flags, and are generally
+    # uninteresting from a forensics standpoint.  We can save a lot of writes
+    # by not caring about them.
+    unless context.is_a?(User)
+      # this should catch a programatic/console user if one is acting
+      # outside the request/response cycle
+      acting_user = @current_user || Canvas.infer_user
+      prior_state = prior_flag_state(operation)
+      post_state = post_flag_state(operation)
+      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
+    end
+  end
+
+  def audit_log_create
+    audit_log_update(operation: :create)
+  end
+
+  def audit_log_destroy
+    audit_log_update(operation: :destroy)
+  end
+
+  def prior_flag_state(operation)
+    operation == :create ? self.default_for_flag : self.state_in_database
+  end
+
+  def post_flag_state(operation)
+    operation == :destroy ? self.default_for_flag : self.state
+  end
+
+  def default_for_flag
+    Feature.definitions[self.feature]&.state || 'undefined'
+  end
   private
 
   def valid_state

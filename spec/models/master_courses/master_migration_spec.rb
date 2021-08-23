@@ -164,7 +164,7 @@ describe MasterCourses::MasterMigration do
       expect(@migration.imports_completed_at).to be_present
       expect(@migration.migration_results.last.root_account_id).to eq @copy_from.root_account_id
 
-      expect(@template.master_content_tags.polymorphic_where(:content => assmt).first.restrictions).to be_empty # never mind
+      expect(@template.master_content_tags.where(content: assmt).first.restrictions).to be_empty # never mind
 
       [@sub1, @sub2].each do |sub|
         sub.reload
@@ -311,6 +311,56 @@ describe MasterCourses::MasterMigration do
       expect(@page2_to.title).to eq @page2.title
     end
 
+    context 'when in the blueprint course a file gets replaced' do
+      let(:child_course) { course_factory }
+      let(:master_course) { @copy_from }
+      let(:master_template) { @template }
+      let(:file_name) { 'filename' }
+      let(:attachment_attributes) do
+        { :filename => file_name, :uploaded_data => default_uploaded_data }
+      end
+      let(:master_attachments) { master_course.reload.attachments.map{ |a| [a.display_name, a.file_state] } }
+      let(:child_attachments) { child_course.reload.attachments.map{ |a| [a.display_name, a.file_state] } }
+
+      before do
+        master_course.attachments.create!(attachment_attributes)
+        master_template.add_child_course!(child_course)
+        run_master_migration
+      end
+
+      context 'when the child course doesn\'t have a file with the same name' do
+        before do
+          Timecop.travel(1.minute.from_now) do
+            master_course.attachments.create!(attachment_attributes).handle_duplicates(:overwrite)
+            run_master_migration
+          end
+        end
+
+        it 'handles the replacements in both master and child course' do
+          expect(master_attachments).to match_array([[file_name, 'deleted'], [file_name, 'available']])
+          expect(child_attachments).to match_array([[file_name, 'deleted'], [file_name, 'available']])
+        end
+      end
+
+      context 'when the child course has a file with the same name' do
+        before do
+          Timecop.travel(1.minute.from_now) do
+            child_course.attachments.create!(attachment_attributes)
+            master_course.attachments.create!(attachment_attributes).handle_duplicates(:overwrite)
+            run_master_migration
+          end
+        end
+
+        it 'handles the replacement in the child course' do
+          expect(child_attachments).to match_array([
+            [file_name, 'deleted'],
+            [file_name, 'available'],
+            ["#{file_name}-1", 'available']
+          ])
+        end
+      end
+    end
+
     it "should sync deleted quiz questions (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
@@ -403,6 +453,69 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
       expect(quiz_to.reload.quiz_groups.to_a).to eq [qgroup2_to]
+    end
+
+    it 'should sync deleted quiz groups linked to question banks after the quiz has been published and submitted' do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      student = user_factory(active_all: true)
+      @copy_to.enroll_student(student, enrollment_state: 'active')
+
+      quiz = @copy_from.quizzes.create!
+      bank = @copy_from.assessment_question_banks.create!(:title=>'Test Bank')
+      bank.assessment_questions.create!(question_data: {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      bank.assessment_questions.create!(question_data: {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
+      qgroup1.assessment_question_bank = bank
+      qgroup1.save
+      @template.content_tag_for(quiz).update_attribute(:restrictions, {content: true})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
+
+      Timecop.freeze(4.minutes.from_now) do
+        quiz_to.publish!
+        quiz_to.generate_submission(student)
+      end
+
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup1.destroy
+      end
+      run_master_migration
+
+      expect(quiz_to.reload.quiz_groups.to_a).to eq []
+    end
+
+    it 'should sync deleted quiz groups with quiz questions after the quiz has been published and submitted' do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      student = user_factory(active_all: true)
+      @copy_to.enroll_student(student, enrollment_state: 'active')
+
+      quiz = @copy_from.quizzes.create!
+      qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
+      qq1 = qgroup1.quiz_questions.create!(quiz: quiz, question_data: {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      qgroup1.save
+      Timecop.freeze(2.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
+
+      Timecop.freeze(4.minutes.from_now) do
+        quiz_to.publish!
+        quiz_to.generate_submission(student)
+      end
+
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup1.destroy
+      end
+      run_master_migration
+
+      expect(quiz_to.reload.quiz_groups.to_a).to eq []
     end
 
     it "should sync deleted assessment bank questions (unless changed downstream)" do
@@ -1036,7 +1149,7 @@ describe MasterCourses::MasterMigration do
       copied_things = [copied_assmt, copied_topic, copied_ann, copied_page, copied_quiz,
         copied_bank, copied_file, copied_event, copied_tool]
       copied_things.each do |copy|
-        expect(MasterCourses::ChildContentTag.all.polymorphic_where(:content => copy).first.migration_id).to eq copy.migration_id
+        expect(MasterCourses::ChildContentTag.where(content: copy).first.migration_id).to eq copy.migration_id
       end
 
       new_text = "<p>some text here</p>"
@@ -1086,7 +1199,7 @@ describe MasterCourses::MasterMigration do
 
       # WikiPage
       copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
-      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_page).first
+      child_tag = sub.child_content_tags.where(content: copied_page).first
       expect(child_tag).to be_present # should create a tag
       new_child_text = "<p>some other text here</p>"
       copied_page.update_attribute(:body, new_child_text)
@@ -1100,7 +1213,7 @@ describe MasterCourses::MasterMigration do
 
       # Assignment
       copied_assignment = @copy_to.assignments.where(:migration_id => mig_id(assignment)).first
-      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_assignment).first
+      child_tag = sub.child_content_tags.where(content: copied_assignment).first
       expect(child_tag).to be_present # should create a tag
       new_child_text = "<p>some other text here</p>"
       copied_assignment.update_attribute(:description, new_child_text)
@@ -1335,9 +1448,9 @@ describe MasterCourses::MasterMigration do
       copied_qq.question_data = copied_qd
       copied_qq.save!
 
-      bank_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_bank).first
+      bank_child_tag = sub.child_content_tags.where(content: copied_bank).first
       expect(bank_child_tag.downstream_changes).to include("assessment_questions_content") # treats all assessment questions like a column
-      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
+      quiz_child_tag = sub.child_content_tags.where(content: copied_quiz).first
       expect(quiz_child_tag.downstream_changes).to include("quiz_questions_content") # treats all assessment questions like a column
 
       new_master_text = "some mastery text"
@@ -1374,6 +1487,32 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
+    it "should use current version of quiz after import if quiz was published on the copy_to" do
+      @copy_to = course_factory
+      @copy_to.enroll_student(User.create!, enrollment_state: 'active')
+      @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!(allowed_attempts: 3)
+      qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+
+      run_master_migration
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_quiz.publish!
+      copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+
+      new_master_text = "some mastery text"
+      qd = qq.question_data
+      qd['question_text'] = new_master_text
+      qq.question_data = qd
+      qq.save!
+
+      run_master_migration # re-copy all the content
+
+      expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
+      expect(copied_quiz.reload.quiz_data).to include(hash_including("question_text" => new_master_text))
+    end
+
     it "should handle graded quizzes/discussions/etc better" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
@@ -1406,8 +1545,8 @@ describe MasterCourses::MasterMigration do
       expect(copied_quiz_assmt.reload.title).to eq new_title # should carry the new title over to the assignments
       expect(copied_topic_assmt.reload.title).to eq new_title
 
-      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
-      topic_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_topic).first
+      quiz_child_tag = sub.child_content_tags.where(content: copied_quiz).first
+      topic_child_tag = sub.child_content_tags.where(content: copied_topic).first
       [quiz_child_tag, topic_child_tag].each do |tag|
         expect(tag.downstream_changes).to be_empty
       end
@@ -1742,6 +1881,61 @@ describe MasterCourses::MasterMigration do
       copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
       expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
+    end
+
+    it "deals with a deleted folder being changed upstream" do
+      blueprint_folder = nil
+      att_tag = nil
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      Timecop.travel(10.minutes.ago) do
+        blueprint_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "folder", :context => @copy_from)
+        att = Attachment.create!(:filename => 'file.txt', :uploaded_data => StringIO.new('1'), :folder => blueprint_folder, :context => @copy_from)
+        att_tag = @template.create_content_tag_for!(att)
+        run_master_migration
+      end
+
+      att2_tag = nil
+      Timecop.travel(5.minutes.ago) do
+        associated_folder = @copy_to.folders.where(cloned_item_id: blueprint_folder.cloned_item_id).take
+        associated_folder.destroy
+
+        blueprint_folder.update(:name => "folder RENAMED", :locked => true)
+        att2 = Attachment.create!(:filename => 'file2.txt', :uploaded_data => StringIO.new('2'), :folder => blueprint_folder, :context => @copy_from)
+        att2_tag = @template.create_content_tag_for!(att2)
+      end
+
+      m = run_master_migration
+      expect(m).to be_completed
+
+      copied_att = @copy_to.attachments.where(:migration_id => att2_tag.migration_id).first
+      expect(copied_att.full_path).to eq "course files/folder RENAMED/file2.txt"
+    end
+
+    it "syncs moved folders" do
+      folder_A = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'A', context: @copy_from)
+      folder_B = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'B', context: @copy_from)
+      # this needs to be here because empty folders don't sync
+      Attachment.create!(filename: 'decoy.txt', uploaded_data: StringIO.new('1'), folder: folder_B, context: @copy_from)
+      folder_C = folder_A.sub_folders.create!(name: 'C', context: @copy_from)
+      att = Attachment.create!(filename: 'file.txt', uploaded_data: StringIO.new('1'), folder: folder_C, context: @copy_from)
+      att_tag = @template.create_content_tag_for!(att)
+
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+      run_master_migration
+
+      copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
+      expect(copied_att.full_path).to eq "course files/A/C/file.txt"
+
+      Timecop.travel(10.minutes.from_now) do
+        folder_C.parent_folder = folder_B
+        folder_C.save!
+        run_master_migration
+      end
+
+      expect(copied_att.reload.full_path).to eq "course files/B/C/file.txt"
     end
 
     it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
@@ -2530,7 +2724,7 @@ describe MasterCourses::MasterMigration do
       topic_to = copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
 
       # ensure schedule_delayed_transitions does not cause a spurious downstream change record
-      expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+      expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
 
       Timecop.travel(5.minutes.from_now) do
         # now actually make a downstream change
@@ -2539,7 +2733,7 @@ describe MasterCourses::MasterMigration do
         topic_to.save!
         run_master_migration
         expect(topic_to.reload.lock_at).to eq date2
-        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
+        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
       end
 
       # lock the availability dates and ensure the downstream change is overwritten
@@ -2547,7 +2741,7 @@ describe MasterCourses::MasterMigration do
         @template.content_tag_for(topic).update_attribute(:restrictions, {:availability_dates => true})
         topic.touch
         run_master_migration
-        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
         expect(topic_to.reload.lock_at).to eq date1
       end
     end

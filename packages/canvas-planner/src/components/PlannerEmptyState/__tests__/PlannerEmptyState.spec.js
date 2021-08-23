@@ -24,6 +24,7 @@ function defaultProps(opts = {}) {
     changeDashboardView: () => {},
     onAddToDo: () => {},
     isCompletelyEmpty: true,
+    isWeekly: false,
     ...opts
   }
 }
@@ -37,6 +38,18 @@ it('renders balloons when not completely empty', () => {
   const wrapper = shallow(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: false})} />)
   expect(wrapper.find('.balloons').length).toEqual(1)
   expect(wrapper.find('.desert').length).toEqual(0)
+  expect(wrapper.contains('Nothing More To Do')).toBeTrue
+  expect(wrapper.contains('Add To-Do')).toBeTrue
+})
+
+it('renders balloons and different text when weekly', () => {
+  const wrapper = shallow(
+    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false, isWeekly: true})} />
+  )
+  expect(wrapper.find('.balloons').length).toEqual(1)
+  expect(wrapper.find('.desert').length).toEqual(0)
+  expect(wrapper.contains('Nothing Due This Week')).toBeTrue
+  expect(wrapper.contains('Add To-Do')).toBeFalse
 })
 
 it('does not changeDashboardView on mount', () => {

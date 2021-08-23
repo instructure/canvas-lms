@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import AvatarWidget from 'compiled/util/AvatarWidget'
+import AvatarWidget from '@canvas/avatar-dialog-view'
 
 QUnit.module('AvatarWidget', {
   setup() {},

@@ -53,14 +53,14 @@
   }
 
   .ic-Super-toggle__switch {
-    width: $toggle-width; height: $toggle-width/2;
+    width: $toggle-width; height: $toggle-width*0.5;
     background: $toggle-background-OFF;
     border: 2px solid $toggle-background-OFF;
-    border-radius: ($toggle-width/4) + 2;
+    border-radius: ($toggle-width*0.25) + 2;
 
     &::after { // handle
       background-color: $toggle-color-switch;
-      width: $toggle-width/2; height: $toggle-width/2;
+      width: $toggle-width*0.5; height: $toggle-width*0.5;
     }
 
     &::before { // focus outline ring
@@ -72,7 +72,7 @@
       height: calc(100% + 0.75rem);
       box-sizing: border-box;
       border: 1px solid var(--ic-brand-primary);
-      border-radius: $toggle-width/2;
+      border-radius: $toggle-width*0.5;
       opacity: 0;
     }
   }
@@ -88,8 +88,8 @@
   }
 
   svg {
-    max-width: $toggle-width/4;
-    max-height: $toggle-width/4;
+    max-width: $toggle-width*0.25;
+    max-height: $toggle-width*0.25;
     display: inline-block;
     vertical-align: middle;
   }

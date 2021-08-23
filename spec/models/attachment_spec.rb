@@ -249,6 +249,7 @@ describe Attachment do
 
   context "canvadocs" do
     before :once do
+      course_model
       configure_canvadocs
     end
 
@@ -279,6 +280,22 @@ describe Attachment do
         a = attachment_model
         a.submit_to_canvadocs
         expect(a.canvadoc).to be_nil
+      end
+
+      it "submits images when they are in the Student Annotation Documents folder" do
+        att = attachment_model(
+          context: @course,
+          content_type: "image/jpeg",
+          folder: @course.student_annotation_documents_folder
+        )
+        att.submit_to_canvadocs
+        expect(att.canvadoc).not_to be_nil
+      end
+
+      it "does not submit images when they are not in the Student Annotation Documents folder" do
+        att = attachment_model(context: @course, content_type: "image/jpeg")
+        att.submit_to_canvadocs
+        expect(att.canvadoc).to be_nil
       end
 
       it "tries again later when upload fails" do
@@ -1408,6 +1425,18 @@ describe Attachment do
         end
         expect(att.root_account_id).to eq Account.default.local_id
       end
+
+      it "links a cross-shard cloned_item correctly" do
+        c0 = course_factory
+        a0 = attachment_model(display_name: 'lolcats.mp4', context: @course, uploaded_data: stub_file_data('lolcats.mp4', '...', 'video/mp4'))
+        @shard1.activate do
+          c1 = course_factory(account: account_model)
+          a1 = a0.clone_for(c1)
+        end
+        a0.reload
+        expect(Shard.shard_for(a0.cloned_item_id)).to eq @shard1
+        expect(a0.cloned_item_id).not_to be_nil
+      end
     end
   end
 
@@ -1966,6 +1995,18 @@ describe Attachment do
       quota = Attachment.get_quota(@group)
       expect(quota[:quota_used]).to eq 0
     end
+
+    it "returns available quota" do
+      course_model
+      @course.update storage_quota: 5.megabytes
+      attachment_model(:context => @course, :uploaded_data => stub_png_data, :filename => 'whatever.png')
+      @attachment.update_attribute :size, 1.megabyte
+      expect(Attachment.quota_available(@course)).to eq 4.megabytes
+
+      # ensure it doesn't go negative
+      @attachment.update_attribute :size, 10.megabytes
+      expect(Attachment.quota_available(@course)).to eq 0
+    end
   end
 
   context "#open" do
@@ -2252,10 +2293,11 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
 
-      context 'and the error was unkown' do
+      context 'and the error was unknown' do
         let(:error) { StandardError }
 
         it 'captures the error' do
@@ -2263,6 +2305,7 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
     end
@@ -2324,14 +2367,19 @@ describe Attachment do
     expect(tag1).not_to be_nil
   end
 
-  it "should unlock files at the right time even if they're accessed shortly before" do
+  it "should unlock and lock files at the right time even if they're accessed shortly before" do
     enable_cache do
       course_with_student :active_all => true
-      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now
+      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now, lock_at: 35.seconds.from_now
       expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
       Timecop.freeze(@attachment.unlock_at + 1.second) do
         run_jobs
         expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq true
+      end
+
+      Timecop.freeze(@attachment.lock_at + 1.second) do
+        run_jobs
+        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq false
       end
     end
   end
@@ -2478,6 +2526,29 @@ describe Attachment do
       weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
       atts = Attachment.copy_attachments_to_submissions_folder(@course, [weird_file])
       expect(atts).to eq [weird_file]
+    end
+  end
+
+  describe "#copy_to_student_annotation_documents_folder" do
+    before(:once) do
+      course_model
+    end
+
+    it "copies attachment into the course Student Annotation Documents folder if not present already" do
+      att = attachment_model(context: @course)
+      att_clone = att.copy_to_student_annotation_documents_folder(@course)
+
+      aggregate_failures do
+        expect(att_clone.id).not_to be att.id
+        expect(att_clone.folder).to eq @course.student_annotation_documents_folder
+      end
+    end
+
+    it "does not copy attachment into the course Student Annotation Documents folder if already present" do
+      att = attachment_model(context: @course, folder: @course.student_annotation_documents_folder)
+      same_att = att.copy_to_student_annotation_documents_folder(@course)
+
+      expect(same_att).to eq att
     end
   end
 end

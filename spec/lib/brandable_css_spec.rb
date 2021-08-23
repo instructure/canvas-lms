@@ -148,4 +148,20 @@ describe BrandableCSS do
       end
     end
   end
+
+  describe 'font_path_cache' do
+    it 'creates the cache' do
+      BrandableCSS.font_path_cache()
+      expect(BrandableCSS.instance_variable_get(:@decorated_font_paths)).not_to be_nil
+    end
+
+    it 'maps font paths' do
+      cache = BrandableCSS.font_path_cache
+      cache.each do |key, val|
+        expect(key).to start_with('/fonts')
+        expect(val).to start_with("/dist/fonts")
+        expect(val).to match(/-[a-z0-9]+\.woff2$/)
+      end
+    end
+  end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// copied from canvas-lms/public/javascripts/jquery.doc_previews.js
+// copied from canvas-lms/ui/shared/features/doc-previews/jquery/index.js
 export const previewableMimeTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
   'application/vnd.oasis.opendocument.spreadsheet',

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -101,7 +103,7 @@
 #         "type": "string"
 #       },
 #       "answer_weight": {
-#         "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should be non-negative.",
+#         "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should be 100.",
 #         "example": 100,
 #         "type": "integer",
 #         "format": "int64"
@@ -275,7 +277,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if params[:existing_questions]
         return add_questions
       end
-
       question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
       if question_data.key?(:question_text)
@@ -284,6 +285,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
+      process_answer_html_content(question_data)
 
       guard_against_big_fields do
         @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
@@ -355,6 +357,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
       question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
+      process_answer_html_content(question_data)
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
@@ -461,5 +464,17 @@ class Quizzes::QuizQuestionsController < ApplicationController
       quiz_data,
       shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
     )
+  end
+
+  def process_answer_html_content(question_data)
+    if Account.site_admin.feature_enabled?(:strip_origin_from_quiz_answer_file_references)
+      answers = question_data[:answers]
+      answers = answers.values if answers.is_a?(Hash)
+      answers&.each do |answer|
+        %i[answer_html answer_comment_html].each do |key|
+          answer[key] = process_incoming_html_content(answer[key]) if answer[key]&.present?
+        end
+      end
+    end
   end
 end

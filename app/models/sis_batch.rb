@@ -580,9 +580,21 @@ class SisBatch < ActiveRecord::Base
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
     current_row ||= 0
-    # delete enrollments for courses that weren't in this batch, in the selected term
+    batch_mode_drop_status = options[:batch_mode_enrollment_drop_status] || 'deleted'
+    # delete or update enrollments to batch_mode_drop_status for enrollments
+    # that weren't in this batch in the batch_mode_term
     enrollments.find_in_batches do |batch|
-      data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+      data = case batch_mode_drop_status
+             when 'deleted'
+              Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+             when 'completed'
+              Enrollment::BatchStateUpdater.complete_batch(batch, sis_batch: self, batch_mode: true, root_account: account)
+             when 'inactive'
+              Enrollment::BatchStateUpdater.inactivate_batch(batch, sis_batch: self, batch_mode: true, root_account: account)
+             else
+                raise NotImplementedError
+      end
+
       SisBatchRollBackData.bulk_insert_roll_back_data(data)
       batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
       enrollment_count += batch_count
@@ -679,6 +691,7 @@ class SisBatch < ActiveRecord::Base
       "multi_term_batch_mode" => self.options[:multi_term_batch_mode],
       "override_sis_stickiness" => self.options[:override_sis_stickiness],
       "add_sis_stickiness" => self.options[:add_sis_stickiness],
+      "update_sis_id_if_login_claimed" => self.options[:update_sis_id_if_login_claimed],
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
@@ -832,13 +845,13 @@ class SisBatch < ActiveRecord::Base
   def finalize_enrollments(ids)
     ids.each_slice(1000) do |slice|
       Enrollment::BatchStateUpdater.delay(n_strand: ["restore_states_batch_updater", account.global_id]).
-        run_call_backs_for(slice, self.account)
+        run_call_backs_for(slice, root_account: account)
     end
     # we know enrollments are not deleted, but we don't know what the previous
     # state was, we will assume deleted and restore the scores and submissions
     # for students, if it was not deleted, it will not break anything.
     Enrollment.where(id: ids, type: 'StudentEnrollment').order(:course_id).preload(:course).find_in_batches do |batch|
-      Enrollment.restore_submissions_and_scores_for_enrollments(batch)
+      StudentEnrollment.restore_submissions_and_scores_for_enrollments(batch)
     end
   end
 
@@ -917,7 +930,7 @@ class SisBatch < ActiveRecord::Base
         begin
           ids = data[:downloadable_attachment_ids]
           if ids.present?
-            Attachment.where(:id => ids).polymorphic_where(:context => self).to_a
+            Attachment.where(id: ids, context: self).to_a
           else
             []
           end

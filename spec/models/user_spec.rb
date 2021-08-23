@@ -125,15 +125,13 @@ describe User do
     expect(@user.associated_accounts.length).to eql(1)
     expect(@user.associated_accounts.first).to eql(account1)
 
-    account2 = account_model
-    account1.parent_account = account2
-    account1.save!
-    @course.reload
+    account2 = account_model(root_account: account1)
+    @course.update(account: account2)
     @user.reload
 
     expect(@user.associated_accounts.length).to eql(2)
-    expect(@user.associated_accounts[0]).to eql(account1)
-    expect(@user.associated_accounts[1]).to eql(account2)
+    expect(@user.associated_accounts[0]).to eql(account2)
+    expect(@user.associated_accounts[1]).to eql(account1)
   end
 
   it "should update account associations when a user is associated to an account just by pseudonym" do
@@ -157,14 +155,6 @@ describe User do
     user.reload
     expect(user.associated_accounts.length).to eql(1)
     expect(user.associated_accounts.first).to eql(account1)
-
-    account1.parent_account = account2
-    account1.save!
-
-    user.reload
-    expect(user.associated_accounts.length).to eql(2)
-    expect(user.associated_accounts[0]).to eql(account1)
-    expect(user.associated_accounts[1]).to eql(account2)
   end
 
   it "should update account associations when a user is associated to an account just by account_users" do
@@ -435,7 +425,7 @@ describe User do
           user.update_root_account_ids
         }.to change {
           user.root_account_ids
-        }.from(nil).to([root_account.global_id])
+        }.from([]).to([root_account.global_id])
       end
 
       context 'and communication channels for the user exist' do
@@ -448,7 +438,7 @@ describe User do
             user.update_root_account_ids
           }.to change {
             user.communication_channels.first.root_account_ids
-          }.from(nil).to([root_account.id])
+          }.from([]).to([root_account.id])
         end
       end
     end
@@ -472,7 +462,7 @@ describe User do
           user.update_root_account_ids
         }.to change {
           user.root_account_ids&.sort
-        }.from(nil).to(
+        }.from([]).to(
           [root_account.id, shard_two_root_account.global_id].sort
         )
       end
@@ -543,6 +533,19 @@ describe User do
       @section2 = @course.course_sections.create!(:name => "Other Section")
       @fake_student = @course.reload.student_view_student
       expect(@fake_student.reload.user_account_associations).to be_empty
+    end
+
+    it "removes account associations for inactive/rejected enrollments" do
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = Account.default.sub_accounts.create!
+      enrollment1 = course_with_student(active_all: true, account: subaccount1)
+      enrollment2 = course_with_student(active_all: true, account: subaccount2, user: @student)
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+
+      enrollment1.reject
+      enrollment2.update workflow_state: 'inactive'
+      @student.update_account_associations
+      expect(@student.user_account_associations.pluck(:account_id)).to be_empty
     end
 
     context "sharding" do
@@ -743,7 +746,7 @@ describe User do
       e.save!
 
       # only four, in the right order (type, then name), and with the top type per course
-      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
+      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eq [
         [@course5.id, 'TeacherEnrollment'],
         [@course2.id, 'TeacherEnrollment'],
         [@course3.id, 'TeacherEnrollment'],
@@ -1033,6 +1036,19 @@ describe User do
 
     it "allows for narrowing courses by enrollments" do
       expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works cross-shard" do
+        @shard1.activate do
+          account = Account.create!
+          course_with_teacher(account: account, active_all: true)
+          course_with_student(course: @course, user: @student1, active_all: true)
+          expect(@student1.check_courses_right?(@teacher, :read_forum)).to eq true
+        end
+      end
     end
   end
 
@@ -1423,8 +1439,8 @@ describe User do
       expect(User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
         "http://somedomain/path"
       )
-      expect(User.avatar_fallback_url('%{fallback}')).to eq(
-        '%{fallback}'
+      expect(User.avatar_fallback_url("http://localhost/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
+        "https://bar/path"
       )
     end
 
@@ -1982,7 +1998,7 @@ describe User do
       context = double
       assignments = [double, double, double]
       user = User.new
-      allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return false
+      allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return false
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)
         allow(assignment).to receive(:context).and_return(context)
@@ -1995,7 +2011,7 @@ describe User do
       context = double
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
-        allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return true
+        allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return true
         due_date1 = {:due_at => Time.now + 1.day}
         due_date2 = {:due_at => Time.now + 1.week}
         due_date3 = {:due_at => 2.weeks.from_now }
@@ -2273,7 +2289,19 @@ describe User do
       p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
       account.account_users.create!(user: user)
 
-      expect(user).to receive(:pseudonyms).never
+      expect(user).not_to receive(:pseudonyms)
+      expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
+    end
+
+    it "is required for an auth provider that has it required" do
+      account = Account.create(settings: { mfa_settings: :optional })
+      ap = account.canvas_authentication_provider
+      ap.update!(mfa_required: true)
+      p = user.pseudonyms.create!(account: account, unique_id: 'user', authentication_provider: ap)
+
+      expect(user.mfa_settings).to eq :required
+
+      expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
   end
@@ -2440,15 +2468,15 @@ describe User do
   describe "preferred_gradebook_version" do
     subject { user.preferred_gradebook_version }
 
-    let(:user) { User.new }
+    let(:user) { User.create! }
 
     it "returns default gradebook when preferred" do
-      user.preferences[:gradebook_version] = 'default'
+      user.set_preference(:gradebook_version, "default")
       is_expected.to eq 'default'
     end
 
     it "returns individual gradebook when preferred" do
-      user.preferences[:gradebook_version] = 'individual'
+      user.set_preference(:gradebook_version, "individual")
       is_expected.to eq 'individual'
     end
 
@@ -3406,6 +3434,52 @@ describe User do
 
     it "should still include it if select values aren't present" do
       expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
+    end
+  end
+
+  describe "#can_create_enrollment_for?" do
+    before(:once) do
+      course_with_ta
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+    end
+
+    it "checks permissions" do
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'TeacherEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'TaEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'DesignerEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
+    end
+
+    it "returns true if :manage_students is enabled" do
+      @course.root_account.role_overrides.create!(
+        permission: 'add_student_to_course',
+        role: ta_role,
+        enabled: false
+      )
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+    end
+
+    it "returns true if :manage_students is disabled" do
+      @course.root_account.role_overrides.create!(
+        permission: 'manage_students',
+        role: ta_role,
+        enabled: false
+      )
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+    end
+  end
+
+  describe "comment_bank_items" do
+    before(:once) do
+      course_with_teacher
+      @c1 = comment_bank_item_model({user: @teacher})
+      @c2 = comment_bank_item_model({user: @teacher})
+    end
+
+    it "only returns active records" do
+      @c2.destroy
+      expect(@teacher.comment_bank_items).to eq [@c1]
     end
   end
 end

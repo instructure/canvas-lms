@@ -64,7 +64,7 @@ export function insertContent(editor, content) {
     // but doesn't correctly forward the second "args" argument. Let's go right for
     // execCommand
     // editor.insertContent(content, {skip_focus: true})
-    editor.execCommand('mceInsertContent', false, content + ' ', {skip_focus: true})
+    editor.execCommand('mceInsertContent', false, content, {skip_focus: true})
     return editor.selection.getEnd()
   }
 }
@@ -133,9 +133,16 @@ export function existingContentToLink(editor, link) {
   )
 }
 
+// Parses HTML string with support in old browsers because jQuery's parseHTML was added in 1.8.
+function parseHTML(htmlString) {
+  const tmp = document.implementation.createHTMLDocument()
+  tmp.body.innerHTML = htmlString.trim()
+  return tmp.body.children
+}
+
 function selectionIsImg(editor) {
   const selection = editor.selection.getContent()
-  return editor.dom.$(selection).is('img')
+  return editor.dom.$(parseHTML(selection)).is('img')
 }
 
 export function existingContentToLinkIsImg(editor) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TextMeasure from 'jsx/gradebook/shared/helpers/TextMeasure'
+import TextMeasure from 'ui/features/gradebook/react/shared/helpers/TextMeasure.js'
 
 QUnit.module('TextMeasure', hooks => {
   let $fixture

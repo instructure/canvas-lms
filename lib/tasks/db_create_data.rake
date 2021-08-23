@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :db do
   desc "Create a new user"
   task :create_user => :environment do

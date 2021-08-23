@@ -220,7 +220,7 @@ module PlannerPageObject
   end
 
   def planner_item_status_checkbox(object_type, object_name)
-    fj("div label:contains('#{object_type} #{object_name} is not marked as done.')")
+    fj("input + label:contains('#{object_type} #{object_name} is not marked as done.')")
   end
 
   def course_page_recent_activity
@@ -429,26 +429,6 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
-  def wait_for_todo_load
-    begin
-      f("[id*=Spinner]", todo_sidebar_container)
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-    rescue SpecTimeLimit::Error
-    end
-    expect(todo_sidebar_container).not_to contain_jqcss("title:contains('To Do Items Loading')")
-  end
-
-  def wait_for_spinner
-    begin
-      f("[id*=Spinner]", planner_app_div) # the loading spinner appears
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      # ignore - sometimes spinner is too quick
-    rescue SpecTimeLimit::Error
-      # ignore - sometimes spinner doesn't appear in Chrome
-    end
-    expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
-  end
-
   def first_item_on_page
     items_displayed[0]
   end
@@ -457,7 +437,8 @@ module PlannerPageObject
     old = graded_discussion_in_the_past
     older = graded_discussion_in_the_past(Time.zone.now-4.days, 'older')
     oldest = graded_discussion_in_the_past(Time.zone.now-6.days, 'oldest')
-    [old, older, oldest]
+    ancient = graded_discussion_in_the_past(Time.zone.now-8.days, 'ancient')
+    [old, older, oldest, ancient]
   end
 
   def create_new_todo
@@ -474,5 +455,14 @@ module PlannerPageObject
 
   def scroll_height
     driver.execute_script("return window.pageYOffset")
+  end
+
+  def item_top_position(index)
+    items_displayed[index].location.y
+  end
+
+  def header_bottom_position
+    header = planner_header_container
+    header.location.y + header.size.height
   end
 end

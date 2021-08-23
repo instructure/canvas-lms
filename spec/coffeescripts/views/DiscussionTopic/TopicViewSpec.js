@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TopicView from 'compiled/views/DiscussionTopic/TopicView'
-import Backbone from 'Backbone'
+import TopicView from 'ui/features/discussion_topic/backbone/views/TopicView.js'
+import Backbone from '@canvas/backbone'
 import fakeENV from 'helpers/fakeENV'
-import DiscussionFilterState from 'compiled/models/DiscussionFilterState'
+import DiscussionFilterState from 'ui/features/discussion_topic/backbone/models/DiscussionFilterState.js'
 import ReactDOM from 'react-dom'
-import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
-import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
 QUnit.module('TopicView', hooks => {
   hooks.beforeEach(() => {

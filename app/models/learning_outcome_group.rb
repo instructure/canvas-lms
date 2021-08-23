@@ -27,11 +27,15 @@ class LearningOutcomeGroup < ActiveRecord::Base
   self.ignored_columns = %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
+  belongs_to :source_outcome_group, class_name: 'LearningOutcomeGroup', inverse_of: :destination_outcome_groups
+  has_many :destination_outcome_groups, class_name: 'LearningOutcomeGroup', inverse_of: :source_outcome_group, dependent: :nullify
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
   has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
+  after_create :clear_descendants_cache
+  after_update :clear_descendants_cache, if: -> { clear_descendants_cache? }
   resolves_root_account through: -> (group) { group.context_id ? group.context.resolved_root_account_id : 0 }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -79,6 +83,38 @@ class LearningOutcomeGroup < ActiveRecord::Base
     )
   end
 
+  def sync_source_group
+    transaction do
+      return unless self.source_outcome_group
+
+      source_outcome_group.child_outcome_links.active.each do |link|
+        add_outcome(link.content, skip_touch: true)
+      end
+
+      source_outcome_group.child_outcome_groups.active.each do |source_child_group|
+        target_child_group = child_outcome_groups.find_by(source_outcome_group_id: source_child_group.id)
+
+        if target_child_group
+          unless target_child_group.workflow_state == "active"
+            target_child_group.workflow_state = "active"
+            target_child_group.save!
+          end
+        else
+          target_child_group = child_outcome_groups.build
+          target_child_group.title = source_child_group.title
+          target_child_group.description = source_child_group.description
+          target_child_group.vendor_guid = source_child_group.vendor_guid
+          target_child_group.source_outcome_group = source_child_group
+          target_child_group.context = self.context
+          target_child_group.skip_parent_group_touch = true
+          target_child_group.save!
+        end
+
+        target_child_group.sync_source_group
+      end
+    end
+  end
+
   # copies an existing outcome group, form this context or another, into this
   # group. if :only is specified, only those immediate child outcomes included
   # in :only are copied; subgroups are only copied if :only is absent.
@@ -120,14 +156,19 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # moves an existing outcome link from the same context to be under this
   # group.
   def adopt_outcome_link(outcome_link, opts={})
+    return if self.context && self.context != outcome_link.context
+    # no-op if the group is global and the link isn't
+    return if self.context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
     # no-op if we're already the parent
-    return unless outcome_link.context == self.context
     return outcome_link if outcome_link.associated_asset == self
+
+    # update context_id if global
+    outcome_link.context_id = self.id if self.context.nil?
 
     # change the parent
     outcome_link.associated_asset = self
     outcome_link.save!
-    touch_parent_group
+    touch_parent_group unless opts[:skip_parent_group_touch]
     outcome_link
   end
 
@@ -209,17 +250,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
     scope.select(title_order_by_clause).order(title_order_by_clause)
   end
 
-  private
-
-  def infer_defaults
-    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
-    if self.context && self.context.learning_outcome_groups.exists? && !building_default
-      default = self.context.root_outcome_group
-      self.learning_outcome_group_id ||= default.id unless self == default
-    end
-    true
-  end
-
   # this finds all the ids of the ancestors avoiding relation loops
   # because of old broken behavior a group can have multiple parents, including itself
   def ancestor_ids
@@ -243,8 +273,27 @@ class LearningOutcomeGroup < ActiveRecord::Base
     @ancestor_ids
   end
 
+  private
+
+  def infer_defaults
+    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
+    if self.context && self.context.learning_outcome_groups.exists? && !building_default
+      default = self.context.root_outcome_group
+      self.learning_outcome_group_id ||= default.id unless self == default
+    end
+    true
+  end
+
   def is_ancestor?(id)
     ancestor_ids.member?(id)
+  end
+
+  def clear_descendants_cache
+    Outcomes::LearningOutcomeGroupChildren.new(context).clear_descendants_cache
+  end
+
+  def clear_descendants_cache?
+    (previous_changes.keys & %w[learning_outcome_group_id workflow_state]).any?
   end
 
   private_class_method def self.title_order_by_clause(table = nil)

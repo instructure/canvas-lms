@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
-import Folder from 'compiled/models/Folder'
-import File from 'compiled/models/File'
+import UsageRightsIndicator from '@canvas/files/react/components/UsageRightsIndicator'
+import Folder from '@canvas/files/backbone/models/Folder'
+import File from '@canvas/files/backbone/models/File.coffee'
 
 QUnit.module('UsageRightsIndicator')
 

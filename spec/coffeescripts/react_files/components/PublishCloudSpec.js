@@ -21,8 +21,8 @@ import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
 import wait from 'waait'
-import PublishCloud from 'jsx/shared/PublishCloud'
-import FilesystemObject from 'compiled/models/FilesystemObject'
+import PublishCloud from '@canvas/files/react/components/PublishCloud'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
 
 QUnit.module('PublishCloud', {
   setup() {

@@ -17,7 +17,7 @@
  */
 
 import mathml from 'mathml'
-import EquationToolbarView from 'compiled/views/tinymce/EquationToolbarView'
+import EquationToolbarView from '@canvas/rce/backbone/views/EquationToolbarView'
 
 QUnit.module('EquationToolbarView MathJax', {
   setup() {},

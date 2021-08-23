@@ -745,6 +745,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       if !self.completed? && self.submission
         s = self.submission
         s.score = self.kept_score
+        s.grade_change_event_author_id = params[:grader_id]
         s.grade_matches_current_submission = true
         s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission

@@ -19,7 +19,7 @@
 import jQuery from 'jquery'
 import 'jquery.cookie'
 
-import submitHtmlForm from 'jsx/theme_editor/submitHtmlForm'
+import submitHtmlForm from '@canvas/theme-editor/submitHtmlForm'
 
 let action, method, md5, csrfToken, form
 

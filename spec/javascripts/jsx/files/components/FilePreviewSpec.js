@@ -19,10 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {mount} from 'enzyme'
-import FilePreview from 'jsx/files/FilePreview'
-import Folder from 'compiled/models/Folder'
-import File from 'compiled/models/File'
-import FilesCollection from 'compiled/collections/FilesCollection'
+import FilePreview from '@canvas/files/react/components/FilePreview'
+import Folder from '@canvas/files/backbone/models/Folder'
+import File from '@canvas/files/backbone/models/File.coffee'
+import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 
 let filesCollection = {}
 const folderCollection = {}

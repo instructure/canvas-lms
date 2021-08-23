@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ReadOnlyCell from 'jsx/gradebook/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/ReadOnlyCell'
+import ReadOnlyCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/ReadOnlyCell.js'
 
 QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
   let $container

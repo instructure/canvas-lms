@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Module from 'compiled/models/Module'
-import ModuleItemCollection from 'compiled/collections/ModuleItemCollection'
+import Backbone from '@canvas/backbone'
+import Module from '@canvas/modules/backbone/models/Module.coffee'
+import ModuleItemCollection from '@canvas/modules/backbone/collections/ModuleItemCollection.coffee'
 
 QUnit.module('Module', {
   setup() {

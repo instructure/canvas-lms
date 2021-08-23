@@ -18,7 +18,7 @@
 
 import React from 'react'
 import enzyme from 'enzyme'
-import ExportInProgress from 'jsx/webzip_export/components/ExportInProgress'
+import ExportInProgress from 'ui/features/webzip_export/react/components/ExportInProgress.js'
 
 QUnit.module('ExportInProgress')
 

@@ -23,6 +23,7 @@ require 'account_reports/report_helper'
 module AccountReports
   class SisExporter
     include ReportHelper
+    include Pronouns
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
                        "enrollments", "groups", "group_membership",
@@ -35,6 +36,8 @@ module AccountReports
       @created_by_sis = @account_report.parameters['created_by_sis']
       extra_text_term(@account_report)
       include_deleted_objects
+      include_enrollment_filter
+      include_enrollment_states
     end
 
     def csv
@@ -111,11 +114,9 @@ module AccountReports
       return @should_add_pronouns if defined?(@should_add_pronouns)
 
       # if root_account.can_add_pronouns? is true, that means the account is using pronouns
-      # if we decided to turn off this column for everyone via Setting, we should not include them
       # if one root_account has pronouns enabled, but does not want to have them in the report, we can disable for the one account
       # if any return false, don't export
       @should_add_pronouns = ![root_account.can_add_pronouns?.to_s,
-                               Setting.get('enable_sis_export_pronouns', 'true'),
                                root_account.enable_sis_export_pronouns?.to_s].include?('false')
     end
 
@@ -124,7 +125,7 @@ module AccountReports
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
          pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
          pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name, users.pronouns"
+         users.name, users.short_name, users.pronouns AS db_pronouns"
       ).where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
@@ -161,7 +162,7 @@ module AccountReports
       row << emails[user.user_id].try(:path)
       row << user.workflow_state
       row << user.sis_batch_id? unless @sis_format
-      row << user.pronouns if should_add_pronouns?
+      row << translate_pronouns(user.db_pronouns) if should_add_pronouns?
       row
     end
 
@@ -492,7 +493,7 @@ module AccountReports
         # rather than a cursor for this iteration
         # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
-        enrol.preload(:root_account, :sis_pseudonym).find_in_batches(start: 0) do |batch|
+        enrol.preload(:root_account, :sis_pseudonym, :role).find_in_batches(strategy: :id) do |batch|
           users = batch.map {|e| User.new(id: e.user_id)}.compact
           users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
           users.uniq!
@@ -549,6 +550,14 @@ module AccountReports
       if @sis_format
         enrol = enrol.where("enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
                                AND (courses.sis_source_id IS NOT NULL OR cs.sis_source_id IS NOT NULL)")
+      end
+
+      if @enrollment_filter
+        enrol = enrol.where(type: @enrollment_filter)
+      end
+
+      if @enrollment_states
+        enrol = enrol.where(workflow_state: @enrollment_states)
       end
       enrol
     end

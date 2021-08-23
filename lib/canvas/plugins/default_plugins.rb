@@ -266,7 +266,8 @@ Canvas::Plugin.register('grade_export', :sis, {
                  :publish_endpoint => "",
                  :wait_for_success => "no",
                  :success_timeout => "600",
-                 :format_type => "instructure_csv" }
+                 :format_type => "instructure_csv" },
+  :test_cluster_inherit => false
 })
 Canvas::Plugin.register('i18n', nil, {
     :name => lambda{ t :name, 'I18n' },
@@ -320,7 +321,8 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
   :settings_partial => 'plugins/crocodoc_settings',
-  :settings => nil
+  :settings => nil,
+  :test_cluster_inherit => false
 })
 
 Canvas::Plugin.register('canvadocs', :previews, {
@@ -392,24 +394,6 @@ Canvas::Plugin.register('vericite', nil, {
   :settings_partial => 'plugins/vericite_settings'
 })
 Canvas::Plugins::TicketingSystem.register!
-Canvas::Plugin.register('live_events', nil, {
-  :name => lambda{ t :name, 'Live Events' },
-  :description => lambda{ t :description, 'Service for real-time events.' },
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings => {
-    :use_consul => false,
-    :kinesis_stream_name => nil,
-    :aws_access_key_id => nil,
-    :aws_secret_access_key => nil,
-    :aws_region => 'us-east-1',
-    :aws_endpoint => nil,
-  },
-  :encrypted_settings => [ :aws_secret_access_key ],
-  :settings_partial => 'plugins/live_events_settings',
-  :validator => 'LiveEventsValidator'
-})
 Canvas::Plugin.register('inst_fs', nil, {
   :name =>lambda{ t :name, 'Inst-FS' },
   :description => lambda{ t :description, 'File service that proxies for S3.' },

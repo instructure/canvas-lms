@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -15,9 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-handle_fallbacks = -> do
-  # dumps the whole cache, even if it's a shared local redis
-  Canvas::DynamicSettings.reset_cache!
-end
-handle_fallbacks.call
-Canvas::Reloader.on_reload(&handle_fallbacks)
+# Looking for the DynamicSettings initializer?
+# It used to be here, but we actually need our consul
+# initialization to happen early enough that other
+# initializing things can read their consul settings,
+# so all of the "setup" stuff for reading from consul is
+# in lib/canvas/dynamic_settings.rb and it gets invoked
+# from application.rb as the "canvas.init_dynamic_settings"
+# initializer.

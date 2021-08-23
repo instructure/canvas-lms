@@ -20,14 +20,19 @@
 require_relative '../helpers/assignments_common'
 require_relative '../helpers/discussions_common'
 require_relative '../helpers/files_common'
+require_relative '../helpers/wiki_and_tiny_common'
+require_relative '../rcs/pages/rce_next_page'
 
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
   include FilesCommon
   include AssignmentsCommon
+  include WikiAndTinyCommon
+  include RCENextPage
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
     @domain_root_account = Account.default
     course_with_teacher_logged_in
@@ -82,11 +87,11 @@ describe "discussion assignments" do
     it "should insert file using rce in a discussion", priority: "1", test_id: 126674 do
       discussion_title = 'New Discussion'
       topic = create_discussion(discussion_title, 'threaded')
-      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-      file.context = @course
-      file.save!
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
-      insert_file_from_rce(:discussion)
+      add_file_to_rce_next
+      submit_form('.form-actions')
+      wait_for_ajax_requests
+      expect(fln("text_file.txt")).to be_displayed
     end
   end
 

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Interfaces::AssignmentsConnectionInterface
-  include GraphQL::Schema::Interface
+  include Interfaces::BaseInterface
 
   class AssignmentFilterInputType < Types::BaseInputObject
     graphql_name "AssignmentFilter"
-    argument :gradingPeriodId, ID, <<~DESC, required: false
+    argument :grading_period_id, ID, <<~DESC, required: false
       only return assignments for the given grading period. Defaults to
       the current grading period. Pass `null` to return all assignments
       (irrespective of the assignment's grading period)
@@ -62,7 +62,7 @@ module Interfaces::AssignmentsConnectionInterface
     # a lot more straigthforward
     case self
     when Types::AssignmentGroupType
-      assignments.reorder(:position, :id)
+      assignments.except(:order).ordered
     when Types::CourseType
       assignments.
         joins(:assignment_group).

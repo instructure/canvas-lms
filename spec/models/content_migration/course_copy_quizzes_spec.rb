@@ -565,7 +565,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       data-equation-content="h\\left( x \\right) = \\left\\{ {\\begin{array}{*{20}{c}}
       {{x^2} + 4x - 1}&amp;{{\\rm{for}}}&amp;{ - 7 \\le x \\le - 1}\\\\
       { - 3x + p}&amp;{{\\rm{for}}}&amp;{ - 1 &lt; x \\le 6}
-      \\end{array}} \\right." />
+      \\end{array}} \\right."></p>
       HTML
 
       data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => qtext}

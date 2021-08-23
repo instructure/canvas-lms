@@ -537,7 +537,7 @@ describe Api::V1::Submission do
         let(:quiz) { quiz_assignment.quiz }
         let(:course) { quiz_assignment.course }
 
-        it "it included if the caller has permission to see the user's grade" do
+        it "is included if the caller has permission to see the user's grade" do
           submission_json = fake_controller.submission_json(submission_for_quiz, quiz_assignment, teacher, session, course, [field], params)
           # submissions for quizzes set the "body" field to a string of the form
           # user: <id>, quiz: <id>, score: <score>, time: <time graded>
@@ -548,6 +548,24 @@ describe Api::V1::Submission do
           submission_json = fake_controller.submission_json(submission_for_quiz, quiz_assignment, user, session, course, [field], params)
           expect(submission_json.fetch(field)).to be nil
         end
+      end
+    end
+
+    describe "read_state" do
+      let(:field) { "read_state" }
+
+      before :each do
+        submission.mark_unread(user)
+      end
+
+      it "is included when requested by include[]=read_state" do
+        submission_json = fake_controller.submission_json(submission, assignment, user, session, course, [field], params)
+        expect(submission_json.fetch(field)).to eq("unread")
+      end
+
+      it "is marked as read after being queried" do
+        fake_controller.submission_json(submission, assignment, user, session, course, [field], params)
+        expect(submission).to be_read(user)
       end
     end
   end

@@ -1,0 +1,11 @@
+{{#if display_name}}
+  {{display_name}}<button role='button' class="pull-right delete-attachment" aria-label='{{#t "#buttons.delete_file" name=display_name}}Delete file {{name}}{{/t}}'><i class="icon-end"/></button>
+{{else}}
+  {{#if isIE}}
+    <input name=file class="file-upload" type=file />
+  {{else}}
+    <button class="btn file-upload-btn">
+      {{#t "#buttons.choose_a_file"}}Choose a File{{/t}}
+    </button>
+  {{/if}}
+{{/if}}

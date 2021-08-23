@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -423,14 +425,7 @@ class EnrollmentsApiController < ApplicationController
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
-      pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
-      use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
-      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index) && !use_numeric_pagination_override
-      enrollments = use_bookmarking ?
-        enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
-        enrollments.joins(:user).select("enrollments.*").
-          order(:type, User.sortable_name_order_by_clause("users"), :id)
+      enrollments = enrollments.joins(:user).select("enrollments.*")
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates).
         any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
@@ -484,12 +479,13 @@ class EnrollmentsApiController < ApplicationController
       end
 
       collection =
-        if use_bookmarking
+        if use_bookmarking?
+          enrollments = enrollments.select("users.sortable_name AS sortable_name")
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
             {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
-          BookmarkedCollection.wrap(bookmarker, enrollments)
+          ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
-          enrollments
+          enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)
         end
       enrollments = Api.paginate(
         collection,
@@ -586,8 +582,7 @@ class EnrollmentsApiController < ApplicationController
   #   students the ability to drop the course if desired. Defaults to false.
   #
   # @argument enrollment[associated_user_id] [Integer]
-  #   For an observer enrollment, the ID of a student to observe. The
-  #   caller must have +manage_students+ permission in the course.
+  #   For an observer enrollment, the ID of a student to observe.
   #   This is a one-off operation; to automatically observe all a
   #   student's enrollments (for example, as a parent), please use
   #   the {api:UserObserveesController#create User Observees API}.
@@ -918,10 +913,9 @@ class EnrollmentsApiController < ApplicationController
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
-      approved_accounts = user.associated_root_accounts.shard(user).inject([]) do |accounts, ra|
-        accounts << ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
-        accounts
-      end
+      approved_accounts = user.associated_root_accounts.map do |ra|
+        ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
+      end.compact
 
       # if there aren't any ids in approved_accounts, then the user doesn't have
       # permissions.
@@ -1010,5 +1004,15 @@ class EnrollmentsApiController < ApplicationController
 
   def render_create_errors(errors)
     render json: {message: errors.join(', ')}, status: :bad_request
+  end
+
+  def use_bookmarking?
+    unless instance_variable_defined?(:@use_bookmarking)
+      # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
+      pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
+      use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
+      @use_bookmarking = !use_numeric_pagination_override
+    end
+    @use_bookmarking
   end
 end

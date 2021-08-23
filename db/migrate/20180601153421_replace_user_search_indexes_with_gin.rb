@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ class ReplaceUserSearchIndexesWithGin < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def up
-    if (schema = connection.extension_installed?(:pg_trgm))
+    if (schema = connection.extension(:pg_trgm)&.schema)
       add_index :users, "lower(name) #{schema}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin, algorithm: :concurrently
       add_index :pseudonyms, "lower(sis_user_id) #{schema}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin, algorithm: :concurrently
       add_index :communication_channels, "lower(path) #{schema}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin, algorithm: :concurrently
@@ -34,7 +36,7 @@ class ReplaceUserSearchIndexesWithGin < ActiveRecord::Migration[5.1]
   end
 
   def down
-    if (schema = connection.extension_installed?(:pg_trgm))
+    if (schema = connection.extension(:pg_trgm)&.schema)
       add_index :users, "lower(name) #{schema}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist, algorithm: :concurrently
       add_index :pseudonyms, "lower(sis_user_id) #{schema}.gist_trgm_ops", name: "index_trgm_pseudonyms_sis_user_id", using: :gist, algorithm: :concurrently
       add_index :communication_channels, "lower(path) #{schema}.gist_trgm_ops", name: "index_trgm_communication_channels_path", using: :gist, algorithm: :concurrently

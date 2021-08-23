@@ -36,6 +36,7 @@ module CustomPageLoaders
       # force a reload, cuz the `get` above won't
       driver.navigate.refresh if is_first_request_of_spec
       close_modal_if_present
+      wait_for_initializers
       wait_for_ajaximations
     else
       wait_for_new_page_load(true) do

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import ExpandableLockOptions from 'jsx/blueprint_courses/components/ExpandableLockOptions'
+import ExpandableLockOptions from 'ui/features/course_settings/react/components/ExpandableLockOptions.js'
 
 QUnit.module('ExpandableLockOptions component')
 

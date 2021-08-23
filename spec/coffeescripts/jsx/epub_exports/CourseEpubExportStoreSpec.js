@@ -17,7 +17,7 @@
  */
 
 import {isEmpty, isUndefined} from 'lodash'
-import CourseStore from 'jsx/epub_exports/CourseStore'
+import CourseStore from 'ui/features/epub_exports/react/CourseStore.js'
 
 QUnit.module('CourseEpubExportStoreSpec', {
   setup() {

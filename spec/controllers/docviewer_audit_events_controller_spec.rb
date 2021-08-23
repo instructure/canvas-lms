@@ -109,6 +109,56 @@ describe DocviewerAuditEventsController do
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
+    it 'renders status not_found if passed a document_id that does not match submission' do
+      assignment = Assignment.create!(course: @course, name: 'generally reasonable', anonymous_grading: true)
+      @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
+
+      default_params[:document_id] = "bad_string_#{@attachment.canvadoc.document_id}"
+      post :create, format: :json, params: default_params
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'associates document_id with annotatable_attachments when assignment is Student Annotation type' do
+      assignment = Assignment.create!(
+        annotatable_attachment: @attachment,
+        anonymous_grading: true,
+        course: @course,
+        name: 'generally reasonable',
+        submission_types: 'student_annotation'
+      )
+      @submission = assignment.submit_homework(
+        @student,
+        annotatable_attachment_id: @attachment.id,
+        submission_type: 'student_annotation'
+      )
+
+      expect {
+        post :create, format: :json, params: default_params
+      }.to change {
+        AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission, user: @teacher).count
+      }.by(1)
+    end
+
+    it 'associates document_id with annotatable_attachments when student annotation assignment has no attempts' do
+      student_in_course(active_all: true, course: @course)
+
+      assignment = Assignment.create!(
+        annotatable_attachment: @attachment,
+        anonymous_grading: true,
+        course: @course,
+        name: 'generally reasonable',
+        submission_types: 'student_annotation'
+      )
+
+      @submission = assignment.submissions.find_by(user_id: @student.id)
+
+      expect {
+        post :create, format: :json, params: default_params
+      }.to change {
+        AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission, user: @teacher).count
+      }.by(1)
+    end
+
     context 'for a moderated assignment' do
       it 'renders status ok if assignment has an open slot for moderating' do
         assignment = Assignment.create!(

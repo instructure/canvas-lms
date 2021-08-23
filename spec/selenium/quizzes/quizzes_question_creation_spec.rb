@@ -24,6 +24,11 @@ describe 'quizzes question creation' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
+  before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
+    stub_rcs_config
+  end
+
   context 'when creating a new question' do
 
     before(:each) do
@@ -200,7 +205,7 @@ describe 'quizzes question creation' do
       replace_content(answers[2].find_element(:css, '.select_answer input'), 'blue')
       replace_content(answers[3].find_element(:css, '.select_answer input'), 'purple')
 
-      driver.execute_script("$('.question_form:visible button[type=\"submit\"]').click();")
+      submit_form(question)
       wait_for_ajax_requests
 
       driver.execute_script("$('#show_question_details').click();")
@@ -460,6 +465,38 @@ describe 'quizzes question creation' do
       create_question_group
 
       expect(f('.quiz_group_form')).to be_displayed
+    end
+  end
+
+  context 'when editing a quiz question' do
+    before(:each) do
+      course_with_teacher_logged_in
+      @quiz = @course.quizzes.create!(title: 'new quiz')
+    end
+
+    def create_quiz_question question_data
+      @quiz.quiz_questions.create!(question_data: question_data)
+
+      @quiz.generate_quiz_data
+      @quiz.workflow_state = 'available'
+      @quiz.save
+      @quiz.reload
+    end
+
+    it 'edits "fill in multi blanks" question' do
+      create_quiz_question({name: 'Quiz Questions', question_type: 'fill_in_multiple_blanks_question', question_text: '[color1]', answers: [], points_possible: 1})
+      open_quiz_edit_form
+      click_questions_tab
+      driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
+      fj('.edit_question_link').click
+      wait_for_ajaximations
+      type_in_tiny '.question:visible textarea.question_content', '[color2]'
+      question = fj('.question_form:visible')
+      select_box = question.find_element(:css, '.blank_id_select')
+      select_box.click
+      options = select_box.find_elements(:css, 'option')
+      expect(options[0].text).to eq 'color1'
+      expect(options[1].text).to eq 'color2'
     end
   end
 

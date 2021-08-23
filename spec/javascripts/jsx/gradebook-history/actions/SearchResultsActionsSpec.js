@@ -17,10 +17,10 @@
  */
 
 import Fixtures from '../Fixtures'
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore'
-import * as HistoryActions from 'jsx/gradebook-history/actions/HistoryActions'
-import HistoryApi from 'jsx/gradebook-history/api/HistoryApi'
-import * as SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsActions'
+import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore.js'
+import * as HistoryActions from 'ui/features/gradebook_history/react/actions/HistoryActions.js'
+import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi.js'
+import * as SearchResultsActions from 'ui/features/gradebook_history/react/actions/SearchResultsActions.js'
 
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
   setup() {

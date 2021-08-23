@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -26,16 +28,16 @@ group :test do
   gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '5.0.0', require: false
+  gem 'puma', '5.2.2', require: false
 
   gem 'db-query-matchers', '0.10.0'
-  gem 'rspec', '3.9.0'
+  gem 'rspec', '3.10.0'
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '4.0.1'
   gem 'rspec-collection_matchers', '1.2.0'
-  gem 'rspec-support', '3.9.2'
-  gem 'rspec-expectations', '3.9.0'
-  gem 'rspec-mocks', '3.9.1'
+  gem 'rspec-support', '3.10.2'
+  gem 'rspec-expectations', '3.10.1'
+  gem 'rspec-mocks', '3.10.2'
   gem 'shoulda-matchers', '4.3.0'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
@@ -50,7 +52,6 @@ group :test do
   gem 'selenium-webdriver', '3.142.7', require: false
     gem 'childprocess', '3.0.0', require: false
   gem 'webdrivers', '4.2.0', require: false
-  gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
   gem 'testrailtagging', '0.3.8.7', require: false
 
   gem 'webmock', '3.8.2', require: false
@@ -60,15 +61,17 @@ group :test do
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.49.0', require: false
-    gem 'pact-mock_service', '3.5.0', require: false
-    gem 'pact-support', '1.15.1', require: false # pinned until https://github.com/pact-foundation/pact-support/issues/81 fixed
+  gem 'pact', '1.57.0', require: false
   gem 'pact-messages', '0.2.0'
-  gem 'pact_broker-client', '1.25.0'
+  gem 'pact_broker-client', '1.40.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 
   gem 'parallel_tests'
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
+  gem 'axe-core-selenium', '4.1.0', require: false
+  gem 'axe-core-rspec', '4.1.0', require: false
+  gem 'axe-core-api', '4.1.0', require:false
+  gem 'stormbreaker', '0.0.3', require: false
 end

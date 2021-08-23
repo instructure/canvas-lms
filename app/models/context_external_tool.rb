@@ -157,7 +157,7 @@ class ContextExternalTool < ActiveRecord::Base
       extension_keys += custom_keys
     end
     extension_keys += {
-        :visibility => lambda{|v| %w{members admins}.include?(v)}
+        :visibility => lambda{|v| %w{members admins public}.include?(v) || v.nil?}
     }.to_a
 
     extension_keys.each do |key, validator|
@@ -168,6 +168,10 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on deactivation, make sure placement data is kept
     if settings[type].key?(:enabled) && !settings[type][:enabled]
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = true if type == :resource_selection
+
       settings[:inactive_placements] ||= {}.with_indifferent_access
       settings[:inactive_placements][type] ||= {}.with_indifferent_access
       settings[:inactive_placements][type].merge!(settings[type])
@@ -177,12 +181,16 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on reactivation, use the old placement data
     if settings[type][:enabled] && settings.dig(:inactive_placements, type)
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = false if type == :resource_selection
+
       settings[type] = settings.dig(:inactive_placements, type).merge(settings[type])
       settings[:inactive_placements].delete(type)
       settings.delete(:inactive_placements) if settings[:inactive_placements].empty?
     end
 
-    settings[type]
+    settings[type].compact!
   end
 
   def has_placement?(type)
@@ -213,6 +221,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def sync_placements!(placements)
+    self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
     placements_to_delete = Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) - placements
     if placements_to_delete.any?
@@ -594,6 +603,24 @@ class ContextExternalTool < ActiveRecord::Base
     @standard_url
   end
 
+  # Does the tool match the host of the given url?
+  # Checks for batches on both domain and url
+  #
+  # This method checks both the domain and url
+  # host when attempting to match host.
+  #
+  # This method was added becauase #matches_domain?
+  # cares about the presence or absence of a protocol
+  # in the domain. Rather than changing that method and
+  # risking breaking Canvas flows, we introduced this
+  # new method.
+  def matches_host?(url)
+    matches_tool_domain?(url) ||
+      (self.url.present? &&
+        Addressable::URI.parse(self.url)&.normalize&.host ==
+          Addressable::URI.parse(url).normalize.host)
+  end
+
   def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
@@ -615,7 +642,7 @@ class ContextExternalTool < ActiveRecord::Base
     return false if domain.blank?
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).normalize.host rescue nil
-    d = domain.gsub(/http[s]?\:\/\//, '')
+    d = domain.downcase.gsub(/http[s]?\:\/\//, '')
     !!(host && ('.' + host).match(/\.#{d}\z/))
 end
 
@@ -690,7 +717,7 @@ end
     return nil if contexts.empty?
 
     context.shard.activate do
-      scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      scope = ContextExternalTool.shard(context.shard).where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
       scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
@@ -702,15 +729,15 @@ end
   end
 
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
+    self.active.where(consumer_key: consumer_key, context: contexts_to_search(context)).first
   end
 
   def self.find_active_external_tool_by_client_id(client_id, context)
-    self.active.where(developer_key_id: client_id).polymorphic_where(context: contexts_to_search(context)).first
+    self.active.where(developer_key_id: client_id, context: contexts_to_search(context)).first
   end
 
   def self.find_external_tool_by_id(id, context)
-    self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
+    self.where(id: id, context: contexts_to_search(context)).first
   end
 
   # Order of precedence: Basic LTI defines precedence as first
@@ -737,7 +764,7 @@ end
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
-      query = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      query = ContextExternalTool.shard(context.shard).where(context: contexts).active
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
 
       all_external_tools = query.to_a

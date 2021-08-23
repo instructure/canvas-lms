@@ -31,6 +31,9 @@ describe StreamItemsHelper do
 
     @context = @course
     @discussion = discussion_topic_model
+    entry = @discussion.discussion_entries.new(user_id: @other_user, message: "you've been mentioned for pretend")
+    entry.mentions.new(user_id: @teacher, root_account_id: @discussion.root_account_id)
+    entry.save!
     @announcement = announcement_model
     @assignment = assignment_model(:course => @course, peer_reviews: true)
     @assignment.assign_peer_review(@teacher, @student)
@@ -45,18 +48,19 @@ describe StreamItemsHelper do
   context "categorize_stream_items" do
     it "should categorize different types correctly" do
       @items = @teacher.recent_stream_items
-      expect(@items.size).to eq 6 # 1 for each type, 1 hidden conversation
+      expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       expect(@categorized["Announcement"].size).to eq 1
       expect(@categorized["Conversation"].size).to eq 1
       expect(@categorized["Assignment"].size).to eq 1
       expect(@categorized["DiscussionTopic"].size).to eq 1
+      expect(@categorized["DiscussionEntry"].size).to eq 1
       expect(@categorized["AssessmentRequest"].size).to eq 1
     end
 
     it "should normalize output into common fields" do
       @items = @teacher.recent_stream_items
-      expect(@items.size).to eq 6 # 1 for each type, 1 hidden conversation
+      expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized.values.flatten.each do |presenter|
         item = @items.detect{ |si| si.id == presenter.stream_item_id }
@@ -147,12 +151,13 @@ describe StreamItemsHelper do
   context "extract_path" do
     it "should link to correct place" do
       @items = @teacher.recent_stream_items
-      expect(@items.size).to eq 6 # 1 for each type, 1 hidden conversation
+      expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       expect(@categorized["Announcement"].first.path).to match("/courses/#{@course.id}/announcements/#{@announcement.id}")
       expect(@categorized["Conversation"].first.path).to match("/conversations/#{@conversation.id}")
       expect(@categorized["Assignment"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}")
       expect(@categorized["DiscussionTopic"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}")
+      expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}")
       expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
   end
@@ -160,12 +165,13 @@ describe StreamItemsHelper do
   context "extract_context" do
     it "should find the correct context" do
       @items = @teacher.recent_stream_items
-      expect(@items.size).to eq 6 # 1 for each type, 1 hidden conversation
+      expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       expect(@categorized["Announcement"].first.context.id).to eq @course.id
       expect(@categorized["Conversation"].first.context.id).to eq @other_user.id
       expect(@categorized["Assignment"].first.context.id).to eq @course.id
       expect(@categorized["DiscussionTopic"].first.context.id).to eq @course.id
+      expect(@categorized["DiscussionEntry"].first.context.id).to eq @course.id
       expect(@categorized["AssessmentRequest"].first.context.id).to eq @course.id
     end
   end
@@ -187,12 +193,13 @@ describe StreamItemsHelper do
   context "extract_summary" do
     it "should find the right content" do
       @items = @teacher.recent_stream_items
-      expect(@items.size).to eq 6 # 1 for each type, 1 hidden conversation
+      expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       expect(@categorized["Announcement"].first.summary).to eq @announcement.title
       expect(@categorized["Conversation"].first.summary).to eq @participant.last_message.body
       expect(@categorized["Assignment"].first.summary).to match /Assignment Created/
       expect(@categorized["DiscussionTopic"].first.summary).to eq @discussion.title
+      expect(@categorized["DiscussionEntry"].first.summary).to eq "#{@other_user.short_name} mentioned you in #{@discussion.title}."
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)
     end
 

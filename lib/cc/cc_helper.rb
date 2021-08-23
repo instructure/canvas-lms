@@ -19,6 +19,7 @@
 #
 
 require 'nokogiri'
+require 'nokogumbo'
 
 module CC
 module CCHelper
@@ -48,6 +49,7 @@ module CCHelper
   WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
+  BASIC_LTI_1_DOT_3 = 'imsbasiclti_xmlv1p3'
   BLTI_NAMESPACE = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
 
   # Common Cartridge 1.2
@@ -97,6 +99,7 @@ module CCHelper
   MEDIA_TRACKS = 'media_tracks.xml'
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
+  RESOURCE_LINK_FOLDER = 'lti_resource_links'
 
   def ims_date(date=nil,default=Time.now)
     CCHelper.ims_date(date, default)
@@ -147,24 +150,44 @@ module CCHelper
 
   def get_html_title_and_body(doc)
     title = get_node_val(doc, 'html head title')
-    body = doc.at_css('html body').to_s.force_encoding(Encoding::UTF_8).gsub(%r{</?body>}, '').strip
+    body = doc.at_css('html body').to_s.encode(Encoding::UTF_8).gsub(%r{</?body>}, '').strip
     [title, body]
   end
 
+  UPLOADED_MEDIA_REGEX = /\/media_objects\/|\/Uploaded Media\//.freeze
+  SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
+  WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
+    Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
+    Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN)))
+  )
+
   def self.map_linked_objects(content)
     linked_objects = []
-    html = Nokogiri::HTML.fragment(content)
-    html.css('a, img').each do |atag|
-      source = atag['href'] || atag['src']
-      next unless source =~ /%24[^%]*%24/
-      if source.include?(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))
-        attachment_key = source.sub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), '')
-        attachment_key = attachment_key.split('?').first
-        attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+    doc = Nokogiri::XML.fragment(content)
+    doc.css('a, img', 'iframe').each do |node|
+      source = node['href'] || node['src']
+      next unless source =~ SPECIAL_REFERENCE_REGEX
+
+      if source =~ WEB_CONTENT_REFERENCE_REGEX
+        attachment_key = CGI.unescape(source.sub(WEB_CONTENT_REFERENCE_REGEX, ''))
+        if node['data-media-type']
+          # files uploaded directly using the Kaltura plugin media recording feature
+          if attachment_key =~ UPLOADED_MEDIA_REGEX
+            # formatted appropriately, no need to massage the pathname
+            attachment_key
+          else
+            # all other media uploads
+            attachment_key = attachment_key.split('?').second
+            attachment_key = "/" + attachment_key.split('/').second
+          end
+        else
+          attachment_key = attachment_key.split('?').first
+          attachment_key = attachment_key.split('/').join('/')
+        end
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
         type, object_key = source.split('/').last 2
-        if type =~ /%24[^%]*%24/
+        if type =~ SPECIAL_REFERENCE_REGEX
           type = object_key
           object_key = nil
         end
@@ -198,6 +221,11 @@ module CCHelper
           "/media_objects/#{$1}"
         else
           match.url.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+        end
+      end
+      @rewriter.set_handler('courses') do |match|
+        if match.obj_id == @course.id
+          "#{COURSE_TOKEN}/"
         end
       end
       @rewriter.set_handler('files') do |match|
@@ -310,11 +338,11 @@ module CCHelper
       # keep track of found media comments, and translate them into links into the files tree
       # if imported back into canvas, they'll get uploaded to the media server
       # and translated back into media comments
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5.fragment(html)
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
-        obj = MediaObject.by_media_id(media_id).first
+        obj = MediaObject.active.by_media_id(media_id).first
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
@@ -326,7 +354,7 @@ module CCHelper
       # process new RCE media iframes too
       doc.css('iframe[data-media-id]').each do |iframe|
         media_id = iframe['data-media-id']
-        obj = MediaObject.by_media_id(media_id).take
+        obj = MediaObject.active.by_media_id(media_id).take
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
@@ -365,7 +393,7 @@ module CCHelper
       client.startSession(CanvasKaltura::SessionType::ADMIN)
     end
     if flavor
-      assets = client.flavorAssetGetByEntryId(obj.media_id)
+      assets = client.flavorAssetGetByEntryId(obj.media_id) || []
       asset = assets.sort_by { |f| f[:size].to_i }.reverse.find { |f| f[:containerFormat] == flavor }
       asset ||= assets.first
     else

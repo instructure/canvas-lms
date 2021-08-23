@@ -51,7 +51,13 @@ module Lti
     def self.old_id_for_user_in_context(asset, context)
       if asset.is_a?(User) && context
         context.shard.activate do
-          asset.past_lti_ids.where(context: context).take&.user_lti_context_id
+          if asset.association(:past_lti_ids).loaded?
+            asset.past_lti_ids.find do |id|
+              id.context_id == context.id && id.context_type == context.class_name
+            end&.user_lti_context_id
+          else
+            asset.past_lti_ids.where(context: context).pluck(:user_lti_context_id).first
+          end
         end
       end
     end

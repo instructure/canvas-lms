@@ -27,9 +27,6 @@ module BrandableCSS
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
   MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'.freeze
 
-  use_compressed = (defined?(Rails) && Rails.env.production?) || (ENV['RAILS_ENV'] == 'production')
-  SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
-
   VARIABLE_HUMAN_NAMES = {
     "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
     "ic-brand-font-color-dark" => lambda { I18n.t("Main Text Color") },
@@ -130,9 +127,7 @@ module BrandableCSS
 
     def check_if_we_need_to_create_a_db_migration
       path = ActiveRecord::Migrator.migrations_paths.first
-      args = [path]
-      args << ActiveRecord::SchemaMigration unless CANVAS_RAILS5_2
-      migrations = ActiveRecord::MigrationContext.new(*args).migrations
+      migrations = ActiveRecord::MigrationContext.new(path, ActiveRecord::SchemaMigration).migrations
       ['predeploy', 'postdeploy'].each do |pre_or_post|
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
@@ -293,7 +288,7 @@ module BrandableCSS
       if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@combined_checksums)
         return @combined_checksums
       end
-      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'] + SASS_STYLE)
+      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
       if file.exist?
         @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
           memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
@@ -310,12 +305,60 @@ module BrandableCSS
       end
     end
 
+    # javascript needs to know the checksums of the available variants for each
+    # handlebars template so that it loads the corresponding stylesheet when the
+    # template is rendered at runtime
+    def handlebars_index_json
+      if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@handlebars_index_json)
+        return @handlebars_index_json
+      end
+
+      file = APP_ROOT.join(CONFIG.dig('indices', 'handlebars', 'path'))
+      unless file.exist?
+        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+      end
+
+      @handlebars_index_json = file.read
+    end
+
     # bundle path should be something like "bundles/speedgrader" or "plugins/analytics/something"
     def cache_for(bundle_path, variant)
       key = ["#{bundle_path}.scss", variant].join(CONFIG['manifest_key_seperator'])
       fingerprint = combined_checksums[key]
       raise "Fingerprint not found. #{bundle_path} #{variant}" unless fingerprint
       fingerprint
+    end
+
+    # build a cache of nominal paths to font files to the decorated version we need to request
+    # e.g. "/fonts/lato/extended/Lato-Bold.woff2": "/dist/fonts/lato/extended/Lato-Bold-cccb897485.woff2"
+    # only track .woff2 font files since those will be the only ones ever asked for
+    # (truth be told, could limit it to just lato extended)
+    # this function is more or less modeled after combined_checksums
+    def font_path_cache
+      return @decorated_font_paths if defined?(@decorated_font_paths) && defined?(ActionController) && ActionController::Base.perform_caching
+
+      file = APP_ROOT.join(CONFIG.dig('paths', 'rev_manifest'))
+
+      # in reality, if the rev-manifest.json file is missing you won't get this far, but let's be careful anyway
+      return(
+        @decorated_font_paths =
+          JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
+            memo["/#{k}"] = "/dist/#{v}" if k =~ /^fonts.*woff2/
+          end.freeze
+      ) if file.exist?
+
+      # the file does not exist in production, we have a problem
+      if defined?(Rails) && Rails.env.production?
+        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+      end
+
+      # for dev/test there might be cases where you don't want it to raise an exception
+      # if you haven't run `brandable_css` and the manifest file doesn't exist yet.
+      # eg: you want to test a controller action and you don't care that it links
+      # to a css file that hasn't been created yet.
+      @decorated_font_paths = {
+        anyfont: 'Error: unknown css checksum. you need to run brandable_css'
+      }.freeze
     end
 
     def all_fingerprints_for(bundle_path)

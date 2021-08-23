@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
+import ConfigurationFormXml from 'ui/features/external_apps/react/components/ConfigurationFormXml.js'
 
 const component = TestUtils.renderIntoDocument(
   <ConfigurationFormXml

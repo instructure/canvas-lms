@@ -18,7 +18,7 @@
 
 // this is a QUnit test and not a jest test because it needs a real DOM to pick on the dir='rtl' stuff
 
-import {direction} from 'jsx/shared/helpers/rtlHelper'
+import {direction} from '@canvas/i18n/rtlHelper'
 
 QUnit.module('rtlHelper', () => {
   QUnit.module('.direction', hooks => {

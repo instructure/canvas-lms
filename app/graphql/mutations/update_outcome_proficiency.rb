@@ -29,7 +29,8 @@ class Mutations::UpdateOutcomeProficiency < Mutations::OutcomeProficiencyBase
     record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeProficiency")
     record = OutcomeProficiency.find_by(id: record_id)
     raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
+
     check_permission(record.context)
-    upsert(input, record)
+    upsert(input, existing_record: record)
   end
 end

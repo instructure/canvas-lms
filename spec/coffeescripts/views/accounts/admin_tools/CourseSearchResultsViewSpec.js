@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import CourseSearchResultsView from 'compiled/views/accounts/admin_tools/CourseSearchResultsView'
-import CourseRestore from 'compiled/models/CourseRestore'
+import Backbone from '@canvas/backbone'
+import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView.js'
+import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
 import assertions from 'helpers/assertions'
 
 const errorMessageJSON = {

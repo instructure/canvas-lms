@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import Assignment from 'compiled/models/Assignment'
-import EditHeaderView from 'compiled/views/assignments/EditHeaderView'
-import editViewTemplate from 'jst/assignments/EditView'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView.coffee'
+import editViewTemplate from 'ui/features/assignment_edit/jst/EditView.handlebars'
 import fakeENV from 'helpers/fakeENV'
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 import assertions from 'helpers/assertions'
 
 const defaultAssignmentOpts = {

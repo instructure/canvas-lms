@@ -108,6 +108,12 @@ describe Outcomes::ResultAnalytics do
       expect(results.length).to eq 2
     end
 
+    it 'does return deleted results' do
+      LearningOutcomeResult.last.destroy
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
     it 'does return muted assignment results with auto post policy' do
       @assignment.mute!
       @assignment.ensure_post_policy(post_manually: false)

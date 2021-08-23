@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Quiz from 'compiled/models/Quiz'
-import QuizCollection from 'compiled/collections/QuizCollection'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection.js'
 
 QUnit.module('QuizCollection')
 

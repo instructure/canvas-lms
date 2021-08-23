@@ -18,9 +18,9 @@
 
 import _ from 'underscore'
 
-import ProcessGradebookUpload from 'jsx/gradebook/uploads/process_gradebook_upload'
+import ProcessGradebookUpload from 'ui/features/gradebook_uploads/jquery/process_gradebook_upload.js'
 import fakeENV from 'helpers/fakeENV'
-import 'timezone'
+import '@canvas/timezone'
 
 const oldAssignment1 = {id: 1, title: 'Old Assignment 1', points_possible: 25, published: true}
 

@@ -38,7 +38,12 @@
         </li>
       <% end %>
 
-      <% if can_do(@context, @current_user, :manage_admin_users, :manage_students, :read_prior_roster) %>
+      <% if can_do(@context,
+                   @current_user,
+                   @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users,
+                   :manage_students,
+                   :read_prior_roster
+                  ) %>
         <li role="presentation">
         <%= sidebar_button course_prior_users_path(@context),
                            t('View Prior Enrollments'),

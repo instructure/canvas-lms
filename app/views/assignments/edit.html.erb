@@ -24,7 +24,7 @@
 <% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 
 <%
-  js_env :assignment_attempts_enabled => @context.feature_enabled?(:assignment_attempts) && !@assignment.quiz_lti?
+  js_env :assignment_attempts_enabled => !@assignment.quiz_lti?
   js_env :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
   css_bundle :assignments, :assignments_edit, :conditional_release_editor, :tinymce
   js_bundle :assignment_edit

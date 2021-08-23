@@ -544,5 +544,123 @@ describe "Api::V1::Assignment" do
       expect(assignment.lti_resource_links.size).to eq 1
       expect(assignment.lti_resource_links.first.custom).to eq custom_params
     end
+
+    context 'when Quizzes 2 tool is selected' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+      end
+
+      let(:external_tool_tag_attributes) do
+        {
+          content_id: tool.id,
+          content_type: 'context_external_tool',
+          custom_params: custom_params.to_json,
+          external_data: '',
+          new_tab: '0',
+          url: 'http://example.com/launch'
+        }
+      end
+
+      it 'create the assignment and set `custom_params` to lti resource link properly' do
+        new_assignmet = assignment_model(course: course, peer_reviews: true)
+        response = api.create_api_assignment(new_assignmet, assignment_params, user)
+
+        expect(response).to eq :created
+        expect(new_assignmet.peer_reviews).to be_falsey
+      end
+    end
+  end
+
+  describe 'Updating submission type' do
+    let(:user) { user_model }
+    let(:course) { course_factory }
+    let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+    let(:assignment_update_params) do
+      ActionController::Parameters.new(
+        name: 'Edited name',
+        submission_types: ['on_paper']
+      )
+    end
+
+    context 'when the assignment does not have student submissions' do
+      it 'should allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 0
+        expect(assignment.submission_types).to eq 'none'
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'on_paper'
+      end
+    end
+
+    context 'when an assignment with submission type other than "online_quiz" has one student submission' do
+      before do
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      it 'should allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'on_paper'
+      end
+    end
+
+    context 'when an assignment with submission type "online - text entry" has one student submission' do
+      before do
+        assignment.update!(submission_types: 'online_text_entry')
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          name: 'Edited name',
+          submission_types: ['online_url','online_upload']
+        )
+      end
+
+      it 'should allow updating the submission entry options' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'online_url,online_upload'
+      end
+    end
+
+    context 'when an assignment with submission type "online_quiz" has one student submission' do
+      before do
+        assignment.update!(submission_types: 'online_quiz')
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      it 'should not allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'online_quiz'
+      end
+
+      it 'should allow updating other fields' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.name).to eq 'Edited name'
+      end
+    end
   end
 end

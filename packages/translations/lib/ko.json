@@ -14,6 +14,9 @@
     "announcements_a4b8ed4a": {
         "message": "공지"
     },
+    "apply_781a2546": {
+        "message": "적용"
+    },
     "apps_54d24a47": {
         "message": "앱"
     },
@@ -56,10 +59,16 @@
     "content_type_2cf90d95": {
         "message": "내용 유형"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n  other {}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n  other {}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n  other {}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n  other {}\n}"
     },
     "course_8a63b4a3": {
@@ -137,6 +146,9 @@
     "group_navigation_99f191a": {
         "message": "그룹 탐색"
     },
+    "home_351838cd": {
+        "message": "홈"
+    },
     "image_8ad06": {
         "message": "이미지"
     },
@@ -163,6 +175,9 @@
     },
     "invalid_url_cbde79f": {
         "message": "잘못된 URL"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "오늘로 가기"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "키보드 단축키"
@@ -203,6 +218,9 @@
     "my_files_2f621040": {
         "message": "내 파일"
     },
+    "name_1aed4a1b": {
+        "message": "이름"
+    },
     "new_13daf639": {
         "message": "새 항목"
     },
@@ -211,6 +229,9 @@
     },
     "no_results_940393cf": {
         "message": "No results."
+    },
+    "none_3b5e34d2": {
+        "message": "없음"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "현재 없음"
@@ -248,9 +269,6 @@
     "record_7c9448b": {
         "message": "녹음/녹화"
     },
-    "recording_98da6bda": {
-        "message": "녹음/녹화"
-    },
     "save_11a80ec3": {
         "message": "저장"
     },
@@ -263,8 +281,8 @@
     "sort_by_e75f9e3e": {
         "message": "정렬 조건"
     },
-    "start_over_f7552aa9": {
-        "message": "새로 시작"
+    "star_8d156e09": {
+        "message": "별표 표시"
     },
     "submit_a3cc6859": {
         "message": "제출"
@@ -292,6 +310,9 @@
     },
     "upload_file_fd2361b8": {
         "message": "파일 업로드"
+    },
+    "uploading_19e8a4e7": {
+        "message": "업로드 중"
     },
     "url_22a5f3b8": {
         "message": "URL"

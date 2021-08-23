@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -91,7 +93,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     paginated_bindings = Api.paginate(
       account_chain_bindings,
       self,
-      pagination_url,
+      url_for(action: :index, account_id: account.id),
       pagination_args
     )
     render json: index_serializer(paginated_bindings)
@@ -105,20 +107,12 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     end
   end
 
-  def pagination_url
-    url_for(action: :index, account_id: account.id)
-  end
-
   def pagination_args
     params[:limit] ? { per_page: params[:limit] } : {}
   end
 
   def account
-    @_account ||= begin
-      a = Account.site_admin if params[:account_id] == 'site_admin'
-      a = @domain_root_account if params[:account_id] == 'self'
-      a || Account.find(params[:account_id])
-    end
+    @_account ||= api_find(Account, params[:account_id])
   end
 
   def existing_binding

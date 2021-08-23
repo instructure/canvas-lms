@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as StudentsApi from 'jsx/assignments/GradeSummary/students/StudentsApi'
+import * as StudentsApi from 'ui/features/assignment_grade_summary/react/students/StudentsApi.js'
 import FakeServer, {
   paramsFromRequest,
   pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('GradeSummary StudentsApi', suiteHooks => {
   let server

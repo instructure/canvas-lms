@@ -36,6 +36,18 @@ describe "Outcome Groups API", type: :request do
     group.add_outcome(@outcome)
   end
 
+  def create_subgroup(opts={})
+    group = opts.delete(:group) || @group
+    group.child_outcome_groups.create!({:title => 'subgroup', :vendor_guid => 'blahblah'}.merge(opts))
+  end
+
+  def add_outcome_to_group(group)
+    group.add_outcome(@outcome)
+    expect(group.child_outcome_links.reload.size).to eq 1
+    expect(group.child_outcome_links.first.content).to eq @outcome
+    group
+  end
+
   def add_or_get_rubric(outcome)
     # This is horribly inefficient, but there's not a good
     # way to query by learning outcome id because it's stored
@@ -287,6 +299,52 @@ describe "Outcome Groups API", type: :request do
       expect(json.map {|j| j['outcome']['id']}).to eq expected_outcome_ids
     end
 
+    it "should return friendly description if friendly description is set on outcome for the given context and feature flag is on" do
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      friendly_description = "a friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @account,
+        description: friendly_description
+      })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+                      controller: 'outcome_groups_api',
+                      action: 'link_index',
+                      account_id: @account.id,
+                      :outcome_style => "full",
+                      format: 'json')
+
+      expected_outcome_descriptions = @links.take(2).map(&:content).map(&:description)
+      expected_outcome_descriptions.append(friendly_description)
+      expect(json.map {|j| j['outcome']['friendly_description']}).to eq expected_outcome_descriptions
+    end
+
+    it "should return course friendly description if outcome has course and account-level friendly descriptions" do
+      course_with_teacher(:user => @user, :active_all => true)
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      @course.root_outcome_group.add_outcome(@outcome)
+      friendly_description = "a course level friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @account,
+        description: "an account level friendly description"
+      })
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @course,
+        description: friendly_description
+      })
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+                      controller: 'outcome_groups_api',
+                      action: 'link_index',
+                      course_id: @course.id,
+                      :outcome_style => "full",
+                      format: 'json')
+
+      expected_outcome_descriptions = friendly_description
+      expect(json.map {|j| j['outcome']['friendly_description']}.first).to eq expected_outcome_descriptions
+    end
+
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome, can_edit) do
@@ -346,35 +404,72 @@ describe "Outcome Groups API", type: :request do
         )
       end
 
-      it "outcome is assessed" do
-        course_with_teacher(active_all: true)
-        student_in_course(context: @course)
-        @course.root_outcome_group.add_outcome(@outcome)
-        expect(@outcome).not_to be_assessed(@course)
+      context "outcome is assessed" do
+        before do
+          course_with_teacher(active_all: true)
+          student_in_course(context: @course)
+          @course.root_outcome_group.add_outcome(@outcome)
 
-        course_with_teacher(active_all: true)
-        student_in_course(context: @course)
-        @course.root_outcome_group.add_outcome(@outcome)
-        assess_with(@outcome, @course, @student)
-        expect(@outcome).to be_assessed(@course)
+          course_with_teacher(active_all: true)
+          student_in_course(context: @course)
+          @course.root_outcome_group.add_outcome(@outcome)
+          assess_with(@outcome, @course, @student)
+        end
 
-        json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
-                         controller: 'outcome_groups_api',
-                         action: 'link_index',
-                         account_id: @account.id,
-                         format: 'json')
+        it 'shows outcome assessed' do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+                          controller: 'outcome_groups_api',
+                          action: 'link_index',
+                          course_id: @course.id,
+                          format: 'json')
 
-        check_outcome.call(json.last["outcome"], false)
+          check_outcome.call(json.last["outcome"], false)
+          check_outcome_link.call(
+            json.last.tap{|j| j.delete("outcome")},
+            @course,
+            @course.root_outcome_group,
+            true, # assessed
+            false,
+            false
+          )
+        end
 
-        # Account context should never be assessed
-        check_outcome_link.call(
-          json.last.tap{ |j| j.delete("outcome") },
-          @account,
-          @account.root_outcome_group,
-          false,
-          false,
-          false
-        )
+        it 'shows outcome unassessed when assessment deleted' do
+          @outcome.learning_outcome_results.where(user: @student).last.destroy!
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+            controller: 'outcome_groups_api',
+            action: 'link_index',
+            course_id: @course.id,
+            format: 'json')
+
+          check_outcome.call(json.last["outcome"], false)
+          check_outcome_link.call(
+            json.last.tap{|j| j.delete("outcome")},
+            @course,
+            @course.root_outcome_group,
+            false, # assessed
+            false,
+            false
+          )
+        end
+
+        it 'shows outcome unassessed at account level' do
+          # Account context should never be assessed
+          json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+            controller: 'outcome_groups_api',
+            action: 'link_index',
+            account_id: @account.id,
+            format: 'json')
+
+          check_outcome_link.call(
+            json.last.tap{ |j| j.delete("outcome") },
+            @account,
+            @account.root_outcome_group,
+            false, # assessed
+            false,
+            false
+          )
+        end
       end
     end
 
@@ -1102,10 +1197,7 @@ describe "Outcome Groups API", type: :request do
         def sub_group_with_outcome
           expect(@group.child_outcome_links).to be_empty
           sub_group = @account.learning_outcome_groups.create!(title: 'some lonely sub group')
-          sub_group.add_outcome(@outcome)
-          expect(sub_group.child_outcome_links.reload.size).to eq 1
-          expect(sub_group.child_outcome_links.first.content).to eq @outcome
-          sub_group
+          add_outcome_to_group(sub_group)
         end
 
         it "should re-use an old link if move_from is included" do
@@ -1121,6 +1213,24 @@ describe "Outcome Groups API", type: :request do
           expect(@group.child_outcome_links.reload.size).to eq 1
           expect(@group.child_outcome_links.first.content).to eq @outcome
           expect(sub_group.child_outcome_links.reload).to be_empty
+        end
+
+        it "should be allowed for global level" do
+          @account_user = @user.account_users.create(:account => Account.site_admin)
+          global_group = LearningOutcomeGroup.global_root_outcome_group
+          add_outcome_to_group(global_group)
+          global_sub_group = create_subgroup(:group => global_group)
+          api_call(:put, "/api/v1/global/outcome_groups/#{global_sub_group.id}/outcomes/#{@outcome.id}",
+                       controller: 'outcome_groups_api',
+                       action: 'link',
+                       id: global_sub_group.id.to_s,
+                       outcome_id: @outcome.id.to_s,
+                       move_from: global_group.id.to_s,
+                       format: 'json')
+          expect(global_sub_group.child_outcome_links.reload.size).to eq 1
+          expect(global_sub_group.child_outcome_links.first.content).to eq @outcome
+          expect(global_sub_group.child_outcome_links.first.context_id).to eq global_sub_group.id
+          expect(global_group.child_outcome_links.reload).to be_empty
         end
 
         it "should not re-use an old link if move_from is omitted" do
@@ -1541,11 +1651,6 @@ describe "Outcome Groups API", type: :request do
                    :id => @group.id.to_s,
                    :format => 'json')
       expect(response).to be_successful
-    end
-
-    def create_subgroup(opts={})
-      group = opts.delete(:group) || @group
-      group.child_outcome_groups.create!({:title => 'subgroup', :vendor_guid => 'blahblah'}.merge(opts))
     end
 
     it "should return the subgroups under the group" do

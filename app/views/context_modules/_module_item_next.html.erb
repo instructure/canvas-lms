@@ -22,7 +22,7 @@
   item_data ||= { published_status: 'unpublished' }
   completion_criteria ||= nil
   editable ||= false
-  can_direct_share = can_do(@context, @current_user, :read_as_admin) && @domain_root_account&.feature_enabled?(:direct_share)
+  can_direct_share = can_do(@context, @current_user, :read_as_admin)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
 
   @module_item_image_tags ||= {

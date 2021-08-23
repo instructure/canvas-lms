@@ -36,7 +36,7 @@ describe('RceFileBrowser', () => {
     selectFile({
       name: 'a file',
       src: '/file/download',
-      api: {url: '/file/download?download_frd=1', 'content-type': 'application/pdf'}
+      api: {url: '/file/download?download_frd=1', type: 'application/pdf'}
     })
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
@@ -45,7 +45,7 @@ describe('RceFileBrowser', () => {
       embedded_iframe_url: undefined,
       content_type: 'application/pdf',
       target: '_blank',
-      class: 'instructure_file_link instructure_scribd_file'
+      class: 'instructure_file_link instructure_scribd_file inline_disabled'
     })
   })
 
@@ -59,8 +59,8 @@ describe('RceFileBrowser', () => {
       src: '/file/download',
       api: {
         url: '/file/download?download_frd=1',
-        'content-type': 'video/mp4',
-        media_entry_id: 'm-deadbeef'
+        type: 'video/mp4',
+        embed: { id: 'm-deadbeef' }
       }
     })
     expect(onFileSelect).toHaveBeenCalledWith({
@@ -71,7 +71,7 @@ describe('RceFileBrowser', () => {
       media_id: 'm-deadbeef',
       content_type: 'video/mp4',
       target: '_blank',
-      class: 'instructure_file_link'
+      class: 'instructure_file_link inline_disabled'
     })
   })
 })

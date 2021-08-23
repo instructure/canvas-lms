@@ -462,109 +462,171 @@ describe "Canvas Cartridge importing" do
     expect(rubric2_2.title).to eq rubric2.title
   end
 
-  it "should import modules" do
-    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now, :require_sequential_progress => true)
-    mod2 = @copy_from.context_modules.create!(:name => "next module")
-    mod3 = @copy_from.context_modules.create!(:name => "url module")
-    mod4 = @copy_from.context_modules.create!(:name => "attachment module")
-    mod2.prerequisites = [{:type=>"context_module", :name=>mod1.name, :id=>mod1.id}]
-    mod2.require_sequential_progress = true
-    mod2.save!
+  context 'importing modules' do
+    it 'can import all info from a basic module structure' do
+      mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now, :require_sequential_progress => true)
+      mod2 = @copy_from.context_modules.create!(:name => "next module")
+      mod3 = @copy_from.context_modules.create!(:name => "url module")
+      mod4 = @copy_from.context_modules.create!(:name => "attachment module")
+      mod2.prerequisites = [{:type=>"context_module", :name=>mod1.name, :id=>mod1.id}]
+      mod2.require_sequential_progress = true
+      mod2.save!
 
-    asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
-    tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
-    c_reqs = []
-    c_reqs << {:type => 'min_score', :min_score => 5, :id => tag.id}
-    page = @copy_from.wiki_pages.create!(:title => "some page")
-    tag = mod1.add_item({:id => page.id, :type => 'wiki_page'})
-    c_reqs << {:type => 'must_view', :id => tag.id}
-    mod1.completion_requirements = c_reqs
-    mod1.save!
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      c_reqs = []
+      c_reqs << {:type => 'min_score', :min_score => 5, :id => tag.id}
+      page = @copy_from.wiki_pages.create!(:title => "some page")
+      tag = mod1.add_item({:id => page.id, :type => 'wiki_page'})
+      c_reqs << {:type => 'must_view', :id => tag.id}
+      mod1.completion_requirements = c_reqs
+      mod1.save!
 
-    #Add assignment/page to @copy_to so the module can reference them on import
-    asmnt2 = @copy_to.assignments.create(:title => "some assignment")
-    asmnt2.migration_id = CC::CCHelper.create_key(asmnt1)
-    asmnt2.save!
-    page2 = @copy_to.wiki_pages.create(:title => "some page")
-    page2.migration_id = CC::CCHelper.create_key(page)
-    page2.save!
+      #Add assignment/page to @copy_to so the module can reference them on import
+      asmnt2 = @copy_to.assignments.create(:title => "some assignment")
+      asmnt2.migration_id = CC::CCHelper.create_key(asmnt1)
+      asmnt2.save!
+      page2 = @copy_to.wiki_pages.create(:title => "some page")
+      page2.migration_id = CC::CCHelper.create_key(page)
+      page2.save!
 
-    mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
-    mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
-    ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
-    ContentTag.where(:id => ct).update_all(:url => "http://b.example.com/with space")
+      mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
+      mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
+      ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
+      ContentTag.where(:id => ct).update_all(:url => "http://b.example.com/with space")
 
-    # attachments are migrated with just their filename as display_name,
-    # if a content tag has a different title the display_name should not update
-    att = Attachment.create!(:filename => 'boring.txt', :display_name => "Super exciting!", :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-    expect(att.display_name).to eq "Super exciting!"
-    # create @copy_to attachment with normal display_name
-    att_2 = Attachment.create!(:filename => 'boring.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
-    att_2.migration_id = CC::CCHelper.create_key(att)
-    att_2.save
-    att_tag = mod4.add_item({:title => "A different title just because", :type => "attachment", :id => att.id})
+      # attachments are migrated with just their filename as display_name,
+      # if a content tag has a different title the display_name should not update
+      att = Attachment.create!(:filename => 'boring.txt', :display_name => "Super exciting!", :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      expect(att.display_name).to eq "Super exciting!"
+      # create @copy_to attachment with normal display_name
+      att_2 = Attachment.create!(:filename => 'boring.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
+      att_2.migration_id = CC::CCHelper.create_key(att)
+      att_2.save
+      att_tag = mod4.add_item({:title => "A different title just because", :type => "attachment", :id => att.id})
 
-    # create @copy_to module link with different name than attachment
-    att_3 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-    att_3.migration_id = CC::CCHelper.create_key(att_3)
-    att_3.save
-    mod4.add_item({:title => "test answers", :type => "attachment", :id => att_3.id})
+      # create @copy_to module link with different name than attachment
+      att_3 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      att_3.migration_id = CC::CCHelper.create_key(att_3)
+      att_3.save
+      mod4.add_item({:title => "test answers", :type => "attachment", :id => att_3.id})
 
-    att_3_2 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
-    att_3_2.migration_id = CC::CCHelper.create_key(att_3)
-    att_3_2.save
+      att_3_2 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
+      att_3_2.migration_id = CC::CCHelper.create_key(att_3)
+      att_3_2.save
 
-    #export to xml
-    builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_module_meta(builder)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_modules(doc)
-    #import json into new course
-    hash[0] = hash[0].with_indifferent_access
-    hash[1] = hash[1].with_indifferent_access
-    hash[2] = hash[2].with_indifferent_access
-    hash[3] = hash[3].with_indifferent_access
-    Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
-    @copy_to.save!
+      #export to xml
+      builder = Builder::XmlMarkup.new(:indent=>2)
+      @resource.create_module_meta(builder)
+      #convert to json
+      doc = Nokogiri::XML(builder.target!)
+      hash = @converter.convert_modules(doc)
+      #import json into new course
+      hash[0] = hash[0].with_indifferent_access
+      hash[1] = hash[1].with_indifferent_access
+      hash[2] = hash[2].with_indifferent_access
+      hash[3] = hash[3].with_indifferent_access
+      Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
+      @copy_to.save!
 
-    mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
-    expect(mod1_2.name).to eq mod1.name
-    expect(mod1_2.unlock_at.to_i).to eq mod1.unlock_at.to_i
-    expect(mod1_2.require_sequential_progress).to eq mod1.require_sequential_progress
-    expect(mod1_2.content_tags.count).to eq mod1.content_tags.count
-    tag = mod1_2.content_tags.first
-    expect(tag.content_id).to eq asmnt2.id
-    expect(tag.content_type).to eq 'Assignment'
-    expect(tag.indent).to eq 1
-    cr1 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
-    expect(cr1[:type]).to eq 'min_score'
-    expect(cr1[:min_score]).to eq 5
-    tag = mod1_2.content_tags.last
-    expect(tag.content_id).to eq page2.id
-    expect(tag.content_type).to eq 'WikiPage'
-    cr2 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
-    expect(cr2[:type]).to eq 'must_view'
+      mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
+      expect(mod1_2.name).to eq mod1.name
+      expect(mod1_2.unlock_at.to_i).to eq mod1.unlock_at.to_i
+      expect(mod1_2.require_sequential_progress).to eq mod1.require_sequential_progress
+      expect(mod1_2.content_tags.count).to eq mod1.content_tags.count
+      tag = mod1_2.content_tags.first
+      expect(tag.content_id).to eq asmnt2.id
+      expect(tag.content_type).to eq 'Assignment'
+      expect(tag.indent).to eq 1
+      cr1 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
+      expect(cr1[:type]).to eq 'min_score'
+      expect(cr1[:min_score]).to eq 5
+      tag = mod1_2.content_tags.last
+      expect(tag.content_id).to eq page2.id
+      expect(tag.content_type).to eq 'WikiPage'
+      cr2 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
+      expect(cr2[:type]).to eq 'must_view'
 
-    mod2_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod2)).first
-    expect(mod2_2.prerequisites.length).to eq 1
-    expect(mod2_2.prerequisites.first).to eq({:type=>"context_module", :name=>mod1_2.name, :id=>mod1_2.id})
+      mod2_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod2)).first
+      expect(mod2_2.prerequisites.length).to eq 1
+      expect(mod2_2.prerequisites.first).to eq({:type=>"context_module", :name=>mod1_2.name, :id=>mod1_2.id})
 
-    mod3_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod3)).first
-    expect(mod3_2.content_tags.length).to eq 2
-    expect(mod3_2.content_tags[0].url).to eq "http://a.example.com/"
-    expect(mod3_2.content_tags[1].url).to eq "http://b.example.com/"
-    expect(@migration.old_warnings_format.first.first).to eq %{Import Error: Module Item - "Example 3"}
+      mod3_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod3)).first
+      expect(mod3_2.content_tags.length).to eq 2
+      expect(mod3_2.content_tags[0].url).to eq "http://a.example.com/"
+      expect(mod3_2.content_tags[1].url).to eq "http://b.example.com/"
+      expect(@migration.old_warnings_format.first.first).to eq %{Import Error: Module Item - "Example 3"}
 
-    mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
-    expect(mod4_2.content_tags.first.title).to eq att_tag.title
-    att_2.reload
-    expect(att_2.display_name).to eq 'boring.txt'
+      mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
+      expect(mod4_2.content_tags.first.title).to eq att_tag.title
+      att_2.reload
+      expect(att_2.display_name).to eq 'boring.txt'
 
-    expect(mod4_2.content_tags.count).to eq 2
-    tag = mod4_2.content_tags.last
-    expect(tag.content_type).to eq "Attachment"
-    expect(tag.content_id).to eq att_3_2.id
+      expect(mod4_2.content_tags.count).to eq 2
+      tag = mod4_2.content_tags.last
+      expect(tag.content_type).to eq "Attachment"
+      expect(tag.content_id).to eq att_3_2.id
+    end
+
+    context 'and the module items are ContextExternalTools' do
+      let(:modules_doc) do
+        xml_builder = Builder::XmlMarkup.new(indent: 1)
+        @resource.create_module_meta(xml_builder)
+        Nokogiri::XML(xml_builder.target!)
+      end
+      let(:converted_modules) do
+        @converter.convert_modules(modules_doc)
+      end
+
+      context 'that use LTI 1.3' do
+        let(:context_module) { @copy_from.context_modules.create!(name: 'test module') }
+        let(:tool) { external_tool_model(context: @copy_from, opts: { use_1_3: true, developer_key: developer_key })}
+        let(:developer_key) { DeveloperKey.create!(account: @copy_from.root_account) }
+        let(:content_tag) do
+          context_module.add_item({ name: 'Test Tool', content: tool, url: tool.url,
+                                  type: 'context_external_tool', custom_params: custom_params,
+                                   id: tool.id })
+        end
+        let(:resource_link) { content_tag.associated_asset }
+        let(:custom_params) { { foo: 'bar' } }
+        # I hate defining this hash manually, rather than testing writing to the file, but I don't
+        # actually need to test the resource link converter, as it has its own set of tests already.
+        let(:external_tools) do
+          builder = Builder::XmlMarkup.new(indent: 2)
+          @resource.create_blti_link(tool, builder)
+          doc = Nokogiri::XML(builder.target!)
+          lti_converter = CC::Importer::BLTIConverter.new
+          tool_data_hash = lti_converter.convert_blti_link(doc)
+          tool_data_hash['migration_id'] = CC::CCHelper.create_key(tool)
+          [ tool_data_hash ]
+        end
+        let(:data) do
+          {
+            modules: converted_modules,
+            lti_resource_links: [
+              {
+                custom: custom_params,
+                lookup_uuid: content_tag.associated_asset.lookup_uuid,
+                context_id: @copy_from.id,
+                context_type: 'Course'
+              }
+            ],
+            external_tools: external_tools
+          }.with_indifferent_access
+        end
+
+        it 'can copy over the UUID and custom params to the new Lti::ResourceLink' do
+          content_tag
+          Importers::CourseContentImporter.import_content(@copy_to,
+                                                          data,
+                                                          nil, @migration)
+          copied_module = @copy_to.context_modules.find_by(migration_id: CC::CCHelper.create_key(context_module))
+          copied_content_tag = copied_module.content_tags.find_by(migration_id: CC::CCHelper.create_key(content_tag))
+          expect(copied_content_tag.associated_asset.lookup_uuid).to eq resource_link.lookup_uuid
+          expect(copied_content_tag.associated_asset.custom).to eq resource_link.custom
+        end
+      end
+    end
   end
 
   it "should translate attachment links on import" do
@@ -626,7 +688,7 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
-    links = Nokogiri::HTML::DocumentFragment.parse(page_2.body).css("a")
+    links = Nokogiri::HTML5.fragment(page_2.body).css("a")
     expect(links.count).to eq 2
     expect(links.first['href']).to eq "/media_objects/#{media_id}"
     expect(links.last['href']).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
@@ -657,7 +719,8 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
-    frame = Nokogiri::HTML::DocumentFragment.parse(page_2.body).at_css("iframe")
+    expect(page_2.body).to include '</iframe>'
+    frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
     expect(frame['src']).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
 
@@ -705,7 +768,7 @@ describe "Canvas Cartridge importing" do
     meta_fields[:workflow_state] = page.workflow_state
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     #convert to json
-    doc = Nokogiri::HTML(exported_html)
+    doc = Nokogiri::HTML5(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
@@ -732,7 +795,7 @@ describe "Canvas Cartridge importing" do
     migration_id = CC::CCHelper.create_key(page)
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, :identifier => migration_id)
     #convert to json
-    doc = Nokogiri::HTML(exported_html)
+    doc = Nokogiri::HTML5(exported_html)
     hash = @converter.convert_wiki(doc, 'blti-link')
     hash = hash.with_indifferent_access
     #import into new course
@@ -786,7 +849,7 @@ describe "Canvas Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(asmnt.description, "Assignment: " + asmnt.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::HTML(html)
+    html_doc = Nokogiri::HTML5(html)
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -828,7 +891,7 @@ describe "Canvas Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@assignment.description, "Assignment: " + @assignment.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::HTML(html)
+    html_doc = Nokogiri::HTML5(html)
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -857,7 +920,7 @@ describe "Canvas Cartridge importing" do
 XML
     #convert to json
     meta_doc = Nokogiri::XML(xml)
-    html_doc = Nokogiri::HTML("<html><head><title>value for title</title></head><body>haha</body></html>")
+    html_doc = Nokogiri::HTML5("<html><head><title>value for title</title></head><body>haha</body></html>")
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -1173,6 +1236,30 @@ XML
     expect(@copy_to.attachments.where(migration_id: 'abc').first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: 'def').first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: 'ghi').first).to be_deleted
+  end
+
+  context 'importing lti resource links' do
+    let(:data) do
+      {
+        'lti_resource_links' => [
+          {
+            'custom' => {
+              'param1' => 'value1'
+            },
+            'lookup_uuid' => '1b302c1e-c0a2-42dc-88b6-c029699a7c7a',
+            'context_id' => @copy_from.id,
+            'context_type' => 'Course'
+          }
+        ]
+      }
+    end
+    let(:migration) { ContentMigration.create(context: @copy_to) }
+
+    it 'process migration from LtiResourceLinkImporter' do
+      expect(Importers::LtiResourceLinkImporter).to receive(:process_migration).once.with(data, migration)
+
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+    end
   end
 
   context "warnings for missing links in imported html" do
@@ -1532,11 +1619,11 @@ describe "matching question reordering" do
 
     fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
     fixed.question_data[:answers].each do |answer|
-      expect(Nokogiri::HTML(answer[:left_html]).at_css("img")).to be_present
-      expect(Nokogiri::HTML(answer[:right]).at_css("img")).to be_blank
+      expect(Nokogiri::HTML5(answer[:left_html]).at_css("img")).to be_present
+      expect(Nokogiri::HTML5(answer[:right]).at_css("img")).to be_blank
     end
     fixed.question_data[:matches].each do |match|
-      expect(Nokogiri::HTML(match[:text]).at_css("img")).to be_blank
+      expect(Nokogiri::HTML5(match[:text]).at_css("img")).to be_blank
     end
   end
 

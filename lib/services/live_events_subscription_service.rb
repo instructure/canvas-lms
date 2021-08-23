@@ -109,9 +109,6 @@ module Services
 
       def settings
         Canvas::DynamicSettings.find("live-events-subscription-service", default_ttl: 5.minutes)
-      rescue Imperium::TimeoutError => e
-        Canvas::Errors.capture_exception(:live_events_subscription, e, :warn)
-        nil
       end
 
       def tool_proxy_jwt_body(tool_proxy, options = {})

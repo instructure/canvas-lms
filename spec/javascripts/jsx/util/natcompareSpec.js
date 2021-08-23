@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import natcompare from 'compiled/util/natcompare'
+import natcompare from '@canvas/util/natcompare'
 
 const valuesToSort = [
   {id: 1, name: 'john, john'},

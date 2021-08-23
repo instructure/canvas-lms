@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import KeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
+import KeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 
 let view = null
 

@@ -19,7 +19,7 @@
 import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
-import BreakdownBarComponent from 'jsx/conditional_release_stats/components/breakdown-graph-bar'
+import BreakdownBarComponent from '@canvas/conditional-release-stats/react/components/breakdown-graph-bar'
 
 QUnit.module('Breakdown Stats Graph Bar')
 

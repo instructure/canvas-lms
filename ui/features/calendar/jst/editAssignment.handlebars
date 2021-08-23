@@ -1,0 +1,101 @@
+<div id='edit_assignment_form' style='padding: 5px;'>
+  <div class="event-details-content">
+    <table class="formtable" style="width: 100%;" role="presentation">
+      <tr>
+        <td><label for="assignment_title">{{#t "title"}}Title:{{/t}}</label></td>
+        <td><input id="assignment_title" name="assignment[name]" size="30" maxlength="255" style="width: 200px;" type="text" value="{{title}}"/></td>
+      </tr>
+      <tr>
+        <td>
+          <label for="assignment_due_at">{{#t "due"}}Due:{{/t}}</label>
+          <label class="screenreader-only" id="calendar_assignment_due_date_accessible_label">
+             {{#t}}Due on date{{/t}}
+             {{datepickerScreenreaderPrompt}}
+           </label>
+        </td>
+        <td>
+          <input class="datetime_field"
+                 id="assignment_due_at"
+                 name="assignment[due_at]"
+                 value="{{fcMomentToDateString date datePickerFormat}}"
+                 size="30"
+                 style="width: 150px;"
+                 type="text"
+                 aria-labelledby="calendar_assignment_due_date_accessible_label"
+                 data-tooltip title="{{accessibleDateFormat}}"/>
+        </td>
+      </tr>
+      <tr class="context_select">
+        <td><label for="assignment_context">{{#t "calendar"}}Calendar:{{/t}}</label></td>
+        <td>
+          <select id="assignment_context" class="context_id">
+            {{#each contexts}}
+              {{#if can_create_assignments}}
+                <option value="{{asset_string}}">{{name}}</option>
+              {{/if}}
+            {{/each}}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><label for="assignment_group">{{#t "group"}}Group:{{/t}}</label></td>
+        <td class="assignment_group_select">
+          <select id="assignment_group" class="assignment_group" name="assignment[assignment_group_id]" aria-label="{{#t "group"}}Group:{{/t}}">
+            <option value="new">[ New Group ]</option>
+          </select>
+        </td>
+      </tr>
+      {{#if postToSISEnabled}}
+        <tr>
+          <td>
+            <label class="control-label" id="post_to_sis_label">
+              {{#t}}Sync to {{postToSISName}}:{{/t}}
+            </label>
+          </td>
+          <td>
+            <label>
+              {{checkbox "postToSIS"
+                id="assignment_post_to_sis"
+                name="assignment[post_to_sis]"
+                aria-labelledby="post_to_sis_label"
+                class="post_to_sis_checkbox"
+              }}
+            </label>
+          </td>
+        </tr>
+      {{/if}}
+      <tr class="context_select">
+        <td>{{#t}}Publish:{{/t}}</td>
+        <td>
+          <!-- start super toggle -->
+          <label class="ic-Super-toggle--on-off" for="assignment_published">
+            <div class="screenreader-only">{{#t}}Publish{{/t}}</div>
+            <input type="checkbox" id="assignment_published" name="assignment[published]" class="ic-Super-toggle__input">
+            <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="{{#t}}Yes{{/t}}" data-unchecked="{{#t}}No{{/t}}">
+              <div class="ic-Super-toggle__switch">
+                <div class="ic-Super-toggle__option--LEFT">
+                  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+                </div>
+                <div class="ic-Super-toggle__option--RIGHT">
+                  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28" /></svg>
+                </div>
+              </div>
+            </div>
+          </label>
+          <!-- end super toggle -->
+        </td>
+      </tr>
+    </table>
+    <div id="important_dates" style='padding-top: 10px;'>
+      <label class="label_with_checkbox" for="calendar_event_important_dates">
+        <input type="checkbox" id="calendar_event_important_dates" style="margin: 0" {{#if important_dates}}checked{{/if}} />
+        {{#t}}Mark as Important Date{{/t}}
+        <span style="display: block"><small>{{#t}}Show event on homeroom sidebar{{/t}}</small></span>
+      </label>
+    </div>
+  </div>
+  <div class="popover-links-holder event-details-footer pull-right">
+    <a href="#" class="event_button btn btn-secondary more_options_link">{{#t "links.more_options"}}More Options{{/t}}</a>
+    <button type="submit" class="event_button btn btn-primary save_assignment">{{#t "#buttons.submit"}}Submit{{/t}}</button>
+  </div>
+</div>

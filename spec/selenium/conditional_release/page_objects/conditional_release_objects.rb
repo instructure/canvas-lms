@@ -86,6 +86,14 @@ class ConditionalReleaseObjects
       element_exists?("//*[contains(@id,'error') and contains(text(),'these scores are out of order')]", true)
     end
 
+    def must_be_a_number_exists?
+      element_exists?("//*[contains(@id,'error') and contains(text(),'must be a number')]", true)
+    end
+
+    def number_is_too_small_exists?
+      element_exists?("//*[contains(@id,'error') and contains(text(),'number is too small')]", true)
+    end
+
     # Common Selectors
     def conditional_release_link
       f("#conditional_release_link")

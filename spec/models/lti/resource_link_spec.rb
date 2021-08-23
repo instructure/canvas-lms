@@ -44,20 +44,20 @@ RSpec.describe Lti::ResourceLink, type: :model do
       expect(resource_link.context_type).not_to be_blank
     end
 
-    it 'sets the "lookup_id" if it is not specified' do
-      expect(resource_link.lookup_id).not_to be_blank
+    it 'sets the "lookup_uuid" if it is not specified' do
+      expect(resource_link.lookup_uuid).not_to be_blank
     end
 
-    it 'sets the "resource_link_id" if it is not specified' do
-      expect(resource_link.resource_link_id).not_to be_blank
+    it 'sets the "resource_link_uuid" if it is not specified' do
+      expect(resource_link.resource_link_uuid).not_to be_blank
     end
 
     it 'sets the "context_external_tool"' do
       expect(resource_link.original_context_external_tool).to eq tool
     end
 
-    it '`lookup_id` should be unique' do
-      expect(resource_link).to validate_uniqueness_of(:lookup_id)
+    it '`lookup_uuid` should be unique scoped to `context`' do
+      expect(resource_link).to validate_uniqueness_of(:lookup_uuid).scoped_to(:context_id, :context_type).ignoring_case_sensitivity
     end
   end
 

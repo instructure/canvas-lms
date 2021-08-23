@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FileUploader from 'compiled/react_files/modules/FileUploader'
+import FileUploader from '@canvas/files/react/modules/FileUploader'
 import moxios from 'moxios'
 
 function setupMocks() {

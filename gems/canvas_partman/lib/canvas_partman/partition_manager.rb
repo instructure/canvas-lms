@@ -71,11 +71,14 @@ See CanvasPartman::Concerns::Partitioned.
 
     # Create a new partition table.
     #
-    # @param [Integer] graceful
+    # @param [Time/Integer] value
+    #   The time or sequencial value to use in generating the table name.
+    #
+    # @param [Boolean] graceful
     #   Do nothing if the partition table already exists.
     #
     # @return [String]
-    #  The name of the newly created partition table.
+    #   The name of the newly created partition table.
     def create_partition(value, graceful: false)
       partition_table = generate_name_for_partition(value)
 

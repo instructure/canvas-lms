@@ -24,7 +24,7 @@ const fs = require('fs')
 const splitStrings = require('../split-strings')
 
 jest.mock(
-  'canvas-planner/locales/en.json',
+  '/canvas/packages/canvas-planner/locales/en.json',
   () => ({
     planner_string: 'Some string that planner needs'
   }),
@@ -32,7 +32,7 @@ jest.mock(
 )
 
 jest.mock(
-  'canvas-rce/locales/en.json',
+  '/canvas/packages/canvas-rce/locales/en.json',
   () => ({
     rce_string: 'Some string that rce needs'
   }),

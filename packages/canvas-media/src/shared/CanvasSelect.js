@@ -133,7 +133,8 @@ export default class CanvasSelect extends React.Component {
   }
 
   render() {
-    const {id, label, value, onChange, children, noOptionsLabel, ...otherProps} = this.props
+    const {id, label, value, onChange, children, noOptionsLabel, liveRegion, ...otherProps} =
+      this.props
 
     return (
       <>
@@ -153,7 +154,7 @@ export default class CanvasSelect extends React.Component {
         >
           {this.renderChildren(children)}
         </Select>
-        <Alert liveRegion={this.props.liveRegion} liveRegionPoliteness="assertive" screenReaderOnly>
+        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly>
           {this.state.announcement}
         </Alert>
       </>

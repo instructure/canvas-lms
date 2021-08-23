@@ -69,114 +69,137 @@ describe ActiveRecord::Base do
     end
   end
 
-  describe "find in batches" do
+  describe "in batches" do
     before :once do
       @c1 = course_factory(:name => 'course1', :active_course => true)
       @c2 = course_factory(:name => 'course2', :active_course => true)
-      u1 = user_factory(:name => 'user1', :active_user => true)
-      u2 = user_factory(:name => 'user2', :active_user => true)
-      u3 = user_factory(:name => 'user3', :active_user => true)
-      @e1 = @c1.enroll_student(u1, :enrollment_state => 'active')
-      @e2 = @c1.enroll_student(u2, :enrollment_state => 'active')
-      @e3 = @c1.enroll_student(u3, :enrollment_state => 'active')
-      @e4 = @c2.enroll_student(u1, :enrollment_state => 'active')
-      @e5 = @c2.enroll_student(u2, :enrollment_state => 'active')
-      @e6 = @c2.enroll_student(u3, :enrollment_state => 'active')
+      @u1 = user_factory(name: 'userC', active_user: true)
+      @u2 = user_factory(name: 'userB', active_user: true)
+      @u3 = user_factory(name: 'userA', active_user: true)
+      @e1 = @c1.enroll_student(@u1, :enrollment_state => 'active')
+      @e2 = @c1.enroll_student(@u2, :enrollment_state => 'active')
+      @e3 = @c1.enroll_student(@u3, :enrollment_state => 'active')
+      @e4 = @c2.enroll_student(@u1, :enrollment_state => 'active')
+      @e5 = @c2.enroll_student(@u2, :enrollment_state => 'active')
+      @e6 = @c2.enroll_student(@u3, :enrollment_state => 'active')
     end
 
-    it "should raise an error when not in a transaction" do
-      expect { User.all.find_in_batches_with_temp_table }.to raise_error /find_in_batches_with_temp_table probably won't work/
+    shared_examples_for "batches" do
+      def do_batches(relation, **kwargs)
+        result = []
+        extra = defined?(extra_kwargs) ? extra_kwargs : {}
+        relation.in_batches(**kwargs.reverse_merge(extra).reverse_merge(strategy: strategy)) do |batch|
+          result << (block_given? ? (yield batch) : batch.to_a)
+        end
+        result
+      end
+
+      it "supports start" do
+        expect(do_batches(Enrollment, start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
+      end
+
+      it "supports finish" do
+        expect(do_batches(Enrollment, finish: @e3.id)).to eq [[@e1, @e2, @e3]]
+      end
+
+      it "supports start and finish with a small batch size" do
+        expect(do_batches(Enrollment, of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
+      end
+
+      it "respects order" do
+        expect(do_batches(User.order(:name), of: 2)).to eq [[@u3, @u2], [@u1]]
+      end
+
+      it "handles a batch size the exact size of the query" do
+        expect(do_batches(User.order(:id), of: 3)).to eq [[@u1, @u2, @u3]]
+      end
+
+      it "preloads" do
+        Account.default.courses.create!
+        a = do_batches(Account.where(id: Account.default).preload(:courses)).flatten.first
+        expect(a.courses.loaded?).to eq true
+      end
+
+      it "handles pluck" do
+        expect do
+          expect(do_batches(User.order(:id), of: 3, load: false) { |r| r.pluck(:id) }).to eq [[@u1.id, @u2.id, @u3.id]]
+        end.not_to change(User.connection_pool.connections, :length)
+        # even with :copy, a new connection should not be taken out (i.e. to satisfy an "actual" query for the pluck)
+      end
+
+      it "works with polymorphic models" do
+        c = Course.create!
+        se = StudentEnrollment.create!(course: c, user: @u1)
+        expect(do_batches(StudentEnrollment.where(id: se.id))).to eq [[se]]
+      end
     end
 
-    it "should find all enrollments from course join in batches" do
-      e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id").
-                        joins(:enrollments).order("e_id asc")
-      batch_size = 2
-      es = []
-      Course.transaction do
-        e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
-          expect(batch.size).to eq batch_size
-          batch.each do |r|
-            es << r["e_id"].to_i
+    context "with temp_table" do
+      let(:strategy) { :temp_table }
+      let(:extra_kwargs) { { ignore_transaction: true } }
+
+      include_examples "batches"
+
+      it "raises an error when not in a transaction" do
+        expect { User.all.find_in_batches(strategy: :temp_table) {} }.to raise_error(ArgumentError)
+      end
+
+      it "finds all enrollments from course join" do
+        e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id")
+          .joins(:enrollments).order("e_id asc")
+        batch_size = 2
+        es = []
+        Course.transaction do
+          e.find_in_batches(strategy: :temp_table, batch_size: batch_size) do |batch|
+            expect(batch.size).to eq batch_size
+            batch.each do |r|
+              es << r["e_id"].to_i
+            end
+          end
+        end
+        expect(es.length).to eq 6
+        expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
+      end
+    end
+
+    context "with cursor" do
+      let(:strategy) { :cursor }
+
+      include_examples "batches"
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "properly transposes across multiple shards" do
+          u1 = User.create!
+          u2 = @shard1.activate { User.create! }
+          User.transaction do
+            users = []
+            User.preload(:pseudonyms).where(id: [u1, u2]).find_each(strategy: :cursor) do |u|
+              users << u
+            end
+            expect(users.sort).to eq [u1, u2].sort
           end
         end
       end
-      expect(es.length).to eq 6
-      expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
-    it "should pluck" do
-      scope = Course.where(id: [@c1, @c2])
-      cs = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
-          cs.concat(batch)
-        end
-      end
-      expect(cs.sort).to eq [@c1.id, @c2.id].sort
-    end
+    context "with copy" do
+      let(:strategy) { :copy }
+      let(:extra_kwargs) { { load: true } }
 
-    it "should multi-column pluck" do
-      scope = Course.where(id: [@c1, @c2])
-      cs = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
-          cs.concat(batch)
-        end
-      end
-      expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
-    end
+      include_examples "batches"
 
-    it "should pluck with join" do
-      scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
-      es = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
-          es.concat(batch)
-        end
-      end
-      expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
-    end
-
-    it "should honor preload when using a cursor" do
-      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
-      Account.default.courses.create!
-      Account.transaction do
-        Account.where(:id => Account.default).preload(:courses).find_each do |a|
-          expect(a.courses.loaded?).to be_truthy
-        end
+      it "works with load: false" do
+        User.in_batches(strategy: :copy) { |r| expect(r.to_a).to eq [@u1, @u2, @u3] }
       end
     end
 
-    it "should not use a cursor when start is passed" do
-      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
-      Account.transaction do
-        expect(Account).to receive(:find_in_batches_with_cursor).never
-        Account.where(:id => Account.default).find_each(start: 0) do
-        end
-      end
-    end
-
-    it "should raise an error when start is used with group" do
-      expect {
-        Account.group(:id).find_each(start: 0) do
-        end
-      }.to raise_error(ArgumentError)
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "properly transposes a cursor query across multiple shards" do
-        u1 = User.create!
-        u2 = @shard1.activate { User.create! }
-        User.transaction do
-          users = []
-          User.preload(:pseudonyms).where(id: [u1, u2]).find_each do |u|
-            users << u
-          end
-          expect(users.sort).to eq [u1, u2].sort
-        end
+    context "with id" do
+      it "should raise an error when start is used with group" do
+        expect do
+          Account.group(:id).find_each(strategy: :id, start: 0) {}
+        end.to raise_error(ArgumentError)
       end
     end
   end
@@ -331,9 +354,10 @@ describe ActiveRecord::Base do
 
   context "bulk_insert" do
     it "should work" do
+      now = Time.now.utc
       User.bulk_insert [
-        {:name => "bulk_insert_1", :workflow_state => "registered"},
-        {:name => "bulk_insert_2", :workflow_state => "registered"}
+        {:name => "bulk_insert_1", :workflow_state => "registered", created_at: now, updated_at: now },
+        {:name => "bulk_insert_2", :workflow_state => "registered", created_at: now, updated_at: now }
       ]
       names = User.order(:name).pluck(:name)
       expect(names).to be_include("bulk_insert_1")
@@ -343,9 +367,10 @@ describe ActiveRecord::Base do
     it "should handle arrays" do
       arr1 = ['1, 2', 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
       arr2 = ['4', '5;', nil, "string with \t tab and \n newline and slash \\"]
+      now = Time.now.utc
       DeveloperKey.bulk_insert [
-        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id},
-        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id}
+        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id, created_at: now, updated_at: now },
+        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id, created_at: now, updated_at: now }
       ]
       names = DeveloperKey.order(:name).pluck(:redirect_uris)
       expect(names).to be_include(arr1.map(&:to_s))
@@ -357,7 +382,8 @@ describe ActiveRecord::Base do
     end
 
     it 'should work through bulk insert objects' do
-      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: {accepted_terms: Time.zone.now})]
+      now = Time.zone.now
+      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: {accepted_terms: now}, created_at: now, updated_at: now) ]
       User.bulk_insert_objects users
       names = User.order(:name).pluck(:name, :preferences)
       expect(names.first.last[:accepted_terms]).not_to be_nil
@@ -539,6 +565,26 @@ describe ActiveRecord::Base do
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
+      u1 = User.create!(name: 'a')
+      u2 = User.create!(name: 'a')
+      User.from(<<-SQL)
+        (WITH duplicates AS (
+          SELECT users.*,
+              ROW_NUMBER() OVER(PARTITION BY users.name
+                                    ORDER BY users.created_at DESC)
+                                    AS dup_count
+          FROM #{User.quoted_table_name}
+          )
+        SELECT *
+        FROM duplicates
+        WHERE dup_count > 1) AS users
+      SQL
+        .limit(1).delete_all
+      expect { User.find(u1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(User.find(u2.id)).to eq u2
+    end
+
     it "does offset too" do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
@@ -548,6 +594,128 @@ describe ActiveRecord::Base do
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
       p3.reload
+    end
+  end
+
+  describe "#in_batches.delete_all" do
+    it "just does a bare delete, instead of an ordered select and then delete" do
+      u = User.create!
+      relation = User.where(id: u.id)
+      expect(relation).to receive(:limit).and_call_original
+      expect(relation.in_batches.delete_all).to eq 1
+      expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "uses a specific strategy if asked to" do
+      u = User.create!
+      relation = User.where(id: u.id)
+      expect(relation).not_to receive(:limit)
+      expect(relation.in_batches(strategy: :cursor).delete_all).to eq 1
+      expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "infers a specific strategy if it can't do a bare delete" do
+      u = User.create!
+      User.transaction do
+        relation = User.where(id: u.id).group(:id)
+        expect(relation).to receive(:in_batches).with(no_args).and_call_original.ordered
+        expect(relation).to receive(:in_batches).with(hash_including(strategy: :temp_table)).and_call_original
+        expect(relation.in_batches.delete_all).to eq 1
+        expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
+  describe "#in_batches.update_all" do
+    before do
+      # just to keep our query count easy to manage in expectations below
+      allow(User.connection).to receive(:readonly?).and_return(false)      
+    end
+
+    let_once(:u) { User.create!(name: 'abcdefg') }
+
+    it "just does a bare update, instead of an ordered select and then update" do
+      # only the reload
+      expect(User.connection).to receive(:exec_query).once.and_call_original
+      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage if the updated column isn't mentioned in the where clause" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage if the updated column isn't mentioned in the where clause (that does exist)" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(id: u.id).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage if the updated column is being assigned to the same value as the condition" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'abcdefg')).to eq 1
+      expect(u.reload.name).to eq 'abcdefg'
+    end
+
+    it "does a bare update for an array condition non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does a bare update for a negated array condition non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where.not(name: ['bob', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
+      expect(u.reload.name).to eq 'bob'
+    end
+
+    it "does multi-stage for an array condition matching value" do
+      expect(User.connection).to receive(:exec_query).twice.and_call_original
+      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'abcdefg')).to eq 1
+      allow(User.connection).to receive(:exec_query).and_call_original
+      expect(u.reload.name).to eq 'abcdefg'
+    end
+
+    it "does a bare update for a comparison condition non-matching value" do
+      expect(User.connection).not_to receive(:exec_query)
+      expect(User.where(updated_at: 5.minutes.ago..).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a comparison condition matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago..).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    it "does a bare update for a range condition non-matching value" do
+      expect(User.connection).not_to receive(:exec_query)
+      expect(User.where(updated_at: 5.minutes.ago..5.minutes.from_now).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a range condition matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago..5.minutes.from_now).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    # because this forms an And predicate that we don't care to handle. gotta draw the line somewhere
+    it "does a multi-stage update for an open range condition even with non-matching value" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(updated_at: 5.minutes.ago...5.minutes.from_now).in_batches.update_all(updated_at: 10.minutes.ago)).to eq 1
+    end
+
+    it "does multi-stage for a sub-query condition" do
+      expect(User.connection).to receive(:exec_query).and_call_original
+      expect(User.where(name: User.select(:name).where(id: u.id)).in_batches.update_all(updated_at: Time.now.utc)).to eq 1
+    end
+
+    it "does bare update for negated boolean condition" do
+      expect(User.connection).not_to receive(:exec_query)
+      Assignment.where.not(grader_comments_visible_to_graders: true)
+        .where.not(grader_names_visible_to_final_grader: true)
+        .in_batches.update_all(
+          grader_comments_visible_to_graders: true,
+          grader_names_visible_to_final_grader: true)
     end
   end
 
@@ -561,24 +729,6 @@ describe ActiveRecord::Base do
   describe "nested conditions" do
     it "should not barf if the condition has a question mark" do
       expect(User.joins(:enrollments).where(enrollments: { workflow_state: 'a?c'}).first).to be_nil
-    end
-  end
-
-  describe ".polymorphic_where" do
-    it "should work" do
-      relation = Assignment.all
-      user1 = User.create!
-      account1 = Account.create!
-      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
-      relation.polymorphic_where(context: [user1, account1])
-    end
-
-    it "should work with NULLs" do
-      relation = Assignment.all
-      user1 = User.create!
-      account1 = Account.create!
-      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
-      relation.polymorphic_where(context: [nil, user1, account1])
     end
   end
 
@@ -739,4 +889,61 @@ describe ActiveRecord::Base do
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
+end
+
+describe ActiveRecord::ConnectionAdapters::ConnectionPool do
+  # create a private pool, with the same config as the regular pool, but ensure
+  # max_runtime is set
+  let(:spec) { ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
+    'spec',
+    ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
+    'postgresql_connection') }
+  let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
+
+  it "doesn't evict a normal cycle" do
+    conn1 = pool.connection
+    pool.checkin(conn1)
+    expect(pool).to be_connected
+    conn2 = pool.connection
+    expect(conn2).to eql conn1
+  end
+
+  it "evicts connections on checkout" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    pool.checkin(conn1)
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    conn2 = pool.connection
+    expect(conn2).not_to eql conn1
+  end
+
+  it "evicts connections on checkin" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    expect(conn1.runtime).to eq 0
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+
+    expect(conn1.runtime).to eq 60
+    pool.checkin(conn1)
+
+    expect(pool).not_to be_connected
+  end
+
+  it "evicts connections if you call flush" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    pool.checkin(conn1)
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+
+    pool.flush
+
+    expect(pool).not_to be_connected
+  end
+
 end

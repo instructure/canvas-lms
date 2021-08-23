@@ -25,8 +25,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
-      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).and_call_original
-      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      allow(CanvasCassandra::DatabaseBuilder).to receive(:configured?).and_call_original
+      allow(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
@@ -165,7 +165,8 @@ describe "AuthenticationAudit API", type: :request do
             "unique_id" => @pseudonym.unique_id,
             "sis_user_id" => nil,
             "integration_id" => nil,
-            "authentication_provider_id" => nil
+            "authentication_provider_id" => nil,
+            "workflow_state" => "active",
           }]
         end
       end

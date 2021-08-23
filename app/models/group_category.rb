@@ -438,10 +438,10 @@ class GroupCategory < ActiveRecord::Base
        tags: {split_type: split_type, root_account_id: self.root_account&.global_id, root_account_name: self.root_account&.name})
     end
 
-    calculate_group_count_by_membership if @create_group_member_count
+    by_section = @group_by_section && self.context.is_a?(Course)
+    calculate_group_count_by_membership(by_section: by_section) if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
-      by_section = @group_by_section && self.context.is_a?(Course)
       assign_unassigned_members(by_section)
     end
     @create_group_count = @assign_unassigned_members = nil
@@ -456,8 +456,15 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  def calculate_group_count_by_membership
-    @create_group_count = (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
+  def calculate_group_count_by_membership(by_section: false)
+    @create_group_count = if by_section
+      counts = User.joins(:not_ended_enrollments).
+        where(enrollments: {course_id: context, type: 'StudentEnrollment'}).
+        distinct('user_id').group('course_section_id').count
+      @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.map(&:ceil).sum
+    else
+      (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
+    end
   end
 
   def unassigned_users
@@ -572,7 +579,6 @@ class GroupCategory < ActiveRecord::Base
 
     def distribute_members
       @groups = @category.groups.active.to_a
-
       get_users_by_section_id
       determine_group_distribution
       assign_students_to_groups
@@ -594,7 +600,7 @@ class GroupCategory < ActiveRecord::Base
 
     def determine_group_distribution
       # try to figure out how to best split up the groups
-      goal_group_size = [@user_count / @groups.count, 1].max # try to get groups with at least this size
+      goal_group_size = [(@user_count / @groups.count.to_f).round, 1].max # try to get groups with at least this size
 
       num_groups_assigned = 0
       user_counts = {}

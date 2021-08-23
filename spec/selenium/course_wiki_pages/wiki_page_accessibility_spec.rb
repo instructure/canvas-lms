@@ -152,7 +152,7 @@ describe "Wiki Pages" do
 
       it "should set focus to the next focusable item if you press Tab" do
         f('.use-as-front-page-menu-item').send_keys(:tab)
-        check_element_has_focus(ff('.wiki-page-link')[1])
+        check_element_has_focus(ff('.select-page-checkbox')[1])
       end
     end
 

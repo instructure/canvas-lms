@@ -20,10 +20,15 @@
 
 module Lti::MembershipService
   class CollatorBase
-    attr_reader :next_page
+    attr_reader :next_page, :role, :per_page, :page, :context
 
-    def initialize
+    def initialize(context, opts={})
+      per_page = opts[:per_page].to_i
       @next_page = true
+      @role = opts[:role]
+      @per_page = [(per_page > 0 ? per_page : Api.per_page), Api.max_per_page].min
+      @page = [opts[:page].to_i, 1].max
+      @context = context
     end
 
     def next_page?

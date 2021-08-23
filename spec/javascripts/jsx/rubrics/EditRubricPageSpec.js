@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditRubricPage from 'compiled/views/rubrics/EditRubricPage'
+import EditRubricPage from '@canvas/rubrics/backbone/views/EditRubricPage'
 import assertions from 'helpers/assertions'
 
 QUnit.module('RubricEdit')

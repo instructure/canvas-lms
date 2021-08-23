@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import SpecificSections from 'jsx/grading/SpecificSections'
+import SpecificSections from '@canvas/grading/react/SpecificSections'
 
 QUnit.module('SpecificSections', suiteHooks => {
   let $container

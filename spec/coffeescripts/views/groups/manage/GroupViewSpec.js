@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import GroupView from 'compiled/views/groups/manage/GroupView'
-import GroupUsersView from 'compiled/views/groups/manage/GroupUsersView'
-import GroupDetailView from 'compiled/views/groups/manage/GroupDetailView'
-import GroupCollection from 'compiled/collections/GroupCollection'
-import GroupUserCollection from 'compiled/collections/GroupUserCollection'
-import Group from 'compiled/models/Group'
+import GroupView from 'ui/features/manage_groups/backbone/views/GroupView.js'
+import GroupUsersView from 'ui/features/manage_groups/backbone/views/GroupUsersView.js'
+import GroupDetailView from 'ui/features/manage_groups/backbone/views/GroupDetailView.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
+import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection.coffee'
+import Group from '@canvas/groups/backbone/models/Group.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
@@ -33,6 +33,7 @@ let users = null
 QUnit.module('GroupView', {
   setup() {
     fakeENV.setup()
+    ENV.permissions = {can_add_groups: true}
     group = new Group({
       id: 42,
       name: 'Foo Group',
@@ -84,26 +85,20 @@ test('it should be accessible', assert => {
   const done = assert.async()
   assertions.isAccessible(view, done, {a11yReport: true})
 })
-const assertCollapsed = function(view) {
+const assertCollapsed = function (view) {
   ok(view.$el.hasClass('group-collapsed'), 'expand visible')
   ok(!view.$el.hasClass('group-expanded'), 'collapse hidden')
 }
-const assertExpanded = function(view) {
+const assertExpanded = function (view) {
   ok(!view.$el.hasClass('group-collapsed'), 'expand hidden')
   ok(view.$el.hasClass('group-expanded'), 'collapse visible')
 }
 test('initial state should be collapsed', () => assertCollapsed(view))
 
 test('expand/collpase buttons', () => {
-  view
-    .$('.toggle-group')
-    .eq(0)
-    .click()
+  view.$('.toggle-group').eq(0).click()
   assertExpanded(view)
-  view
-    .$('.toggle-group')
-    .eq(0)
-    .click()
+  view.$('.toggle-group').eq(0).click()
   assertCollapsed(view)
 })
 

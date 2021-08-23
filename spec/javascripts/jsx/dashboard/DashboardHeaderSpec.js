@@ -21,14 +21,15 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {shallow} from 'enzyme'
 import moxios from 'moxios'
+import {moxiosWait} from 'jest-moxios-utils'
 import sinon from 'sinon'
 import $ from 'jquery'
-import {DashboardHeader} from 'jsx/dashboard/DashboardHeader'
+import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader'
 import {resetPlanner} from '@instructure/canvas-planner'
 
 const container = document.getElementById('fixtures')
 
-const FakeDashboard = function(props) {
+const FakeDashboard = function (props) {
   // let property be null to force the default property on DashboardHeader
   let showTodoList = props.showTodoList
   if (showTodoList === null) showTodoList = undefined
@@ -121,17 +122,14 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
     status: 200,
     responseText: {}
   })
-  const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
+  const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm.js')
 
   ReactDOM.render(
     <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,
     container
   )
   notOk(
-    $fakeRightSide
-      .find('.Sidebar__TodoListContainer')
-      .text()
-      .includes('Loading'),
+    $fakeRightSide.find('.Sidebar__TodoListContainer').text().includes('Loading'),
     'container should not contain "Loading"'
   )
 
@@ -143,10 +141,7 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
       )
 
       ok(
-        $fakeRightSide
-          .find('.Sidebar__TodoListContainer')
-          .text()
-          .includes('Loading'),
+        $fakeRightSide.find('.Sidebar__TodoListContainer').text().includes('Loading'),
         'container should contain "Loading"'
       )
       $fakeRightSide.remove()
@@ -304,4 +299,25 @@ test('it should add planner classes to the page when planner is loaded', () => {
   ok(document.body.classList.contains('dashboard-is-planner'))
   dashboardHeader.changeDashboard('cards')
   notOk(document.body.classList.contains('dashboard-is-planner'))
+})
+
+test('it should allow switching back to the Elementary dashboard if it was disabled', () => {
+  let dashboardHeader = null
+  ReactDOM.render(
+    <FakeDashboard
+      headerRef={c => {
+        dashboardHeader = c
+      }}
+      dashboard_view="activity"
+      canEnableElementaryDashboard
+    />,
+    container
+  )
+  dashboardHeader.changeDashboard('elementary')
+
+  return moxiosWait(req => {
+    strictEqual(req.config.method, 'put')
+    strictEqual(req.config.data, JSON.stringify({elementary_dashboard_disabled: false}))
+    strictEqual(req.url, '/api/v1/users/self/settings')
+  })
 })

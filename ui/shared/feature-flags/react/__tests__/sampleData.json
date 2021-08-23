@@ -1,0 +1,229 @@
+{
+  "allowedFeature": {
+    "feature": "feature1",
+    "applies_to": "RootAccount",
+    "root_opt_in": true,
+    "display_name": "Feature 1",
+    "description": "This does great feature1y things",
+    "feature_flag": {
+      "feature": "feature1",
+      "state": "allowed",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    },
+    "type": "setting"
+  },
+  "allowedOnFeature": {
+    "feature": "feature2",
+    "applies_to": "Account",
+    "root_opt_in": true,
+    "display_name": "Feature 2",
+    "description": "This does great feature2y things",
+    "feature_flag": {
+      "feature": "feature2",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    },
+    "type": "feature_option"
+  },
+  "onFeature": {
+    "feature": "feature3",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Feature 3",
+    "description": "This does great feature3y things",
+    "feature_flag": {
+      "feature": "feature3",
+      "state": "on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    },
+    "type": "feature_option"
+  },
+  "offFeature": {
+    "feature": "feature4",
+    "applies_to": "User",
+    "root_opt_in": true,
+    "display_name": "Feature 4",
+    "description": "This does great feature4y things",
+    "autoexpand": true,
+    "feature_flag": {
+      "feature": "feature4",
+      "state": "off",
+      "transitions": {
+        "allowed": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    },
+    "type": "feature_option"
+  },
+  "allowedOnRootAccountFeature": {
+    "feature": "feature5",
+    "applies_to": "RootAccount",
+    "root_opt_in": true,
+    "display_name": "Feature 5",
+    "description": "This does great feature5y things",
+    "feature_flag": {
+      "feature": "feature5",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": true
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    },
+    "type": "feature_option"
+  },
+  "allowedOnCourseFeature": {
+    "feature": "feature6",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Feature 6",
+    "description": "This does great feature6y things",
+    "feature_flag": {
+      "feature": "feature6",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    },
+    "type": "feature_option"
+  },
+  "betaFeature": {
+    "feature": "betaFeature",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Beta Feature",
+    "description": "This is a work in progress",
+    "feature_flag": {
+      "feature": "betaFeature",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    },
+    "beta": true,
+    "type": "feature_option"
+  },
+  "pendingEnforcementOnFeature": {
+    "feature": "feature7",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement On",
+    "description": "This feature has pending enforcement on",
+    "enable_at": "2021-08-23",
+    "pending_enforcement": true ,
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    },
+    "type": "feature_option"
+  },
+  "pendingEnforcementOffFeature": {
+    "feature": "feature8",
+    "applies_to": "SiteAdmin",
+    "root_opt_in": true,
+    "display_name": "Feature with Pending Enforcement Off",
+    "description": "This feature has pending enforcement off",
+    "enable_at": "2021-08-23",
+    "feature_flag": {
+      "feature": "feature7",
+      "state": "hidden",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "hidden"
+    },
+    "type": "feature_option"
+  }
+}

@@ -49,13 +49,52 @@ module Lti
         expect(described_class.valid_placements(Account.default)).to include(:conference_selection)
       end
 
-      it 'does not include submission_type_selection when FF disabled' do
-        expect(described_class.valid_placements(Account.default)).not_to include(:submission_type_selection)
+      it 'includes submission_type_selection when FF enabled' do
+        expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
+      end
+    end
+
+    describe 'update_tabs_and_return_item_banks_tab' do
+      let(:tabs_with_item_banks) {
+        [
+          {
+            :id=>"context_external_tool_1",
+            :label=>"Item Banks",
+            :css_class=>"context_external_tool_1",
+            :visibility=>nil,
+            :href=>:course_external_tool_path,
+            :external=>true,
+            :hidden=>false,
+            :args=>[2, 1]
+          }
+        ]
+      }
+
+      let(:tabs_without_item_banks) {
+        [
+          {
+            :id=>"context_external_tool_1",
+            :label=>"Another",
+            :css_class=>"context_external_tool_1",
+            :visibility=>nil,
+            :href=>:course_external_tool_path,
+            :external=>true,
+            :hidden=>false,
+            :args=>[2, 1]
+          }
+        ]
+      }
+
+      it 'updates item banks tab label' do
+        tabs = tabs_with_item_banks
+        described_class.update_tabs_and_return_item_banks_tab(tabs, :new_label)
+        expect(tabs[0][:label]).to eq :new_label
       end
 
-      it 'includes submission_type_selection when FF enabled' do
-        Account.default.enable_feature!(:submission_type_tool_placement)
-        expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
+      it 'let tabs as the same' do
+        tabs = tabs_without_item_banks
+        described_class.update_tabs_and_return_item_banks_tab(tabs)
+        expect(tabs).to eq tabs_without_item_banks
       end
     end
   end

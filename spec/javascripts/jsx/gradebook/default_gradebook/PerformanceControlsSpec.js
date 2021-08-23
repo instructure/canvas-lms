@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
+import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls.js'
 
 QUnit.module('Gradebook > PerformanceControls', () => {
   QUnit.module('#activeRequestLimit', () => {

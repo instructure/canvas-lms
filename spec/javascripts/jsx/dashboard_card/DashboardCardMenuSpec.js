@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import DashboardCardMenu from 'jsx/dashboard_card/DashboardCardMenu'
+import DashboardCardMenu from '@canvas/dashboard-card/react/DashboardCardMenu'
 
 const defaultProps = () => ({
   trigger: <button type="button">menu</button>,

@@ -29,7 +29,7 @@ describe "login/canvas/new.html.erb" do
   it "uses canvas route by default" do
     render
     expect(response).not_to be_nil
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('form#login_form')['action']).to eq '/login/canvas'
   end
 
@@ -39,7 +39,7 @@ describe "login/canvas/new.html.erb" do
     controller.request.path_parameters[:controller] = 'login/ldap'
     render
     expect(response).not_to be_nil
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('form#login_form')['action']).to eq '/login/ldap'
   end
 

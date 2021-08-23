@@ -31,7 +31,7 @@ export default function generator({borders, colors, media, spacing, typography})
     heroMinHeight: '7rem',
     heroWidth: '12rem',
     heroWidthLarge: '14rem',
-    heroPadding: '0 0.0625rem',
+    heroPadding: '0.0625rem',
     heroColor: colors.brand,
     heroBorderRadius: borders.radiusMedium,
 
@@ -52,7 +52,7 @@ export default function generator({borders, colors, media, spacing, typography})
   }
 }
 
-generator['canvas-a11y'] = generator['modern-a11y'] = function({colors}) {
+generator['canvas-a11y'] = generator['modern-a11y'] = function ({colors}) {
   return {
     heroTextDecoration: 'underline',
     heroTextDecorationHover: 'none',
@@ -60,7 +60,7 @@ generator['canvas-a11y'] = generator['modern-a11y'] = function({colors}) {
   }
 }
 
-generator.canvas = function(variables) {
+generator.canvas = function (variables) {
   return {
     groupColor: variables['ic-brand-primary'],
     titleColor: variables['ic-brand-primary']

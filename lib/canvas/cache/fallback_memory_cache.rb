@@ -29,6 +29,33 @@ module Canvas
         opts = {expires_in: ttl}
         hash.each{|k, v| write(k, v, opts) }
       end
+
+      # lock is unique to this implementation, it's not a standard part of
+      # rails caches.  Pass a key to lock and you'll get back a nonce if you
+      # hold the lease.  You need to retain the nonce to unlock later, but the lock timeout
+      # will make sure it gets released eventually.
+      # This shadows the implementation in `SafeRedisRaceCondition`
+      # so that we can use locking on any local cache implementation.
+      def lock(key, options)
+        nonce = SecureRandom.hex(20)
+        lock_timeout = options.fetch(:lock_timeout, 5).to_i
+        existing_value = read(key)
+        return false if existing_value
+        write(key, nonce, expires_in: lock_timeout.seconds)
+        true
+      end
+
+      # unlock is unique to this implementation, it's not a standard part of
+      # rails caches.  Pass a key to unlock and you'll get back a nonce if you
+      # hold the lease.  It deletes the lock, but only if the nonce that
+      # is passed.
+      # This shadows the implementation in `SafeRedisRaceCondition`
+      # so that we can use locking on any local cache implementation.
+      def unlock(key, nonce)
+        raise ArgumentError("nonce can't be nil") unless nonce
+        existing_value = read(key)
+        delete(key) if nonce == existing_value
+      end
     end
   end
 end

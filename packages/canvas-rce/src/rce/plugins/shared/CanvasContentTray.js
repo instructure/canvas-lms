@@ -353,10 +353,19 @@ export default function CanvasContentTray(props) {
           onOpen={handleOpenTray}
           onEntered={() => {
             const c = document.querySelector('[role="main"]')
-            const target_w = c ? c.offsetWidth - trayRef.current?.offsetWidth : 0
-            if (target_w >= 320) {
-              c.style.boxSizing = 'border-box'
-              c.style.width = `${target_w}px`
+            let target_w = 0
+            if (c) {
+              const margin =
+                window.getComputedStyle(c).direction === 'ltr'
+                  ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
+                  : c.getBoundingClientRect().left
+
+              target_w = c.offsetWidth - trayRef.current?.offsetWidth + margin
+
+              if (target_w >= 320 && target_w < c.offsetWidth) {
+                c.style.boxSizing = 'border-box'
+                c.style.width = `${target_w}px`
+              }
             }
             setHidingTrayOnAction(target_w < 320)
           }}
@@ -377,25 +386,24 @@ export default function CanvasContentTray(props) {
             >
               <Flex.Item padding="medium" shadow="above">
                 <Flex margin="none none medium none">
-                  <Flex.Item grow shrink>
+                  <Flex.Item shouldgrow shouldshrink>
                     <Heading level="h2">{formatMessage('Add')}</Heading>
                   </Flex.Item>
 
                   <Flex.Item>
                     <CloseButton
-                      placement="static"
-                      variant="icon"
+                      placement="end"
                       onClick={handleDismissTray}
                       data-testid="CloseButton_ContentTray"
-                    >
-                      {formatMessage('Close')}
-                    </CloseButton>
+                      screenReaderLabel={formatMessage('Close')}
+                    />
                   </Flex.Item>
                 </Flex>
 
                 <Filter
                   {...filterSettings}
                   userContextType={props.contextType}
+                  containingContextType={props.containingContext.contextType}
                   onChange={newFilter => {
                     handleFilterChange(
                       newFilter,
@@ -409,8 +417,8 @@ export default function CanvasContentTray(props) {
               </Flex.Item>
 
               <Flex.Item
-                grow
-                shrink
+                shouldgrow
+                shouldshrink
                 margin="xx-small xxx-small 0"
                 elementRef={el => (scrollingAreaRef.current = el)}
               >
@@ -420,6 +428,11 @@ export default function CanvasContentTray(props) {
                     contentSubtype={filterSettings.contentSubtype}
                     sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
                     searchString={filterSettings.searchString}
+                    source={props.source}
+                    jwt={props.jwt}
+                    host={props.host}
+                    refreshToken={props.refreshToken}
+                    context={{type: props.contextType, id: props.contextId}}
                     {...contentProps}
                   />
                 </ErrorBoundary>
@@ -446,6 +459,11 @@ const trayPropsMap = {
   canUploadFiles: bool.isRequired,
   contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's
   contextType: string.isRequired, // initial value indicating the user's context, not the tray's
+  containingContext: shape({
+    contextType: string.isRequired,
+    contextId: string.isRequired,
+    userId: string.isRequired
+  }),
   filesTabDisabled: bool,
   host: requiredWithoutSource,
   jwt: requiredWithoutSource,
@@ -456,7 +474,7 @@ const trayPropsMap = {
   themeUrl: string
 }
 
-export const trayProps = shape(trayPropsMap)
+export const trayPropTypes = shape(trayPropsMap)
 
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,

@@ -21,12 +21,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe AuthenticationProvider::Google do
+  it 'has valid recognized_params' do
+    expect(AuthenticationProvider::Google.recognized_params).to match_array(
+      [:client_id, :client_secret, :mfa_required, :login_attribute, :jit_provisioning, :hosted_domain]
+    )
+  end
+
   it 'rejects non-matching hd' do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = 'instructure.com'
-    expect(Canvas::Security).to receive(:decode_jwt).and_return({'hd' => 'school.edu', 'sub' => '123'})
+    expect(CanvasSecurity).to receive(:decode_jwt).and_return({'hd' => 'school.edu', 'sub' => '123'})
     userinfo = double('userinfo', parsed: {})
-    token = double('token', params: {}, options: {}, get: userinfo)
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {}, get: userinfo)
 
     expect { ap.unique_id(token) }.to raise_error('User is from unacceptable domain "school.edu".')
   end
@@ -34,9 +40,9 @@ describe AuthenticationProvider::Google do
   it 'allows hd from list' do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = 'canvaslms.com, instructure.com'
-    expect(Canvas::Security).to receive(:decode_jwt).and_return({'hd' => 'instructure.com', 'sub' => '123'})
+    expect(CanvasSecurity).to receive(:decode_jwt).and_return({'hd' => 'instructure.com', 'sub' => '123'})
     userinfo = double('userinfo', parsed: {})
-    token = double('token', params: {}, options: {}, get: userinfo)
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {}, get: userinfo)
 
     expect(ap.unique_id(token)).to eq '123'
   end
@@ -44,8 +50,8 @@ describe AuthenticationProvider::Google do
   it 'rejects missing hd' do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = 'instructure.com'
-    expect(Canvas::Security).to receive(:decode_jwt).and_return({'sub' => '123'})
-    token = double('token', params: {}, options: {})
+    expect(CanvasSecurity).to receive(:decode_jwt).and_return({'sub' => '123'})
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {})
 
     expect { ap.unique_id(token) }.to raise_error('Google Apps user not received, but required')
   end
@@ -53,8 +59,8 @@ describe AuthenticationProvider::Google do
   it 'rejects missing hd for *' do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = '*'
-    expect(Canvas::Security).to receive(:decode_jwt).and_return({'sub' => '123'})
-    token = double('token', params: {}, options: {})
+    expect(CanvasSecurity).to receive(:decode_jwt).and_return({'sub' => '123'})
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {})
 
 
     expect { ap.unique_id(token) }.to raise_error('Google Apps user not received, but required')
@@ -63,8 +69,8 @@ describe AuthenticationProvider::Google do
   it "accepts any hd for '*'" do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = '*'
-    expect(Canvas::Security).to receive(:decode_jwt).once.and_return({'hd' => 'instructure.com', 'sub' => '123'})
-    token = double('token', params: {}, options: {})
+    expect(CanvasSecurity).to receive(:decode_jwt).once.and_return({'hd' => 'instructure.com', 'sub' => '123'})
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {})
     expect(token).to receive(:get).and_return(double(parsed: {}))
 
     expect(ap.unique_id(token)).to eq '123'
@@ -72,8 +78,8 @@ describe AuthenticationProvider::Google do
 
   it "accepts when hosted domain isn't required" do
     ap = AuthenticationProvider::Google.new
-    expect(Canvas::Security).to receive(:decode_jwt).once.and_return({'sub' => '123'})
-    token = double('token', params: {}, options: {})
+    expect(CanvasSecurity).to receive(:decode_jwt).once.and_return({'sub' => '123'})
+    token = double('token', params: { 'id_token' => 'dummy' }, options: {})
 
     expect(ap.unique_id(token)).to eq '123'
   end

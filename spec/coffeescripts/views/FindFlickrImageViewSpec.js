@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import FindFlickrImageView from 'compiled/views/FindFlickrImageView'
+import FindFlickrImageView from '@canvas/rce/backbone/views/FindFlickrImageView.coffee'
 import 'helpers/jquery.simulate'
 
 const searchTerm = 'bunnies'

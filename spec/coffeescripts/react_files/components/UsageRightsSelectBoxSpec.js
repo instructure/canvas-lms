@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
+import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 
 QUnit.module('UsageRightsSelectBox', {
   teardown() {

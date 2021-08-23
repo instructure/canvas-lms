@@ -74,7 +74,8 @@ class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
 end
 
 module Interfaces::SubmissionInterface
-  include GraphQL::Schema::Interface
+  include Interfaces::BaseInterface
+
   description 'Types for submission or submission history'
 
   class LatePolicyStatusType < Types::BaseEnum
@@ -132,7 +133,7 @@ module Interfaces::SubmissionInterface
     all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
 
     load_association(:assignment).then do
-      scope = submission.comments_for(current_user).published
+      scope = submission.comments_excluding_drafts_for(current_user)
       unless all_comments
         target_attempt = for_attempt || submission.attempt || 0
         if target_attempt <= 1
@@ -312,4 +313,6 @@ module Interfaces::SubmissionInterface
   end
 
   field :url, Types::UrlType, null: true
+
+  field :extra_attempts, Integer, null: true
 end

@@ -1203,7 +1203,7 @@ describe Canvas::LiveEvents do
   describe '.content_migration_completed' do
     let(:course) { course_factory() }
     let(:source_course) { course_factory() }
-    let(:migration) { ContentMigration.create(context: course, source_course: source_course) }
+    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
@@ -1222,7 +1222,8 @@ describe Canvas::LiveEvents do
           import_quizzes_next: true,
           domain: course.root_account.domain,
           source_course_lti_id: migration.source_course.lti_context_id,
-          destination_course_lti_id: course.lti_context_id
+          destination_course_lti_id: course.lti_context_id,
+          migration_type: migration.migration_type
         ),
         hash_including(
           context_type: course.class.to_s,
@@ -1467,6 +1468,29 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'ContextModuleProgression LiveEventsCallback' do
+    it "queues a job to dispatch .course_completed" do
+      course = course_model(sis_source_id: "abc123")
+      user = user_model
+      context_module = course.context_modules.create!
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id)
+      context_module_progression.workflow_state = 'completed'
+      context_module_progression.completed_at = Time.now
+
+      allow(Rails.env).to receive(:production?).and_return(true)
+
+      # post-transaction callbacks won't happen in specs, so do this manually
+      Canvas::LiveEventsCallbacks.after_update(context_module_progression, context_module_progression.changes)
+
+      strand = "course_progress_course_#{context_module_progression.context_module.global_context_id}_user_#{context_module_progression.global_user_id}"
+      job = Delayed::Job.where(strand: strand).take
+      expect(job).not_to be_nil
+      expect(job.run_at).to be > Time.now
+      expect(job.max_concurrent).to eq 1
+      expect(job.tag).to eq 'CourseProgress.dispatch_live_event'
+    end
+  end
+
   describe '.discussion_topic_created' do
     it 'should trigger a discussion topic created live event' do
       course = course_model
@@ -1590,7 +1614,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1613,7 +1638,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)

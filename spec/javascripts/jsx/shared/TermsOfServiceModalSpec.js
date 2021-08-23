@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import {mount, shallow} from 'enzyme'
-import TermsOfServiceModal from 'jsx/shared/TermsOfServiceModal'
+import TermsOfServiceModal from 'ui/features/terms_of_service_modal/react/TermsOfServiceModal.js'
 
 QUnit.module('Terms of Service Modal Link', {
   beforeEach() {

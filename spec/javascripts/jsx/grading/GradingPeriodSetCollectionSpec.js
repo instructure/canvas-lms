@@ -21,9 +21,9 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate, findRenderedDOMComponentWithTag} from 'react-dom/test-utils'
-import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi'
-import enrollmentTermsApi from 'compiled/api/enrollmentTermsApi'
-import GradingPeriodSetCollection from 'jsx/grading/GradingPeriodSetCollection'
+import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
+import enrollmentTermsApi from 'ui/features/account_grading_standards/enrollmentTermsApi.js'
+import GradingPeriodSetCollection from 'ui/features/account_grading_standards/react/GradingPeriodSetCollection.js'
 
 const wrapper = document.getElementById('fixtures')
 

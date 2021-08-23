@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Outcome from 'compiled/models/Outcome'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Course Outcomes', {

@@ -42,7 +42,7 @@ describe ApplicationHelper do
     it "should work work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -52,7 +52,7 @@ describe ApplicationHelper do
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -62,7 +62,7 @@ describe ApplicationHelper do
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -70,16 +70,35 @@ describe ApplicationHelper do
     end
   end
 
-  it "show_user_create_course_button should work" do
-    Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
-    @domain_root_account = Account.default
-    expect(show_user_create_course_button(nil)).to be_falsey
-    user_factory
-    expect(show_user_create_course_button(@user)).to be_falsey
-    course_with_teacher
-    expect(show_user_create_course_button(@teacher)).to be_truthy
-    account_admin_user
-    expect(show_user_create_course_button(@admin)).to be_truthy
+  context 'show_user_create_course_button' do
+    before(:once) { @domain_root_account = Account.default }
+
+    it 'should work (non-granular)' do
+      @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
+      @domain_root_account.update_attribute(
+        :settings,
+        { teachers_can_create_courses: true, students_can_create_courses: true }
+      )
+      expect(show_user_create_course_button(nil)).to be_falsey
+      user_factory
+      expect(show_user_create_course_button(@user)).to be_falsey
+      course_with_teacher
+      expect(show_user_create_course_button(@teacher)).to be_truthy
+      account_admin_user
+      expect(show_user_create_course_button(@admin)).to be_truthy
+    end
+
+    it 'should work for no enrollments setting (granular permissions)' do
+      @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
+      @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
+      expect(show_user_create_course_button(nil)).to be_falsey
+      user_factory
+      expect(show_user_create_course_button(@user)).to be_truthy
+      course_with_teacher
+      expect(show_user_create_course_button(@teacher)).to be_falsey
+      account_admin_user
+      expect(show_user_create_course_button(@admin)).to be_truthy
+    end
   end
 
   describe "tomorrow_at_midnight" do
@@ -449,12 +468,7 @@ describe ApplicationHelper do
   end
 
   describe "help link" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     it "should configure the help link to display the dialog by default" do
-      expect(helper.show_help_link?).to eq true
       expect(helper.help_link_url).to eq '#'
       expect(helper.help_link_classes).to eq 'help_dialog_trigger'
     end
@@ -463,13 +477,11 @@ describe ApplicationHelper do
       support_url = 'http://instructure.com'
       Account.default.update_attribute(:settings, { :support_url => support_url })
       helper.instance_variable_set(:@domain_root_account, Account.default)
-      Setting.set('show_feedback_link', 'false')
 
       expect(helper.support_url).to eq support_url
-      expect(helper.show_help_link?).to eq true
       expect(helper.help_link_url).to eq support_url
       expect(helper.help_link_icon).to eq 'help'
-      expect(helper.help_link_classes).to eq 'support_url'
+      expect(helper.help_link_classes).to eq 'support_url help_dialog_trigger'
     end
 
     it "should return the configured icon" do
@@ -1114,7 +1126,7 @@ describe ApplicationHelper do
       expect(prefetch_xhr('some_url', id: 'some_id', options: {headers: {"x-some-header": "some-value"}})).to eq(
 "<script>
 //<![CDATA[
-(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[\"some_id\"] = fetch(\"some_url\", {\"credentials\":\"same-origin\",\"headers\":{\"Accept\":\"application/json+canvas-string-ids, application/json\",\"x-some-header\":\"some-value\"}})
+(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[\"some_id\"] = fetch(\"some_url\", {\"credentials\":\"same-origin\",\"headers\":{\"Accept\":\"application/json+canvas-string-ids, application/json\",\"X-Requested-With\":\"XMLHttpRequest\",\"x-some-header\":\"some-value\"}})
 //]]>
 </script>"
       )

@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Notification < ActiveRecord::Base
-  self.shard_category = :unsharded
-
+class Notification < Switchman::UnshardedRecord
   include Workflow
   include TextHelper
 
@@ -36,6 +34,9 @@ class Notification < ActiveRecord::Base
     "Assignment Submitted Late",
     "Grade Weight Changed",
     "Group Assignment Submitted Late",
+
+    # Mentions
+    "Discussion Mention",
 
     # Testing
     "Show In Feed",
@@ -56,50 +57,54 @@ class Notification < ActiveRecord::Base
 
   ALLOWED_PUSH_NOTIFICATION_CATEGORIES = [
     "all_submissions",
-    "announcement_created_by_you",
-    "calendar",
-    "due_date",
-    "course_content",
-    "appointment_cancelations",
-    "student_appointment_signups",
-    "appointment_availability",
-    "conversation_message",
-    "submission_comment",
-    "grading",
     "announcement",
-    "invitation"
+    "announcement_created_by_you",
+    "appointment_availability",
+    "appointment_cancelations",
+    "calendar",
+    "conversation_message",
+    "course_content",
+    "discussion_mention",
+    "due_date",
+    "grading",
+    "invitation",
+    "student_appointment_signups",
+    "submission_comment"
   ].freeze
 
   ALLOWED_PUSH_NOTIFICATION_TYPES = [
-    "New Announcement",
-    "Assignment Created",
-    "New Event Created",
-    "Submission Graded",
-    "Assignment Due Date Changed",
-    "Conversation Message",
-    "Web Conference Invitation",
-    "Event Date Changed",
-    "Submission Comment",
+    "Annotation Notification",
+    "Annotation Teacher Notification",
+    "Announcement Reply",
+    "Appointment Canceled By User",
+    "Appointment Deleted For User",
+    "Appointment Group Deleted",
     "Appointment Group Published",
-    "Submission Needs Grading",
+    "Appointment Group Updated",
+    "Assignment Changed",
+    "Assignment Created",
+    "Assignment Due Date Changed",
+    "Assignment Due Date Override Changed",
+    "Assignment Unmuted",
+    "Collaboration Invitation",
+    "Conversation Message",
+    "Discussion Mention",
+    "Event Date Changed",
+    "New Announcement",
+    "New Event Created",
+    "Peer Review Invitation",
+    "Quiz Regrade Finished",
+    "Rubric Assessment Submission Reminder",
+    "Submission Comment",
     "Submission Comment For Teacher",
     "Submission Grade Changed",
-    "Assignment Changed",
-    "Appointment Group Updated",
-    "Annotation Notification",
-    "Appointment Group Deleted",
-    "Assignment Due Date Override Changed",
-    "Peer Review Invitation",
-    "Announcement Reply",
-    "Rubric Assessment Submission Reminder",
-    "Collaboration Invitation",
-    "Appointment Canceled By User",
+    "Submission Graded",
+    "Submission Needs Grading",
     "Upcoming Assignment Alert",
-    "Annotation Teacher Notification",
-    "Assignment Unmuted",
-    "Quiz Regrade Finished",
-    "Appointment Deleted For User",
+    "Web Conference Invitation"
   ].freeze
+
+  NON_CONFIGURABLE_TYPES = %w(Migration Registration Summaries Alert).freeze
 
   COURSE_TYPES = [
     # Course Activities
@@ -119,6 +124,7 @@ class Notification < ActiveRecord::Base
     # Discussions
     'Discussion',
     'DiscussionEntry',
+    'DiscussionMention',
 
     # Scheduling
     'Student Appointment Signups',
@@ -160,6 +166,21 @@ class Notification < ActiveRecord::Base
 
   def self.all_cached
     @all ||= self.all.to_a.each(&:readonly!)
+  end
+
+  def self.valid_configurable_types
+    # this is ugly, but reading from file instead of defined notifications in db
+    # because this is used to define valid types in our graphql which needs to
+    # exists for specs to be able to use any graphql mutation in this space.
+    #
+    # the file is loaded by category, category_name so first, then last grabs all the types.
+    #  we have a deprecated type that we consider invalid
+    # graphql types cannot have spaces we have used underscores
+    # and we don't allow editing system notification types
+    @configurable_types ||= YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
+      .map(&:first).map(&:last)
+      .select { |type| !type.include?('DEPRECATED') }
+      .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end
 
   def self.find(id, options = {})
@@ -214,10 +235,6 @@ class Notification < ActiveRecord::Base
     end
   end
 
-  def category_spaceless
-    (self.category || "None").gsub(/\s/, "_")
-  end
-
   def sort_order
     case category
     when 'Announcement'
@@ -243,10 +260,12 @@ class Notification < ActiveRecord::Base
      TYPES_TO_SHOW_IN_FEED
   end
 
+  # TODO: Remove after deprecate_sms occurs.
   def self.categories_to_send_in_sms(root_account)
     root_account.settings[:allowed_sms_notification_categories] || Setting.get('allowed_sms_notification_categories', ALLOWED_SMS_NOTIFICATION_CATEGORIES.join(',')).split(',')
   end
 
+  # TODO: Remove after deprecate_sms occurs.
   def self.types_to_send_in_sms(root_account)
     root_account.settings[:allowed_sms_notification_types] || Setting.get('allowed_sms_notification_types', ALLOWED_SMS_NOTIFICATION_TYPES.join(',')).split(',')
   end
@@ -280,7 +299,7 @@ class Notification < ActiveRecord::Base
   end
 
   def dashboard?
-    ["Migration", "Registration", "Summaries", "Alert"].exclude?(self.category)
+    NON_CONFIGURABLE_TYPES.exclude?(self.category)
   end
 
   def category_slug
@@ -343,6 +362,8 @@ class Notification < ActiveRecord::Base
       FREQ_NEVER
     when 'DiscussionEntry'
       FREQ_DAILY
+    when 'DiscussionMention'
+      FREQ_IMMEDIATELY
     when 'Announcement Reply'
       FREQ_NEVER
     when 'Due Date'
@@ -415,6 +436,7 @@ class Notification < ActiveRecord::Base
     t 'names.confirm_sms_communication_channel', 'Confirm Sms Communication Channel'
     t 'names.content_export_failed', 'Content Export Failed'
     t 'names.content_export_finished', 'Content Export Finished'
+    t 'Discussion Mention'
     t 'names.enrollment_accepted', 'Enrollment Accepted'
     t 'names.enrollment_invitation', 'Enrollment Invitation'
     t 'names.enrollment_notification', 'Enrollment Notification'
@@ -488,6 +510,7 @@ class Notification < ActiveRecord::Base
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
+    t 'DiscussionMention'
     t 'categories.due_date', 'Due Date'
     t 'categories.files', 'Files'
     t 'categories.grading', 'Grading'
@@ -508,7 +531,7 @@ class Notification < ActiveRecord::Base
 
   # Translatable display text to use when representing the category to the user.
   # NOTE: If you add a new notification category, update the mapping file for groupings to show up
-  #       on notification preferences page. /app/coffeescripts/notifications/NotificationGroupMappings.js
+  #       on notification preferences page. ui/features/notification_preferences/jquery/NotificationGroupMappings.js
   def category_display_name
     case category
     when 'Announcement'
@@ -523,6 +546,8 @@ class Notification < ActiveRecord::Base
       t(:discussion_display, 'Discussion')
     when 'DiscussionEntry'
       t(:discussion_post_display, 'Discussion Post')
+    when 'DiscussionMention'
+      t('Discussion Mention')
     when 'Due Date'
       t(:due_date_display, 'Due Date')
     when 'Grading'
@@ -595,6 +620,8 @@ EOS
       t(:discussion_description, 'New discussion topic in your course')
     when 'DiscussionEntry'
       t(:discussion_post_description, "New discussion post in a topic you're subscribed to")
+    when 'DiscussionMention'
+      t("New mention in a discussion post.")
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'

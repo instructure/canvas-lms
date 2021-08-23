@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -317,12 +319,7 @@ class SectionsController < ApplicationController
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
           @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
-          can_manage_students = @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
-          js_env(
-            :PERMISSIONS => {
-              :manage_students => can_manage_students,
-              :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
-            })
+          js_env
           if @context.grants_right?(@current_user, session, :manage)
             set_student_context_cards_js_env
           end

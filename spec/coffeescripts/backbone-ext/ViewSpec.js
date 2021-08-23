@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import mixing from 'compiled/util/mixin'
+import Backbone from '@canvas/backbone'
+import mixing from '@canvas/backbone/mixin.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('View', {

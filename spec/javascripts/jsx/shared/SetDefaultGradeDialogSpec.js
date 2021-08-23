@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
 import {waitFor} from '../support/Waiters'
 
 QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {

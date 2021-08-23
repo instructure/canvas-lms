@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
-import * as GradesApi from 'jsx/assignments/GradeSummary/grades/GradesApi'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import * as GradesApi from 'ui/features/assignment_grade_summary/react/grades/GradesApi.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 /* eslint-disable qunit/no-identical-names */
 

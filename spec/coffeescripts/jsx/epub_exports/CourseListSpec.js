@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import CourseList from 'jsx/epub_exports/CourseList'
+import CourseList from 'ui/features/epub_exports/react/CourseList.js'
 
 QUnit.module('CourseListSpec', {
   setup() {

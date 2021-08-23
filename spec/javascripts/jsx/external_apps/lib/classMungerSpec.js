@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classMunger from 'jsx/external_apps/lib/classMunger'
+import classMunger from 'ui/features/external_apps/react/lib/classMunger.js'
 
 QUnit.module('ExternalApps.classMunger')
 

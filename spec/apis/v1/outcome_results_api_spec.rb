@@ -338,208 +338,149 @@ describe "Outcome Results API", type: :request do
             outcome_result # Creates result for enrolled student outcome_student
           end
 
-          context 'is disabled' do
-            it "doesn't display no results students when exclude[]=missing_user_rollups is present" do
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_user_rollups"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              CSV
-            end
-
-            it "does display no results students when no excludes are present" do
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
-              CSV
-            end
-
-            it 'does not display concluded students in a specific section' do
-              section1 = add_section 's1', course: outcome_course
-              student_in_section section1, user: @concluded_student, allow_multiple_enrollments: true
-              @concluded_student.enrollments.map(&:deactivate)
-
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?section_id=#{section1.id}"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-              CSV
-            end
-
-            it 'does not display inactive students in a specific section' do
-              section1 = add_section 's1', course: outcome_course
-              student_in_section section1, user: @inactive_student, allow_multiple_enrollments: true
-              @inactive_student.enrollments.map(&:deactivate)
-
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?section_id=#{section1.id}"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-              CSV
-            end
+          it "doesn't display concluded students when exclude[]=concluded_enrollments is present" do
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},,3.0
+            CSV
           end
 
-          context 'is enabled' do
+          it "doesn't display concluded students when exclude[]=concluded_enrollments and section_id is given" do
+            section1 = add_section 's1', course: outcome_course
+            student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
+            student_in_section section1, user: @concluded_student, allow_multiple_enrollments: true
+            @concluded_student.enrollments.map(&:conclude)
+
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments&section_id=#{section1.id}"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+            CSV
+          end
+
+          it "doesn't display inactive students when exclude[]=inactive_enrollments is present" do
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},,3.0
+            CSV
+          end
+
+          it "doesn't display concluded students when exclude[]=inactive_enrollments and section_id is given" do
+            section1 = add_section 's1', course: outcome_course
+            student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
+            student_in_section section1, user: @inactive_student, allow_multiple_enrollments: true
+            @inactive_student.enrollments.map(&:deactivate)
+
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&section_id=#{section1.id}"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+            CSV
+          end
+
+          it "doesn't display no results students when exclude[]=missing_user_rollups is present" do
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_user_rollups"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
+              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+            CSV
+          end
+
+          it 'displays concluded, inactive, and no results students when they are not excluded' do
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
+              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},,3.0
+            CSV
+          end
+
+          context 'users with multiple enrollments' do
             before do
-              @course.account.enable_feature!(:inactive_concluded_lmgb_filters)
+              @section1 = add_section 's1', course: outcome_course
+              student_in_section @section1, user: outcome_student, allow_multiple_enrollments: true
+              student_in_section @section1, user: @inactive_student, allow_multiple_enrollments: true
+              student_in_section @section1, user: @concluded_student, allow_multiple_enrollments: true
             end
 
-            it "doesn't display concluded students when exclude[]=concluded_enrollments is present" do
+            it 'displays concluded, inactive, and no results students when they arent excluded in a section' do
+              student_in_section @section1, user: @no_results_student, allow_multiple_enrollments: true
+              @no_results_student.enrollments.first.accept
+              @inactive_student.enrollments.map(&:deactivate)
+              @concluded_student.enrollments.map(&:conclude)
               user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments"
+              get "/courses/#{@course.id}/outcome_rollups.csv?section_id=#{@section1.id}"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
                 Student name,Student ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
                 #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
                 #{outcome_student.name},#{outcome_student.id},3.0,3.0
                 #{@no_results_student.name},#{@no_results_student.id},,3.0
               CSV
             end
 
-            it "doesn't display concluded students when exclude[]=concluded_enrollments and section_id is given" do
-              section1 = add_section 's1', course: outcome_course
-              student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
-              student_in_section section1, user: @concluded_student, allow_multiple_enrollments: true
-              @concluded_student.enrollments.map(&:conclude)
-
+            it 'students with an active enrollment are always present' do
               user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments&section_id=#{section1.id}"
+              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
                 Student name,Student ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
+                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
                 #{outcome_student.name},#{outcome_student.id},3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},,3.0
               CSV
             end
 
-            it "doesn't display inactive students when exclude[]=inactive_enrollments is present" do
+            it 'users with inactive and concluded enrollments do display when only one is excluded' do
+              @inactive_student.enrollments.last.conclude
+              @concluded_student.enrollments.last.deactivate
               user_session @user
               get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
                 Student name,Student ID,new outcome result,new outcome mastery points
                 #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
-              CSV
-            end
-
-            it "doesn't display concluded students when exclude[]=inactive_enrollments and section_id is given" do
-              section1 = add_section 's1', course: outcome_course
-              student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
-              student_in_section section1, user: @inactive_student, allow_multiple_enrollments: true
-              @inactive_student.enrollments.map(&:deactivate)
-
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&section_id=#{section1.id}"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              CSV
-            end
-
-            it "doesn't display no results students when exclude[]=missing_user_rollups is present" do
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_user_rollups"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              CSV
-            end
-
-            it 'displays concluded, inactive, and no results students when they are not excluded' do
-              user_session @user
-              get "/courses/#{@course.id}/outcome_rollups.csv"
-              expect(response).to be_successful
-              expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
                 #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
                 #{outcome_student.name},#{outcome_student.id},3.0,3.0
                 #{@no_results_student.name},#{@no_results_student.id},,3.0
               CSV
             end
 
-            context 'users with multiple enrollments' do
-              before do
-                @section1 = add_section 's1', course: outcome_course
-                student_in_section @section1, user: outcome_student, allow_multiple_enrollments: true
-                student_in_section @section1, user: @inactive_student, allow_multiple_enrollments: true
-                student_in_section @section1, user: @concluded_student, allow_multiple_enrollments: true
-              end
-
-              it 'displays concluded, inactive, and no results students when they arent excluded in a section' do
-                student_in_section @section1, user: @no_results_student, allow_multiple_enrollments: true
-                @no_results_student.enrollments.first.accept
-                @inactive_student.enrollments.map(&:deactivate)
-                @concluded_student.enrollments.map(&:conclude)
-                user_session @user
-                get "/courses/#{@course.id}/outcome_rollups.csv?section_id=#{@section1.id}"
-                expect(response).to be_successful
-                expect(response.body).to eq <<~CSV
-                  Student name,Student ID,new outcome result,new outcome mastery points
-                  #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                  #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                  #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                  #{@no_results_student.name},#{@no_results_student.id},,3.0
-                CSV
-              end
-
-              it 'students with an active enrollment are always present' do
-                user_session @user
-                get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
-                expect(response).to be_successful
-                expect(response.body).to eq <<~CSV
-                  Student name,Student ID,new outcome result,new outcome mastery points
-                  #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                  #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                  #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                  #{@no_results_student.name},#{@no_results_student.id},,3.0
-                CSV
-              end
-
-              it 'users with inactive and concluded enrollments do display when only one is excluded' do
-                @inactive_student.enrollments.last.conclude
-                @concluded_student.enrollments.last.deactivate
-                user_session @user
-                get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments"
-                expect(response).to be_successful
-                expect(response.body).to eq <<~CSV
-                  Student name,Student ID,new outcome result,new outcome mastery points
-                  #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                  #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                  #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                  #{@no_results_student.name},#{@no_results_student.id},,3.0
-                CSV
-              end
-
-              it 'users with inactive and concluded enrollments dont display when both are excluded' do
-                @inactive_student.enrollments.last.conclude
-                @concluded_student.enrollments.last.deactivate
-                user_session @user
-                get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
-                expect(response).to be_successful
-                expect(response.body).to eq <<~CSV
-                  Student name,Student ID,new outcome result,new outcome mastery points
-                  #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                  #{@no_results_student.name},#{@no_results_student.id},,3.0
-                CSV
-              end
+            it 'users with inactive and concluded enrollments dont display when both are excluded' do
+              @inactive_student.enrollments.last.conclude
+              @concluded_student.enrollments.last.deactivate
+              user_session @user
+              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
+              expect(response).to be_successful
+              expect(response.body).to eq <<~CSV
+                Student name,Student ID,new outcome result,new outcome mastery points
+                #{outcome_student.name},#{outcome_student.id},3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},,3.0
+              CSV
             end
           end
         end

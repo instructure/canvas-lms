@@ -20,7 +20,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-
 def call_setting(opts)
   status_assertion = opts[:assert_unauthorized] ? {:expected_status => 401} : {}
   api_call_as_user(opts[:as_user], :get,

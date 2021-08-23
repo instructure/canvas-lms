@@ -21,8 +21,9 @@ module CC
   module AssignmentResources
 
     def add_assignments
-      Assignments::ScopedToUser.new(@course, @user).scope.
-        no_submittables.each do |assignment|
+      # @user is nil if it's kicked off by the system, like a course template
+      relation = @user ? Assignments::ScopedToUser.new(@course, @user).scope : @course.active_assignments
+      relation.no_submittables.each do |assignment|
         next unless export_object?(assignment)
         next if @user && assignment.locked_for?(@user, check_policies: true)
 
@@ -45,6 +46,9 @@ module CC
 
     def add_assignment(assignment)
       add_exported_asset(assignment)
+
+      # Student Annotation assignments need to include the attachment they're using
+      add_item_to_export(assignment.annotatable_attachment) if assignment.annotated_document?
 
       migration_id = create_key(assignment)
 
@@ -265,6 +269,11 @@ module CC
         node.external_tool_url assignment.external_tool_tag.url
         node.external_tool_data_json assignment.external_tool_tag.external_data.to_json if assignment.external_tool_tag.external_data
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
+
+        # Exporting the lookup_id allows Canvas to rebind
+        # the custom params to the assignment on import.
+        resource_link = assignment.primary_resource_link
+        node.resource_link_lookup_uuid resource_link.lookup_uuid if resource_link.present?
       end
 
       node.tag!(:turnitin_settings, (assignment.send(:turnitin_settings).to_json)) if assignment.turnitin_enabled || assignment.vericite_enabled
@@ -289,7 +298,40 @@ module CC
       if assignment.post_policy.present?
         node.post_policy { |policy| policy.post_manually(assignment.post_policy.post_manually?) }
       end
+
+      if assignment.line_items.any?
+        node.line_items do |line_items_node|
+          assignment.line_items.find_each do |line_item|
+            add_line_item(line_items_node, line_item, assignment) if line_item.active?
+          end
+        end
+      end
+
+      if assignment.annotated_document? && assignment.annotatable_attachment&.available?
+        node.annotatable_attachment_migration_id(key_generator.create_key(assignment.annotatable_attachment))
+      end
     end
 
+    def self.add_line_item(line_items_node, line_item, assignment)
+      line_items_node.line_item do |li_node|
+        li_node.coupled line_item.coupled
+        li_node.tag line_item.tag if line_item.tag
+        li_node.resource_id line_item.resource_id if line_item.resource_id
+        li_node.extensions line_item.extensions.to_json if line_item.extensions.present?
+
+        # Include client ID if cannot be inferred from a tool tag (happens
+        # with AGS-created assignment with submission_types=none)
+        if line_item.client_id && !assignment.external_tool_tag
+          li_node.client_id line_item.client_id
+        end
+
+        # Include label & score_maximum if they are different from assignment's
+        # (should only happen in the case of multiple line items)
+        li_node.label line_item.label if line_item.label != assignment.name
+        if line_item.score_maximum != assignment.points_possible
+          li_node.score_maximum line_item.score_maximum
+        end
+      end
+    end
   end
 end

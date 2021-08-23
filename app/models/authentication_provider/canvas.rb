@@ -28,7 +28,7 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
   end
 
   def self.recognized_params
-    [ :self_registration, :enable_captcha ].freeze
+    super + [ :self_registration, :enable_captcha ].freeze
   end
 
   def self.login_button?

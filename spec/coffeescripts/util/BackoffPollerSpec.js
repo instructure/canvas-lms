@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import BackoffPoller from 'compiled/util/BackoffPoller'
+import BackoffPoller from '@canvas/backoff-poller'
 
 QUnit.module('BackoffPoller', {
   setup() {

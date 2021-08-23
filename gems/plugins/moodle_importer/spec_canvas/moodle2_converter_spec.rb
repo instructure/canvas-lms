@@ -56,7 +56,7 @@ describe Moodle::Converter do
 
       ann = @course.announcements.first
       expect(ann.title).to eq "News forum"
-      expect(ann.message).to eq "<p>General news and announcements</p>"
+      expect(ann.message).to eq "General news and announcements"
     end
   end
 

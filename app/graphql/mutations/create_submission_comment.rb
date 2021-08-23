@@ -26,6 +26,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
   argument :comment, String, required: true
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :media_object_id, ID, required: false
+  argument :media_object_type, String, required: false
 
   field :submission_comment, Types::SubmissionCommentType, null: true
 
@@ -43,6 +44,10 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
       media_objects = MediaObject.by_media_id(input[:media_object_id])
       raise GraphQL::ExecutionError, 'not found' if media_objects.empty?
       opts[:media_comment_id] = input[:media_object_id]
+
+      if input[:media_object_type].present?
+        opts[:media_comment_type] = input[:media_object_type]
+      end
     end
 
     file_ids = (input[:file_ids] || []).uniq

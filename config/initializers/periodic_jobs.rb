@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -48,7 +50,8 @@ class PeriodicJobs
   end
 
   def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false)
-    Shard.with_each_shard(Shard.in_current_region) do
+    callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
+    Shard.with_each_shard(Shard.in_current_region, exception: callback) do
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
@@ -160,8 +163,7 @@ Rails.configuration.after_initialize do
     DatabaseServer.send_in_each_region(
       BounceNotificationProcessor,
       :process,
-      { run_current_region_asynchronously: true,
-        singleton: 'BounceNotificationProcessor.process' }
+      { run_current_region_asynchronously: true }
     )
   end
 
@@ -266,6 +268,10 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'ScheduledSmartAlert.queue_current_jobs', '5 * * * *' do
     with_each_shard_by_database(ScheduledSmartAlert, :queue_current_jobs)
+  end
+
+  Delayed::Periodic.cron 'Course.sync_homeroom_enrollments', '5 0 * * *' do
+    with_each_shard_by_database(Course, :sync_homeroom_enrollments)
   end
 
   # the default is hourly, and we picked a weird minute just to avoid

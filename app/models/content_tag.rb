@@ -63,6 +63,7 @@ class ContentTag < ActiveRecord::Base
   after_save :run_due_date_cacher_for_quizzes_next
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
+  after_save :clear_total_outcomes_cache
   after_create :update_outcome_contexts
 
   include CustomValidations
@@ -502,19 +503,16 @@ class ContentTag < ActiveRecord::Base
   scope :for_context, lambda { |context|
     case context
     when Account
-      select("content_tags.*").
-          joins("INNER JOIN (
-            SELECT DISTINCT ct.id AS content_tag_id FROM #{ContentTag.quoted_table_name} AS ct
-            INNER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON caa.course_id = ct.context_id
-              AND ct.context_type = 'Course'
-            WHERE caa.account_id = #{context.id}
-          UNION
-            SELECT ct.id AS content_tag_id FROM #{ContentTag.quoted_table_name} AS ct
-            WHERE ct.context_id = #{context.id} AND context_type = 'Account')
-          AS related_content_tags ON related_content_tags.content_tag_id = content_tags.id")
+      where(context: context).union(for_associated_courses(context))
     else
-      where(:context_type => context.class.to_s, :context_id => context)
+      where(context: context)
     end
+  }
+  scope :for_associated_courses, lambda { |account|
+    select("DISTINCT content_tags.*").joins("INNER JOIN
+      #{CourseAccountAssociation.quoted_table_name} AS caa
+      ON caa.course_id = content_tags.context_id AND content_tags.context_type = 'Course'
+      AND caa.account_id = #{account.id}")
   }
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
@@ -620,10 +618,10 @@ class ContentTag < ActiveRecord::Base
     eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 
-  def visible_to_user?(user, opts=nil)
+  def visible_to_user?(user, opts=nil, session=nil)
     return unless self.context_module
 
-    opts ||= self.context_module.visibility_for_user(user)
+    opts ||= self.context_module.visibility_for_user(user, session)
     return false unless opts[:can_read]
 
     return true if opts[:can_read_as_admin]
@@ -679,4 +677,10 @@ class ContentTag < ActiveRecord::Base
     super({:methods => :quiz_lti}.merge(options))
   end
 
+  def clear_total_outcomes_cache
+    return unless tag_type == 'learning_outcome_association' && associated_asset_type == 'LearningOutcomeGroup'
+
+    clear_context = context_type == 'LearningOutcomeGroup' ? nil : context
+    Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
+  end
 end

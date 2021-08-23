@@ -29,6 +29,14 @@ describe Account do
     it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
+  context "BASIC_COLUMNS_FOR_CALLBACKS" do
+    it "can save a minimal object" do
+      a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
+      a.name = "Changed"
+      expect { a.save! }.not_to raise_error
+    end
+  end
+
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
@@ -845,8 +853,10 @@ describe Account do
     end
   end
 
+  # TODO: deprecated; need to look into removing this setting
   it "should allow no_enrollments_can_create_courses correctly" do
     a = Account.default
+    a.disable_feature!(:granular_permissions_manage_courses)
     a.settings = { :no_enrollments_can_create_courses => true }
     a.save!
 
@@ -863,6 +873,34 @@ describe Account do
 
     expect(a.grants_right?(@user, :create_courses)).to eq false
     expect(manual.grants_right?(@user, :create_courses)).to eq false
+  end
+
+  it "does not allow create courses for student view students" do
+    a = Account.default
+    a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
+
+    manual = a.manually_created_courses_account
+    course = manual.courses.create!
+    user = course.student_view_student
+
+    expect(a.grants_right?(user, :create_courses)).to eq false
+    expect(manual.grants_right?(user, :create_courses)).to eq false
+  end
+
+
+  it "does not allow create courses for student view students (granular permissions)" do
+    a = Account.default
+    a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
+    a.enable_feature!(:granular_permissions_manage_courses)
+
+    manual = a.manually_created_courses_account
+    course = manual.courses.create!
+    user = course.student_view_student
+
+    expect(a.grants_right?(user, :create_courses)).to eq false
+    expect(manual.grants_right?(user, :create_courses)).to eq false
   end
 
   it "should correctly return sub-accounts as options" do
@@ -888,8 +926,8 @@ describe Account do
     subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
     subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
     subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
-    expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
-    expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
+    expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+    expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
   end
 
   context "sharding" do
@@ -902,8 +940,8 @@ describe Account do
       subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
       subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
       @shard1.activate do
-        expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
-        expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
       end
     end
   end
@@ -1501,9 +1539,23 @@ describe Account do
       account3 = account2.sub_accounts.create!
       account4 = account3.sub_accounts.create!
 
-      expect(account4.account_chain).to eq [account4, account3, account2, account1]
-    end
+      chain = account4.account_chain
+      expect(chain).to eq [account4, account3, account2, account1]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1]
 
+      chain = account4.account_chain(include_site_admin: true)
+      sa = Account.site_admin
+      expect(chain).to eq [account4, account3, account2, account1, sa]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1, sa]
+    end
   end
 
   describe "#can_see_admin_tools_tab?" do
@@ -1728,16 +1780,19 @@ describe Account do
       enable_cache do
         account = account_model
 
-        account.default_storage_quota = 10.megabytes
-        account.save!
+        sub1 = account.sub_accounts.create!
+        sub2 = account.sub_accounts.create!
+        sub2.update(default_storage_quota: 10.megabytes)
 
-        to_be_subaccount = Account.create!
+        to_be_subaccount = sub1.sub_accounts.create!
         expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
 
         # should clear caches
-        to_be_subaccount.parent_account = account
-        to_be_subaccount.save!
-        expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        Timecop.travel(1.second.from_now) do
+          to_be_subaccount.update(parent_account: sub2)
+          to_be_subaccount = Account.find(to_be_subaccount.id)
+          expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        end
       end
     end
   end
@@ -2060,6 +2115,7 @@ describe Account do
         au = AccountUser.create!(:account => other_account, :user => @user)
         expect(cached_account_users).to eq []
         @account.update_attribute(:parent_account, other_account)
+        @account.reload
         expect(cached_account_users).to eq [au]
       end
 
@@ -2213,22 +2269,54 @@ describe Account do
   end
 
   context '#roles_with_enabled_permission' do
+    def create_role_override(permission, role, context, enabled = true)
+      RoleOverride.create!(
+        context: context,
+        permission: permission,
+        role: role,
+        enabled: enabled
+      )
+    end
     let(:account) { account_model }
 
     it 'returns expected roles with the given permission' do
+      account.disable_feature!(:granular_permissions_manage_courses)
       role = account.roles.create :name => 'AssistantGrader'
       role.base_role_type = 'TaEnrollment'
       role.workflow_state = 'active'
       role.save!
-      RoleOverride.create!(
-        context: account,
-        permission: 'change_course_state',
-        role: role,
-        enabled: true
-      )
+      create_role_override('change_course_state', role, account)
       expect(
         account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
       ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
+    end
+
+    it 'returns expected roles with the given permission (granular permissions)' do
+      account.enable_feature!(:granular_permissions_manage_courses)
+      role = account.roles.create :name => 'TeacherAdmin'
+      role.base_role_type = 'TeacherEnrollment'
+      role.workflow_state = 'active'
+      role.save!
+      create_role_override('manage_courses_add', role, account)
+      create_role_override('manage_courses_publish', role, account)
+      create_role_override('manage_courses_conclude', role, account)
+      create_role_override('manage_courses_reset', role, account)
+      create_role_override('manage_courses_delete', role, account)
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
+      ).to eq %w[AccountAdmin]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_publish).map(&:name).sort
+      ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_conclude).map(&:name).sort
+      ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_reset).map(&:name).sort
+      ).to eq %w[AccountAdmin TeacherAdmin]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_delete).map(&:name).sort
+      ).to eq %w[AccountAdmin TeacherAdmin]
     end
   end
 
@@ -2245,6 +2333,99 @@ describe Account do
       expect(Rails.cache).to receive(:delete).with("short_name_lookup/account_#{a.id}").ordered
       expect(Rails.cache).to receive(:delete).with(["account2", a.id].cache_key).ordered
       a.save!
+    end
+  end
+
+  describe "enable_as_k5_account setting" do
+    it "enable_as_k5_account? helper returns false by default" do
+      account = Account.create!
+      expect(account).not_to be_enable_as_k5_account
+    end
+
+    it "enable_as_k5_account? and enable_as_k5_account helpers return correct values" do
+      account = Account.create!
+      account.settings[:enable_as_k5_account] = {
+        value: true,
+        locked: true
+      }
+      expect(account).to be_enable_as_k5_account
+      expect(account.enable_as_k5_account[:value]).to be_truthy
+      expect(account.enable_as_k5_account[:locked]).to be_truthy
+    end
+  end
+
+  describe "#effective_course_template" do
+    let(:root_account) { Account.create! }
+    let(:sub_account) { root_account.sub_accounts.create! }
+    let(:template) { root_account.courses.create!(template: true) }
+
+    it "returns an explicit template" do
+      sub_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template
+    end
+
+    it "inherits a template" do
+      root_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template
+    end
+
+    it "doesn't use an explicit non-template" do
+      root_account.update!(course_template: template)
+      Course.ensure_dummy_course
+      sub_account.update!(course_template_id: 0)
+      expect(sub_account.effective_course_template).to be_nil
+    end
+  end
+
+  describe "#course_template_id" do
+    it "resets id of 0 to nil on root accounts" do
+      a = Account.new
+      a.course_template_id = 0
+      expect(a).to be_valid
+      expect(a.course_template_id).to be_nil
+    end
+
+    it "requires the course template to be in the same root account" do
+      a = Account.create!
+      a2 = Account.create!
+      c = a2.courses.create!(template: true)
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "requires the course template to actually be a template" do
+      a = Account.create!
+      c = a.courses.create!
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "allows a valid course template" do
+      a = Account.create!
+      c = a.courses.create!(template: true)
+      a.course_template = c
+      expect(a).to be_valid
+    end
+  end
+
+  describe "#dummy?" do
+    it "returns false for most accounts" do
+      act = Account.new(id: 1)
+      expect(act.dummy?).to be_falsey
+    end
+
+    it "is true for a 0-id account" do
+      act = Account.new(id: 0)
+      expect(act.dummy?).to be_truthy
+    end
+
+    it "determines the outcome of `unless_dummy`" do
+      act = Account.new(id: 0)
+      expect(act.unless_dummy).to be_nil
+      act.id = 1
+      expect(act.unless_dummy).to be(act)
     end
   end
 end

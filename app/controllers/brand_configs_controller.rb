@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -30,7 +32,7 @@ class BrandConfigsController < ApplicationController
     add_crumb t('Themes')
     @page_title = join_title(t('Themes'), @account.name)
     css_bundle :brand_config_index
-    js_bundle :brand_configs_index
+    js_bundle :brand_configs
 
     base_brand_config = @account.parent_account.try(:effective_brand_config)
     base_brand_config ||= BrandConfig.k12_config if k12?

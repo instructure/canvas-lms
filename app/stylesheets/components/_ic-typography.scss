@@ -28,6 +28,8 @@
 ///////==============
 /// Global Settings
 ///////==============
+@use "sass:math";
+
 html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
@@ -91,14 +93,14 @@ a.text-success:hover { color: darken($ic-color-success, 10%); }
 ///////==============
 
 h1, h2, h3, h4, h5, h6 {
-  margin: $ic-sp/2 0;
+  margin: $ic-sp*0.5 0;
   font-family: $ic-font-family;
   font-weight: $ic-font-weight;
   line-height: $ic-line-height;
   text-rendering: optimizelegibility; // Fix the character spacing for headings
   small {
     font-weight: normal;
-    line-height: $ic-line-height/0.5;
+    line-height: math.div($ic-line-height, 0.5);
     color: $ic-font-color--subdued;
   }
 }
@@ -129,7 +131,7 @@ h3, .h3 {
 }
 
 .page-header {
-  padding-bottom: ($ic-sp / 2);
+  padding-bottom: ($ic-sp * 0.5);
   margin: 20px 0 30px;
   border-bottom: 1px solid $ic-border-color;
 }
