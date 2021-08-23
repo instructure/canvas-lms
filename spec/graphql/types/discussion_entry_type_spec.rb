@@ -86,9 +86,9 @@ describe Types::DiscussionEntryType do
 
     it 'returns the reply preview data' do
       sub_entry.update!(message: "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>", include_reply_preview: true)
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { authorName }')).to eq parent.user.short_name
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { createdAt }')).to eq parent.created_at.iso8601
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('replyPreviewData { message }')).to eq parent.summary
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { author { shortName } }')).to eq parent.user.short_name
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { createdAt }')).to eq parent.created_at.iso8601
+      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { previewMessage }')).to eq parent.summary
     end
   end
 
