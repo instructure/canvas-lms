@@ -150,11 +150,6 @@ describe DiscussionEntry do
 
     let(:student) { student_in_course(active_all: true) }
 
-    it "should mark include_reply_preview as true" do
-      expect(@entry.include_reply_preview).to be true
-      expect(@entry.message).to eql("<p>only this should stay</p>")
-    end
-
     it "should mark include_reply_preview as false" do
       @entry.update({message: "<p>not a reply preview anymore</p>"})
       @entry.save!
