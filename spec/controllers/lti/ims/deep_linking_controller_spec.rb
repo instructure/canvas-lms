@@ -396,8 +396,8 @@ module Lti
             end
           end
 
-          context 'when create_new_module param is included' do
-            let(:params) { super().merge({ course_id: course.id, create_new_module: true }) }
+          context 'when placement should create new module' do
+            let(:params) { super().merge({ course_id: course.id, placement: 'module_index_menu' }) }
 
             context 'when feature flag is disabled' do
               it 'does not change anything' do
@@ -447,6 +447,160 @@ module Lti
                   expect { subject }.to change { ContentTag.where(context: course).count }.by 3
                 end
               end
+            end
+          end
+        end
+
+        context 'when content items that contain line items are received' do
+          let(:course) { course_model(account: account) }
+          let(:context_external_tool) {
+            ContextExternalTool.create!(
+              context: course.account,
+              url: 'http://tool.url/login',
+              name: 'test tool',
+              shared_secret: 'secret',
+              consumer_key: 'key',
+              developer_key: developer_key,
+              settings: { use_1_3: true }
+            )
+          }
+
+          let(:params) { super().merge({ course_id: course.id, placement: 'course_assignments_menu' }) }
+          let(:launch_url) { 'http://tool.url/launch' }
+          let(:content_items) { [content_item] }
+          let(:content_item) do
+            { type: 'ltiResourceLink', url: launch_url, title: 'Item 1', lineItem: lineItem }
+          end
+          let(:lineItem) do
+            { scoreMaximum: 10 }
+          end
+
+          before do
+            course
+            user_session(@user)
+            context_external_tool
+            course.root_account.enable_feature! :lti_deep_linking_line_items
+          end
+
+          shared_examples_for 'does nothing' do
+            it 'does not create an assignment' do
+              expect { subject }.not_to change { course.assignments.count }
+            end
+          end
+
+          context 'when feature flag is disabled' do
+            before do
+              course.root_account.disable_feature! :lti_deep_linking_line_items
+            end
+
+            it_behaves_like 'does nothing'
+          end
+
+          context 'when context is an account' do
+            let(:params) { super().except(:course_id).merge({ account_id: account.id }) }
+
+            it_behaves_like 'does nothing'
+          end
+
+          context 'when placement is not allowed to create line items' do
+            let(:params) { super().merge({ placement: 'assignment_selection' }) }
+
+            it_behaves_like 'does nothing'
+          end
+
+          context 'when required parameter scoreMaximum is absent' do
+            let(:lineItem) { { label: 'will not work' } }
+
+            it_behaves_like 'does nothing'
+            it 'sends error in content item response' do
+              subject
+              expect(assigns[:js_env][:content_items].first).to have_key(:errors)
+            end
+          end
+
+          it 'creates an assignment from lineItem data' do
+            expect { subject }.to change { course.assignments.count }.by 1
+          end
+
+          context 'when content item includes available dates' do
+            let(:content_item) do
+              super().merge({ available: { startDateTime: Time.zone.now.iso8601, endDateTime: Time.zone.now.iso8601 } })
+            end
+
+            it 'sets assignment unlock date to startDateTime' do
+              subject
+              expect(Assignment.last.unlock_at).to eq content_item.dig(:available, :startDateTime)
+            end
+
+            it 'sets assignment lock date to endDateTime' do
+              subject
+              expect(Assignment.last.lock_at).to eq content_item.dig(:available, :endDateTime)
+            end
+          end
+
+          context 'when content item includes submission dates' do
+            let(:content_item) do
+              super().merge({ submission: { endDateTime: Time.zone.now.iso8601 } })
+            end
+
+            it 'sets assignment due date to endDateTime' do
+              subject
+              expect(Assignment.last.due_at).to eq content_item.dig(:submission, :endDateTime)
+            end
+          end
+
+          context 'when content item includes title' do
+            let(:content_item) do
+              super().merge({ title: 'hello' })
+            end
+
+            it 'uses title for assignment title' do
+              subject
+              expect(Assignment.last.title).to eq content_items.first.dig(:title)
+            end
+          end
+
+          context 'when line item includes label' do
+            let(:lineItem) do
+              super().merge({ label: 'hello' })
+            end
+
+            it 'uses label for assignment title' do
+              subject
+              expect(Assignment.last.title).to eq content_items.first.dig(:lineItem, :label)
+            end
+          end
+
+          context 'when line item includes tag' do
+            let(:lineItem) do
+              super().merge({ tag: 'hello' })
+            end
+
+            it 'stores tag on line item' do
+              subject
+              expect(Lti::LineItem.last.tag).to eq content_items.first.dig(:lineItem, :tag)
+            end
+          end
+
+          context 'when line item includes resourceId' do
+            let(:lineItem) do
+              super().merge({ resourceId: 'hello' })
+            end
+
+            it 'stores resourceId on line item' do
+              subject
+              expect(Lti::LineItem.last.resource_id).to eq content_items.first.dig(:lineItem, :resourceId)
+            end
+          end
+
+          context 'when content item includes custom' do
+            let(:content_item) do
+              super().merge({ custom: { hello: '$User.id' } })
+            end
+
+            it 'stores custom on resource link' do
+              subject
+              expect(Lti::ResourceLink.last.custom).to eq content_items.first[:custom].with_indifferent_access
             end
           end
         end
