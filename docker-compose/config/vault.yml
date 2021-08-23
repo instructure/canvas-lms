@@ -1,12 +1,13 @@
-# production:
-#   addr: https://vault.blah.com
-#   token_path: /path/to/token/on/disk
-#   kv_mount: app-canvas
-# test:
-#   addr: http://vault:8200
-#   token: canvas_root_token
-#   kv_mount: app-canvas
+# default: &default
+#   addr: <%= ENV.fetch('REDIS_VAULT_ADDR', 'http://vault:8200') %>
+#   token: <%= ENV.fetch('REDIS_VAULT_TOKEN', 'canvas_root_token') %>
+#   kv_mount: <%= ENV.fetch('REDIS_VAULT_KV_MOUNT', 'app-canvas') %>
+
 # development:
-#   addr: http://vault:8200
-#   token: canvas_root_token
-#   kv_mount: app-canvas
+#   <<: *default
+
+# test:
+#   <<: *default
+
+# production:
+#   <<: *default
