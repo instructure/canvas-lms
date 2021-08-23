@@ -63,6 +63,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       # unread filter is used like search results and need to exclude deleted entries
       scope = scope.active.unread_for_user(@current_user) if @filter == 'unread'
       scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
+      scope = scope.preload(:user, :editor)
       fulfill(object, scope)
     end
   end
