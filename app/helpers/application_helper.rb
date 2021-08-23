@@ -525,12 +525,18 @@ module ApplicationHelper
   def editor_buttons
     contexts = ContextExternalTool.contexts_to_search(@context)
     return [] if contexts.empty?
-    cached_tools = Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
-      tools = ContextExternalTool.shard(@context.shard).active.
-          having_setting('editor_button').where(context: contexts)
-      tools.sort_by(&:id)
+
+    cached_tools = Rails.cache.fetch((['editor_buttons_for2'] + contexts.uniq).cache_key) do
+      tools = ContextExternalTool
+        .shard(@context.shard)
+        .active
+        .having_setting('editor_button')
+        .where(context: contexts)
+        .order(:id)
+      # force the YAML to be deserialized before caching, since it's expensive
+      tools.each(&:settings)
     end
-    ContextExternalTool.shard(@context.shard).editor_button_json(cached_tools, @context, @current_user, session)
+    ContextExternalTool.shard(@context.shard).editor_button_json(cached_tools.dup, @context, @current_user, session)
   end
 
   def nbsp
