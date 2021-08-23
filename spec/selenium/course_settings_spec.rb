@@ -44,6 +44,22 @@ describe "course settings" do
       expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
     end
 
+    it "should show the course name" do
+      get "/courses/#{@course.id}/settings"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq @course.name
+    end
+
+    it "should show the course alt name if it exists" do
+      @course.alt_name = "the alt name"
+      @course.save!
+      get "/courses/#{@course.id}/settings"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq @course.alt_name
+    end
+
     it 'should provide sync to homeroom and homeroom selection' do
       @course.update!(homeroom_course: true, name: 'homeroom1')
       orig_teacher = @teacher
