@@ -93,6 +93,16 @@ const GROUPS_QUERY = gql`
     }
   }
 `
+const LOADED_GROUPS_QUERY = gql`
+  query LoadedGroupsQuery($collection: String!) {
+    loadedGroups(collection: $collection)
+  }
+`
+const CONTEXT_GROUPS_QUERY = gql`
+  query ContextGroupsLoadedQuery($contextType: String!, $contextId: ID!) {
+    rootGroupId(contextType: $contextType, contextId: $contextId)
+  }
+`
 
 const useTreeBrowser = queryVariables => {
   const {isCourse} = useCanvasContext()
@@ -102,15 +112,25 @@ const useTreeBrowser = queryVariables => {
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
-  const [loadedGroups, setLoadedGroups] = useState([])
   const {data: cacheData} = useQuery(GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
     variables: queryVariables
   })
+  const {data: loadedGroupsData} = useQuery(LOADED_GROUPS_QUERY, {
+    fetchPolicy: 'cache-only',
+    variables: queryVariables
+  })
   const groups = cacheData.groups || []
+  const loadedGroups = loadedGroupsData.loadedGroups || []
 
   const addLoadedGroups = ids => {
-    setLoadedGroups([...loadedGroups, ...ids])
+    client.writeQuery({
+      query: LOADED_GROUPS_QUERY,
+      variables: queryVariables,
+      data: {
+        loadedGroups: [...loadedGroups, ...ids]
+      }
+    })
   }
 
   const clearCache = () => {
@@ -253,32 +273,61 @@ export const useManageOutcomes = collection => {
     collection
   })
 
+  const {data: contextGroupLoadedData} = useQuery(CONTEXT_GROUPS_QUERY, {
+    fetchPolicy: 'cache-only',
+    variables: {
+      contextId,
+      contextType
+    }
+  })
+
+  const rootGroupId = contextGroupLoadedData.rootGroupId
+
   useEffect(() => {
-    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
-      setIsLoading(false)
-    } else if (isLoading && error) {
+    if (
+      isLoading &&
+      ((Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) || error)
+    ) {
       setIsLoading(false)
     }
   }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
 
   useEffect(() => {
-    client
-      .query({
-        query: CHILD_GROUPS_QUERY,
-        variables: {
-          id: contextId,
-          type: contextType
-        }
-      })
-      .then(({data}) => {
-        const rootGroup = data?.context?.rootOutcomeGroup
-        addLoadedGroups([rootGroup._id])
-        setRootId(rootGroup._id)
-        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+    const saveRootGroupId = id => {
+      addLoadedGroups([id])
+      setRootId(id)
+    }
+
+    if (!rootGroupId) {
+      client
+        .query({
+          query: CHILD_GROUPS_QUERY,
+          variables: {
+            id: contextId,
+            type: contextType
+          }
+        })
+        .then(({data}) => {
+          const rootGroup = data.context.rootOutcomeGroup
+          client.writeQuery({
+            query: CONTEXT_GROUPS_QUERY,
+            variables: {
+              contextId,
+              contextType
+            },
+            data: {
+              rootGroupId: rootGroup._id
+            }
+          })
+          saveRootGroupId(rootGroup._id)
+          addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+        })
+        .catch(err => {
+          setError(err.message)
+        })
+    } else {
+      saveRootGroupId(rootGroupId)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

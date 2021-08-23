@@ -316,20 +316,6 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Where would you like to move this outcome?')).toBeInTheDocument()
   })
 
-  it('clears selected outcome when edit outcome modal is closed', async () => {
-    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
-      ...groupDetailDefaultProps
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getAllByText('Outcome Menu')[0])
-    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Cancel'))
-    expect(queryByText('Edit Outcome')).not.toBeInTheDocument()
-  })
-
   it('clears selected outcome when remove outcome modal is closed', async () => {
     const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -715,6 +701,7 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(within(getByRole('dialog')).getByText('Create new group'))
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Cancel'))
+      await act(async () => jest.runAllTimers())
       expect(getByText('new group name')).toBeInTheDocument()
     })
 
@@ -781,6 +768,22 @@ describe('OutcomeManagementPanel', () => {
       })
       expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
+  })
+
+  // Need to move this bellow since somehow this spec is triggering an infinite loop
+  // in runAllTimers above if we put this spec before it
+  it('clears selected outcome when edit outcome modal is closed', async () => {
+    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Cancel'))
+    expect(queryByText('Edit Outcome')).not.toBeInTheDocument()
   })
 
   it('shows edit group modal if edit option from group menu is selected', async () => {
