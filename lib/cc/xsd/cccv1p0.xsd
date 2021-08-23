@@ -389,6 +389,40 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="pace_plans">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="pace_plan">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
+              <xs:element name="start_date" type="xs:date" minOccurs="0"/>
+              <xs:element name="end_date" type="xs:date" minOccurs="0"/>
+              <xs:element name="published_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="exclude_weekends" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="hard_end_dates" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="module_items" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="module_item">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="duration" type="xs:integer" minOccurs="1"/>
+                          <xs:element name="module_item_identifierref" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="externalFeeds">
     <xs:complexType>
       <xs:sequence>
