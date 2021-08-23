@@ -28,10 +28,19 @@ const MentionDropdownOption = props => {
 
   // Scroll individual item into view when its selected or navigated towards
   useEffect(() => {
-    if (props.isSelected && !props.highlightMouse && props.isInteractive) {
-      optionRef.current.scrollIntoView(false)
+    if (
+      props.isSelected &&
+      optionRef.current &&
+      props.menuRef &&
+      !props.highlightMouse &&
+      props.isInteractive
+    ) {
+      const menuItemOffsetTop = optionRef.current?.offsetTop
+      const menuHeight = props.menuRef.current?.clientHeight
+      const itemHeight = optionRef.current?.clientHeight
+      props.menuRef.current.scrollTop = menuItemOffsetTop - (menuHeight - itemHeight) / 2
     }
-  }, [props.highlightMouse, props.isInteractive, props.isSelected])
+  }, [props.highlightMouse, props.isInteractive, props.isSelected, props.menuRef, props.optionRef])
 
   return (
     <View
@@ -41,6 +50,9 @@ const MentionDropdownOption = props => {
           ? 'brand'
           : null
       }
+      elementRef={el => {
+        optionRef.current = el
+      }}
       padding="xx-small"
       onMouseEnter={() => {
         if (props.highlightMouse) {
@@ -56,7 +68,6 @@ const MentionDropdownOption = props => {
       <li
         aria-selected={props.isSelected}
         id={props.id}
-        ref={optionRef}
         role="option"
         style={{listStyle: 'none'}}
         onClick={props.onSelect}
@@ -100,5 +111,9 @@ MentionDropdownOption.props = {
   /**
    * Callback to set focused user
    */
-  onOptionMouseEnter: PropTypes.func
+  onOptionMouseEnter: PropTypes.func,
+  /**
+   * Menu Ref is needed to scroll menu correctly
+   */
+  menuRef: PropTypes.node
 }

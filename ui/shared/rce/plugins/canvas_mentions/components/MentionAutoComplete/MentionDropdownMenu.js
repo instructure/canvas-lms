@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import PropTypes from 'prop-types'
-import React, {useMemo} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import MentionDropdownOption from './MentionDropdownOption'
 import {View} from '@instructure/ui-view'
 import {usePopper} from 'react-popper'
@@ -33,8 +33,9 @@ const MentionDropdownMenu = ({
   onOptionMouseEnter,
   isInteractive
 }) => {
-  // Variables
+  // Hooks & Variables
   const directionality = tinyMCE?.activeEditor?.getParam('directionality')
+  const menuRef = useRef(null)
 
   // Setup Popper
   const virtualReference = useMemo(() => {
@@ -44,7 +45,7 @@ const MentionDropdownMenu = ({
       }
     }
   }, [coordiantes])
-  const [popperElement, setPopperElement] = React.useState(null)
+  const [popperElement, setPopperElement] = useState(null)
   const {styles, attributes} = usePopper(virtualReference, popperElement, {
     placement: directionality === 'rtl' ? 'bottom-end' : 'bottom-start',
     modifiers: [
@@ -77,11 +78,20 @@ const MentionDropdownMenu = ({
           onOptionMouseEnter={() => {
             onOptionMouseEnter(user)
           }}
+          menuRef={menuRef}
           isInteractive={isInteractive}
         />
       )
     })
-  }, [mentionOptions, selectedUser, instanceId, highlightMouse, onSelect, onOptionMouseEnter, isInteractive])
+  }, [
+    mentionOptions,
+    selectedUser,
+    instanceId,
+    highlightMouse,
+    isInteractive,
+    onSelect,
+    onOptionMouseEnter
+  ])
 
   // Don't show if menu is empty
   if (mentionOptions?.length === 0) {
@@ -108,6 +118,9 @@ const MentionDropdownMenu = ({
         padding="none"
         shadow="above"
         width="auto"
+        elementRef={el => {
+          menuRef.current = el
+        }}
       >
         <ul
           aria-label="Mentionable Users"
