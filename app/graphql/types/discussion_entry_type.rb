@@ -25,6 +25,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    global_id_field :id
 
     field :discussion_topic_id, ID, null: false
     field :parent_id, ID, null: true

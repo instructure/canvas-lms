@@ -194,9 +194,9 @@ export const DiscussionThreadContainer = props => {
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
-        key={`reply-${props.discussionEntry.id}`}
+        key={`reply-${props.discussionEntry._id}`}
         authorName={props.discussionEntry.author.displayName}
-        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
@@ -218,8 +218,8 @@ export const DiscussionThreadContainer = props => {
   ) {
     threadActions.push(
       <ThreadingToolbar.Like
-        key={`like-${props.discussionEntry.id}`}
-        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
+        key={`like-${props.discussionEntry._id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
         authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
@@ -232,8 +232,8 @@ export const DiscussionThreadContainer = props => {
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
-        key={`expand-${props.discussionEntry.id}`}
-        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
+        key={`expand-${props.discussionEntry._id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
         expandText={
           <ReplyInfo
             replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
@@ -347,7 +347,7 @@ export const DiscussionThreadContainer = props => {
                     postUtilities={
                       !props.discussionEntry.deleted ? (
                         <ThreadActions
-                          id={props.discussionEntry.id}
+                          id={props.discussionEntry._id}
                           isUnread={!props.discussionEntry.read}
                           onToggleUnread={toggleUnread}
                           onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}

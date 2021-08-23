@@ -49,7 +49,7 @@ export const IsolatedParent = props => {
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
         authorName={props.discussionEntry.author.displayName}
-        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
       />

@@ -55,7 +55,7 @@ export function ThreadingToolbar({...props}) {
             onClick={() => {
               const isolatedId = props.discussionEntry.rootEntryId
                 ? props.discussionEntry.rootEntryId
-                : props.discussionEntry.id
+                : props.discussionEntry._id
               const relativeId = props.discussionEntry.rootEntryId
                 ? props.discussionEntry._id
                 : null
@@ -65,7 +65,7 @@ export function ThreadingToolbar({...props}) {
                 props.discussionEntry.rootEntryId,
                 false,
                 relativeId,
-                props.discussionEntry.id
+                props.discussionEntry._id
               )
             }}
           >

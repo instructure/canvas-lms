@@ -131,7 +131,7 @@ export const IsolatedThreadsContainer = props => {
           onOpenIsolatedView={props.onOpenIsolatedView}
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
-          isHighlighted={entry.id === props.highlightEntryId}
+          isHighlighted={entry._id === props.highlightEntryId}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -238,7 +238,7 @@ const IsolatedThreadContainer = props => {
         isIsolatedView
         onClick={() =>
           props.onOpenIsolatedView(
-            props.discussionEntry.id,
+            props.discussionEntry._id,
             props.discussionEntry.rootEntryId,
             true
           )
@@ -270,7 +270,7 @@ const IsolatedThreadContainer = props => {
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, null, false)}
+        onClick={() => props.onOpenIsolatedView(props.discussionEntry._id, null, false)}
       />
     )
   }
