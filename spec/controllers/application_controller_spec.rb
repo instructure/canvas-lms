@@ -804,6 +804,19 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:redirect_to)
         controller.send(:content_tag_redirect, Account.default, tag, nil)
       end
+
+      context 'when the build param is passed' do
+        it 'redirects to build for a quiz_lti assignment' do
+          tag = create_tag(content_type: 'Assignment')
+          allow(tag).to receive(:quiz_lti).and_return true
+          expect(controller).to receive(:named_context_url).with(
+            Account.default, :context_assignment_url, 44, {module_item_id: 42}
+          ).and_return('nil')
+          allow(controller).to receive(:redirect_to)
+          controller.params[:build] = true
+          controller.send(:content_tag_redirect, Account.default, tag, nil)
+        end
+      end
     end
 
     it 'redirects for a quiz' do
