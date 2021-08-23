@@ -455,7 +455,7 @@ describe "API Authentication", type: :request do
       end
 
       context "trusted developer key" do
-        def trusted_exchange(create_token=false)
+        def trusted_exchange(create_token=false, userinfo: false)
           @key.trusted = true
           @key.save!
 
@@ -465,10 +465,13 @@ describe "API Authentication", type: :request do
               course_with_teacher_logged_in(:user => @user)
               @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
               if create_token
-                @user.access_tokens.create!(developer_key: @key)
+                token = @user.access_tokens.create!(developer_key: @key, scopes: userinfo ? ['/auth/userinfo'] : [])
+                yield token if block_given?
               end
 
-              get "/login/oauth2/auth", params: {:response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"}
+              params = {:response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"}
+              params[:scope] = '/auth/userinfo' if userinfo
+              get "/login/oauth2/auth", params: params
               expect(response).to be_redirect
               expect(response['Location']).to match(%r{http://www.example.com/my_uri?})
               code = response['Location'].match(/code=([^\?&]+)/)[1]
@@ -500,8 +503,22 @@ describe "API Authentication", type: :request do
           @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true)
+          json = trusted_exchange(true) do |token|
+            expect_any_instantiation_of(token).to receive(:save).at_least(:once).and_call_original
+          end
           expect(json['access_token']).not_to be_nil
+          expect(@user.access_tokens.count).to eq 1
+        end
+
+        it "should not regenerate if force_token_reuse with userinfo" do
+          @key.force_token_reuse = true
+          @key.auto_expire_tokens = false
+          @key.save!
+
+          json = trusted_exchange(true, userinfo: true) do |token|
+            expect_any_instantiation_of(token).not_to receive(:save)
+          end
+          expect(json['user']).not_to be_nil
           expect(@user.access_tokens.count).to eq 1
         end
       end
