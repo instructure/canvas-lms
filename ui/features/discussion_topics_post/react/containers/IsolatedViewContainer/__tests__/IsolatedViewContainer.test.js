@@ -357,7 +357,7 @@ describe('IsolatedViewContainer', () => {
     })
   })
 
-  it('disables the reply and enables the expand buttons if the RCE is open', async () => {
+  it.skip('disables the reply and enables the expand buttons if the RCE is open', async () => {
     const setRCEOpen = jest.fn()
     const {findByTestId} = setup(defaultProps({RCEOpen: true, setRCEOpen}))
 
