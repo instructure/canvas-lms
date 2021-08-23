@@ -32,7 +32,10 @@ import {
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
 import {useQuery} from '@apollo/react-hooks'
 
-const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => {
+const MOUSE_FOCUS_TYPE = 'mouse'
+const KEYBOARD_FOCUS_TYPE = 'keyboard'
+
+const MentionUIManager = ({editor, onExited, onFocusedUserChange}) => {
   // Setup State
   const [mentionCoordinates, setMentionCoordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -40,6 +43,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
   const [debouncedInputText, setDebouncedInputText] = useState('')
   const [shouldExit, setShouldExit] = useState(false)
   const [noResults, setNoResults] = useState(false)
+  const [focusType, setFocusType] = useState(null) // Options are 'keyboard' and 'mouse'
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
@@ -82,6 +86,8 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
 
   // Navigates highlight of mention
   const navigateFocusedUser = dir => {
+    setFocusType(KEYBOARD_FOCUS_TYPE)
+
     // Return if no options present
     if (filteredOptionsRef.current.length === 0) {
       return
@@ -243,6 +249,13 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
         setFocusedUser(user)
         setShouldExit(true)
       }}
+      onMouseEnter={() => {
+        setFocusType(MOUSE_FOCUS_TYPE)
+      }}
+      onOptionMouseEnter={user => {
+        setFocusedUser(user)
+      }}
+      highlightMouse={focusType === MOUSE_FOCUS_TYPE}
     />
   )
 }
@@ -253,12 +266,10 @@ MentionUIManager.propTypes = {
   rceRef: PropTypes.object,
   onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
-  onSelect: PropTypes.func,
   editor: PropTypes.object
 }
 
 MentionUIManager.defaultProps = {
   onFocusedUserChange: () => {},
-  onExited: () => {},
-  onSelect: () => {}
+  onExited: () => {}
 }

@@ -28,18 +28,25 @@ const MentionDropdownOption = props => {
 
   // Scroll individual item into view when its selected or navigated towards
   useEffect(() => {
-    if (props.isSelected) {
+    if (props.isSelected && !props.highlightMouse) {
       optionRef.current.scrollIntoView(false)
     }
-  }, [props.isSelected])
+  }, [props.highlightMouse, props.isSelected])
 
   return (
     <View
       as="div"
-      background={isHover || props.isSelected ? 'brand' : null}
+      background={
+        (isHover && props.highlightMouse) || (props.isSelected && !props.highlightMouse)
+          ? 'brand'
+          : null
+      }
       padding="xx-small"
       onMouseEnter={() => {
-        setHover(true)
+        if (props.highlightMouse) {
+          props.onOptionMouseEnter()
+          setHover(true)
+        }
       }}
       onMouseLeave={() => {
         setHover(false)
@@ -56,7 +63,15 @@ const MentionDropdownOption = props => {
       >
         <View as="div">
           <Avatar name={props.name} margin="0 small 0 0" size="x-small" />
-          <Text color={isHover ? 'primary-inverse' : null}>{props.name}</Text>
+          <Text
+            color={
+              (isHover && props.highlightMouse) || (props.isSelected && !props.highlightMouse)
+                ? 'primary-inverse'
+                : null
+            }
+          >
+            {props.name}
+          </Text>
         </View>
       </li>
     </View>
@@ -77,5 +92,13 @@ MentionDropdownOption.props = {
   /**
    * onSelect callback that accepts a function
    */
-  onSelect: PropTypes.string.isRequired
+  onSelect: PropTypes.string.isRequired,
+  /**
+   * Bool to control mouse highlighting
+   */
+  highlightMouse: PropTypes.bool,
+  /**
+   * Callback to set focused user
+   */
+  onOptionMouseEnter: PropTypes.func
 }

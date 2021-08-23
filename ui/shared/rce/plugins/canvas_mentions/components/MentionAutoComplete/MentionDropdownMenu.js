@@ -24,11 +24,14 @@ import {ARIA_ID_TEMPLATES} from '../../constants'
 
 const MentionDropdownMenu = ({
   onSelect,
+  onMouseEnter,
   mentionOptions,
   show,
   coordiantes,
   selectedUser,
-  instanceId
+  instanceId,
+  highlightMouse,
+  onOptionMouseEnter
 }) => {
   // Variables
   const directionality = tinyMCE?.activeEditor?.getParam('directionality')
@@ -70,10 +73,14 @@ const MentionDropdownMenu = ({
           isSelected={selectedUser === user.id}
           key={user.id}
           id={ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)}
+          highlightMouse={highlightMouse}
+          onOptionMouseEnter={() => {
+            onOptionMouseEnter(user)
+          }}
         />
       )
     })
-  }, [mentionOptions, onSelect, instanceId, selectedUser])
+  }, [mentionOptions, selectedUser, instanceId, highlightMouse, onSelect, onOptionMouseEnter])
 
   // Don't show if menu is empty
   if (!show || mentionOptions?.length === 0) {
@@ -85,6 +92,7 @@ const MentionDropdownMenu = ({
       className="mention-dropdown-menu"
       ref={setPopperElement}
       style={{...styles.popper, zIndex: 10000}}
+      onMouseEnter={onMouseEnter}
       {...attributes.popper}
     >
       <View
@@ -144,5 +152,17 @@ MentionDropdownMenu.proptypes = {
   /**
    * ID of selected user
    */
-  selectedUser: PropTypes.string
+  selectedUser: PropTypes.string,
+  /**
+   * Event for triggering onMosueOver
+   */
+  onMouseEnter: PropTypes.func,
+  /**
+   * Bool to control mouse highlighting
+   */
+  highlightMouse: PropTypes.bool,
+  /**
+   * Callback to set user on hover
+   */
+  onOptionMouseEnter: PropTypes.func
 }
