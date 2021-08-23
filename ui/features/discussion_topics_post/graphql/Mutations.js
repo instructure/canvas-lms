@@ -130,6 +130,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $message: String!
     $parentEntryId: ID
     $fileId: ID
+    $includeReplyPreview: Boolean
   ) {
     createDiscussionEntry(
       input: {
@@ -137,6 +138,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         message: $message
         parentEntryId: $parentEntryId
         fileId: $fileId
+        includeReplyPreview: $includeReplyPreview
       }
     ) {
       discussionEntry {

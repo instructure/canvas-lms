@@ -185,12 +185,13 @@ export const IsolatedViewContainer = props => {
     )
   }
 
-  const onReplySubmit = (message, replyId) => {
+  const onReplySubmit = (message, replyId, includeReplyPreview) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         parentEntryId: replyId,
-        message
+        message,
+        includeReplyPreview
       }
     })
   }
@@ -299,10 +300,14 @@ export const IsolatedViewContainer = props => {
 
   const replyPreview = (nodes, previewId) => {
     if (!nodes) return ''
-    let preview = ''
+    let preview = {}
     nodes.every(reply => {
       if (reply._id === previewId) {
-        preview = reply.replyPreview ? reply.replyPreview : ''
+        preview = {
+          author: {shortName: reply.author.displayName},
+          createdAt: reply.createdAt,
+          previewMessage: reply.message.replace(/<[^>]*>?/gm, '')
+        }
         return false
       }
       return true
@@ -379,12 +384,12 @@ export const IsolatedViewContainer = props => {
                 margin="none none x-small"
               >
                 <DiscussionEdit
-                  onSubmit={text => {
-                    onReplySubmit(text, props.replyId)
+                  onSubmit={(text, includeReplyPreview) => {
+                    onReplySubmit(text, props.replyId, includeReplyPreview)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  replyPreview={replyPreview(
+                  quotedEntry={replyPreview(
                     isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
                       .nodes,
                     props.replyId
