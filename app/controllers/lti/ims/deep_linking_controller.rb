@@ -29,15 +29,25 @@ module Lti
 
       before_action :require_context
       before_action :validate_jwt
-      before_action :add_module_items # renders if unauthorized
+      before_action :require_context_update_rights
+      before_action :require_tool
 
       def deep_linking_response
-        # Adding one module item creates the resource link
-        # in ContextModule#add_item, adding multiple creates links in
-        # add_module_items before action
+        # content items not meant for creating module items should have resource links
+        # associated with them here before passing them to the UI for further processing
         create_lti_resource_links unless adding_module_item?
 
-        # Set content items and messaging values in JS env
+        # multiple content items meant for creating module items should create the module
+        # items and associate resource links here before passing them to the UI and
+        # reloading the modules page
+        add_module_items if multiple_module_items?
+
+        # one content item meant for creating a module item should be ignored, since the
+        # add module item modal in the UI will handle it
+
+        # Pass content items and messaging values in JS env. these will be sent via
+        # window.postMessage to the main Canvas window, which can choose to do what
+        # it will with the content items
         js_env({
           content_items: content_items,
           message: messaging_value('msg'),
@@ -49,6 +59,8 @@ module Lti
         }.compact)
 
         render layout: 'bare'
+      rescue InvalidContentItem => e
+        render json: e.errors, status: :bad_request
       end
     end
   end
