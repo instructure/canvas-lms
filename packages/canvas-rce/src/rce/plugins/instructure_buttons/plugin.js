@@ -20,6 +20,7 @@ import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 import {isOKToLink} from '../../contentInsertionUtils'
 import clickCallback from './clickCallback'
+import registerEditToolbar from './registerEditToolbar'
 
 const CREATE_BUTTON = 'create'
 const LIST_BUTTON = 'list_buttons_and_icons'
@@ -106,6 +107,9 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
         }
       }
     })
+
+    // Register context toolbar for editing existing buttons / icons
+    registerEditToolbar(ed, () => {console.log('TODO: populate tray with SVG metadata')})
   }
 })
 

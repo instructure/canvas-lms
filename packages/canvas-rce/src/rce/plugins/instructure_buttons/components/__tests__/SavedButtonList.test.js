@@ -137,4 +137,8 @@ describe('rceToFile', () => {
   it('returns an object with thumbnailUrl as thumbnail_url', () => {
     expect(rceToFile(rceFile).thumbnail_url).toStrictEqual('http://example.com/kitten.png')
   })
+
+  it('returns an object with the buttons/icons attr set to true', () => {
+    expect(rceToFile(rceFile)['data-inst-buttons-and-icons']).toEqual(true)
+  })
 })

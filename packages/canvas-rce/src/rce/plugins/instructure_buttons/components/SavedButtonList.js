@@ -19,6 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {func, shape, string} from 'prop-types';
 
+import {BTN_AND_ICON_ATTRIBUTE} from '../../instructure_buttons/registerEditToolbar'
 import Images from '../../instructure_image/Images'
 
 export function rceToFile({createdAt, id, name, thumbnailUrl, type, url}) {
@@ -29,7 +30,8 @@ export function rceToFile({createdAt, id, name, thumbnailUrl, type, url}) {
     filename: name,
     href: url,
     id,
-    thumbnail_url: thumbnailUrl
+    thumbnail_url: thumbnailUrl,
+    [BTN_AND_ICON_ATTRIBUTE]: true
   }
 }
 
