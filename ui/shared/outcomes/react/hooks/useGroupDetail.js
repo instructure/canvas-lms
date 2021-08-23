@@ -18,7 +18,6 @@
 
 import {useEffect, useRef} from 'react'
 import {useApolloClient, useQuery} from 'react-apollo'
-import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -63,7 +62,7 @@ const useGroupDetail = ({
   searchString = '',
   id
 }) => {
-  const {contextType, contextId} = useCanvasContext()
+  const {contextType, contextId, rootIds} = useCanvasContext()
   searchString = useSearchString(searchString)
   const abortController = useAbortController([id, searchString])
   const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
@@ -72,7 +71,7 @@ const useGroupDetail = ({
 
   if (searchString) queryVars.searchQuery = searchString
 
-  const skip = !id || id === ACCOUNT_FOLDER_ID
+  const skip = !id || rootIds.includes(id)
   const variables = {
     id,
     outcomeIsImported: loadOutcomesIsImported,

@@ -28,9 +28,6 @@ import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-export const ROOT_ID = '0'
-export const ACCOUNT_FOLDER_ID = '-1'
-
 const structFromGroup = g => ({
   id: g._id,
   name: g.title,
@@ -105,9 +102,9 @@ const CONTEXT_GROUPS_QUERY = gql`
 `
 
 const useTreeBrowser = queryVariables => {
-  const {isCourse} = useCanvasContext()
+  const {isCourse, treeBrowserRootGroupId: ROOT_GROUP_ID} = useCanvasContext()
   const client = useApolloClient()
-  const [rootId, setRootId] = useState(ROOT_ID)
+  const [rootId, setRootId] = useState(ROOT_GROUP_ID)
   const [isLoadingRootGroup, setIsLoadingRootGroup] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
@@ -404,7 +401,14 @@ export const useManageOutcomes = collection => {
 }
 
 export const useFindOutcomeModal = open => {
-  const {contextType, contextId, isCourse} = useCanvasContext()
+  const {
+    contextType,
+    contextId,
+    isCourse,
+    globalRootId,
+    treeBrowserRootGroupId: ROOT_GROUP_ID,
+    treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
+  } = useCanvasContext()
   const client = useApolloClient()
   const {
     collections,
@@ -462,8 +466,8 @@ export const useFindOutcomeModal = open => {
         variables: {
           id: contextId,
           type: contextType,
-          rootGroupId: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID || '0',
-          includeGlobalRootGroup: !!ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID
+          rootGroupId: globalRootId || '0',
+          includeGlobalRootGroup: !!globalRootId
         }
       })
       .then(({data}) => {
@@ -480,7 +484,7 @@ export const useFindOutcomeModal = open => {
 
         if (rootGroups.length > 0) {
           childGroups.push({
-            _id: ACCOUNT_FOLDER_ID,
+            _id: ACCOUNT_GROUP_ID,
             title: I18n.t('Account Standards'),
             isRootGroup: true
           })
@@ -505,13 +509,13 @@ export const useFindOutcomeModal = open => {
               ...g,
               isRootGroup: true,
               parentOutcomeGroup: {
-                _id: ACCOUNT_FOLDER_ID,
+                _id: ACCOUNT_GROUP_ID,
                 __typename: 'LearningOutcomeGroup'
               }
             })
           ),
           ...extractGroups({
-            _id: ROOT_ID,
+            _id: ROOT_GROUP_ID,
             isRootGroup: true,
             title: I18n.t('Root Learning Outcome Groups'),
             childGroups: {
@@ -520,8 +524,8 @@ export const useFindOutcomeModal = open => {
           })
         ]
 
-        addLoadedGroups([ACCOUNT_FOLDER_ID, ROOT_ID])
-        setRootId(ROOT_ID)
+        addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
+        setRootId(ROOT_GROUP_ID)
         addGroups(groups)
       })
       .catch(err => {

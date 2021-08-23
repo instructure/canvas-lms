@@ -26,6 +26,10 @@ module ImprovedOutcomeManagementPage
     fj("button:contains('State Standards')")
   end
 
+  def common_core_standards_tree_button
+    fj("button:contains('CCSS.ELA-Literacy.CCRA.W - Writing')")
+  end
+
   def account_standards_tree_button
     fj("button:contains('Account Standards')")
   end
@@ -50,8 +54,8 @@ module ImprovedOutcomeManagementPage
     f("input[data-testid='name-input']")
   end
 
-  def state_standards_search_text
-    f("input[placeholder='Search within State Standards']")
+  def common_core_search_text
+    f("input[placeholder='Search within CCSS.ELA-Literacy.CCRA.W - Writing']")
   end
 
   def create_button
@@ -232,8 +236,8 @@ module ImprovedOutcomeManagementPage
     set_value(create_outcome_title, title)
   end
 
-  def search_state_standards(title)
-    set_value(state_standards_search_text, title)
+  def search_common_core(title)
+    set_value(common_core_search_text, title)
   end
 
   def edit_outcome_title(title)

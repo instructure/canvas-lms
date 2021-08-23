@@ -22,7 +22,7 @@ import {within} from '@testing-library/dom'
 import React from 'react'
 import {createCache} from '@canvas/apollo'
 import OutcomeManagementPanel from '../index'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext, {ACCOUNT_GROUP_ID} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   accountMocks,
   courseMocks,
@@ -90,7 +90,11 @@ describe('OutcomeManagementPanel', () => {
     } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, canManage, isMobileView}}}>
+      <OutcomesContext.Provider
+        value={{
+          env: {contextType, contextId, canManage, isMobileView, rootIds: [ACCOUNT_GROUP_ID]}
+        }}
+      >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>

@@ -117,6 +117,7 @@ describe "account admin outcomes" do
         goto_improved_state_outcomes
         open_find_modal
         state_standards_tree_button.click
+        common_core_standards_tree_button.click
         job_count = Delayed::Job.count
         outcome0_title = nth_find_outcome_modal_item_title(0)
         add_button_nth_find_outcome_modal_item(0).click
@@ -144,11 +145,12 @@ describe "account admin outcomes" do
         goto_improved_state_outcomes
         open_find_modal
         state_standards_tree_button.click
+        common_core_standards_tree_button.click
         # Searching for the whole string will bring in several results and will make the test longer,
         #  so we're just searching for one very specific thing that will load quickly
         complete_title = 'CCSS.ELA-Literacy.CCRA.W.1'
         search_title = 'CCRA.W.1'
-        search_state_standards(search_title)
+        search_common_core(search_title)
         wait_for_ajaximations
         job_count = Delayed::Job.count
         wait_for(method: nil, timeout: 2) { find_outcome_modal_items.count == 1 }

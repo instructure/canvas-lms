@@ -25,7 +25,7 @@ import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icon
 import {Select} from '@instructure/ui-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {isRTL} from '@canvas/i18n/rtlHelper'
-import {ACCOUNT_FOLDER_ID, ROOT_ID} from '@canvas/outcomes/react/treeBrowser'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const BACK_OPTION = 'back'
 const VIEW_OPTION = 'view'
@@ -42,6 +42,7 @@ const GroupActionDrillDown = ({
   showActionLinkForRoot
 }) => {
   const [selectedGroupId, setSelectedGroupId] = useState(rootId)
+  const {rootIds} = useCanvasContext()
   const [highlightedOptionId, setHighlightedOptionId] = useState('')
   const [highlightAction, setHighlightAction] = useState(false)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
@@ -49,7 +50,7 @@ const GroupActionDrillDown = ({
   const hasSelectedGroup = selectedGroupId !== rootId
   const isActionLinkHighlighted = highlightAction || VIEW_OPTION === highlightedOptionId
   const margin = isRTL() ? {marginRight: '-.75em'} : {marginLeft: '-.75em'}
-  const disableActionLink = [ACCOUNT_FOLDER_ID, ROOT_ID].includes(selectedGroupId)
+  const disableActionLink = rootIds.includes(selectedGroupId)
 
   useEffect(() => {
     setIsLoadingGroup(hasSelectedGroup && !loadedGroups.includes(selectedGroupId))
@@ -80,7 +81,7 @@ const GroupActionDrillDown = ({
       const parentGroupId = collections[selectedGroupId].parentGroupId
       setShowOutcomesView(false)
       setSelectedGroupId(parentGroupId)
-      if (![ACCOUNT_FOLDER_ID, ROOT_ID].includes(parentGroupId)) {
+      if (!rootIds.includes(parentGroupId)) {
         onCollectionClick({id: parentGroupId})
       }
       showFlashAlert({

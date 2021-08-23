@@ -20,7 +20,10 @@ import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext, {
+  ACCOUNT_GROUP_ID,
+  ROOT_GROUP_ID
+} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
@@ -69,10 +72,29 @@ describe('FindOutcomesModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      mocks = findModalMocks(),
+      renderer = rtlRender,
+      globalRootId = '',
+      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
+    } = {}
   ) => {
     return renderer(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, isMobileView}}}>
+      <OutcomesContext.Provider
+        value={{
+          env: {
+            contextType,
+            contextId,
+            isMobileView,
+            globalRootId,
+            rootIds,
+            treeBrowserRootGroupId: ROOT_GROUP_ID,
+            treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
+          }
+        }}
+      >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -257,19 +279,10 @@ describe('FindOutcomesModal', () => {
     })
 
     describe('global standards', () => {
-      beforeEach(() => {
-        window.ENV = {
-          GLOBAL_ROOT_OUTCOME_GROUP_ID: '1'
-        }
-      })
-
-      afterEach(() => {
-        window.ENV = null
-      })
-
       it('renders the State Standards group and subgroups', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          mocks: findModalMocks({includeGlobalRootGroup: true})
+          mocks: findModalMocks({includeGlobalRootGroup: true}),
+          globalRootId: '1'
         })
         await act(async () => jest.runAllTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
@@ -277,14 +290,25 @@ describe('FindOutcomesModal', () => {
         await act(async () => jest.runAllTimers())
       })
 
-      it('does not render the State Standard group if no GLOBAL_ROOT_OUTCOME_GROUP_ID is set', async () => {
-        window.ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID = ''
+      it('does not render the State Standard group if no globalRootId is set', async () => {
         const {queryByText, getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: findModalMocks({includeGlobalRootGroup: true})
         })
         await act(async () => jest.runAllTimers())
         expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
         expect(queryByText('State Standards')).not.toBeInTheDocument()
+      })
+
+      it('does not list outcomes within the State Standard group', async () => {
+        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          mocks: [...findModalMocks({includeGlobalRootGroup: true}), ...groupMocks({groupId: '1'})],
+          globalRootId: '1'
+        })
+        await act(async () => jest.runAllTimers())
+        await clickWithinMobileSelect(queryByText('Groups'))
+        fireEvent.click(getByText('State Standards'))
+        await act(async () => jest.runAllTimers())
+        expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
       })
     })
   }

@@ -30,7 +30,7 @@ import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
 import {showImportConfirmBox} from './ImportConfirmBox'
-import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
+import {useFindOutcomeModal} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
@@ -40,7 +40,7 @@ import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {isMobileView, isCourse} = useCanvasContext()
+  const {isMobileView, isCourse, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {
@@ -227,7 +227,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               overflowX="auto"
               elementRef={setRightColumnRef}
             >
-              {selectedGroupId && selectedGroupId !== ACCOUNT_FOLDER_ID ? (
+              {selectedGroupId && !rootIds.includes(selectedGroupId) ? (
                 findOutcomesView
               ) : (
                 <FindOutcomesBillboard />
