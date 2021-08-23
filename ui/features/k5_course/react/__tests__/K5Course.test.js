@@ -19,7 +19,7 @@
 import React from 'react'
 import moxios from 'moxios'
 import tz from '@canvas/timezone'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, act} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
 import {
@@ -135,7 +135,7 @@ const createStudentView = () => {
   return studentViewBarContainer
 } */
 
-beforeAll(() => {
+beforeEach(() => {
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
@@ -143,14 +143,6 @@ beforeAll(() => {
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-})
-
-afterAll(() => {
-  moxios.uninstall()
-  fetchMock.restore()
-})
-
-beforeEach(() => {
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
 })
@@ -160,6 +152,8 @@ afterEach(() => {
   const modulesContainer = document.getElementById('k5-modules-container')
   modulesContainer.remove()
   localStorage.clear()
+  moxios.uninstall()
+  fetchMock.restore()
 })
 
 describe('K-5 Subject Course', () => {
@@ -570,6 +564,19 @@ describe('K-5 Subject Course', () => {
         const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
       })
+    })
+
+    it('does not load content until tab is active', async () => {
+      const {getByText, findByText} = render(
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />
+      )
+      expect(getByText('Time to learn!')).toBeInTheDocument()
+      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeFalsy()
+      expect(fetchMock.called(FETCH_APPS_URL)).toBeFalsy()
+      act(() => getByText('Resources').click())
+      expect(await findByText('This is really important.')).toBeInTheDocument()
+      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeTruthy()
+      expect(fetchMock.called(FETCH_APPS_URL)).toBeTruthy()
     })
   })
 

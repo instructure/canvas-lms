@@ -475,15 +475,13 @@ export function K5Course({
             outcomeProficiency={outcomeProficiency}
           />
         )}
-        {currentTab === TAB_IDS.RESOURCES && (
-          <ResourcesPage
-            cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
-            cardsSettled
-            visible={currentTab === TAB_IDS.RESOURCES}
-            showStaff={false}
-            isSingleCourse
-          />
-        )}
+        <ResourcesPage
+          cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
+          cardsSettled
+          visible={currentTab === TAB_IDS.RESOURCES}
+          showStaff={false}
+          isSingleCourse
+        />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
       </View>
     </K5DashboardContext.Provider>

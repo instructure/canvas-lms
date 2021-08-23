@@ -487,7 +487,7 @@ describe('K-5 Dashboard', () => {
       expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
     })
 
-    it('only fetches announcements and LTIs based on cards once per page load', done => {
+    it('only fetches announcements based on cards once per page load', done => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
       moxios.withMock(() => {
         render(<K5Dashboard {...defaultProps} />)
@@ -503,10 +503,6 @@ describe('K-5 Dashboard', () => {
             .then(() => {
               // Expect just one announcement request for all cards
               expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(1)
-              // Expect one LTI request for each non-homeroom card
-              expect(
-                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length
-              ).toBe(1)
               done()
             })
         )
@@ -620,6 +616,17 @@ describe('K-5 Dashboard', () => {
       expect(getByText('A wonderful assignment')).toBeInTheDocument()
       expect(getByText('Social Studies')).toBeInTheDocument()
       expect(getByText('Exciting discussion')).toBeInTheDocument()
+    })
+
+    it('preloads surrounding weeks only once schedule tab is visible', async done => {
+      const {findByText, getByRole} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+      expect(moxios.requests.count()).toBe(5)
+      act(() => getByRole('tab', {name: 'Schedule'}).click())
+      moxios.wait(() => {
+        expect(moxios.requests.count()).toBe(7) // 2 more requests for prev and next week preloads
+        done()
+      })
     })
   })
 

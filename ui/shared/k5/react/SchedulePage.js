@@ -23,7 +23,8 @@ import {
   createPlannerApp,
   createPlannerPreview,
   renderWeeklyPlannerHeader,
-  JumpToHeaderButton
+  JumpToHeaderButton,
+  preloadInitialItems
 } from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 
@@ -39,6 +40,7 @@ const SchedulePage = ({
   singleCourse
 }) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
+  const [hasPreloadedItems, setHasPreloadedItems] = useState(false)
   const plannerApp = useRef()
 
   useEffect(() => {
@@ -47,6 +49,21 @@ const SchedulePage = ({
       setPlannerCreated(true)
     }
   }, [plannerInitialized])
+
+  // Only preload the previous and next weeks' items once the schedule tab is active
+  // The present week's items are loaded regardless of tab state
+  useEffect(() => {
+    if (
+      visible &&
+      isPlannerCreated &&
+      plannerInitialized &&
+      userHasEnrollments &&
+      !hasPreloadedItems
+    ) {
+      preloadInitialItems()
+      setHasPreloadedItems(true)
+    }
+  }, [visible, isPlannerCreated, plannerInitialized, userHasEnrollments, hasPreloadedItems])
 
   let content = <></>
   if (plannerInitialized && isPlannerCreated) {
