@@ -34,7 +34,7 @@ module LiveEvents
       if res['stub_kinesis']
         return true if !Rails.env.production?
 
-        LiveEvents.logger.warn(
+        LiveEvents.logger&.warn(
           "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
         )
       end
@@ -45,7 +45,7 @@ module LiveEvents
           res['custom_aws_credentials'] ||
           (res['aws_access_key_id'].present? && res['aws_secret_access_key_dec'].present?)
         # Creating Kinesis client with no creds will hang if can't connect to AWS to get creds
-        LiveEvents.logger.warn(
+        LiveEvents.logger&.warn(
           "LIVE EVENTS: no creds given for kinesis in non-prod environment. Disabling."
         )
         return nil
