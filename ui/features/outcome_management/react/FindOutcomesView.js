@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -48,7 +48,8 @@ const FindOutcomesView = ({
   mobileScrollContainer,
   importGroupStatus,
   importOutcomesStatus,
-  importOutcomeHandler
+  importOutcomeHandler,
+  shouldFocusAddAllBtn
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -60,6 +61,11 @@ const FindOutcomesView = ({
     [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
+
+  const addAllBtnRef = useRef()
+  useEffect(() => {
+    if (shouldFocusAddAllBtn) addAllBtnRef.current?.focus()
+  }, [shouldFocusAddAllBtn])
 
   const countAndAddButton = (
     <Flex.Item>
@@ -102,6 +108,7 @@ const FindOutcomesView = ({
                 enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
               }
               onClick={onAddAllHandler}
+              ref={addAllBtnRef}
             >
               {I18n.t('Add All Outcomes')}
             </Button>
@@ -283,7 +290,8 @@ FindOutcomesView.defaultProps = {
     isRootGroup: false
   },
   importGroupStatus: IMPORT_NOT_STARTED,
-  mobileScrollContainer: null
+  mobileScrollContainer: null,
+  shouldFocusAddAllBtn: false
 }
 
 FindOutcomesView.propTypes = {
@@ -299,7 +307,8 @@ FindOutcomesView.propTypes = {
   mobileScrollContainer: PropTypes.instanceOf(Element),
   importGroupStatus: PropTypes.string,
   importOutcomesStatus: PropTypes.object.isRequired,
-  importOutcomeHandler: PropTypes.func.isRequired
+  importOutcomeHandler: PropTypes.func.isRequired,
+  shouldFocusAddAllBtn: PropTypes.bool
 }
 
 export default FindOutcomesView

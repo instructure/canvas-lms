@@ -78,6 +78,7 @@ describe('FindOutcomesView', () => {
     importGroupStatus: IMPORT_NOT_STARTED,
     importOutcomesStatus: {},
     importOutcomeHandler: importOutcomeHandlerMock,
+    shouldFocusAddAllBtn: false,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
     ...props
