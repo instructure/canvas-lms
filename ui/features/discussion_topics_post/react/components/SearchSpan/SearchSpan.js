@@ -20,13 +20,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
-  // eslint-disable-next-line no-constant-condition
-  if (false && !!searchArea && !!searchTerm && !isIsolatedView) {
+  if (!!searchArea && !!searchTerm && !isIsolatedView) {
     const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
-    return searchArea.replace(
-      searchExpression,
-      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
-    )
+    return searchArea
+      .replace(/<[^>]*>?/gm, '')
+      .replace(
+        searchExpression,
+        '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+      )
   }
   return searchArea
 }
