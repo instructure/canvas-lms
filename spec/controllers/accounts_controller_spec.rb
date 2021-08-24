@@ -950,6 +950,20 @@ describe AccountsController do
       expect(assigns[:js_env][:help_link_icon]).to eq 'paperclip'
     end
 
+    it "should order desc announcements" do
+      account_with_admin_logged_in
+      Timecop.freeze do
+        account_notification(account: @account, message: "Announcement 1", created_at: Time.zone.now - 1.minute)
+        @a1 = @announcement
+        account_notification(account: @account, message: "Announcement 2", created_at: Time.zone.now)
+        @a2 = @announcement
+      end
+      get 'settings', params: {account_id: @account.id}
+      expect(response).to be_successful
+      expect(assigns[:announcements].first.id).to eq @a1.id
+      expect(assigns[:announcements].last.id).to eq @a2.id
+    end
+
     context "sharding" do
       specs_require_sharding
 
