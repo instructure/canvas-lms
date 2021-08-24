@@ -3028,15 +3028,6 @@ test('ActionMenu is rendered on renderActionMenu', function () {
   equal(buttonText, 'Actions')
 })
 
-test('GradebookMenu is rendered on renderGradebookMenu', function () {
-  this.gradebook.options.assignmentOrOutcome = 'assignment'
-  this.gradebook.renderGradebookMenu()
-  const buttonText = document
-    .querySelector('[data-component="GradebookMenu"] Button')
-    .innerText.trim()
-  equal(buttonText, 'Gradebook')
-})
-
 test('StatusesModal is mounted on renderStatusesModal', function () {
   const clock = sinon.useFakeTimers()
   const statusModal = this.gradebook.renderStatusesModal()
@@ -6695,6 +6686,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     })
 
     test('is false when filter_speed_grader_by_student_group is not enabled', () => {
+      gradebook.options.course_settings.filter_speed_grader_by_student_group = false
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       strictEqual(props.requireStudentGroupForSpeedGrader, false)

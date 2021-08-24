@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,20 +17,16 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import Gradebook from './react/default_gradebook/Gradebook'
+import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
+import {render, within} from '@testing-library/react'
+import Gradebook from '../../Gradebook'
+import '@testing-library/jest-dom/extend-expect'
 
-import('@canvas/context-cards/react/StudentContextCardTrigger')
-
-const mountPoint = document.querySelector('#gradebook_app')
-const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu"]')
-
-const props = {
-  ...ENV.GRADEBOOK_OPTIONS,
-  currentUserId: ENV.current_user_id,
-  locale: ENV.LOCALE,
-  gradebookMenuNode
-}
-
-const component = React.createElement(Gradebook, props)
-ReactDOM.render(component, mountPoint)
+describe('Gradebook', () => {
+  it('GradebookMenu is rendered', () => {
+    const node = document.createElement('div')
+    render(<Gradebook {...defaultGradebookProps} gradebookMenuNode={node} />)
+    const {getByText} = within(node)
+    expect(node).toContainElement(getByText(/Gradebook/i))
+  })
+})

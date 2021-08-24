@@ -146,8 +146,13 @@ const anonymousSpeedGraderAlertMountPoint = function () {
   return document.querySelector("[data-component='AnonymousSpeedGraderAlert']")
 }
 
-class Gradebook {
+export function Portal({node, children}) {
+  return ReactDOM.createPortal(children, node)
+}
+
+class Gradebook extends React.Component {
   constructor(options1) {
+    super(options1)
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
@@ -232,7 +237,6 @@ class Gradebook {
     this.updatePostGradesFeatureButton = this.updatePostGradesFeatureButton.bind(this)
     this.initHeader = this.initHeader.bind(this)
     this.renderGradebookMenus = this.renderGradebookMenus.bind(this)
-    this.renderGradebookMenu = this.renderGradebookMenu.bind(this)
     this.getFilterSettingsViewOptionsMenuProps =
       this.getFilterSettingsViewOptionsMenuProps.bind(this)
     this.updateFilterSettings = this.updateFilterSettings.bind(this)
@@ -1755,26 +1759,8 @@ class Gradebook {
   }
 
   renderGradebookMenus() {
-    this.renderGradebookMenu()
     this.renderViewOptionsMenu()
-    return this.renderActionMenu()
-  }
-
-  renderGradebookMenu() {
-    let j, len, mountPoint
-    const mountPoints = document.querySelectorAll('[data-component="GradebookMenu"]')
-    const props = {
-      assignmentOrOutcome: this.options.assignmentOrOutcome,
-      courseUrl: this.options.context_url,
-      learningMasteryEnabled: this.options.outcome_gradebook_enabled
-    }
-    const results = []
-    for (j = 0, len = mountPoints.length; j < len; j++) {
-      mountPoint = mountPoints[j]
-      props.variant = mountPoint.getAttribute('data-variant')
-      results.push(renderComponent(GradebookMenu, mountPoint, props))
-    }
-    return results
+    this.renderActionMenu()
   }
 
   getTeacherNotesViewOptionsMenuProps() {
@@ -4253,6 +4239,24 @@ class Gradebook {
     ) {
       return this._essentialDataLoaded.resolve()
     }
+  }
+
+  componentDidMount() {
+    this.initialize()
+    this.onShow()
+  }
+
+  render() {
+    return (
+      <Portal node={this.props.gradebookMenuNode}>
+        <GradebookMenu
+          assignmentOrOutcome={this.options.assignmentOrOutcome}
+          courseUrl={this.options.context_url}
+          learningMasteryEnabled={this.options.outcome_gradebook_enabled}
+          variant="DefaultGradebook"
+        />
+      </Portal>
+    )
   }
 }
 

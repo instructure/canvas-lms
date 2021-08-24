@@ -18,70 +18,74 @@
 
 import Gradebook from '../Gradebook'
 
+export const defaultGradebookProps = {
+  api_max_per_page: 50,
+  chunk_size: 50,
+  closed_grading_period_ids: [],
+  colors: {},
+  context_allows_gradebook_uploads: true,
+  context_id: '1',
+  context_url: '/courses/1/',
+
+  course_settings: {
+    allow_final_grade_override: false,
+    filter_speed_grader_by_student_group: false
+  },
+
+  currentUserId: '1',
+  dataloader_improvements: true,
+  default_grading_standard: [
+    ['A', 0.9],
+    ['B', 0.8],
+    ['C', 0.7],
+    ['D', 0.6],
+    ['F', 0.0]
+  ],
+  editable: true,
+  export_gradebook_csv_url: 'http://example.com/export',
+  final_grade_override_enabled: false,
+  gradebook_column_order_settings_url: 'http://example.com/gradebook_column_order_settings_url',
+  gradebook_import_url: 'http://example.com/import',
+  gradebook_is_editable: true,
+  graded_late_submissions_exist: false,
+  grading_schemes: [
+    {
+      id: '2801',
+      data: [
+        ['😂', 0.9],
+        ['🙂', 0.8],
+        ['😐', 0.7],
+        ['😢', 0.6],
+        ['💩', 0]
+      ],
+      title: 'Emoji Grades'
+    }
+  ],
+  has_modules: true,
+  latePolicyStatusDisabled: false,
+  locale: 'en',
+  new_gradebook_development_enabled: true,
+  outcome_gradebook_enabled: false,
+  performanceControls: {
+    active_request_limit: 10
+  },
+  post_grades_ltis: [],
+  publish_to_sis_enabled: false,
+  sections: [],
+
+  settings: {
+    show_concluded_enrollments: 'false',
+    show_inactive_enrollments: 'false'
+  },
+
+  settings_update_url: '/path/to/settingsUpdateUrl',
+  speed_grader_enabled: true,
+  student_groups: []
+}
+
 export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
-    api_max_per_page: 50,
-    chunk_size: 50,
-    closed_grading_period_ids: [],
-    colors: {},
-    context_allows_gradebook_uploads: true,
-    context_id: '1',
-    context_url: '/courses/1/',
-
-    course_settings: {
-      allow_final_grade_override: false,
-      filter_speed_grader_by_student_group: false
-    },
-
-    currentUserId: '1',
-    dataloader_improvements: true,
-    default_grading_standard: [
-      ['A', 0.9],
-      ['B', 0.8],
-      ['C', 0.7],
-      ['D', 0.6],
-      ['F', 0.0]
-    ],
-    editable: true,
-    export_gradebook_csv_url: 'http://example.com/export',
-    final_grade_override_enabled: false,
-    gradebook_column_order_settings_url: 'http://example.com/gradebook_column_order_settings_url',
-    gradebook_import_url: 'http://example.com/import',
-    gradebook_is_editable: true,
-    graded_late_submissions_exist: false,
-    grading_schemes: [
-      {
-        id: '2801',
-        data: [
-          ['😂', 0.9],
-          ['🙂', 0.8],
-          ['😐', 0.7],
-          ['😢', 0.6],
-          ['💩', 0]
-        ],
-        title: 'Emoji Grades'
-      }
-    ],
-    has_modules: true,
-    latePolicyStatusDisabled: false,
-    locale: 'en',
-    new_gradebook_development_enabled: true,
-    outcome_gradebook_enabled: false,
-    performanceControls: {
-      active_request_limit: 10
-    },
-    post_grades_ltis: [],
-    publish_to_sis_enabled: false,
-    sections: [],
-
-    settings: {
-      show_concluded_enrollments: 'false',
-      show_inactive_enrollments: 'false'
-    },
-
-    settings_update_url: '/path/to/settingsUpdateUrl',
-    speed_grader_enabled: true,
-    student_groups: [],
+    ...defaultGradebookProps,
     ...options
   })
 
