@@ -24,10 +24,11 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {string} from 'prop-types'
+import {string, bool} from 'prop-types'
 import formatMessage from '../../format-message'
 import Day from '../Day'
 import KinderPandaSvg from './kinder-panda.svg'
+import {MULTI_COURSE_ITEMS, SINGLE_COURSE_ITEMS} from './mock-items'
 
 import {SMALL_MEDIA_QUERY, MEDIUM_MEDIA_QUERY} from '../responsiviser'
 
@@ -36,83 +37,7 @@ const mediumMediaQuery = window.matchMedia(MEDIUM_MEDIA_QUERY)
 
 const noOp = () => {}
 
-const COMMON_PROPS = {
-  date: moment().hour(23).minute(59),
-  dateStyle: 'due',
-  points: 100,
-  status: {},
-  readOnly: true
-}
-
-const ITEMS = [
-  {
-    ...COMMON_PROPS,
-    id: '1',
-    uniqueId: 'assignment-1',
-    context: {
-      id: 'Math',
-      type: 'Course',
-      title: 'Math',
-      color: '#BF32A4'
-    },
-    title: 'A wonderful assignment',
-    type: 'Assignment'
-  },
-  {
-    ...COMMON_PROPS,
-    id: '2',
-    uniqueId: 'assignment-2',
-    context: {
-      id: 'Math',
-      type: 'Course',
-      title: 'Math',
-      color: '#BF32A4'
-    },
-    title: 'The best assignment',
-    type: 'Assignment'
-  },
-  {
-    ...COMMON_PROPS,
-    id: '3',
-    uniqueId: 'discussion-3',
-    context: {
-      id: 'Science',
-      type: 'Course',
-      title: 'Science',
-      color: '#69B8DE'
-    },
-    title: 'A great discussion assignment',
-    type: 'Discussion'
-  },
-  {
-    ...COMMON_PROPS,
-    id: '4',
-    uniqueId: 'quiz-4',
-    context: {
-      id: 'Lang Arts',
-      type: 'Course',
-      title: 'Language Arts',
-      color: '#E1AF52'
-    },
-    title: 'Fun quiz',
-    type: 'Quiz'
-  },
-  {
-    ...COMMON_PROPS,
-    id: '5',
-    uniqueId: 'discussion-5',
-    context: {
-      id: 'Soc Studies',
-      type: 'Course',
-      title: 'Social Studies',
-      color: '#0081D3'
-    },
-    title: 'Exciting discussion',
-    type: 'Discussion'
-  }
-]
-
-export default function PlannerPreview({timeZone}) {
+export default function PlannerPreview({timeZone, singleCourse}) {
   let responsiveSize = 'large'
   if (smallMediaQuery.matches) responsiveSize = 'small'
   if (mediumMediaQuery.matches) responsiveSize = 'medium'
@@ -137,17 +62,19 @@ export default function PlannerPreview({timeZone}) {
       <Day
         timeZone={timeZone}
         day={moment().format('YYYY-MM-DD')}
-        itemsForDay={ITEMS}
+        itemsForDay={singleCourse ? SINGLE_COURSE_ITEMS : MULTI_COURSE_ITEMS}
         toggleCompletion={noOp}
         updateTodo={noOp}
         simplifiedControls
         showMissingAssignments={false}
         responsiveSize={responsiveSize}
+        singleCourseView={singleCourse}
       />
     </View>
   )
 }
 
 PlannerPreview.propTypes = {
-  timeZone: string.isRequired
+  timeZone: string.isRequired,
+  singleCourse: bool.isRequired
 }

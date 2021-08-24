@@ -616,8 +616,10 @@ describe('K-5 Dashboard', () => {
       expect(
         getByText('Below is an example of how students will see their schedule')
       ).toBeInTheDocument()
+      expect(getByText('Math')).toBeInTheDocument()
+      expect(getByText('A wonderful assignment')).toBeInTheDocument()
       expect(getByText('Social Studies')).toBeInTheDocument()
-      expect(getByText('A great discussion assignment')).toBeInTheDocument()
+      expect(getByText('Exciting discussion')).toBeInTheDocument()
     })
   })
 

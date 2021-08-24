@@ -461,6 +461,7 @@ export function K5Course({
           timeZone={timeZone}
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
+          singleCourse
         />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage

@@ -312,6 +312,7 @@ export const K5Dashboard = ({
               timeZone={timeZone}
               userHasEnrollments={!!cards?.length}
               visible={currentTab === TAB_IDS.SCHEDULE}
+              singleCourse={false}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}

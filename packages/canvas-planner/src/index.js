@@ -52,10 +52,10 @@ export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 
-export function createPlannerPreview(timeZone) {
+export function createPlannerPreview(timeZone, singleCourse) {
   return (
     <Suspense fallback={loading()}>
-      <PlannerPreview timeZone={timeZone} />
+      <PlannerPreview timeZone={timeZone} singleCourse={singleCourse} />
     </Suspense>
   )
 }

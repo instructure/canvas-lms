@@ -427,6 +427,28 @@ describe('K-5 Subject Course', () => {
     })
   })
 
+  describe('schedule tab', () => {
+    it('shows a planner preview scoped to a single course if user has no student enrollments', async () => {
+      const {findByTestId, getByText, queryByText} = render(
+        <K5Course
+          {...defaultProps}
+          defaultTab={TAB_IDS.SCHEDULE}
+          canManage
+          userIsStudent={false}
+          userIsInstructor
+        />
+      )
+      expect(await findByTestId('kinder-panda')).toBeInTheDocument()
+      expect(getByText('Schedule Preview')).toBeInTheDocument()
+      expect(
+        getByText('Below is an example of how students will see their schedule')
+      ).toBeInTheDocument()
+      expect(queryByText('Math')).not.toBeInTheDocument()
+      expect(getByText('A wonderful assignment')).toBeInTheDocument()
+      expect(queryByText('Exciting discussion')).not.toBeInTheDocument()
+    })
+  })
+
   describe('modules tab', () => {
     it('shows modules content if modules tab is selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />)
