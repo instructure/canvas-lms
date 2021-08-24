@@ -23,7 +23,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
-function StudentSearchInput({readonly = false, onChange}) {
+function TextSearchInput({label, readonly = false, onChange}) {
   const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = event => {
@@ -33,9 +33,9 @@ function StudentSearchInput({readonly = false, onChange}) {
   }
 
   return (
-    <View as="div" textAlign="start" maxWidth="34rem" margin="0 0 small 0">
+    <View as="div" textAlign="start" margin="0 0 small 0">
       <TextInput
-        renderLabel={I18n.t('Student Names')}
+        renderLabel={label}
         value={inputValue}
         onChange={handleInputChange}
         interaction={readonly ? 'readonly' : 'enabled'}
@@ -45,9 +45,10 @@ function StudentSearchInput({readonly = false, onChange}) {
   )
 }
 
-StudentSearchInput.propTypes = {
+TextSearchInput.propTypes = {
+  label: PropTypes.string.isRequired,
   readonly: PropTypes.bool,
   onChange: PropTypes.func.isRequired
 }
 
-export default StudentSearchInput
+export default TextSearchInput

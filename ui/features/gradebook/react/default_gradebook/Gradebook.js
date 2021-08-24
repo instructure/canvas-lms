@@ -81,7 +81,7 @@ import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
-import StudentSearchInput from './components/StudentSearchInput'
+import TextSearchInput from './components/TextSearchInput'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -198,6 +198,7 @@ class Gradebook extends React.Component {
     this.filterAssignmentByAssignmentGroup = this.filterAssignmentByAssignmentGroup.bind(this)
     this.filterAssignmentByGradingPeriod = this.filterAssignmentByGradingPeriod.bind(this)
     this.filterAssignmentByModule = this.filterAssignmentByModule.bind(this)
+    this.filterAssignmentBySearchString = this.filterAssignmentBySearchString.bind(this)
 
     // # Course Content Event Handlers
     this.handleSubmissionPostedChange = this.handleSubmissionPostedChange.bind(this)
@@ -252,8 +253,10 @@ class Gradebook extends React.Component {
     this.weightedGrades = this.weightedGrades.bind(this)
     this.switchTotalDisplay = this.switchTotalDisplay.bind(this)
     this.togglePointsOrPercentTotals = this.togglePointsOrPercentTotals.bind(this)
-    this.onUserFilterInput = this.onUserFilterInput.bind(this)
-    this.renderSearchFilter = this.renderSearchFilter.bind(this)
+    this.onUserFilterInputStudents = this.onUserFilterInputStudents.bind(this)
+    this.onUserFilterInputAssignments = this.onUserFilterInputAssignments.bind(this)
+    this.renderStudentSearchFilter = this.renderStudentSearchFilter.bind(this)
+    this.renderAssignmentSearchFilter = this.renderAssignmentSearchFilter.bind(this)
     // Custom Column
     this.buildCustomColumn = this.buildCustomColumn.bind(this)
     this.initGrid = this.initGrid.bind(this)
@@ -1168,7 +1171,8 @@ class Gradebook extends React.Component {
       this.filterAssignmentByPublishedStatus,
       this.filterAssignmentByAssignmentGroup,
       this.filterAssignmentByGradingPeriod,
-      this.filterAssignmentByModule
+      this.filterAssignmentByModule,
+      this.filterAssignmentBySearchString
     ]
     const matchesAllFilters = assignment => {
       return assignmentFilters.every(filter => {
@@ -1176,6 +1180,14 @@ class Gradebook extends React.Component {
       })
     }
     return assignments.filter(matchesAllFilters)
+  }
+
+  filterAssignmentBySearchString(assignment) {
+    if (this.assignmentFilterTerm) {
+      const pattern = new RegExp(this.assignmentFilterTerm, 'i')
+      return assignment.name.match(pattern) != null
+    }
+    return true
   }
 
   filterAssignmentBySubmissionTypes(assignment) {
@@ -2000,7 +2012,8 @@ class Gradebook extends React.Component {
     if (this.contentLoadStates.contextModulesLoaded) {
       this.updateModulesFilterVisibility()
     }
-    this.renderSearchFilter(this.courseContent.students.listStudents())
+    this.renderStudentSearchFilter(this.courseContent.students.listStudents())
+    this.renderAssignmentSearchFilter(this.assignments)
   }
 
   renderGridColor() {
@@ -2159,19 +2172,20 @@ class Gradebook extends React.Component {
     }
   }
 
-  onUserFilterInput(term) {
+  onUserFilterInputStudents(term) {
     this.userFilterTerm = term
     return this.buildRows()
   }
 
-  renderSearchFilter(students) {
+  renderStudentSearchFilter(students) {
     if (this.options.enhanced_gradebook_filters) {
-      const mountPoint = document.getElementById('gradebook-secondary-toolbar')
+      const mountPoint = document.getElementById('gradebook-student-search')
       const props = {
+        label: I18n.t('Student Names'),
         readonly: students.length === 0,
-        onChange: this.onUserFilterInput
+        onChange: this.onUserFilterInputStudents
       }
-      renderComponent(StudentSearchInput, mountPoint, props)
+      renderComponent(TextSearchInput, mountPoint, props)
     } else {
       if (!this.userFilter) {
         const opts = {el: '#search-filter-container input'}
@@ -2180,12 +2194,30 @@ class Gradebook extends React.Component {
         }
 
         this.userFilter = new InputFilterView(opts)
-        this.userFilter.on('input', this.onUserFilterInput)
+        this.userFilter.on('input', this.onUserFilterInputStudents)
       }
       const disabled =
         !this.contentLoadStates.studentsLoaded || !this.contentLoadStates.submissionsLoaded
       this.userFilter.el.disabled = disabled
       this.userFilter.el.setAttribute('aria-disabled', disabled)
+    }
+  }
+
+  onUserFilterInputAssignments(term) {
+    this.assignmentFilterTerm = term
+    this.setVisibleGridColumns()
+    return this.updateGrid()
+  }
+
+  renderAssignmentSearchFilter(assignments) {
+    if (this.options.enhanced_gradebook_filters) {
+      const mountPoint = document.getElementById('gradebook-assignment-search')
+      const props = {
+        label: I18n.t('Assignment Names'),
+        readonly: assignments.length === 0,
+        onChange: this.onUserFilterInputAssignments
+      }
+      renderComponent(TextSearchInput, mountPoint, props)
     }
   }
 

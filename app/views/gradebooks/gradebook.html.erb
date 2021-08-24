@@ -97,7 +97,10 @@
       <div id="gradebook_app"></div>
     </div>
     <% if Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
-      <div id="gradebook-secondary-toolbar"></div>
+      <div style="display: flex;">
+        <div id="gradebook-assignment-search" style="flex: 1;padding-right: 12px;"></div>
+        <div id="gradebook-student-search" style="flex: 1;"></div>
+      </div>
     <% end %>
     <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
       <div id="gradebook_grid"></div>

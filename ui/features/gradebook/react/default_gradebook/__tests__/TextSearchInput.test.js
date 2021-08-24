@@ -18,25 +18,29 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import StudentSearchInput from '../components/StudentSearchInput'
+import TextSearchInput from '../components/TextSearchInput'
 
-describe('StudentSearchInput', () => {
+describe('TextSearchInput', () => {
   it('renders label', () => {
     const students = []
-    const {getByLabelText} = render(<StudentSearchInput students={students} onChange={() => {}} />)
-    const input = getByLabelText(/Student Names/)
+    const {getByLabelText} = render(
+      <TextSearchInput students={students} label="label" readonly={false} onChange={() => {}} />
+    )
+    const input = getByLabelText(/label/)
     expect(input).toBeInTheDocument()
   })
 
   it('readonly', () => {
-    const {getByLabelText} = render(<StudentSearchInput readonly onChange={() => {}} />)
-    const input = getByLabelText(/Student Names/)
+    const {getByLabelText} = render(<TextSearchInput label="label" readonly onChange={() => {}} />)
+    const input = getByLabelText(/label/)
     expect(input).toHaveAttribute('readonly')
   })
 
   it('enabled', () => {
-    const {getByLabelText} = render(<StudentSearchInput readonly={false} onChange={() => {}} />)
-    const input = getByLabelText(/Student Names/)
+    const {getByLabelText} = render(
+      <TextSearchInput label="label" readonly={false} onChange={() => {}} />
+    )
+    const input = getByLabelText(/label/)
     expect(input).not.toHaveAttribute('readonly')
   })
 
@@ -44,9 +48,9 @@ describe('StudentSearchInput', () => {
     const mockOnChange = jest.fn()
     const students = [{id: 1, name: 'John Doe'}]
     const {getByLabelText} = render(
-      <StudentSearchInput students={students} onChange={mockOnChange} />
+      <TextSearchInput students={students} label="label" readonly={false} onChange={mockOnChange} />
     )
-    const input = getByLabelText(/Student Names/)
+    const input = getByLabelText(/label/)
     expect(input).toBeInTheDocument()
     fireEvent.change(input, {target: {value: 'John'}})
     expect(mockOnChange).toHaveBeenCalledWith('John')

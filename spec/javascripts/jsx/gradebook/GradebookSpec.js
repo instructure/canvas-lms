@@ -1410,13 +1410,33 @@ test('returns false if sorting by custom and there is a custom column order stor
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: true)', {
+QUnit.module('Gradebook#renderAssignmentSearchFilter (enhanced_gradebook_filters: true)', {
   setup() {
     setFixtureHtml($fixtures)
     this.gradebook = createGradebook({enhanced_gradebook_filters: true})
     this.gradebook.setStudentsLoaded(true)
     this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderSearchFilter([])
+    this.gradebook.renderAssignmentSearchFilter([])
+  },
+
+  teardown() {
+    $fixtures.innerHTML = ''
+  }
+})
+
+test('renders Assignment Names label', function () {
+  this.gradebook.renderAssignmentSearchFilter([])
+  const assignmentSearch = document.querySelector('#gradebook-assignment-search')
+  ok(assignmentSearch.textContent.includes('Assignment Names'))
+})
+
+QUnit.module('Gradebook#renderStudentSearchFilter (enhanced_gradebook_filters: true)', {
+  setup() {
+    setFixtureHtml($fixtures)
+    this.gradebook = createGradebook({enhanced_gradebook_filters: true})
+    this.gradebook.setStudentsLoaded(true)
+    this.gradebook.setSubmissionsLoaded(true)
+    this.gradebook.renderStudentSearchFilter([])
   },
 
   teardown() {
@@ -1425,25 +1445,25 @@ QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: true)', 
 })
 
 test('does not render old set up/search field', function () {
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, false, 'input is not disabled')
   strictEqual(input.getAttribute('aria-disabled'), null, 'input is not aria-disabled')
 })
 
 test('renders Student Names label', function () {
-  this.gradebook.renderSearchFilter([])
-  const toolbar = document.querySelector('#gradebook-secondary-toolbar')
-  ok(toolbar.textContent.includes('Student Names'))
+  this.gradebook.renderStudentSearchFilter([])
+  const studentSearch = document.querySelector('#gradebook-student-search')
+  ok(studentSearch.textContent.includes('Student Names'))
 })
 
-QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: false)', {
+QUnit.module('Gradebook#renderStudentSearchFilter (enhanced_gradebook_filters: false)', {
   setup() {
     setFixtureHtml($fixtures)
     this.gradebook = createGradebook({enhanced_gradebook_filters: false})
     this.gradebook.setStudentsLoaded(true)
     this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderSearchFilter([])
+    this.gradebook.renderStudentSearchFilter([])
   },
 
   teardown() {
@@ -1457,7 +1477,7 @@ test('binds an InputFilterView to the search filter markup', function () {
 
 test('does not create a new InputFilterView when already bound', function () {
   const userFilter = this.gradebook.userFilter
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   strictEqual(this.gradebook.userFilter, userFilter)
 })
 
@@ -1469,7 +1489,7 @@ test('enables the input when students and submissions are loaded', () => {
 
 test('disables the input when students are not loaded', function () {
   this.gradebook.setStudentsLoaded(false)
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
@@ -1477,7 +1497,7 @@ test('disables the input when students are not loaded', function () {
 
 test('disables the input when submissions are not loaded', function () {
   this.gradebook.setSubmissionsLoaded(false)
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
