@@ -303,7 +303,7 @@ export const IsolatedViewContainer = props => {
     })
   }
 
-  const replyPreview = (nodes, previewId) => {
+  const buildQuotedReply = (nodes, previewId) => {
     if (!nodes) return ''
     let preview = {}
     nodes.every(reply => {
@@ -394,7 +394,7 @@ export const IsolatedViewContainer = props => {
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  quotedEntry={replyPreview(
+                  quotedEntry={buildQuotedReply(
                     isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
                       .nodes,
                     props.replyId

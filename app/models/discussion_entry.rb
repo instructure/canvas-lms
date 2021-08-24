@@ -184,25 +184,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  def quoted_reply_html
-    "<div class=\"mceNonEditable reply_preview\" data-discussion-reply-preview=\"1\">
-      <blockquote cite=\"#\">
-        <span>
-          <strong>#{user.short_name}</strong> #{created_at.iso8601}
-        </span>
-        #{self.deleted? ? "<p>#{I18n.t('Deleted by %{user}', user: editor.short_name)}</p>" : "<p>#{summary}</p>"}
-      </blockquote>
-    </div>"
-  end
-
-  def reply_preview_data
-    {
-      author_name: user.short_name,
-      created_at: created_at,
-      message: self.deleted? ? "<p>'Deleted by #{editor.short_name}'</p>" : summary
-    }
-  end
-
   def plaintext_message=(val)
     self.message = format_message(val).first
   end

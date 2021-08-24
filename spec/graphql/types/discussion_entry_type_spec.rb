@@ -65,23 +65,9 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
-  describe 'reply preview' do
+  describe 'quoted entry' do
     before do
       allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
-    end
-
-    it 'returns empty string when is a root entry reply' do
-      expect(discussion_entry_type.resolve("replyPreview")).to eq nil
-    end
-
-    it 'returns the quoted reply html for reply preview' do
-      expect(discussion_sub_entry_type.resolve("replyPreview")).to eq sub_entry.quoted_reply_html
-    end
-
-    it 'returns the deleted reply html for reply preview' do
-      sub_entry.update(editor: user_model(name: 'jim bo'))
-      sub_entry.destroy
-      expect(discussion_sub_entry_type.resolve("replyPreview")).to include "Deleted by jim bo"
     end
 
     it 'returns the reply preview data' do
