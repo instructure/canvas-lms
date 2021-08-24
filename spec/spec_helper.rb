@@ -27,14 +27,13 @@ require 'securerandom'
 require 'tmpdir'
 
 ENV["RAILS_ENV"] = 'test'
+require File.expand_path('../../config/environment', __FILE__)
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require_relative 'coverage_tool'
   CoverageTool.start("RSpec:#{Process.pid}")
 end
-
-require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 
 require 'rspec/rails'
 
@@ -317,7 +316,7 @@ RSpec.configure do |config|
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV['RSPEC_PROCESSES']
+  if ENV['RSPEC_PROCESSES'] && !ENV['RSPECQ_REDIS_URL']
     file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
     config.add_formatter "RspecJunitFormatter", file unless File.file?(file)

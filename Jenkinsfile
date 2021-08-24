@@ -248,7 +248,7 @@ pipeline {
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
-    RSPEC_PROCESSES = 4
+    RSPEC_PROCESSES = "${configuration.isRspecqEnabled() ? 6 : 4}"
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
