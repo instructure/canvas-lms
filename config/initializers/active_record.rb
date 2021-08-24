@@ -130,22 +130,37 @@ class ActiveRecord::Base
     255
   end
 
-  def self.find_by_asset_string(string, asset_types=nil)
+  def self.find_by_asset_string(string, asset_types = nil)
     find_all_by_asset_string([string], asset_types)[0]
   end
 
-  def self.find_all_by_asset_string(strings, asset_types=nil)
-    # TODO: start checking asset_types, if provided
-    strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
-      next result if asset_types && !asset_types.include?(klass)
-      result.concat((klass.constantize.where(id: id_pairs.map(&:last)).to_a rescue []))
-    end
+  def self.find_all_by_asset_string(strings, asset_types = nil)
+    assets = strings.is_a?(Hash) ? strings : parse_asset_string_list(strings)
+
+    assets.map do |klass, ids|
+      next if asset_types && asset_types.exclude?(klass)
+
+      begin
+        klass = klass.constantize
+      rescue NameError
+        next
+      end
+      next unless klass < ActiveRecord::Base
+
+      klass.where(id: ids).to_a
+    end.compact.flatten
   end
 
-  # takes an asset string list, like "course_5,user_7" and turns it into an
-  # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
+  # takes an asset string list, like "course_5,user_7,course_9" and turns it into an
+  # hash of { class_name => [ id ] } like { "Course" => [5, 9], "User" => [7] }
   def self.parse_asset_string_list(asset_string_list)
-    asset_string_list.to_s.split(",").map { |str| parse_asset_string(str) }
+    asset_strings = asset_string_list.is_a?(Array) ? asset_string_list : asset_string_list.to_s.split(",")
+    result = {}
+    asset_strings.each do |str|
+      type, id = parse_asset_string(str)
+      (result[type] ||= []) << id
+    end
+    result
   end
 
   def self.parse_asset_string(str)
