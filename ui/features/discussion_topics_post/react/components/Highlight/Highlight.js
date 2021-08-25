@@ -28,7 +28,7 @@ export function Highlight({...props}) {
     if (props.isHighlighted && highlightRef.current) {
       setTimeout(() => {
         highlightRef.current?.scrollIntoView({behavior: 'smooth', block: 'center'})
-        highlightRef.current.querySelector('button').focus({preventScroll: true})
+        highlightRef.current?.querySelector('button').focus({preventScroll: true})
       }, 0)
     }
   }, [props.isHighlighted, highlightRef])

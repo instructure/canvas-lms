@@ -24,6 +24,7 @@ import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContaine
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {getOptimisticResponse} from './utils'
 import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
@@ -32,58 +33,6 @@ import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-
-const getOptimisticResponse = text => {
-  return {
-    createDiscussionEntry: {
-      discussionEntry: {
-        id: 'PLACEHOLDER',
-        _id: 'PLACEHOLDER',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deleted: false,
-        message: text,
-        ratingCount: null,
-        ratingSum: null,
-        rating: false,
-        read: true,
-        forcedReadState: false,
-        subentriesCount: null,
-        rootEntryParticipantCounts: {
-          unreadCount: 0,
-          repliesCount: 0,
-          __typename: 'DiscussionEntryCounts'
-        },
-        author: {
-          id: 'PLACEHOLDER',
-          _id: ENV.current_user.id,
-          avatarUrl: ENV.current_user.avatar_image_url,
-          displayName: ENV.current_user.display_name,
-          courseRoles: [],
-          __typename: 'User'
-        },
-        editor: null,
-        lastReply: null,
-        permissions: {
-          attach: false,
-          create: false,
-          delete: false,
-          rate: false,
-          read: false,
-          reply: false,
-          update: false,
-          viewRating: false,
-          __typename: 'DiscussionEntryPermissions'
-        },
-        rootEntryId: null,
-        parentId: 'PLACEHOLDER',
-        __typename: 'DiscussionEntry'
-      },
-      errors: null,
-      __typename: 'CreateDiscussionEntryPayload'
-    }
-  }
-}
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')

@@ -156,3 +156,57 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
 export const isTopicAuthor = (topicAuthor, entryAuthor) => {
   return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
 }
+
+export const getOptimisticResponse = (message, parentId = 'PLACEHOLDER', rootEntryId = null) => {
+  return {
+    createDiscussionEntry: {
+      discussionEntry: {
+        id: 'DISCUSSION_ENTRY_PLACEHOLDER',
+        _id: 'DISCUSSION_ENTRY_PLACEHOLDER',
+        createdAt: new Date().toString(),
+        updatedAt: new Date().toString(),
+        deleted: false,
+        message,
+        ratingCount: null,
+        ratingSum: null,
+        rating: false,
+        read: true,
+        replyPreview: '',
+        forcedReadState: false,
+        subentriesCount: null,
+        rootEntryParticipantCounts: {
+          unreadCount: 0,
+          repliesCount: 0,
+          __typename: 'DiscussionEntryCounts'
+        },
+        author: {
+          id: 'USER_PLACEHOLDER',
+          _id: ENV.current_user.id,
+          avatarUrl: ENV.current_user.avatar_image_url,
+          displayName: ENV.current_user.display_name,
+          courseRoles: [],
+          __typename: 'User'
+        },
+        editor: null,
+        lastReply: null,
+        permissions: {
+          attach: false,
+          create: false,
+          delete: false,
+          rate: false,
+          read: false,
+          reply: false,
+          update: false,
+          viewRating: false,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        parentId,
+        rootEntryId,
+        quotedEntry: null,
+        __typename: 'DiscussionEntry'
+      },
+      errors: null,
+      __typename: 'CreateDiscussionEntryPayload'
+    }
+  }
+}

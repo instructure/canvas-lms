@@ -19,7 +19,8 @@
 import {
   updateDiscussionTopicEntryCounts,
   addReplyToDiscussionEntry,
-  getSpeedGraderUrl
+  getSpeedGraderUrl,
+  getOptimisticResponse
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -57,12 +58,15 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId: props?.relativeEntryId,
+      relativeEntryId:
+        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
       includeRelativeEntry: !!props?.relativeEntryId
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+
+    props.setHighlightEntryId(newDiscussionEntry.id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -192,7 +196,8 @@ export const IsolatedViewContainer = props => {
         parentEntryId: replyId,
         message,
         includeReplyPreview
-      }
+      },
+      optimisticResponse: getOptimisticResponse(message, replyId, props.discussionEntryId)
     })
   }
 
