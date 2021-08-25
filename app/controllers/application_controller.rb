@@ -2820,6 +2820,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :show_student_view_button?
 
+  IMMERSIVE_READER_PAGES = ["wiki_pages#show"].freeze
+
+  def show_immersive_reader?
+    controller_action = "#{params[:controller]}##{params[:action]}"
+
+    return false unless IMMERSIVE_READER_PAGES.include?(controller_action)
+
+    @context&.account&.feature_enabled?(:immersive_reader_wiki_pages)
+  end
+  helper_method :show_immersive_reader?
+
   def uncached_k5_user?
     if @current_user && @domain_root_account
       # See if the user has associations with any k5-enabled accounts

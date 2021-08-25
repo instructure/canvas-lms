@@ -76,81 +76,6 @@ describe WikiPagesController do
       end
     end
 
-    describe "immersive reader" do
-      context 'in a sub account' do
-        before do
-          @root_account = Account.create!
-          @sub_account = @root_account.sub_accounts.create!
-
-          @root_account.allow_feature!(:immersive_reader_wiki_pages)
-          @sub_account.enable_feature!(:immersive_reader_wiki_pages)
-
-          @course = @sub_account.courses.create!
-          course_with_teacher(course: @course, active_all: true)
-          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
-          user_session @teacher
-        end
-
-        it "should render with the proper JS_ENV set" do
-          get 'show', params: {course_id: @course.id, id: @page.url}
-          expect(response).to be_successful
-          expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
-        end
-      end
-
-      context "as a teacher" do
-        before do
-          course_with_teacher(active_all: true)
-          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
-          user_session @teacher
-        end
-
-        context "feature enabled" do
-          before do
-            @course.root_account.enable_feature! :immersive_reader_wiki_pages
-          end
-
-          it "should render with the proper JS_ENV set" do
-            get 'show', params: {course_id: @course.id, id: @page.url}
-            expect(response).to be_successful
-            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
-          end
-        end
-      end
-
-      context "as a student" do
-        before do
-          course_with_student(active_all: true)
-          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
-          user_session @student
-        end
-
-        context "feature enabled" do
-          before do
-            @course.root_account.enable_feature! :immersive_reader_wiki_pages
-          end
-
-          it "should render with the proper JS_ENV set" do
-            get 'show', params: {course_id: @course.id, id: @page.url}
-            expect(response).to be_successful
-            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
-          end
-        end
-
-        context "K5 mode enabled" do
-          before do
-            @course.account.enable_as_k5_account!
-          end
-
-          it "should hide view_all_pages link" do
-            get 'show', params: {course_id: @course.id, id: @page.url}
-            expect(response).to be_successful
-            expect(controller.js_env[:DISPLAY_SHOW_ALL_LINK]).to be_falsey
-          end
-        end
-      end
-    end
-
     context "placements for Commons Favorites Import" do
       before do
         allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
@@ -169,6 +94,21 @@ describe WikiPagesController do
         get 'show', params: {course_id: @course.id, id: @page.url}
         expect(response).to be_successful
         expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
+      end
+    end
+
+    context "when K5 mode is enabled and user is a student" do
+      before do
+        course_with_student(active_all: true)
+        @course.account.enable_as_k5_account!
+        @page = @course.wiki_pages.create!(title: "a page", body: "")
+        user_session(@user)
+      end
+
+      it "hides the view_all_pages link" do
+        get 'show', params: {course_id: @course.id, id: @page.url}
+        expect(response).to be_successful
+        expect(controller.js_env[:DISPLAY_SHOW_ALL_LINK]).to be_falsey
       end
     end
 
