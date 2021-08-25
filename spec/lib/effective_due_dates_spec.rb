@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Course do
   before(:once) do
+    Account.site_admin.enable_feature!(:visible_assignments_scope_change)
     @test_course = Course.create!
     course_with_teacher(course: @test_course, active_all: true)
     @teacher = @user
@@ -868,14 +869,28 @@ describe Course do
           expect(edd.to_hash).to eq({})
         end
 
-        it 'unassigns students in the assigned section when they are deactivated' do
+        it 'does not unassign students in the assigned section when they are deactivated' do
           section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
           student_in_section(section, user: @student1)
-          @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+          override = @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
           @student1_enrollment.deactivate
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-          expect(edd.to_hash).to eq({})
+          expect(edd.to_hash).to eq({
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 1.day.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'CourseSection'
+                                        }
+                                      }
+                                    })
         end
 
         it 'does not unassign students in the assigned section when they are concluded' do
