@@ -8,7 +8,7 @@ require 'optparse'
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: /\.rb$/,
+  file_regex: %r{(?:\.e?rb|\.rake|\.gemspec|/[^./]+)$},
   format: "rubocop",
   command: "bin/rubocop",
   campsite_mode: false,
