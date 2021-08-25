@@ -71,11 +71,8 @@ class CommunicationChannel
         cc.path_type,
         cc.path_description
       ] + self.class.report_columns.values.map do |value_generator|
-        if value_generator == :last_bounce_at
-          value_generator.to_proc.call(cc)&.to_time&.iso8601
-        else
-          value_generator.to_proc.call(cc)
-        end
+        value = value_generator.to_proc.call(cc)
+        value.respond_to?(:iso8601) ? value.iso8601 : value
       end
     end
 
