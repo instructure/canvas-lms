@@ -30,7 +30,8 @@ import {
   groupDetailMocks,
   groupMocks,
   moveOutcomeMock,
-  updateOutcomeGroupMock
+  updateOutcomeGroupMock,
+  createOutcomeGroupMocks
 } from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -708,16 +709,6 @@ describe('OutcomeManagementPanel', () => {
     })
 
     it('shows groups created in the modal immediately on the LHS', async () => {
-      const newGroup = {
-        id: 101,
-        title: 'new group name',
-        description: '',
-        isRootGroup: false,
-        parent_outcome_group: {id: '2'}
-      }
-      jest
-        .spyOn(api, 'addOutcomeGroup')
-        .mockImplementation(() => Promise.resolve({status: 200, data: newGroup}))
       const {getByText, getByRole, getByLabelText} = render(<OutcomeManagementPanel />, {
         ...groupDetailDefaultProps,
         mocks: [
@@ -735,7 +726,8 @@ describe('OutcomeManagementPanel', () => {
             contextType: 'Course',
             contextId: '2',
             withMorePage: false
-          })
+          }),
+          ...createOutcomeGroupMocks({parentOutcomeGroupId: '2', title: 'new group name'})
         ]
       })
       await act(async () => jest.runOnlyPendingTimers())

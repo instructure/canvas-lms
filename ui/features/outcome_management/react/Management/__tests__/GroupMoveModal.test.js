@@ -19,12 +19,15 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
-import {smallOutcomeTree, updateOutcomeGroupMock} from '@canvas/outcomes/mocks/Management'
+import {
+  smallOutcomeTree,
+  updateOutcomeGroupMock,
+  createOutcomeGroupMocks
+} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import GroupMoveModal from '../GroupMoveModal'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import * as api from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
@@ -254,32 +257,25 @@ describe('GroupMoveModal', () => {
   })
 
   describe('for a newly created group', () => {
-    const newGroup = {
-      id: '200',
-      title: 'new group',
-      description: '',
-      isRootGroup: false,
-      parent_outcome_group: {id: '100'}
-    }
-    const mocks = [
-      ...smallOutcomeTree(),
-      updateOutcomeGroupMock({
-        id: '400',
-        parentOutcomeGroupId: '200',
-        title: null,
-        description: null,
-        vendorGuid: null
-      })
-    ]
-
     it('becomes selected and can be moved into', async () => {
-      jest
-        .spyOn(api, 'addOutcomeGroup')
-        .mockImplementation(() => Promise.resolve({status: 200, data: newGroup}))
       const {getByText, getByLabelText} = render(
         <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />,
         {
-          mocks
+          mocks: [
+            ...smallOutcomeTree(),
+            updateOutcomeGroupMock({
+              id: '400',
+              parentOutcomeGroupId: '200',
+              title: null,
+              description: null,
+              vendorGuid: null
+            }),
+            ...createOutcomeGroupMocks({
+              id: '200',
+              parentOutcomeGroupId: '100',
+              title: 'new group'
+            })
+          ]
         }
       )
       await act(async () => jest.runOnlyPendingTimers())

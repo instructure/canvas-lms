@@ -276,16 +276,28 @@ export const UPDATE_LEARNING_OUTCOME_GROUP = gql`
   }
 `
 
+export const CREATE_LEARNING_OUTCOME_GROUP = gql`
+  mutation CreateLearningOutcomeGroup($input: CreateLearningOutcomeGroupInput!) {
+    createLearningOutcomeGroup(input: $input) {
+      learningOutcomeGroup {
+        _id
+        title
+        description
+        vendorGuid
+        parentOutcomeGroup {
+          _id
+          title
+        }
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
   )
-
-export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {
-  return axios.post(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${parentGroupId}/subgroups`,
-    {title}
-  )
-}

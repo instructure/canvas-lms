@@ -21,10 +21,13 @@ import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import ManagementHeader from '../ManagementHeader'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
+import CreateOutcomeModal from '../CreateOutcomeModal'
 import {MockedProvider} from '@apollo/react-testing'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
+jest.mock('../CreateOutcomeModal')
+CreateOutcomeModal.mockImplementation(() => <div>CreateOutcomeModal</div>)
 jest.useFakeTimers()
 
 const render = (
@@ -53,7 +56,7 @@ describe('ManagementHeader', () => {
   })
 
   afterEach(() => {
-    showImportOutcomesModal.mockRestore()
+    jest.clearAllMocks()
   })
 
   it('renders Outcomes title', () => {
@@ -139,8 +142,9 @@ describe('ManagementHeader', () => {
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Create Outcome')).toBeInTheDocument()
+    await act(async () => jest.runAllTimers())
+    expect(CreateOutcomeModal).toHaveBeenCalled()
+    expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
   })
 
   describe('Responsiveness', () => {
@@ -201,12 +205,13 @@ describe('ManagementHeader', () => {
       expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
     })
 
-    it('opens FindOutcomesModal when Find Menu Item is clicked', () => {
+    it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
+      await act(async () => jest.runAllTimers())
       expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
     })
 
@@ -216,8 +221,9 @@ describe('ManagementHeader', () => {
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Create'))
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Create Outcome')).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      expect(CreateOutcomeModal).toHaveBeenCalled()
+      expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
     })
   })
 })

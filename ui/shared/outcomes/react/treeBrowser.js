@@ -24,9 +24,9 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CHILD_GROUPS_QUERY, groupFields} from '../graphql/Management'
 import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
+import useGroupCreate from './hooks/useGroupCreate'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
-import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
 const structFromGroup = g => ({
   id: g._id,
@@ -37,12 +37,12 @@ const structFromGroup = g => ({
 })
 
 const formatNewGroup = g => ({
-  _id: g.id,
+  _id: g._id,
   title: g.title,
   description: g.description,
   isRootGroup: false,
   parentOutcomeGroup: {
-    _id: g.parent_outcome_group.id,
+    _id: g.parentOutcomeGroup._id,
     __typename: 'LearningOutcomeGroup'
   },
   __typename: 'LearningOutcomeGroup'
@@ -269,6 +269,7 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   } = useTreeBrowser({
     collection
   })
+  const {createGroup: graphqlGroupCreate} = useGroupCreate()
 
   const {data: contextGroupLoadedData} = useQuery(CONTEXT_GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
@@ -360,26 +361,10 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   }, [importNumber])
 
   const createGroup = async (groupName, parentGroupId = rootId) => {
-    try {
-      const newGroup = await addOutcomeGroup(contextType, contextId, parentGroupId, groupName)
-      addNewGroup(newGroup.data)
-      showFlashAlert({
-        message: I18n.t('"%{groupName}" has been created.', {groupName}),
-        type: 'success'
-      })
-      return structFromGroup(formatNewGroup(newGroup.data))
-    } catch (err) {
-      showFlashAlert({
-        message: err.message
-          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
-              groupName,
-              message: err.message
-            })
-          : I18n.t('An error occurred adding group "%{groupName}".', {
-              groupName
-            }),
-        type: 'error'
-      })
+    const newGroup = await graphqlGroupCreate(groupName, parentGroupId)
+    if (newGroup?._id) {
+      addNewGroup(newGroup)
+      return structFromGroup(formatNewGroup(newGroup))
     }
   }
 

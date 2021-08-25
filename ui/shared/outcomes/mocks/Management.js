@@ -25,7 +25,8 @@ import {
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
-  IMPORT_OUTCOMES
+  IMPORT_OUTCOMES,
+  CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -1615,6 +1616,111 @@ export const importGroupMocks = ({
             targetContextId,
             targetContextType
           }
+        }
+      },
+      result
+    }
+  ]
+}
+
+export const createOutcomeGroupMocks = ({
+  id = '101',
+  title = 'New Group',
+  description = null,
+  vendorGuid = null,
+  parentOutcomeGroupId = '100',
+  parentOutcomeGroupTitle = 'Parent Outcome Group',
+  failResponse = false,
+  failMutation = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      createLearningOutcomeGroup: {
+        learningOutcomeGroup: {
+          _id: id,
+          title,
+          description,
+          vendorGuid,
+          parentOutcomeGroup: {
+            _id: parentOutcomeGroupId,
+            title: parentOutcomeGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'LearningOutcomeGroup'
+        },
+        errors: null,
+        __typename: 'CreateLearningOutcomeGroupPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: id,
+        message: 'Network error',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutation = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: 'Mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  const input = {
+    id: parentOutcomeGroupId,
+    title
+  }
+  if (description) input.description = description
+  if (vendorGuid) input.vendorGuid = vendorGuid
+
+  return [
+    {
+      request: {
+        query: CREATE_LEARNING_OUTCOME_GROUP,
+        variables: {
+          input
         }
       },
       result

@@ -19,19 +19,19 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
-import {accountMocks, smallOutcomeTree, groupMocks} from '@canvas/outcomes/mocks/Management'
+import {
+  accountMocks,
+  smallOutcomeTree,
+  groupMocks,
+  createOutcomeGroupMocks
+} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
-import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import TargetGroupSelector from '../TargetGroupSelector'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
-jest.mock('@canvas/outcomes/graphql/Management', () => ({
-  ...jest.requireActual('@canvas/outcomes/graphql/Management'),
-  addOutcomeGroup: jest.fn()
-}))
 
 describe('TargetGroupSelector', () => {
   let cache
@@ -157,23 +157,20 @@ describe('TargetGroupSelector', () => {
       expect(getByText('Create New Group')).toHaveFocus()
     })
 
-    it('calls the addOutcomeGroup api when the item is created', async () => {
-      const newGroup = {
-        id: '101',
-        title: 'Group 101',
-        description: '',
-        isRootGroup: false,
-        parent_outcome_group: {id: '1'}
-      }
-      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200, data: newGroup}))
-      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
+    it('displays flash confirmation if group is created', async () => {
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />, {
+        mocks: [
+          ...accountMocks({childGroupsCount: 0}),
+          ...createOutcomeGroupMocks({
+            parentOutcomeGroupId: '1',
+            title: 'new group name'
+          })
+        ]
+      })
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
-      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
@@ -182,32 +179,42 @@ describe('TargetGroupSelector', () => {
     })
 
     it('displays custom error message if group cannot be created', async () => {
-      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />, {
+        mocks: [
+          ...accountMocks({childGroupsCount: 0}),
+          ...createOutcomeGroupMocks({
+            parentOutcomeGroupId: '1',
+            title: 'new group name',
+            failResponse: true
+          })
+        ]
+      })
       await act(async () => jest.runAllTimers())
-      addOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
-      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
-      await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred adding group "new group name": Server is busy.'
+        message: 'An error occurred adding group "new group name": GraphQL error: Network error.'
       })
     })
 
     it('displays default error message if group cannot be created and no error message is returned', async () => {
-      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />, {
+        mocks: [
+          ...accountMocks({childGroupsCount: 0}),
+          ...createOutcomeGroupMocks({
+            parentOutcomeGroupId: '1',
+            title: 'new group name',
+            failMutationNoErrMsg: true
+          })
+        ]
+      })
       await act(async () => jest.runAllTimers())
-      addOutcomeGroup.mockReturnValue(Promise.reject(new Error()))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
-      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
