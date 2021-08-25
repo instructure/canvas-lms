@@ -80,6 +80,40 @@ describe NotificationMessageCreator do
       expect(paths).not_to include(d.path)
     end
 
+    it "should default to the account time zone if the user has no time zone" do
+      original_time_zone = Time.zone
+      Time.zone = 'UTC'
+      course_with_teacher
+      account = @course.account
+      account.default_time_zone = 'Pretoria'
+      account.save!
+
+      @user = user_model(:workflow_state => 'registered')
+      communication_channel(@user, {username: 'a@example.com', active_cc: true})
+
+      due_at = Time.zone.parse('2014-06-06 11:59:59')
+      assignment_model(course: @course, due_at: due_at)
+
+      notification = Notification.create!(name: "Assignment Created", category: 'Due Date')
+
+      messages = NotificationMessageCreator.new(
+        notification,
+        @assignment,
+        to_list: @user,
+        data: {
+          course_id: @assignment.context_id,
+          root_account_id: @assignment.root_account_id
+        }
+      ).create_message
+
+      presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new('Pretoria'))
+      due_at_string = presenter.as_string(shorten_midnight: false)
+
+      expect(messages.count).to eq 1
+      expect(messages[0].html_body.include?(due_at_string)).to eq true
+      Time.zone = original_time_zone
+    end
+
     it "should use the default channel if no policies apply" do
       assignment_model
       user_model(:workflow_state => 'registered')
