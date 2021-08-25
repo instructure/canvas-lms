@@ -879,6 +879,67 @@ describe('OutcomeManagementPanel', () => {
     expect(within(editModal).getByText('Group Description 4')).toBeInTheDocument()
   })
 
+  describe('Search input', () => {
+    const searchInputMocks = [
+      ...courseMocks({childGroupsCount: 2}),
+      ...groupMocks({groupId: '200'}),
+      ...groupDetailMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        contextType: 'Course',
+        contextId: '2',
+        searchQuery: 'Outcome 1',
+        withMorePage: false
+      }),
+      ...groupMocks({groupId: '201', childGroupOffset: 400}),
+      ...groupDetailMocks({
+        title: 'Course folder 1',
+        groupId: '201',
+        contextType: 'Course',
+        contextId: '2',
+        searchQuery: 'Outcome 2',
+        withMorePage: false
+      })
+    ]
+
+    it('should not clear search input if same group is selected/toggled', async () => {
+      const {getByText, getByLabelText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: searchInputMocks
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      const courseFolder = getByText('Course folder 0')
+      fireEvent.click(courseFolder)
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('2 Outcomes')).toBeInTheDocument()
+      fireEvent.change(getByLabelText('Search field'), {target: {value: 'Outcome 1'}})
+      await act(async () => jest.advanceTimersByTime(500))
+      expect(getByText('1 Outcome')).toBeInTheDocument()
+      fireEvent.click(courseFolder)
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('1 Outcome')).toBeInTheDocument()
+      expect(getByLabelText('Search field')).toHaveValue('Outcome 1')
+    })
+
+    it('should clear search input if different group is selected', async () => {
+      const {getByText, getByLabelText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: searchInputMocks
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('2 Outcomes')).toBeInTheDocument()
+      fireEvent.change(getByLabelText('Search field'), {target: {value: 'Outcome 1'}})
+      await act(async () => jest.advanceTimersByTime(500))
+      expect(getByText('1 Outcome')).toBeInTheDocument()
+      fireEvent.click(getByText('Course folder 1'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('2 Outcomes')).toBeInTheDocument()
+      expect(getByLabelText('Search field')).toHaveValue('')
+    })
+  })
+
   describe('mobile', () => {
     beforeEach(() => {
       isMobileView = true

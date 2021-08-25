@@ -24,7 +24,6 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!OutcomeManagement'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
-import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -44,12 +43,6 @@ import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 
 const OutcomeManagementPanel = () => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
-  const {
-    search: searchString,
-    debouncedSearch: debouncedSearchString,
-    onChangeHandler: onSearchChangeHandler,
-    onClearHandler: onSearchClearHandler
-  } = useSearch()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
@@ -65,7 +58,11 @@ const OutcomeManagementPanel = () => {
     selectedParentGroupId,
     removeGroup,
     loadedGroups,
-    createGroup
+    createGroup,
+    searchString,
+    debouncedSearchString,
+    updateSearch: onSearchChangeHandler,
+    clearSearch: onSearchClearHandler
   } = useManageOutcomes('OutcomeManagementPanel')
 
   const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({

@@ -253,7 +253,7 @@ export const useManageOutcomes = collection => {
   const client = useApolloClient()
   const {
     collections,
-    queryCollections,
+    queryCollections: queryCollectionsTreeBrowser,
     error,
     setError,
     isLoading,
@@ -282,6 +282,18 @@ export const useManageOutcomes = collection => {
   })
 
   const rootGroupId = contextGroupLoadedData.rootGroupId
+
+  const {
+    search: searchString,
+    debouncedSearch: debouncedSearchString,
+    onChangeHandler: updateSearch,
+    onClearHandler: clearSearch
+  } = useSearch()
+
+  const queryCollections = props => {
+    if (props?.id !== selectedGroupId) clearSearch()
+    queryCollectionsTreeBrowser(props)
+  }
 
   useEffect(() => {
     if (
@@ -368,7 +380,11 @@ export const useManageOutcomes = collection => {
     addNewGroup,
     removeGroup,
     loadedGroups,
-    createGroup
+    createGroup,
+    searchString,
+    debouncedSearchString,
+    updateSearch,
+    clearSearch
   }
 }
 
