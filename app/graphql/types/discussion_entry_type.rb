@@ -51,9 +51,7 @@ module Types
 
     field :preview_message, String, null: true
     def preview_message
-      load_association(:editor).then do
-        object.deleted? ? nil : object.summary
-      end
+      object.deleted? ? nil : object.summary
     end
 
     field :quoted_entry, Types::DiscussionEntryType, null: true
