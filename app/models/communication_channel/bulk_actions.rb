@@ -70,7 +70,10 @@ class CommunicationChannel
         cc.id,
         cc.path_type,
         cc.path_description
-      ] + self.class.report_columns.values.map { |value_generator| value_generator.to_proc.call(cc) }
+      ] + self.class.report_columns.values.map do |value_generator|
+        value = value_generator.to_proc.call(cc)
+        value.respond_to?(:iso8601) ? value.iso8601 : value
+      end
     end
 
     def csv_report
