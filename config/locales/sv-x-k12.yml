@@ -21562,7 +21562,7 @@ sv-x-k12:
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Den här integreringen är inte aktiverad. Du måste aktivera den för att kunna göra inställningar."
   this_is_a_blueprint_course_5e7b47fe: "Detta är en blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Det här är en lista med kommaseparerade länkar som är betrodda. Om alla länkar i den här listan är betrodda åsidosätts CSRF-token vid inloggning till Canvas."
-  this_is_a_course_template_99bbe698: "Detta är en blueprint"
+  this_is_a_course_template_99bbe698: "Detta är en kursmall"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Detta är en funktion som möjliggör utveckling av en responsiv layout"
   this_is_a_graded_discussion_count_points_possible_59926e2c: 
     one: "Det här är en bedömd diskussion: %{count} möjlig poäng"

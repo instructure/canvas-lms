@@ -55,7 +55,7 @@ const FindOutcomeItem = ({
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
   const importStatus = [importGroupStatus, importOutcomeStatus]
   const isOutcomeImported = isImported || importStatus.includes(IMPORT_COMPLETED)
-  const onAddHandler = () => importOutcomeHandler(id, false, sourceContextId, sourceContextType)
+  const onAddHandler = () => importOutcomeHandler(id, 1, false, sourceContextId, sourceContextType)
 
   const checkbox = (
     <Flex.Item size={isMobileView ? '' : '6.75rem'} alignSelf="end">
