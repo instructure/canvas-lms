@@ -110,5 +110,31 @@ describe "Discussion Topic Show" do
         expect(fj("span:contains('child reply number 1')")).to be_present
       end
     end
+
+    context "when the mentions feature flag is turned on" do
+      before :once do
+        Account.site_admin.enable_feature! :rce_mentions_in_discussions
+        Account.site_admin.enable_feature! :isolated_view
+      end
+
+      it "can mention users in the reply" do
+        student_in_course(course: @course, name: 'Jeff', active_all: true).user
+        student_in_course(course: @course, name: 'Jefferson', active_all: true).user
+        student_in_course(course: @course, name: 'Jeffrey', active_all: true).user
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        f("button[data-testid='discussion-topic-reply']").click
+        wait_for_ajaximations
+        type_in_tiny 'textarea', '@'
+        wait_for_ajaximations
+        driver.action.send_keys(:arrow_down).perform # Jefferson
+        driver.action.send_keys(:arrow_down).perform # Jeffrey
+        driver.action.send_keys(:enter).perform
+        wait_for_ajaximations
+        driver.action.send_keys("HI!").perform
+        fj("button:contains('Reply')").click
+        wait_for_ajaximations
+        expect(fj("p:contains('@JeffreyHI!')")).to be_present
+      end
+    end
   end
 end
