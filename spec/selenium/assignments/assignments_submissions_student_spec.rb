@@ -280,6 +280,31 @@ describe "submissions" do
       expect(submission.reload.body).to eq "<p>#{body_text}</p>"
     end
 
+    it "does not allow submissions that contain placeholders for unfinished file uploads" do
+      @assignment.update(:submission_types => "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      body_html = '<span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span>'
+      switch_new_editor_views # switch to html editor
+      tinymce = f("#submission_body")
+      tinymce.click
+      tinymce.send_keys(body_html)
+      assignment_form = f('#submit_online_text_entry_form')
+      wait_for_tiny(assignment_form)
+      submission = @assignment.submissions.find_by!(user_id: @student)
+      # it should not actually submit and pop up an error message
+      expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
+      expect(ff('.error_box')[1]).to include_text('File has not finished uploading')
+
+      # now make sure it works with finished upload
+      tinymce.clear
+      body_html = '<a title="filename" href="fileref" target="_blank" data-canvas-previewable="false">filename</a>&nbsp;'
+      tinymce.click
+      tinymce.send_keys(body_html)
+      expect { submit_form(assignment_form) }.to change { submission.reload.updated_at }
+      expect(submission.reload.body).to eq "<p>#{body_html}</p>"
+    end
+
     it "does not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
