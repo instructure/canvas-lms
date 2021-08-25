@@ -265,7 +265,7 @@ export const useManageOutcomes = collection => {
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
-    clearCache,
+    clearCache: clearTreeBrowserCache,
     addNewGroup,
     removeGroup,
     loadedGroups
@@ -280,6 +280,20 @@ export const useManageOutcomes = collection => {
       contextType
     }
   })
+
+  const clearCache = () => {
+    client.writeQuery({
+      query: CONTEXT_GROUPS_QUERY,
+      variables: {
+        contextType,
+        contextId
+      },
+      data: {
+        rootGroupId: null
+      }
+    })
+    clearTreeBrowserCache()
+  }
 
   const rootGroupId = contextGroupLoadedData.rootGroupId
 
@@ -317,7 +331,8 @@ export const useManageOutcomes = collection => {
           variables: {
             id: contextId,
             type: contextType
-          }
+          },
+          fetchPolicy: 'network-only'
         })
         .then(({data}) => {
           const rootGroup = data.context.rootOutcomeGroup

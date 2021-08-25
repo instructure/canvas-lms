@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -62,8 +62,16 @@ const OutcomeManagementPanel = () => {
     searchString,
     debouncedSearchString,
     updateSearch: onSearchChangeHandler,
-    clearSearch: onSearchClearHandler
+    clearSearch: onSearchClearHandler,
+    clearCache
   } = useManageOutcomes('OutcomeManagementPanel')
+
+  useEffect(() => {
+    return () => {
+      clearCache()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
