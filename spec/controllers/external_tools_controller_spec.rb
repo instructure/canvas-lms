@@ -686,6 +686,90 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params['first']).to be_nil
       end
     end
+
+    context 'when tool is hidden from course nav' do
+      let(:context) { @course }
+      let(:tool) do
+        t = new_valid_tool(context)
+        t.course_navigation = { url: 'http://test.host/course_navigation' }
+        t.global_navigation = { url: 'http://test.host/global_navigation' }
+        t.save!
+        t
+      end
+      let(:placement) { raise 'override' }
+
+      before :each do
+        @course.tab_configuration = [{ id: tool.asset_string, hidden: true }]
+        @course.save!
+      end
+
+      def show_request
+        get :show, params: {"#{context.class.base_class.to_s.downcase}_id": context.id, id: tool.id, placement: placement}
+      end
+
+      shared_examples_for 'can launch tool' do
+        let(:user) { raise 'override in examples' }
+
+        it 'returns 200' do
+          user_session(user)
+          show_request
+          expect(response.code.to_i).to be 200
+        end
+      end
+
+      shared_examples_for 'blocked from launching tool' do
+        let(:user) { raise 'override in examples' }
+
+        it 'returns 401' do
+          user_session(user)
+          show_request
+          expect(response.code.to_i).to be 401
+        end
+      end
+
+      context 'for course_navigation placement' do
+        let(:placement) { :course_navigation }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'blocked from launching tool' do
+          let(:user) { @student }
+        end
+      end
+
+      context 'for other placement' do
+        let(:placement) { :global_navigation }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @student }
+        end
+      end
+
+      context 'for tool launched from Account' do
+        let(:placement) { :course_navigation }
+        let(:context) { Account.default }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @student }
+        end
+      end
+    end
   end
 
   describe "GET 'retrieve'" do
@@ -866,6 +950,23 @@ describe ExternalToolsController do
       user_session(@user)
       get 'retrieve', params: {:course_id => @course.id}
       assert_unauthorized
+    end
+
+    context 'when tool is hidden from course nav' do
+      let(:tool) do
+        @course.context_external_tools.create!(name: "bob", consumer_key: "bob", shared_secret: "bob", url: "http://www.example.com/basic_lti")
+      end
+
+      before :each do
+        user_session(@student)
+        @course.tab_configuration = [{id: tool.asset_string, hidden: true }]
+        @course.save!
+      end
+
+      it 'should restrict students from launching' do
+        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/basic_lti", placement: 'course_navigation'}
+        assert_unauthorized
+      end
     end
 
     it "should find tools matching by exact url" do

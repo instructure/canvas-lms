@@ -154,6 +154,15 @@ class ExternalToolsController < ApplicationController
       raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
     placement = placement_from_params
+
+    # when a tool gets hidden from the Course Nav sidebar (Course > Settings > Navigation),
+    # students should not be able to launch it. Only admins should be able to launch hidden
+    # tools from the course_navigation placement.
+    if is_tool_hidden_for_user?(@current_user, @context, @tool, placement, session)
+      render_unauthorized_action
+      return
+    end
+
     add_crumb(@context.name, named_context_url(@context, :context_url))
     @lti_launch = lti_launch(
       tool: @tool,
@@ -380,6 +389,14 @@ class ExternalToolsController < ApplicationController
       placement = placement_from_params
       return unless find_tool(params[:id], placement)
 
+      # when a tool gets hidden from the Course Nav sidebar (Course > Settings > Navigation),
+      # students should not be able to launch it. Only admins should be able to launch hidden
+      # tools from the course_navigation placement.
+      if is_tool_hidden_for_user?(@current_user, @context, @tool, placement, session)
+        render_unauthorized_action
+        return
+      end
+
       add_crumb(@context.name, named_context_url(@context, :context_url))
 
       @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
@@ -403,6 +420,15 @@ class ExternalToolsController < ApplicationController
 
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
     end
+  end
+
+  # a tool is considered hidden for a user if the tool is launched from the course context,
+  # with the default course_navigation placement, the user is not considered a course admin,
+  # and a course admin has removed it from the sidebar.
+  def is_tool_hidden_for_user?(user, context, tool, placement, session)
+    placement.to_sym == :course_navigation && context.respond_to?(:tab_hidden?) &&
+      !context.grants_right?(user, session, :read_as_admin) &&
+      context.tab_hidden?(tool.asset_string)
   end
 
   def tool_return_success_url(selection_type=nil)
