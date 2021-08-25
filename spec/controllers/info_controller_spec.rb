@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe InfoController do
 
@@ -77,6 +77,57 @@ describe InfoController do
           expect(body).to include(type)
         end
       end
+    end
+  end
+
+  describe "GET 'readiness'" do
+    it 'should respond with 200 if all system components are alive and serving' do
+      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(MultiCache.cache).to receive(:fetch).and_call_original
+      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
+      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+      get 'readiness'
+      expect(response).to be_successful
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 200
+    end
+
+    it 'should respond with 503 if a system component is considered down' do
+      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(MultiCache.cache).to receive(:fetch).and_call_original
+      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
+      allow(Delayed::Job.connection).to receive(:active?).and_return(false)
+      get 'readiness'
+      expect(response.code).to eq '503'
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 503
+    end
+
+    it 'should catch any exceptions thrown and log them as errors' do
+      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(MultiCache.cache).to receive(:fetch).and_call_original
+      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_raise(Redis::TimeoutError)
+      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+      expect(Canvas::Errors).to receive(:capture_exception).once
+      get 'readiness'
+      expect(response.code).to eq '503'
+      components = JSON.parse(response.body)['components']
+      redis = components.find{|c| c['name'] == 'redis'}
+      expect(redis['status']).to eq 503
+    end
+
+    it 'should return all dependent system components in json response' do
+      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(MultiCache.cache).to receive(:fetch).and_call_original
+      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
+      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+      get 'readiness'
+      expect(response).to be_successful
+      components = JSON.parse(response.body)['components']
+      expect(components.map { |c| c['name'] }).to eq %w[
+        common_css common_js consul filesystem jobs postgresql redis rev_manifest
+      ]
+      expect(components.map { |c| c['status'] }).to eq [200, 200, 200, 200, 200, 200, 200, 200]
     end
   end
 

@@ -19,8 +19,8 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_action :load_account, :only => :health_check
-  skip_before_action :load_user, :only => [:health_check, :browserconfig]
+  skip_before_action :load_account, :only => [:health_check, :readiness]
+  skip_before_action :load_user, :only => [:health_check, :readiness, :browserconfig]
 
   def styleguide
     render :layout => "layouts/styleguide"
@@ -55,7 +55,7 @@ class InfoController < ApplicationController
     Account.connection.active?
     if Delayed::Job == Delayed::Backend::ActiveRecord::Job &&
       Account.connection != Delayed::Job.connection
-      Delayed::Job.connection.active? 
+      Delayed::Job.connection.active?
     end
     Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
     # consul works; we don't really care about the result, but it should not error trying to
@@ -93,6 +93,73 @@ class InfoController < ApplicationController
       render :json => {:status => "canvas will be ok, probably"}
     end
   end
+
+  def readiness
+    # This action provides a clear signal for assessing system components that are "owned"
+    # by Canvas and are ultimately responsible for being alive and able to serve consumer traffic
+    #
+    # Readiness Checks
+    #
+    # returns a PrefixProxy instance, treated as truthy
+    consul = -> { DynamicSettings.find(tree: :private)[:readiness].nil? }
+    # ensures brandable_css_bundles_with_deps exists, returns a string (path), treated as truthy
+    css = -> { css_url_for("common") }
+    # returns the value of the block <integer>, treated as truthy
+    filesystem = -> do
+      Tempfile.open('readiness', ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write('readiness') }
+    end
+    # returns a boolean
+    jobs = -> { Delayed::Job.connection.active? }
+    # ensures webpack worked; returns a string, treated as truthy
+    js = -> { ActionController::Base.helpers.javascript_url("#{js_base_url}/common") }
+    # returns a boolean
+    postgres = -> { Account.connection.active? }
+    # nil response treated as truthy
+    redis = -> { MultiCache.cache.fetch('readiness').nil? }
+    # ensures `gulp rev` has ran; returns a string, treated as truthy
+    rev_manifest = -> { Canvas::Cdn::RevManifest.gulp_manifest.values.first }
+
+    components = {
+      common_css: readiness_check(css),
+      common_js: readiness_check(js),
+      consul: readiness_check(consul),
+      filesystem: readiness_check(filesystem),
+      jobs: readiness_check(jobs),
+      postgresql: readiness_check(postgres),
+      redis: readiness_check(redis),
+      rev_manifest: readiness_check(rev_manifest)
+    }
+
+    failed = components.reject { |_k, v| v[:status] }.map(&:first)
+    render_readiness_json(components, failed.any? ? 503 : 200)
+  end
+
+  def readiness_check(component)
+    begin
+      status = false
+      time = Benchmark.ms { status = component.call }
+    rescue => e
+      Canvas::Errors.capture_exception(:readiness, e, :error)
+    end
+
+    { time: time, status: status }
+  end
+
+  def render_readiness_json(components, status_code)
+    render json: {
+             status: status_code,
+             components:
+               components.map do |k, v|
+                 name = k
+                 status = v[:status] ? 200 : 503
+                 time = v[:time]
+                 { 'name' => name, 'status' => status, 'response_time_ms' => time }
+               end
+           },
+           status: status_code
+  end
+
+  private :readiness_check, :render_readiness_json
 
   # for windows live tiles
   def browserconfig
