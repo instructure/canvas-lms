@@ -315,17 +315,9 @@ module Types
       # currently does not support type inheritance. If graphql starts supporting type inheritance
       # this field can be replaced by a discussionAuthor type that inherits from User type and
       # contains a discussionRoles field
+      return if course_id.nil?
 
-      return [] if course_id.nil?
-
-      course_roles = []
-
-      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object).then do |roles|
-        roles.each do |role|
-          course_roles.push(role[:type])
-        end
-        course_roles
-      end
+      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object)
     end
   end
 end

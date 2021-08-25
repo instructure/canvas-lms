@@ -652,25 +652,25 @@ describe Types::UserType do
     it "does not return student role" do
       expect(
         user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when no course id is given" do
+    it "returns nil when no course id is given" do
       expect(
         user_type.resolve(%|courseRoles(roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when course id is null" do
+    it "returns nil when course id is null" do
       expect(
         user_type.resolve(%|courseRoles(courseId: null, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "does not return custom roles based on teacher" do
       expect(
         custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "Returns multiple roles when mutiple enrollments exist" do
