@@ -55,8 +55,7 @@ ready(() => {
     course_id: ENV.COURSE_ID,
     course_home: ENV.COURSE_HOME,
     course_title: ENV.COURSE_TITLE,
-    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK,
-    show_immersive_reader: ENV.IMMERSIVE_READER_ENABLED
+    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK
   })
 
   wikiPageView.render()

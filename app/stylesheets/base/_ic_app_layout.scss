@@ -291,6 +291,14 @@ body:not(.course-menu-expanded) {
   margin: 0 $ic-sp*2;
   min-height: $ic-breadcrumbs-height;
   box-sizing: border-box;
+
+  .right-of-crumbs {
+    display: flex;
+  }
+
+  .right-of-crumbs > * {
+    margin-left: 12px;
+  }
 }
 
 .ic-app-course-nav-toggle {

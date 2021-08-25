@@ -74,17 +74,17 @@ function handleClick({title, content}, readerSDK) {
 }
 
 export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
-  return breakpoints?.miniTablet ? (
-    <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
-      {I18n.t('Immersive Reader')}
-    </Button>
-  ) : (
+  return breakpoints?.mobileOnly ? (
     <IconButton
       onClick={() => handleClick(content, readerSDK)}
       screenReaderLabel={I18n.t('Immersive Reader')}
     >
       <SVGIcon src={LOGO} />
     </IconButton>
+  ) : (
+    <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
+      {I18n.t('Immersive Reader')}
+    </Button>
   )
 }
 
