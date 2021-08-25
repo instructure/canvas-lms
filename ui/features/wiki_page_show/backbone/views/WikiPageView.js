@@ -66,7 +66,6 @@ export default class WikiPageView extends Backbone.View {
     this.optionProperty('course_home')
     this.optionProperty('course_title')
     this.optionProperty('display_show_all_pages')
-    this.optionProperty('show_immersive_reader')
   }
 
   initialize() {
@@ -111,13 +110,24 @@ export default class WikiPageView extends Backbone.View {
 
     // Attach the immersive reader button if enabled
     const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
-    if (immersive_reader_mount_point) {
+    const immersive_reader_mobile_mount_point = document.getElementById(
+      'immersive_reader_mobile_mount_point'
+    )
+    if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
       import('../../react/ImmersiveReader')
         .then(ImmersiveReader => {
-          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
-            title: document.querySelector('.page-title').textContent,
-            content: document.querySelector('.show-content').innerHTML
-          })
+          const content = document.querySelector('.show-content').innerHTML
+          const title = document.querySelector('.page-title').textContent
+
+          if (immersive_reader_mount_point) {
+            ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+          }
+
+          if (immersive_reader_mobile_mount_point) {
+            ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+              content, title
+            })
+          }
         })
         .catch(e => {
           console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
@@ -249,7 +259,6 @@ export default class WikiPageView extends Backbone.View {
     json.wiki_page_history_path = this.wiki_page_history_path
     json.course_home = this.course_home
     json.course_title = this.course_title
-    json.show_immersive_reader = this.show_immersive_reader
     json.CAN = {
       VIEW_ALL_PAGES: !!this.display_show_all_pages || !!this.WIKI_RIGHTS.manage,
       VIEW_PAGES: !!this.WIKI_RIGHTS.read,
