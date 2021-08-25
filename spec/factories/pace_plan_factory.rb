@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class PacePlanModuleItem < ActiveRecord::Base
-  belongs_to :pace_plan
-  belongs_to :module_item, class_name: 'ContentTag'
-  belongs_to :root_account, class_name: 'Account'
+module Factories
+  def pace_plan_model(opts={})
+    course = opts.delete(:course) || opts[:context] || course_model(reusable: true)
+    @pace_plan = factory_with_protected_attributes(course.pace_plans, valid_pace_plan_attributes.merge(opts))
+  end
 
-  before_save :infer_root_account_id
-  validates :pace_plan, presence: true
-  validates :module_item_id, presence: true
-
-  scope :active, -> { joins(:module_item).merge(ContentTag.active) }
-  scope :ordered, -> { joins(module_item: :context_module).
-    order('context_modules.position, context_modules.id, content_tags.position, content_tags.id') }
-
-  def infer_root_account_id
-    self.root_account_id ||= pace_plan&.root_account_id
+  def valid_pace_plan_attributes
+    {
+      workflow_state: 'active',
+      start_date: Time.current,
+      end_date: 1.month.from_now,
+      exclude_weekends: true,
+      hard_end_dates: true,
+      published_at: Time.current
+    }
   end
 end

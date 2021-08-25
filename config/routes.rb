@@ -2352,6 +2352,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: :gradebooks) do
       put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
     end
+
+    scope(controller: :pace_plans) do
+      post 'courses/:course_id/pace_plans', action: :create
+      get 'courses/:course_id/pace_plans/:id', action: :show
+      put 'courses/:course_id/pace_plans/:id', action: :update
+    end
   end
 
     # this is not a "normal" api endpoint in the sense that it is not documented or
