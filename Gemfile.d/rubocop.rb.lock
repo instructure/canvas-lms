@@ -22,10 +22,20 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     ast (2.4.2)
     concurrent-ruby (1.1.9)
+    gergich (1.2.3)
+      httparty (~> 0.17)
+      sqlite3 (~> 1.4)
+    httparty (0.18.1)
+      mime-types (~> 3.0)
+      multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     jira_ref_parser (1.0.1)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2021.0704)
     minitest (5.14.4)
+    multi_xml (0.6.0)
     outrigger (2.1.1)
       activerecord (>= 5.0, < 6.2)
     parallel (1.20.0)
@@ -56,6 +66,7 @@ GEM
     rubocop-rspec (1.33.0)
       rubocop (>= 0.60.0)
     ruby-progressbar (1.10.1)
+    sqlite3 (1.4.2)
     thread_safe (0.3.6)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
@@ -66,6 +77,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
+  gergich (= 1.2.3)
   rainbow (= 3.0.0)
   rubocop (= 1.19.1)
   rubocop-canvas!

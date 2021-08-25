@@ -23,8 +23,10 @@
 group :test do
   dedicated_gemfile = ENV['BUNDLE_GEMFILE']&.end_with?('rubocop.rb')
 
+  gem 'gergich', '1.2.3', require: false
+
+  gem 'rubocop', '1.19.1', require: false
   gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"
-    gem 'rubocop', '1.19.1', require: false
       gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rails', '2.11.3', require: false
   gem 'rubocop-rspec', '1.33.0', require: false
