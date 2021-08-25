@@ -198,4 +198,16 @@ describe('Notification Preferences Table', () => {
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
     expect(sendScoresToggle.checked).toBe(false)
   })
+
+  it('allows tabbing to the row headers', () => {
+    const container = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
+    )
+
+    const dueDate = container.getByTestId('due_date_header')
+    expect(dueDate.tabIndex).toBe(0)
+  })
 })

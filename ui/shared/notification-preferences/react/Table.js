@@ -25,6 +25,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import theme from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -190,10 +191,18 @@ const renderNotificationCategory = (
                     }
                     placement="end"
                   >
-                    {
-                      notificationPreferences.channels[0].categories[notificationCategory][category]
-                        .notification.categoryDisplayName
-                    }
+                    <span
+                      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                      tabIndex="0"
+                      style={{padding: theme.variables.spacing.xxSmall}}
+                      data-testid={`${formatCategoryKey(category)}_header`}
+                    >
+                      {
+                        notificationPreferences.channels[0].categories[notificationCategory][
+                          category
+                        ].notification.categoryDisplayName
+                      }
+                    </span>
                   </Tooltip>
                   <ScreenReaderContent>
                     <div
