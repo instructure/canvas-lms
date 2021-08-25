@@ -24,12 +24,14 @@ linter_options = {
     RuboCop::CLI.new.run(args)
   end
 }
+no_fail = false
 
 OptionParser.new do |opts|
   opts.on("--heavy") { linter_options[:heavy_mode] = true }
   opts.on("--boy-scout") { linter_options[:boyscout_mode] = true }
   opts.on("--plugin PLUGIN") { |v| linter_options[:plugin] = v }
+  opts.on("--no-fail-on-offense") { |v| no_fail = true }
 end.parse!
 
 rlint = Linter.new(linter_options)
-exit(rlint.run ? 0 : 1)
+exit 1 if !rlint.run && !no_fail
