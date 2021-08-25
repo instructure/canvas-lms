@@ -24815,7 +24815,7 @@ sv:
   this_is_a_blueprint_course_5e7b47fe: "Detta är en blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Det här är en lista med kommaseparerade länkar som är betrodda. Om alla länkar i den här listan är betrodda åsidosätts CSRF-token vid inloggning till Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Det här är en avslutad kurs, så endast avslutad anmälningar är tillgängliga."
-  this_is_a_course_template_99bbe698: "Detta är en blueprint"
+  this_is_a_course_template_99bbe698: "Detta är en kursmall"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Det här är en funktion som gör det möjligt för produkt-design att ta bort alla de olika skriftstorlekarna i applikationen."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Detta är en funktion som möjliggör utveckling av en responsiv layout"
   this_is_a_graded_discussion_count_points_possible_59926e2c: 
