@@ -17,13 +17,15 @@
  */
 
 import DateHelper from '../../../../../shared/datetime/dateHelper'
+import I18n from 'i18n!discussion_topics_post'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {responsiveQuerySizes} from '../../utils'
 
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!discussion_topics_post'
 
 export const ReplyPreview = ({...props}) => {
   const message = props.deleted
@@ -31,27 +33,47 @@ export const ReplyPreview = ({...props}) => {
     : props.previewMessage
 
   return (
-    <View
-      as="div"
-      borderWidth="0 0 0 large"
-      data-testid="reply-preview"
-      margin="0 0 medium 0"
-      padding="x-small 0 x-small medium"
-    >
-      <Flex direction="column">
-        <Flex.Item>
-          <View>
-            <Text weight="bold">{props.author.shortName}</Text>
-          </View>
-          <View margin="0 0 0 small">
-            <Text>{DateHelper.formatDatetimeForDiscussions(props.createdAt)}</Text>
-          </View>
-        </Flex.Item>
-        <Flex.Item margin="small 0 0 0">
-          <Text>{message}</Text>
-        </Flex.Item>
-      </Flex>
-    </View>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'x-small'
+        },
+        desktop: {
+          textSize: 'small'
+        }
+      }}
+      render={responsiveProps => (
+        <View
+          as="div"
+          borderWidth="0 0 0 large"
+          data-testid="reply-preview"
+          margin="0 0 medium 0"
+          padding="x-small 0 x-small medium"
+        >
+          <Flex direction="column">
+            <Flex.Item>
+              <View>
+                <Text weight="bold" size={responsiveProps.textSize}>
+                  {props.author.shortName}
+                </Text>
+              </View>
+            </Flex.Item>
+            <Flex.Item>
+              <View>
+                <Text size="x-small">
+                  {DateHelper.formatDatetimeForDiscussions(props.createdAt)}
+                </Text>
+              </View>
+            </Flex.Item>
+            <Flex.Item margin="small 0 0 0">
+              <Text size={responsiveProps.textSize}>{message}</Text>
+            </Flex.Item>
+          </Flex>
+        </View>
+      )}
+    />
   )
 }
 
