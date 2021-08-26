@@ -1143,8 +1143,12 @@ function allowsReassignment(submission) {
   )
 }
 
-function renderStatusMenu(submission) {
-  ReactDOM.render(
+function renderStatusMenu(component) {
+  ReactDOM.render(component, document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT))
+}
+
+function statusMenuComponent(submission) {
+  return (
     <SpeedGraderStatusMenu
       key={submission.id}
       lateSubmissionInterval={ENV.late_policy?.late_submission_interval || 'day'}
@@ -1152,8 +1156,7 @@ function renderStatusMenu(submission) {
       secondsLate={submission.seconds_late || 0}
       selection={determineSubmissionSelection(submission)}
       updateSubmission={updateSubmissionAndPageEffects}
-    />,
-    document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
+    />
   )
 }
 
@@ -1169,7 +1172,7 @@ function updateSubmissionAndPageEffects(data) {
       refreshGrades(() => {
         EG.refreshSubmissionsToView()
         styleSubmissionStatusPills(getLateAndMissingPills())
-        renderStatusMenu(submission)
+        renderStatusMenu(statusMenuComponent(submission))
       })
     })
     .catch(showFlashError())
@@ -2037,7 +2040,8 @@ EG = {
     const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
     if (mountPoint) {
       styleSubmissionStatusPills(getLateAndMissingPills())
-      renderStatusMenu(this.currentStudent.submission)
+      const component = isMostRecent ? statusMenuComponent(this.currentStudent.submission) : null
+      renderStatusMenu(component)
     }
 
     const turnitinEnabled =
