@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useEffect, useState} from 'react'
+import React, {forwardRef, useCallback, useEffect, useState} from 'react'
 import {bool, func, number, object, objectOf, oneOfType, string} from 'prop-types'
 import {createChainedFunction} from '@instructure/ui-utils'
 import RCE from '@instructure/canvas-rce/es/rce/RCE'
@@ -80,13 +80,28 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     enabled: ENV.rce_auto_save && autosave,
     interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
   })
+  const [refCreated, setRefCreated] = useState(null)
+
+  // you have to use a callback function ref because a ref as a useEffect dependency
+  // will never trigger it to be rerun. This way any time the ref changes,
+  // the function is called. rceRef as a dependency is to quiet eslint.
+  const magicRef = useCallback(
+    node => {
+      rceRef.current = node
+      if (node) {
+        node.getTextarea().remoteEditor = node
+      }
+      setRefCreated(node)
+    },
+    [rceRef]
+  )
 
   useEffect(() => {
-    const rce_wrapper = rceRef.current
+    const rce_wrapper = refCreated && rceRef.current
     return () => {
       rce_wrapper?.destroy()
     }
-  }, [rceRef])
+  }, [rceRef, refCreated])
 
   useEffect(() => {
     loadEventListeners()
@@ -94,7 +109,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
 
   return (
     <RCE
-      ref={rceRef}
+      ref={magicRef}
       autosave={autosave_}
       defaultContent={defaultContent}
       editorOptions={tinymceConfig}
