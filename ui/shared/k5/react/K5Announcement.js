@@ -100,7 +100,17 @@ export default function K5Announcement({
         homeroomAnnouncements.length && homeroomAnnouncements[0].postedDate
           ? new Date(homeroomAnnouncements[0].postedDate)
           : new Date()
-      end_date.setSeconds(end_date.getSeconds() - 1)
+      // I bet you're wondering why we're adding a second to the end_date
+      // the announcements api will return records between start and end, inclusive
+      // but while the resolution in the api is seconds, in the db the
+      // announcement is finer grained. If the most current announcement's posted_at
+      // date is stored as 1:02:03.001
+      // then sending 1:02:03 as the end data will miss it.
+      // we also can't subtract a second or millisecond from the currentAnnouncemnt
+      // to start the query because in course import, multiple announcements can end up
+      // with the same posted_at date.
+      end_date.setSeconds(end_date.getSeconds() + 1)
+
       // look back at most 1 year for old announcements
       const start_date = new Date()
       start_date.setFullYear(start_date.getFullYear() - 1)
@@ -120,13 +130,18 @@ export default function K5Announcement({
         }))
         setMoreHomeroomAnnouncementsURL(link.next?.url)
 
-        const parsedAnnouncements = json.map(a => transformAnnouncement(a))
+        const parsedAnnouncements = json
+          .filter(a => a.id !== currentAnnouncement?.id)
+          .map(a => transformAnnouncement(a))
         setHomeroomAnnouncements(
           homeroomAnnouncements.concat(parsedAnnouncements).sort((a, b) => {
             if (!a.postedDate) return 1 // noRecentAnnouncementsFauxAnnouncement, with no postedDate, is always newest
             if (!b.postedDate) return -1
             if (a.postedDate < b.postedDate) return -1
             if (a.postedDate > b.postedDate) return 1
+            // postedDates are equal, the currentAnnouncement passed in should be considered the latest
+            if (a.id === currentAnnouncement?.id) return 1
+            if (b.id === currentAnnouncement?.id) return -1
             return 0
           })
         )
@@ -139,7 +154,7 @@ export default function K5Announcement({
       }
       setLoadingMore(false)
     },
-    [courseId, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
+    [courseId, currentAnnouncement.id, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
   )
 
   const currentAnnouncementIndex = useCallback(() => {

@@ -229,6 +229,41 @@ describe('K5Announcement', () => {
       })
     })
 
+    it('handles 2 announcements with identical posted_at dates', async () => {
+      const postedAt = '2021-08-01T18:00:00Z'
+      const props = getProps({}, {postedDate: postedAt})
+      fetchMock.get(
+        /\/api\/v1\/announcements/,
+        {
+          body: JSON.stringify([
+            {...props.firstAnnouncement},
+            {
+              id: '18',
+              title: 'Announcement 2',
+              message: 'Hello, I am announcement 2',
+              html_url: '/courses/1/discussion_topics/18',
+              posted_at: postedAt,
+              attachments: []
+            }
+          ]),
+          headers: {
+            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
+          }
+        },
+        {}
+      )
+      const {findByText, getByText} = render(<K5Announcement {...props} />)
+      expect(getByText('20 minutes of weekly reading')).toBeInTheDocument()
+
+      await waitFor(() => {}, {timeout: 10})
+      const prevBtn = getByText('Previous announcement').closest('button')
+      await act(async () => {
+        prevBtn.click()
+        expect(await findByText('Announcement 2')).toBeInTheDocument()
+        expect(prevBtn.hasAttribute('disabled')).toBeTruthy()
+      })
+    })
+
     describe('with no recent announcements', () => {
       let oldDate
       beforeEach(() => {
