@@ -140,7 +140,8 @@ export const K5Dashboard = ({
   selectedContextCodes,
   selectedContextsLimit,
   parentSupportEnabled,
-  observerList
+  observerList,
+  canAddObservee
 }) => {
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
@@ -294,6 +295,8 @@ export const K5Dashboard = ({
                 currentUser={currentUser}
                 handleChangeObservedUser={setObservedUserId}
                 margin="medium 0 xx-small 0"
+                canAddObservee={canAddObservee}
+                currentUserRoles={currentUserRoles}
               />
             </View>
           )}
@@ -398,7 +401,8 @@ K5Dashboard.propTypes = {
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
-  observerList: ObserverListShape.isRequired
+  observerList: ObserverListShape.isRequired,
+  canAddObservee: PropTypes.bool.isRequired
 }
 
 const mapDispatchToProps = {

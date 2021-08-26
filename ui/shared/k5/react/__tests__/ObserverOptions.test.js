@@ -32,6 +32,7 @@ describe('ObserverOptions', () => {
       avatar_image_url: 'http://avatar'
     },
     handleChangeObservedUser: jest.fn(),
+    canAddObservee: false,
     ...overrides
   })
 
@@ -96,5 +97,32 @@ describe('ObserverOptions', () => {
     const {getByRole} = render(<ObserverOptions {...getProps()} />)
     const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select.value).toBe('Student 4')
+  })
+
+  it('displays the add student option if the user can add observees', () => {
+    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee />)
+    const select = getByRole('combobox', {name: 'Select a student to view'})
+    expect(select).toBeInTheDocument()
+    act(() => select.click())
+    expect(getByText('Add Student')).toBeInTheDocument()
+  })
+
+  it("does not display the add student option if the user can't add observees", () => {
+    const {getByRole, queryByText} = render(
+      <ObserverOptions {...getProps()} canAddObservee={false} />
+    )
+    const select = getByRole('combobox', {name: 'Select a student to view'})
+    expect(select).toBeInTheDocument()
+    act(() => select.click())
+    expect(queryByText('Add Student')).not.toBeInTheDocument()
+  })
+
+  it('opens the add student modal when Add Student option is clicked', () => {
+    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee />)
+    const select = getByRole('combobox', {name: 'Select a student to view'})
+    expect(select).toBeInTheDocument()
+    act(() => select.click())
+    act(() => getByText('Add Student').click())
+    expect(getByText('Pair with student')).toBeInTheDocument()
   })
 })

@@ -516,7 +516,11 @@ class UsersController < ApplicationController
         PERMISSIONS: {
           create_courses_as_admin: @current_user.roles(@domain_root_account).include?('admin'),
           create_courses_as_teacher: @domain_root_account.grants_right?(@current_user, session, :create_courses)
-        }
+        },
+        CAN_ADD_OBSERVEE: @current_user
+                          .profile
+                          .tabs_available(@current_user, :root_account => @domain_root_account)
+                          .any?{|t| t[:id] == UserProfile::TAB_OBSERVEES }
       })
 
       css_bundle :k5_common, :k5_dashboard, :dashboard_card

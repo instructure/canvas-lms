@@ -23,19 +23,30 @@ import getCookie from 'get-cookie'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
-import {IconUserLine} from '@instructure/ui-icons'
+import {IconUserLine, IconAddLine} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
-
-import {parseObserverList} from './utils'
+import {parseObserverList, parseObservedUsersResponse} from './utils'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import AddStudentModal from './AddStudentModal'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const SELECTED_OBSERVED_USER_COOKIE = 'k5_observed_user_id'
 
-const ObserverOptions = ({observerList, currentUser, handleChangeObservedUser, margin}) => {
-  const [observedUsers] = useState(() => parseObserverList(observerList))
+const ObserverOptions = ({
+  observerList,
+  currentUser,
+  handleChangeObservedUser,
+  margin,
+  canAddObservee,
+  currentUserRoles
+}) => {
+  const [observedUsers, setObservedUsers] = useState(() => parseObserverList(observerList))
   const [selectSearchValue, setSelectSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
+  const [newStudentModalOpen, setNewStudentModalOpen] = useState(false)
+  const isOnlyObserver = currentUserRoles?.every(r => r === 'user' || r === 'observer')
 
   const handleUserSelected = useCallback(
     id => {
@@ -66,8 +77,72 @@ const ObserverOptions = ({observerList, currentUser, handleChangeObservedUser, m
     ) : (
       <IconUserLine />
     )
+  const onNewStudentPaired = async () => {
+    try {
+      const {json} = await doFetchApi({
+        path: '/api/v1/users/self/enrollments',
+        params: {
+          type: ['ObserverEnrollment'],
+          include: ['avatar_url', 'observed_users'],
+          per_page: 100
+        }
+      })
+      const obseervees = parseObservedUsersResponse(json, isOnlyObserver, currentUser)
+      setObservedUsers(obseervees)
+    } catch (ex) {
+      showFlashAlert({
+        message: I18n.t('Unable to get observed students'),
+        err: ex,
+        type: 'error'
+      })
+    }
+  }
 
-  if (observedUsers.length > 1) {
+  const addStudentOption = (
+    <CanvasAsyncSelect.Option
+      key="new"
+      id="new-student-option"
+      value="new"
+      renderBeforeLabel={props => <IconAddLine color={!props.isHighlighted ? 'brand' : null} />}
+      // according to the documentation the next line should override the default color
+      // on inst-ui 8.7.0, but it doesn't seem to work on inst-ui 7.9.0
+      // themeOverride={{color: k5Theme.variables.colors.brand}}
+    >
+      {props => <Text color={!props.isHighlighted ? 'brand' : null}>{I18n.t('Add Student')}</Text>}
+    </CanvasAsyncSelect.Option>
+  )
+
+  const handleClose = () => {
+    setNewStudentModalOpen(false)
+  }
+  const handleOptionSelected = id => {
+    if (id === 'new-student-option') {
+      setNewStudentModalOpen(true)
+    } else {
+      handleUserSelected(id)
+    }
+  }
+
+  if (observedUsers.length > 1 || canAddObservee) {
+    const userPickerOptions = observedUsers
+      .filter(
+        u =>
+          u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
+          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase()
+      )
+      .map(u => (
+        <CanvasAsyncSelect.Option
+          key={u.id}
+          id={u.id}
+          value={u.id}
+          renderBeforeLabel={<IconUserLine />}
+        >
+          {u.name}
+        </CanvasAsyncSelect.Option>
+      ))
+    if (canAddObservee) {
+      userPickerOptions.push(addStudentOption)
+    }
     return (
       <View as="div" margin={margin}>
         <CanvasAsyncSelect
@@ -78,27 +153,22 @@ const ObserverOptions = ({observerList, currentUser, handleChangeObservedUser, m
           }
           noOptionsLabel={I18n.t('No Results')}
           onInputChange={e => setSelectSearchValue(e.target.value)}
-          onOptionSelected={(_e, id) => handleUserSelected(id)}
+          onOptionSelected={(_e, id) => {
+            handleOptionSelected(id)
+          }}
           renderBeforeInput={selectAvatar}
           shouldNotWrap
         >
-          {observedUsers
-            .filter(
-              u =>
-                u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
-                selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase()
-            )
-            .map(u => (
-              <CanvasAsyncSelect.Option
-                key={u.id}
-                id={u.id}
-                value={u.id}
-                renderBeforeLabel={<IconUserLine />}
-              >
-                {u.name}
-              </CanvasAsyncSelect.Option>
-            ))}
+          {userPickerOptions}
         </CanvasAsyncSelect>
+        {canAddObservee && (
+          <AddStudentModal
+            open={newStudentModalOpen}
+            handleClose={handleClose}
+            currentUserId={currentUser.id}
+            onStudentPaired={onNewStudentPaired}
+          />
+        )}
       </View>
     )
   } else if (observedUsers.length === 1 && observedUsers[0].id !== currentUser.id) {
@@ -137,7 +207,9 @@ ObserverOptions.propTypes = {
     avatar_image_url: PropTypes.string
   }).isRequired,
   handleChangeObservedUser: PropTypes.func.isRequired,
-  margin: PropTypes.string
+  margin: PropTypes.string,
+  canAddObservee: PropTypes.bool.isRequired,
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default ObserverOptions
