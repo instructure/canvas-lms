@@ -34,8 +34,16 @@ import {subscribe} from 'jquery-tinypubsub'
 // It uses OutcomeView and OutcomeGroupView to render
 
 export default class ContentView extends Backbone.View {
-  initialize({readOnly, setQuizMastery, useForScoring, instructionsTemplate, renderInstructions}) {
+  initialize({
+    readOnly,
+    setQuizMastery,
+    useForScoring,
+    instructionsTemplate,
+    renderInstructions,
+    inFindDialog
+  }) {
     this.readOnly = readOnly
+    this.inFindDialog = inFindDialog
     this.setQuizMastery = setQuizMastery
     this.useForScoring = useForScoring
     this.instructionsTemplate = instructionsTemplate
@@ -64,6 +72,7 @@ export default class ContentView extends Backbone.View {
     viewOpts = {
       ...viewOpts,
       readOnly: this.readOnly,
+      inFindDialog: this.inFindDialog,
       setQuizMastery: this.setQuizMastery,
       useForScoring: this.useForScoring
     }

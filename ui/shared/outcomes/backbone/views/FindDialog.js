@@ -81,6 +81,7 @@ export default class FindDialog extends DialogBaseView {
       el: this.$el.find('.outcomes-content'),
       instructionsTemplate,
       readOnly: true,
+      inFindDialog: true,
       setQuizMastery: opts.setQuizMastery,
       useForScoring: opts.useForScoring
     })
