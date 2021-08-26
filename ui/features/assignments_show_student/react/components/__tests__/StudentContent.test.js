@@ -16,17 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import StudentContent from '../StudentContent'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
+import ContextModuleApi from '../../apis/ContextModuleApi'
 import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 
 jest.mock('../AttemptSelect')
 
+jest.mock('../../apis/ContextModuleApi')
+
 describe('Assignment Student Content View', () => {
+  beforeEach(() => {
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
+  })
+
   it('renders the student header if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
@@ -158,6 +165,47 @@ describe('Assignment Student Content View', () => {
       )
 
       expect(await findByText('View Rubric')).toBeInTheDocument()
+    })
+
+    describe('module links', () => {
+      beforeEach(() => {
+        window.ENV.ASSIGNMENT_ID = '1'
+        window.ENV.COURSE_ID = '1'
+
+        ContextModuleApi.getContextModuleData.mockClear()
+      })
+
+      it('renders next and previous module links if they exist for the assignment', async () => {
+        ContextModuleApi.getContextModuleData.mockResolvedValue({
+          next: {url: '/next', tooltipText: {string: 'Next'}},
+          previous: {url: '/previous', tooltipText: {string: 'Previous'}}
+        })
+
+        const {getByTestId} = render(
+          <MockedProvider>
+            <StudentContent {...props} />
+          </MockedProvider>
+        )
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+
+        const footer = getByTestId('student-footer')
+        expect(within(footer).getByRole('link', {name: /Previous/})).toBeInTheDocument()
+        expect(within(footer).getByRole('link', {name: /Next/})).toBeInTheDocument()
+      })
+
+      it('does not render module links if no next/previous modules exist for the assignment', async () => {
+        ContextModuleApi.getContextModuleData.mockResolvedValue({})
+
+        const {queryByRole} = render(
+          <MockedProvider>
+            <StudentContent {...props} />
+          </MockedProvider>
+        )
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+
+        expect(queryByRole('link', {name: /Previous/})).not.toBeInTheDocument()
+        expect(queryByRole('link', {name: /Next/})).not.toBeInTheDocument()
+      })
     })
   })
 

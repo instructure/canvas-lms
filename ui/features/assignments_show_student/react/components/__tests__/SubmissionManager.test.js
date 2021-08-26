@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mount} from 'enzyme'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   CREATE_SUBMISSION,
@@ -26,6 +25,7 @@ import {
 } from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
+import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -37,6 +37,8 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
 jest.mock('@canvas/rce/RichContentEditor')
+
+jest.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -51,6 +53,10 @@ describe('SubmissionManager', () => {
     window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
+  })
+
+  beforeEach(() => {
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
   })
 
   it('renders the AttemptTab', async () => {
@@ -984,6 +990,71 @@ describe('SubmissionManager', () => {
 
       expect(queryByTestId('student-footer')).not.toBeInTheDocument()
     })
+
+    describe('modules', () => {
+      let oldEnv
+
+      beforeEach(() => {
+        oldEnv = window.ENV
+        window.ENV = {
+          ...oldEnv,
+          ASSIGNMENT_ID: '1',
+          COURSE_ID: '1'
+        }
+
+        ContextModuleApi.getContextModuleData.mockClear()
+      })
+
+      afterEach(() => {
+        window.ENV = oldEnv
+      })
+
+      it('renders next and previous module links if they exist for the assignment', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+
+        ContextModuleApi.getContextModuleData.mockResolvedValue({
+          next: {url: '/next', tooltipText: {string: 'some module'}},
+          previous: {url: '/previous', tooltipText: {string: 'some module'}}
+        })
+
+        const {getByTestId} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+        const footer = getByTestId('student-footer')
+        expect(within(footer).getByRole('link', {name: /Previous/})).toBeInTheDocument()
+        expect(within(footer).getByRole('link', {name: /Next/})).toBeInTheDocument()
+      })
+
+      it('does not render module buttons if no next/previous modules exist for the assignment', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+
+        ContextModuleApi.getContextModuleData.mockResolvedValue({})
+
+        const {queryByRole} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+        expect(queryByRole('link', {name: /Previous/})).not.toBeInTheDocument()
+        expect(queryByRole('link', {name: /Next/})).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('similarity pledge', () => {
@@ -1065,65 +1136,6 @@ describe('SubmissionManager', () => {
 
       const submitButton = getByRole('button', {name: 'Submit Assignment'})
       expect(submitButton).not.toBeDisabled()
-    })
-  })
-
-  describe('Module sequence footer buttons', () => {
-    let props
-    let wrapper
-    let submissionManager
-
-    beforeEach(async () => {
-      window.ENV.CONTEXT_MODULE_ITEM = {
-        done: false,
-        id: '1',
-        module_id: '2'
-      }
-      window.ENV.ASSIGNMENT_ID = 1
-      window.ENV.COURSE_ID = 1
-
-      props = await mockAssignmentAndSubmission()
-
-      wrapper = mount(
-        <MockedProvider>
-          <SubmissionManager {...props} />
-        </MockedProvider>
-      )
-      submissionManager = wrapper.find(SubmissionManager)
-    })
-
-    afterEach(() => {
-      delete window.ENV.CONTEXT_MODULE_ITEM
-      delete window.ENV.ASSIGNMENT_ID
-      delete window.ENV.COURSE_ID
-    })
-
-    it('contains the Previous button when previousModuleObject is defined', async () => {
-      submissionManager.setState({
-        previousModuleObject: {
-          tooltipText: 'Assignment 1',
-          url: 'http://example.com/courses/1/modules/items/14'
-        }
-      })
-      expect(wrapper.find({'data-testid': 'previous-assignment-btn'}).exists()).toBeTruthy()
-    })
-
-    it('contains the Next button when nextModuleObject is defined', async () => {
-      submissionManager.setState({
-        nextModuleObject: {
-          tooltipText: 'Assignment 2',
-          url: 'http://example.com/courses/1/modules/items/15'
-        }
-      })
-      expect(wrapper.find({'data-testid': 'next-assignment-btn'})).toBeTruthy()
-    })
-
-    it('not contains the Previous button when previousModuleObject is not defined', async () => {
-      expect(wrapper.find({'data-testid': 'previous-assignment-btn'}).exists()).toBeFalsy()
-    })
-
-    it('not contains the Next button when nextModuleObject is not defined', async () => {
-      expect(wrapper.find({'data-testid': 'next-assignment-btn'}).exists()).toBeFalsy()
     })
   })
 })
