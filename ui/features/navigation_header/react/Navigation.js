@@ -55,11 +55,6 @@ const TYPE_FILTER_MAP = {
   groups: group => group.can_access && !group.concluded
 }
 
-// whether or not to retrieve the entire result set
-const TYPE_FULL_RESULT_SET_MAP = {
-  history: true
-}
-
 const RESOURCE_COUNT = 10
 
 // give the trays that slide out from the the nav bar
@@ -199,7 +194,7 @@ export default class Navigation extends React.Component {
       const newData = previousData.concat(this.filterDataForType(data, type))
 
       // queue the next page if we need one
-      if (newData.length < RESOURCE_COUNT || TYPE_FULL_RESULT_SET_MAP[type]) {
+      if (newData.length < RESOURCE_COUNT) {
         const link = parseLinkHeader(xhr)
         if (link.next) {
           this.loadResourcePage(link.next, type, newData)
