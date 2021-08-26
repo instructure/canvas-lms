@@ -810,46 +810,69 @@ describe AssignmentsController do
       before do
         @course.enable_feature!(:assignments_2_student)
         @course.save!
-        user_session(@student)
       end
 
-      it "sets unlock date as a prerequisite for date locked assignment" do
-        @assignment.unlock_at = 1.week.from_now
-        @assignment.lock_at = 2.weeks.from_now
-        @assignment.due_at = 10.days.from_now
-        @assignment.submission_types = 'text_tool'
-        @assignment.save!
+      context "when not logged in" do
+        it "redirects to the login page for a non-public course" do
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(response).to redirect_to(login_url)
+        end
 
-        get 'show', params: {course_id: @course.id, id: @assignment.id}
-
-        expect(assigns[:js_env][:PREREQS][:unlock_at]).to eq(@assignment.unlock_at)
+        it "renders the 'old' assignment page layout for a public course" do
+          @course.update!(is_public: true)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(response).to render_template("assignments/show")
+        end
       end
 
-      it "sets the previous assignment as a prerequisite for assignment in module with prerequisite requirement" do
-        @mod = @course.context_modules.create!(name: 'Module 1')
-        @mod2 = @course.context_modules.create!(name: 'Module 2')
+      context "when logged in as a student" do
+        before do
+          user_session(@student)
+        end
 
-        @assignment2 = @course.assignments.create(title: "another assignment")
+        it "does not render the 'old' assignment page layout" do
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(response).not_to render_template("assignments/show")
+        end
 
-        @tag = @mod.add_item(type: 'assignment', id: @assignment.id)
-        @mod2.add_item(type: 'assignment', id: @assignment2.id)
-        @mod.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
-        @mod2.prerequisites = "module_#{@mod.id}"
-        @mod.save!
-        @mod2.save!
+        it "sets unlock date as a prerequisite for date locked assignment" do
+          @assignment.unlock_at = 1.week.from_now
+          @assignment.lock_at = 2.weeks.from_now
+          @assignment.due_at = 10.days.from_now
+          @assignment.submission_types = 'text_tool'
+          @assignment.save!
 
-        get 'show', params: {course_id: @course.id, id: @assignment2.id}
+          get 'show', params: {course_id: @course.id, id: @assignment.id}
 
-        expect(assigns[:js_env][:PREREQS][:items].first[:prev][:title]).to eq(@assignment.title)
-      end
+          expect(assigns[:js_env][:PREREQS][:unlock_at]).to eq(@assignment.unlock_at)
+        end
 
-      it "sets belongs to unpublished module when assignment is part of a unpublished module" do
-        @mod = @course.context_modules.create!(name: 'Unpublished module')
-        @mod.unpublish
-        @mod.add_item(type: 'assignment', id: @assignment.id)
+        it "sets the previous assignment as a prerequisite for assignment in module with prerequisite requirement" do
+          @mod = @course.context_modules.create!(name: 'Module 1')
+          @mod2 = @course.context_modules.create!(name: 'Module 2')
 
-        get 'show', params: {course_id: @course.id, id: @assignment.id}
-        expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
+          @assignment2 = @course.assignments.create(title: "another assignment")
+
+          @tag = @mod.add_item(type: 'assignment', id: @assignment.id)
+          @mod2.add_item(type: 'assignment', id: @assignment2.id)
+          @mod.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+          @mod2.prerequisites = "module_#{@mod.id}"
+          @mod.save!
+          @mod2.save!
+
+          get 'show', params: {course_id: @course.id, id: @assignment2.id}
+
+          expect(assigns[:js_env][:PREREQS][:items].first[:prev][:title]).to eq(@assignment.title)
+        end
+
+        it "sets belongs to unpublished module when assignment is part of a unpublished module" do
+          @mod = @course.context_modules.create!(name: 'Unpublished module')
+          @mod.unpublish
+          @mod.add_item(type: 'assignment', id: @assignment.id)
+
+          get 'show', params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
+        end
       end
     end
 
