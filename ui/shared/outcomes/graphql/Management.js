@@ -61,6 +61,11 @@ export const CHILD_GROUPS_QUERY = gql`
       }
       ... on LearningOutcomeGroup {
         _id
+        title
+        parentOutcomeGroup {
+          _id
+          title
+        }
         ...ChildGroupsFragment
       }
     }

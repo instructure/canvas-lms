@@ -70,7 +70,7 @@ describe('TargetGroupSelector', () => {
 
   it('loads nested groups', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [...smallOutcomeTree()]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -80,7 +80,7 @@ describe('TargetGroupSelector', () => {
 
   it('calls setTargetGroup with the selected group object and ancestors ids', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [...smallOutcomeTree()]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))

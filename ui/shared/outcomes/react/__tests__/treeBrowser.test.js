@@ -20,7 +20,7 @@ import React from 'react'
 import {createCache} from '@canvas/apollo'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
-import {accountMocks} from '../../mocks/Management'
+import {smallOutcomeTree} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {MockedProvider} from '@apollo/react-testing'
 
@@ -30,11 +30,6 @@ describe('useManageOutcomes', () => {
   let cache
   let mocks
 
-  beforeEach(() => {
-    cache = createCache()
-    mocks = accountMocks()
-  })
-
   const wrapper = ({children}) => (
     <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
       <MockedProvider cache={cache} mocks={mocks}>
@@ -43,7 +38,28 @@ describe('useManageOutcomes', () => {
     </OutcomesContext.Provider>
   )
 
-  test('it doesnt show deleted group after rerender', async () => {
+  beforeEach(() => {
+    cache = createCache()
+    mocks = smallOutcomeTree()
+  })
+
+  it('works with initialGroupId', async () => {
+    const {result} = renderHook(
+      () => useManageOutcomes({collection: 'test', initialGroupId: '400'}),
+      {wrapper}
+    )
+
+    await act(async () => jest.runAllTimers())
+    expect(result.current.selectedGroupId).toBe('400')
+    expect(result.current.selectedParentGroupId).toBe('100')
+
+    act(() => result.current.queryCollections({id: '100'}))
+    await act(async () => jest.runAllTimers())
+    expect(result.current.selectedGroupId).toBe('100')
+    expect(result.current.selectedParentGroupId).toBe('1')
+  })
+
+  it('it doesnt show deleted group after rerender', async () => {
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
     await act(async () => jest.runAllTimers())
 

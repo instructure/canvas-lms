@@ -23,20 +23,40 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import CreateOutcomeModal from '../CreateOutcomeModal'
 import {MockedProvider} from '@apollo/react-testing'
+import {createCache} from '../../../../shared/apollo'
+import {smallOutcomeTree} from '../../../../shared/outcomes/mocks/Management'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
 jest.mock('../CreateOutcomeModal')
-CreateOutcomeModal.mockImplementation(() => <div>CreateOutcomeModal</div>)
+CreateOutcomeModal.mockImplementation(({starterGroupId = ''}) => (
+  <div>
+    CreateOutcomeModal <span>{starterGroupId}</span>
+  </div>
+))
 jest.useFakeTimers()
+
+let cache
 
 const render = (
   children,
-  {isMobileView = false, canManage = true, canImport = true, renderer = rtlRender} = {}
+  {
+    contextType = 'Account',
+    contextId = '1',
+    isMobileView = false,
+    canManage = true,
+    canImport = true,
+    renderer = rtlRender,
+    mocks = []
+  } = {}
 ) => {
   return renderer(
-    <OutcomesContext.Provider value={{env: {isMobileView, canManage, canImport}}}>
-      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    <OutcomesContext.Provider
+      value={{env: {isMobileView, canManage, canImport, contextType, contextId}}}
+    >
+      <MockedProvider cache={cache} mocks={mocks}>
+        {children}
+      </MockedProvider>
     </OutcomesContext.Provider>
   )
 }
@@ -53,11 +73,13 @@ describe('ManagementHeader', () => {
 
   beforeEach(() => {
     handleAddOutcomesMock = jest.fn()
+    cache = createCache()
   })
 
   afterEach(() => {
     showImportOutcomesModal.mockRestore()
     jest.clearAllMocks()
+    showImportOutcomesModal.mockRestore()
   })
 
   it('renders Outcomes title', () => {
@@ -225,6 +247,20 @@ describe('ManagementHeader', () => {
       await act(async () => jest.runAllTimers())
       expect(CreateOutcomeModal).toHaveBeenCalled()
       expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
+    })
+  })
+
+  describe('Drilldown', () => {
+    it('renders CreateOutcomeModal with starterGroupId if lhsGroupId is provided', async () => {
+      const lhsGroupId = 'starter group id'
+
+      const {queryByText} = render(<ManagementHeader {...defaultProps({lhsGroupId})} />, {
+        mocks: smallOutcomeTree()
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(queryByText('Create'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText(lhsGroupId)).toBeInTheDocument()
     })
   })
 })

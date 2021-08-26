@@ -43,7 +43,11 @@ import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
 
-const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
+const OutcomeManagementPanel = ({
+  importNumber,
+  createdOutcomeGroupIds,
+  onLhsSelectedGroupIdChanged
+}) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
@@ -66,7 +70,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
     clearCache
-  } = useManageOutcomes('OutcomeManagementPanel', {importNumber})
+  } = useManageOutcomes({collection: 'OutcomeManagementPanel', importNumber})
 
   useEffect(() => {
     return () => {
@@ -84,6 +88,14 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [showGroupOptions, setShowGroupOptions] = useState(false)
+
+  useEffect(() => {
+    if (onLhsSelectedGroupIdChanged) {
+      onLhsSelectedGroupIdChanged(selectedGroupId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGroupId])
+
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -371,11 +383,10 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             <GroupMoveModal
               groupId={selectedGroupId}
               groupTitle={group?.title}
-              parentGroupId={selectedParentGroupId}
               isOpen={isGroupMoveModalOpen}
               onCloseHandler={closeGroupMoveModal}
               onSuccess={selectParentGroupInLhs}
-              rootGroup={collections[rootId]}
+              parentGroup={collections[selectedParentGroupId]}
             />
           )}
           {selectedOutcome && (
@@ -398,7 +409,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
                 onCloseHandler={onCloseOutcomeMoveModal}
                 onCleanupHandler={onCloseOutcomeMoveModal}
                 onSuccess={onSuccessMoveOutcomes}
-                rootGroup={collections[rootId]}
+                initialTargetGroup={collections[selectedGroupId]}
               />
             </>
           )}
@@ -433,7 +444,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             onCloseHandler={closeOutcomesMoveModal}
             onCleanupHandler={onCloseOutcomesMoveModal}
             onSuccess={onSuccessMoveOutcomes}
-            rootGroup={collections[rootId]}
+            initialTargetGroup={collections[selectedGroupId]}
           />
         </>
       )}
@@ -447,6 +458,7 @@ OutcomeManagementPanel.defaultProps = {
 
 OutcomeManagementPanel.propTypes = {
   createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
+  onLhsSelectedGroupIdChanged: PropTypes.func,
   importNumber: PropTypes.number
 }
 

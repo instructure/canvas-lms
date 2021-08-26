@@ -42,7 +42,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from './shared/OutcomesRceField'
 
-const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess}) => {
+const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
@@ -51,7 +51,11 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess}) => {
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const {rootId, collections, addNewGroup} = useManageOutcomes('OutcomeManagementPanel')
+  const {rootId, collections} = useManageOutcomes({
+    collection: 'OutcomeManagementPanel',
+    initialGroupId: starterGroupId
+  })
+
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
 
@@ -167,6 +171,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess}) => {
         shouldReturnFocus
         onDismiss={closeModal}
         shouldCloseOnDocumentClick={false}
+        data-testid="createOutcomeModal"
       >
         <Modal.Body>
           {!isMobileView ? (
@@ -215,8 +220,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess}) => {
                 setSelectedGroupAncestorIds(targetAncestorsIds)
                 setSelectedGroup(targetGroup)
               }}
-              onGroupCreated={addNewGroup}
-              modalName="CreateOutcomeModal"
+              starterGroupId={starterGroupId}
             />
           </View>
         </Modal.Body>
@@ -248,7 +252,8 @@ CreateOutcomeModal.defaultProps = {
 CreateOutcomeModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func
+  onSuccess: PropTypes.func,
+  starterGroupId: PropTypes.string
 }
 
 export default CreateOutcomeModal

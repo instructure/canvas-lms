@@ -19,7 +19,12 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
-import {accountMocks, smallOutcomeTree, moveOutcomeMock} from '@canvas/outcomes/mocks/Management'
+import {
+  accountMocks,
+  smallOutcomeTree,
+  moveOutcomeMock,
+  groupMocks
+} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import OutcomeMoveModal from '../OutcomeMoveModal'
@@ -33,6 +38,7 @@ describe('OutcomeMoveModal', () => {
   let onCloseHandlerMock
   let onCleanupHandlerMock
   let showFlashAlertSpy
+  let defaultMocks
   const generateOutcomes = num =>
     new Array(num).fill(0).reduce(
       (acc, _val, ind) => ({
@@ -52,9 +58,9 @@ describe('OutcomeMoveModal', () => {
     onCloseHandler: onCloseHandlerMock,
     onCleanupHandler: onCleanupHandlerMock,
     outcomes: generateOutcomes(1),
-    rootGroup: {
-      id: '0',
-      title: 'Root account folder'
+    initialTargetGroup: {
+      id: '1',
+      name: 'Root account folder'
     },
     ...props
   })
@@ -64,6 +70,16 @@ describe('OutcomeMoveModal', () => {
     onCloseHandlerMock = jest.fn()
     onCleanupHandlerMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    defaultMocks = [
+      ...accountMocks({childGroupsCount: 0}),
+      ...groupMocks({
+        childGroupsCount: 2,
+        title: 'Root account folder',
+        groupId: '1',
+        childGroupTitlePrefix: 'Account folder',
+        childGroupOffset: 100
+      })
+    ]
   })
 
   afterEach(() => {
@@ -76,7 +92,7 @@ describe('OutcomeMoveModal', () => {
       contextType = 'Account',
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
-      mocks = accountMocks({childGroupsCount: 0})
+      mocks = defaultMocks
     } = {}
   ) => {
     return realRender(
@@ -132,7 +148,7 @@ describe('OutcomeMoveModal', () => {
 
   it('enables the move button by default', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [...smallOutcomeTree()]
     })
     await act(async () => jest.runAllTimers())
     expect(getByText('Move').closest('button')).toBeEnabled()
@@ -140,7 +156,7 @@ describe('OutcomeMoveModal', () => {
 
   it('enables the move button when a child group is selected', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [...defaultMocks, ...smallOutcomeTree()]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -153,7 +169,7 @@ describe('OutcomeMoveModal', () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
-        mocks: [...smallOutcomeTree('Account'), moveOutcomeMock()]
+        mocks: [...defaultMocks, ...smallOutcomeTree(), moveOutcomeMock()]
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -177,7 +193,8 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
         mocks: [
-          ...smallOutcomeTree('Account'),
+          ...defaultMocks,
+          ...smallOutcomeTree(),
           moveOutcomeMock({
             failResponse: true
           })
@@ -201,7 +218,8 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
         mocks: [
-          ...smallOutcomeTree('Account'),
+          ...defaultMocks,
+          ...smallOutcomeTree(),
           moveOutcomeMock({
             failMutation: true
           })
@@ -224,7 +242,8 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
         mocks: [
-          ...smallOutcomeTree('Account'),
+          ...defaultMocks,
+          ...smallOutcomeTree(),
           moveOutcomeMock({
             failMutationNoErrMsg: true
           })
@@ -247,7 +266,8 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
         mocks: [
-          ...smallOutcomeTree('Account'),
+          ...defaultMocks,
+          ...smallOutcomeTree(),
           moveOutcomeMock({
             partialSuccess: true
           })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, act, within} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {
   OutcomePanel,
@@ -30,6 +30,7 @@ import {
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
 import * as OutcomesImporter from '@canvas/outcomes/react/OutcomesImporter'
+import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter')
 jest.useFakeTimers()
@@ -289,6 +290,69 @@ describe('OutcomeManagement', () => {
     })
 
     sharedExamples()
+  })
+
+  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
+    window.ENV = {
+      context_asset_string: 'course_2',
+      CONTEXT_URL_ROOT: '/course/2',
+      IMPROVED_OUTCOMES_MANAGEMENT: true,
+      PERMISSIONS: {
+        manage_proficiency_calculations: true,
+        manage_outcomes: true
+      },
+      current_user: {id: '1'}
+    }
+    const mocks = [
+      ...courseMocks({childGroupsCount: 2}),
+      ...groupMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        parentOutcomeGroupTitle: 'Root course folder',
+        parentOutcomeGroupId: '2'
+      }),
+      ...groupDetailMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false
+      }),
+      ...groupMocks({
+        groupId: '300',
+        childGroupOffset: 400,
+        parentOutcomeGroupTitle: 'Course folder 0',
+        parentOutcomeGroupId: '200'
+      }),
+      ...groupDetailMocks({
+        groupId: '300',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false
+      })
+    ]
+    const {getByText, getByTestId} = render(
+      <MockedProvider cache={cache} mocks={mocks}>
+        <OutcomeManagement breakpoints={{tablet: true}} />
+      </MockedProvider>
+    )
+    await act(async () => jest.runAllTimers())
+
+    // Select a group in the lsh
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+
+    // The easy way to determine if lsh is passing to ManagementHeader is
+    // to open the create outcome modal and check if the lhs group was loaded
+    // by checking if the child of the lhs group is there
+    fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
+    await act(async () => jest.runAllTimers())
+    expect(
+      within(getByTestId('createOutcomeModal')).getByText('Course folder 0')
+    ).toBeInTheDocument()
+    expect(
+      within(getByTestId('createOutcomeModal')).getByText('Group 200 folder 0')
+    ).toBeInTheDocument()
   })
 })
 
