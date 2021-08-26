@@ -24,12 +24,13 @@ import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import React, {createRef} from 'react'
+import theme from '@instructure/canvas-theme'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine, IconExternalLinkLine, IconLinkLine} from '@instructure/ui-icons'
+import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -205,9 +206,11 @@ class UrlEntry extends React.Component {
   renderAttempt = () => (
     <View as="div" borderWidth="small" data-testid="url-entry" margin="0 0 medium 0">
       <Billboard
-        heading={I18n.t('Website Url')}
-        hero={<IconLinkLine color="brand" />}
+        heading={I18n.t('Enter Web URL')}
+        headingAs="h4"
+        headingLevel="h4"
         message={this.renderURLInput()}
+        theme={{backgroundColor: theme.variables.colors.porcelain}}
       />
     </View>
   )
