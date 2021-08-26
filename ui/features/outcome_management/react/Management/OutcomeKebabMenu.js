@@ -45,7 +45,7 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescriptio
     >
       <Menu.Item value="edit">
         <IconEditLine size="x-small" />
-        <View padding="0 small" data-testid="outcome-kebab-menu-edit">
+        <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-edit">
           {I18n.t('Edit')}
         </View>
       </Menu.Item>
@@ -57,7 +57,7 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescriptio
       </Menu.Item>
       <Menu.Item value="move">
         <IconMoveEndLine size="x-small" />
-        <View padding="0 small" data-testid="outcome-kebab-menu-move">
+        <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-move">
           {I18n.t('Move')}
         </View>
       </Menu.Item>
