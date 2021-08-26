@@ -27,6 +27,7 @@ import {
 import {
   up as configureDateTime
 } from './initializers/configureDateTime'
+import { up as enableDTNPI } from './initializers/enableDTNPI'
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
 // on the page from rails, so this should not cause a new network request.
@@ -34,6 +35,7 @@ moment().locale(ENV.MOMENT_LOCALE)
 
 configureDateTimeMomentParser()
 configureDateTime()
+enableDTNPI()
 
 // This will inject and set up sentry for deprecation reporting.  It should be
 // stripped out and be a no-op in production.
