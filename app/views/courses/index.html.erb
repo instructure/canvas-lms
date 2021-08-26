@@ -20,9 +20,13 @@
   if k5_user?
     all_courses_title = t('All Subjects')
     courses_title = t('Subjects')
+    course_label = t('Subject')
+    add_course_aria_label = t('Add a Subject')
   else
     all_courses_title = t('headings.my_courses', %{All Courses})
     courses_title = t('titles.courses', 'Courses')
+    course_label = t('Course')
+    add_course_aria_label = t('Add a Course')
   end
 %>
 
@@ -49,9 +53,14 @@
                   id="start_new_course"
                   class="Button element_toggler"
                   aria-controls="new_course_form"
-                  aria-label="<%= t('Add a Course') %>">
-                  <i class="icon-plus"></i> <%= t('start_new_course', 'Course') %></button>
-          <%= render :partial => 'shared/new_course_form' %>
+                  aria-label="<%= add_course_aria_label %>"
+          >
+                  <i class="icon-plus"></i> <%= course_label %></button>
+          <% if k5_user? %>
+            <div id="create_subject_modal_container"></div>
+          <% else %>
+            <%= render :partial => 'shared/new_course_form' %>
+          <% end %>
       <% end %>
     </div>
   </div>
@@ -63,7 +72,7 @@
     <thead>
       <tr>
         <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
+        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
         <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>
@@ -87,7 +96,7 @@
     <thead>
       <tr>
         <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
+        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
         <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>
@@ -111,7 +120,7 @@
     <thead>
       <tr>
         <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
+        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
         <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
         <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
         <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>

@@ -26,23 +26,23 @@ describe "course index" do
   include CourseIndexPage
 
   before :once do
-    classic_account = Account.create!(name: "Classic", parent_account: Account.default)
-    k5_account = Account.create!(name: "Elementary", parent_account: Account.default)
-    toggle_k5_setting(k5_account)
+    @classic_account = Account.create!(name: "Classic", parent_account: Account.default)
+    @k5_account = Account.create!(name: "Elementary", parent_account: Account.default)
+    toggle_k5_setting(@k5_account)
     @user = User.create!
 
     @current_courses = []
-    @current_courses << course_with_student(:course_name => "Classic Course (Current)", :account => classic_account, :user => @user, :active_all => true).course
-    @current_courses << course_with_student(:course_name => "K5 Course (Current)", :account => k5_account, :user => @user, :active_all => true).course
+    @current_courses << course_with_student(:course_name => "Classic Course (Current)", :account => @classic_account, :user => @user, :active_all => true).course
+    @current_courses << course_with_student(:course_name => "K5 Course (Current)", :account => @k5_account, :user => @user, :active_all => true).course
 
     @past_courses = []
-    @past_courses << course_with_student(:course_name => "Classic Course (Past)", :account => classic_account, :user => @user, :active_all => true).course
-    @past_courses << course_with_student(:course_name => "K5 Course (Past)", :account => k5_account, :user => @user, :active_all => true).course
+    @past_courses << course_with_student(:course_name => "Classic Course (Past)", :account => @classic_account, :user => @user, :active_all => true).course
+    @past_courses << course_with_student(:course_name => "K5 Course (Past)", :account => @k5_account, :user => @user, :active_all => true).course
     @past_courses.each(&:complete!)
 
     @future_courses = []
-    @future_courses << course_with_student(:course_name => "Classic Course (Future)", :account => classic_account, :user => @user).course
-    @future_courses << course_with_student(:course_name => "K5 Course (Future)", :account => k5_account, :user => @user).course
+    @future_courses << course_with_student(:course_name => "Classic Course (Future)", :account => @classic_account, :user => @user).course
+    @future_courses << course_with_student(:course_name => "K5 Course (Future)", :account => @k5_account, :user => @user).course
     @future_courses.each do |c|
       c.start_at = 1.week.from_now
       c.conclude_at = 6.weeks.from_now
@@ -107,6 +107,32 @@ describe "course index" do
       ["K5 Course (Current)", "K5 Course (Past)", "K5 Course (Future)"].each do |name|
         expect(row_with_text(name)).not_to contain_css(star)
       end
+    end
+  end
+
+  context "start new course button" do
+    it "launches k5 dialog for k5 users" do
+      course_with_teacher_logged_in(:account => @k5_account)
+      @teacher.account.settings[:teachers_can_create_courses] = true
+      @teacher.account.save!
+
+      get "/courses"
+      add_course_button = f('#start_new_course')
+      expect(add_course_button).to include_text("Subject")
+      add_course_button.click
+      expect(fj('h2:contains("Create Subject")')).to be_displayed
+    end
+
+    it "launches new course dialog for non-k5 users" do
+      course_with_teacher_logged_in(:account => @classic_account)
+      @teacher.account.settings[:teachers_can_create_courses] = true
+      @teacher.account.save!
+
+      get "/courses"
+      add_course_button = f('#start_new_course')
+      expect(add_course_button).to include_text("Course")
+      add_course_button.click
+      expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
     end
   end
 end
