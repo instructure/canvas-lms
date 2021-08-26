@@ -202,6 +202,17 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
   ${DiscussionEntry.fragment}
 `
 
+export const UPDATE_DISCUSSION_THREAD_READ_STATE = gql`
+  mutation UpdateDiscussionThreadReadState($discussionEntryId: ID!, $read: Boolean!) {
+    updateDiscussionThreadReadState(input: {discussionEntryId: $discussionEntryId, read: $read}) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+`
+
 export const UPDATE_DISCUSSION_READ_STATE = gql`
   mutation UpdateDiscussionReadState($discussionTopicId: ID!, $read: Boolean!) {
     updateDiscussionReadState(input: {discussionTopicId: $discussionTopicId, read: $read}) {

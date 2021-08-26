@@ -27,7 +27,9 @@ import {
   IconDiscussionLine,
   IconEditLine,
   IconTrashLine,
-  IconSpeedGraderLine
+  IconSpeedGraderLine,
+  IconMarkAsReadSolid,
+  IconMarkAsReadLine
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -47,7 +49,8 @@ export const ThreadActions = props => {
       goToParent: props.goToParent,
       onEdit: props.onEdit,
       onDelete: props.onDelete,
-      onOpenInSpeedGrader: props.onOpenInSpeedGrader
+      onOpenInSpeedGrader: props.onOpenInSpeedGrader,
+      onMarkThreadAsRead: props.onMarkThreadAsRead
     }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
@@ -83,15 +86,15 @@ const getMenuConfigs = props => {
     options.push({
       key: 'markAllAsRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Thread as Read'),
-      selectionCallback: props.onMarkAllAsUnread
+      label: I18n.t('Mark All as Read'),
+      selectionCallback: props.onMarkAllAsRead
     })
   }
   if (props.onMarkAllAsUnread) {
     options.push({
       key: 'markAllAsUnRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Thread as Unread'),
+      label: I18n.t('Mark All as Unread'),
       selectionCallback: props.onMarkAllAsUnread
     })
   }
@@ -108,6 +111,26 @@ const getMenuConfigs = props => {
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark as Unread'),
       selectionCallback: props.onToggleUnread
+    })
+  }
+  if (props.onMarkThreadAsRead) {
+    options.push({
+      key: 'markThreadAsRead',
+      icon: <IconMarkAsReadLine />,
+      label: I18n.t('Mark Thread as Read'),
+      selectionCallback: () => {
+        props.onMarkThreadAsRead(true)
+      }
+    })
+  }
+  if (props.onMarkThreadAsRead) {
+    options.push({
+      key: 'markThreadAsUnRead',
+      icon: <IconMarkAsReadSolid />,
+      label: I18n.t('Mark Thread as Unread'),
+      selectionCallback: () => {
+        props.onMarkThreadAsRead(false)
+      }
     })
   }
   if (props.goToTopic) {
@@ -174,6 +197,7 @@ ThreadActions.propTypes = {
   id: PropTypes.string.isRequired,
   onMarkAllAsUnread: PropTypes.func,
   onMarkAllAsRead: PropTypes.func,
+  onMarkThreadAsRead: PropTypes.func,
   onToggleUnread: PropTypes.func.isRequired,
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,

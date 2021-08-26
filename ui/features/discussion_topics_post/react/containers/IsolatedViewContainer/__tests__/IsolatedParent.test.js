@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {IsolatedParent} from '../IsolatedParent'
+import {mswClient} from '../../../../../../shared/msw/mswClient'
 import React from 'react'
 
 jest.mock('../../../utils', () => ({
@@ -48,7 +50,11 @@ describe('IsolatedParent', () => {
   })
 
   const setup = props => {
-    return render(<IsolatedParent {...props} />)
+    return render(
+      <ApolloProvider client={mswClient}>
+        <IsolatedParent {...props} />
+      </ApolloProvider>
+    )
   }
 
   describe('thread actions menu', () => {

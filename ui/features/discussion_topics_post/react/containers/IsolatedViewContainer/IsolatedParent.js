@@ -33,14 +33,27 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT} from '../../../graphql/Mutations'
-import {useMutation} from 'react-apollo'
+import {
+  UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
+  UPDATE_DISCUSSION_THREAD_READ_STATE
+} from '../../../graphql/Mutations'
+import {useMutation, useApolloClient} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedParent = props => {
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
     UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
   )
+
+  const client = useApolloClient()
+  const resetDiscussionCache = () => {
+    client.resetStore()
+  }
+
+  const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
+    update: resetDiscussionCache
+  })
+
   const [isEditing, setIsEditing] = useState(false)
   const threadActions = []
 
@@ -170,6 +183,16 @@ export const IsolatedParent = props => {
                           props.discussionTopic.permissions?.speedGrader
                             ? props.onOpenInSpeedGrader
                             : null
+                        }
+                        onMarkThreadAsRead={readState =>
+                          updateDiscussionThreadReadState({
+                            variables: {
+                              discussionEntryId: props.discussionEntry.rootEntryId
+                                ? props.discussionEntry.rootEntryId
+                                : props.discussionEntry.id,
+                              read: readState
+                            }
+                          })
                         }
                       />
                     }
