@@ -41,27 +41,53 @@ describe 'discussions' do
     user_session(@teacher)
   end
 
-  it 'shows direct share options in index page' do
-    DiscussionsIndex.visit(@course)
-    DiscussionsIndex.discussion_menu(@discussion1.title).click
+  context "when discussions redesign feature flag is FF" do
+    before :once do
+      Account.site_admin.disable_feature! :react_discussions_post
+    end
 
-    expect(DiscussionsIndex.manage_discussions_menu.text).to include('Send To...')
-    expect(DiscussionsIndex.manage_discussions_menu.text).to include('Copy To...')
+    it 'shows direct share options in index page' do
+      DiscussionsIndex.visit(@course)
+      DiscussionsIndex.discussion_menu(@discussion1.title).click
+
+      expect(DiscussionsIndex.manage_discussions_menu.text).to include('Send To...')
+      expect(DiscussionsIndex.manage_discussions_menu.text).to include('Copy To...')
+    end
+
+    it 'allows user to send discussion from individual discussion page' do
+      Discussion.visit(@course, @discussion1)
+      Discussion.manage_discussion_button.click
+      Discussion.send_to_menuitem.click
+
+      expect(Discussion.discussion_page_body).to contain_css(send_to_dialog_css_selector)
+    end
+
+    it 'allows user to copy discussion from individual discussion page' do
+      Discussion.visit(@course, @discussion1)
+      Discussion.manage_discussion_button.click
+      Discussion.copy_to_menuitem.click
+
+      expect(Discussion.discussion_page_body).to contain_css(copy_to_dialog_css_selector)
+    end
   end
 
-  it 'allows user to send discussion from individual discussion page' do
-    Discussion.visit(@course, @discussion1)
-    Discussion.manage_discussion_button.click
-    Discussion.send_to_menuitem.click
+  context "when discussions redesign feature flag is ON" do
+    before :once do
+      Account.site_admin.enable_feature! :react_discussions_post
+    end
 
-    expect(Discussion.discussion_page_body).to contain_css(send_to_dialog_css_selector)
-  end
-
-  it 'allows user to copy discussion from individual discussion page' do
-    Discussion.visit(@course, @discussion1)
-    Discussion.manage_discussion_button.click
-    Discussion.copy_to_menuitem.click
-
-    expect(Discussion.discussion_page_body).to contain_css(copy_to_dialog_css_selector)
+    it 'allows user to send discussion from individual discussion page' do
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion1.id}"
+      f("button[data-testid='discussion-post-menu-trigger']").click
+      fj("span[role='menuitem']:contains('Send To...')").click
+      expect(fj("h2:contains('Send To...')")).to be_present
+    end
+  
+    it 'allows user to copy discussion from individual discussion page' do
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion1.id}"
+      f("button[data-testid='discussion-post-menu-trigger']").click
+      fj("span[role='menuitem']:contains('Copy To...')").click
+      expect(fj("h2:contains('Copy To...')")).to be_present
+    end
   end
 end
