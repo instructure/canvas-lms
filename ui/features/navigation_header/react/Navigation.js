@@ -117,16 +117,6 @@ export default class Navigation extends React.Component {
      */
 
     // ////////////////////////////////
-    // / Hover Events
-    // ////////////////////////////////
-
-    Object.keys(TYPE_URL_MAP).forEach(type => {
-      $(`#global_nav_${type}_link`).one('mouseover', () => {
-        this.getResource(TYPE_URL_MAP[type], type)
-      })
-    })
-
-    // ////////////////////////////////
     // / Click Events
     // ////////////////////////////////
     Object.keys(TYPE_URL_MAP).forEach(type => {
