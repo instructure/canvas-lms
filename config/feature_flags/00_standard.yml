@@ -1,5 +1,6 @@
 ---
 allow_opt_out_of_inbox:
+  type: setting
   state: hidden
   display_name:
     features.allow_opt_out_of_inbox: Allow Users to Opt-out of the Inbox
@@ -18,12 +19,14 @@ analytics_2:
     to appear in New Analytics after setting this feature flag to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
 anonymous_instructor_annotations:
+  type: setting
   state: allowed
   display_name: Anonymous Instructor Annotations
   description: Anonymize all instructor comments and annotations within DocViewer
   applies_to: Course
   root_opt_in: false
 autodetect_field_separators_for_gradebook_exports:
+  type: setting
   state: allowed
   display_name: Autodetect field separators in compatible spreadsheet exports
   description: Attempt to detect an appropriate field separator in compatible spreadsheet
@@ -31,6 +34,7 @@ autodetect_field_separators_for_gradebook_exports:
   applies_to: User
   custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook
 common_cartridge_page_conversion:
+  type: setting
   state: hidden
   display_name: Common Cartridge HTML File to Page Conversion
   description: If enabled, Common Cartridge importers will convert HTML files into
@@ -50,6 +54,7 @@ compact_live_event_payloads:
   description: Canvas will remove keys with null values from live event payloads if
     this feature is enabled.
 conditional_release:
+  type: setting
   state: allowed
   display_name: Mastery Paths
   description: Configure individual learning paths for students based on assessment
@@ -59,6 +64,7 @@ conditional_release:
   custom_transition_proc: conditional_release_transition_hook
   after_state_change_proc: conditional_release_after_change_hook
 disable_alert_timeouts:
+  type: setting
   state: allowed
   display_name:
     features.disable_alert_timeouts: Disable Alert Notification Timeouts
@@ -69,6 +75,7 @@ disable_alert_timeouts:
   applies_to: User
   autoexpand: true
 disable_celebrations:
+  type: setting
   state: hidden
   display_name:
     features.hide_celebrations: Disable Celebration Animations
@@ -77,6 +84,7 @@ disable_celebrations:
       animations.
   applies_to: User
 disable_keyboard_shortcuts:
+  type: setting
   state: hidden
   display_name: Disable Keyboard Shortcuts
   description: |-
@@ -108,12 +116,14 @@ embedded_release_notes:
   pending_enforcement: true
   applies_to: Account
 encrypted_sourcedids:
+  type: setting
   state: allowed
   display_name: Encrypted Sourcedids for Basic Outcomes
   description: If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.
   applies_to: RootAccount
   root_opt_in: true
 epub_export:
+  type: setting
   state: allowed
   display_name: ePub Exporting
   description: This enables users to generate and download course ePub.
@@ -147,6 +157,7 @@ filter_speed_grader_by_student_group:
     production:
       state: hidden
 final_grades_override:
+  type: setting
   state: allowed
   display_name: Final Grade Override
   description: Enable ability to alter the final grade for the entire course without
@@ -167,6 +178,7 @@ google_docs_domain_restriction:
   applies_to: RootAccount
   root_opt_in: true
 high_contrast:
+  type: setting
   state: allowed
   display_name:
     features.high_contrast: High Contrast UI
@@ -182,6 +194,7 @@ important_dates:
   description: Enables important dates to be applied to assignments, calendar events, and others.
   applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
+  type: setting
   state: allowed
   display_name: Include Byte-Order Mark in compatible spreadsheet exports
   description: Optionally include a byte-order mark in compatible spreadsheet exports
@@ -195,6 +208,7 @@ international_sms:
   applies_to: RootAccount
   root_opt_in: true
 javascript_csp:
+  type: setting
   state: allowed
   display_name: Content Security Policy
   description: Enable the Security tab on the settings page to adjust CSP settings
@@ -205,6 +219,7 @@ javascript_csp:
     production:
       state: hidden
 k12:
+  type: setting
   state: hidden
   display_name:
     features.k12: K-12 Specific Features
@@ -242,6 +257,7 @@ new_gradebook_plagiarism_indicator:
   description: Enables display of plagiarism reports and similarity scores in the
     New Gradebook submission tray.
 new_sis_integrations:
+  type: setting
   state: hidden
   display_name: Enable new SIS integration settings
   description:
@@ -257,12 +273,14 @@ new_sis_integrations:
   root_opt_in: true
   beta: true
 new_user_tutorial:
+  type: setting
   state: allowed
   display_name: New User Tutorial
   description: Provide tutorial information for new users in a flyout tray.
   applies_to: RootAccount
   root_opt_in: true
 new_user_tutorial_on_off:
+  type: setting
   state: allowed
   display_name: Course Set-up Tutorial
   description: Course set-up tutorial provides tips on how to leverage the feature
@@ -295,6 +313,7 @@ outcome_extra_credit:
   applies_to: Course
   root_opt_in: true
 outcome_gradebook:
+  type: setting
   state: allowed
   display_name:
     features.learning_mastery_gradebook: Learning Mastery Gradebook
@@ -389,6 +408,7 @@ strip_origin_from_quiz_answer_file_references:
     causing CORS failures when a quiz is created in one domain and
     taken in another (like a vanity domain).
 student_outcome_gradebook:
+  type: setting
   state: allowed
   display_name:
     features.student_outcome_gradebook: Student Learning Mastery Gradebook
@@ -407,6 +427,7 @@ timer_without_autosubmission:
   applies_to: RootAccount
   state: hidden
 underline_all_links:
+  type: setting
   state: allowed
   display_name: Underline Links
   description:
@@ -417,6 +438,7 @@ underline_all_links:
       Rich Content Editor, which always underlines links for all users.
   applies_to: User
 use_semi_colon_field_separators_in_gradebook_exports:
+  type: setting
   state: allowed
   display_name: Use semicolons to separate fields in compatible spreadsheet exports
   description: Use semicolons instead of commas to separate fields in compatible spreadsheet
@@ -424,6 +446,7 @@ use_semi_colon_field_separators_in_gradebook_exports:
   applies_to: User
   custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
 wrap_calendar_event_titles:
+  type: setting
   state: allowed
   display_name: Wrap event titles in Calendar month view
   description: Show calendar events in the month view on multiple lines if the title

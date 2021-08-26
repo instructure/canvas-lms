@@ -29,6 +29,7 @@ site_admin_keys_only:
     already behaved in this way.
   applies_to: SiteAdmin
 use_oembed_token:
+  type: setting
   state: hidden
   display_name: Require signed token for oEmbed
   description: |-

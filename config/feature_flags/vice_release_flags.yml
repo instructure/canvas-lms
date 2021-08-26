@@ -1,5 +1,6 @@
 ---
 confetti_for_assignments:
+  type: setting
   state: hidden
   display_name: Confetti for On-Time Submissions
   description: |-
@@ -8,6 +9,7 @@ confetti_for_assignments:
   applies_to: RootAccount
 
 confetti_for_valid_links:
+  type: setting
   state: hidden
   display_name: Confetti for valid links
   description: |-
@@ -23,7 +25,7 @@ react_discussions_post:
     This feature enhances the Canvas experience within Discussions and Announcements.
     When this flag is enabled, early access to ongoing improvements will be
     displayed automatically with every release. For full details,
-    please see the Discussions/Announcements Redesign user group 
+    please see the Discussions/Announcements Redesign user group
     in the Canvas Community.
   applies_to: Course
 

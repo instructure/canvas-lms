@@ -37,6 +37,7 @@ inline_math_everywhere:
     flag is also on.
   applies_to: RootAccount
 auto_show_cc:
+  type: setting
   state: allowed
   display_name: Auto Show Closed Captions
   description: |-
