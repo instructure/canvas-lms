@@ -2827,7 +2827,7 @@ class ApplicationController < ActionController::Base
   def show_immersive_reader?
     controller_action = "#{params[:controller]}##{params[:action]}"
     immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
-      ["assignments#syllabus", "wiki_pages#show"].freeze
+      ["assignments#show", "assignments#syllabus", "wiki_pages#show"].freeze
     else
       ["wiki_pages#show"].freeze
     end
