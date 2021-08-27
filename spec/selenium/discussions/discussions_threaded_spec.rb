@@ -41,7 +41,7 @@ describe "threaded discussions" do
     before :once do
       Account.site_admin.disable_feature! :react_discussions_post
     end
-  
+
     it "should reply with iframe element" do
       entry_text = "<iframe src='https://example.com'></iframe>"
       Discussion.visit(@course, @topic)
@@ -55,7 +55,7 @@ describe "threaded discussions" do
       expect(get_all_replies.count).to eq 1
       expect(f("iframe[src='https://example.com']")).to be_present
     end
-  
+
     it "should allow edits to entries with replies", priority: "2", test_id: 222520 do
       edit_text = 'edit message'
       entry = @topic.discussion_entries.create!(
@@ -71,7 +71,7 @@ describe "threaded discussions" do
       edit_entry(entry, edit_text)
       expect(entry.reload.message).to match(edit_text)
     end
-  
+
     it "should not allow edits for a concluded student", priority: "2", test_id: 222526 do
       student_enrollment = course_with_student(
         :course => @course,
@@ -87,11 +87,11 @@ describe "threaded discussions" do
       student_enrollment.send("conclude")
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
-  
+
       fj("#entry-#{entry.id} .al-trigger").click
       expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
     end
-  
+
     it "should not allow deletes for a concluded student", priority: "2", test_id: 222526 do
       student_enrollment = course_with_student(
         :course => @course,
@@ -107,11 +107,11 @@ describe "threaded discussions" do
       student_enrollment.send("conclude")
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
-  
+
       fj("#entry-#{entry.id} .al-trigger").click
       expect(fj('.al-options:visible').text).to include("Delete (Disabled)")
     end
-  
+
     it "should allow edits to discussion with replies", priority: "1", test_id: 150513 do
       reply_depth = 3
       reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
@@ -122,63 +122,56 @@ describe "threaded discussions" do
       edit_topic('edited title', 'edited message')
       expect(get_all_replies.count).to eq 3
     end
-  
-    it "should edit a reply", priority: "1", test_id: 150514 do
-      edit_text = 'edit message'
-      entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-      Discussion.visit(@course, @topic)
-      edit_entry(entry, edit_text)
-    end
-  
+
     it "should not allow students to edit replies to a locked topic", priority: "1", test_id: 222521 do
       user_session(@student)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       @topic.lock!
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
-  
+
       fj("#entry-#{entry.id} .al-trigger").click
       wait_for_ajaximations
-  
+
       expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
     end
-  
+
     it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
       @enrollment.workflow_state = 'active'
       @enrollment.save!
-  
+
       # Reset discussion created_at time to two minutes ago
       @topic.update_attribute(:posted_at, Time.zone.now - 2.minute)
-  
+
       # Create reply message and reset created_at to one minute ago
       @topic.reply_from(user: @student, html: "New test reply")
       reply = DiscussionEntry.last
       reply.update_attribute(:created_at, Time.zone.now - 1.minute)
-  
+
       # Navigate to discussion URL
       Discussion.visit(@course, @topic)
-  
+
       replied_at = f('.discussion-pubdate.hide-if-collapsed > time').attribute("data-html-tooltip-title")
-  
+
       edit_entry(reply, "Reply edited")
       reply.reload
       edited_at = format_time_for_view(reply.updated_at)
       displayed_edited_at = f('.discussion-fyi').text
-  
+
       # Verify displayed edit time includes object update time
       expect(displayed_edited_at).to include(edited_at)
-  
+
       # Verify edit time is different than reply time
       expect(replied_at).not_to eql(edited_at)
     end
-  
+
     it "should delete a reply", priority: "1", test_id: 150515 do
       skip_if_safari(:alert)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
       delete_entry(entry)
     end
-  
+
     it "should display editor name and timestamp after edit", priority: "2", test_id: 222522 do
       skip_if_chrome('needs research: passes locally fails on Jenkins ')
       edit_text = 'edit message'
@@ -188,7 +181,7 @@ describe "threaded discussions" do
       wait_for_ajaximations
       expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
     end
-  
+
     it "should support repeated editing", priority: "2", test_id: 222523 do
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
@@ -199,11 +192,11 @@ describe "threaded discussions" do
       entry.reload
       expect(entry.message).to match 'New text 2'
     end
-  
+
     it "should re-render replies after editing", priority: "2", test_id: 222524 do
       edit_text = 'edit message'
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-  
+
       Discussion.visit(@course, @topic)
       @last_entry = f("#entry-#{entry.id}")
       reply_text = "this is a reply"
@@ -211,28 +204,28 @@ describe "threaded discussions" do
       expect { DiscussionEntry.count }.to become(2)
       subentry = DiscussionEntry.last
       refresh_page
-  
+
       expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy, "precondition"
       edit_entry(entry, edit_text)
       expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy
     end
-  
+
     it "should display editor name and timestamp after delete", priority: "2", test_id: 222525  do
       entry_text = 'new entry'
       Discussion.visit(@course, @topic)
-  
+
       fj('label[for="showDeleted"]').click()
       add_reply(entry_text)
       entry = DiscussionEntry.last
       delete_entry(entry)
       expect(f("#entry-#{entry.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
     end
-  
+
     context "student tray" do
       before(:each) do
         @account = Account.default
       end
-  
+
       it "discussion page should display student name in tray", priority: "1", test_id: 3022069 do
         topic = @course.discussion_topics.create!(
           user: @teacher,
@@ -255,7 +248,7 @@ describe "threaded discussions" do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
     end
-    
+
     it "should reply with iframe element" do
       entry_text = "<iframe src='https://example.com'></iframe>"
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -267,6 +260,79 @@ describe "threaded discussions" do
       fj("button:contains('Reply')").click
       wait_for_ajaximations
       expect(f("iframe[src='https://example.com']")).to be_present
+    end
+
+    it "should allow edits to entries with replies" do
+      edit_text = 'edit message'
+      entry = @topic.discussion_entries.create!(
+        user: @student,
+        message: 'new threaded reply from student'
+      )
+      @topic.discussion_entries.create!(
+        user: @student,
+        message: 'new threaded child reply from student',
+        parent_entry: entry
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("button[data-testid='thread-actions-menu']").click
+      fj("li:contains('Edit')").click
+      wait_for_ajaximations
+      type_in_tiny('textarea',edit_text)
+      fj("button:contains('Save')").click
+      wait_for_ajax_requests
+      expect(entry.reload.message).to match(edit_text)
+    end
+
+    context 'concluded student' do
+      before :each do
+        student_enrollment = course_with_student(
+          :course => @course,
+          :user => @student,
+          :active_enrollment => true
+        )
+        @topic.discussion_entries.create!(
+          user: @student,
+          message: 'new threaded reply from student'
+        )
+        student_enrollment.send("conclude")
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      end
+
+      it "should not allow editing for a concluded student", skip: 'VICE-1986' do
+        # TODO: complete test once concluded students can no longer edit
+      end
+
+      it "should not allow deleting for a concluded student", skip: 'VICE-1986' do
+        # TODO: complete test once concluded students can no longer delete
+      end
+    end
+
+    it "should not allow students to edit replies to a locked topic" do
+      user_session(@student)
+      @topic.discussion_entries.create!(
+        user: @student,
+        message: "new threaded reply from student"
+      )
+      @topic.lock!
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("button[data-testid='thread-actions-menu']").click
+      expect(f('body')).not_to contain_jqcss("li:contains('Edit')")
+    end
+
+    it "should delete a reply" do
+      skip_if_safari(:alert)
+      entry = @topic.discussion_entries.create!(
+        user: @student,
+        message: "new threaded reply from student"
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("button[data-testid='thread-actions-menu']").click
+      fj("li:contains('Delete')").click
+      driver.switch_to.alert.accept
+      wait_for_ajax_requests
+      entry.reload
+      expect(entry.workflow_state).to eq 'deleted'
     end
   end
 end
