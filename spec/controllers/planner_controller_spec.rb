@@ -753,7 +753,7 @@ describe PlannerController do
           @original_course = @course
           @shard1.activate do
             @another_account = Account.create!
-            @another_course = @another_account.courses.create!(:workflow_state => 'available')
+            @another_course = @another_account.courses.create!(id: @course.local_id, workflow_state: 'available')
          end
         end
 
@@ -773,6 +773,19 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.map { |i| i["plannable_id"]}).to eq [announcement.id, @assignment.id, @assignment2.id]
+        end
+
+        it "queries the correct shard-relative context codes for calendar events" do
+          @course.enroll_student(@student, enrollment_state: 'active')
+          @shard1.activate do
+            # on the local shard, matching a course id for a course the user is in on their home shard
+            @another_course.calendar_events.create!(start_at: Time.zone.now)
+
+            user_session(@student)
+            get :index
+            response_json = json_parse(response.body)
+            expect(response_json).to eq []
+          end
         end
 
         it "returns all_ungraded_todo_items across shards" do
