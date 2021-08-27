@@ -480,11 +480,6 @@ describe DiscussionEntry do
       expect(@topic.unread_count(@s5)).to eq 0
     end
 
-    it "should use unique_constaint_retry when updating read state" do
-      expect(DiscussionEntry).to receive(:unique_constraint_retry).once
-      @entry.change_read_state("read", @student)
-    end
-
     it "should not increment unread count for students in group topics when posting to the root" do
       course_with_student(:active_all => true)
       teacher1 = @teacher

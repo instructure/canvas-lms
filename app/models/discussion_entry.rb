@@ -486,18 +486,22 @@ class DiscussionEntry < ActiveRecord::Base
   # opts         - Additional named arguments (default: {})
   #                :forced - Also set the forced_read_state to this value.
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipant if the
-  # read_state was changed, or true if the read_state was not changed. If the
-  # read_state is not changed, a participant record will not be created.
+  # Returns nil if current_user is nil, the id of the DiscussionEntryParticipant
+  # if the read_state was changed, or true if the read_state was not changed.
+  # If the read_state is not changed, a participant record will not be created.
   def change_read_state(new_state, current_user = nil, opts = {})
     current_user ||= self.current_user
     return nil unless current_user
 
     if new_state != self.read_state(current_user)
-      entry_participant = self.update_or_create_participant(opts.merge(:current_user => current_user, :new_state => new_state))
+      entry_participant = self.update_or_create_participant(
+        opts.merge(current_user: current_user, new_state: new_state)
+      )
       StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
-      if entry_participant.present? && entry_participant.valid?
-        self.discussion_topic.update_or_create_participant(opts.merge(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1)))
+      if entry_participant.present?
+        self.discussion_topic.update_or_create_participant(
+          opts.merge(current_user: current_user, offset: (new_state == "unread" ? 1 : -1))
+        )
       end
       entry_participant
     else
@@ -511,7 +515,7 @@ class DiscussionEntry < ActiveRecord::Base
   # current_user - The User to to change state for. This function does nothing
   #                if nil is passed. (default: self.current_user)
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # Returns nil if current_user is nil, the DiscussionEntryParticipant.id if the
   # rating was changed, or true if the rating was not changed. If the
   # rating is not changed, a participant record will not be created.
   def change_rating(new_rating, current_user = nil)
@@ -526,7 +530,7 @@ class DiscussionEntry < ActiveRecord::Base
         return true
       end
 
-      entry_participant = self.update_or_create_participant(current_user: current_user, rating: new_rating)
+      entry_participant = self.update_or_create_participant(current_user: current_user, rating: new_rating).first
 
       update_aggregate_rating(old_rating, new_rating)
     end
@@ -557,24 +561,18 @@ class DiscussionEntry < ActiveRecord::Base
   #        :new_state    - The new workflow_state for the participant.
   #        :forced       - The new forced_read_state for the participant.
   #
-  # Returns the DiscussionEntryParticipant for the specified User, or nil if no
-  # current_user is specified.
+  # Returns id or nil if no current_user is specified.
   def update_or_create_participant(opts={})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
 
-    entry_participant = nil
-    DiscussionEntry.uncached do
-      DiscussionEntry.unique_constraint_retry do
-        entry_participant = self.discussion_entry_participants.where(:user_id => current_user).first
-        entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
-        entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
-        entry_participant.forced_read_state = opts[:forced] if opts.key?(:forced)
-        entry_participant.rating = opts[:rating] if opts.key?(:rating)
-        entry_participant.save
-      end
-    end
-    entry_participant
+    DiscussionEntryParticipant.upsert_for_entries(
+      self,
+      current_user,
+      new_state: opts[:new_state],
+      forced: opts[:forced],
+      rating: opts[:rating]
+    ).first
   end
 
   # Public: Find the existing DiscussionEntryParticipant, or create a default

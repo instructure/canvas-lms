@@ -160,7 +160,7 @@ describe Types::DiscussionEntryType do
   describe "forced_read_state attribute" do
     context "forced_read_state is nil" do
       before do
-        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: nil })
+        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: nil, new_state: 'read' })
       end
 
       it 'returns false' do

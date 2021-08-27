@@ -43,6 +43,116 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     Hash[ratings.map{|x| [x.discussion_entry_id, x.rating]}]
   end
 
+  def self.not_null_column_object(column: nil, entry: nil, user: nil)
+    entry_participant = self.new(discussion_entry: entry, user: user)
+    error_message = "Null value in column '#{column}' violates not-null constraint"
+    entry_participant.errors.add(column, error_message)
+    entry_participant
+  end
+
+  # creates or updates entry_participants returning ids if changed.
+  # small amount of validation to ensure we have the required attributes.
+  # build an insert statement.
+  # build an update statement.
+  # execute.
+  # takes an entry, user, and accepts batch, new_state, forced, and rating.
+  # runs for the entry when a batch is not provided.
+  # when run for a batch, still uses an entry, mainly to pull root_account_id.
+  # returns the ids of records changed or inserted, or a
+  # DiscussionEntryParticipant object with errors for backwards compatability to
+  # the previous method.
+  def self.upsert_for_entries(entry, user, batch: nil, new_state: nil, forced: nil, rating: nil)
+    batch ||= [entry]
+
+    raise(ArgumentError) if batch.count > 1_000
+    return not_null_column_object(column: :entry, entry: entry, user: user) unless entry
+    return not_null_column_object(column: :user, entry: entry, user: user) unless user
+
+    insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
+    update_columns = []
+    update_values = []
+
+    # need to still set to false when passed as false, so check for not nil.
+    unless forced.nil?
+      update_columns << 'forced_read_state'
+      update_values << connection.quote(forced)
+    end
+
+    # need to still set to 0 when passed as 0, so check for not nil.
+    unless rating.nil?
+      update_columns << 'rating'
+      update_values << connection.quote(rating)
+    end
+
+    insert_columns += update_columns
+    # workflow_state is a non null column and is required for the insert side.
+    # The update side does not require workflow_state. Already exists in the
+    # non-null column
+    default_state = new_state || 'unread'
+    insert_values = batch.map do |batch_entry|
+      row_values(batch_entry, user.id, entry.root_account_id, default_state, update_values)
+    end
+
+    # takes ruby arrays of values into sql arrays ready for insert.
+    # [[entry_id, user_id, root_account_id, "'read'"],[...]] =>
+    # ["(entry_id,user_id,root_account_id,'read'),(...)"]
+    insert_rows = insert_values.map { |row| "(#{row.join(',')})" }
+
+    # new_state needs to be handled after the insert_values because we always
+    # have workflow_state in the insert, but should only be on the update side
+    # if the value is provided. We don't want to accidentally mark an entry as
+    # 'unread', but also don't want to include 'workflow_state' two times in the
+    # insert.
+    if new_state
+      update_columns << 'workflow_state'
+      update_values << connection.quote(new_state)
+    end
+
+    # if there are no values in the update_columns, there is no point to
+    # creating the record. A non-existent record is treated as an unread record.
+    return not_null_column_object(column: :workflow_state, entry: entry, user: user) if update_columns.empty?
+
+    # takes two ruby arrays and makes into a sql update statement.
+    # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
+    # "workflow_state='read',forced_read_state=true"
+    update_statement = update_columns.zip(update_values).map { |a| a.join('=') }.join(',')
+    # takes the update_arrays and also creates a where clause so we don't update
+    # records that wouldn't end up changing.
+    # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
+    # "(discussion_entry_participants.workflow_state,discussion_entry_participants.forced_read_state)
+    #   IS DISTINCT FROM ('read',true)
+    where_clause = "(#{quoted_table_name}.#{update_columns.join(",#{quoted_table_name}.")})
+                     IS DISTINCT FROM (#{update_values.join(',')})"
+
+    # actual sql query combined into a statement.
+    upsert_sql = <<~SQL.squish
+      INSERT INTO #{quoted_table_name}
+                  (#{insert_columns.join(',')})
+           VALUES #{insert_rows.join(',')}
+      ON CONFLICT (discussion_entry_id,user_id)
+    DO UPDATE SET #{update_statement}
+            WHERE #{where_clause}
+    SQL
+
+    # run the query.
+    connection.exec_insert(upsert_sql)
+  end
+
+  def self.row_values(batch_entry, user_id, root_account_id, default_state, update_values)
+    [
+      connection.quote(batch_entry.id),
+      connection.quote(user_id),
+      connection.quote(root_account_id),
+      connection.quote(default_state),
+    ] + update_values
+  end
+
+  def self.upsert_for_root_entry_and_descendants(root_entry, user, new_state: nil, forced: nil, rating: nil)
+    root_entry.flattened_discussion_subentries.active.find_ids_in_batches do |batch|
+      upsert_for_entries(root_entry, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
+    end
+  end
+
   workflow do
     state :unread
     state :read
