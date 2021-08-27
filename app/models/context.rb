@@ -356,7 +356,9 @@ module Context
     klasses_to_ids.each do |(klass, ids)|
       next if ids.empty?
 
-      scopes << klass.where(id: ids)
+      scopes << klass
+        .shard(Shard.current) # prevent it switching shards on us
+        .where(id: ids)
         .order(updated_at: :desc)
         .select(:updated_at)
         .limit(1)
