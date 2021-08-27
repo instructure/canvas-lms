@@ -240,15 +240,7 @@ const OutcomeManagementPanel = () => {
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="1%"
-            height="60vh"
-            margin="small none none none"
-            padding="small none large none"
-            display="inline-block"
-          >
+          <Flex.Item as="div" position="relative" width="1%" height="60vh" display="inline-block">
             {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             <div
               tabIndex="0"
@@ -279,7 +271,7 @@ const OutcomeManagementPanel = () => {
               setScrollContainer(el)
             }}
           >
-            <View as="div" padding="x-small none none x-small">
+            <View as="div" padding="small none none x-small">
               {selectedGroupId && (
                 <ManageOutcomesView
                   key={selectedGroupId}
