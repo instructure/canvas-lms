@@ -1716,6 +1716,44 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
       end
+
+      describe "update" do
+        
+        it "syncs enrollments if setting is set" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).to receive(:process_job)
+
+          user_session(@teacher)
+
+          get 'update', params: {
+            :id => @course.id,
+            :course => {
+              homeroom_course_id: '17',
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+
+        it "does not sync if course is a sis import" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).not_to receive(:process_job)
+
+          user_session(@teacher)
+          sis = @course.account.sis_batches.create
+          @course.sis_batch_id = sis.id
+          @course.save!
+
+          get 'update', params: {
+            :id => @course.id, 
+            :course => {
+              homeroom_course_id: '17', 
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+      end
     end
 
     context 'COURSE.latest_announcement' do

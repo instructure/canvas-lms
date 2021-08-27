@@ -268,7 +268,7 @@
           <% end %>
         </div>
       </div>
-      <% if @context.elementary_subject_course? %>
+      <% if @context.elementary_subject_course? && @context.sis_batch_id.blank? %>
         <div class="form-row">
           <div class="form-label nobr"><%= f.blabel :enrollments_from_homeroom, :en => "Enrollments" %></div>
           <div class="tall-row">

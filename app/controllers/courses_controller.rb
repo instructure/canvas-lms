@@ -885,8 +885,8 @@ class CoursesController < ApplicationController
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
-          # Sync homeroom enrollments if enabled
-          if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+          # Sync homeroom enrollments if enabled and the course isn't a SIS import
+          if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
             progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
             progress.user = @current_user
             progress.reset!
@@ -3036,8 +3036,8 @@ class CoursesController < ApplicationController
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
-        # Sync homeroom enrollments if enabled
-        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+        # Sync homeroom enrollments if enabled and course isn't a SIS import
+        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!
