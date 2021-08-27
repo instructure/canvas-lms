@@ -9,12 +9,12 @@ PATH
 
 GEM
   specs:
-    activemodel (6.0.4)
-      activesupport (= 6.0.4)
-    activerecord (6.0.4)
-      activemodel (= 6.0.4)
-      activesupport (= 6.0.4)
-    activesupport (6.0.4)
+    activemodel (6.0.4.1)
+      activesupport (= 6.0.4.1)
+    activerecord (6.0.4.1)
+      activemodel (= 6.0.4.1)
+      activesupport (= 6.0.4.1)
+    activesupport (6.0.4.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
