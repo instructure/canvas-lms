@@ -24,12 +24,16 @@ import('@canvas/context-cards/react/StudentContextCardTrigger')
 
 const mountPoint = document.querySelector('#gradebook_app')
 const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu"]')
+const settingsModalButtonContainer = document.getElementById(
+  'gradebook-settings-modal-button-container'
+)
 
 const props = {
   ...ENV.GRADEBOOK_OPTIONS,
   currentUserId: ENV.current_user_id,
   locale: ENV.LOCALE,
-  gradebookMenuNode
+  gradebookMenuNode,
+  settingsModalButtonContainer
 }
 
 const component = React.createElement(Gradebook, props)

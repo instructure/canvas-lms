@@ -153,6 +153,7 @@ export function Portal({node, children}) {
 class Gradebook extends React.Component {
   constructor(options1) {
     super(options1)
+    this.gradebookSettingsModalButton = React.createRef()
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
@@ -247,7 +248,6 @@ class Gradebook extends React.Component {
     this.renderFilters = this.renderFilters.bind(this)
     this.renderGridColor = this.renderGridColor.bind(this)
     this.renderGradebookSettingsModal = this.renderGradebookSettingsModal.bind(this)
-    this.renderSettingsButton = this.renderSettingsButton.bind(this)
     this.renderStatusesModal = this.renderStatusesModal.bind(this)
     this.weightedGroups = this.weightedGroups.bind(this)
     this.weightedGrades = this.weightedGrades.bind(this)
@@ -567,7 +567,7 @@ class Gradebook extends React.Component {
 
   bindGridEvents() {
     this.gradebookGrid.events.onColumnsReordered.subscribe((_event, columns) => {
-      let column, currentCustomColumnIds, currentFrozenColumns, updatedCustomColumnIds
+      let currentCustomColumnIds, currentFrozenColumns, updatedCustomColumnIds
       // determine if assignment columns or custom columns were reordered
       // (this works because frozen columns and non-frozen columns are can't be
       // swapped)
@@ -587,7 +587,7 @@ class Gradebook extends React.Component {
           let j, len
           const results = []
           for (j = 0, len = currentFrozenColumns.length; j < len; j++) {
-            column = currentFrozenColumns[j]
+            const column = currentFrozenColumns[j]
             if (column.type === 'custom_column') {
               results.push(column.customColumnId)
             }
@@ -599,7 +599,7 @@ class Gradebook extends React.Component {
           const ref1 = columns.frozen
           const results = []
           for (j = 0, len = ref1.length; j < len; j++) {
-            column = ref1[j]
+            const column = ref1[j]
             if (column.type === 'custom_column') {
               results.push(column.customColumnId)
             }
@@ -1398,7 +1398,6 @@ class Gradebook extends React.Component {
       return allSubmissions
     }
     return _.filter(allSubmissions, submission => {
-      let ref1
       const studentPeriodInfo =
         this.effectiveDueDates[submission.assignment_id]?.[submission.user_id]
       return studentPeriodInfo && studentPeriodInfo.grading_period_id === this.gradingPeriodId
@@ -1625,12 +1624,6 @@ class Gradebook extends React.Component {
     }
   }
 
-  gradingPeriodList() {
-    return this.gradingPeriodSet.gradingPeriods.sort((a, b) => {
-      return a.startDate - b.startDate
-    })
-  }
-
   updateGradingPeriodFilterVisibility() {
     let props
     const mountPoint = document.getElementById('grading-periods-filter-container')
@@ -1640,7 +1633,9 @@ class Gradebook extends React.Component {
     ) {
       props = {
         disabled: !this.contentLoadStates.assignmentsLoaded.all,
-        gradingPeriods: this.gradingPeriodList(),
+        gradingPeriods: this.gradingPeriodSet.gradingPeriods.sort(
+          (a, b) => a.startDate - b.startDate
+        ),
         onSelect: this.updateCurrentGradingPeriod,
         selectedGradingPeriodId: this.gradingPeriodId
       }
@@ -1759,7 +1754,6 @@ class Gradebook extends React.Component {
     this.renderFilters()
     this.arrangeColumnsBy(this.getColumnOrder(), true)
     this.renderGradebookSettingsModal()
-    this.renderSettingsButton()
     this.renderStatusesModal()
     return $('#keyboard-shortcuts').click(function () {
       const questionMarkKeyDown = $.Event('keydown', {
@@ -2037,7 +2031,7 @@ class Gradebook extends React.Component {
       locale: this.options.locale,
       gradebookIsEditable: this.options.gradebook_is_editable,
       onClose: () => {
-        return this.gradebookSettingsModalButton.focus()
+        return this.gradebookSettingsModalButton.current.focus()
       },
       onCourseSettingsUpdated: settings => {
         return this.courseSettings.handleUpdated(settings)
@@ -2074,31 +2068,6 @@ class Gradebook extends React.Component {
         viewUngradedAsZero
       }
     }
-  }
-
-  renderSettingsButton() {
-    const iconSettingsSolid = React.createElement(IconSettingsSolid)
-    const buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
-    const buttonProps = {
-      icon: iconSettingsSolid,
-      id: 'gradebook-settings-button',
-      variant: 'icon',
-      onClick: () => {
-        let ref1
-        return (ref1 = this.gradebookSettingsModal.current) != null ? ref1.open() : undefined
-      }
-    }
-    const screenReaderContent = React.createElement(
-      ScreenReaderContent,
-      {},
-      I18n.t('Gradebook Settings')
-    )
-    return (this.gradebookSettingsModalButton = renderComponent(
-      Button,
-      buttonMountPoint,
-      buttonProps,
-      screenReaderContent
-    ))
   }
 
   renderStatusesModal() {
@@ -3103,7 +3072,7 @@ class Gradebook extends React.Component {
   }
 
   navigateAssignment(direction) {
-    let assignment, curAssignment, i, j, len, ref1, ref2, ref3
+    let assignment, curAssignment, i, ref1, ref3
     const location = this.gradebookGrid.gridSupport.state.getActiveLocation()
     const columns = this.gradebookGrid.grid.getColumns()
     const range =
@@ -3131,7 +3100,7 @@ class Gradebook extends React.Component {
             return results
           }.apply(this)
 
-    for (j = 0, len = range.length; j < len; j++) {
+    for (let j = 0; j < range.length; j++) {
       i = range[j]
       curAssignment = columns[i]
       if (curAssignment.id.match(/^assignment_(?!group)/)) {
@@ -4282,14 +4251,27 @@ class Gradebook extends React.Component {
 
   render() {
     return (
-      <Portal node={this.props.gradebookMenuNode}>
-        <GradebookMenu
-          assignmentOrOutcome={this.options.assignmentOrOutcome}
-          courseUrl={this.options.context_url}
-          learningMasteryEnabled={this.options.outcome_gradebook_enabled}
-          variant="DefaultGradebook"
-        />
-      </Portal>
+      <>
+        <Portal node={this.props.settingsModalButtonContainer}>
+          <Button
+            renderIcon={IconSettingsSolid}
+            ref={this.gradebookSettingsModalButton}
+            id="gradebook-settings-button"
+            variant="icon"
+            onClick={() => this.gradebookSettingsModal.current?.open()}
+          >
+            <ScreenReaderContent>{I18n.t('Gradebook Settings')}</ScreenReaderContent>
+          </Button>
+        </Portal>
+        <Portal node={this.props.gradebookMenuNode}>
+          <GradebookMenu
+            assignmentOrOutcome={this.options.assignmentOrOutcome}
+            courseUrl={this.options.context_url}
+            learningMasteryEnabled={this.options.outcome_gradebook_enabled}
+            variant="DefaultGradebook"
+          />
+        </Portal>
+      </>
     )
   }
 }

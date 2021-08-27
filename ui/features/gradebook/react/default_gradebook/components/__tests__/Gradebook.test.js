@@ -30,3 +30,12 @@ describe('Gradebook', () => {
     expect(node).toContainElement(getByText(/Gradebook/i))
   })
 })
+
+describe('compareAssignmentPositions', () => {
+  it('renders gradebookSettingsModalButton', () => {
+    const node = document.createElement('div')
+    render(<Gradebook {...defaultGradebookProps} settingsModalButtonContainer={node} />)
+    const {getByText} = within(node)
+    expect(node).toContainElement(getByText(/Gradebook Settings/i))
+  })
+})
