@@ -234,12 +234,14 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
-    @page_title = t('account_notification_settings_title', 'Account Notification Settings')
+    @page_title = t('account_notification_settings_title', 'Notification Settings')
     set_active_tab 'notifications'
 
     add_crumb(@current_user.short_name, profile_path)
-    add_crumb(t("Account Notification Settings"))
+    add_crumb(t("Notification Settings"))
     js_env NOTIFICATION_PREFERENCES_OPTIONS: {
+      enable_course_selector:
+        Account.site_admin.feature_enabled?(:notification_settings_course_selector) || @user&.active_k5_enrollments?,
       allowed_push_categories: Notification.categories_to_send_in_push,
       send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
       read_privacy_info: @user.preferences[:read_notification_privacy_info],
