@@ -179,18 +179,9 @@ class RoleOverride < ActiveRecord::Base
     manage_courses_add: {
       label: lambda { t('Add courses') },
       label_v2: lambda { t('Courses - add') },
-      group: 'manage_courses',
-      group_label: lambda { t('Manage Courses') },
-      available_to: %w[
-        StudentEnrollment
-        TaEnrollment
-        DesignerEnrollment
-        TeacherEnrollment
-        ObserverEnrollment
-        AccountAdmin
-        AccountMembership
-      ],
+      available_to: %w[AccountAdmin AccountMembership],
       true_for: %w[AccountAdmin],
+      account_only: true,
       account_allows:
         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
     },

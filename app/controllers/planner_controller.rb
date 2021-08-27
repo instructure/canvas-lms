@@ -380,9 +380,9 @@ class PlannerController < ApplicationController
 
     @local_course_ids, @local_group_ids, @local_user_ids = transpose_ids(@user&.shard || Shard.current, Shard.current)
 
-    @context_codes = @course_ids.map { |id| "course_#{id}" }
-    @context_codes.concat(@group_ids.map { |id| "group_#{id}" })
-    @context_codes.concat(@user_ids.map { |id| "user_#{id}" })
+    @context_codes = @local_course_ids.map { |id| "course_#{id}" }
+    @context_codes.concat(@local_group_ids.map { |id| "group_#{id}" })
+    @context_codes.concat(@local_user_ids.map { |id| "user_#{id}" })
   end
 
   def contexts_cache_key
