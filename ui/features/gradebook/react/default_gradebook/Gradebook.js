@@ -2183,7 +2183,8 @@ class Gradebook extends React.Component {
       const props = {
         label: I18n.t('Student Names'),
         readonly: students.length === 0,
-        onChange: this.onUserFilterInputStudents
+        onChange: this.onUserFilterInputStudents,
+        placeholder: I18n.t('Search Students')
       }
       renderComponent(TextSearchInput, mountPoint, props)
     } else {
@@ -2215,7 +2216,8 @@ class Gradebook extends React.Component {
       const props = {
         label: I18n.t('Assignment Names'),
         readonly: assignments.length === 0,
-        onChange: this.onUserFilterInputAssignments
+        onChange: this.onUserFilterInputAssignments,
+        placeholder: I18n.t('Search Assignments')
       }
       renderComponent(TextSearchInput, mountPoint, props)
     }

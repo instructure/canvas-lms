@@ -55,4 +55,17 @@ describe('TextSearchInput', () => {
     fireEvent.change(input, {target: {value: 'John'}})
     expect(mockOnChange).toHaveBeenCalledWith('John')
   })
+
+  it('placeholder', () => {
+    const {getByPlaceholderText} = render(
+      <TextSearchInput
+        label="label"
+        readonly={false}
+        onChange={() => {}}
+        placeholder="placeholder text"
+      />
+    )
+    const searchField = getByPlaceholderText(/placeholder text/)
+    expect(searchField).toBeInTheDocument()
+  })
 })

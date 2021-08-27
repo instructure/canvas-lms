@@ -23,7 +23,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
-function TextSearchInput({label, readonly = false, onChange}) {
+function TextSearchInput({label, readonly = false, onChange, placeholder = ''}) {
   const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = event => {
@@ -40,6 +40,7 @@ function TextSearchInput({label, readonly = false, onChange}) {
         onChange={handleInputChange}
         interaction={readonly ? 'readonly' : 'enabled'}
         renderBeforeInput={<IconSearchLine inline={false} />}
+        placeholder={placeholder}
       />
     </View>
   )
@@ -48,7 +49,8 @@ function TextSearchInput({label, readonly = false, onChange}) {
 TextSearchInput.propTypes = {
   label: PropTypes.string.isRequired,
   readonly: PropTypes.bool,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string
 }
 
 export default TextSearchInput
