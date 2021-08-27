@@ -44,9 +44,9 @@ export const PostContainer = props => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           direction: 'column-reverse',
           authorInfo: {
             padding: '0'

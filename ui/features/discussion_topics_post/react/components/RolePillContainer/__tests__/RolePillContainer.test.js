@@ -97,7 +97,7 @@ describe('RolePillContainer', () => {
   describe('Mobile view is respected', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'}
+        tablet: {maxWidth: '767px'}
       }))
     })
 

@@ -39,9 +39,9 @@ export const AuthorInfo = props => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',

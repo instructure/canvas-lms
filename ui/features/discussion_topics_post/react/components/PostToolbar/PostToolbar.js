@@ -51,9 +51,9 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           justifyItems: 'space-between',
           textSize: 'x-small'
         },
