@@ -241,6 +241,7 @@ class Course < ActiveRecord::Base
   has_many :comment_bank_items, inverse_of: :course
 
   has_many :pace_plans
+  has_many :blackout_dates, as: :context, inverse_of: :context
 
   prepend Profile::Association
 
