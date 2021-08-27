@@ -128,6 +128,7 @@
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Frist: Fleire datoar" },
   "due_when_7eed10c6": { "message": "Frist: { when }" },
+  "edit_c5fbea07": { "message": "Rediger" },
   "edit_equation_f5279959": { "message": "Endre likning" },
   "edit_link_7f53bebb": { "message": "Endre lenke" },
   "editor_statusbar_26ac81fc": { "message": "Statusrad editor" },
@@ -146,8 +147,6 @@
   "external_links_3d9f074e": { "message": "Eksterne lenker" },
   "external_tools_6e77821": { "message": "Eksterne verktøy" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
-  "file_upload_failed_af22dd91": { "message": "Filopplasting mislukkast" },
-  "file_uploading_56c9c0c8": { "message": "Filopplasting" },
   "file_url_c12b64be": { "message": "Fil-URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
@@ -313,7 +312,6 @@
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Send!" },
   "subscript_59744f96": { "message": "Senka skrift" },
-  "success_file_uploaded_8174e93f": { "message": "Vellukka: fil lasta opp" },
   "superscript_8cb349a2": { "message": "Heva skrift" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Støtta filtypar: SRT og WebVTT"
@@ -355,9 +353,6 @@
   "upload_file_fd2361b8": { "message": "Last opp fil" },
   "upload_image_6120b609": { "message": "Last opp bilde frå disk" },
   "upload_media_ce31135a": { "message": "Last opp media" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Opplasting er ikkje tilgjengeleg for denne mappa"
-  },
   "upload_record_media_e4207d72": { "message": "Last opp/Ta opp media" },
   "uploading_19e8a4e7": { "message": "Lastar opp" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {

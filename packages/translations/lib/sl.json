@@ -530,12 +530,6 @@
     "feedback_6dcc1991": {
         "message": "Povratne informacije"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Nalaganje datoteke ni uspelo"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Nalaganje datoteke"
-    },
     "file_url_c12b64be": {
         "message": "URL datoteke"
     },
@@ -1130,9 +1124,6 @@
     "subscript_59744f96": {
         "message": "Podpisano"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Uspešno: Naložene datoteke"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Uspešno: Čakajoča opravila je ustvarjen."
     },
@@ -1273,9 +1264,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Naloži medije"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Za to mapo ni na voljo nalaganje"
     },
     "upload_record_media_e4207d72": {
         "message": "Naloži/posnemi medij"

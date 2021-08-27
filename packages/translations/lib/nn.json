@@ -461,12 +461,6 @@
     "feedback_6dcc1991": {
         "message": "Tilbakemelding"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Filopplasting mislukkast"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Filopplasting"
-    },
     "file_url_c12b64be": {
         "message": "Fil-URL"
     },
@@ -613,6 +607,9 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "join_6cafecca": {
+        "message": "Ta del"
     },
     "jump_to_today_254ccf41": {
         "message": "Hopp til i dag"
@@ -1001,9 +998,6 @@
     "subscript_59744f96": {
         "message": "Senka skrift"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Vellukka: fil lasta opp"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Vellukka: Gjeremålsliste er oppretta"
     },
@@ -1114,9 +1108,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Last opp media"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Opplasting er ikkje tilgjengeleg for denne mappa"
     },
     "upload_record_media_e4207d72": {
         "message": "Last opp/Ta opp media"

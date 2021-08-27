@@ -113,6 +113,7 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "join_6cafecca": { "message": "Ta del" },
   "jump_to_today_254ccf41": { "message": "Hopp til i dag" },
   "late_2be42b88": { "message": "Sein" },
   "load_more_a36f9cf9": { "message": "Last opp meir" },

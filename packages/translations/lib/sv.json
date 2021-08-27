@@ -530,12 +530,6 @@
     "feedback_6dcc1991": {
         "message": "Feedback"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Det gick inte att ladda upp filen"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Filen laddas upp"
-    },
     "file_url_c12b64be": {
         "message": "Filens URL"
     },
@@ -1130,9 +1124,6 @@
     "subscript_59744f96": {
         "message": "Nedsänkt"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Klart: Filen har laddats upp"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Klart: Skapade att göra-objekt"
     },
@@ -1273,9 +1264,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Ladda upp media"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Uppladdning är inte tillgängligt för den här mappen"
     },
     "upload_record_media_e4207d72": {
         "message": "Ladda upp/spela in media"

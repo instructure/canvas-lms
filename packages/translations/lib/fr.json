@@ -530,12 +530,6 @@
     "feedback_6dcc1991": {
         "message": "Commentaire"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Le téléchargement du fichier a échoué"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Envoi de fichier"
-    },
     "file_url_c12b64be": {
         "message": "URL du fichier"
     },
@@ -1130,9 +1124,6 @@
     "subscript_59744f96": {
         "message": "En indice"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Opération réussie : Fichier envoyé"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Opération réussie : À faire créé"
     },
@@ -1273,9 +1264,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Télécharger un fichier multimédia"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Envoi indisponible pour ce dossier."
     },
     "upload_record_media_e4207d72": {
         "message": "Envoyer/enregistrer un fichier multimédia"
