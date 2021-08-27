@@ -343,10 +343,11 @@ class PlannerController < ApplicationController
     # get ids relative to the current shard, not the user's
     @local_course_ids = @user ? @course_ids.map{|id| Shard.relative_id_for(id, @user.shard, Shard.current)} : @course_ids
     @local_group_ids = @user ? @group_ids.map{|id| Shard.relative_id_for(id, @user.shard, Shard.current)} : @group_ids
+    @local_user_ids = @user ? @user_ids.map{|id| Shard.relative_id_for(id, @user.shard, Shard.current)} : @user_ids
 
-    @context_codes = @course_ids.map{|id| "course_#{id}"} || []
-    @context_codes += @group_ids.map{|id| "group_#{id}"}
-    @context_codes += @user_ids.map{|id| "user_#{id}"}
+    @context_codes = @local_course_ids.map{|id| "course_#{id}"} || []
+    @context_codes += @local_group_ids.map{|id| "group_#{id}"}
+    @context_codes += @local_user_ids.map{|id| "user_#{id}"}
   end
 
   def contexts_cache_key
