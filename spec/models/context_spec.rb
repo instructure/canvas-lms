@@ -385,6 +385,24 @@ describe Context do
 
       expect(Context.last_updated_at(Course => [@course1.id, @course2.id])).to be_nil
     end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "doesn't query multiple shards at once" do
+        c = Course.create!
+        now = Time.zone.now
+        g = @shard1.activate do
+          a = Account.create!
+          a.groups.create!(updated_at: now + 1.minute)
+        end
+        expect(g.updated_at).to eq now + 1.minute
+        # doesn't find g, because it's on a different shard
+        # if it queried both shards, if they're on the same database it will find g,
+        # if they're not, it will throw an error
+        expect(Context.last_updated_at(Course => [c.id], Group => [g.id])).to eq c.updated_at
+      end
+    end
   end
 
   describe "resolved_root_account_id" do
