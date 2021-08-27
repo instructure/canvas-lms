@@ -632,6 +632,7 @@ describe SplitUsers do
           cc = shard1_source_user.reload.communication_channels.where(path: 'a@example.com').take
           n = Notification.create!(name: 'Assignment Createds', subject: 'Tests', category: 'TestNevers')
           NotificationPolicy.create(notification: n, communication_channel: cc, frequency: 'immediately')
+          NotificationPolicyOverride.create(notification: n, communication_channel: cc, frequency: 'immediately', context: shard1_course)
           SplitUsers.split_db_users(shard1_source_user)
         end
 

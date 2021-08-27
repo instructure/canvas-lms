@@ -214,6 +214,7 @@ class SplitUsers
         ccs = CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id))
         DelayedMessage.where(communication_channel_id: ccs).delete_all
         NotificationPolicy.where(communication_channel: ccs).delete_all
+        NotificationPolicyOverride.where(communication_channel: ccs).delete_all
         ccs.delete_all
       end
     end
