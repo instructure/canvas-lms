@@ -121,6 +121,12 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
   end
 
+  it 'allows querying for participant information' do
+    expect(discussion_entry_type.resolve('entryParticipant { read }')).to eq true
+    expect(discussion_entry_type.resolve('entryParticipant { forcedReadState }')).to be_nil
+    expect(discussion_entry_type.resolve('entryParticipant { rating }')).to be_nil
+  end
+
   it 'does not allows querying for participant counts on non root_entries' do
     de_type = GraphQLTypeTester.new(parent, current_user: @teacher)
     expect(de_type.resolve('rootEntryParticipantCounts { unreadCount }')).to be_nil

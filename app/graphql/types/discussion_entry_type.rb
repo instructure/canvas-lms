@@ -126,6 +126,13 @@ module Types
       ).load(object)
     end
 
+    field :entry_participant, Types::EntryParticipantType, null: true
+    def entry_participant
+      Loaders::EntryParticipantLoader.for(
+        current_user: current_user
+      ).load(object)
+    end
+
     field :parent, Types::DiscussionEntryType, null: true
     def parent
       load_association(:parent_entry)
