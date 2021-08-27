@@ -210,8 +210,8 @@ describe MicrosoftSync::SyncerSteps do
 
     before do
       n_students_in_course(2, course: course)
-      teacher_in_course(course: course)
-      teacher_in_course(course: course)
+      teacher_in_course(course: course, active_enrollment: true)
+      teacher_in_course(course: course, active_enrollment: true)
     end
 
     context 'when the max enrollments in a course was not reached' do
@@ -376,7 +376,10 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     let!(:teachers) do
-      [teacher_in_course(course: course), teacher_in_course(course: course)].map(&:user)
+      [
+        teacher_in_course(course: course, active_enrollment: true),
+        teacher_in_course(course: course, active_enrollment: true)
+      ].map(&:user)
     end
 
     let(:mappings) do
@@ -746,7 +749,7 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are changes to process' do
       let(:n_students) { 1 }
       let!(:students) { 1.upto(n_students).map{student_in_course(course: course).user} }
-      let!(:teacher) { teacher_in_course(course: course).user }
+      let!(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
 
       before do
         students.each_with_index do |student, index|
@@ -851,11 +854,13 @@ describe MicrosoftSync::SyncerSteps do
           expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-mail-aad')
         end
 
-        it 'ignores inactive enrollments' do
-          Enrollment.where(course: course, user: students[0]).update_all(workflow_state: 'deleted')
-          subject
-          expect(diff).to_not have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
-          expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+        %w[completed deleted inactive invited rejected].each do |state|
+          it "ignores #{state} enrollments" do
+            Enrollment.where(course: course, user: students[0]).update_all(workflow_state: state)
+            subject
+            expect(diff).to_not have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
+            expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+          end
         end
 
         it 'ignores StudentViewEnrollment (fake) enrollments' do
