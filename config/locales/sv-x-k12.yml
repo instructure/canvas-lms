@@ -1612,6 +1612,7 @@ sv-x-k12:
   add_criterion_eb9587ef: "Lägg till kriterium"
   add_custom_link_22059c0: "Lägg till anpassad länk"
   add_delete_edit_7dbc9c5b: "lägg till/ta bort/redigera"
+  add_delete_manage_d65e235: "lägg till/ta bort/hantera"
   add_designers_to_courses_9588820b: "Lägg till designers i kurser"
   add_discussion_653dab4c: "Lägg till diskussion"
   add_domain_f15bc6c1: "Lägg till domän"
@@ -1632,8 +1633,10 @@ sv-x-k12:
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Lägg till granulära behörigheter för hantering av kursfiler"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Lägg till granulära behörigheter för hantering av kurssektioner"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Lägg till granulära behörigheter för hantering av kurser, t.ex. Lägg till/Publicera/Slutför/Ta bort"
+  add_granularity_to_permissions_around_managing_gro_ef410a72: "Lägg till granulära behörigheter för grupphantering i konto- och kurskontexter"
   add_group_c84f9e9d: "Lägg till grupp"
   add_group_set_f9809e11: "Lägg till gruppuppsättning"
+  add_groups_a133e48c: "Lägg till grupper"
   add_help_menu_links_de9fc34f: "Lägg till hjälpmenylänkar"
   add_hostname_as_an_allowed_domain_1f58c38d: "Lägg till %{hostname} som en tillåten domän"
   add_hostname_to_the_whitelist_c808192e: "Lägg till %{hostname} i vitlistan."
@@ -2522,14 +2525,18 @@ sv-x-k12:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Ett fel uppstod vid försök att hitta LTI-konfigurationen"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Ett fel uppstod när uppsättningen bedömningsperioder skulle uppdateras"
   an_error_occurred_adding_group_groupname_670af30: "Ett fel inträffade när gruppen %{groupName} skulle läggas till\""
+  an_error_occurred_adding_group_groupname_6ed99725: "Ett fel inträffade när gruppen %{groupName} skulle läggas till."
   an_error_occurred_adding_group_groupname_message_6af9ef4c: "Ett fel inträffade när gruppen %{groupName} skulle läggas till: %{message}"
+  an_error_occurred_adding_group_groupname_message_8854de45: "Ett fel inträffade när gruppen %{groupName} skulle läggas till: %{message}."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Ett fel uppstod vid ändring av låsstatusen för \"%{fileName}\""
   an_error_occurred_creating_the_conference_fcad5f6f: "Ett fel inträffade när konferensen skapades"
   an_error_occurred_during_the_sync_process_error_62d98be7: "Ett fel inträffade under synkroniseringen: %{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Ett fel uppstod vid inläsning av lärandemålsdata."
   an_error_occurred_making_a_network_request_d1bda348: "Ett fel uppstod vid försök att göra en nätverksförfrågan"
+  an_error_occurred_moving_group_grouptitle_16ec1ebd: "Ett fel inträffade när gruppen %{groupTitle} skulle flyttas."
   an_error_occurred_moving_group_grouptitle_b20a640b: "Ett fel inträffade när gruppen ”%{groupTitle}” skulle flyttas"
   an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "Ett fel inträffade när gruppen ”%{groupTitle}” skulle flyttas: %{message}"
+  an_error_occurred_moving_group_grouptitle_message_5c592f26: "Ett fel inträffade när gruppen ”%{groupTitle}” skulle flyttas: %{message}."
   an_error_occurred_moving_group_title_24fd7fb4: "Ett fel inträffade när gruppen ”%{title}” skulle flyttas\""
   an_error_occurred_moving_group_title_message_f8428b66: "Ett fel inträffade när gruppen ”%{title}” skulle flyttas: %{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "Ett fel inträffade vid flytt av lärandemålet \"%{title}\""
@@ -2565,6 +2572,10 @@ sv-x-k12:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Ett fel inträffade när lärandemålet skulle skapas: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Ett fel inträffade när lärandemålet skulle skapas: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Ett fel uppstod vid borttagning av anslag."
+  an_error_occurred_while_importing_this_group_9aef7c30: "Ett fel inträffade när den här gruppen importerades."
+  an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Ett fel inträffade när den här gruppen importerades: %{message}."
+  an_error_occurred_while_importing_this_outcome_2ce488af: "Ett fel inträffade när det här lärandemålet importerades."
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Ett fel inträffade när det här lärandemålet importerades: %{message}."
   an_error_occurred_while_loading_account_learning_o_29a11066: "Ett fel inträffade vid inläsning av lärandemålsgrupper för kontot."
   an_error_occurred_while_loading_account_outcomes_8f337857: "Ett fel inträffade vid inläsning av kontots lärandemål."
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Ett fel inträffade vid inläsning av kontots lärandemål: %{error}"
@@ -2595,6 +2606,7 @@ sv-x-k12:
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Ett fel inträffade vid borttagning av lärandemålet: %{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: "Ett fel inträffade vid borttagning av den här gruppen."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "Ett fel inträffade vid borttagning av den här gruppen: %{message}"
+  an_error_occurred_while_removing_this_group_messag_c15e0830: "Ett fel inträffade vid borttagning av den här gruppen: %{message}."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Ett fel uppstod vid hämtning av din QR-kod"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Ett fel uppstod när färdighetsbedömningar skulle sparas"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Ett fel uppstod när kontots kompetensbedömningar skulle sparas: %{message}"
@@ -2606,6 +2618,8 @@ sv-x-k12:
   an_error_occurred_while_starting_migration_8e6015e2: "Ett fel uppstod när migreringen startades"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ett fel inträffade när ett försök gjordes att ändra användargränssnittet"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ett fel uppstod vid uppdatering av anslagets låsta status."
+  an_error_occurred_while_updating_group_grouptitle_2072b3c9: "Ett fel inträffade när gruppen %{groupTitle} uppdaterades."
+  an_error_occurred_while_updating_group_grouptitle__6029f82d: "Ett fel inträffade när den här gruppen uppdaterades ”%{groupTitle}”: %{message}."
   an_error_occurred_while_updating_group_grouptitle__f32110b5: "Ett fel inträffade när den här gruppen uppdaterades ”%{groupTitle}”: %{message}"
   an_error_occurred_while_updating_group_grouptitle_fc919aa: "Ett fel inträffade när gruppen ”%{groupTitle}” uppdaterades"
   an_error_occurred_while_updating_late_policies_a95b707f: "Ett fel uppstod vid uppdateringen av policyer för sena inlämningar"
@@ -3449,7 +3463,7 @@ sv-x-k12:
         manually_assign_peer_reviews: Manuellt
         require_peer_reviews: "Begär kamratrespons"
       locked_until: "Tilldela bedömningar"
-      peer_reviews_assign_at_explanation: "Måste komma efter inlämningsdatum. Om tomt används inlämningsdatum."
+      peer_reviews_assign_at_explanation: "Om tomt används inlämningsdatum."
       peer_reviews_header: Kamratrespons
       reviews_per_user: "Bedömningar per användare"
     points_possible_number: "Möjliga poäng måste vara ett tal"
@@ -4268,6 +4282,7 @@ sv-x-k12:
     unpublish: Avpublicera
     unpublished: Avpublicerad
     update: Uppdatera
+  buttons_and_icons_e66ee12c: "Knappar och ikoner"
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Efter klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alla länkar är som standard aktiverade för en kurs.  Elever ser inte länkar till sektioner som saknar innehåll.  Om du exempelvis inte har skapat några quiz kommer de inte att se quizlänkarna.  Du kan sortera och uttryckligen inaktivera dessa länkar om det finns delar av kursen som inte du vill att eleverna ska ha tillgång till."
@@ -4812,6 +4827,8 @@ sv-x-k12:
   canvas_files_889a274f: Canvas-filer
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas för Elementary"
+  canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary: det finns många meddelanden i fjärrundervisningsrummet"
+  canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: Föräldrastöd"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas kan stötta kollaborativt samarbete där två eller flera
@@ -4825,6 +4842,7 @@ sv-x-k12:
   canvas_login_failure_message_4c922f2f: "Meddelande om misslyckad Canvas-inloggning"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas multi-faktor autentiserings säkerhetskopierings koder"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas behöver åtkomst till din kamera."
+  canvas_needs_access_to_your_camera_b5418c0: "Canvas behöver åtkomst till din kamera."
   canvas_notifications_tutorial_video_79b8e768: "Handledningsvideo för aviseringar i Canvas"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       Nu har Canvas två quizmotorer. Välj vilken
@@ -4844,6 +4862,9 @@ sv-x-k12:
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas tar bort nycklar med null-värden från livehändelsers nyttolaster om den här funktionen är aktiverad."
+  cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
+      Hämta antalet innehållsredigerare som visas när första sidan läses in. Du kan sedan
+      starta var och en allt eftersom den visas i vyporten.
   captions_subtitles_af2c47e: Bildtexter/underrubriker
   captured_image_91838f78: "Registrerad bild"
   card_view_eaf73185: Kortvy
@@ -4963,6 +4984,7 @@ sv-x-k12:
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Classic Quizzes: Rensa ursprungsdata från Canvas-filens URL:er i svar"
   classic_view_33f29576: "Klassisk vy"
   clear_2084585f: Rensa
+  clear_all_da755751: "Rensa alla"
   clear_search_field_75f595c7: "Rensa sökfältet"
   clear_selected_file_82388e50: "Rensa vald fil"
   clear_user_cache_ef079f7f: "Rensa användar-cacheminne"
@@ -5291,6 +5313,123 @@ sv-x-k12:
       notices: 
         contact_registered: "Kontaktmetod har registrerats."
   communication_channels_a9abd037: Kommunikationskanaler
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: fullgjord
   complete_all_items_e1779257: "Slutför alla objekt"
   complete_fd828dea: Färdig
@@ -6658,8 +6797,8 @@ sv-x-k12:
   course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Kursroller kan endast hantera Blueprint-kurser om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll."
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Kursroller kan endast hantera Blueprint-kurser om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll. Om du vill öppna sidofältet för kursmallar måste Kurser – lägg till/redigera/ta bort kurser vara aktiverat. Om du vill lägga till en associerad kurs måste även Kurser – visa lista och Kurser – lägg till/redigera/ta bort vara aktiverat. Om du vill redigera låsinställningar på modellobjekttyper måste även Kurser – lägg till/redigera/ta bort vara aktiverat."
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "Kursroller kan endast hantera Blueprint-kurser om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll. För att hantera kopplade kurser måste även Kurser – visa lista och Hantera kurser – lägg till vara aktiverade. För att redigera låsinställningar på filer måste även Hantera kurser: Administratör – hantera/uppdatera och Kursfiler – redigera vara aktiverade. För att redigera låsinställningar på quiz måste även Hantera kurser: Administratör – hantera/uppdatera och Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverade."
-  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll."
-  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll."
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Kursroller kan endast hantera Blueprint-kursinnehåll om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll."
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Kursroller kan endast hantera Blueprint-kursinnehåll om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll."
   course_roles_d2d5d666: Kursroller
   course_roster_78f70e97: Kursdeltagare
   course_rubrics_881dcf0: Kursmatriser
@@ -6984,8 +7123,10 @@ sv-x-k12:
         course_template: Kursmall
         course_visibility: Synlighet
         custom_course_visibility: Anpassa
+        enable_pace_plans: "Aktivera taktplaner"
         enrollment_term_id: Termin
         enrollments_from_homeroom: Registreringar
+        friendly_name: "Anpassat namn"
         grading_scheme: Bedömningsschema
         grading_standard_enabled: "Aktivera kursens bedömningsschema"
         hide_distribution_graphs: "Dölj bedömningsfördelningsdiagram för eleverna"
@@ -7000,6 +7141,7 @@ sv-x-k12:
         license: Licens
         lock_all_announcements: "Avaktivera kommentarer på anslag"
         open_enrollment: "Lägg till en ”Gå med i den här kursen”-länk på kursens startsida"
+        pace_plans: Taktplaner
         participation_id: Deltagande
         restrict_enrollments_to_course_dates: "Elever kan endast delta i kursen mellan dessa datum"
         restrict_student_future_view: "Begränsa så att elever inte kan se kursen före startdatumet"
@@ -7235,6 +7377,7 @@ sv-x-k12:
   create_new_discussions_6ab69da2: "Skapa nya diskussioner"
   create_new_e0946c49: "Skapa ny"
   create_new_group_bf9561d4: "Skapa ny grupp"
+  create_new_group_fca5cc73: "Skapa ny grupp"
   create_new_group_set_13b1f62a: "Skapa ny gruppuppsättning"
   create_outcome_4dac05a0: "Skapa ett lärandemål"
   create_pages_581a4d59: "Skapa sidor"
@@ -7611,6 +7754,7 @@ sv-x-k12:
   deduct_104e8866: "Räkna av"
   deep_orange_4c7eea99: "Djup orange"
   deep_purple_bb3e2907: "Djup lila"
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djup inkapslade svar stöds inte längre. Ditt svar visas på första sidan av den här tråden."
   default_9db103d: Standard
   default_conference_title: "%{course_name} Konferens"
   default_dates_a0a2ae26: standarddatum
@@ -7661,6 +7805,7 @@ sv-x-k12:
   delete_grading_scheme_6b308832: "Radera bedömningsschema"
   delete_grading_scheme_title_215f0a40: "Ta bort bedömningsschema %{title}"
   delete_group_86c381ec: "Radera grupp"
+  delete_groups_c637c07: "Ta bort grupper"
   delete_in_progress_2d3f0e0d: "Radera pågår"
   delete_key_developername_be80e695: "Ta bort nyckel %{developerName}"
   delete_mastery_level_position_5cf0f8f7: "Ta bort måluppfyllelsenivån %{position}"
@@ -7708,11 +7853,13 @@ sv-x-k12:
   delete_your_work_fe136221: "Vill du ta bort arbetet?"
   deleted_1be5ed1: Raderad
   deleted_by_deletername_f269211a: "Borttagen av %{deleterName}"
+  deleted_by_user_be69f8: "Borttagen av %{user}"
   deleted_caption_b5c66807: "Tog bort undertext"
   deleted_ce03674d: raderad
   deleted_content_exceptions_237e809d: "Undantag för borttaget innehåll:"
   deleted_content_referenced_in_this_resource_e42d1998: "Den här resursen har referenser till borttaget innehåll:"
   deleted_deletedtimingdisplay_f4c73003: "Raderad %{deletedTimingDisplay}"
+  deleted_topic_notice: "Det ämnet har raderats"
   deleting_6421031e: "raderar ..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       En inlämningsfil tas typiskt endast bort när en elev publicerar olämpligt eller privat material.
@@ -8372,6 +8519,7 @@ sv-x-k12:
   download_course_roster_csv_86b3d192: "Ladda ner deltagarlista som CSV-fil"
   download_epub_757cf0af: "Ladda ner ePub"
   download_errors_attchment_82ffea3f: "Hämta errors_attchment"
+  download_filename_781704f5: "Ladda ner %{filename}"
   download_item_analysis_report_statuslabel_8c9387ec: "Ladda ner objektets analysrapport %{statusLabel}"
   download_page_views_csv_974f36e1: "Ladda ner sidvisningar (CSV)."
   download_report_77164f62: "Ladda ner rapport"
@@ -8563,6 +8711,7 @@ sv-x-k12:
       find_existing_rubric: "Hitta befintlig matris"
   edit_rubric_title_104d6fd2: "Redigera matris: %{title}"
   edit_section_name_558cc89: "Redigera sektionen ”%{name}\""
+  edit_status_612572db: "Redigera status"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Redigera inlämningsstatus från SpeedGrader"
   edit_survey_b0d6890d: "Redigera enkät"
   edit_term_name_29a8a322: "Redigera term %{name}"
@@ -8714,6 +8863,7 @@ sv-x-k12:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Ger nya API-slutpunkter för kursen och användardata från New Analytics."
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: "Gör att webbplatsadministratörer kan konfigurera versionsinformation till användare"
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Gör det möjligt att sortera på SIS-ID, integrations-ID och inloggnings-ID i den nya bedömningsöversikten."
+  enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Aktiverar stöd för observatörer inom Canvas for Elementary."
   enables_the_course_templates_feature_globally_79d5302f: "Aktiverar kursmallsfunktionen globalt"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Om du aktiverar grundläggande teman ändras teckensnittet i Canvas och kursnavigeringsmenyn begränsas för alla användare i din kurs."
   encourage_class_participation_4e069479: "Uppmuntra deltagande"
@@ -8850,6 +9000,7 @@ sv-x-k12:
   enrollments_teachers: Lärare
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Ser till att lärandemål som redan importerats i en kurs inte dupliceras om de importeras igen."
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ser till att användare utan behörigheter för Importera lärandemål inte kan se knappen på fliken Lärandemål"
+  enter_a_filename_for_the_photo_4f0fc10e: "Ange ett filnamn för bilden"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Ange en hexkod här för att använda en anpassad färg."
   enter_a_valid_date_46d77547: "Ange ett giltigt datum"
   enter_a_what_if_score_668c91a3: "Skriv in tänk om-resultat."
@@ -9397,6 +9548,7 @@ sv-x-k12:
   failed_307449e1: "Misslyckades:"
   failed_creating_user_b706a1c5: "Det gick inte att skapa användare"
   failed_getting_file_to_preview_89fe2bf4: "Det gick inte att hämta filen för förhandsgranskning"
+  failed_getting_next_batch_of_announcements_1f1165a5: "Det gick inte att hämta nästa batch meddelande."
   failed_loading_associations_component_is_your_netw_fa49fb32: "Misslyckades att ladda föreningskomponenten. Är din nätverksanslutning OK?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Det gick inte att ladda kursval. Uppdatera sidan och försök igen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Misslyckades med att ladda synkronisering-historik (Sync History) komponenten. Är din nätverksanslutning OK?"
@@ -9516,6 +9668,8 @@ sv-x-k12:
       next: "New Quizzes"
     student_outcome_gradebook: "Elevers bedömningsöversikt för lärandemål"
   features_2581da: Funktioner
+  features_in_active_development_opting_in_includes__210f7720: "Funktioner i aktiv utveckling – om du väljer att delta får du löpande uppdateringar utanför det normala publiceringsschemat."
+  features_no_longer_in_active_development_that_incl_74c3a739: "Funktioner som inte längre är i aktiv utveckling har ett datum då de aktiveras som standard."
   federated_attributes_5cbe6441: "Federerade attribut"
   federated_attributes_are_information_sent_from_you_2116fb61: "Federerade attribut är information som skickats från ditt externa verifieringssystem som kan användas för att automatiskt uppdatera överensstämmande information för användare i Canvas varje gång de loggar in."
   feed_url_8a433438: Flödes-URL
@@ -9759,12 +9913,14 @@ sv-x-k12:
   france_33_90b595d7: "Frankrike (+33)"
   french_33881544: Franska
   french_canada_c3d92fa6: "Franska (Kanada)"
+  friendly_description_57f7fdde: "Egen beskrivning"
   friendly_description_for_parent_student_display_e608ecf3: "Egen beskrivning (visas för förälder/elev)"
   friendly_name_601153fb: "Anpassat namn"
   from_date_must_be_before_to_date_79f00046: "\"Från\" datum måste vara före \"Till\"-datum"
   from_fdd4956d: Från
   from_from_to_to_e31f6422: "Från %{from} till %{to}"
   from_gravatar_58372d5a: "Från Gravatar"
+  from_grouptitle_860dff95: "Från %{groupTitle}"
   front_page_must_be_set_first_4dbbfdbe: "Framsidan måste ställas in först"
   front_page_must_be_set_first_c5246f7d: "Framsidan måste ställas in först"
   full_article_9296bb6f: "Fullständig artikel"
@@ -10421,6 +10577,7 @@ sv-x-k12:
   granular_permissions_for_managing_course_files_1ed7f019: "Granulära behörigheter för hantering av kursfiler"
   granular_permissions_for_managing_course_sections_da4b04b: "Granulära behörigheter för hantering av kurssektioner"
   granular_permissions_for_managing_courses_a71be71d: "Granulära behörigheter för hantering av kurser"
+  granular_permissions_for_managing_groups_in_accoun_b71b4b7: "Granulära behörigheter för grupphantering i konto- och kurskontexter"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerade behörigheter för hantering av wikisidor"
   graph_bar_b5daa23d: Diagramstapel
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram med bedömningar för varje uppgift"
@@ -10735,6 +10892,7 @@ sv-x-k12:
     unassigned_students: "Icke-tilldelade elever (%{count})"
     unassigned_users: "Icke-tilldelade användare (%{count})"
   groups_6c90e26a: Grupper
+  groups_add_4038ae8a: "Grupper – lägg till"
   groups_add_edit_delete_1536bbb4: "Grupper – lägg till/redigera/ta bort"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Grupper är ett bra sätt att samarbeta i projekt elelr för att ta fram schemar för studiesessioner
@@ -10750,7 +10908,9 @@ sv-x-k12:
                     mer fokuserat projekt.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper får inte ha storleksbegränsningar för tilldelning per sektion"
   groups_course_c73e4c2c: "Grupper (kurs)"
+  groups_delete_bb79a2b4: "Grupper – ta bort"
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} Grupper | %{outcomes} Lärandemål"
+  groups_manage_a5197479: "Grupper – hantera"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper måste vara tomma för tilldelning per sektion"
   groups_navigation_menu_76b5acc6: "Navigeringsmeny för grupper"
   groups_tray_ef3e2649: Gruppfack
@@ -11159,6 +11319,7 @@ sv-x-k12:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Om ingen väljs, visa för alla i hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Om ingen väljs, visa för alla i hela kontot)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Om en eller flera behörigheter är inaktiverade kan användare fortfarande visa och ladda ner filer i ZIP-format."
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: "Om namnet anges kommer det att användas istället för kursens faktiska namn på översikten och i aviseringar."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Om även RCE-förbättring har aktiverats,
       kommer RCE att spara ditt arbete automatiskt under tiden du arbetar
@@ -11786,6 +11947,7 @@ sv-x-k12:
   k12_description: "Uppdatera de ikoner i  den globala navigeringsmenyn som verkar meningsfullt att uppdatera, speciellt i en K12-miljö."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazakstan (+7)"
+  keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "Kom ihåg att den här inlämningen räknas för alla i din %{groupName} grupp."
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Kom ihåg att den här inlämningen räknas för alla i din %{groupType} grupp."
   keep_students_informed_3f41a7e6: "Hålla elever informerade"
   keep_submissions_anonymous_5cbaf419: "Håll inlämningarna anonyma"
@@ -11900,6 +12062,7 @@ sv-x-k12:
   learn_more_about_collaborations_2978f66d: "Lär dig mer om samarbeten"
   learn_more_about_quiz_statistics_315a378: "Läs mer om quizstatistik."
   learn_more_about_the_differences_a1217479: "Läs mer om skillnaderna."
+  learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: "Läs mer om den här funktionen i *Användargrupp för taktplaner*."
   learn_more_about_using_commons_and_blueprints_3df953f6: "Läs mer om att använda Commons och Blueprint-kurser"
   learn_more_about_video_conferencing_5f0e76e4: "Lär dig mer om videokonferenser"
   learning_analytics_beta_view_46deb4c8: "Lärandeanalyser (beta) – visa"
@@ -12133,6 +12296,8 @@ sv-x-k12:
   loading_accounts_3364e7a0: "Läser in konton ..."
   loading_additional_items_ed5f672d: "Läser in ytterligare objekt..."
   loading_additional_todo_details_acba0cf2: "Läser in ytterligare att göra-information"
+  loading_announcement_content_4405470f: "Läser in innehåll i meddelade"
+  loading_announcement_title_b8fc3057: "Läser in titel på meddelande"
   loading_announcements_b927a86c: "Läser in anslag"
   loading_apps_f85740cb: "Läser in appar ..."
   loading_artifact_dc3bfe9f: "Läser in artefakt"
@@ -12189,6 +12354,7 @@ sv-x-k12:
   loading_more_sub_accounts_d0a30903: "Läser in fler underkonton ..."
   loading_more_terms_4053e31f: "Läser in fler terminer ..."
   loading_name_data_c66ea65f: "Läs in data för %{name}"
+  loading_observed_students_dfdda108: "Läser in observerade elever"
   loading_options_c823e98b: "Läser in alternativ..."
   loading_outcome_results_96e21ce4: "Läser in lärandemålsresultat"
   loading_release_notes_7deaa2eb: "Läser in versionsinformation"
@@ -12419,11 +12585,14 @@ sv-x-k12:
   manage_course_sections_f482d1b3: "Hantera kurssektioner"
   manage_course_templates_66c00052: "Hantera kursmallar"
   manage_courses_abe8335f: "Hantera kurser"
+  manage_create_edit_delete_groups_f9046ee3: "Hantera (skapa/redigera/radera) grupper"
   manage_discussion_c1dd8f4e: "Hantera diskussion"
   manage_discussion_title_a2ecb3fb: "Hantera diskussioner %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Hantera registreringsstatus, skapa grupper och lägg till användare från denna sida."
   manage_grading_schemes_in_context_name_e3678273: "Hantera bedömningsscheman i %{context_name}"
   manage_group_group_name_ac8578c6: "Hantera gruppen %{group_name}"
+  manage_groups_4b962fa9: "Hantera grupper"
+  manage_groups_4c3a2a9f: "Hantera grupper"
   manage_home_4fc3480b: "Hantera startsidan"
   manage_home_for_coursename_5e5c7661: "Hantera startsidan för %{courseName}"
   manage_item_name_6118d4b0: "Hantera %{item_name}"
@@ -12609,7 +12778,9 @@ sv-x-k12:
   members_are_free_to_join_defa5929: "Medlemmar får gå med"
   membership_by_invitation_only_9bc27199: "Medlemskap enbart genom inbjudan"
   membership_service_configuration_d8ba5a74: "Konfigurering av medlemsservice"
+  mentions_error_page_fd84c53c: "Felsida för omnämnanden"
   menu_39cb0e8e: Meny
+  menu_options_9b6b0b5c: Menyalternativ
   message: 
     default_subject: Canvasavisering
   message_5c38209d: Meddelande
@@ -13254,11 +13425,15 @@ sv-x-k12:
         body: "Canvas-notis – Inbjudan till samarbete: %{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
-        body: "E-postadressen, %{email} registreras på %{website} för användaren, %{user}."
+        body: |-
+            E-postadressen: %{email} läggs till i ett Canvas-konto som registreras på %{website}.
+            
+            Ignorera det här e-postmeddelandet om du vill förhindra att den här adressen registreras.
         details: "Klicka på följande länk för att bekräfta registreringen:"
         html: 
-          body: "E-postadressen, %{email} registreras på %{website} för användaren, %{user}."
+          body: "E-postadressen: %{email} läggs till i ett Canvas-konto som registreras på %{website}."
           details: "Klicka här för att bekräfta registreringen"
+          reject_message: "Ignorera det här e-postmeddelandet om du vill förhindra att den här adressen registreras."
           subject: "Bekräfta e-post: Canvas"
         subject: "Bekräfta e-post: Canvas"
     confirm_registration: 
@@ -14743,6 +14918,7 @@ sv-x-k12:
   newest_first_87672763: "Nyaste först"
   newest_oldest_d768cf1a: "Nyast - äldst"
   next_40e12421: Nästa
+  next_announcement_6e6e0f17: "Nästa meddelande"
   next_announcements_page_3956eb11: "Nästa sida med anslag"
   next_assignment_8ec51175: "Nästa uppgift"
   next_e0d38b1f: nästa
@@ -14834,6 +15010,7 @@ sv-x-k12:
   no_placements_enabled_f705f28: "Inga placeringar har aktiverats"
   no_points_possible_368669d: "Inga möjliga poäng"
   no_points_possible_72db3a55: "Inga möjliga poäng"
+  no_recent_announcements_abf950d5: "Inga nya meddelanden"
   no_results_3cda4e72: "Inga resultat"
   no_results_f36777ee: "Inga resultat"
   no_results_found_58717065: "Inga resultat hittades"
@@ -15482,6 +15659,7 @@ sv-x-k12:
   outcome_export_89229eb4: "Export av lärandemål"
   outcome_group_39fae76f: Lärandemålsgrupp
   outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Lärandemålgruppen innehåller en eller fler lärandemål som för närvarande är kopplade till innehåll."
+  outcome_group_contains_one_or_more_outcomes_that_a_5c040c5f: "Lärandemålgruppen innehåller ett eller fler lärandemål som för närvarande är kopplade till innehåll"
   outcome_group_menu_2fffeb71: Lärandemålsgruppmeny
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Resultatgrupp med Canvas-id %{id} hittades inte"
   outcome_groups: 
@@ -15508,6 +15686,7 @@ sv-x-k12:
   outcome_results_title: "Resultat för lärandemål"
   outcome_score_141cf00a: resultat
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Lärandemål: %{title} har statusen %{statusTooltip}"
+  outcome_title_was_successfully_created_a4094d6c: "Lärandemålet %{title} skapades."
   outcome_title_was_successfully_created_be3a408: "Lärandemålet %{title} skapades"
   outcome_with_canvas_id_id_not_found_215c5227: "Resultat med Canvas-id ”%{id}” hittades inte"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Lärandemål med ID:t %{guid} finns redan i en annan orelaterad kurs eller konto (%{name})"
@@ -15687,6 +15866,9 @@ sv-x-k12:
   own_copyright_cc59db55: "Egen upphovsrätt"
   owner_email_236d1b2: "Ägarens e-postadress"
   owner_email_4d02f795: "Ägarens e-post:"
+  pace_plans_4bb9c5ff: Taktplaner
+  pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Taktplaner har stöd för rullande registrering i Canvas. Detta möjliggör en magisk distribution av inlämningsdatum för elever med olika startdatum som baseras på den takt som läraren har definierat. Läs mer och få återkoppling i användargruppen Taktplaner."
+  pace_plans_is_in_active_development_f6c20046: "Taktplaner är i aktiv utveckling."
   package_error: "Fel vid identifiering av pakettyp: %{error}"
   package_export_from_d6e2b073: "Paketexport från"
   page_50c4823d: Sida
@@ -15806,6 +15988,8 @@ sv-x-k12:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: Kamratresponsuppgift
+  peer_review_due_dueattext_20987412: "Kamratrespons ska lämnas in %{dueAtText}"
+  peer_review_due_eb63af38: "Kamratrespons ska lämnas in"
   peer_review_for_assignment_ce72fc52: "Kamratresponsuppgift för %{assignment}"
   peer_review_for_name_bcffa32f: "Kamratrespons för %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Kamratrespons för %{name} Inlämningsdatum: %{dueAtText}"
@@ -16489,6 +16673,7 @@ sv-x-k12:
   preview_website_url_eb5b8a5f: "Förhandsgranska webbplats-URL"
   preview_your_changes_373557d8: "Förhandsgranska dina ändringar"
   previous_445ca243: föregående
+  previous_announcement_7efc02d9: "Tidigare meddelande"
   previous_announcements_page_79c0ada1: "Föregående sida med anslag"
   previous_assignment_83d1f423: "Föregående uppgift"
   previous_bd2ac015: Föregående
@@ -16829,6 +17014,9 @@ sv-x-k12:
       Ger ett utrymme för användare att arbeta på ett enda Google Doc
       samtidigt, inifrån din Canvas-kurs.
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Tillhandahåll en URI till din IdP’s metadata för att automatiskt fylla i de andra fälten. Om din skola är en del av InCommon eller Storbritanniens Access Management Federation, ska ange urn: mace: incommon eller http://ukfederation.org.uk, för metadata URI och också ange skolans enhets-ID."
+  provide_navigation_to_navigate_between_all_announc_9f1bed39: |-
+      Tillhandahåll navigering mellan alla meddelanden i
+      fjärrundervisningsrummet.
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
       Ange URL:en till din SAML IdP Discovery Service som efterlever
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*-protokollet.
@@ -18228,6 +18416,7 @@ sv-x-k12:
   rce_edit_closed_captions_de3ad169: "Redigera undertexter i innehållsredigeraren"
   rce_enhancements_5701e06: "Förbättringar av innehållsredigeraren"
   rce_initialization_fix_4f176bda: "Initieringskorrigering för RCE"
+  rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "Begränsa antalet innehållsredigerare som kan startas på sidan"
   rce_mentions_in_discussions_82cd11e3: "RCE-omnämnanden i diskussioner"
   rce_pretty_html_editor_d8faf2bb: "Nätt HTML-redigerare i innehållsredigeraren"
   re_activate_user_f7d77c9a: "Återaktivera användare"
@@ -19226,6 +19415,7 @@ sv-x-k12:
   select_a_module_optional_7edb5cb0: "Välj en modul (valfritt)"
   select_a_predefined_color_c77ab2f5: "Välj en fördefinierad färg."
   select_a_provisional_grade_7106e3d5: "Välj en provisorisk omdöme"
+  select_a_student_to_view_281d17b9: "Välj en elev att visa"
   select_all_assignments_bd07b919: "Välj alla uppgifter"
   select_all_count_courses_4fc63811: 
     one: "Välj (%{count}) kurs"
@@ -20561,6 +20751,7 @@ sv-x-k12:
   student_name_b446c661: "elevens namn"
   student_name_c45b2a7: "Elevens namn"
   student_name_options_cb029725: "Alternativ för elevnamn"
+  student_names_ea4b671a: Studentnamn
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Elevnamn måste vara dolt eftersom anonym bedömning krävs."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Elevnamn måste vara dolt eftersom detta är en anonym enkät."
   student_number_db6f06c1: "Elev %{number}"
@@ -20861,6 +21052,7 @@ sv-x-k12:
   submit_comment_commenttext_8e5638d7: "Skicka kommentar: %{commentText}"
   submit_comment_e5cc2718: "Skicka kommentar"
   submit_confirmation_4d366dd1: Inlämningsbekräftelse
+  submit_file_using_label_9fa4bbb7: "Skicka in filen med %{label}"
   submit_file_using_name_bc8d7b71: "Skicka in filen med %{name}"
   submit_for_student_d90838e8: "Skicka in för elev"
   submit_media_file_f334c1ba: "Skicka in mediafil"
@@ -21025,6 +21217,7 @@ sv-x-k12:
   tabs_5605547e: Flikar
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
+  take_a_photo_via_webcam_954f2433: "Ta en bild med webbkameran"
   take_a_picture_d582acf1: "Ta en bild"
   take_a_snapshot_now_5b622d85: "Ta en ögonblicksbild nu"
   take_photo_b06762f9: "Ta ett foto"
@@ -21287,10 +21480,14 @@ sv-x-k12:
                 
                 Tack,
                 Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "Meddelandet med ämnet ”%{subject}” levererades inte. För att svara på Canvas-meddelanden från den här e-postadressen måste den först vara en bekräftad kommunikationskanal i din Canvas-profil. Besök din profil och skicka om bekräftelsemeddelandena för den här e-postadressen. Du kan även kontakta den här personen via Canvas Inbox. Se avsnittet om Inbox för din användarroll i Canvas Guides om du behöver hjälp. [Se %{link}]."
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-användaren som angavs i kontoinställningarna är inte en utbildningsanvändare och kan inte användas med Microsoft Teams Sync-integreringen."
   the_module_item_is_locked_27fe420b: "Modulobjektet är låst"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De senaste resultaten för användaren %{current_user_name} och lärandemålen %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Nästa tillgängliga möte i denna kurs är den *%{date}*"
   the_original_quizzes_interface_fcda53bc: "Gränssnittet för ursprungliga quizet"
+  the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Lärandemålgruppen importerades till den här kursen."
+  the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "Lärandemålgruppen importerades till det här kontot."
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: "Det går inte att ta bort det lärandemål du valde eftersom det är associerat till innehåll i det här kontot."
     other: "Det går inte att ta bort de lärandemål du valde eftersom de är associerade till innehåll i det här kontot."
@@ -22634,6 +22831,7 @@ sv-x-k12:
   unable_to_find_learningoutcome_for_id_id_49541314: "det gick inte att hitta LearningOutcome för ID:t %{id}"
   unable_to_get_accounts_cb825c43: "Det gick inte att hämta konton"
   unable_to_get_homerooms_959dfe67: "Det gick inte att hämta fjärrundervisningsrum"
+  unable_to_get_observed_students_ff62d801: "Det gick inte att hämta observerade elever"
   unable_to_load_courses_menu_7074ea04: "Det gick inte att läsa in kursmenyn."
   unable_to_load_messages_2b158fd0: "Det gick inte att läsa in meddelandena. "
   unable_to_load_messages_49a2942b: "Det gick inte att läsa in meddelandena."
@@ -23438,6 +23636,7 @@ sv-x-k12:
   view_due_items_due_today_for_course_coursename_129e433: "Visa %{due} objekt som ska lämnas in i dag för kursen %{courseName}"
   view_faculty_journals_ad0e8c8f: "Visa lärarjournaler"
   view_feature_settings_at_an_account_level_ec7f5e10: "Visa funktionsinställningar på kontonivå"
+  view_feedback_b88c99c: "Visa återkoppling"
   view_feedback_f2feabca: "Visa återkoppling"
   view_file_8a1c62e5: "Visa fil"
   view_gradebook_d6713dd1: "Visa bedömningsöversikten"
@@ -23505,6 +23704,7 @@ sv-x-k12:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Varning: Vänligen använd agendavy, för förbättrad tillgång till kalenderhändelser."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Varning: för förbättrad tillgång vid omorganisering av uppgifter och grupper, kan du använda alternativet Flytta till dialog som finns i menyn."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Varning! För förbättrad åtkomst, klicka här för att använda den individuella Visa bedömningsöversikt."
+  warning_for_improved_accessibility_with_annotated__43e3a5ea: "Varning! För att få en förbättrad tillgänglighet med noterade uppgifter, använd Filuppladdning eller Textinmatning för att kommentera."
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Varning! Om det finns användare med den här rollen kommer de att behålla sina nuvarande behörigheter men du kommer inte att kunna skapa nya användare med den här rollen."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Varning. Steget har underordnade som inte är StepItem-komponenter"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Varning! Steget har två StepItems med statusen Pågår"
@@ -23879,6 +24079,7 @@ sv-x-k12:
   you_are_not_enrolled_in_any_courses_a5c63286: "Du har inte registrerat dig för några kurser."
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Du prenumererar inte på det här ämnet. Klicka för att prenumerera."
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Du är inte den valda moderatorn för denna uppgift"
+  you_are_observing_observeduser_afd2f245: "Du observerar %{observedUser}"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Du är redo att synkronisera 1 uppgift."
     other: "Du är redo att synkronisera %{count} uppgifter."
