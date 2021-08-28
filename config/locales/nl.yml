@@ -1828,6 +1828,7 @@ nl:
   add_criterion_eb9587ef: "Criterium toevoegen"
   add_custom_link_22059c0: "Aangepaste link toevoegen"
   add_delete_edit_7dbc9c5b: toevoegen/verwijderen/bewerken
+  add_delete_manage_d65e235: toevoegen/verwijderen/beheren
   add_designers_to_courses_9588820b: "Ontwerpers aan cursussen toevoegen"
   add_discussion_653dab4c: "Discussie toevoegen"
   add_domain_f15bc6c1: "Domein toevoegen"
@@ -1848,8 +1849,10 @@ nl:
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Voegt details toe aan machtigingen rondom het beheer van cursusbestanden"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Voegt details toe aan machtigingen rondom het beheer van cursussecties"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Details toevoegen aan machtigingen rondom beheer van cursussen, zoals Toevoegen/Publiceren/Voltooien/Verwijderen"
+  add_granularity_to_permissions_around_managing_gro_ef410a72: "Voegt details toe aan machtigingen rondom het beheer van groepen in Account- of Cursusinhoud"
   add_group_c84f9e9d: "Groep toevoegen"
   add_group_set_f9809e11: "Groepsreeks toevoegen"
+  add_groups_a133e48c: "Groepen toevoegen"
   add_help_menu_links_de9fc34f: "Koppelingen hulpmenu toevoegen"
   add_hostname_as_an_allowed_domain_1f58c38d: "%{hostname} toevoegen als een toegestaan domein"
   add_hostname_to_the_whitelist_c808192e: "%{hostname} toevoegen aan de whitelist"
@@ -2772,14 +2775,18 @@ nl:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Er is een fout opgetreden bij het zoeken naar de LTI-configuratie"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Er was een probleem bij het bijwerken van de set beoordelingsperiodes."
   an_error_occurred_adding_group_groupname_670af30: "Er is een fout opgetreden bij het toevoegen van groep \"%{groupName}\""
+  an_error_occurred_adding_group_groupname_6ed99725: "Er is een fout opgetreden bij het toevoegen van groep \"%{groupName}\"."
   an_error_occurred_adding_group_groupname_message_6af9ef4c: "Er is een fout opgetreden bij het toevoegen van groep \"%{groupName}\": %{message}"
+  an_error_occurred_adding_group_groupname_message_8854de45: "Er is een fout opgetreden bij het toevoegen van groep \"%{groupName}\": %{message}."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Er is een fout opgetreden bij het wijzigen van de vergrendelingsstatus voor \"%{fileName}\""
   an_error_occurred_creating_the_conference_fcad5f6f: "Er is een fout opgetreden bij het aanmaken van de vergadering"
   an_error_occurred_during_the_sync_process_error_62d98be7: "Er is een fout opgetreden tijdens het synchronisatieproces: %{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Er is een fout opgetreden bij het laden van leerdoelgegevens."
   an_error_occurred_making_a_network_request_d1bda348: "Er is een fout opgetreden bij het maken van een netwerkaanvraag"
+  an_error_occurred_moving_group_grouptitle_16ec1ebd: "Er is een fout opgetreden bij het verplaatsen van groep \"%{groupTitle}\"."
   an_error_occurred_moving_group_grouptitle_b20a640b: "Er is een fout opgetreden bij het verplaatsen van groep \"%{groupTitle}\""
   an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "Er is een fout opgetreden bij het verplaatsen van groep \"%{groupTitle}\": %{message}"
+  an_error_occurred_moving_group_grouptitle_message_5c592f26: "Er is een fout opgetreden bij het verplaatsen van groep \"%{groupTitle}\": %{message}."
   an_error_occurred_moving_group_title_24fd7fb4: "Er is een fout opgetreden bij het verplaatsen van groep \"%{title}\""
   an_error_occurred_moving_group_title_message_f8428b66: "Er is een fout opgetreden bij het verplaatsen van groep \"%{title}\": %{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "Er is een fout opgetreden bij het verplaatsen van leerdoel \"%{title}\""
@@ -2816,6 +2823,10 @@ nl:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Er is een fout opgetreden tijdens het maken van dit leerdoel: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Er is een fout opgetreden tijdens het maken van dit leerdoel: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Er is een fout opgetreden tijdens het verwijderen van aankondigingen"
+  an_error_occurred_while_importing_this_group_9aef7c30: "Er is een fout opgetreden tijdens het importeren van deze groep."
+  an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Er is een fout opgetreden tijdens het importeren van deze groep: %{message}."
+  an_error_occurred_while_importing_this_outcome_2ce488af: "Er is een fout opgetreden tijdens het importeren van dit leerdoel."
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Er is een fout opgetreden tijdens het importeren van dit leerdoel: %{message}."
   an_error_occurred_while_loading_account_learning_o_29a11066: "Er is een fout opgetreden tijdens het laden van accountleerdoelgroepen."
   an_error_occurred_while_loading_account_outcomes_8f337857: "Er is een fout opgetreden tijdens het laden van de accountleerdoelen."
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Er is een fout opgetreden tijdens het laden van accountleerdoelen: %{error}"
@@ -2846,6 +2857,7 @@ nl:
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Er is een fout opgetreden tijdens het verwijderen van het leerdoel: %{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: "Er is een fout opgetreden tijdens het verwijderen van deze groep."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "Er is een fout opgetreden tijdens het verwijderen van deze groep: %{message}"
+  an_error_occurred_while_removing_this_group_messag_c15e0830: "Er is een fout opgetreden tijdens het verwijderen van deze groep: %{message}."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Er is een fout opgetreden tijdens het ophalen van je QR-code"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Er is een fout opgetreden tijdens het opslaan van accountvaardigheidsbeoordelingen"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Er is een fout opgetreden tijdens het opslaan van accountvaardigheidsbeoordelingen: %{message}"
@@ -2857,6 +2869,8 @@ nl:
   an_error_occurred_while_starting_migration_8e6015e2: "Er is een fout opgetreden tijdens het starten van de migratie"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Er is een fout opgetreden bij het wijzigen van de UI."
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Er is een fout opgetreden tijdens het bijwerken van de vergrendelingsstatus voor aankondigingen."
+  an_error_occurred_while_updating_group_grouptitle_2072b3c9: "Er is een fout opgetreden tijdens het bijwerken van groep \"%{groupTitle}\"."
+  an_error_occurred_while_updating_group_grouptitle__6029f82d: "Er is een fout opgetreden tijdens het bijwerken van groep \"%{groupTitle}\": %{message}."
   an_error_occurred_while_updating_group_grouptitle__f32110b5: "Er is een fout opgetreden tijdens het bijwerken van groep \"%{groupTitle}\": %{message}"
   an_error_occurred_while_updating_group_grouptitle_fc919aa: "Er is een fout opgetreden tijdens het bijwerken van groep \"%{groupTitle}\""
   an_error_occurred_while_updating_late_policies_a95b707f: "Er is een fout opgetreden bij het updaten van het laatbeleid"
@@ -3853,7 +3867,7 @@ nl:
         manually_assign_peer_reviews: "Peerbeoordelingen handmatig toewijzen"
         require_peer_reviews: "Peerbeoordelingen vereisen"
       locked_until: "Reviews toewijzen"
-      peer_reviews_assign_at_explanation: "Moet na de inleverdatum vallen. Bij een leeg veld wordt de inleverdatum gebruikt."
+      peer_reviews_assign_at_explanation: "Indien leeg, wordt de inleverdatum gebruikt."
       peer_reviews_header: Peerbeoordelingen
       reviews_per_user: "Reviews per gebruiker"
     points_possible_number: "Mogelijke punten moeten een getal zijn"
@@ -4752,6 +4766,7 @@ nl:
     update: Bijwerken
     view_account_roster: "Accountrooster bekijken"
     view_course_roster: "Cursusrooster bekijken"
+  buttons_and_icons_e66ee12c: "Knoppen en pictogrammen"
   by_b90c6b6f: Door
   by_client_id_4f2fe02c: "Door Client-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alle links zijn standaard voor een cursus ingeschakeld. Cursisten zullen links voor onderdelen zonder inhoud niet kunnen zien. Bijvoorbeeld, als je geen toetsen hebt gemaakt dan zullen ze de link voor de toetsen niet kunnen zien. Je kunt deze links sorteren en expliciet uitschakelen als er gebieden in de cursus zijn waarvan je niet wilt dat cursisten er toegang tot hebben."
@@ -5338,6 +5353,8 @@ nl:
   canvas_files_889a274f: Canvas-bestanden
   canvas_for_elementary_beta_28bc5181: "Canvas voor Elementair (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas voor Elementair"
+  canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas voor Elementair: veel aankondingingen in de huisklas"
+  canvas_for_elementary_parent_support_74a2356e: "Canvas voor Elementair: Oudersondersteuning"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas helpt he gebruik te maken van samenwerkingstechnologieën
@@ -5352,6 +5369,7 @@ nl:
   canvas_login_failure_message_4c922f2f: "Foutbericht in Canvas aanmelding"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Back-upcodes voor Canvas Multi-Factor-verificatie"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas heeft toegang tot je camera nodig."
+  canvas_needs_access_to_your_camera_b5418c0: "Canvas heeft toegang tot je camera nodig."
   canvas_notifications_tutorial_video_79b8e768: "Instructievideo over meldingen in Canvas"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       Canvas heeft nu twee toetsengines. Kies de engine die
@@ -5373,6 +5391,9 @@ nl:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas zal alle inzendingen herberekenen nadat je de toets opslaat; dit kan een paar minuten duren."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas verwijdert sleutels met lege waarden uit payloads met live gebeurtenissen als deze functie is ingeschakeld."
+  cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
+      Limiteer het aantal RCE's weergegeven op de eerste pagina die wordt geladen. Hierna
+      elke initialiseren als deze op het punt staat in het weergavegebied te gaan.
   captions_subtitles_af2c47e: Ondertiteling
   captured_image_91838f78: "Opgenomen afbeelding"
   card_movement_menu_for_title_b94c09af: "Menu Kaartverplaatsing voor %{title}"
@@ -5501,6 +5522,7 @@ nl:
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Klassieke toetsen: Herkomst van URL's in Canvas-bestanden verwijderen in antwoorden"
   classic_view_33f29576: "Klassieke weergave"
   clear_2084585f: Wissen
+  clear_all_da755751: "Alles wissen"
   clear_search_field_75f595c7: "Zoekveld wissen"
   clear_selected_file_82388e50: "Verwijder geselecteerd bestand"
   clear_user_cache_ef079f7f: "Gebruikerscache wissen"
@@ -5869,6 +5891,123 @@ nl:
       notices: 
         contact_registered: "Contactmethode geregistreerd!"
   communication_channels_a9abd037: Communicatiekanalen
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: voltooid
   complete_all_items_e1779257: "Alle items voltooien"
   complete_fd828dea: Voltooid
@@ -7851,8 +7990,10 @@ nl:
         course_template: Cursussjabloon
         course_visibility: Zichtbaarheid
         custom_course_visibility: Aanpassen
+        enable_pace_plans: "Tempoplannen inschakelen"
         enrollment_term_id: Periode
         enrollments_from_homeroom: Inschrijvingen
+        friendly_name: "Gebruiksvriendelijke naam"
         grading_scheme: Beoordelingsschema
         grading_standard_enabled: "Beoordelingsschema voor de cursus inschakelen"
         hide_distribution_graphs: "Grafiek met de cijferverdeling voor cursisten verbergen"
@@ -7869,6 +8010,7 @@ nl:
         lock_all_announcements: "Opmerkingen over aankondigingen uitschakelen"
         master_course: "Cursus inschakelen als Blauwdrukcursus"
         open_enrollment: "Een link \"Aan deze cursus deelnemen\" toevoegen aan de startpagina van de cursus"
+        pace_plans: Tempoplannen
         participation_id: Deelname
         public_syllabus: "De syllabus voor deze cursus voor iedereen zichtbaar maken"
         restrict_enrollments_to_course_dates: "Cursisten kunnen alleen tussen deze datums aan de cursus deelnemen"
@@ -8161,6 +8303,7 @@ nl:
   create_new_discussions_6ab69da2: "Nieuwe discussies maken"
   create_new_e0946c49: "Nieuwe maken"
   create_new_group_bf9561d4: "Nieuwe groep maken"
+  create_new_group_fca5cc73: "Nieuwe groep maken"
   create_new_group_set_13b1f62a: "Nieuwe groepsset maken"
   create_outcome_4dac05a0: "Leerdoel maken"
   create_pages_581a4d59: "Pagina's maken"
@@ -8558,6 +8701,7 @@ nl:
   deduct_104e8866: Aftrekken
   deep_orange_4c7eea99: "Diep oranje"
   deep_purple_bb3e2907: "Diep paars"
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Diepgeneste antwoorden worden niet langer ondersteund. Je antwoord verschijnt op de eerste pagina van deze thread."
   default_9db103d: Standaard
   default_conference_title: "%{course_name} vergadering"
   default_dates_a0a2ae26: standaarddatums
@@ -8611,6 +8755,7 @@ nl:
   delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen"
   delete_grading_scheme_title_215f0a40: "Beoordelingsschema %{title} verwijderen"
   delete_group_86c381ec: "Groep verwijderen"
+  delete_groups_c637c07: "Groep verwijderen"
   delete_in_progress_2d3f0e0d: "Verwijderen wordt uitgevoerd"
   delete_key_developername_be80e695: "Sleutel verwijderen %{developerName}"
   delete_key_name_c2de8c0c: "Sleutel verwijderen %{name}"
@@ -8663,11 +8808,13 @@ nl:
   delete_your_work_fe136221: "Je werk verwijderen?"
   deleted_1be5ed1: Verwijderd
   deleted_by_deletername_f269211a: "Verwijderd door %{deleterName}"
+  deleted_by_user_be69f8: "Verwijderd door %{user}"
   deleted_caption_b5c66807: "Verwijderde ondertiteling"
   deleted_ce03674d: verwijderd
   deleted_content_exceptions_237e809d: "Uitzonderingen verwijderde inhoud:"
   deleted_content_referenced_in_this_resource_e42d1998: "Verwijderde inhoud waarnaar in deze resource wordt verwezen:"
   deleted_deletedtimingdisplay_f4c73003: "%{deletedTimingDisplay} verwijderd"
+  deleted_topic_notice: "Dat onderwerp is verwijderd"
   deleting_6421031e: "bezig met verwijderen..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Verwijderen van een inleveringsbestand wordt gewoonlijk alleen gedaan wanneer een cursist ongewenst of privémateriaal plaatst.
@@ -9407,6 +9554,7 @@ nl:
   download_course_roster_csv_86b3d192: "Cursusrooster CSV downloaden"
   download_epub_757cf0af: "ePub downloaden"
   download_errors_attchment_82ffea3f: "Downloaden errors_attchment"
+  download_filename_781704f5: "%{filename} downloaden"
   download_item_analysis_report_statuslabel_8c9387ec: "Rapport met itemanalyse %{statusLabel} downloaden"
   download_page_views_csv_974f36e1: "Paginaweergaven CSV downloaden"
   download_report_77164f62: "Rapport downloaden"
@@ -9621,6 +9769,7 @@ nl:
       find_existing_rubric: "Bestaande rubriek zoeken"
   edit_rubric_title_104d6fd2: "Rubriek bewerken: %{title}"
   edit_section_name_558cc89: "Sectie \"%{name}\" bewerken"
+  edit_status_612572db: "Status bewerken"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Inleveringsstatus bewerken vanaf SpeedGrader"
   edit_survey_b0d6890d: "Enquête bewerken"
   edit_term_name_29a8a322: "Periode bewerken %{name}"
@@ -9797,6 +9946,7 @@ nl:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Hiermee schakel je API-eindpunten in voor de cursus en gebruikersgegevens die worden verstrekt door Nieuwe analyse."
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: "Stelt sitebeheerder-gebruikers in staat om releaseopmerkingen te configureren om weer te geven aan gebruikers"
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Mogelijkheid tot sorteren op SIS-ID, integratie-ID en aanmeldings-ID in de Nieuwe cijferlijst."
+  enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Schakelt ondersteuning in voor waarnemers binnen Canvas voor Elementair."
   enables_the_course_templates_feature_globally_79d5302f: "Hiermee wordt de functie Cursussjablonen op globaal niveau ingeschakeld"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Door Elementair thema in te schakelen verandert het lettertype in de Canvas-interface en wordt het menu Cursusnavigatie voor alle gebruikers in je cursus vereenvoudigd."
   encourage_class_participation_4e069479: "Klasdeelname aanmoedigen"
@@ -9934,6 +10084,7 @@ nl:
   enrollments_teachers: Docenten
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Zorgt ervoor dat leerdoelen die reeds in een cursus zijn geïmporteerd niet worden gedupliceerd als ze opnieuw worden geïmporteerd"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Zorgt ervoor dat gebruikers zonder de machtiging Leerdoelen importeren niet de knop kunnen zien binnen het tabblad Leerdoelen"
+  enter_a_filename_for_the_photo_4f0fc10e: "Voer een bestandsnaam voor de foto in"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Voer een hex-code in om een aangepaste kleur te gebruiken"
   enter_a_valid_date_46d77547: "Een geldige datum invoeren"
   enter_a_what_if_score_668c91a3: "Voer een wat-als-score in."
@@ -10597,6 +10748,7 @@ nl:
   failed_307449e1: "Mislukt:"
   failed_creating_user_b706a1c5: "Gebruiker maken is mislukt"
   failed_getting_file_to_preview_89fe2bf4: "Voorbeeldweergave van bestand niet gelukt"
+  failed_getting_next_batch_of_announcements_1f1165a5: "Verkrijgen van volgende batch aankondigingen is mislukt."
   failed_loading_associations_component_is_your_netw_fa49fb32: "Laden van  component Koppelingen is mislukt. Is je netwerkverbinding in orde?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Laden van cursussecties mislukt. Vernieuw de pagina om het opnieuw te proberen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Laden van component Synchronisatiegeschiedenis is mislukt. Is je netwerkverbinding in orde?"
@@ -10741,6 +10893,8 @@ nl:
     student_groups: "Pagina met nieuwe groepen cursisten"
     student_outcome_gradebook: "Cijferlijst vakbeheersing door cursisten"
   features_2581da: Functies
+  features_in_active_development_opting_in_includes__210f7720: "Functies in actieve ontwikkeling — opt-in omvat lopende updates buiten het regelmatige releaseschema"
+  features_no_longer_in_active_development_that_incl_74c3a739: "Functies niet langer in actieve ontwikkeling die een datum bevatten dat ze standaard worden ingeschakeld"
   federated_attributes_5cbe6441: "Federatieve kenmerken"
   federated_attributes_are_information_sent_from_you_2116fb61: "Federatieve kenmerken zijn vanaf je verificatie provider verzonden gegevens die gebruikt kunnen worden om overeenkomende gegevens automatisch bij te werken voor gebruikers in Canvas, telkens als ze inloggen."
   feed_url_8a433438: Feed-url
@@ -11041,12 +11195,14 @@ nl:
   france_c25bfeae: Frankrijk
   french_33881544: Frans
   french_canada_c3d92fa6: "Frans (Canada)"
+  friendly_description_57f7fdde: "Gebruiksvriendelijke naam"
   friendly_description_for_parent_student_display_e608ecf3: "Gebruiksvriendelijke beschrijving (voor ouders/cursistweergave)"
   friendly_name_601153fb: "Gebruiksvriendelijke naam"
   from_date_must_be_before_to_date_79f00046: "'Van'-datum moet eerder zijn dan 'Tot'-datum"
   from_fdd4956d: Van
   from_from_to_to_e31f6422: "Van %{from} tot %{to}"
   from_gravatar_58372d5a: "Van Gravatar"
+  from_grouptitle_860dff95: "Uit %{groupTitle}"
   front_page_must_be_set_first_4dbbfdbe: "Voorpagina moet eerst worden ingesteld"
   front_page_must_be_set_first_c5246f7d: "Voorpagina moet eerst worden ingesteld"
   full_article_9296bb6f: "Volledig artikel"
@@ -12062,6 +12218,7 @@ nl:
   granular_permissions_for_managing_course_files_1ed7f019: "Gedetailleerde machtigingen voor beheer van cursusbestanden"
   granular_permissions_for_managing_course_sections_da4b04b: "Gedetailleerde machtigingen voor beheer van cursussecties"
   granular_permissions_for_managing_courses_a71be71d: "Gedetailleerde machtigingen voor beheer van cursussen"
+  granular_permissions_for_managing_groups_in_accoun_b71b4b7: "Gedetailleerde machtigingen voor het beheer van groepen in Account- of Cursusinhoud"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Specifieke machtigingen voor het beheren van wiki-pagina's"
   graph_bar_b5daa23d: Grafiekbalk
   graph_of_grades_for_each_assignment_4c44d4d1: "Grafiek van beoordelingen voor elke opdracht"
@@ -12523,6 +12680,7 @@ nl:
     unassigned_students: "Niet-toegewezen cursisten (%{count})"
     unassigned_users: "Niet-toegewezen gebruikers (%{count})"
   groups_6c90e26a: Groepen
+  groups_add_4038ae8a: "Groepen - toevoegen"
   groups_add_edit_delete_1536bbb4: "Groepen - toevoegen/bewerken/verwijderen"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Groepen zijn een goede plek om samen aan projecten te werken of om schema's voor studiesessies en dergelijke uit te zoeken. Elke groep krijgt een kalender, een wiki, discussies en een beetje ruimte om bestanden op te slaan. Groepen kunnen samenwerken aan documenten of zelfs webvergaderingen plannen. Het is echt als een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht project kunt werken."
   groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
@@ -12533,7 +12691,9 @@ nl:
                     aan een gerichter project.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Groepen mogen geen groottebeperkingen hebben om ze per sectie te kunnen toewijzen"
   groups_course_c73e4c2c: "Groepen (cursus)"
+  groups_delete_bb79a2b4: "Groepen - verwijderen"
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} Groepen | %{outcomes} Leerdoelen"
+  groups_manage_a5197479: "Groepen - beheren"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Groepen moeten leeg zijn om ze per sectie te kunnen toewijzen"
   groups_navigation_menu_76b5acc6: "Menu Groepsnavigatie"
   groups_tray_ef3e2649: Groepen
@@ -12984,6 +13144,7 @@ nl:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele subaccount weergeven)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele account weergeven)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Als één of alle machtigingen zijn uitgeschakeld, kan de gebruiker nog wel bestanden weergeven en deze downloaden in een zip-bestand."
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: "Indien verstrekt, wordt deze naam gebruikt in plaats van de feitelijke naam van de cursus op het dashboard en in meldingen."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Als er ook RCE-verbeteringen zijn ingeschakeld,
       slaat de RCE uw werk automatisch op terwijl u ermee aan het werk bent
@@ -13661,6 +13822,7 @@ nl:
   k12_description: "Werk de pictogrammen in het menu Globale navigatie bij zodat ze beter aansluiten bij een omgeving voor basisonderwijs."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazachstan (+7)"
+  keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "Hou in gedachten: deze inlevering zal voor iedereen in je %{groupName} groep tellen."
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hou in gedachten: deze inzending zal voor iedereen van jouw %{groupType}-groep tellen."
   keep_students_informed_3f41a7e6: "Houd cursisten op de hoogte"
   keep_submissions_anonymous_5cbaf419: "Inzendingen anoniem houden"
@@ -13792,6 +13954,7 @@ nl:
   learn_more_about_collaborations_2978f66d: "Meer informatie over samenwerkingen"
   learn_more_about_quiz_statistics_315a378: "Meer informatie over de statistieken van de vraag."
   learn_more_about_the_differences_a1217479: "Meer informatie over de verschillen."
+  learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: "Meer informatie over deze functie vind je in *Gebruikersgroep voor tempoplannen*."
   learn_more_about_using_commons_and_blueprints_3df953f6: "Meer informatie over gebruik van Commons en blauwdrukken."
   learn_more_about_video_conferencing_5f0e76e4: "Meer informatie over videoconferencing"
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (bèta) - bekijken"
@@ -14036,6 +14199,8 @@ nl:
   loading_accounts_3364e7a0: "Accounts worden geladen..."
   loading_additional_items_ed5f672d: "Bezig met laden van aanvullende items..."
   loading_additional_todo_details_acba0cf2: "Laden van aanvullende to-do details"
+  loading_announcement_content_4405470f: "Inhoud van aankondiging wordt geladen"
+  loading_announcement_title_b8fc3057: "Titel van aankondiging wordt geladen"
   loading_announcements_b927a86c: "Aankondigingen laden"
   loading_apps_f85740cb: "Apps worden geladen..."
   loading_artifact_dc3bfe9f: "Artifact wordt geladen"
@@ -14095,6 +14260,7 @@ nl:
   loading_more_sub_accounts_d0a30903: "Meer subaccounts laden..."
   loading_more_terms_4053e31f: "Meer items laden..."
   loading_name_data_c66ea65f: "%{name} gegevens worden geladen"
+  loading_observed_students_dfdda108: "Waargenomen cursisten worden geladen"
   loading_options_c823e98b: "Opties laden..."
   loading_outcome_results_96e21ce4: "Leerdoelresultaten laden"
   loading_permissions_28495bdb: "Machtigingen laden"
@@ -14365,11 +14531,14 @@ nl:
   manage_course_sections_f482d1b3: "Cursussecties beheren"
   manage_course_templates_66c00052: "Cursussjablonen beheren"
   manage_courses_abe8335f: "Cursussen beheren"
+  manage_create_edit_delete_groups_f9046ee3: "Groepen beheren (toevoegen/bewerken/verwijderen)"
   manage_discussion_c1dd8f4e: "Discussie beheren"
   manage_discussion_title_a2ecb3fb: "Discussie beheren %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Inschrijvingsstatus beheren, groepen maken en gebruikers toevoegen vanaf deze pagina."
   manage_grading_schemes_in_context_name_e3678273: "Beoordelingsschema's beheren in %{context_name}"
   manage_group_group_name_ac8578c6: "%{group_name} groep beheren"
+  manage_groups_4b962fa9: "Groepen beheren"
+  manage_groups_4c3a2a9f: "Groepen beheren"
   manage_home_4fc3480b: "Startpagina beheren"
   manage_home_for_coursename_5e5c7661: "Startpagina beheren voor %{courseName}"
   manage_item_name_6118d4b0: "%{item_name} beheren"
@@ -14565,6 +14734,7 @@ nl:
   members_are_free_to_join_defa5929: "Leden zijn welkom om deel te nemen"
   membership_by_invitation_only_9bc27199: "Deelname alleen op uitnodiging"
   membership_service_configuration_d8ba5a74: "Configuratie Membership Service"
+  mentions_error_page_fd84c53c: Vermeldingen-foutpagina
   menu: 
     current_groups: "Huidige groepen"
     customize: Aanpassen
@@ -14572,6 +14742,7 @@ nl:
     my_courses: "Mijn cursussen"
   menu_39cb0e8e: Menu
   menu_of_options_for_this_permission_77f50c31: "Menu met opties voor deze machtiging"
+  menu_options_9b6b0b5c: Menuopties
   message: 
     default_subject: "Waarschuwing van Canvas"
   message_5c38209d: Bericht
@@ -15259,11 +15430,15 @@ nl:
         body: "Canvas waarschuwing - Uitnodiging voor samenwerking: %{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
-        body: "Het e-mailadres %{email} wordt geregistreerd op %{website} voor de gebruiker %{user}."
+        body: |-
+            Het e-mailadres: %{email} wordt toegevoegd aan een Canvas-account geregisteerd op %{website}.
+            
+            Om te voorkomen dat dit adres wordt geregistreerd, moet je deze e-mail negeren.
         details: "Bezoek de volgende link om het registratieproces te voltooien:"
         html: 
-          body: "Het e-mailadres %{email} wordt geregistreerd op %{website} voor de gebruiker %{user}."
+          body: "Het e-mailadres: %{email} wordt toegevoegd aan een Canvas-account geregistreerd op %{website}."
           details: "Hier klikken om de registratie te bevestigen"
+          reject_message: "Om te voorkomen dat dit adres wordt geregistreerd, moet je deze e-mail negeren."
           subject: "E-mailadres: Canvas bevestigen"
         subject: "E-mailadres: Canvas bevestigen"
     confirm_registration: 
@@ -17070,6 +17245,7 @@ nl:
   newest_first_87672763: "Nieuwste eerste"
   newest_oldest_d768cf1a: "Nieuwste - Oudste"
   next_40e12421: Volgende
+  next_announcement_6e6e0f17: "Volgende aankondiging"
   next_announcements_page_3956eb11: "Pagina Volgende aankondigingen"
   next_assignment_8ec51175: "Volgende opdracht"
   next_e0d38b1f: volgende
@@ -17170,6 +17346,7 @@ nl:
   no_placements_enabled_f705f28: "Geen plaatsingen ingeschakeld"
   no_points_possible_368669d: "Geen punten mogelijk"
   no_points_possible_72db3a55: "Geen punten mogelijk"
+  no_recent_announcements_abf950d5: "Geen recente aankondigingen"
   no_results_3cda4e72: "Geen resultaten"
   no_results_f36777ee: "Geen resultaten"
   no_results_found_58717065: "Geen resultaten gevonden"
@@ -17873,6 +18050,7 @@ nl:
   outcome_export_89229eb4: "Leerdoel exporteren"
   outcome_group_39fae76f: "Groepe van leerdoelen"
   outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Leerdoelgroep bevat een of meer leerdoelen die momenteel aan inhoud zijn gekoppeld."
+  outcome_group_contains_one_or_more_outcomes_that_a_5c040c5f: "Leerdoelgroep bevat een of meer leerdoelen die momenteel aan inhoud zijn gekoppeld"
   outcome_group_menu_2fffeb71: "Menu Leerdoelgroepen"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Leerdoelgroep met Canvas-ID %{id} niet gevonden"
   outcome_groups: 
@@ -17899,6 +18077,7 @@ nl:
   outcome_results_title: "Resultaten van leerdoelen"
   outcome_score_141cf00a: resultaat
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultaat: %{title}heeft een status van %{statusTooltip}"
+  outcome_title_was_successfully_created_a4094d6c: "Aanmaken van leerdoel \"%{title}\" is gelukt."
   outcome_title_was_successfully_created_be3a408: "Leerdoel \"%{title}\" succesvol aangemaakt"
   outcome_with_canvas_id_id_not_found_215c5227: "Leerdoel met Canvas-ID \"%{id}\" niet gevonden"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Leerdoel met ID %{guid} bestaat al in een andere niet-gerelateerde cursus of account (%{name})"
@@ -18087,6 +18266,9 @@ nl:
   own_copyright_cc59db55: "Eigen auteursrecht"
   owner_email_236d1b2: "Eigenaar van e-mail"
   owner_email_4d02f795: "Eigenaar van e-mail:"
+  pace_plans_4bb9c5ff: Tempoplannen
+  pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Tempoplannen voegt ondersteuning toe voor voortschrijdende inschrijvingen in Canvas; toestaan van magische verdeling van inleverdatums voor cursisten met verschillende startdatums gebaseerd op het tempo gedefinieerd door een cursusleider. Meer informatie verkrijgen en feedback geven door deelname aan de Gebruikersgroep voor tempoplannen."
+  pace_plans_is_in_active_development_f6c20046: "Tempoplannen is in actieve ontwikkeling."
   package_error: "Fout bij het identificeren van pakkettype: %{error}"
   package_export_from_d6e2b073: "Pakket geëxporteerd uit"
   page_50c4823d: Pagina
@@ -18211,6 +18393,8 @@ nl:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Opdracht voor peerbeoordeling"
+  peer_review_due_dueattext_20987412: "Peerbeoordeling verwacht %{dueAtText}"
+  peer_review_due_eb63af38: "Peerbeoordeling verwacht"
   peer_review_for_assignment_ce72fc52: "Peerbeoordeling voor %{assignment}"
   peer_review_for_name_bcffa32f: "Peerbeoordeling voor %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peerbeoordeling voor %{name} in te leveren: %{dueAtText}"
@@ -18958,6 +19142,7 @@ nl:
   preview_website_url_eb5b8a5f: "Voorbeeld website-url"
   preview_your_changes_373557d8: "Voorbeeld van jouw wijzigingen"
   previous_445ca243: vorige
+  previous_announcement_7efc02d9: "Vorige aankondiging"
   previous_announcements_page_79c0ada1: "Pagina Vorige aankondigingen"
   previous_assignment_83d1f423: "Vorige opdracht"
   previous_bd2ac015: Vorige
@@ -19346,6 +19531,9 @@ nl:
                 te werken, rechtstreeks vanuit je Canvas-cursus.
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Geef een URI op naar de metadata van je IdP om de andere velden automatisch in te vullen. Als je school deel uitmaakt van InCommon of van de UK Access Management Federation, geef je respectievelijk urn:mace:incommon of http://ukfederation.org.uk op voor de metadata-URI en geef je bovendien de entiteit-ID van je school op."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Zorg voor een URI voor de IdP metadata van je om automatisch andere velden te bevolken. Als je school onderdeel is van InCommon, geef dan urn:mace:incommon op voor de metadata URI, en geef ook de entiteit ID van je school op."
+  provide_navigation_to_navigate_between_all_announc_9f1bed39: |-
+      Verstrekken van navigatie om te nagiveren door alle beschikbare aankondigingen
+      in de huisklascursus.
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
       Stuur de URL naar je SAML IdP Discovery Service die voldoet aan het
       protocol *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*.
@@ -21010,6 +21198,7 @@ nl:
   rce_edit_closed_captions_de3ad169: "RCE bewerken van ondertiteling"
   rce_enhancements_5701e06: RCE-verbeteringen
   rce_initialization_fix_4f176bda: "Correctie RCE-initialisatie"
+  rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "RCE-limietgetal voor RCE's in eerste instantie weergegeven op de pagina"
   rce_mentions_in_discussions_82cd11e3: "RCE-vermeldingen in Discussies"
   rce_pretty_html_editor_d8faf2bb: "RCE pretty HTML-editor"
   re_activate_user_f7d77c9a: "Gebruiker opnieuw activeren"
@@ -22104,6 +22293,7 @@ nl:
   select_a_module_optional_7edb5cb0: "Een module selecteren (optioneel)"
   select_a_predefined_color_c77ab2f5: "Een vooraf vastgestelde kleur selecteren."
   select_a_provisional_grade_7106e3d5: "Een voorlopig cijfer opslaan"
+  select_a_student_to_view_281d17b9: "Selecteer een cursist om te bekijken"
   select_all_assignments_bd07b919: "Alle opdrachten selecteren"
   select_all_count_9ad54aa1: "Alle selecteren (%{count})"
   select_all_count_courses_4fc63811: 
@@ -23694,6 +23884,7 @@ nl:
   student_name_c45b2a7: "Naam van cursist"
   student_name_hidden_b894d102: "cursist (naam verborgen)"
   student_name_options_cb029725: "Opties cursistnaam"
+  student_names_ea4b671a: Cursistnamen
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Namen van cursisten moeten verborgen zijn omdat anoniem beoordelen verplicht is."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Namen van cursisten moeten verborgen zijn omdat dit een anonieme enquête is."
   student_number_db6f06c1: "Cursist %{number}"
@@ -24021,6 +24212,7 @@ nl:
   submit_comment_commenttext_8e5638d7: "Opmerking verzenden: %{commentText}"
   submit_comment_e5cc2718: "Opmerking inleveren"
   submit_confirmation_4d366dd1: "Bevestiging sturen"
+  submit_file_using_label_9fa4bbb7: "Bestand inleveren met %{label}"
   submit_file_using_name_bc8d7b71: "Bestand verzenden met %{name}"
   submit_for_student_d90838e8: "Inleveren voor cursist"
   submit_media_file_f334c1ba: "Mediabestand inleveren"
@@ -24198,6 +24390,7 @@ nl:
   tabs_5605547e: Tabbladen
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
+  take_a_photo_via_webcam_954f2433: "Maak een foto met webcam"
   take_a_picture_d582acf1: "Een afbeelding nemen"
   take_a_snapshot_now_5b622d85: "Maak nu een snapshot"
   take_photo_b06762f9: "Foto maken"
@@ -24479,10 +24672,14 @@ nl:
                 
                 Bedankt,
                 Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "Het bericht dat je stuurde met onderwerpregel \"%{subject}\" is niet afgeleverd. Om Canvas-berichten vanaf dit e-mailadres te beantwoorden, moet het eerst een bevestigd communcatiekanaal in je Canvas-profiel zijn. Ga naar je profiel en stuur de bevestigingsmail voor dit e-mailadres. Je kunt ook contact opnemen met deze persoon via de Canvas-inbox. Meer informatie hierover kun je vinden in het hoofdstuk Inbox voor je gebruikersrol in de Canvas-handleidingen. [Zie %{link}]."
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "De Microsoft 365 tenant verstrekt in de accountinstellingen is geen Education-tenant en kan daarom niet met de Microsoft Teams Sync-integratie worden gebruikt."
   the_module_item_is_locked_27fe420b: "Het item van de module is vergrendeld."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De meest recente scores voor gebruiker %{current_user_name} en %{outcome_name} resultaat."
   the_next_available_appointment_in_this_course_is_o_da10316c: "De eerstvolgende beschikbare afspraak in deze cursus is op *%{date}*"
   the_original_quizzes_interface_fcda53bc: "De originele toetseninterface"
+  the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Importeren van de leerdoelgroep in deze cursus is gelukt."
+  the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "Importeren van de leerdoelgroep in dit account is gelukt."
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: "Het leerdoel dat je hebt geselecteerd kan niet worden verwijderd omdat het is verbonden met inhoud in dit account."
     other: "De leerdoelen die je hebt geselecteerd kunnen niet worden verwijderd omdat ze zijn verbonden met inhoud in dit account."
@@ -25896,6 +26093,7 @@ nl:
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Kan in je instituut geen overeenkomsten vinden voor deze e-mailadressen. Selecteer de adressen die je wilt gebruiken om nieuwe gebruikers te maken. Niet-geselecteerde adressen worden overgeslagen."
   unable_to_get_accounts_cb825c43: "Kan geen accounts krijgen"
   unable_to_get_homerooms_959dfe67: "Kan geen klassen krijgen"
+  unable_to_get_observed_students_ff62d801: "Kan waargenomen cursisten niet ophalen"
   unable_to_load_courses_menu_7074ea04: "Kan cursussenmenu niet laden."
   unable_to_load_lti_1_3_tools_cf169f9: "Kan LTI 1.3 Tools niet laden"
   unable_to_load_messages_2b158fd0: "Kan berichten niet laden. "
@@ -26805,6 +27003,7 @@ nl:
   view_due_items_due_today_for_course_coursename_129e433: "%{due} items bekijken voor inlevering vandaag voor cursus %{courseName}"
   view_faculty_journals_ad0e8c8f: "Faculteitsnieuws weergeven"
   view_feature_settings_at_an_account_level_ec7f5e10: "Functie-instellingen bekijken op accountniveau"
+  view_feedback_b88c99c: "Feedback bekijken"
   view_feedback_f2feabca: "Feedback bekijken"
   view_file_8a1c62e5: "Bestand weergeven"
   view_gradebook_d6713dd1: "Cijferlijst bekijken"
@@ -26883,6 +27082,7 @@ nl:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Waarschuwing: Voor verbeterde toegang tot kalendergebeurtenissen, gebruik de agendaweergave."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Waarschuwing: Gebruik de optie Naar dialoog verplaatsen in het menu voor betere toegang tot herordening van opdrachten en groepen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Waarschuwing: Voor betere toegang, klik hier om Individuele Weergave Cijferlijst te gebruiken."
+  warning_for_improved_accessibility_with_annotated__43e3a5ea: "Waarschuwing: Voor verbeterde toegankelijkheid bij opdrachten met aantekeningen kun je Bestand uploaden of Tekstinvoer gebruiken om opmerkingen achter te laten."
   warning_icon_f64936d7: waarschuwingspictogram
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Waarschuwing: Als er gebruikers met deze functie zijn, behouden ze de huidige machtigingen voor deze functie, maar je kunt dan geen nieuwe gebruikers met deze functie meer maken."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Waarschuwingsstap heeft onderliggende items die geen StepItem-componenten zijn"
@@ -27277,6 +27477,7 @@ nl:
   you_are_not_enrolled_in_any_courses_a5c63286: "Je bent voor geen enkele cursus ingeschreven."
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Je bent niet aangemeld voor dit onderwerp. Klik om aan te melden."
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Jij bent niet de geselecteerde moderator voor deze opdracht"
+  you_are_observing_observeduser_afd2f245: "Je bent %{observedUser} aan het waarnemen"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Je bent klaar om 1 opdracht te synchroniseren."
     other: "Je bent klaar om %{count} opdrachten te synchroniseren."
