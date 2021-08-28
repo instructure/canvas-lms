@@ -52,6 +52,7 @@
   "button_size_20f5fce1": { "message": "按钮大小" },
   "buttons_and_icons_e66ee12c": { "message": "按钮和图标" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "选择标题文件" },
   "choose_usage_rights_33683854": { "message": "选择使用权限..." },
   "circle_484abe63": { "message": "圆圈" },
@@ -236,6 +237,7 @@
   },
   "my_files_2f621040": { "message": "我的文件" },
   "my_images_427f9b0c": { "message": "我的图像" },
+  "name_1aed4a1b": { "message": "名称" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "导航菜单或工具栏"
   },
@@ -379,6 +381,7 @@
     "message": "键入 Control F9 以访问表格选项。{ text }"
   },
   "unpublished_dfd8801": { "message": "取消发布" },
+  "untitled_efdc2d7d": { "message": "无标题" },
   "upload_document_253f0478": { "message": "上传文档" },
   "upload_file_fd2361b8": { "message": "上传文件" },
   "upload_image_6120b609": { "message": "上传图像" },

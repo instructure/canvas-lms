@@ -52,6 +52,7 @@
   "button_size_20f5fce1": { "message": "Gwosè Bouton" },
   "buttons_and_icons_e66ee12c": { "message": "Bouton ak Ikòn" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Anile" },
   "choose_caption_file_9c45bc4e": { "message": "Chwazi fichye soutit" },
   "choose_usage_rights_33683854": {
     "message": "Itilizasyon dwa itilizasyon..."
@@ -250,6 +251,7 @@
   },
   "my_files_2f621040": { "message": "Fichye Mwen" },
   "my_images_427f9b0c": { "message": "Imaj Mwen" },
+  "name_1aed4a1b": { "message": "Non" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navige atravè meni oswa ba zouti a"
   },
@@ -403,6 +405,7 @@
     "message": "tape Control F9 pouw gen aksè a opsyon tablo yo. { text }"
   },
   "unpublished_dfd8801": { "message": "pa pibliye" },
+  "untitled_efdc2d7d": { "message": "san tit" },
   "upload_document_253f0478": { "message": "Chaje Dokiman" },
   "upload_file_fd2361b8": { "message": "Transfere Fichye" },
   "upload_image_6120b609": { "message": "Transfere Imaj" },

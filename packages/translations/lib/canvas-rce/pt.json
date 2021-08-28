@@ -58,6 +58,7 @@
   "button_size_20f5fce1": { "message": "Tamanho do Botão" },
   "buttons_and_icons_e66ee12c": { "message": "Botões e Ícones" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Cancelar" },
   "choose_caption_file_9c45bc4e": { "message": "Ficheiro de legenda" },
   "choose_usage_rights_33683854": {
     "message": "Escolher direitos de utilização..."
@@ -282,6 +283,7 @@
   },
   "my_files_2f621040": { "message": "Os meus ficheiros" },
   "my_images_427f9b0c": { "message": "Minhas Imagens" },
+  "name_1aed4a1b": { "message": "Nome" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegue pelo menu ou barra de ferramentas"
   },
@@ -435,6 +437,7 @@
     "message": "digite Control F9 para acessar as opções da tabela. { text }"
   },
   "unpublished_dfd8801": { "message": "Não publicado" },
+  "untitled_efdc2d7d": { "message": "sem título" },
   "upload_document_253f0478": { "message": "Carregar documento" },
   "upload_file_fd2361b8": { "message": "Carregar ficheiro" },
   "upload_image_6120b609": { "message": "Carregar imagem" },

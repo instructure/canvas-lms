@@ -56,6 +56,7 @@
   "button_size_20f5fce1": { "message": "حجم الزر" },
   "buttons_and_icons_e66ee12c": { "message": "الأزرار والأيقونات" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "إلغاء" },
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
   "choose_usage_rights_33683854": { "message": "اختر حقوق الاستخدام..." },
   "circle_484abe63": { "message": "الدائرة" },
@@ -258,6 +259,7 @@
   },
   "my_files_2f621040": { "message": "ملفاتي" },
   "my_images_427f9b0c": { "message": "صوري" },
+  "name_1aed4a1b": { "message": "الاسم" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
@@ -407,6 +409,7 @@
     "message": "اضغط Control F9 للوصول إلى اختيارات الجدول. { text }"
   },
   "unpublished_dfd8801": { "message": "غير منشور" },
+  "untitled_efdc2d7d": { "message": "بدون عنوان" },
   "upload_document_253f0478": { "message": "تحميل المستند" },
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },

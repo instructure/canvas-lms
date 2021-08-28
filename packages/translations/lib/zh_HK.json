@@ -185,6 +185,9 @@
     "calendar_event_89aadc1c": {
         "message": "行事曆活動"
     },
+    "cancel_caeb1e68": {
+        "message": "取消"
+    },
     "canvas_planner_98ed106": {
         "message": "Canvas 手冊"
     },
@@ -806,6 +809,9 @@
     "my_images_427f9b0c": {
         "message": "我的影像"
     },
+    "name_1aed4a1b": {
+        "message": "名稱"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "導航整個選單或工具欄"
     },
@@ -1252,6 +1258,9 @@
     },
     "unpublished_dfd8801": {
         "message": "未發佈"
+    },
+    "untitled_efdc2d7d": {
+        "message": "無標題"
     },
     "upload_document_253f0478": {
         "message": "上傳文件"

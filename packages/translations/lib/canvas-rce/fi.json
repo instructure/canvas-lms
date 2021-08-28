@@ -58,6 +58,7 @@
   "button_size_20f5fce1": { "message": "Painikkeen koko" },
   "buttons_and_icons_e66ee12c": { "message": "Painikkeet ja kuvakkeet" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Peruuta" },
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
   "choose_usage_rights_33683854": { "message": "Valitse käyttöoikeudet..." },
   "circle_484abe63": { "message": "Ympyrä" },
@@ -278,6 +279,7 @@
   },
   "my_files_2f621040": { "message": "Omat tiedostot" },
   "my_images_427f9b0c": { "message": "Omat kuvat" },
+  "name_1aed4a1b": { "message": "Nimi" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Siirry valikon tai työkalupalkin läpi"
   },
@@ -431,6 +433,7 @@
     "message": "käytä taulukon asetuksia kirjoittamalla Control F9. { text }"
   },
   "unpublished_dfd8801": { "message": "julkaisematon" },
+  "untitled_efdc2d7d": { "message": "Nimetön" },
   "upload_document_253f0478": { "message": "Lataa asiakirja" },
   "upload_file_fd2361b8": { "message": "Lataa tiedosto" },
   "upload_image_6120b609": { "message": "Lisää kuva" },

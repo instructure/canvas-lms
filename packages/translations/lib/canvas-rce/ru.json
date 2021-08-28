@@ -54,6 +54,7 @@
   "button_size_20f5fce1": { "message": "Кнопка «Размер»" },
   "buttons_and_icons_e66ee12c": { "message": "Кнопки и пиктограммы" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 г. Acme Inc." },
+  "cancel_caeb1e68": { "message": "Отменить" },
   "choose_caption_file_9c45bc4e": {
     "message": "Выберите файл подписи к изображению"
   },
@@ -284,6 +285,7 @@
   },
   "my_files_2f621040": { "message": "Мои файлы" },
   "my_images_427f9b0c": { "message": "Мои изображения" },
+  "name_1aed4a1b": { "message": "Имя" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Навигация в меню или панели инструментов"
   },
@@ -449,6 +451,7 @@
     "message": "Наберите Control F9 для доступа к опциям таблицы. { text }"
   },
   "unpublished_dfd8801": { "message": "не опубликовано" },
+  "untitled_efdc2d7d": { "message": "без названия" },
   "upload_document_253f0478": { "message": "Загрузить документ" },
   "upload_file_fd2361b8": { "message": "Загрузить файл" },
   "upload_image_6120b609": { "message": "Загрузить изображение" },

@@ -52,6 +52,7 @@
   "button_size_20f5fce1": { "message": "按鈕大小" },
   "buttons_and_icons_e66ee12c": { "message": "按鈕和圖示" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "選擇字幕檔案" },
   "choose_usage_rights_33683854": { "message": "選擇使用權限…" },
   "circle_484abe63": { "message": "圓形" },
@@ -234,6 +235,7 @@
   },
   "my_files_2f621040": { "message": "我的檔案" },
   "my_images_427f9b0c": { "message": "我的影像" },
+  "name_1aed4a1b": { "message": "名稱" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
   },
@@ -379,6 +381,7 @@
     "message": "輸入 Control F9 以存取表格選項。{ text }"
   },
   "unpublished_dfd8801": { "message": "未發佈" },
+  "untitled_efdc2d7d": { "message": "無標題" },
   "upload_document_253f0478": { "message": "上傳文件" },
   "upload_file_fd2361b8": { "message": "上傳檔案" },
   "upload_image_6120b609": { "message": "上載影像" },
