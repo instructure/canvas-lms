@@ -354,5 +354,14 @@ module CanvasRails
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
     end
+
+    initializer("set_allowed_request_id_setters", after: :finisher_hook) do |app|
+      # apparently there is no initialization hook that comes late enough for
+      # routes to already be loaded, so we have to load them explicitly
+      app.reload_routes!
+      RequestContext::Generator.allow_unsigned_request_context_for(
+        app.routes.url_helpers.api_graphql_subgraph_path
+      )
+    end
   end
 end
