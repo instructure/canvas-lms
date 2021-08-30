@@ -63,8 +63,9 @@ group :test do
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
-  gem 'axe-core-selenium', '4.2.1', require: false
-  gem 'axe-core-rspec', '4.2.1', require: false
-  gem 'axe-core-api', '4.2.1', require:false
+  # axe-core* versions at or above 4.2 have difficulties with iframes. Keep these at 4.1.0 until fixes are investigated
+  gem 'axe-core-selenium', '~> 4.1.0', require: false
+  gem 'axe-core-rspec', '~> 4.1.0', require: false
+  gem 'axe-core-api', '~> 4.1.0', require:false
   gem 'stormbreaker', '0.0.4', require: false
 end
