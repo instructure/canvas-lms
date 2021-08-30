@@ -1974,6 +1974,8 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRunti
 
 module RestoreConnectionConnectionPool
   def restore_connection(conn)
+    # If the connection got closed before we restored it, don't try to return it
+    return unless conn.active?
     synchronize do
       adopt_connection(conn)
       # check if a new connection was checked out in the meantime, and check it back in
