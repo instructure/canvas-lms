@@ -80,7 +80,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
       config = default_config.merge(:ssl => true, :port => 995)
 
       expect(Net::POP3).to receive(:new).with(config[:server], config[:port]).and_return(@pop_mock)
-      expect(@pop_mock).to receive(:enable_ssl).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(@pop_mock).to receive(:enable_ssl).with(OpenSSL::SSL::VERIFY_PEER)
       expect(@pop_mock).to receive(:start).with(config[:username], config[:password])
 
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new(config)
