@@ -105,6 +105,10 @@ module K5DashboardPageObject
     "[data-testid = 'k5-dashboard-options']"
   end
 
+  def dashboard_card_specific_subject_selector(subject)
+    "[data-testid='k5-dashboard-card'][aria-label='#{subject}'"
+  end
+
   def empty_dashboard_selector
     "[data-testid = 'empty-dash-panda']:visible"
   end
@@ -333,6 +337,10 @@ module K5DashboardPageObject
 
   def dashboard_card
     f(dashboard_card_selector)
+  end
+
+  def dashboard_card_specific_subject(subject)
+    f(dashboard_card_specific_subject_selector(subject))
   end
 
   def dashboard_header

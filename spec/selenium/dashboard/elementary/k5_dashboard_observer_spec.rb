@@ -20,6 +20,10 @@
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
 require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_grades_tab_page'
+require_relative '../../grades/setup/gradebook_setup'
+require_relative '../pages/k5_schedule_tab_page'
+require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 
 describe "observer k5 dashboard" do
@@ -27,6 +31,10 @@ describe "observer k5 dashboard" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
+  include K5ScheduleTabPageObject
+  include K5GradesTabPageObject
+  include GradebookSetup
+  include K5ResourceTabPageObject
 
   before :once do
     Account.site_admin.enable_feature!(:k5_parent_support)
@@ -39,8 +47,68 @@ describe "observer k5 dashboard" do
     driver.manage.delete_cookie('k5_observed_user_id')
   end
 
+  context 'single observed student' do
+    it 'defaults to the one observed student' do
+      get "/"
+
+      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('K5Student')
+    end
+
+    it 'shows the homeroom announcement and subject for the one observed student' do
+      announcement_heading1 = "K5 Do this"
+      announcement_content1 = "So happy to see all of you."
+      new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
+
+      get "/"
+
+      expect(dashboard_card_specific_subject('Science')).to be_displayed
+      expect(announcement_title(announcement_heading1)).to be_displayed
+    end
+
+    it 'shows missing assignments on dashboard schedule tab' do
+      skip("needs at least LS-2481")
+      now = Time.zone.now
+      create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(now))
+      create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(now))
+
+      get "/#schedule"
+
+      expect(missing_data.text).to eq('Show 2 missing items')
+    end
+
+    it 'show the grades progress bar with the appropriate progress' do
+      skip("LS-2582 grades not working right now")
+      subject_grade = "75"
+
+      assignment = create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100)
+      assignment.grade_student(@student, grader: @homeroom_teacher, score: subject_grade, points_deducted: 0)
+
+      get "/#grades"
+
+      expect(grade_progress_bar(subject_grade)).to be_displayed
+    end
+
+    it 'shows the Important Info for the main resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@homeroom_course, important_info_text)
+
+      get "/#resources"
+      expect(important_info_content).to include_text(important_info_text)
+    end
+
+    it 'shows the LTI resources for account and course on resources page' do
+      lti_resource_name = 'Commons'
+      create_lti_resource(lti_resource_name)
+
+      get "/#resources"
+
+      expect(k5_app_buttons[0].text).to eq lti_resource_name
+    end
+  end
+
   context 'multiple observed students' do
     before :once do
+      @new_students = []
       2.times do |x|
         course_with_student(
           active_all: true,
@@ -48,7 +116,21 @@ describe "observer k5 dashboard" do
           course: @homeroom_course
         )
         add_linked_observer(@student, @observer, root_account: @account)
+        @new_students << @student
       end
+
+      course_with_student(
+        active_course: true,
+        course_name: "Art",
+        user: @new_students[0]
+      )
+      @art_course = @course
+
+      course_with_student(
+        active_all: true,
+        user: @new_students[1],
+        course: @subject_course
+      )
     end
 
     it 'provides a dropdown for multiple observed students' do
@@ -65,6 +147,7 @@ describe "observer k5 dashboard" do
       click_observed_student_option('My1 Student')
 
       expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My1 Student')
+      expect(dashboard_card_specific_subject('Art')).to be_displayed
     end
 
     it 'selects allows for searching for a student in dropdown list' do
@@ -74,19 +157,20 @@ describe "observer k5 dashboard" do
       click_observed_student_option('My2 Student')
 
       expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+      expect(dashboard_card_specific_subject('Science')).to be_displayed
     end
 
-    it 'shows the observers name first if observer is also a student' do
+    it 'shows the observers name first if observer is also a student', ignore_js_errors: true do
       course_with_student(
         active_all: true,
         user: @observer,
-        course: @homeroom_course
+        course: @art_course
       )
 
       get "/"
 
       expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('Mom')
+      expect(dashboard_card_specific_subject('Art')).to be_displayed
     end
-
   end
 end
