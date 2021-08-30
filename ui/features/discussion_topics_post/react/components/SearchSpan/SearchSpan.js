@@ -35,6 +35,7 @@ const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
 export function SearchSpan({...props}) {
   return (
     <span
+      className="user_content"
       dangerouslySetInnerHTML={{
         __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView)
       }}
