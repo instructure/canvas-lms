@@ -139,8 +139,9 @@ const DiscussionTopicManager = props => {
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => {
+    onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -194,6 +195,7 @@ const DiscussionTopicManager = props => {
             openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (

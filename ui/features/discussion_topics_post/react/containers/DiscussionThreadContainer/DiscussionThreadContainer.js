@@ -319,11 +319,6 @@ export const DiscussionThreadContainer = props => {
     setEditorExpanded(false)
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
     <Responsive
       match="media"
@@ -338,7 +333,7 @@ export const DiscussionThreadContainer = props => {
       }}
       render={responsiveProps => (
         <>
-          <Highlight isHighlighted={highlightEntry}>
+          <Highlight isHighlighted={props.discussionEntry._id === props.highlightEntryId}>
             <div style={{marginLeft: marginDepth}} ref={threadRef}>
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
@@ -479,7 +474,8 @@ DiscussionThreadContainer.propTypes = {
   markAsRead: PropTypes.func,
   parentRef: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string
 }
 
 DiscussionThreadContainer.defaultProps = {
