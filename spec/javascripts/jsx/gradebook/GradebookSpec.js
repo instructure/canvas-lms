@@ -1410,19 +1410,22 @@ test('returns false if sorting by custom and there is a custom column order stor
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-QUnit.module('Gradebook#renderAssignmentSearchFilter (enhanced_gradebook_filters: true)', {
-  setup() {
-    setFixtureHtml($fixtures)
-    this.gradebook = createGradebook({enhanced_gradebook_filters: true})
-    this.gradebook.setStudentsLoaded(true)
-    this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderAssignmentSearchFilter([])
-  },
+QUnit.module(
+  'Gradebook#renderAssignmentSearchFilter (gradebook_assignment_search_and_redesign: true)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: true})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderAssignmentSearchFilter([])
+    },
 
-  teardown() {
-    $fixtures.innerHTML = ''
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
   }
-})
+)
 
 test('renders Assignment Names label', function () {
   this.gradebook.renderAssignmentSearchFilter([])
@@ -1430,19 +1433,22 @@ test('renders Assignment Names label', function () {
   ok(assignmentSearch.textContent.includes('Assignment Names'))
 })
 
-QUnit.module('Gradebook#renderStudentSearchFilter (enhanced_gradebook_filters: true)', {
-  setup() {
-    setFixtureHtml($fixtures)
-    this.gradebook = createGradebook({enhanced_gradebook_filters: true})
-    this.gradebook.setStudentsLoaded(true)
-    this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderStudentSearchFilter([])
-  },
+QUnit.module(
+  'Gradebook#renderStudentSearchFilter (gradebook_assignment_search_and_redesign: true)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: true})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderStudentSearchFilter([])
+    },
 
-  teardown() {
-    $fixtures.innerHTML = ''
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
   }
-})
+)
 
 test('does not render old set up/search field', function () {
   this.gradebook.renderStudentSearchFilter([])
@@ -1457,19 +1463,22 @@ test('renders Student Names label', function () {
   ok(studentSearch.textContent.includes('Student Names'))
 })
 
-QUnit.module('Gradebook#renderStudentSearchFilter (enhanced_gradebook_filters: false)', {
-  setup() {
-    setFixtureHtml($fixtures)
-    this.gradebook = createGradebook({enhanced_gradebook_filters: false})
-    this.gradebook.setStudentsLoaded(true)
-    this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderStudentSearchFilter([])
-  },
+QUnit.module(
+  'Gradebook#renderStudentSearchFilter (gradebook_assignment_search_and_redesign: false)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: false})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderStudentSearchFilter([])
+    },
 
-  teardown() {
-    $fixtures.innerHTML = ''
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
   }
-})
+)
 
 test('binds an InputFilterView to the search filter markup', function () {
   equal(this.gradebook.userFilter.constructor.name, 'InputFilterView')

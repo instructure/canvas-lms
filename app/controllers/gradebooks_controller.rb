@@ -426,6 +426,7 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      gradebook_assignment_search_and_redesign: Account.site_admin.feature_enabled?(:gradebook_assignment_search_and_redesign),
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,

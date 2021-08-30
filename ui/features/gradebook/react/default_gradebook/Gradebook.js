@@ -2153,7 +2153,7 @@ class Gradebook extends React.Component {
   }
 
   renderStudentSearchFilter(students) {
-    if (this.options.enhanced_gradebook_filters) {
+    if (this.options.gradebook_assignment_search_and_redesign) {
       const mountPoint = document.getElementById('gradebook-student-search')
       const props = {
         label: I18n.t('Student Names'),
@@ -2186,7 +2186,7 @@ class Gradebook extends React.Component {
   }
 
   renderAssignmentSearchFilter(assignments) {
-    if (this.options.enhanced_gradebook_filters) {
+    if (this.options.gradebook_assignment_search_and_redesign) {
       const mountPoint = document.getElementById('gradebook-assignment-search')
       const props = {
         label: I18n.t('Assignment Names'),
