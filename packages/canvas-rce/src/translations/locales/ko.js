@@ -51,6 +51,7 @@ const locale = {
   "discussions_a5f96392": { "message": "토론" },
   "discussions_index_6c36ced": { "message": "토론 색인" },
   "done_54e3d4b6": { "message": "마침" },
+  "edit_c5fbea07": { "message": "편집" },
   "embed_image_1080badc": { "message": "이미지 포함" },
   "external_links_3d9f074e": { "message": "외부 링크" },
   "external_tools_6e77821": { "message": "외부도구" },

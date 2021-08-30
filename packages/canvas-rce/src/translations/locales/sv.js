@@ -75,6 +75,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Knappstorlek" },
   "buttons_and_icons_e66ee12c": { "message": "Knappar och ikoner" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Välj undertextfil" },
   "choose_usage_rights_33683854": {
     "message": "Välj användningsrättigheter ..."
@@ -174,6 +175,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Förfallodatum: Flera datum" },
   "due_when_7eed10c6": { "message": "Inlämningsdatum: { when }" },
+  "edit_c5fbea07": { "message": "Redigera" },
   "edit_equation_f5279959": { "message": "Redigera ekvation" },
   "edit_link_7f53bebb": { "message": "Redigera länk" },
   "editor_statusbar_26ac81fc": { "message": "Statusfält för redigeraren" },
@@ -198,10 +200,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Externa verktyg" },
   "extra_large_b6cdf1ff": { "message": "Extra stor" },
   "extra_small_9ae33252": { "message": "Extra liten" },
-  "file_upload_failed_af22dd91": {
-    "message": "Det gick inte att ladda upp filen"
-  },
-  "file_uploading_56c9c0c8": { "message": "Filen laddas upp" },
   "file_url_c12b64be": { "message": "Filens URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
@@ -300,6 +298,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mina filer" },
   "my_images_427f9b0c": { "message": "Mina bilder" },
+  "name_1aed4a1b": { "message": "Namn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigera via menyn eller verktygsfältet"
   },
@@ -407,9 +406,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Lämna in" },
   "subscript_59744f96": { "message": "Nedsänkt" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Klart: Filen har laddats upp"
-  },
   "superscript_8cb349a2": { "message": "Upphöjd" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Filtyper som stöds: SRT eller WebVTT"
@@ -462,13 +458,11 @@ const locale = {
     "message": "Skriv Control F9 för åtkomst till tabellalternativ. { text }"
   },
   "unpublished_dfd8801": { "message": "avpublicerad" },
+  "untitled_efdc2d7d": { "message": "namnlös" },
   "upload_document_253f0478": { "message": "Ladda upp dokument" },
   "upload_file_fd2361b8": { "message": "Ladda upp fil" },
   "upload_image_6120b609": { "message": "Ladda upp bild" },
   "upload_media_ce31135a": { "message": "Ladda upp media" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Uppladdning är inte tillgängligt för den här mappen"
-  },
   "upload_record_media_e4207d72": { "message": "Ladda upp/spela in media" },
   "uploading_19e8a4e7": { "message": "Laddar upp" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

@@ -78,6 +78,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Pātene Rahi" },
   "buttons_and_icons_e66ee12c": { "message": "Pātene me ngā Ata" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Whakakore" },
   "choose_caption_file_9c45bc4e": { "message": "Kōwhiria kōnae tapanga" },
   "choose_usage_rights_33683854": {
     "message": "Kōwhiria ngā mōtika whakamahi ..."
@@ -179,6 +180,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "E tika ana: Rā Maha" },
   "due_when_7eed10c6": { "message": "E tika ana: { when }" },
+  "edit_c5fbea07": { "message": "Whakatika" },
   "edit_equation_f5279959": { "message": "Whakatika Tatauranga" },
   "edit_link_7f53bebb": { "message": "Whakatika hononga" },
   "editor_statusbar_26ac81fc": { "message": "Editor Pae tūnga" },
@@ -203,8 +205,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Taputapu o waho" },
   "extra_large_b6cdf1ff": { "message": "Nui rawa atu" },
   "extra_small_9ae33252": { "message": "Tāpiri iti" },
-  "file_upload_failed_af22dd91": { "message": "Rahua te utanga kōnae" },
-  "file_uploading_56c9c0c8": { "message": "E uta ana te kōnae" },
   "file_url_c12b64be": { "message": "Kōnae URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } kōnae icon" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } āhua arokite" },
@@ -301,6 +301,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Aku kōnae" },
   "my_images_427f9b0c": { "message": "Āku Āhua" },
+  "name_1aed4a1b": { "message": "Ingoa" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Whakatere i roto i te tahua paeutauta rānei"
   },
@@ -400,9 +401,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Ngā Kāhua" },
   "submit_a3cc6859": { "message": "Tuku" },
   "subscript_59744f96": { "message": "Tuhinga" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Angitu: Kaore te tukuake i te wātea mo tēnei kōpaki"
-  },
   "superscript_8cb349a2": { "message": "Tuhinga nui" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Ngā kōnae momo kua tautokotia: SRT me WebVTT rānei"
@@ -455,13 +453,11 @@ const locale = {
     "message": "patopato Control F9 ki te whakauru ngā kōwhiringa ripanga. { text }"
   },
   "unpublished_dfd8801": { "message": "kaore i pānuitia" },
+  "untitled_efdc2d7d": { "message": "taitara kore" },
   "upload_document_253f0478": { "message": "Tikiake Tuhinga" },
   "upload_file_fd2361b8": { "message": "Tukuake kōnae" },
   "upload_image_6120b609": { "message": "Tukuake Whakāturanga" },
   "upload_media_ce31135a": { "message": "Tukuatu pāpāho" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Kaore i te wātea te tukuake mo tēnei kōpaki"
-  },
   "upload_record_media_e4207d72": { "message": "Tukuatu/Tāhopu Pāpāpho" },
   "uploading_19e8a4e7": { "message": "E tikiake ana" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

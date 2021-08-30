@@ -79,6 +79,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Dimensione pulsanti" },
   "buttons_and_icons_e66ee12c": { "message": "Pulsanti e icone" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annulla" },
   "choose_caption_file_9c45bc4e": {
     "message": "Scegli un file di sottotitoli"
   },
@@ -182,6 +183,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Scadenza: Più date" },
   "due_when_7eed10c6": { "message": "Scadenza: { when }" },
+  "edit_c5fbea07": { "message": "Modifica" },
   "edit_equation_f5279959": { "message": "Modifica equazione" },
   "edit_link_7f53bebb": { "message": "Modifica collegamento" },
   "editor_statusbar_26ac81fc": { "message": "Barra di stato dell’editor" },
@@ -204,8 +206,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Strumenti esterni" },
   "extra_large_b6cdf1ff": { "message": "Extra Large" },
   "extra_small_9ae33252": { "message": "Extra piccola" },
-  "file_upload_failed_af22dd91": { "message": "Errore caricamento file" },
-  "file_uploading_56c9c0c8": { "message": "Caricamento file" },
   "file_url_c12b64be": { "message": "URL file" },
   "filename_file_icon_602eb5de": { "message": "Icona file { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -308,6 +308,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "I miei file" },
   "my_images_427f9b0c": { "message": "Le mi immagini" },
+  "name_1aed4a1b": { "message": "Nome" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviga attraverso il menu o la barra degli strumenti"
   },
@@ -413,9 +414,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stili" },
   "submit_a3cc6859": { "message": "Invia" },
   "subscript_59744f96": { "message": "Pedice" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Operazione riuscita: File caricato"
-  },
   "superscript_8cb349a2": { "message": "Apice" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipi di file supportati: SRT o WebVTT"
@@ -468,13 +466,11 @@ const locale = {
     "message": "digita Control F9 per accedere alle opzioni di tabella. { text }"
   },
   "unpublished_dfd8801": { "message": "non pubblicato" },
+  "untitled_efdc2d7d": { "message": "senza titolo" },
   "upload_document_253f0478": { "message": "Carica documento" },
   "upload_file_fd2361b8": { "message": "Carica File" },
   "upload_image_6120b609": { "message": "Carica immagine" },
   "upload_media_ce31135a": { "message": "Carica file multimediali" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Caricamento non disponibile per questa cartella"
-  },
   "upload_record_media_e4207d72": {
     "message": "Carica/Registra file multimediali"
   },

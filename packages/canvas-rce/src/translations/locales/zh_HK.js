@@ -73,6 +73,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "按鈕大小" },
   "buttons_and_icons_e66ee12c": { "message": "按鈕和圖示" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "選擇字幕檔案" },
   "choose_usage_rights_33683854": { "message": "選擇使用權限…" },
   "circle_484abe63": { "message": "圓形" },
@@ -154,6 +155,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "截止日期：多個日期" },
   "due_when_7eed10c6": { "message": "截止日期：{ when }" },
+  "edit_c5fbea07": { "message": "編輯" },
   "edit_equation_f5279959": { "message": "編輯方程式" },
   "edit_link_7f53bebb": { "message": "編輯連結" },
   "editor_statusbar_26ac81fc": { "message": "編輯器狀態欄" },
@@ -174,8 +176,6 @@ const locale = {
   "external_tools_6e77821": { "message": "外部工具" },
   "extra_large_b6cdf1ff": { "message": "超大" },
   "extra_small_9ae33252": { "message": "超小" },
-  "file_upload_failed_af22dd91": { "message": "檔案上載失敗" },
-  "file_uploading_56c9c0c8": { "message": "檔案上載中" },
   "file_url_c12b64be": { "message": "檔案 URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } 檔案圖示" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } 影像預覽" },
@@ -256,6 +256,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "我的檔案" },
   "my_images_427f9b0c": { "message": "我的影像" },
+  "name_1aed4a1b": { "message": "名稱" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
   },
@@ -351,7 +352,6 @@ const locale = {
   "styles_2aa721ef": { "message": "樣式" },
   "submit_a3cc6859": { "message": "提交" },
   "subscript_59744f96": { "message": "下標" },
-  "success_file_uploaded_8174e93f": { "message": "成功：已上載檔案" },
   "superscript_8cb349a2": { "message": "上標" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "支援的檔案類型：SRT 或 WebVTT"
@@ -402,13 +402,11 @@ const locale = {
     "message": "輸入 Control F9 以存取表格選項。{ text }"
   },
   "unpublished_dfd8801": { "message": "未發佈" },
+  "untitled_efdc2d7d": { "message": "無標題" },
   "upload_document_253f0478": { "message": "上傳文件" },
   "upload_file_fd2361b8": { "message": "上傳檔案" },
   "upload_image_6120b609": { "message": "上載影像" },
   "upload_media_ce31135a": { "message": "上傳媒體" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "此資料夾無法使用上載功能"
-  },
   "upload_record_media_e4207d72": { "message": "上傳/錄製媒體" },
   "uploading_19e8a4e7": { "message": "正在上傳" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

@@ -81,6 +81,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Tamaño del botón" },
   "buttons_and_icons_e66ee12c": { "message": "Botones e íconos" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Cancelar" },
   "choose_caption_file_9c45bc4e": { "message": "Elegir archivo de subtítulos" },
   "choose_usage_rights_33683854": { "message": "Elegir derechos de uso..." },
   "circle_484abe63": { "message": "Círculo" },
@@ -182,6 +183,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Fecha límite: Varias fechas" },
   "due_when_7eed10c6": { "message": "Fecha límite: { when }" },
+  "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar ecuación" },
   "edit_link_7f53bebb": { "message": "Editar enlace" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado del editor" },
@@ -204,8 +206,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Herramientas externas" },
   "extra_large_b6cdf1ff": { "message": "Extra grande" },
   "extra_small_9ae33252": { "message": "Extra pequeño" },
-  "file_upload_failed_af22dd91": { "message": "Falló la carga del archivo" },
-  "file_uploading_56c9c0c8": { "message": "Cargando archivo" },
   "file_url_c12b64be": { "message": "URL del archivo" },
   "filename_file_icon_602eb5de": {
     "message": "Icono del archivo { filename }"
@@ -306,6 +306,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mis archivos" },
   "my_images_427f9b0c": { "message": "Mis imágenes" },
+  "name_1aed4a1b": { "message": "Nombre" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegar por el menú o la barra de herramientas"
   },
@@ -413,7 +414,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Entregar" },
   "subscript_59744f96": { "message": "Subíndice" },
-  "success_file_uploaded_8174e93f": { "message": "Éxito: Archivo cargado" },
   "superscript_8cb349a2": { "message": "Superíndice" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipos de archivos admitidos: SRT o WebVTT"
@@ -464,13 +464,11 @@ const locale = {
     "message": "presione Control F9 para acceder a las opciones de tabla. { text }"
   },
   "unpublished_dfd8801": { "message": "no publicado" },
+  "untitled_efdc2d7d": { "message": "sin título" },
   "upload_document_253f0478": { "message": "Cargar documento" },
   "upload_file_fd2361b8": { "message": "Cargar archivo" },
   "upload_image_6120b609": { "message": "Cargar imagen" },
   "upload_media_ce31135a": { "message": "Cargar multimedia" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Carga no disponible para esta carpeta"
-  },
   "upload_record_media_e4207d72": { "message": "Cargar/grabar multimedia" },
   "uploading_19e8a4e7": { "message": "Cargando" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

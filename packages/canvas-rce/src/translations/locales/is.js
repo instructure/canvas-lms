@@ -76,6 +76,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Stærð hnapps" },
   "buttons_and_icons_e66ee12c": { "message": "Hnappar og tákn" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Hætta við" },
   "choose_caption_file_9c45bc4e": { "message": "Veldu skjátextaskrá" },
   "choose_usage_rights_33683854": { "message": "Velja notkunarréttindi..." },
   "circle_484abe63": { "message": "Hringur" },
@@ -171,6 +172,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Skil: Margar dagsetningar" },
   "due_when_7eed10c6": { "message": "Skil: { when }" },
+  "edit_c5fbea07": { "message": "Breyta" },
   "edit_equation_f5279959": { "message": "Breyta jöfnu" },
   "edit_link_7f53bebb": { "message": "Breyta tengli" },
   "editor_statusbar_26ac81fc": { "message": "Stöðuslá ritils" },
@@ -193,8 +195,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Ytri tæki" },
   "extra_large_b6cdf1ff": { "message": "Sérstaklega stórar" },
   "extra_small_9ae33252": { "message": "Sérstaklega smátt" },
-  "file_upload_failed_af22dd91": { "message": "Upphleðsla skrár mistókst" },
-  "file_uploading_56c9c0c8": { "message": "Skrá er að hlaðast upp" },
   "file_url_c12b64be": { "message": "Skráar-URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } skráartákn" },
   "filename_image_preview_6cef8f26": {
@@ -287,6 +287,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mínar skrár" },
   "my_images_427f9b0c": { "message": "Mínar myndir" },
+  "name_1aed4a1b": { "message": "Nafn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Notaðu valmyndina eða verkfæraslánna til að komast á réttan stað"
   },
@@ -388,9 +389,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stílar" },
   "submit_a3cc6859": { "message": "Leggja fram" },
   "subscript_59744f96": { "message": "Undirskrift" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Árangur: Skrá var hlaðið upp"
-  },
   "superscript_8cb349a2": { "message": "Yfirskrift" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Studdar skráagerðir: SRT eða WebVTT"
@@ -441,13 +439,11 @@ const locale = {
     "message": "sláðu inn Ctrl F9 til að fá aðgang að töfluvalkostum. { text }"
   },
   "unpublished_dfd8801": { "message": "óbirt" },
+  "untitled_efdc2d7d": { "message": "ónefnt" },
   "upload_document_253f0478": { "message": "Hlaða upp skjali" },
   "upload_file_fd2361b8": { "message": "Hlaða upp skrá" },
   "upload_image_6120b609": { "message": "Hleð upp mynd" },
   "upload_media_ce31135a": { "message": "Hlaða upp miðli" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Upphleðsla ekki tiltæk fyrir þessa möppu"
-  },
   "upload_record_media_e4207d72": {
     "message": "Hlaða/taka upp margmiðlunarefni"
   },
