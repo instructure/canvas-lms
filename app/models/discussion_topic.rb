@@ -534,36 +534,24 @@ class DiscussionTopic < ActiveRecord::Base
   protected :update_stream_item_state
 
   def update_participants_read_state(current_user, new_state, update_fields)
-    entry_ids = discussion_entries.pluck(:id)
-    existing_entry_participants = DiscussionEntryParticipant.existing_participants(current_user, entry_ids).to_a
+    # if workflow_state is unread, and force_read_state is not provided then
+    # mark everything as unread but use the defaults, or allow other entries to
+    # be implicitly unread, but still update any existing records.
+    if new_state == 'unread' && !update_fields.key?(:forced_read_state)
+      DiscussionEntryParticipant.where(discussion_entry_id: discussion_entries.select(:id), user: current_user)
+        .where.not(workflow_state: new_state)
+        .in_batches.update_all(update_fields)
+    else
+      DiscussionEntryParticipant.upsert_for_topic(self, current_user,
+                                                  new_state: new_state,
+                                                  forced: update_fields[:forced_read_state])
+    end
+
     update_or_create_participant(current_user: current_user,
       new_state: new_state,
       new_count: new_state == 'unread' ? self.default_unread_count : 0)
-
-    if entry_ids.present? && existing_entry_participants.present?
-      update_existing_participants_read_state(current_user, update_fields, existing_entry_participants)
-    end
-
-    if new_state == "read"
-      new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
-      bulk_insert_new_participants(new_entry_ids, current_user, update_fields)
-    end
   end
   protected :update_participants_read_state
-
-  def update_existing_participants_read_state(current_user, update_fields, existing_entry_participants)
-    existing_ids = existing_entry_participants.map(&:id)
-    DiscussionEntryParticipant.where(id: existing_ids).update_all(update_fields)
-  end
-  protected :update_existing_participants_read_state
-
-  def bulk_insert_new_participants(new_entry_ids, current_user, update_fields)
-    records = new_entry_ids.map do |entry_id|
-      { discussion_entry_id: entry_id, user_id: current_user.id, root_account_id: self.root_account_id}.merge(update_fields)
-    end
-    DiscussionEntryParticipant.bulk_insert(records)
-  end
-  protected :bulk_insert_new_participants
 
   def default_unread_count
     self.discussion_entries.active.count
