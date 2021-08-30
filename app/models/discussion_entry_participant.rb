@@ -61,12 +61,12 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   # returns the ids of records changed or inserted, or a
   # DiscussionEntryParticipant object with errors for backwards compatability to
   # the previous method.
-  def self.upsert_for_entries(entry, user, batch: nil, new_state: nil, forced: nil, rating: nil)
-    batch ||= [entry]
+  def self.upsert_for_entries(entry_or_topic, user, batch: nil, new_state: nil, forced: nil, rating: nil)
+    batch ||= [entry_or_topic]
 
     raise(ArgumentError) if batch.count > 1_000
-    return not_null_column_object(column: :entry, entry: entry, user: user) unless entry
-    return not_null_column_object(column: :user, entry: entry, user: user) unless user
+    return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
+    return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
     insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
     update_columns = []
@@ -90,7 +90,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     # non-null column
     default_state = new_state || 'unread'
     insert_values = batch.map do |batch_entry|
-      row_values(batch_entry, user.id, entry.root_account_id, default_state, update_values)
+      row_values(batch_entry, user.id, entry_or_topic.root_account_id, default_state, update_values)
     end
 
     # takes ruby arrays of values into sql arrays ready for insert.
@@ -110,7 +110,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
     # if there are no values in the update_columns, there is no point to
     # creating the record. A non-existent record is treated as an unread record.
-    return not_null_column_object(column: :workflow_state, entry: entry, user: user) if update_columns.empty?
+    return not_null_column_object(column: :workflow_state, entry: entry_or_topic, user: user) if update_columns.empty?
 
     # takes two ruby arrays and makes into a sql update statement.
     # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
@@ -140,7 +140,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   def self.row_values(batch_entry, user_id, root_account_id, default_state, update_values)
     [
-      connection.quote(batch_entry.id),
+      connection.quote(batch_entry),
       connection.quote(user_id),
       connection.quote(root_account_id),
       connection.quote(default_state),
@@ -148,8 +148,16 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.upsert_for_root_entry_and_descendants(root_entry, user, new_state: nil, forced: nil, rating: nil)
-    root_entry.flattened_discussion_subentries.active.find_ids_in_batches do |batch|
+    DiscussionEntry.where(root_entry: root_entry)
+      .or(DiscussionEntry.where(id: root_entry))
+      .active.find_ids_in_batches do |batch|
       upsert_for_entries(root_entry, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
+    end
+  end
+
+  def self.upsert_for_topic(topic, user, new_state: nil, forced: nil, rating: nil)
+    topic.discussion_entries.active.find_ids_in_batches do |batch|
+      upsert_for_entries(topic, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
     end
   end
 
