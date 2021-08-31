@@ -42,7 +42,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useState, useCallback} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
 
@@ -88,7 +88,7 @@ export const DiscussionThreadContainer = props => {
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
-  const threadRef = useRef()
+  const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -288,25 +288,32 @@ export const DiscussionThreadContainer = props => {
   }
 
   // Scrolling auto listener to mark messages as read
+  const onThreadRefCurrentSet = useCallback(refCurrent => {
+    setThreadRefCurrent(refCurrent)
+  }, [])
+
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.read &&
       !props.discussionEntry?.forcedReadState
     ) {
-      const observer = new IntersectionObserver(() => props.markAsRead(props.discussionEntry._id), {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-      })
+      const observer = new IntersectionObserver(
+        ([entry]) => entry.isIntersecting && props.markAsRead(props.discussionEntry._id),
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4
+        }
+      )
 
-      if (threadRef.current) observer.observe(threadRef.current)
+      if (threadRefCurrent) observer.observe(threadRefCurrent)
 
       return () => {
-        if (threadRef.current) observer.unobserve(threadRef.current)
+        if (threadRefCurrent) observer.unobserve(threadRefCurrent)
       }
     }
-  }, [threadRef, props.discussionEntry.read, props])
+  }, [threadRefCurrent, props.discussionEntry.read, props])
 
   const onReplySubmit = text => {
     createDiscussionEntry({
@@ -334,7 +341,7 @@ export const DiscussionThreadContainer = props => {
       render={responsiveProps => (
         <>
           <Highlight isHighlighted={props.discussionEntry._id === props.highlightEntryId}>
-            <div style={{marginLeft: marginDepth}} ref={threadRef}>
+            <div style={{marginLeft: marginDepth}} ref={onThreadRefCurrentSet}>
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
                   <PostContainer
@@ -362,7 +369,7 @@ export const DiscussionThreadContainer = props => {
                             props.depth === 0
                               ? null
                               : () => {
-                                  const topOffset = props.parentRef.current.offsetTop
+                                  const topOffset = props.parentRefCurrent.offsetTop
                                   window.scrollTo(0, topOffset - 44)
                                 }
                           }
@@ -439,7 +446,7 @@ export const DiscussionThreadContainer = props => {
               discussionEntryId={props.discussionEntry._id}
               depth={props.depth + 1}
               markAsRead={props.markAsRead}
-              parentRef={threadRef}
+              parentRefCurrent={threadRefCurrent}
             />
           )}
           {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
@@ -472,7 +479,7 @@ DiscussionThreadContainer.propTypes = {
   discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object,
+  parentRefCurrent: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string
@@ -513,7 +520,7 @@ const DiscussionSubentries = props => {
       discussionEntry={entry}
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
-      parentRef={props.parentRef}
+      parentRefCurrent={props.parentRefCurrent}
     />
   ))
 }
@@ -523,5 +530,5 @@ DiscussionSubentries.propTypes = {
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object
+  parentRefCurrent: PropTypes.object
 }
