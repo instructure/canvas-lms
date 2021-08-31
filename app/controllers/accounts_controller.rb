@@ -740,7 +740,9 @@ class AccountsController < ApplicationController
 
     page_opts = {}
     # don't calculate a total count for this endpoint.
-    page_opts[:total_entries] = nil
+    if params[:search_term] || !@account.allow_last_page_on_account_courses?
+      page_opts[:total_entries] = nil
+    end
 
     all_precalculated_permissions = nil
     GuardRail.activate(:secondary) do
