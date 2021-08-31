@@ -613,10 +613,10 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.where("workflow_state NOT IN ('deleted','inactive','rejected') AND type<>'StudentViewEnrollment'").
-                where(:user_id => shard_user_ids).
-                select([:user_id, :course_id, :course_section_id]).
-                distinct.to_a
+          Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
+            .where(:user_id => shard_user_ids)
+            .select([:user_id, :course_id, :course_section_id])
+            .distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
