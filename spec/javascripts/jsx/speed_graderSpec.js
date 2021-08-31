@@ -1704,6 +1704,24 @@ QUnit.module('SpeedGrader', rootHooks => {
       strictEqual(secondaryMountPoint.children.length, 1)
     })
 
+    test('hides the status menu component when the current submission student is concluded', () => {
+      finishSetup()
+      const studentId = SpeedGrader.EG.currentStudent.id
+      window.jsonData.gradingPeriods[8].is_closed = false
+      window.jsonData.studentMap[studentId].enrollments[0].workflow_state = 'completed'
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 0)
+    })
+
+    test('shows the status menu component when the current submission student is not concluded', () => {
+      finishSetup()
+      window.jsonData.gradingPeriods[8].is_closed = false
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 1)
+    })
+
     test('includes last-viewed date for attachments if not anonymizing students', () => {
       finishSetup()
       SpeedGrader.EG.handleSubmissionSelectionChange()
