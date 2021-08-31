@@ -325,9 +325,33 @@ const courseTemplatesPermissions = generateActionTemplates(
     {
       title: I18n.t('Courses'),
       description: I18n.t(
-        'To create a new course to use as a course template, Manage Courses - add must also be enabled.'
+        'To create a new course to use as a course template, Courses - add must also be enabled.'
       )
     }
+  ],
+  [],
+  []
+)
+
+const coursesAddPermissions = generateActionTemplates(
+  'manage_courses_add',
+  [
+    {
+      title: I18n.t('Courses (Account)'),
+      description: I18n.t('Allows user to add new courses to an account.')
+    }
+  ][
+    ({
+      title: I18n.t('Account Settings'),
+      description: I18n.t(
+        'To allow other users to create courses in an account, select the appropriate user role in the Account Settings page: teachers, students, and/or users with no enrollments.'
+      )
+    },
+    {
+      description: I18n.t(
+        'If this permission is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings.'
+      )
+    })
   ],
   [],
   []
@@ -405,7 +429,7 @@ const blueprintCoursePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To manage associated courses, Courses - view list and Manage Courses - add must also be enabled.'
+        'To manage associated courses, Courses - view list and Courses - add must also be enabled.'
       )
     },
     {
@@ -415,7 +439,7 @@ const blueprintCoursePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled.'
+        'To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
@@ -680,13 +704,13 @@ const courseListViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
-        'If this permission is disabled and Manage Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings.'
+        'If this permission is disabled and Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings.'
       )
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To add associated courses, Blueprint Courses - add / edit / associate / delete and Manage Courses - add must also be enabled.'
+        'To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add must also be enabled.'
       )
     },
     {
@@ -995,7 +1019,7 @@ const studentCollabPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To add a course group to a collaboration, Group view all student groups must also be enabled.'
+        'To add a course group to a collaboration, Groups - add must also be enabled.'
       )
     }
   ],
@@ -1027,7 +1051,7 @@ const studentCollabPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To add a course group to a collaboration, Groups - add / edit / delete must also be enabled.'
+        'To add a course group to a collaboration, Groups - add must also be enabled.'
       )
     }
   ]
@@ -1164,6 +1188,16 @@ const pairingCodePermissions = generateActionTemplates(
       description: I18n.t(
         'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.'
       )
+    },
+    {
+      description: I18n.t(
+        'Pairing codes are only supported when self registration is enabled for the account.'
+      )
+    },
+    {
+      description: I18n.t(
+        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps. To disable QR code logins for all users in your account, please contact your Customer Success Manager.'
+      )
     }
   ],
   [
@@ -1179,6 +1213,16 @@ const pairingCodePermissions = generateActionTemplates(
       title: I18n.t('People'),
       description: I18n.t(
         'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Pairing codes are only supported when self registration is enabled for the course.'
+      )
+    },
+    {
+      description: I18n.t(
+        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps.'
       )
     }
   ]
@@ -1256,41 +1300,31 @@ const ltiAddEditPermissions = generateActionTemplates(
   ]
 )
 
-const assignmentsQuizzesPermissions = generateActionTemplates(
+const assignmentsQuizzesManagePermissions = generateActionTemplates(
   'manage_assignments',
   [
     {
       title: I18n.t('Assignments'),
-      description: I18n.t(
-        'Allows user to add, edit, delete, and publish and unpublish assignments.'
-      )
+      description: I18n.t('Allows user to edit and publish/unpublish assignments.')
     },
     {
       description: I18n.t('Allows user to manage assignment settings.')
     },
     {
-      description: I18n.t('Allows user to add assignment groups in a course.')
-    },
-    {
-      description: I18n.t('Allows user to enable and edit assignment group weighting in a course.')
+      description: I18n.t('Allows user to weight assignment groups.')
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings on the Assignments and Quizzes index pages in a Blueprint master course.'
+        'Allows user to edit lock settings on the Assignments and Quizzes index pages.'
       )
     },
     {
       title: I18n.t('Commons'),
+      description: I18n.t('Allows user to share an assignment to Commons.')
+    },
+    {
       description: I18n.t('Allows user to share a quiz to Commons.')
-    },
-    {
-      title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to edit assignment details on individual discussions.')
-    },
-    {
-      title: I18n.t('Modules'),
-      description: I18n.t('Allows user to add new assignments to a module.')
     },
     {
       title: I18n.t('Question Banks (Account Navigation)'),
@@ -1300,7 +1334,159 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('Quizzes'),
-      description: I18n.t('Allows user to add, edit, delete, and publish and unpublish quizzes.')
+      description: I18n.t('Allows user to edit and publish/unpublish quizzes.')
+    }
+  ],
+  [
+    {
+      title: I18n.t('Blueprint Courses'),
+      description: I18n.t(
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - manage / edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Discussions'),
+      description: I18n.t(
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Grades'),
+      description: I18n.t(
+        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Quizzes'),
+      description: I18n.t('To moderate a quiz, Grades - edit must also be enabled.')
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Assignments'),
+      description: I18n.t('Allows user to edit and publish/unpublish assignments.')
+    },
+    {
+      description: I18n.t('Allows user to manage assignment settings.')
+    },
+    {
+      description: I18n.t('Allows user to weight assignment groups.')
+    },
+    {
+      title: I18n.t('Blueprint Courses'),
+      description: I18n.t(
+        'Allows user to edit lock settings on the Assignments and Quizzes index pages.'
+      )
+    },
+    {
+      title: I18n.t('Commons'),
+      description: I18n.t('Allows user to share an assignment to Commons.')
+    },
+    {
+      description: I18n.t('Allows user to share a quiz to Commons.')
+    },
+    {
+      title: I18n.t('Quizzes'),
+      description: I18n.t('Allows user to edit and publish/unpublish quizzes.')
+    }
+  ],
+  [
+    {
+      title: I18n.t('Blueprint Courses'),
+      description: I18n.t(
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - manage / edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Discussions'),
+      description: I18n.t(
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Grades'),
+      description: I18n.t(
+        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Quizzes'),
+      description: I18n.t('To moderate a quiz, Grades - edit must also be enabled.')
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.'
+      )
+    }
+  ]
+)
+
+const assignmentsQuizzesPermissions = generateActionTemplates(
+  'manage_assignments_and_quizzes',
+  [
+    {
+      title: I18n.t('Assignments and Quizzes - add'),
+      description: I18n.t('Allows user to add assignments in a course.')
+    },
+    {
+      description: I18n.t('Allows user to add assignment groups in a course.')
+    },
+    {
+      description: I18n.t('Allows user to duplicate assignments in a course.')
+    },
+    {
+      description: I18n.t('Allows user to add new assignments to a module.')
+    },
+    {
+      description: I18n.t('Allows user to add new question banks to a course or account.')
+    },
+    {
+      description: I18n.t(
+        'Allows user to add new questions to new or existing question banks in a course or account.'
+      )
+    },
+    {
+      description: I18n.t('Allows user to add quizzes in a course.')
+    },
+    {
+      description: I18n.t('Allows user to duplicate quizzes in a course.')
+    },
+    {
+      title: I18n.t('Assignments and Quizzes - delete'),
+      description: I18n.t('Allows user to delete assignments in a course.')
+    },
+    {
+      description: I18n.t('Allows user to delete assignment groups in a course.')
+    },
+    {
+      description: I18n.t('Allows user to delete quizzes in a course.')
     }
   ],
   [
@@ -1312,23 +1498,12 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To differentiate assignments to individual students, Users - view list ​must also be enabled.'
-      )
-    },
-    {
-      title: I18n.t('Blueprint Courses'),
-      description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit assignments, Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'If these additional permissions are enabled, but Assignments and Quizzes - add / edit / delete is not enabled, Blueprint lock settings for an assignment can be managed from the assignment’s details page.'
-      )
-    },
-    {
-      description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To differentiate assignments to individual students, Users - view list must also be enabled.'
       )
     },
     {
@@ -1338,82 +1513,93 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
       )
     },
     {
-      title: I18n.t('Grades'),
+      title: I18n.t('Discussions'),
       description: I18n.t(
-        'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
+        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.'
       )
     },
     {
       title: I18n.t('Quizzes'),
-      description: I18n.t('To moderate a quiz, Grades - edit​ must also be enabled.')
+      description: I18n.t(
+        'To access the Quizzes Index Page, Course Content - view must be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access item banks for a course or account, Item Banks - manage account must also be enabled.'
+      )
     },
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.'
+        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.'
       )
     }
   ],
   [
     {
-      title: I18n.t('Assignments'),
-      description: I18n.t(
-        'Allows user to add, edit, delete, and publish and unpublish assignments.'
-      )
-    },
-    {
-      description: I18n.t('Allows user to manage assignment settings.')
+      title: I18n.t('Assignments and Quizzes - add'),
+      description: I18n.t('Allows user to add assignments in a course.')
     },
     {
       description: I18n.t('Allows user to add assignment groups in a course.')
     },
     {
-      description: I18n.t('Allows user to enable and edit assignment group weighting in a course.')
+      description: I18n.t('Allows user to duplicate assignments in a course.')
     },
     {
-      title: I18n.t('Blueprint Courses'),
-      description: I18n.t(
-        'Allows user to edit Blueprint lock settings on the Assignments and Quizzes index pages in a Blueprint master course.'
-      )
-    },
-    {
-      title: I18n.t('Commons'),
-      description: I18n.t('Allows user to share a quiz to Commons.')
-    },
-    {
-      title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to edit assignment details on individual discussions.')
-    },
-    {
-      title: I18n.t('Modules'),
       description: I18n.t('Allows user to add new assignments to a module.')
     },
     {
-      title: I18n.t('Quizzes'),
-      description: I18n.t('Allows user to add, edit, delete, and publish and unpublish quizzes.')
+      description: I18n.t('Allows user to add new question banks to a course.')
+    },
+    {
+      description: I18n.t(
+        'Allows user to add new questions to new or existing question banks in a course.'
+      )
+    },
+    {
+      description: I18n.t('Allows user to add quizzes in a course.')
+    },
+    {
+      description: I18n.t('Allows user to duplicate quizzes in a course.')
+    },
+    {
+      title: I18n.t('Assignments and Quizzes - delete'),
+      description: I18n.t('Allows user to delete assignments in a course.')
+    },
+    {
+      description: I18n.t('Allows user to delete assignment groups in a course.')
+    },
+    {
+      description: I18n.t('Allows user to delete quizzes in a course.')
     }
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'To differentiate assignments to individual students, Users - view list ​must also be enabled.'
-      )
-    },
-    {
-      title: I18n.t('Blueprint Courses'),
-      description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To access the Assignments Index Page, Course Content - view must be enabled.'
       )
     },
     {
       description: I18n.t(
-        'If these additional permissions are enabled, but Assignments and Quizzes - add / edit / delete is not enabled, Blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+        'To edit assignments, Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To differentiate assignments to individual students, Users - view list must also be enabled.'
       )
     },
     {
@@ -1423,19 +1609,36 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
       )
     },
     {
-      title: I18n.t('Grades'),
+      title: I18n.t('Discussions'),
       description: I18n.t(
-        'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
+        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.'
       )
     },
     {
       title: I18n.t('Quizzes'),
-      description: I18n.t('To moderate a quiz, Grades - edit​ must also be enabled.')
+      description: I18n.t(
+        'To access the Quizzes Index Page, Course Content - view must be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access item banks for a course, Item Banks - manage account must also be enabled.'
+      )
     },
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.'
+        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.'
       )
     }
   ]
@@ -1746,6 +1949,9 @@ const permissionsTeacher = generateActionTemplates(
     {
       title: I18n.t('Teachers - remove'),
       description: I18n.t('Allows user to remove teachers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate teachers in a course.')
     }
   ],
   [
@@ -1781,6 +1987,9 @@ const permissionsTeacher = generateActionTemplates(
     {
       title: I18n.t('Teachers - remove'),
       description: I18n.t('Allows user to remove teachers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate teachers in a course.')
     }
   ],
   [
@@ -1817,6 +2026,9 @@ const permissionsTA = generateActionTemplates(
     {
       title: I18n.t('TAs - remove'),
       description: I18n.t('Allows user to remove TAs from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate TAs in a course.')
     }
   ],
   [
@@ -1852,6 +2064,9 @@ const permissionsTA = generateActionTemplates(
     {
       title: I18n.t('TAs - remove'),
       description: I18n.t('Allows user to remove TAs from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate TAs in a course.')
     }
   ],
   [
@@ -1888,6 +2103,9 @@ const permissionsDesigner = generateActionTemplates(
     {
       title: I18n.t('Designers - remove'),
       description: I18n.t('Allows user to remove designers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate designers in a course.')
     }
   ],
   [
@@ -1923,6 +2141,9 @@ const permissionsDesigner = generateActionTemplates(
     {
       title: I18n.t('Designers - remove'),
       description: I18n.t('Allows user to remove designers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate designers in a course.')
     }
   ],
   [
@@ -1959,6 +2180,9 @@ const permissionsObserver = generateActionTemplates(
     {
       title: I18n.t('Observers - remove'),
       description: I18n.t('Allows user to remove observers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate observers in a course.')
     }
   ],
   [
@@ -1994,6 +2218,9 @@ const permissionsObserver = generateActionTemplates(
     {
       title: I18n.t('Observers - remove'),
       description: I18n.t('Allows user to remove observers from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate observers in a course.')
     }
   ],
   [
@@ -2030,6 +2257,9 @@ const permissionsStudent = generateActionTemplates(
     {
       title: I18n.t('Students - remove'),
       description: I18n.t('Allows user to remove students from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate students in a course.')
     }
   ],
   [
@@ -2065,6 +2295,9 @@ const permissionsStudent = generateActionTemplates(
     {
       title: I18n.t('Students - remove'),
       description: I18n.t('Allows user to remove students from a course.')
+    },
+    {
+      description: I18n.t('Allows user to deactivate students in a course.')
     }
   ],
   [
@@ -2092,10 +2325,6 @@ const courseManagePermissions = generateActionTemplates(
   'manage_courses',
   [
     {
-      title: I18n.t('Courses - add'),
-      description: I18n.t('Allows user to add new courses to an account.')
-    },
-    {
       title: I18n.t('Courses - conclude'),
       description: I18n.t('Allows user to view the Conclude Course button.')
     },
@@ -2122,9 +2351,7 @@ const courseManagePermissions = generateActionTemplates(
       )
     },
     {
-      description: I18n.t(
-        'If Courses - add is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings.'
-      )
+      description: I18n.t('To add a course, Courses - add must also be enabled.')
     },
     {
       description: I18n.t(
@@ -2190,10 +2417,6 @@ const courseManagePermissions = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Courses - add'),
-      description: I18n.t('Allows user to add new courses to an account.')
-    },
-    {
       title: I18n.t('Courses - conclude'),
       description: I18n.t('Allows user to view the Conclude Course button.')
     },
@@ -2219,6 +2442,12 @@ const courseManagePermissions = generateActionTemplates(
   ],
   [
     {
+      title: I18n.t('Blueprint Courses'),
+      description: I18n.t(
+        'Blueprint courses must be enabled for an account by an admin. Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
+      )
+    },
+    {
       title: I18n.t('Course Settings'),
       description: I18n.t(
         'The Courses - delete permission affects viewing the Permanently Delete this Course button, which only appears for manually created courses.'
@@ -2227,6 +2456,12 @@ const courseManagePermissions = generateActionTemplates(
     {
       description: I18n.t(
         'The Courses - Reset permission resets course content for both manually created and SIS-managed courses. (For SIS-managed courses, the SIS Data - manage permission does not apply.)'
+      )
+    },
+    {
+      title: I18n.t('Courses'),
+      description: I18n.t(
+        'Courses can only be created at the course level if allowed by a Canvas admin. If allowed, courses can be created in the Dashboard.'
       )
     },
     {
@@ -2485,7 +2720,7 @@ const gradesEditPermissions = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To moderate a quiz, Assignments and Quizzes - add / edit / delete also be enabled.'
+        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
@@ -2561,7 +2796,7 @@ const gradesEditPermissions = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled.'
+        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
@@ -2576,88 +2811,161 @@ const gradesEditPermissions = generateActionTemplates(
   ]
 )
 
-const gradesAddEditDeletePermissions = generateActionTemplates(
+const groupsManagePermissions = generateActionTemplates(
   'manage_groups',
   [
     {
-      title: I18n.t('Account Groups'),
-      description: I18n.t('Allows user to create, edit, and delete account groups.')
+      title: I18n.t('Groups - add'),
+      description: I18n.t('Allows user to create account or course groups.')
     },
     {
-      title: I18n.t('Course Groups'),
-      description: I18n.t('Allows user to create, edit, and delete course groups.')
+      description: I18n.t('Allows user to add group members to account or course groups.')
+    },
+    {
+      description: I18n.t('Allows user to add a group for a group assignment in a course.')
+    },
+    {
+      description: I18n.t('Allows user to create course groups created by students.')
+    },
+    {
+      description: I18n.t('Allows users to import groups in a course.')
+    },
+    {
+      title: I18n.t('Groups - delete'),
+      description: I18n.t('Allows user to delete account or course groups.')
+    },
+    {
+      description: I18n.t('Allows user to remove students from account or course groups.')
     },
     {
       description: I18n.t(
-        'Allows user to create, edit, and delete course groups created by students.'
+        'Allows user to move group members to another group in an account or course.'
       )
+    },
+    {
+      description: I18n.t('Allows user to assign a student group leader in an account or course.')
+    },
+    {
+      title: I18n.t('Groups - manage'),
+      description: I18n.t('Allows user to edit account and course groups.')
+    },
+    {
+      description: I18n.t(
+        'Allows user to view the Clone Group Set button for an account or course group.'
+      )
+    },
+    {
+      description: I18n.t('Allows user to randomly assign users to an account or course group.')
+    },
+    {
+      description: I18n.t('Allows user to add users to an account or course group.')
+    },
+    {
+      description: I18n.t(
+        'Allows user to move group members to another group in an account or course.'
+      )
+    },
+    {
+      description: I18n.t('Allows user to assign a student group leader in an account or course.')
     }
   ],
   [
     {
-      title: I18n.t('Account Groups'),
-      description: I18n.t(
-        'If this permission is disabled, at the account level, the user cannot view any existing account groups. At the course level, the user can view, but not access, any existing groups, including groups created by students.'
-      )
-    },
-    {
-      description: I18n.t('To view groups, Users - view list must also be enabled.')
-    },
-    {
+      title: I18n.t('Groups - add'),
       description: I18n.t(
         'To add account level groups via CSV, SIS Data - import must also be enabled.'
       )
     },
     {
-      title: I18n.t('Course Groups'),
-      description: I18n.t('By default, students can always create groups in a course.')
-    },
-    {
+      title: I18n.t('Groups'),
       description: I18n.t(
-        'To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'If this permission is disabled, at the account level, the user cannot view any existing account groups. At the course level, the user can view, but not access, any existing groups, including groups created by students.'
       )
     },
     {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        'To access the People page and view Groups, Users - view list must also be enabled.'
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People (Groups tab)'),
-      description: I18n.t('Allows user to create, edit, and delete course groups.')
+      description: I18n.t('To view account-level groups, Users - view list must also be enabled.')
     },
     {
       description: I18n.t(
-        'Allows user to create, edit, and delete course groups created by students.'
+        'To view all student groups in a course, Groups - view all student groups must also be enabled.'
+      )
+    },
+    {
+      description: I18n.t(
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access the People page and view course groups, Users - view list must also be enabled.'
       )
     }
   ],
   [
     {
-      title: I18n.t('Collaborations'),
-      description: I18n.t(
-        'Allows user to view all course groups, not just where they are enrolled, in the Collaborate With window.'
-      )
+      title: I18n.t('Groups - add'),
+      description: I18n.t('Allows user to create course groups.')
     },
+    {
+      description: I18n.t('Allows user to add students to course groups.')
+    },
+    {
+      description: I18n.t('Allows user to add a group for a group assignment in a course.')
+    },
+    {
+      description: I18n.t('Allows user to create course groups created by students.')
+    },
+    {
+      description: I18n.t('Allows users to import groups in a course.')
+    },
+    {
+      title: I18n.t('Groups - delete'),
+      description: I18n.t('Allows user to delete course groups.')
+    },
+    {
+      description: I18n.t('Allows user to remove group members from course groups.')
+    },
+    {
+      description: I18n.t('Allows user to move group members to another group in a course.')
+    },
+    {
+      description: I18n.t('Allows user to assign a student group leader in a course.')
+    },
+    {
+      title: I18n.t('Groups - manage'),
+      description: I18n.t('Allows user to edit course groups.')
+    },
+    {
+      description: I18n.t('Allows user to view the Clone Group Set button for a course group.')
+    },
+    {
+      description: I18n.t('Allows user to randomly assign users to a course group.')
+    },
+    {
+      description: I18n.t('Allows user to add users to a course group.')
+    },
+    {
+      description: I18n.t('Allows user to move group members to another group in a course.')
+    },
+    {
+      description: I18n.t('Allows user to assign a student group leader in a course.')
+    }
+  ],
+  [
     {
       title: I18n.t('Groups'),
       description: I18n.t(
-        'If this permission is disabled, the user can only view existing groups, including groups created by students.'
+        'To view all student groups in a course, Groups - view all student groups must also be enabled.'
       )
     },
     {
-      title: I18n.t('People'),
       description: I18n.t(
-        'To access the People page and view Groups, Users - view list must also be enabled.'
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
       )
     },
     {
-      title: I18n.t('Course Settings (Course Details tab)'),
       description: I18n.t(
-        'To restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.'
+        'To access the People page and view course groups, Users - view list must also be enabled.'
       )
     }
   ]
@@ -2700,7 +3008,14 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Outcomes'),
-      description: I18n.t('Determines visibility and management of Outcomes in Account Navigation.')
+      description: I18n.t(
+        'Determines visibility and management of the Outcomes link in Account Navigation.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Allows user to view the Outcomes Manage tab at the account and course levels.'
+      )
     },
     {
       description: I18n.t(
@@ -2709,6 +3024,17 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
     }
   ],
   [
+    {
+      title: I18n.t('Feature Preview'),
+      description: I18n.t(
+        'If the Account and Course Level Outcome Mastery Scales feature preview is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.'
+      )
+    },
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
@@ -2731,7 +3057,23 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
   ],
   [
     {
+      title: I18n.t('Feature Preview'),
+      description: I18n.t(
+        'If the Account and Course Level Outcome Mastery Scales feature preview is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+      )
+    },
+    {
+      description: I18n.t(
+        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.'
+      )
+    },
+    {
       title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.'
+      )
+    },
+    {
       description: I18n.t(
         'To import learning outcomes, Learning Outcomes - import must also be enabled.'
       )
@@ -2743,42 +3085,152 @@ const outcomeProficiencyCalculationsAddEditDeletePermissions = generateActionTem
   'manage_proficiency_calculations',
   [
     {
-      title: I18n.t('Outcome Proficiency Calculations'),
+      title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Allows user to set outcome proficiency calculations at the account and course levels.'
+        'Allows user to view the Outcomes Calculations tab and set outcome proficiency calculations at the account and course levels.'
       )
     }
   ],
-  [],
   [
     {
-      title: I18n.t('Outcome Proficiency Calculations'),
+      title: I18n.t('Feature Preview'),
       description: I18n.t(
-        'Allows user to set outcome proficiency calculations at the course level.'
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which must be enabled by a Customer Success Manager.'
+      )
+    },
+    {
+      description: I18n.t('This feature affects existing data for an entire account.')
+    },
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
       )
     }
   ],
-  []
+  [
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'Allows user to view the Outcomes Calculation tab and set outcome proficiency calculations at the course level.'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Feature Preview'),
+      description: I18n.t(
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which can only be enabled at the account level.'
+      )
+    },
+    {
+      description: I18n.t('This feature affects existing data for all courses in the account.')
+    },
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
+      )
+    }
+  ]
 )
 
 const outcomeProficiencyScalesAddEditDeletePermissions = generateActionTemplates(
   'manage_proficiency_scales',
   [
     {
-      title: I18n.t('Outcome Mastery Scales'),
+      title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Allows user to set outcome mastery scales at the account and course levels.'
+        'Allows user to view the Outcomes Mastery tab and set outcome mastery scales at the account and course levels.'
       )
     }
   ],
-  [],
   [
     {
-      title: I18n.t('Outcome Mastery Scales'),
-      description: I18n.t('Allows user to set outcome mastery scales at the course level.')
+      title: I18n.t('Feature Preview'),
+      description: I18n.t(
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which must be enabled by a Customer Success Manager.'
+      )
+    },
+    {
+      description: I18n.t('This feature affects existing data for an entire account.')
+    },
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access the Calculation tab, the Outcome Proficiency Calculations - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
+      )
     }
   ],
-  []
+  [
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'Allows user to view the Outcomes Mastery tab and set outcome mastery scales at the course level.'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Feature Preview'),
+      description: I18n.t(
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which can only be enabled at the account level.'
+      )
+    },
+    {
+      description: I18n.t('This feature affects existing data for all courses in the account.')
+    },
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+      )
+    },
+    {
+      description: I18n.t(
+        'To access the Calculation tab, the Outcome Proficiency Calculations - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Rubrics'),
+      description: I18n.t(
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
+      )
+    }
+  ]
 )
 
 const courseSectionsViewPermissions = generateActionTemplates(
@@ -3028,7 +3480,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.'
+        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add are enabled.'
       )
     }
   ],
@@ -3050,7 +3502,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled.'
+        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add is enabled.'
       )
     }
   ]
@@ -3231,9 +3683,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
       description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.')
     },
     {
-      description: I18n.t(
-        'To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled.'
-      )
+      description: I18n.t('To edit a discussion, Discussions - moderate must also be enabled.')
     }
   ],
   [
@@ -3292,9 +3742,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
       description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.')
     },
     {
-      description: I18n.t(
-        'To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled.'
-      )
+      description: I18n.t('To edit a discussion, Discussions - moderate must also be enabled.')
     }
   ]
 )
@@ -3467,14 +3915,12 @@ const discussionViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a discussion to Commons, Course Content - add / edit / delete must also be enabled.'
+        'To share a discussion to Commons, Courses - manage / update must also be enabled.'
       )
     },
     {
       title: I18n.t('Discussions'),
-      description: I18n.t(
-        'To manage discussions, Discussions - post and Discussions - moderate must also be enabled.'
-      )
+      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.')
     },
     {
       description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.')
@@ -3540,7 +3986,7 @@ const questionBankPermissions = generateActionTemplates(
     {
       title: I18n.t('Quizzes and Question Banks'),
       description: I18n.t(
-        'To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - add / edit / delete must also be enabled.'
+        'To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - manage / edit must also be enabled.'
       )
     }
   ],
@@ -3561,7 +4007,7 @@ const questionBankPermissions = generateActionTemplates(
     {
       title: I18n.t('Question Banks (Courses)'),
       description: I18n.t(
-        'To fully manage course-level question banks, Assignments and Quizzes - add / edit / delete permission must also be enabled.'
+        'To fully manage course-level question banks, Assignments and Quizzes - manage / edit permission must also be enabled.'
       )
     }
   ]
@@ -3689,9 +4135,7 @@ const usersViewListPermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Account Groups'),
-      description: I18n.t(
-        'To view account-level groups, Groups - add / edit / delete must also be enabled.'
-      )
+      description: I18n.t('To view account-level groups, Groups - manage must also be enabled.')
     },
     {
       title: I18n.t('Admin Tools (Logging tab)'),
@@ -3709,6 +4153,16 @@ const usersViewListPermissions = generateActionTemplates(
       description: I18n.t(
         'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
       )
+    },
+    {
+      title: I18n.t('Groups'),
+      description: I18n.t('To add groups, Groups - add must also be enabled.')
+    },
+    {
+      description: I18n.t('To delete groups, Groups - delete must also be enabled.')
+    },
+    {
+      description: I18n.t('To edit groups, Groups - manage must also be enabled.')
     },
     {
       title: I18n.t('People (Account)'),
@@ -3769,9 +4223,13 @@ const usersViewListPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('Groups'),
-      description: I18n.t(
-        'To add, edit, or delete groups, Groups - add / edit / delete must also be enabled.'
-      )
+      description: I18n.t('To add groups, Groups - add must also be enabled.')
+    },
+    {
+      description: I18n.t('To delete groups, Groups - delete must also be enabled.')
+    },
+    {
+      description: I18n.t('To edit groups, Groups - manage must also be enabled.')
     },
     {
       title: I18n.t('People'),
@@ -4432,6 +4890,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     alertPermissions.ACCOUNT,
     analyticsViewPermissions.ACCOUNT,
     announcementsViewPermissions.ACCOUNT,
+    assignmentsQuizzesManagePermissions.ACCOUNT,
     assignmentsQuizzesPermissions.ACCOUNT,
     assignmentsAndQuizzes.ACCOUNT,
     blueprintCoursePermissions.ACCOUNT,
@@ -4448,6 +4907,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     courseViewChangePermissions.ACCOUNT,
     courseViewUsagePermissions.ACCOUNT,
     courseVisibilityPermissions.ACCOUNT,
+    coursesAddPermissions.ACCOUNT,
     developerKeysManagePermissions.ACCOUNT,
     discussionscreatePermissions.ACCOUNT,
     discussionsModerateManagePermissions.ACCOUNT,
@@ -4461,7 +4921,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     gradesEditPermissions.ACCOUNT,
     gradesViewAllPermissions.ACCOUNT,
     gradesViewChangeLogPermissions.ACCOUNT,
-    gradesAddEditDeletePermissions.ACCOUNT,
+    groupsManagePermissions.ACCOUNT,
     groupsViewAllStudentPermissions.ACCOUNT,
     learningOutcomesAddEditDeletePermissions.ACCOUNT,
     learningOutcomesImportPermissions.ACCOUNT,
@@ -4510,6 +4970,7 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     analyticsViewPermissions.COURSE,
     announcementsViewPermissions.COURSE,
     assignmentsAndQuizzes.COURSE,
+    assignmentsQuizzesManagePermissions.COURSE,
     assignmentsQuizzesPermissions.COURSE,
     blueprintCoursePermissions.COURSE,
     courseUndeletePermissions.COURSE,
@@ -4524,6 +4985,7 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     courseSectionsViewPermissions.COURSE,
     courseTemplatesPermissions.COURSE,
     courseVisibilityPermissions.COURSE,
+    coursesAddPermissions.COURSE,
     developerKeysManagePermissions.COURSE,
     discussionscreatePermissions.COURSE,
     discussionsModerateManagePermissions.COURSE,
@@ -4537,7 +4999,7 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     gradesEditPermissions.COURSE,
     gradesViewAllPermissions.COURSE,
     gradesViewChangeLogPermissions.COURSE,
-    gradesAddEditDeletePermissions.COURSE,
+    groupsManagePermissions.COURSE,
     groupsViewAllStudentPermissions.COURSE,
     learningOutcomesAddEditDeletePermissions.COURSE,
     learningOutcomesImportPermissions.COURSE,
