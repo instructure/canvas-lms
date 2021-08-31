@@ -217,6 +217,7 @@ module SIS
       end
 
       def run_parallel_importer(id, csv: nil, attempt: 0)
+        InstStatsd::Statsd.increment("sis_parallel_worker", tags: {attempt: attempt})
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
         if should_stop_import?
           parallel_importer.abort
