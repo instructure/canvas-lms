@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useState} from 'react'
+import React, {useReducer, useState, useEffect} from 'react'
 
 import {View} from '@instructure/ui-view'
 
 import {useStoreProps} from '../../../shared/StoreContext'
 
-import {DEFAULT_SETTINGS} from '../../svg/constants'
+import {useSvgSettings, statuses} from '../../svg/settings'
 import {BTN_AND_ICON_ATTRIBUTE} from '../../registerEditToolbar'
 import {buildSvg, buildStylesheet} from '../../svg'
 import formatMessage from '../../../../../format-message'
@@ -34,18 +34,13 @@ import {TextSection} from './TextSection'
 import {ImageSection} from './ImageSection'
 import {Footer} from './Footer'
 
-export const CreateButtonForm = ({editor, onClose}) => {
-  const [settings, dispatch] = useReducer(
-    (state, changes) => ({...state, ...changes}),
-    DEFAULT_SETTINGS
-  )
-
-  const [status, setStatus] = useState('idle')
-
+export const CreateButtonForm = ({editor, onClose, editing}) => {
+  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing)
+  const [status, setStatus] = useState(statuses.IDLE)
   const storeProps = useStoreProps()
 
   const handleSubmit = () => {
-    setStatus('loading')
+    setStatus(statuses.LOADING)
 
     const svg = buildSvg(settings, {isPreview: false})
     buildStylesheet()
@@ -58,7 +53,7 @@ export const CreateButtonForm = ({editor, onClose}) => {
       })
       .then(writeButtonToRCE)
       .then(onClose)
-      .catch(() => setStatus('error'))
+      .catch(() => setStatus(statuses.ERROR))
   }
 
   const writeButtonToRCE = ({url}) => {
@@ -71,6 +66,10 @@ export const CreateButtonForm = ({editor, onClose}) => {
     editor.insertContent(img)
   }
 
+  useEffect(() => {
+    setStatus(settingsStatus)
+  }, [settingsStatus])
+
   return (
     <View as="div">
       <Header settings={settings} onChange={dispatch} />
@@ -78,7 +77,7 @@ export const CreateButtonForm = ({editor, onClose}) => {
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
       <ImageSection editor={editor} settings={settings} onChange={dispatch} />
-      <Footer disabled={status === 'loading'} onCancel={onClose} onSubmit={handleSubmit} />
+      <Footer disabled={status === statuses.LOADING} onCancel={onClose} onSubmit={handleSubmit} />
     </View>
   )
 }

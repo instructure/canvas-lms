@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 
 import {useStoreProps} from '../../../../shared/StoreContext'
 import {CreateButtonForm} from '../CreateButtonForm'
+import FakeEditor from '../../../../shared/__tests__/FakeEditor'
 
 jest.mock('../../../../shared/StoreContext')
 
@@ -134,5 +135,76 @@ describe('<CreateButtonForm />', () => {
     expect(button).toBeDisabled()
 
     await waitFor(() => expect(defaults.onClose).toHaveBeenCalled())
+  })
+
+  describe('when a button is being edited', () => {
+    let ed
+
+    beforeEach(() => {
+      ed = new FakeEditor()
+
+      // Add an image to the editor and select it
+      ed.setContent(
+        '<img id="test-image" src="https://canvas.instructure.com/svg" alt="a red circle" />'
+      )
+      ed.setSelectedNode(ed.dom.select('#test-image')[0])
+    })
+
+    const subject = () =>
+      render(<CreateButtonForm onClose={jest.fn()} editing={true} editor={new FakeEditor()} />)
+
+    beforeEach(() => {
+      global.fetch = jest.fn().mockResolvedValue({
+        text: () =>
+          Promise.resolve(`
+            <svg height="100" width="100">
+              <metadata>
+                {
+                  "name":"Test Image",
+                  "alt":"a test image",
+                  "shape":"triangle",
+                  "size":"large",
+                  "color":"#FF2717",
+                  "outlineColor":"#06A3B7",
+                  "outlineSize":"small",
+                  "text":"Some Text",
+                  "textSize":"medium",
+                  "textColor":"#009606",
+                  "textBackgroundColor":"#E71F63",
+                  "textPosition":"middle"
+                }
+              </metadata>
+              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+            </svg>
+          `)
+      })
+    })
+
+    afterEach(() => jest.restoreAllMocks())
+
+    it('loads the standard SVG metadata', async () => {
+      const {getByLabelText, getByTestId} = subject()
+
+      await waitFor(() => {
+        expect(getByLabelText('Name').value).toEqual('Test Image')
+        expect(getByLabelText('Button Shape').value).toEqual('Triangle')
+        expect(getByLabelText('Button Size').value).toEqual('Large')
+        expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // button color
+        expect(getByTestId('colorPreview-#06A3B7')).toBeInTheDocument() // button outline
+        expect(getByLabelText('Button Outline Size').value).toEqual('Small')
+      })
+    })
+
+    it('loads the text-related SVG metadata', async () => {
+      const {getByLabelText, getByTestId, getByText} = subject()
+
+      await waitFor(() => {
+        expect(getByText('Some Text')).toBeInTheDocument()
+        expect(getByLabelText('Text Size').value).toEqual('Medium')
+        expect(getByTestId('colorPreview-#009606')).toBeInTheDocument() // text color
+        expect(getByTestId('colorPreview-#E71F63')).toBeInTheDocument() // text background color
+        expect(getByLabelText('Text Position').value).toEqual('Middle')
+      })
+    })
   })
 })
