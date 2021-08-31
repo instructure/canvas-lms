@@ -2275,7 +2275,8 @@ EG = {
 
     const mountPoint = availableMountPointForStatusMenu()
     if (mountPoint) {
-      const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded
+      const isInModeration = isModerated && !jsonData.grades_published_at
+      const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
       styleSubmissionStatusPills(getLateMissingAndExcusedPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
       renderStatusMenu(component, mountPoint)

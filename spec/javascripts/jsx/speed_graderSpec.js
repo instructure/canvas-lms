@@ -1722,6 +1722,38 @@ QUnit.module('SpeedGrader', rootHooks => {
       strictEqual(mountPoint.children.length, 1)
     })
 
+    test('hides the status menu component when the current assignment have moderated grading enabled and grades have not been published', () => {
+      finishSetup()
+      window.jsonData.moderated_grading = true
+      window.jsonData.grades_published_at = null
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 0)
+    })
+
+    test('shows the status menu component when the current assignment have moderated grading enabled and grades have been published', () => {
+      finishSetup()
+      window.jsonData.moderated_grading = true
+      window.jsonData.grades_published_at = '2015-05-04T12:00:00.000Z'
+      window.jsonData.gradingPeriods[8].is_closed = false
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 1)
+    })
+
+    test('shows the status menu component when the current assignment have moderated grading disabled and grades have not been published', () => {
+      finishSetup()
+      window.jsonData.moderated_grading = false
+      window.jsonData.grades_published_at = null
+      window.jsonData.gradingPeriods[8].is_closed = false
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 1)
+    })
+
     test('includes last-viewed date for attachments if not anonymizing students', () => {
       finishSetup()
       SpeedGrader.EG.handleSubmissionSelectionChange()
