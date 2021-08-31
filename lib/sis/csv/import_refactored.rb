@@ -217,30 +217,37 @@ module SIS
       end
 
       def run_parallel_importer(id, csv: nil, attempt: 0)
-        InstStatsd::Statsd.increment("sis_parallel_worker", tags: {attempt: attempt})
+        ensure_later = false
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
+        in_retry =  parallel_importer.workflow_state == 'retry'
+
         if should_stop_import?
           parallel_importer.abort
           return
         end
+        InstStatsd::Statsd.increment("sis_parallel_worker", tags: { attempt: attempt, retry: in_retry})
+
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
         try_importing_segment(csv, parallel_importer, importer_object, skip_progress: @run_immediately)
       rescue => e
-        if parallel_importer.workflow_state != 'retry'
+        if !in_retry
+          ensure_later = true
           parallel_importer.write_attribute(:workflow_state, 'retry')
-          run_parallel_importer(parallel_importer)
-        end
-        if attempt < Setting.get('number_of_tries_before_failing', 5).to_i
+          run_parallel_importer(parallel_importer, attempt: attempt)
+        elsif attempt < Setting.get('number_of_tries_before_failing', 5).to_i
+          ensure_later = true
           parallel_importer.write_attribute(:workflow_state, 'queued')
           attempt += 1
-          delay(**job_args(importer_type)).run_parallel_importer(parallel_importer, attempt: attempt)
+          args = job_args(importer_type, attempt: attempt)
+          delay_if_production(**args).run_parallel_importer(parallel_importer, attempt: attempt)
+        else
+          parallel_importer.fail
+          csv ||= { file: parallel_importer.attachment.display_name }
+          fail_with_error!(e, csv: csv)
         end
-        parallel_importer.fail
-        csv ||= { file: parallel_importer.attachment.display_name }
-        fail_with_error!(e, csv: csv)
       ensure
-        unless @run_immediately
+        unless @run_immediately || ensure_later
           if is_last_parallel_importer_of_type?(parallel_importer)
             queue_next_importer_set unless should_stop_import?
           end
