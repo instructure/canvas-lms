@@ -88,6 +88,7 @@ export default class UsageRightsIndicator extends React.Component {
             onClick={this.handleClick}
             title={this.props.suppressWarning ? I18n.t('Manage usage rights') : this.warningMessage}
             data-tooltip="top"
+            aria-label={I18n.t('Set usage rights')}
           >
             {!this.props.suppressWarning && (
               <span className="screenreader-only">{this.warningMessage}</span>
@@ -109,6 +110,7 @@ export default class UsageRightsIndicator extends React.Component {
           disabled={!this.props.userCanEditFilesForContext}
           title={this.props.model.get('usage_rights').license_name}
           data-tooltip="top"
+          aria-label={I18n.t('Set usage rights')}
         >
           <span ref="screenreaderText" className="screenreader-only">
             {iconData.text}
