@@ -98,7 +98,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       showImportConfirmBox({
         count: group.outcomesCount,
         onImportHandler: () => {
-          importOutcomes(selectedGroupId, group.outcomesCount)
+          importOutcomes(selectedGroupId, group.title)
           closeConfirmBox()
           focusDoneBtn()
         },
@@ -108,7 +108,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         }
       })
     } else {
-      importOutcomes(selectedGroupId, group.outcomesCount)
+      importOutcomes(selectedGroupId, group.title)
     }
   }
 

@@ -319,7 +319,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('25 outcomes have been successfully added to this account.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this account.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -347,7 +349,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('50 outcomes have been successfully added to this course.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this course.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -510,7 +514,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText('51 outcomes have been successfully added to this course.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this course.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -530,7 +536,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('25 outcomes have been successfully added to this account.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this account.'
+          )[0]
         ).toBeInTheDocument()
       })
 
