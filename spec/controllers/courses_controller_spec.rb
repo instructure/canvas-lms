@@ -3555,6 +3555,16 @@ describe CoursesController do
       }
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
+
+      get 'users', params: {
+        search_term: 'us',
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        per_page: 1
+      }
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
     it 'only returns group_ids for active group memberships when requested' do
