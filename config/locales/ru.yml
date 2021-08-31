@@ -1855,6 +1855,7 @@ ru:
   add_criterion_eb9587ef: "Добавить критерий"
   add_custom_link_22059c0: "Добавить пользовательскую ссылку"
   add_delete_edit_7dbc9c5b: "добавить / удалить / редактировать"
+  add_delete_manage_d65e235: "добавить / удалить / управлять"
   add_designers_to_courses_9588820b: "Добавить дизайнеров в курсы"
   add_discussion_653dab4c: "Добавить дискуссию"
   add_domain_f15bc6c1: "Добавить домен"
@@ -1875,8 +1876,10 @@ ru:
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Добавьте детализацию к разрешениям, относящимся к управлению файлами курса"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Добавьте детализацию к разрешениям, относящимся к управлению разделами курса"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Добавьте модульность в разрешения для управления курсами, например, Добавить / Опубликовать / Завершить / Удалить"
+  add_granularity_to_permissions_around_managing_gro_ef410a72: "Добавьте детализацию к разрешениям, относящимся к управлению группами в учетной записи или контекстах курса"
   add_group_c84f9e9d: "Добавить группу"
   add_group_set_f9809e11: "Добавить набор групп"
+  add_groups_a133e48c: "Добавить группы"
   add_help_menu_links_de9fc34f: "Добавить ссылку меню справки"
   add_hostname_as_an_allowed_domain_1f58c38d: "Добавить %{hostname} как разрешенный домен"
   add_hostname_to_the_whitelist_c808192e: "Добавить %{hostname} в белый список"
@@ -2802,14 +2805,18 @@ ru:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Произошла ошибка при попытке найти конфигурацию LTI"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Возникла ошибка при оюновлении набора периода оценивания"
   an_error_occurred_adding_group_groupname_670af30: "Произошла ошибка при добавлении группы «%{groupName}»"
+  an_error_occurred_adding_group_groupname_6ed99725: "Произошла ошибка при добавлении группы «%{groupName}»."
   an_error_occurred_adding_group_groupname_message_6af9ef4c: "Произошла ошибка при добавлении группы «%{groupName}»: %{message}"
+  an_error_occurred_adding_group_groupname_message_8854de45: "Произошла ошибка при добавлении группы «%{groupName}»: %{message}."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Произошла ошибка, что привело к изменению статуса блокировки для \"%{fileName}\""
   an_error_occurred_creating_the_conference_fcad5f6f: "Произошла ошибка при создании конференции"
   an_error_occurred_during_the_sync_process_error_62d98be7: "Произошла ошибка в процессе синхронизации: %{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Произошла ошибка при загрузке данных результатов."
   an_error_occurred_making_a_network_request_d1bda348: "Произошла ошибка, что привело к созданию сетевого запроса"
+  an_error_occurred_moving_group_grouptitle_16ec1ebd: "Произошла ошибка при перемещении группы «%{groupTitle}»."
   an_error_occurred_moving_group_grouptitle_b20a640b: "Произошла ошибка при перемещении группы «%{groupTitle}»"
   an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "Произошла ошибка при перемещении группы «%{groupTitle}»: %{message}"
+  an_error_occurred_moving_group_grouptitle_message_5c592f26: "Произошла ошибка при перемещении группы «%{groupTitle}»: %{message}."
   an_error_occurred_moving_group_title_24fd7fb4: "Произошла ошибка при перемещении группы «%{title}»"
   an_error_occurred_moving_group_title_message_f8428b66: "Произошла ошибка при перемещении группы «%{title}»: %{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "Произошла ошибка при перемещении результата «%{title}»"
@@ -2850,6 +2857,10 @@ ru:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Произошла ошибка при создании этого результата: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Произошла ошибка при создании этого результата: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Произошла ошибка при удалении аннотаций."
+  an_error_occurred_while_importing_this_group_9aef7c30: "Произошла ошибка при импортировании этой группы."
+  an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Произошла ошибка при импортировании этой группы: %{message}."
+  an_error_occurred_while_importing_this_outcome_2ce488af: "Произошла ошибка при импортировании этого результата."
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Произошла ошибка при импортировании этого результата: %{message}."
   an_error_occurred_while_loading_account_learning_o_29a11066: "Произошла ошибка при загрузке результатов групп результатов обучения учетной записи."
   an_error_occurred_while_loading_account_outcomes_8f337857: "Произошла ошибка при загрузке результатов учетной записи."
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Произошла ошибка при загрузке результатов учетной записи: %{error}"
@@ -2884,6 +2895,7 @@ ru:
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Произошла ошибка при удалении результатов: %{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: "Произошла ошибка при удалении этой группы."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "Произошла ошибка при удалении этой группы: %{message}"
+  an_error_occurred_while_removing_this_group_messag_c15e0830: "Произошла ошибка при удалении этой группы: %{message}."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Произошла ошибка при попытке получения вашего QR-кода"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Произошла ошибка при сохранении оценок по специальной подготовке для учетной записи"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Произошла ошибка при сохранении уровней профподготовки в учетной записи: %{message}"
@@ -2895,6 +2907,8 @@ ru:
   an_error_occurred_while_starting_migration_8e6015e2: "Произошла ошибка при запуске миграции"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Произошла ошибка при попытке изменения пользовательского интерфейса"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Произошла ошибка при обновлении статуса блокировки объявлений."
+  an_error_occurred_while_updating_group_grouptitle_2072b3c9: "Произошла ошибка при обновлении группы «%{groupTitle}»."
+  an_error_occurred_while_updating_group_grouptitle__6029f82d: "Произошла ошибка при обновлении группы «%{groupTitle}»: %{message}."
   an_error_occurred_while_updating_group_grouptitle__f32110b5: "Произошла ошибка при обновлении группы «%{groupTitle}»: %{message}"
   an_error_occurred_while_updating_group_grouptitle_fc919aa: "Произошла ошибка при обновлении группы «%{groupTitle}»"
   an_error_occurred_while_updating_late_policies_a95b707f: "Произошла ошибка при обновлении политик опозданий"
@@ -3932,7 +3946,7 @@ ru:
         manually_assign_peer_reviews: "Назначить рассмотрение коллегами вручную"
         require_peer_reviews: "Требуется рассмотрение коллегами"
       locked_until: "Назначить рассмотрение"
-      peer_reviews_assign_at_explanation: "Должно быть после даты выполнения. Если пустое, используется дата выполнения."
+      peer_reviews_assign_at_explanation: "Если пусто, используется дата наступления срока."
       peer_reviews_header: "Рассмотрение коллегами"
       reviews_per_user: "Оценки для пользователя"
     points_possible_number: "Значение возможных баллов должно быть числом"
@@ -4836,6 +4850,7 @@ ru:
     update: Обновить
     view_account_roster: "Просмотреть список учетных записей"
     view_course_roster: "Просмотреть список курсов"
+  buttons_and_icons_e66ee12c: "Кнопки и пиктограммы"
   by_b90c6b6f: По
   by_client_id_4f2fe02c: "По идентификатору клиента"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "По умолчанию, все ссылки курса активны. Студенты не видят ссылки к пустым разделам. Например, если вы не создали ни одной контрольной работы, они не увидят ссылку на раздел контрольных работ. Вы можете отсортировать и явно скрыть эти ссылки, если в курсе есть области, к которым вы хотите закрыть доступ для студентов."
@@ -5424,6 +5439,8 @@ ru:
   canvas_files_889a274f: "Файлы Canvas"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (бета-версия)"
   canvas_for_elementary_e6f5a06f: "Canvas для Elementary"
+  canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas для Elementary: много объявлений в «домашней комнате»"
+  canvas_for_elementary_parent_support_74a2356e: "Canvas для Elementary: Родительская поддержка"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas позволяет вам воспользоваться технологиями сотрудничества и создания совместных проектов, когда несколько
@@ -5438,6 +5455,7 @@ ru:
   canvas_login_failure_message_4c922f2f: "Сообщение об ошибке входа в Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Резервные коды многофакторной проверки подлинности Canvas"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas требуется доступ к вашей камере."
+  canvas_needs_access_to_your_camera_b5418c0: "Canvas требуется доступ к вашей камере."
   canvas_notifications_tutorial_video_79b8e768: "Учебное видео об уведомлениях в Canvas"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       В Canvas сейчас имеются два механизма тестирования. Выберите, какой
@@ -5459,6 +5477,9 @@ ru:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas повторно оценит все отправки после того, как вы сохраните контрольную работу. Это может занять несколько минут."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas удалит ключи с нулевыми значениями из интерактивных событий в случае активации этой функции."
+  cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
+      Ограничение количества RCE, отображаемых при первоначальной загрузке страницы. После этого
+      инициализируйте каждый при входе в область просмотра.
   captions_subtitles_af2c47e: Надписи/субтитры
   captured_image_91838f78: "Захваченное изображение"
   card_movement_menu_for_title_b94c09af: "Меню движения карточки %{title}"
@@ -5589,6 +5610,7 @@ ru:
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Классические тестирования: Удалить источник из URL-адресов файлов Canvas в ответах"
   classic_view_33f29576: "Классический вид"
   clear_2084585f: Очистить
+  clear_all_da755751: "Очистить все"
   clear_search_field_75f595c7: "Очистить поле поиска"
   clear_selected_file_82388e50: "Очистить выбранный файл"
   clear_user_cache_ef079f7f: "Очистить кэш пользователя"
@@ -5959,6 +5981,123 @@ ru:
       notices: 
         contact_registered: "Способ контакта зарегистрирован!"
   communication_channels_a9abd037: "Каналы связи"
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: завершенный
   complete_all_items_e1779257: "Завершить все элементы"
   complete_fd828dea: Завершить
@@ -8053,8 +8192,10 @@ ru:
         course_template: "Шаблон курса"
         course_visibility: "Права на просмотр"
         custom_course_visibility: Настройка
+        enable_pace_plans: "Включить планы темпов"
         enrollment_term_id: Период
         enrollments_from_homeroom: Зачисления
+        friendly_name: "Удобное название"
         grading_scheme: "Схема оценок"
         grading_standard_enabled: "Разрешить схему оценок курса"
         hide_distribution_graphs: "Скрыть графики распределения оценок от студентов"
@@ -8071,6 +8212,7 @@ ru:
         lock_all_announcements: "Отключить комментарии к объявлениям"
         master_course: "Разрешить использовать курс в качестве шаблонного"
         open_enrollment: "Добавить ссылку \"Присоединиться к этому курсу\" к домашней странице курса"
+        pace_plans: "Планы темпов"
         participation_id: Участие
         public_syllabus: "Сделать программу обучения для данного курса общедоступной"
         restrict_enrollments_to_course_dates: "Учащиеся могут участвовать в курсе только в промежутке между этими датами"
@@ -8365,6 +8507,7 @@ ru:
   create_new_discussions_6ab69da2: "Создать новые обсуждения"
   create_new_e0946c49: "Создать новый"
   create_new_group_bf9561d4: "Создать новую группу"
+  create_new_group_fca5cc73: "Создать новую группу"
   create_new_group_set_13b1f62a: "Создание новой группы"
   create_new_submission_e6b7c18d: "Создать новую отправку"
   create_outcome_4dac05a0: "Создать результат"
@@ -8800,6 +8943,7 @@ ru:
   deduct_104e8866: Снижение
   deep_orange_4c7eea99: Темно-оранжевый
   deep_purple_bb3e2907: Темно-фиолетовый
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Глубоко вложенные ответы больше не поддерживаются. Ваш ответ появится на первой странице этой темы."
   default_9db103d: "По умолчанию"
   default_conference_title: "Конференция %{course_name}"
   default_dates_a0a2ae26: "даты по умолчанию"
@@ -8853,6 +8997,7 @@ ru:
   delete_grading_scheme_6b308832: "Удалить схему оценок"
   delete_grading_scheme_title_215f0a40: "Удалить схему выставления оценок %{title}"
   delete_group_86c381ec: "Удалить группу"
+  delete_groups_c637c07: "Удалить группы"
   delete_in_progress_2d3f0e0d: "Выполняется удаление"
   delete_key_developername_be80e695: "Клавиша удаления %{developerName}"
   delete_key_name_c2de8c0c: "Клавиша удаления %{name}"
@@ -8905,11 +9050,13 @@ ru:
   delete_your_work_fe136221: "Удалить вашу работу?"
   deleted_1be5ed1: Удалено
   deleted_by_deletername_f269211a: "Удалено %{deleterName}"
+  deleted_by_user_be69f8: "Удалено %{user}"
   deleted_caption_b5c66807: "Удален заголовок"
   deleted_ce03674d: удалено
   deleted_content_exceptions_237e809d: "Исключения удаленного контента:"
   deleted_content_referenced_in_this_resource_e42d1998: "Удалено содержимое, на которое задана ссылка в этом ресурсе:"
   deleted_deletedtimingdisplay_f4c73003: "Удаленное %{deletedTimingDisplay}"
+  deleted_topic_notice: "Эта тема удалена"
   deleting_6421031e: удаление...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Удаление выбранного файла обычно выполняется только в том случае, если слушатель размещает неподходящий или конфиденциальный материал.
@@ -9664,6 +9811,7 @@ ru:
   download_course_roster_csv_86b3d192: "Скачайте CSV списка курса"
   download_epub_757cf0af: "Загрузить ePub"
   download_errors_attchment_82ffea3f: "Загрузить errors_attchment"
+  download_filename_781704f5: "Скачать %{filename}"
   download_item_analysis_report_statuslabel_8c9387ec: "Скачать отчет по анализу элемента %{statusLabel}"
   download_page_views_csv_974f36e1: "Загрузить CSV просмотра страниц"
   download_report_77164f62: "Загрузить отчет"
@@ -9882,6 +10030,7 @@ ru:
       find_existing_rubric: "Найти существующую рубрику"
   edit_rubric_title_104d6fd2: "Редактировать рубрику: %{title}"
   edit_section_name_558cc89: "Редактировать раздел «%{name}»"
+  edit_status_612572db: "Редактировать статус"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Изменить статус отправки из SpeedGrader"
   edit_survey_b0d6890d: "Редактировать опрос"
   edit_term_name_29a8a322: "Редактировать семестр %{name}"
@@ -10058,6 +10207,7 @@ ru:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Включает конечные точки API для курса и данные пользователя, предоставленные New Analytics."
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: "Позволяет пользователям с правами siteadmin показывать пользователям примечания к выпуску"
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Активирует сортировку по идентификатору SIS, идентификатору интеграции и идентификатору входа в систему в новом журнале оценок."
+  enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Включает поддержку наблюдателей в Canvas для Elementary."
   enables_the_course_templates_feature_globally_79d5302f: "Включает глобальную функцию для шаблонов курсов"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Включение простой темы приведет к изменению шрифта в интерфейсе Canvas и упрощению меню навигации по курсам для всех пользователей вашего курса."
   encourage_class_participation_4e069479: "Поощряйте активную работу учащихся на занятиях"
@@ -10195,6 +10345,7 @@ ru:
   enrollments_teachers: Учителя
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Исключает вероятность дублирования результатов, которые уже были импортированы в курс, в случае их повторного импорта"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Обеспечивает, чтобы пользователи, не имеющие разрешения на импорт результатов, не могли видеть кнопку на вкладке «Результаты»."
+  enter_a_filename_for_the_photo_4f0fc10e: "Введите имя файла для фотографии"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введите hexcode здесь, чтобы использовать собственный цвет."
   enter_a_valid_date_46d77547: "Введите правильную дату"
   enter_a_what_if_score_668c91a3: "Введите оценку «что, если»."
@@ -10870,6 +11021,7 @@ ru:
   failed_307449e1: "Ошибка:"
   failed_creating_user_b706a1c5: "Не удалось создать пользователя"
   failed_getting_file_to_preview_89fe2bf4: "Не удалось получить файл для предпросмотра"
+  failed_getting_next_batch_of_announcements_1f1165a5: "Не удалось получить следующую партию объявлений."
   failed_loading_associations_component_is_your_netw_fa49fb32: "Не удалось загрузить компонент ассоциаций. Подключение в вашей сети в порядке?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Не удалось загрузить разделы курса. Перезагрузите страницу, чтобы попытаться еще раз."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Не удалось загрузить компонент истории синхронизации. Подключение в вашей сети в порядке?"
@@ -11014,6 +11166,8 @@ ru:
     student_groups: "Страница новых групп студентов"
     student_outcome_gradebook: "Табель успеваемости студента по усвоению обучения"
   features_2581da: Функции
+  features_in_active_development_opting_in_includes__210f7720: "Функции находится в активной разработке — выбор включает в себя постоянные обновления вне регулярного графика релизов"
+  features_no_longer_in_active_development_that_incl_74c3a739: "Функции, которые больше не находятся в активной разработке и включают дату, когда они будут включены по умолчанию"
   federated_attributes_5cbe6441: "Федеративные Атрибуты"
   federated_attributes_are_information_sent_from_you_2116fb61: "Федеративные атрибуты - это информация, посланная от провайдера аутентификации, которая может использоваться для автоматического обновления соответствующей информации для пользователей Canvas каждый раз, когда они входят в систему."
   feed_url_8a433438: "Url-адрес источника"
@@ -11318,12 +11472,14 @@ ru:
   france_c25bfeae: Франция
   french_33881544: Французский
   french_canada_c3d92fa6: "Французский (Канада)"
+  friendly_description_57f7fdde: "Понятное результатов"
   friendly_description_for_parent_student_display_e608ecf3: "Понятное описание (для отображения родителей/студентов)"
   friendly_name_601153fb: "Удобное название"
   from_date_must_be_before_to_date_79f00046: "Дата 'С' должна быть раньше даты 'До'"
   from_fdd4956d: От
   from_from_to_to_e31f6422: "С %{from} по %{to}"
   from_gravatar_58372d5a: "Из Gravatar"
+  from_grouptitle_860dff95: "От %{groupTitle}"
   front_page_must_be_set_first_4dbbfdbe: "Вначале должна быть установлена титульная страница"
   front_page_must_be_set_first_c5246f7d: "Сначала следует задать первую страницу"
   full_article_9296bb6f: "Статья целиком"
@@ -12365,6 +12521,7 @@ ru:
   granular_permissions_for_managing_course_files_1ed7f019: "Детализированные разрешения для управления файлами курса"
   granular_permissions_for_managing_course_sections_da4b04b: "Детализированные разрешения для управления разделами курса"
   granular_permissions_for_managing_courses_a71be71d: "Детализированные разрешения для управления курсами"
+  granular_permissions_for_managing_groups_in_accoun_b71b4b7: "Детализированные разрешения для управления группами в учетной записи или контекстах курса"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Детализированные разрешения для управления страницами Вики"
   graph_bar_b5daa23d: Гистограмма
   graph_of_grades_for_each_assignment_4c44d4d1: "График оценок каждого задания"
@@ -12827,6 +12984,7 @@ ru:
     unassigned_students: "Неназначенные студенты (%{count})"
     unassigned_users: "Неназначенные пользователи (%{count})"
   groups_6c90e26a: Группы
+  groups_add_4038ae8a: "Группы — добавить"
   groups_add_edit_delete_1536bbb4: "Группы - добавить / редактировать / удалить"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Группа – это отличное место для совместной работы над проектами или для того, чтобы узнать расписание учебных сессий,
@@ -12842,7 +13000,9 @@ ru:
                     студентов над более четко обозначенным проектом.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Группы не могут быть ограничены в размере для задания по разделам"
   groups_course_c73e4c2c: "Группы (курс)"
+  groups_delete_bb79a2b4: "Группы — удалить"
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} Группы | %{outcomes} Результаты"
+  groups_manage_a5197479: "Группы — управлять"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Группы должны быть пустыми для задания по разделам"
   groups_navigation_menu_76b5acc6: "Меню навигации по группам"
   groups_tray_ef3e2649: "Панель групп"
@@ -13304,6 +13464,7 @@ ru:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Если ничего не выбрано, показать всем во всей субучетной записи)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Если ничего не выбрано, показать всем во всей учетной записи)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Если одно или все разрешения отключены, пользователь может по-прежнему просматривать и скачивать файлы в zip-файл."
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: "Если это имя указано, оно будет использоваться вместо фактического названия курса на панели мониторинга и в уведомлениях."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Если улучшения RCE также активированы,
       RCE будет выполнять автосохранение вашей работы по мере продвижения вперед
@@ -13998,6 +14159,7 @@ ru:
   k12_description: "Обновить иконки в меню Глобальная навигация, которые имеют больше смысла именно в среде K-12."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Казахстан (+7)"
+  keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "Имейте в виду, что эта отправка заданий будет учитываться для каждого члена вашей группы %{groupName}."
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Имейте в виду, что эта отправка заданий будет учитываться для каждого члена вашей группы %{groupType}."
   keep_students_informed_3f41a7e6: "Сообщите сведения учащимся"
   keep_submissions_anonymous_5cbaf419: "Сохранить отправки анонимными"
@@ -14133,6 +14295,7 @@ ru:
   learn_more_about_collaborations_2978f66d: "Узнайте больше о сотрудничестве"
   learn_more_about_quiz_statistics_315a378: "Узнайте больше о статистике теста."
   learn_more_about_the_differences_a1217479: "Узнать больше о различиях."
+  learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: "Подробнее об этой функции в *группе пользователей планов темпов*."
   learn_more_about_using_commons_and_blueprints_3df953f6: "Узнать более подробные сведения об использовании Commons и Blueprints."
   learn_more_about_video_conferencing_5f0e76e4: "Подробнее о видеоконференциях"
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (бета-версия) - просмотр"
@@ -14381,6 +14544,8 @@ ru:
   loading_accounts_3364e7a0: "Загрузка учетных записей..."
   loading_additional_items_ed5f672d: "Загрузка дополнительных элементов..."
   loading_additional_todo_details_acba0cf2: "Загрузка детальной информации о дополнительном списке заданий со сроками выполнения"
+  loading_announcement_content_4405470f: "Загрузка контента объявления"
+  loading_announcement_title_b8fc3057: "Загрузка заголовка объявления"
   loading_announcements_b927a86c: "Загрузка объявлений"
   loading_apps_f85740cb: "Идет загрузка приложений..."
   loading_artifact_dc3bfe9f: "Загрузка артефакта"
@@ -14442,6 +14607,7 @@ ru:
   loading_more_sub_accounts_d0a30903: "Загрузка дополнительных субучетных записей..."
   loading_more_terms_4053e31f: "Загрузка дополнительных условий..."
   loading_name_data_c66ea65f: "Загрузка данных %{name}"
+  loading_observed_students_dfdda108: "Загрузка наблюдаемых учащихся"
   loading_options_c823e98b: "Загрузка вариантов..."
   loading_outcome_results_96e21ce4: "Загрузка результатов"
   loading_permissions_28495bdb: "Загрузка разрешений"
@@ -14712,11 +14878,14 @@ ru:
   manage_course_sections_f482d1b3: "Управление разделами курса"
   manage_course_templates_66c00052: "Управление шаблонами курсов"
   manage_courses_abe8335f: "Управление курсами"
+  manage_create_edit_delete_groups_f9046ee3: "Управление (создание / редактирование / удаление) группами"
   manage_discussion_c1dd8f4e: "Управление обсуждением"
   manage_discussion_title_a2ecb3fb: "Управление дискуссией %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Управляйте статусом регистраций, создавайте группы и добавляйте пользователей с этой страницы."
   manage_grading_schemes_in_context_name_e3678273: "Управление схемами оценок в %{context_name}"
   manage_group_group_name_ac8578c6: "Управление группой %{group_name}"
+  manage_groups_4b962fa9: "Управление группами"
+  manage_groups_4c3a2a9f: "Управление группами"
   manage_home_4fc3480b: "Управление начальной страницей"
   manage_home_for_coursename_5e5c7661: "Управление начальной страницей для %{courseName}"
   manage_item_name_6118d4b0: "Управлять %{item_name}"
@@ -14912,6 +15081,7 @@ ru:
   members_are_free_to_join_defa5929: "Участники могут свободно вступать"
   membership_by_invitation_only_9bc27199: "Членство только по приглашениям"
   membership_service_configuration_d8ba5a74: "Конфигурация Службы членства"
+  mentions_error_page_fd84c53c: "Страница ошибок упоминаний"
   menu: 
     current_groups: "Текущие группы"
     customize: Настройка
@@ -14919,6 +15089,7 @@ ru:
     my_courses: "Мои курсы"
   menu_39cb0e8e: Меню
   menu_of_options_for_this_permission_77f50c31: "Меню параметров для этого разрешения"
+  menu_options_9b6b0b5c: "Параметры меню"
   message: 
     default_subject: "Уведомление Canvas"
   message_5c38209d: Сообщение
@@ -15627,11 +15798,15 @@ ru:
         body: "Уведомление Canvas - приглашение на участие в совместной работе: %{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
-        body: "Адрес электронной почты, %{email} зарегистрирован %{website} для пользователя, %{user}."
+        body: |-
+            Адрес эл. почты: %{email} добавляется в учетную запись Canvas, зарегистрированную по адресу %{website}.
+            
+            В целях предотвращения регистрации этого адреса проигнорируйте это эл. письмо.
         details: "Для подтверждения этой регистрации перейдите по следующему url-адресу:"
         html: 
-          body: "Адрес электронной почты, %{email}, зарегистрирован на %{website} для пользователя, %{user}."
+          body: "Адрес эл. почты: %{email} добавляется в учетную запись Canvas, зарегистрированную по адресу %{website}."
           details: "Щелкните здесь, чтобы подтвердить регистрацию"
+          reject_message: "В целях предотвращения регистрации этого адреса проигнорируйте это эл. письмо."
           subject: "Подтвердите электронную почту: Canvas"
         subject: "Подтвердите электронную почту: Canvas"
     confirm_registration: 
@@ -17454,6 +17629,7 @@ ru:
   newest_first_87672763: "Сначала самые новые"
   newest_oldest_d768cf1a: "Самые новые - Самые старые"
   next_40e12421: Далее
+  next_announcement_6e6e0f17: "Следующее объявление"
   next_announcements_page_3956eb11: "Страница «Следующие объявления»"
   next_assignment_8ec51175: "Следующее задание"
   next_e0d38b1f: далее
@@ -17554,6 +17730,7 @@ ru:
   no_placements_enabled_f705f28: "Нет включенных размещений"
   no_points_possible_368669d: "Нет возможных баллов"
   no_points_possible_72db3a55: "Нет возможных баллов"
+  no_recent_announcements_abf950d5: "Нет последних объявлений"
   no_results_3cda4e72: "Нет результатов"
   no_results_f36777ee: "Без результатов"
   no_results_found_58717065: "Результаты не найдены"
@@ -18268,6 +18445,7 @@ ru:
   outcome_export_89229eb4: "Экспорт результатов"
   outcome_group_39fae76f: "Группа результатов"
   outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Результат группы содержит одни или более результатов, которые в настоящее время сопоставлены с содержимым."
+  outcome_group_contains_one_or_more_outcomes_that_a_5c040c5f: "Результат группы содержит одни или более результатов, которые в настоящее время сопоставлены с содержимым"
   outcome_group_menu_2fffeb71: "Меню Группа результатов"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Группа результатов с идентификатором canvas %{id} не найдена"
   outcome_groups: 
@@ -18294,6 +18472,7 @@ ru:
   outcome_results_title: "Результаты успеваемости"
   outcome_score_141cf00a: "оценка результата"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Результат: %{title} имеет статус %{statusTooltip}"
+  outcome_title_was_successfully_created_a4094d6c: "Результат «%{title}» был успешно создан."
   outcome_title_was_successfully_created_be3a408: "Результат «%{title}» успешно создан"
   outcome_with_canvas_id_id_not_found_215c5227: "Результат с идентификатором canvas «%{id}» не найден"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Результат с идентификатором %{guid} уже существует в другом несвязанном курсе или в учетной записи (%{name})"
@@ -18486,6 +18665,9 @@ ru:
   own_copyright_cc59db55: "Собственное авторское право"
   owner_email_236d1b2: "Адрес электронной почты владельца"
   owner_email_4d02f795: "Владелец электронной почты:"
+  pace_plans_4bb9c5ff: "Планы темпов"
+  pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Планы темпов добавляют поддержку повторяющихся зачислений в Canvas, позволяя превосходным образом распределять сроки сдачи для учащихся с разными датами начала занятий на основе определенного преподавателем темпа. Узнать больше и оставить отзыв можно, присоединившись к группе пользователей Планы темпов."
+  pace_plans_is_in_active_development_f6c20046: "Планы темпов находятся в активной разработке."
   package_error: "Ошибка определения типа пакета: %{error}"
   package_export_from_d6e2b073: "Экспорт пакета из"
   page_50c4823d: Страница
@@ -18610,6 +18792,8 @@ ru:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Задание для независимой оценки"
+  peer_review_due_dueattext_20987412: "Рассмотрение коллегами, срок %{dueAtText}"
+  peer_review_due_eb63af38: "Рассмотрение коллегами, срок"
   peer_review_for_assignment_ce72fc52: "Рассмотрение коллегами для %{assignment}"
   peer_review_for_name_bcffa32f: "Рассмотрение коллегами для %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Рассмотрение коллегами для %{name} Срок исполнения: %{dueAtText}"
@@ -19356,6 +19540,7 @@ ru:
   preview_website_url_eb5b8a5f: "Предпросмотр url-адреса веб-сайта"
   preview_your_changes_373557d8: "Предварительный просмотр изменений"
   previous_445ca243: назад
+  previous_announcement_7efc02d9: "Предыдущее объявление"
   previous_announcements_page_79c0ada1: "Страница «Предыдущие объявления»"
   previous_assignment_83d1f423: "Предыдущая задача"
   previous_bd2ac015: Предыдущий
@@ -19744,6 +19929,9 @@ ru:
                 документом Google Doc прямо изнутри вашего курса Canvas.
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Укажите URI для ваших метаданных IdP, чтобы автоматически заполнить другие поля. Если ваше учебное заведение входит в InCommon или является членом Федерации Великобритании по управлению доступом, укажите, соответственно, urn:mace:incommon или http://ukfederation.org.uk, в качестве URI метаданных, а также укажите ИД объекта для вашего учебного заведения."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Укажите URI для метаданных вашего IdP для автоматического заполнения других полей. Если ваша школа является частью InCommon, укажите urn:mace:incommon для метаданных URI, а также предоставьте идентификатор объекта вашей школы."
+  provide_navigation_to_navigate_between_all_announc_9f1bed39: |-
+      Обеспечить средства перехода между всеми доступными объявлениями
+      в рамках курса в «домашней комнате».
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
       Присвойте URL своей службе обнаружения SAML IdP, соответствующий протоколу
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*. Дополнительные
@@ -21493,6 +21681,7 @@ ru:
   rce_edit_closed_captions_de3ad169: "RCE Редактировать скрытые субтитры"
   rce_enhancements_5701e06: "Усовершенствования RCE"
   rce_initialization_fix_4f176bda: "RCE Initialization Fix"
+  rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "RCE Ограничение количества RCE, первоначально отображаемых на странице"
   rce_mentions_in_discussions_82cd11e3: "Упоминания RCE в обсуждениях"
   rce_pretty_html_editor_d8faf2bb: "Редактор RTCE Pretty HTML"
   re_activate_user_f7d77c9a: "Реактивировать пользователя"
@@ -22628,6 +22817,7 @@ ru:
   select_a_module_optional_7edb5cb0: "Выбрать модуль (не обязательно)"
   select_a_predefined_color_c77ab2f5: "Выберите заранее определенный цвет."
   select_a_provisional_grade_7106e3d5: "Выберите предварительную оценку"
+  select_a_student_to_view_281d17b9: "Выберите учащегося просмотра"
   select_all_assignments_bd07b919: "Выбрать все задания"
   select_all_count_9ad54aa1: "Выбрать все (%{count})"
   select_all_count_courses_4fc63811: 
@@ -24238,6 +24428,7 @@ ru:
   student_name_c45b2a7: "Имя учащегося"
   student_name_hidden_b894d102: "студент (имя скрыто)"
   student_name_options_cb029725: "Опции выбора имен учащихся"
+  student_names_ea4b671a: "Имена учащихся"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Имена студентов должны быть скрыты из-за необходимости анонимного оценивания."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Имена студентов должны быть скрыты, потому что это анонимный опрос."
   student_number_db6f06c1: "Студент %{number}"
@@ -24581,6 +24772,7 @@ ru:
   submit_comment_commenttext_8e5638d7: "Отправить комментарий: %{commentText}"
   submit_comment_e5cc2718: "Отправить комментарий"
   submit_confirmation_4d366dd1: "Отправить подтверждение"
+  submit_file_using_label_9fa4bbb7: "Отправьте файл с помощью %{label}"
   submit_file_using_name_bc8d7b71: "Отправьте файл с помощью %{name}"
   submit_for_student_d90838e8: "Отправить для учащегося"
   submit_media_file_f334c1ba: "Отправить файл мультимедиа"
@@ -24758,6 +24950,7 @@ ru:
   tabs_5605547e: Вкладки
   tagalog_74906db7: Тагальский
   taiwan_886_9a5b6bbf: "Тайвань (+886)"
+  take_a_photo_via_webcam_954f2433: "Сделать фотографию с помощью веб-камеры"
   take_a_picture_d582acf1: "Использовать изображение"
   take_a_snapshot_now_5b622d85: "Сделать снэпшот"
   take_photo_b06762f9: "Сделать снимок"
@@ -25045,10 +25238,14 @@ ru:
                 
                 Благодарим вас,
                 Служба поддержки Canvas
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "Отправленное вами сообщение с темой «%{subject}» не было доставлено. Для ответа на сообщения Canvas из этого сообщения вам сначала необходимо создать подтвержденный канал коммуникации в своем профиле Canvas. Зайдите в свой профиль и повторно отправьте подтверждение для этого адреса электронной почты. Также вы можете связаться с этим лицом через Canvas Inbox. Более подробную информацию по своей роли пользователя см. в главе «Inbox» в руководстве Canvas. [См. %{link}]."
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Клиент Microsoft 365, указанный в настройках учетной записи, не является клиентом Education, поэтому его нельзя использовать с интеграцией Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "Элемент модуля заблокирован."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Самые последние баллы для пользователя %{current_user_name} и результат %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Следующая доступная для назначения дата для этого курса - *%{date}*"
   the_original_quizzes_interface_fcda53bc: "Исходный интерфейс тестирований"
+  the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Группа результатов была успешно импортирована в этот курс."
+  the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "Группа результатов была успешно импортирована в эту учетную запись."
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     few: "Выбранные вами результаты невозможно удалить, так как они согласованы с контентом в этой учетной записи."
     many: "Выбранные вами результаты невозможно удалить, так как они согласованы с контентом в этой учетной записи."
@@ -26478,6 +26675,7 @@ ru:
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Не удается найти совпадения для этих адресов электронной почты в вашем учреждении. Выберите людей, которых вы хотите добавить в качестве новых пользователей. Люди, которых вы не выберете, будут пропущены."
   unable_to_get_accounts_cb825c43: "Невозможно получить учетные записи"
   unable_to_get_homerooms_959dfe67: "Невозможно получить «домашние комнаты»,"
+  unable_to_get_observed_students_ff62d801: "Невозможно получить наблюдаемых учащихся"
   unable_to_load_courses_menu_7074ea04: "Не удается загрузить меню курсов."
   unable_to_load_lti_1_3_tools_cf169f9: "Невозможно загрузить инструменты Lti 1.3"
   unable_to_load_messages_2b158fd0: "Невозможно загрузить сообщения. "
@@ -27411,6 +27609,7 @@ ru:
   view_due_items_due_today_for_course_coursename_129e433: "Показать %{due} пунктов со сроком сдачи сегодня для курса %{courseName}"
   view_faculty_journals_ad0e8c8f: "Просмотреть журнал преподавателей"
   view_feature_settings_at_an_account_level_ec7f5e10: "Просмотр настроек функций на уровне учетной записи"
+  view_feedback_b88c99c: "Просмотреть отзыв"
   view_feedback_f2feabca: "Просмотреть отзыв"
   view_file_8a1c62e5: "Посмотреть файл"
   view_gradebook_d6713dd1: "Просмотр табеля успеваемости"
@@ -27489,6 +27688,7 @@ ru:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Внимание: Для улучшения доступности календарных событий, пожалуйста, используйте вкладку повестки дня"
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Предупреждение. Для улучшения доступности переназначения заданий и групп, используйте расположенную в меню опцию «Переместить в диалог»."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Предупреждение. Для улучшения доступности, щелкните здесь, чтобы использовать индивидуальное представление Табеля успеваемости."
+  warning_for_improved_accessibility_with_annotated__43e3a5ea: "Внимание! Для улучшения доступности аннотированных заданий используйте загрузку файлов или ввод текста, чтобы оставить комментарии."
   warning_icon_f64936d7: "иконка предупреждения"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Внимание! Если имеются пользователи с этой ролью, они сохранять текущие разрешения, но вы не сможете создавать новых пользователей с этой ролью."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "У шага предупреждения имеются дочерние модели, не являющиеся StepItem компонентами"
@@ -27903,6 +28103,7 @@ ru:
   you_are_not_enrolled_in_any_courses_a5c63286: "Вы не зарегистрированы ни на один курс"
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Вы не подписаны на данную тему. Щелкните, чтобы подписаться"
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Вы не являетесь выбранным модератором для данного задания"
+  you_are_observing_observeduser_afd2f245: "Вы наблюдаете за %{observedUser}"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     few: "Вы уже готовые синхронизировать %{count} заданий."
     many: "Вы уже готовые синхронизировать %{count} заданий."

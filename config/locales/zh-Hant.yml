@@ -1828,6 +1828,7 @@ zh-Hant:
   add_criterion_eb9587ef: 添加標準
   add_custom_link_22059c0: 添加自定義連結
   add_delete_edit_7dbc9c5b: 添加/刪除/編輯
+  add_delete_manage_d65e235: 添加/刪除/管理
   add_designers_to_courses_9588820b: 添加設計者至課程
   add_discussion_653dab4c: 添加討論區
   add_domain_f15bc6c1: 添加網域
@@ -1848,8 +1849,10 @@ zh-Hant:
   add_granularity_to_permissions_around_managing_cou_2244c94a: 添加有關管理課程檔案的細微權限
   add_granularity_to_permissions_around_managing_cou_4a5bc486: 添加有關管理課程分班的細微權限
   add_granularity_to_permissions_around_managing_cou_e18d7f97: 添加有關添加/發佈/結束/刪除等管理課程的細微權限
+  add_granularity_to_permissions_around_managing_gro_ef410a72: 添加有關帳戶或課程內容中管理課程分班的細微權限
   add_group_c84f9e9d: 添加小組
   add_group_set_f9809e11: 添加小組集合
+  add_groups_a133e48c: 添加小組
   add_help_menu_links_de9fc34f: 添加支援選單鏈接
   add_hostname_as_an_allowed_domain_1f58c38d: "添加 %{hostname} 為獲允許網域"
   add_hostname_to_the_whitelist_c808192e: "將 %{hostname} 添加到白名單"
@@ -2774,14 +2777,18 @@ zh-Hant:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "嘗試找到 LTI 配置時發生錯誤"
   an_error_occured_while_updating_the_grading_period_9e024cd1: 更新評分時段組時發生錯誤。
   an_error_occurred_adding_group_groupname_670af30: "添加群組 “%{groupName}” 時發生錯誤"
+  an_error_occurred_adding_group_groupname_6ed99725: "添加小組「%{groupName}」時發生錯誤。"
   an_error_occurred_adding_group_groupname_message_6af9ef4c: "添加群組 “%{groupName}” 時發生錯誤：%{message}"
+  an_error_occurred_adding_group_groupname_message_8854de45: "添加小組「%{groupName}」時發生錯誤：%{message}。"
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "變更 \"%{fileName}\" 的鎖定狀態時發生錯誤"
   an_error_occurred_creating_the_conference_fcad5f6f: 創建作業時發生錯誤
   an_error_occurred_during_the_sync_process_error_62d98be7: "同步程序期間發生錯誤：%{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: 載入學習成果數據時發生錯誤。
   an_error_occurred_making_a_network_request_d1bda348: 發出連線請求時發生錯誤
+  an_error_occurred_moving_group_grouptitle_16ec1ebd: "移動小組「%{groupTitle}」時發生錯誤。"
   an_error_occurred_moving_group_grouptitle_b20a640b: "移動群組「%{groupTitle}」時發生錯誤"
   an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "移動群組「%{groupTitle}」時發生錯誤：%{message}"
+  an_error_occurred_moving_group_grouptitle_message_5c592f26: "移動小組「%{groupTitle}」時發生錯誤：%{message}。"
   an_error_occurred_moving_group_title_24fd7fb4: "移動群組 “%{title}” 時發生錯誤"
   an_error_occurred_moving_group_title_message_f8428b66: "移動群組 “%{title}” 時發生錯誤：%{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "移動成果「%{title}」時發生錯誤"
@@ -2818,6 +2825,10 @@ zh-Hant:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "建立此成果時發生錯誤：%{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "建立此成果時發生錯誤：%{message}。"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: 刪除通告時發生錯誤。
+  an_error_occurred_while_importing_this_group_9aef7c30: 匯入此小組時發生錯誤。
+  an_error_occurred_while_importing_this_group_messa_e0d98e2d: "匯入此小組時發生錯誤：%{message}。"
+  an_error_occurred_while_importing_this_outcome_2ce488af: 匯入此成果時發生錯誤。
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "匯入此成果時發生錯誤：%{message}。"
   an_error_occurred_while_loading_account_learning_o_29a11066: 載入帳戶學習成果小組時發生錯誤。
   an_error_occurred_while_loading_account_outcomes_8f337857: 載入帳戶成果時發生錯誤。
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "載入帳戶成果時發生錯誤：%{error}"
@@ -2848,6 +2859,7 @@ zh-Hant:
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "移除成果時發生錯誤：%{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: 移除此群組時發生錯誤。
   an_error_occurred_while_removing_this_group_messag_19809d9a: "移除此群組時發生錯誤：%{message}"
+  an_error_occurred_while_removing_this_group_messag_c15e0830: "移除此小組時發生錯誤：%{message}。"
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "取得您的 QR 碼時發生錯誤"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: 儲存帳戶能力評級時發生錯誤
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "儲存帳戶能力評級時發生錯誤：%{message}"
@@ -2859,6 +2871,8 @@ zh-Hant:
   an_error_occurred_while_starting_migration_8e6015e2: 開始遷移時發生錯誤
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: 嘗試變更使用者介面時發生錯誤
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: 更新通告鎖定狀態時發生錯誤。
+  an_error_occurred_while_updating_group_grouptitle_2072b3c9: "更新小組「%{groupTitle}」時發生錯誤。"
+  an_error_occurred_while_updating_group_grouptitle__6029f82d: "更新小組「%{groupTitle}」時發生錯誤：%{message}。"
   an_error_occurred_while_updating_group_grouptitle__f32110b5: "更新群組「%{groupTitle}」時發生錯誤：%{message}"
   an_error_occurred_while_updating_group_grouptitle_fc919aa: "更新群組「%{groupTitle}」時發生錯誤"
   an_error_occurred_while_updating_late_policies_a95b707f: 更新遲交規則時發生錯誤
@@ -3851,7 +3865,7 @@ zh-Hant:
         manually_assign_peer_reviews: 手動指派同行檢閱
         require_peer_reviews: 需要同行檢閱
       locked_until: 指派檢閱
-      peer_reviews_assign_at_explanation: 必須在截止日期之後出現。如果為空，使用截止日期。
+      peer_reviews_assign_at_explanation: 如果空白，請使用截止日期。
       peer_reviews_header: 同行檢閱
       reviews_per_user: 每個使用者的檢閱數量
     points_possible_number: 可能的分數必須是數字
@@ -4755,6 +4769,7 @@ zh-Hant:
     update: 更新
     view_account_roster: 查看帳戶名單
     view_course_roster: 查看課程名單
+  buttons_and_icons_e66ee12c: 按鈕和圖示
   by_b90c6b6f: 編輯人
   by_client_id_4f2fe02c: "依用戶端 ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 預設情況下，所有連結均為一門課程而啟用。學生們不會希望看到所鏈接的部分不含有任何內容。例如，如果您並未創建任何測驗，他們就不希望看到測驗鏈接。如果您不想讓您的學生們訪問課程的某些區域，您可以對這些鏈接進行排序并將其明確關閉。
@@ -5341,6 +5356,8 @@ zh-Hant:
   canvas_files_889a274f: "Canvas 檔案"
   canvas_for_elementary_beta_28bc5181: "Canvas 小學版（測試版）"
   canvas_for_elementary_e6f5a06f: "Canvas 小學版"
+  canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas 小學版：主教室中很多通告"
+  canvas_for_elementary_parent_support_74a2356e: "Canvas 小學版：Parent 支援"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas 能助您協調協作科技服務，讓多名
@@ -5355,6 +5372,7 @@ zh-Hant:
   canvas_login_failure_message_4c922f2f: "Canvas 登入失敗訊息"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas 多因素驗證備份代碼"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas 需要存取您的攝影機。"
+  canvas_needs_access_to_your_camera_b5418c0: "Canvas 需要存取您的攝影機。"
   canvas_notifications_tutorial_video_79b8e768: "Canvas 通知教程影片"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       Canvas 現在有兩個測驗引擎。請選擇您要使用
@@ -5376,6 +5394,9 @@ zh-Hant:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 將在您儲存測驗後重新評分所有提交件，這可能需要幾分鐘的時間。"
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "如果啟用此功能，Canvas 將從現場活動負荷中移除有空值的密鑰。"
+  cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
+      設定初始頁面載入時成為 RCE 的數目上限。之後
+      將每一個初始化，因為其即將進入檢視區中。
   captions_subtitles_af2c47e: 圖片說明/字幕
   captured_image_91838f78: 擷取的影像
   card_movement_menu_for_title_b94c09af: "卡移動選單%{title}"
@@ -5504,6 +5525,7 @@ zh-Hant:
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "傳統測驗：從回答中的 Canvas 檔案 URL 移去來源"
   classic_view_33f29576: 傳統視圖
   clear_2084585f: 清除
+  clear_all_da755751: 全部清除
   clear_search_field_75f595c7: 清除搜尋欄位
   clear_selected_file_82388e50: 清除所選擇的檔案
   clear_user_cache_ef079f7f: 清除使用者緩存
@@ -5874,6 +5896,123 @@ zh-Hant:
       notices: 
         contact_registered: 聯繫方式已註冊！
   communication_channels_a9abd037: 通訊通道
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: 完成
   complete_all_items_e1779257: 完成所有項目
   complete_fd828dea: 完成
@@ -7859,8 +7998,10 @@ zh-Hant:
         course_template: 課程範本
         course_visibility: 可見性
         custom_course_visibility: 自定義
+        enable_pace_plans: 啟用進度計畫
         enrollment_term_id: 學期
         enrollments_from_homeroom: 註冊
+        friendly_name: 易記名稱
         grading_scheme: 評分方案
         grading_standard_enabled: 啟用課程評分方案
         hide_distribution_graphs: 隱藏成績分配圖，以使學生看不到
@@ -7877,6 +8018,7 @@ zh-Hant:
         lock_all_announcements: 停用關於公告的評論
         master_course: 開放課程至計劃課程
         open_enrollment: 添加『加入這門課程』連結到課程首頁
+        pace_plans: 進度計畫
         participation_id: 參與
         public_syllabus: 使本課程的教學大綱公開可見
         restrict_enrollments_to_course_dates: 學生只能在這些日期之間參加課程
@@ -8174,6 +8316,7 @@ zh-Hant:
   create_new_discussions_6ab69da2: 創建新討論區
   create_new_e0946c49: 新建
   create_new_group_bf9561d4: 建立新群組
+  create_new_group_fca5cc73: 建立新小組
   create_new_group_set_13b1f62a: 創建新小組
   create_outcome_4dac05a0: 建立成果
   create_pages_581a4d59: 建立頁面
@@ -8570,6 +8713,7 @@ zh-Hant:
   deduct_104e8866: 扣除
   deep_orange_4c7eea99: 深橘色
   deep_purple_bb3e2907: 深紫色
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: 不再支援深入的巢狀回覆。您的回覆將出現在此討論串的的第一頁。
   default_9db103d: 默認值
   default_conference_title: "%{course_name} 會議"
   default_dates_a0a2ae26: 預設日期
@@ -8623,6 +8767,7 @@ zh-Hant:
   delete_grading_scheme_6b308832: 刪除評分方案
   delete_grading_scheme_title_215f0a40: "刪除等級評分方式 %{title}"
   delete_group_86c381ec: 刪除群組
+  delete_groups_c637c07: 刪除小組
   delete_in_progress_2d3f0e0d: 進行刪除中
   delete_key_developername_be80e695: "刪除鍵%{developerName}"
   delete_key_name_c2de8c0c: "刪除鍵%{name}"
@@ -8675,11 +8820,13 @@ zh-Hant:
   delete_your_work_fe136221: 刪除您的工作？
   deleted_1be5ed1: 已刪除
   deleted_by_deletername_f269211a: "由 %{deleterName} 刪除"
+  deleted_by_user_be69f8: "由 %{user} 刪除"
   deleted_caption_b5c66807: 已刪除字幕
   deleted_ce03674d: 已刪除
   deleted_content_exceptions_237e809d: 刪除的內容除外：
   deleted_content_referenced_in_this_resource_e42d1998: 在此資源內參考了已刪除的內容：
   deleted_deletedtimingdisplay_f4c73003: "已刪除 %{deletedTimingDisplay}"
+  deleted_topic_notice: 該主題已被刪除
   deleting_6421031e: 正在刪除...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       刪除提交項目檔案一般僅在學生公佈不合適或私密資料時使用。
@@ -9416,6 +9563,7 @@ zh-Hant:
   download_course_roster_csv_86b3d192: "下載學生名冊 CSV"
   download_epub_757cf0af: "下載 ePub 文檔"
   download_errors_attchment_82ffea3f: 下載errors_attchment
+  download_filename_781704f5: "下載 %{filename}"
   download_item_analysis_report_statuslabel_8c9387ec: "下載項目分析報告 %{statusLabel}"
   download_page_views_csv_974f36e1: "下載頁面檢視 CSV"
   download_report_77164f62: 下載報告
@@ -9630,6 +9778,7 @@ zh-Hant:
       find_existing_rubric: 尋找現有題目
   edit_rubric_title_104d6fd2: "編輯評分標準：%{title}"
   edit_section_name_558cc89: "編輯班別 \"%{name}”"
+  edit_status_612572db: 編輯狀態
   edit_submission_status_from_speedgrader_5e1b1cd4: "從 Speedgrader 編輯提交項目狀態"
   edit_survey_b0d6890d: 編輯調查
   edit_term_name_29a8a322: "編輯學期%{name}"
@@ -9804,6 +9953,7 @@ zh-Hant:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "對新分析工具提供的課程和使用者資料啟用新的 API 端點。"
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: 啟用網站管理使用者以設定向使用者顯示的發佈說明
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "在「新成績單」中啟用依 SIS ID、集成 ID 和登入 ID 排序。"
+  enables_support_for_observers_within_canvas_for_el_c5e31b5b: "在 Canvas 小學版內啟用觀察者的支援。"
   enables_the_course_templates_feature_globally_79d5302f: 啟用全域課程範本功能
   enabling_the_elementary_theme_will_change_the_font_c944b619: "啟用小學外觀主題後，您的課程內所有使用者將看見 Canvas 介面內的字體改變，並採用簡化課程導航選單。"
   encourage_class_participation_4e069479: 鼓勵班級參與
@@ -9941,6 +10091,7 @@ zh-Hant:
   enrollments_teachers: 教師
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: 確保已經匯入至課程的成果不會因再次匯入而重複
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: 確保沒有匯入學習成果權限的使用者無法在學習成果標籤中檢視此按鈕
+  enter_a_filename_for_the_photo_4f0fc10e: 輸入照片的檔案名稱
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "此處插入 hexcode 自定義顏色"
   enter_a_valid_date_46d77547: 輸入有效日期
   enter_a_what_if_score_668c91a3: 輸入預期得分。
@@ -10604,6 +10755,7 @@ zh-Hant:
   failed_307449e1: 失敗：
   failed_creating_user_b706a1c5: 創建使用者失敗
   failed_getting_file_to_preview_89fe2bf4: 取得要預覽的檔案失敗
+  failed_getting_next_batch_of_announcements_1f1165a5: 無法取得下一批通告。
   failed_loading_associations_component_is_your_netw_fa49fb32: 未能加載關聯組件。您的網絡連接是否正常？
   failed_loading_course_sections_refresh_page_to_try_f97160bf: 加載班別失敗。重新整理頁面。
   failed_loading_sync_history_component_is_your_netw_2d04fc10: 未能加載同步記錄組件。您的網絡連接是否正常？
@@ -10746,6 +10898,8 @@ zh-Hant:
     student_groups: 新學生群組頁面
     student_outcome_gradebook: 學生學習成績概覽
   features_2581da: 功能
+  features_in_active_development_opting_in_includes__210f7720: "啟用的開發中的功能 — 選擇加入包括定期發佈排程外的持續更新"
+  features_no_longer_in_active_development_that_incl_74c3a739: 啟用的開發中不再使用的功能，包括預設為開啟時的日期
   federated_attributes_5cbe6441: 聯合屬性
   federated_attributes_are_information_sent_from_you_2116fb61: "聯合屬性指由您的驗證提供方發送的資訊，用於在使用者每一次登入 Canvas 時自動更新相應的使用者資訊。"
   feed_url_8a433438: "摘要 URL"
@@ -11046,12 +11200,14 @@ zh-Hant:
   france_c25bfeae: 法國
   french_33881544: 法語
   french_canada_c3d92fa6: 法語（加拿大）
+  friendly_description_57f7fdde: 易記描述
   friendly_description_for_parent_student_display_e608ecf3: 友好描述（適用於父母/學生顯示）
   friendly_name_601153fb: 易記名稱
   from_date_must_be_before_to_date_79f00046: 「從」日期必須在「至」日期之前
   from_fdd4956d: 來自
   from_from_to_to_e31f6422: "自 %{from} 至 %{to}"
   from_gravatar_58372d5a: "來自 Gravatar"
+  from_grouptitle_860dff95: "來自 %{groupTitle}"
   front_page_must_be_set_first_4dbbfdbe: 必須先設置標題版
   front_page_must_be_set_first_c5246f7d: 必須先設定首頁
   full_article_9296bb6f: 全文
@@ -12063,6 +12219,7 @@ zh-Hant:
   granular_permissions_for_managing_course_files_1ed7f019: 管理課程檔案的細微權限
   granular_permissions_for_managing_course_sections_da4b04b: 管理課程分班的細微權限
   granular_permissions_for_managing_courses_a71be71d: 管理課程的細微權限
+  granular_permissions_for_managing_groups_in_accoun_b71b4b7: 帳戶或課程內容中管理小組的細微權限
   granular_permissions_for_managing_wiki_pages_3ed89a84: 管理維基頁面的細微權限
   graph_bar_b5daa23d: 圖表欄
   graph_of_grades_for_each_assignment_4c44d4d1: 每個任務的成績圖表
@@ -12522,6 +12679,7 @@ zh-Hant:
     unassigned_students: "未指派的學生 (%{count})"
     unassigned_users: "未指派的使用者 (%{count})"
   groups_6c90e26a: 群組
+  groups_add_4038ae8a: "小組 - 添加"
   groups_add_edit_delete_1536bbb4: "小組 - 添加 / 編輯 / 刪除"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       群組可用於進行專案協作，或支援進行學期的計劃安排等。
@@ -12536,7 +12694,9 @@ zh-Hant:
       處理更集中的項目。
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: 按班別分組時，分配組內人數不可有限制
   groups_course_c73e4c2c: 小組（課程）
+  groups_delete_bb79a2b4: "小組 - 刪除"
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} 群組 | %{outcomes} 學習成果"
+  groups_manage_a5197479: "小組 - 管理"
   groups_must_be_empty_to_assign_by_section_a9fafa72: 按班別分組時，所有組內都應未有組員
   groups_navigation_menu_76b5acc6: 小組導航工具選單
   groups_tray_ef3e2649: 群組收集箱
@@ -12985,6 +13145,7 @@ zh-Hant:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: （如果沒有選中任何人，則顯示予整個子帳戶中的每個人）
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: （如果沒有選中任何人，則顯示予整個帳戶中的每個人）
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "如果已停用一項或所有權限，使用者仍可檢視及下載檔案為 zip 檔。"
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: 如有提供，此名稱將優先使用在控制面板上和通知中的課程實際名稱中。
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       如果 RCE 強化也已啟用，
       RCE 將在您離開時自動儲存您的工作
@@ -13664,6 +13825,7 @@ zh-Hant:
   k12_description: "更新「網站導航選單」中的圖示，特別讓 K-12 環境中的更合理。"
   k_2521301c: k
   kazakhstan_7_8fe892c: "哈薩克斯坦 (+7)"
+  keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "請記住，此提交項目對於您的 %{groupName} 小組中的每個人而言都很重要。"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "謹記，此提交項目對於您的 %{groupType} 群組中的每個人而言都很重要。"
   keep_students_informed_3f41a7e6: 讓學生獲得最新消息
   keep_submissions_anonymous_5cbaf419: 保持提交件匿名
@@ -13795,6 +13957,7 @@ zh-Hant:
   learn_more_about_collaborations_2978f66d: 瞭解更多關於協作的內容
   learn_more_about_quiz_statistics_315a378: 了解更多關於測驗統計資料的資訊。
   learn_more_about_the_differences_a1217479: 了解更多有關差異。
+  learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: 瞭解更多有關*進度計畫使用者小組*中的此功能。
   learn_more_about_using_commons_and_blueprints_3df953f6: 了解更多有關使用公用區及藍圖資訊。
   learn_more_about_video_conferencing_5f0e76e4: 更深入了解視像會議
   learning_analytics_beta_view_46deb4c8: "學習分析工具（測試版）- 檢視"
@@ -14039,6 +14202,8 @@ zh-Hant:
   loading_accounts_3364e7a0: 載入帳戶中...
   loading_additional_items_ed5f672d: 正在載入額外的項目......
   loading_additional_todo_details_acba0cf2: 正在載入額外待辦事項詳細資料
+  loading_announcement_content_4405470f: 載入通告內容
+  loading_announcement_title_b8fc3057: 載入通告標題
   loading_announcements_b927a86c: 通告載入中
   loading_apps_f85740cb: 載入應用程式中...
   loading_artifact_dc3bfe9f: 載入項目
@@ -14098,6 +14263,7 @@ zh-Hant:
   loading_more_sub_accounts_d0a30903: 載入更多子帳戶...
   loading_more_terms_4053e31f: 載入更多學期...
   loading_name_data_c66ea65f: "載入 %{name} 資料"
+  loading_observed_students_dfdda108: 載入觀察的學生
   loading_options_c823e98b: 正在載入選項…
   loading_outcome_results_96e21ce4: 正在載入學習成果成積
   loading_permissions_28495bdb: 正在載入權限
@@ -14368,11 +14534,14 @@ zh-Hant:
   manage_course_sections_f482d1b3: 管理課程分班
   manage_course_templates_66c00052: 管理課程範本
   manage_courses_abe8335f: 管理課程
+  manage_create_edit_delete_groups_f9046ee3: 管理（建立/編輯/刪除）小組
   manage_discussion_c1dd8f4e: 管理討論
   manage_discussion_title_a2ecb3fb: "管理討論%{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 管理註冊狀態，創建組以及從此頁面添加使用者。
   manage_grading_schemes_in_context_name_e3678273: "管理 %{context_name} 的評分方案"
   manage_group_group_name_ac8578c6: "管理群組 %{group_name}"
+  manage_groups_4b962fa9: 管理小組
+  manage_groups_4c3a2a9f: 管理小組
   manage_home_4fc3480b: 管理主頁
   manage_home_for_coursename_5e5c7661: "管理主頁的 %{courseName}"
   manage_item_name_6118d4b0: "管理 %{item_name}"
@@ -14568,6 +14737,7 @@ zh-Hant:
   members_are_free_to_join_defa5929: 成員可自由加入
   membership_by_invitation_only_9bc27199: 僅限於邀請的成員資格
   membership_service_configuration_d8ba5a74: 會員服務配置
+  mentions_error_page_fd84c53c: 提及錯誤頁面
   menu: 
     current_groups: 當前群組
     customize: 自定義
@@ -14575,6 +14745,7 @@ zh-Hant:
     my_courses: 我的課程
   menu_39cb0e8e: 選單
   menu_of_options_for_this_permission_77f50c31: 此權限的選項目錄
+  menu_options_9b6b0b5c: 選單選項
   message: 
     default_subject: "Canvas 提示"
   message_5c38209d: 訊息
@@ -15262,11 +15433,15 @@ zh-Hant:
         body: "Canvas 提示 - 協作邀請：%{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
-        body: "電郵地址%{email} 已被使用者 %{user} 在 %{website} 上註冊使用。"
+        body: |-
+            電郵地址：%{email} 正添加到在 %{website} 註冊的 Canvas 帳戶中。
+            
+            若要防止此地址被註冊，請忽略此電郵。
         details: "要確認此註冊，請瀏覽以下 URL："
         html: 
-          body: "電郵地址 %{email} 已被使用者 %{user} 在 %{website} 上註冊使用。"
+          body: "電郵地址：%{email} 正添加到在 %{website} 註冊的 Canvas 帳戶中。"
           details: 按一下此處確認此註冊
+          reject_message: 若要防止此地址被註冊，請忽略此電郵。
           subject: 確認電子郵件：Canvas
         subject: 確認電子郵件：Canvas
     confirm_registration: 
@@ -17071,6 +17246,7 @@ zh-Hant:
   newest_first_87672763: 最新優先
   newest_oldest_d768cf1a: "最新 - 最舊"
   next_40e12421: 下一個
+  next_announcement_6e6e0f17: 下一個通告
   next_announcements_page_3956eb11: 下一個通告頁
   next_assignment_8ec51175: 下一個作業
   next_e0d38b1f: 下一個
@@ -17171,6 +17347,7 @@ zh-Hant:
   no_placements_enabled_f705f28: 未啟用配置
   no_points_possible_368669d: 沒有可能的分數
   no_points_possible_72db3a55: 沒有可能分數
+  no_recent_announcements_abf950d5: 沒有最近的通告
   no_results_3cda4e72: 沒有結果
   no_results_f36777ee: 無結果
   no_results_found_58717065: 找不到結果
@@ -17877,6 +18054,7 @@ zh-Hant:
   outcome_export_89229eb4: 匯出成果
   outcome_group_39fae76f: 學習成果群組
   outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: 學習成果群組包含一個或多個已與內容對齊的成果。
+  outcome_group_contains_one_or_more_outcomes_that_a_5c040c5f: 成果小組包含一個或多個目前與內容對齊的學習成果
   outcome_group_menu_2fffeb71: 學習成果群組選單
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "沒有找到 Canvas ID %{id} 的成果群組"
   outcome_groups: 
@@ -17903,6 +18081,7 @@ zh-Hant:
   outcome_results_title: 成果結果
   outcome_score_141cf00a: 學習成果評分
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "成果：%{title} 的狀態為 %{statusTooltip}"
+  outcome_title_was_successfully_created_a4094d6c: "成功建立成果「%{title}」。"
   outcome_title_was_successfully_created_be3a408: "成果 “%{title}” 已成功創建"
   outcome_with_canvas_id_id_not_found_215c5227: "沒有找到 Canvas ID \"%{id}\" 的成果"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "另一無關的課程或帳戶（%{name}）的成果已使用 ID %{guid}"
@@ -18091,6 +18270,9 @@ zh-Hant:
   own_copyright_cc59db55: 自有版權
   owner_email_236d1b2: 所有者電子郵件
   owner_email_4d02f795: 所有者電子郵件：
+  pace_plans_4bb9c5ff: 進度計畫
+  pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "「進度計畫」添加點名註冊的支援到 Canvas 中；根據導師規定的計畫允許不同開始日期的學生的截止日期神奇分配。瞭解更多和加入「進度計畫使用者小組」以提供反饋。"
+  pace_plans_is_in_active_development_f6c20046: 進度計畫在啟用的開發中。
   package_error: "正在確認包類型時發生錯誤: %{error}"
   package_export_from_d6e2b073: 軟件包由……匯出
   page_50c4823d: 頁面
@@ -18215,6 +18397,8 @@ zh-Hant:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: 同儕檢閱作業
+  peer_review_due_dueattext_20987412: "同儕互評截止日期 %{dueAtText}"
+  peer_review_due_eb63af38: 同儕檢閱截止日期
   peer_review_for_assignment_ce72fc52: "%{assignment} 的同行審閱"
   peer_review_for_name_bcffa32f: "%{name} 的同儕互評"
   peer_review_for_name_due_dueattext_f5f6547d: "%{name} 的同儕互評截止日期：%{dueAtText}"
@@ -18955,6 +19139,7 @@ zh-Hant:
   preview_website_url_eb5b8a5f: "預覽網站 URL"
   preview_your_changes_373557d8: 預覽您的更改
   previous_445ca243: 上一個
+  previous_announcement_7efc02d9: 之前的通告
   previous_announcements_page_79c0ada1: 上一個通告頁
   previous_assignment_83d1f423: 上一個作業
   previous_bd2ac015: 上一個
@@ -19345,6 +19530,9 @@ zh-Hant:
       同時，從您的 Canvas 課程中為使用者提供空間。
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "為您的 IdP 元數據提供 URI，以自動填充其他欄。如果您的學校是 InCommon 或英國存取管理聯會 (UK Access Management Federation) 的成員，請分別指定元數據 URI 的 urn:mace:incommon 或 http://ukfederation.org.uk，並提供您學校的實體 ID。"
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "為您的 IdP 元數據提供一個 URI 地址，以自動填充其他字段。如果您能的學校是 InCommon 的成員，請在元數據 URI 中標明 urn:mace:incommon，並提供您學校的實體 ID。"
+  provide_navigation_to_navigate_between_all_announc_9f1bed39: |-
+      提供導航工具以導航主教室課程中
+      可用的所有通告。
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
       提供您的 SAML IdP 探索服務的 URL，該 URL 必須符合
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* 協議。
@@ -21006,6 +21194,7 @@ zh-Hant:
   rce_edit_closed_captions_de3ad169: "RCE 編輯隱藏字幕"
   rce_enhancements_5701e06: "RCE 強化"
   rce_initialization_fix_4f176bda: "RCE 初始化修復程式"
+  rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "RCE 限制頁面上初始成為的 RCE 數目。"
   rce_mentions_in_discussions_82cd11e3: "討論區中的 RCE 提及"
   rce_pretty_html_editor_d8faf2bb: "RCE 美觀 HTML 編輯器"
   re_activate_user_f7d77c9a: 重新啟用使用者
@@ -22099,6 +22288,7 @@ zh-Hant:
   select_a_module_optional_7edb5cb0: 選擇單元（可選）
   select_a_predefined_color_c77ab2f5: 選擇一個預設的顏色
   select_a_provisional_grade_7106e3d5: 選擇一個暫定評分
+  select_a_student_to_view_281d17b9: 選擇要檢視的學生
   select_all_assignments_bd07b919: 選擇所有作業
   select_all_count_9ad54aa1: "全選 (%{count})"
   select_all_count_courses_4fc63811: 
@@ -23681,6 +23871,7 @@ zh-Hant:
   student_name_c45b2a7: 學生姓名
   student_name_hidden_b894d102: 學生（姓名隱藏）
   student_name_options_cb029725: 學生名稱選項
+  student_names_ea4b671a: 學生姓名
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: 由於需要匿名評分，學生姓名必須隱藏
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: 由於本調查為匿名，學生姓名必須隱藏。
   student_number_db6f06c1: "學生%{number}"
@@ -24008,6 +24199,7 @@ zh-Hant:
   submit_comment_commenttext_8e5638d7: "提交意見：%{commentText}"
   submit_comment_e5cc2718: 提交註解
   submit_confirmation_4d366dd1: 提交確認
+  submit_file_using_label_9fa4bbb7: "使用 %{label} 提交檔案"
   submit_file_using_name_bc8d7b71: "使用 %{name} 提交檔案"
   submit_for_student_d90838e8: 為學生提交
   submit_media_file_f334c1ba: 提交媒體文檔
@@ -24185,6 +24377,7 @@ zh-Hant:
   tabs_5605547e: 標籤
   tagalog_74906db7: 他加祿語
   taiwan_886_9a5b6bbf: "台灣 (+886)"
+  take_a_photo_via_webcam_954f2433: 透過網路攝影機拍照
   take_a_picture_d582acf1: 拍照
   take_a_snapshot_now_5b622d85: 現在拍攝快照
   take_photo_b06762f9: 拍攝照片
@@ -24466,10 +24659,14 @@ zh-Hant:
                 
                 謝謝！
                 Canvas 支援團隊
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "您發送的主題為「%{subject}」的訊息未能投遞。如希望透過本郵件回覆 Canvas 訊息，您的 Canvas 個人檔案中必須有經確認的通訊渠道。請瀏覽您的個人檔案並重新發送此電郵地址的確認電郵。您亦可以透過 Canvas 收件匣聯絡此人。如需協助，請參閱 Canvas 指南內有關您的使用者身份的收件匣章節。[請參閱 %{link}]。"
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "帳戶設定中提供的 Microsoft 365 租借用戶不是「教育」租借用戶，因此無法配合「Microsoft Teams 同步」整合一起使用。"
   the_module_item_is_locked_27fe420b: 該單元項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "此課程可供選擇的預約是*%{date}*"
   the_original_quizzes_interface_fcda53bc: 原有測驗介面
+  the_outcome_group_was_successfully_imported_into_t_9c80a6fb: 成功將成果小組匯入此課程中。
+  the_outcome_group_was_successfully_imported_into_t_cf19e3d1: 成功將成果小組匯入此帳戶中。
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: 您已選擇的學習成果不能被移除，因為它們已與此帳戶中的內容對齊。
     other: 您已選擇的學習成果不能被移除，因為它們已與此帳戶中的內容對齊。
@@ -25883,6 +26080,7 @@ zh-Hant:
   unable_to_find_matches_for_these_email_addresses_i_c2305106: 無法在您的機構中為這些電郵地址找到吻合。選擇那些您要創建為新使用者的。未選擇的將被略過。
   unable_to_get_accounts_cb825c43: 無法取得帳戶
   unable_to_get_homerooms_959dfe67: 無法取得主教室
+  unable_to_get_observed_students_ff62d801: 無法取得觀察的學生
   unable_to_load_courses_menu_7074ea04: 無法載入課程選單
   unable_to_load_lti_1_3_tools_cf169f9: "無法載入 Lti 1.3 工具"
   unable_to_load_messages_2b158fd0: "無法載入訊息。 "
@@ -26795,6 +26993,7 @@ zh-Hant:
   view_due_items_due_today_for_course_coursename_129e433: "檢視課程 %{courseName} 的今天截止的 %{due} 項目"
   view_faculty_journals_ad0e8c8f: 檢視教職員日誌
   view_feature_settings_at_an_account_level_ec7f5e10: 檢視帳戶級別的功能設定
+  view_feedback_b88c99c: 檢視反饋
   view_feedback_f2feabca: 檢視反饋
   view_file_8a1c62e5: 檢視文檔
   view_gradebook_d6713dd1: 檢視成績單
@@ -26868,6 +27067,7 @@ zh-Hant:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: 警告：為提高月曆事件的可訪問性，請使用議程視圖。
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: 警告：爲了提高重新排列作業和群組時的可訪問性，請使用功能表中的『移至對話框』選項。
   warning_for_improved_accessibility_please_click_he_e6472c02: 警告：為改善訪問性，請按一下此處以使用個人成績冊視圖模式。
+  warning_for_improved_accessibility_with_annotated__43e3a5ea: 警告：關於改善的存取性與註釋的作業，請使用「檔案上傳」或「文字輸入」留下評論。
   warning_icon_f64936d7: 警告圖標
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: 警告：如果任何使用者有此角色，他們將保持當前權限，但是您將無法創建有此角色的新使用者。
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "警告 步驟包含並非 StepItem 組件的兒童"
@@ -27262,6 +27462,7 @@ zh-Hant:
   you_are_not_enrolled_in_any_courses_a5c63286: 您未註冊任何課程
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: 您未訂閱此主題。按一下以進行訂閱。
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: 您不是此作業的指定核分人
+  you_are_observing_observeduser_afd2f245: "您正在觀察 %{observedUser}"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "您已準備好同步 %{count} 項作業。"
     other: "您已準備好同步 %{count} 項作業。"

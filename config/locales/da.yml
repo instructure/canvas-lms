@@ -1827,6 +1827,7 @@ da:
   add_criterion_eb9587ef: "Tilføj kriterie"
   add_custom_link_22059c0: "Tilføj brugertilpasset link"
   add_delete_edit_7dbc9c5b: "tilføj / slet / rediger"
+  add_delete_manage_d65e235: "tilføj / slet / administrer"
   add_designers_to_courses_9588820b: "Føj designere til fag"
   add_discussion_653dab4c: "Tilføj diskussion"
   add_domain_f15bc6c1: "Tilføj domæne"
@@ -1847,8 +1848,10 @@ da:
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Tilføj detaljer til tilladelser vedrørende styring af fagfiler"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Tilføj detaljer til tilladelser vedrørende styring af fagsektioner"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Tilføj granularitet til tilladelser for at administrere fag, dvs. Tilføj / offentliggør / afslut / slet"
+  add_granularity_to_permissions_around_managing_gro_ef410a72: "Tilføj detaljer til tilladelser vedrørende administration af grupper i Konto- eller Fagkontekster"
   add_group_c84f9e9d: "Tilføj gruppe"
   add_group_set_f9809e11: "Tilføj gruppesæt"
+  add_groups_a133e48c: "Tilføj grupper"
   add_help_menu_links_de9fc34f: "Tilføj hjælp-menulinks"
   add_hostname_as_an_allowed_domain_1f58c38d: "Tilføj %{hostname} som et tilladt domæne"
   add_hostname_to_the_whitelist_c808192e: "Tilføj %{hostname} til hvidlisten"
@@ -2770,14 +2773,18 @@ da:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Der opstod en fejl under forsøg på at finde LTI-konfigurationen"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "En fejl opstod under opdatering af karakterperiodesæt."
   an_error_occurred_adding_group_groupname_670af30: "Der opstod en fejl ved tilføjelse af gruppe \"%{groupName}\""
+  an_error_occurred_adding_group_groupname_6ed99725: "Der opstod en fejl ved tilføjelse af gruppe \"%{groupName}\"."
   an_error_occurred_adding_group_groupname_message_6af9ef4c: "Der opstod en fejl ved tilføjelse af gruppe \"%{groupName}\": %{message}"
+  an_error_occurred_adding_group_groupname_message_8854de45: "Der opstod en fejl ved tilføjelse af gruppe \"%{groupName}\": %{message}."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Der opstod en fejl under ændring af låsestatus for \"%{fileName}\""
   an_error_occurred_creating_the_conference_fcad5f6f: "Der opstod en fejl under oprettelse af ​​konferencen"
   an_error_occurred_during_the_sync_process_error_62d98be7: "Der opstod en fejl under synkroninseringsprocessen %{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Der opstod en fejl ved indlæsning af læringsudbyttedata."
   an_error_occurred_making_a_network_request_d1bda348: "Der opstod en fejl under oprettelse af en netværksanmodning"
+  an_error_occurred_moving_group_grouptitle_16ec1ebd: "Der opstod en fejl ved flytning af gruppe \"%{groupTitle}\"."
   an_error_occurred_moving_group_grouptitle_b20a640b: "Der opstod en fejl ved flytning af gruppe \"%{groupTitle}\""
   an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "Der opstod en fejl ved flytning af gruppe \"%{groupTitle}\": %{message}"
+  an_error_occurred_moving_group_grouptitle_message_5c592f26: "Der opstod en fejl ved flytning af gruppe \"%{groupTitle}\": %{message}."
   an_error_occurred_moving_group_title_24fd7fb4: "Der opstod en fejl ved flytning af gruppe \"%{title}\""
   an_error_occurred_moving_group_title_message_f8428b66: "Der opstod en fejl ved flytning af gruppe \"%{title}\": %{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "Der opstod en fejl ved flytning af læringsudbyttet \"%{title}\""
@@ -2814,6 +2821,10 @@ da:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Der opstod en fejl under oprettelse af dette læringsudbytte: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Der opstod en fejl under oprettelse af dette læringsudbytte: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Der opstod en fejl under sletning af beskeder"
+  an_error_occurred_while_importing_this_group_9aef7c30: "Der opstod en fejl under import af denne gruppe."
+  an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Der opstod en fejl under import af denne gruppe: %{message}."
+  an_error_occurred_while_importing_this_outcome_2ce488af: "Der opstod en fejl under import af dette læringsudbytte."
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Der opstod en fejl under import af dette læringsudbytte: %{message}."
   an_error_occurred_while_loading_account_learning_o_29a11066: "Der opstod en fejl under indlæsning af kontoens læringsudbyttegrupper."
   an_error_occurred_while_loading_account_outcomes_8f337857: "Der opstod en fejl under indlæsning af kontoens læringsudbytter."
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Der opstod en fejl under indlæsning af kontoens læringsudbytter: %{error}"
@@ -2844,6 +2855,7 @@ da:
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Der opstod en fejl under fjernelse af læringsudbyttet: %{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: "Der opstod en fejl under fjernelse af denne gruppe."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "Der opstod en fejl under fjernelse af denne gruppe: %{message}"
+  an_error_occurred_while_removing_this_group_messag_c15e0830: "Der opstod en fejl under fjernelse af denne gruppe: %{message}."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Der opstod en fejl, da du forsøgte at hente din QR-kode"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Der opstod en fejl, da kontoens færdighedsbedømmelser skulle gemmes"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Der opstod en fejl, da kontoens færdighedsbedømmelser skulle gemmes: %{message}"
@@ -2855,6 +2867,8 @@ da:
   an_error_occurred_while_starting_migration_8e6015e2: "Der opstod en fejl under opstart af overførsel"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Der opstod en fejl under forsøg på at ændre brugergrænsefladen"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Der opstod en fejl under opdatering af beskeder låst tilstand."
+  an_error_occurred_while_updating_group_grouptitle_2072b3c9: "Der opstod en fejl under opdatering af gruppen \"%{groupTitle}\"."
+  an_error_occurred_while_updating_group_grouptitle__6029f82d: "Der opstod en fejl under opdatering af gruppen \"%{groupTitle}\": %{message}."
   an_error_occurred_while_updating_group_grouptitle__f32110b5: "Der opstod en fejl under opdatering af gruppen \"%{groupTitle}\": %{message}"
   an_error_occurred_while_updating_group_grouptitle_fc919aa: "Der opstod en fejl under opdatering af gruppen \"%{groupTitle}\""
   an_error_occurred_while_updating_late_policies_a95b707f: "Der opstod en fejl under opdatering af sentpolitikker"
@@ -3851,7 +3865,7 @@ da:
         manually_assign_peer_reviews: "Tildel peer reviews manuelt"
         require_peer_reviews: "Kræv peer reviews"
       locked_until: "Tildel bedømmelser"
-      peer_reviews_assign_at_explanation: "Skal ligge efter afleveringsdato. Hvis tom, bruges afleveringsdato."
+      peer_reviews_assign_at_explanation: "Hvis blank, bruger afleveringsdato."
       peer_reviews_header: "Peer reviews"
       reviews_per_user: "Bedømmelse pr. bruger"
     points_possible_number: "Mulige point skal være et tal"
@@ -4753,6 +4767,7 @@ da:
     update: Opdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursusliste"
+  buttons_and_icons_e66ee12c: "Knapper og ikoner"
   by_b90c6b6f: Af
   by_client_id_4f2fe02c: "Efter kunde-id"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle links aktiveret til et fag. De studerende kan ikke se links til sektioner uden indhold. Hvis du for eksempel ikke har oprettet nogen test, kan de ikke se testenes link. Du kan sortere og udtrykkeligt deaktivere disse links, hvis der findes områder i faget, som de studerende ikke skal have adgang til."
@@ -5339,6 +5354,8 @@ da:
   canvas_files_889a274f: Canvas-filer
   canvas_for_elementary_beta_28bc5181: "Canvas til folkeskolen (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas til folkeskolen"
+  canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas til folkeskolen: mange beskeder i klasseværelset"
+  canvas_for_elementary_parent_support_74a2356e: "Canvas til folkeskolen: Forældresupport"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas hjælper dig med at udnytte samarbejdsteknologi, så flere
@@ -5353,6 +5370,7 @@ da:
   canvas_login_failure_message_4c922f2f: "Canvas-login fejlmeddelelse"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas sikkerhedskoder for multi-faktor-autentifikation"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas har brug for adgang til dit kamera."
+  canvas_needs_access_to_your_camera_b5418c0: "Canvas har brug for adgang til dit kamera."
   canvas_notifications_tutorial_video_79b8e768: "Selvstudiumvideo om Canvas-meddelelser"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       Canvas har nu to test-programmer. Vælg venligst, hvilket
@@ -5374,6 +5392,9 @@ da:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil bed'mme alle dine indesendelser igen efter du har gemt quizzen, det kan tage et øjeblik."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas fjerner nøgler med nulværdier fra livebegivenheders nyttedata, hvis denne funktion er aktiveret."
+  cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
+      Begræns antallet af RCE'er, der blev gengivet ved den første sideindlæsning. Efter det
+      skal hver af dem initialiseres, mens de er ved at gå ind i visningsporten.
   captions_subtitles_af2c47e: "Billedtekster / undertekster"
   captured_image_91838f78: "Optaget billede"
   card_movement_menu_for_title_b94c09af: "Kortaktivitet menu for %{title}"
@@ -5502,6 +5523,7 @@ da:
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Classic Quizzes: Fjern oprindelse fra Canvas-fil-URL'er i svar"
   classic_view_33f29576: "Klassisk visning"
   clear_2084585f: Ryd
+  clear_all_da755751: "Ryd alle"
   clear_search_field_75f595c7: "Ryd søgefelt"
   clear_selected_file_82388e50: "Ryd valgt fil"
   clear_user_cache_ef079f7f: "Ryd brugercache"
@@ -5872,6 +5894,123 @@ da:
       notices: 
         contact_registered: "Kontaktmetode registreret!"
   communication_channels_a9abd037: Kommunikationskanaler
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: fuldført
   complete_all_items_e1779257: "Fuldfør alle elementer"
   complete_fd828dea: Fuldført
@@ -7854,8 +7993,10 @@ da:
         course_template: Fagkabelon
         course_visibility: Synlighed
         custom_course_visibility: Tilpas
+        enable_pace_plans: "Aktiver tempoplaner"
         enrollment_term_id: Semester
         enrollments_from_homeroom: Tilmeldinger
+        friendly_name: "Brugervenligt navn"
         grading_scheme: Karakterordning
         grading_standard_enabled: "Aktiver fagets karakterordning"
         hide_distribution_graphs: "Skjul grafer over karakterfordeling for studerende"
@@ -7872,6 +8013,7 @@ da:
         lock_all_announcements: "Deaktiver kommentarer på beskeder"
         master_course: "Aktiver fag som et blueprint-fag"
         open_enrollment: "Føj et link \"Meld dig til dette fag\" på fagets startside"
+        pace_plans: Tempoplaner
         participation_id: Deltagelse
         public_syllabus: "Gør denne kursusbeskrivelse synlig for alle"
         restrict_enrollments_to_course_dates: "Studerende kan kun deltage i faget mellem disse datoer"
@@ -8166,6 +8308,7 @@ da:
   create_new_discussions_6ab69da2: "Opret nye diskussioner"
   create_new_e0946c49: "Opret ny"
   create_new_group_bf9561d4: "Opret ny gruppe"
+  create_new_group_fca5cc73: "Opret ny gruppe"
   create_new_group_set_13b1f62a: "Opret nyt gruppesæt"
   create_outcome_4dac05a0: "Opret læringsudbytte"
   create_pages_581a4d59: "Opret sider"
@@ -8562,6 +8705,7 @@ da:
   deduct_104e8866: "Træk fra"
   deep_orange_4c7eea99: "Dyb orange"
   deep_purple_bb3e2907: "Dyb lilla"
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Dybt indlejrede svar understøttes ikke længere. Dit svar vises på den første side i denne tråd."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konference"
   default_dates_a0a2ae26: standarddatoer
@@ -8615,6 +8759,7 @@ da:
   delete_grading_scheme_6b308832: "Slet karakterordning"
   delete_grading_scheme_title_215f0a40: "Sletter karaktersystem %{title}"
   delete_group_86c381ec: "Slet gruppe"
+  delete_groups_c637c07: "Slet grupper"
   delete_in_progress_2d3f0e0d: "Sletning i gang"
   delete_key_developername_be80e695: "Slet nøgle %{developerName}"
   delete_key_name_c2de8c0c: "Slet nøgle %{name}"
@@ -8667,11 +8812,13 @@ da:
   delete_your_work_fe136221: "Slet dit arbejde?"
   deleted_1be5ed1: Slettet
   deleted_by_deletername_f269211a: "Slettet af %{deleterName}"
+  deleted_by_user_be69f8: "Slettet af %{user}"
   deleted_caption_b5c66807: "Slettet billedtekst"
   deleted_ce03674d: slettet
   deleted_content_exceptions_237e809d: "Slettet indhold undtagelser:"
   deleted_content_referenced_in_this_resource_e42d1998: "Slettet indhold henvist til i denne ressource:"
   deleted_deletedtimingdisplay_f4c73003: "Slettet %{deletedTimingDisplay}"
+  deleted_topic_notice: "Det emne er blevet slettet"
   deleting_6421031e: "sletter ..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Sletning af en afleveringsfil udføres typisk kun, når en studerende slår upassende eller privat materiale op.
@@ -9410,6 +9557,7 @@ da:
   download_course_roster_csv_86b3d192: "Download faglistens CSV"
   download_epub_757cf0af: "Download ePub"
   download_errors_attchment_82ffea3f: "Download errors_attchment"
+  download_filename_781704f5: "Download %{filename}"
   download_item_analysis_report_statuslabel_8c9387ec: "Download rapport over elementanalyse %{statusLabel}"
   download_page_views_csv_974f36e1: "Download sidevisninger CSV"
   download_report_77164f62: "Download rapport"
@@ -9624,6 +9772,7 @@ da:
       find_existing_rubric: "Find eksisterende rubrik"
   edit_rubric_title_104d6fd2: "Redigér rubrik: %{title}"
   edit_section_name_558cc89: "Rediger sektion \"%{name}\""
+  edit_status_612572db: "Rediger status"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Rediger indsendelsesstatus fra Speedgrader"
   edit_survey_b0d6890d: "Rediger spørgeundersøgelse"
   edit_term_name_29a8a322: "Rediger semester %{name}"
@@ -9801,6 +9950,7 @@ da:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-slutpunkter for fag- og brugerdata leveret af New Analytics."
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: "Gør det muligt for siteadmin-brugere at konfigurere udgivelsesnotater, der skal vises for brugerne"
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Aktiverer sortering efter SIS-ID, integrations-ID og login-ID i Ny karakteroversigt."
+  enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Muliggør understøttelse af observatører i Canvas for folkeskolen."
   enables_the_course_templates_feature_globally_79d5302f: "Aktiverer funktionen Fagskabeloner globalt"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Aktivering af temaet til folkeskolen vil ændre skrifttypen i Canvas-grænsefladen og forenkle fagnavigationsmenuen for alle brugere i dit fag."
   encourage_class_participation_4e069479: "Tilskynd klassedeltagelse"
@@ -9938,6 +10088,7 @@ da:
   enrollments_teachers: Lærere
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sørger for, at læringsudbytter, der allerede er blevet importeret til et fag, ikke duplikeres, hvis de importeres igen"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Sørger for, at brugere uden tilladelsen Importer læringsudbytter ikke kan se knappen under fanen Læringsudbytter"
+  enter_a_filename_for_the_photo_4f0fc10e: "Indtast et filnavn for billedet"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Indtast en farvekode her for at bruge en brugerdefineret farve."
   enter_a_valid_date_46d77547: "Indtast en gyldig dato"
   enter_a_what_if_score_668c91a3: "Indtast et Hvad-nu-hvis-resultat."
@@ -10601,6 +10752,7 @@ da:
   failed_307449e1: "Mislykkedes:"
   failed_creating_user_b706a1c5: "Kunne ikke oprette bruger"
   failed_getting_file_to_preview_89fe2bf4: "Kunne ikke hente filen til forhåndsvisning"
+  failed_getting_next_batch_of_announcements_1f1165a5: "Det lykkedes ikke at få næste batch af meddelelser."
   failed_loading_associations_component_is_your_netw_fa49fb32: "Kunne ikke læse Associationer-komponent. Er din netværksforbindelse OK?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Lastning af fag-sektioner mislykkedes. Opdater side for at prøve igen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Fejl ved læsning af Synkroniseringshistorik-komponent. Er din netværksforbindelse OK?"
@@ -10745,6 +10897,8 @@ da:
     student_groups: "Ny studerendes gruppeside"
     student_outcome_gradebook: Målopfyldelsesoversigt
   features_2581da: Funktioner
+  features_in_active_development_opting_in_includes__210f7720: "Funktioner i aktiv udvikling - tilmelding inkluderer løbende opdateringer uden for den almindelige udgivelsesplan"
+  features_no_longer_in_active_development_that_incl_74c3a739: "Funktioner, som ikke længere er i aktiv udvikling, der inkluderer en dato, hvor de som standard vil blive slået til"
   federated_attributes_5cbe6441: "Samlede attributter"
   federated_attributes_are_information_sent_from_you_2116fb61: "Samlede attributter er information sendt fra din autentifikationsudbyder, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
   feed_url_8a433438: "Feed url"
@@ -11045,12 +11199,14 @@ da:
   france_c25bfeae: Frankrig
   french_33881544: Fransk
   french_canada_c3d92fa6: "Fransk (Canada)"
+  friendly_description_57f7fdde: "Brugervenlig beskrivelse"
   friendly_description_for_parent_student_display_e608ecf3: "Brugervenlig beskrivelse (til visning for forældre / studerende)"
   friendly_name_601153fb: "Brugervenligt navn"
   from_date_must_be_before_to_date_79f00046: "'Fra'-dato skal være før 'Til'-dato"
   from_fdd4956d: Fra
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
   from_gravatar_58372d5a: "Fra Gravatar"
+  from_grouptitle_860dff95: "Fra %{groupTitle}"
   front_page_must_be_set_first_4dbbfdbe: "Forsiden skal indstilles først"
   front_page_must_be_set_first_c5246f7d: "Forsiden skal indstilles først"
   full_article_9296bb6f: "Fuld artikel"
@@ -12066,6 +12222,7 @@ da:
   granular_permissions_for_managing_course_files_1ed7f019: "Detaljerede tilladelser til administration af fagfiler"
   granular_permissions_for_managing_course_sections_da4b04b: "Detaljerede tilladelser til administration af fagsektioner"
   granular_permissions_for_managing_courses_a71be71d: "Detaljerede tilladelser til administration af fag"
+  granular_permissions_for_managing_groups_in_accoun_b71b4b7: "Detaljerede tilladelser til administrering af grupper i Konto- eller Fagkontekster"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulære tilladelser til styring af wikisider"
   graph_bar_b5daa23d: Graflinje
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram over karakterer for hver opgave"
@@ -12530,6 +12687,7 @@ da:
     unassigned_students: "Studerende uden tildeling (%{count})"
     unassigned_users: "Brugere uden tildeling (%{count})"
   groups_6c90e26a: Grupper
+  groups_add_4038ae8a: "Grupper - tilføj"
   groups_add_edit_delete_1536bbb4: "Grupper - tilføj / rediger / slet"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Grupper er et godt sted til at samarbejde på projekter, eller finde ud af tidsplaner til studiesessioner
@@ -12545,7 +12703,9 @@ da:
       mere fokuseret projekt.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan ikke have størrelsesbegrænsninger til at tildele pr. sektion"
   groups_course_c73e4c2c: "Grupper (fag)"
+  groups_delete_bb79a2b4: "Grupper - slet"
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} Grupper | %{outcomes} Læringsudbytter"
+  groups_manage_a5197479: "Grupper - administrer"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper skal være tomme for at tildele pr. sektion"
   groups_navigation_menu_76b5acc6: Gruppe-navigationsmenu
   groups_tray_ef3e2649: Gruppebakke
@@ -12995,6 +13155,7 @@ da:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Vis til alle i hele underkontoen, hvis der ikke vælges noget)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Vis til alle i hele kontoen, hvis der ikke vælges noget)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Hvis en eller alle tilladelser er deaktiveret, kan brugeren stadig se og downloade filer til en zip-fil."
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: "Hvis angivet, bliver dette navn brugt på oversigten og i meddelelser frem for fagets faktiske navn."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Hvis RCE-forbedringer også er aktiveret,
       gemmer RCE automatisk dit arbejde hen ad vejen
@@ -13675,6 +13836,7 @@ da:
   k12_description: "Opdater ikonerne i menuen Global navigation, så de giver mere mening specifikt i et folkeskolemiljø."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kasakhstan (+7)"
+  keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "Husk på, at denne aflevering gælder for alle i din %{groupName} gruppe."
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Husk på, at denne aflevering gælder for alle i din %{groupType} gruppe."
   keep_students_informed_3f41a7e6: "Hold de studerende informeret"
   keep_submissions_anonymous_5cbaf419: "Hold afleveringer anonyme"
@@ -13806,6 +13968,7 @@ da:
   learn_more_about_collaborations_2978f66d: "Lær mere om samarbejder"
   learn_more_about_quiz_statistics_315a378: "Lær mere om teststatistikker."
   learn_more_about_the_differences_a1217479: "Lær mere om forskellene."
+  learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: "Lær mere om denne funktion i *brugergruppen Tempoplaner*."
   learn_more_about_using_commons_and_blueprints_3df953f6: "Få mere at vide om brug af Commons og Blueprints"
   learn_more_about_video_conferencing_5f0e76e4: "Lær mere om videokonferencer"
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (Beta) - vis"
@@ -14050,6 +14213,8 @@ da:
   loading_accounts_3364e7a0: "Indlæser konti ..."
   loading_additional_items_ed5f672d: "Indlæser yderligere elementer ..."
   loading_additional_todo_details_acba0cf2: "Indlæser yderligere detaljer på opgavelisten"
+  loading_announcement_content_4405470f: "Indlæser beskedindhold"
+  loading_announcement_title_b8fc3057: "Indlæser beskedtitel"
   loading_announcements_b927a86c: "Henter beskeder"
   loading_apps_f85740cb: "Indlæser apps ..."
   loading_artifact_dc3bfe9f: "Indlæser artefakt"
@@ -14109,6 +14274,7 @@ da:
   loading_more_sub_accounts_d0a30903: "Indlæser flere underkonti ..."
   loading_more_terms_4053e31f: "Indlæser flere semestre ..."
   loading_name_data_c66ea65f: "Indlæser %{name} data"
+  loading_observed_students_dfdda108: "Indlæser observerede studerende"
   loading_options_c823e98b: "Indstillinger indlæses ..."
   loading_outcome_results_96e21ce4: "Indlæser læringsudbytteresultater"
   loading_permissions_28495bdb: "Indlæser tilladelser"
@@ -14379,11 +14545,14 @@ da:
   manage_course_sections_f482d1b3: "Administrer fagsektioner"
   manage_course_templates_66c00052: "Administrer fagskabeloner"
   manage_courses_abe8335f: "Administrer fag"
+  manage_create_edit_delete_groups_f9046ee3: "Administrering af (tilføj / rediger / slet) grupper"
   manage_discussion_c1dd8f4e: "Administrering af diskussion"
   manage_discussion_title_a2ecb3fb: "Administrer diskussion %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Administrer tilmeldings-status, opret grupper og tilføj brugere fra denne side."
   manage_grading_schemes_in_context_name_e3678273: "Styring af karakterordninger i  %{context_name}"
   manage_group_group_name_ac8578c6: "Administrering af gruppe %{group_name}"
+  manage_groups_4b962fa9: "Administrer grupper"
+  manage_groups_4c3a2a9f: "Administrer grupper"
   manage_home_4fc3480b: "Administrer hjem"
   manage_home_for_coursename_5e5c7661: "Administrer hjem for %{courseName}"
   manage_item_name_6118d4b0: "Administrering af %{item_name}"
@@ -14579,6 +14748,7 @@ da:
   members_are_free_to_join_defa5929: "Medlemmer kan frit tilmelde sig"
   membership_by_invitation_only_9bc27199: "Medlemskab udelukkede efter invitation"
   membership_service_configuration_d8ba5a74: "Konfiguration af medlemskabsservice"
+  mentions_error_page_fd84c53c: "Nævner fejlside"
   menu: 
     current_groups: "Aktuelle grupper"
     customize: Tilpas
@@ -14586,6 +14756,7 @@ da:
     my_courses: "Mine kurser"
   menu_39cb0e8e: Menu
   menu_of_options_for_this_permission_77f50c31: "Menu for indstillinger for denne tilladelse"
+  menu_options_9b6b0b5c: Menuindstillinger
   message: 
     default_subject: Canvas-varsling
   message_5c38209d: Besked
@@ -15273,11 +15444,15 @@ da:
         body: "Canvas-varsling - Invitation til samarbejde: %{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
-        body: "E-mailadressen %{email} registreres på %{website} for brugeren, %{user}."
+        body: |-
+            E-mailadressen: %{email} tilføjes til en Canvas-konto, der er registreret på %{website}.
+            
+            For at forhindre denne adresse i at blive registreret, skal du se bort fra denne e-mail.
         details: "Gå ind på følgende url for at bekræfte denne registrering:"
         html: 
-          body: "E-mailadressen %{email} registreres på %{website} for brugeren, %{user}."
+          body: "E-mailadressen: %{email} tilføjes til en Canvas-konto, der er registreret på %{website}."
           details: "Klik her for at bekræfte registreringen"
+          reject_message: "For at forhindre denne adresse i at blive registreret, skal du se bort fra denne e-mail."
           subject: "Bekræft e-mail: Canvas"
         subject: "Bekræft e-mail: Canvas"
     confirm_registration: 
@@ -17084,6 +17259,7 @@ da:
   newest_first_87672763: "Nyeste først"
   newest_oldest_d768cf1a: "Nyeste - ældste"
   next_40e12421: Næste
+  next_announcement_6e6e0f17: "Næste besked"
   next_announcements_page_3956eb11: "Næste besked-side"
   next_assignment_8ec51175: "Næste opgave"
   next_e0d38b1f: næste
@@ -17184,6 +17360,7 @@ da:
   no_placements_enabled_f705f28: "Der er ikke aktiveret placeringer"
   no_points_possible_368669d: "Ingen mulige point"
   no_points_possible_72db3a55: "Ingen mulige point"
+  no_recent_announcements_abf950d5: "Ingen seneste beskeder"
   no_results_3cda4e72: "Ingen resultater"
   no_results_f36777ee: "Ingen resultater"
   no_results_found_58717065: "Der blev ikke fundet resultater"
@@ -17889,6 +18066,7 @@ da:
   outcome_export_89229eb4: "Eksport af læringsudbytte"
   outcome_group_39fae76f: Læringsudbytte-gruppe
   outcome_group_contains_one_or_more_outcomes_that_a_1b584b7a: "Læringsudbytte-gruppen indeholder et eller flere læringsudbytter, der i øjeblikket er tilpasset indholdet."
+  outcome_group_contains_one_or_more_outcomes_that_a_5c040c5f: "Læringsudbyttegruppe indeholder et eller flere læringsudbytter, der aktuelt er tilpasset til indhold"
   outcome_group_menu_2fffeb71: "Gruppemenu for læringsudbytter"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Læringsudbytte med Canvas-ID %{id} ikke fundet"
   outcome_groups: 
@@ -17915,6 +18093,7 @@ da:
   outcome_results_title: Læringsudbytteresultater
   outcome_score_141cf00a: læringsudbytte
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Læringsudbytte: %{title} har en status for %{statusTooltip}"
+  outcome_title_was_successfully_created_a4094d6c: "Læringsudbytte \"%{title}\" blev oprettet."
   outcome_title_was_successfully_created_be3a408: "Læringsudbytte \"%{title}\" blev oprettet"
   outcome_with_canvas_id_id_not_found_215c5227: "Læringsudbytte med Canvas-ID \"%{id}\" ikke fundet"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Læringsudbytte med ID %{guid} findes allerede i et andet uafhængigt fag eller en konto (%{name})"
@@ -18103,6 +18282,9 @@ da:
   own_copyright_cc59db55: "Ejer ophavsret"
   owner_email_236d1b2: "E-mailens ejer"
   owner_email_4d02f795: "Ejerens e-mail:"
+  pace_plans_4bb9c5ff: Tempoplaner
+  pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Tempoplaner tilføjer support til rullende tilmeldinger til Canvas, hvilket gør magisk fordeling af forfaldsdatoer muligt for studerende med forskellige startdatoer baseret på en instruktørs definerede tempo. Lær mere, og giv feedback ved at deltage i brugergruppen for Tempoplaner."
+  pace_plans_is_in_active_development_f6c20046: "Tempoplaner er i aktiv udvikling."
   package_error: "Fejl under identificering af pakketype: %{error}"
   package_export_from_d6e2b073: "Pakke-eksport fra"
   page_50c4823d: Side
@@ -18227,6 +18409,8 @@ da:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Peer review-opgave"
+  peer_review_due_dueattext_20987412: "Peer-review forfalder %{dueAtText}"
+  peer_review_due_eb63af38: "Peer-review forfalder"
   peer_review_for_assignment_ce72fc52: "Peer review for %{assignment}"
   peer_review_for_name_bcffa32f: "Peer-review for %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peer-review for %{name}, der skal afleveres: %{dueAtText}"
@@ -18973,6 +19157,7 @@ da:
   preview_website_url_eb5b8a5f: "Forhåndsvisning af URL"
   preview_your_changes_373557d8: "Forhåndsvis ændringer"
   previous_445ca243: forrige
+  previous_announcement_7efc02d9: "Tidligere besked"
   previous_announcements_page_79c0ada1: "Forrige besked-side"
   previous_assignment_83d1f423: "Tidligere opgave"
   previous_bd2ac015: Forrige
@@ -19359,6 +19544,9 @@ da:
                 samtidigt, direkte fra dit Canvas-fag.
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Giv en URI til din IdPs metadata for automatisk at udfylde de andre felter. Hvis din skole er en del af InCommon eller UK Access Management Federation, skal du angive henholdsvis urn:mace:incommon eller http://ukfederation.org.uk for metadata URI, og angiv også din skoles enheds-ID."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Angiv et URI til din IdP's metadata for automatisk udfyldning af andre felter. Hvis din skole er en del af InCommon, specificer urn:mace:incommon for metadata URI og angiv også din skoles enheds id."
+  provide_navigation_to_navigate_between_all_announc_9f1bed39: |-
+      Giv navigation for at navigere mellem alle tilgængelige beskeder
+      i klasseværelse-faget.
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
       Giv URL'en til din SAML IdP opdagelsesservice, der er i overensstemmelse med
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* protokollen.
@@ -21023,6 +21211,7 @@ da:
   rce_edit_closed_captions_de3ad169: "RCE rediger billedtekster"
   rce_enhancements_5701e06: RCE-forbedringer
   rce_initialization_fix_4f176bda: "RCE initialiseringsrettelse"
+  rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "RCE Begræns antal RCE'er, som oprindeligt blev gengivet på siden"
   rce_mentions_in_discussions_82cd11e3: "RCE-omtaler i diskussioner"
   rce_pretty_html_editor_d8faf2bb: "RCE pænt HTML-redigeringsværktøj"
   re_activate_user_f7d77c9a: "Genaktiver bruger"
@@ -22117,6 +22306,7 @@ da:
   select_a_module_optional_7edb5cb0: "Vælg et modul (valgfrit)"
   select_a_predefined_color_c77ab2f5: "Vælg en foruddefineret farve."
   select_a_provisional_grade_7106e3d5: "Vælg en foreløbig karakter"
+  select_a_student_to_view_281d17b9: "Vælg en studerende at få vist"
   select_all_assignments_bd07b919: "Vælg alle opgaver"
   select_all_count_9ad54aa1: "Vælg alle (%{count})"
   select_all_count_courses_4fc63811: 
@@ -23707,6 +23897,7 @@ da:
   student_name_c45b2a7: "Den studerendes navn"
   student_name_hidden_b894d102: "studerende (skjult navn)"
   student_name_options_cb029725: "Studerendes navn - muligheder"
+  student_names_ea4b671a: "De studerendes navne"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "De studerendes navne skal skjules, fordi der kræves anonym karaktergivning."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studerendes navne skal skjules, da dette er en anonym spørgeundersøgelse."
   student_number_db6f06c1: "Studerende %{number}"
@@ -24034,6 +24225,7 @@ da:
   submit_comment_commenttext_8e5638d7: "Tilføj kommentar: %{commentText}"
   submit_comment_e5cc2718: "Indsend kommentar"
   submit_confirmation_4d366dd1: "Indsend bekræftelse"
+  submit_file_using_label_9fa4bbb7: "Send fil vha. %{label}"
   submit_file_using_name_bc8d7b71: "Send fil vha. %{name}"
   submit_for_student_d90838e8: "Aflever for studerende"
   submit_media_file_f334c1ba: "Indsend mediefil"
@@ -24211,6 +24403,7 @@ da:
   tabs_5605547e: Faner
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
+  take_a_photo_via_webcam_954f2433: "Tag et foto via webcam"
   take_a_picture_d582acf1: "Tag et billede"
   take_a_snapshot_now_5b622d85: "Tag et øjebliksbillede nu"
   take_photo_b06762f9: "Tag foto"
@@ -24492,10 +24685,14 @@ da:
                 
                 Med venlig hilsen
                 Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "Den meddelelse, du sendte med emnelinjen \"%{subject}\" blev ikke leveret. For at svare på Canvas-meddelelser fra denne e-mail skal den først indstilles til en bekræftet kommunikationskanal i din Canvas-profil. Gå ind på din profil, og send bekræftelses-e-mailen til denne e-mailadresse igen. Du kan også kontakte denne person via Canvas-indbakken. For hjælp henvises der til kapitlet Indbakke for din brugerrolle i Canvas-vejledningerne. [Se %{link}]."
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-lejeren, der er angivet i kontoindstillinger, er ikke en Uddannelses-lejer, så den kan ikke bruges med Microsoft Teams Sync-integrationen."
   the_module_item_is_locked_27fe420b: "Modulelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De seneste resultater for bruger %{current_user_name} og læringsudbytte %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Den næste tilgængelige aftale i dette fag er d. *%{date}*"
   the_original_quizzes_interface_fcda53bc: "Den originale test-grænseflade"
+  the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Læringsudbytte-gruppen blev importeret til dette fag."
+  the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "Læringsudbytte-gruppen blev importeret til denne konto."
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: "Det læringsudbytte, du har valgt, kan ikke fjernes, fordi det er tilpasset indholdet på denne konto."
     other: "De læringsudbytter, du har valgt, kan ikke fjernes, fordi de er tilpasset indholdet på denne konto."
@@ -25909,6 +26106,7 @@ da:
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Kan ikke finde match for disse e-mailadresser i din institution. Vælg dem, du gerne vil oprette som nye brugere. Ikke valgte bliver sprunget over."
   unable_to_get_accounts_cb825c43: "Ikke i stand til at hente konti"
   unable_to_get_homerooms_959dfe67: "Kan ikke hente klasseværelser"
+  unable_to_get_observed_students_ff62d801: "Kunne ikke hente observerede studerende"
   unable_to_load_courses_menu_7074ea04: "Kunne ikke indlæse fagmenuen."
   unable_to_load_lti_1_3_tools_cf169f9: "Kan ikke indlæse Lti 1.3 værktøjer"
   unable_to_load_messages_2b158fd0: "Kan ikke indlæse beskeder. "
@@ -26821,6 +27019,7 @@ da:
   view_due_items_due_today_for_course_coursename_129e433: "Vis %{due} elementer i dag for fag %{courseName}"
   view_faculty_journals_ad0e8c8f: "Vis undervisernotater"
   view_feature_settings_at_an_account_level_ec7f5e10: "Se funktionsindstillinger på kontoniveau"
+  view_feedback_b88c99c: "Vis feedback"
   view_feedback_f2feabca: "Vis feedback"
   view_file_8a1c62e5: "Vis fil"
   view_gradebook_d6713dd1: "Vis karakteroversigt"
@@ -26899,6 +27098,7 @@ da:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Advarsel: Benyt dagsordenvisning for nemmere at kunne se kalenderbegivenheder."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Advarsel: For at forbedre adgang til omorganisering af opgaver og grupper, skal du benytte muligheden Flyt til dialog i menuen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Advarsel: Klik på Individuel visning af karakteroversigt for forbedret tilgængelighed."
+  warning_for_improved_accessibility_with_annotated__43e3a5ea: "Advarsel: For bedre tilgængelighed for opgaver med anmærkninger skal du bruge Filoverførsel eller Tekstindtastning til at skrive kommentarer."
   warning_icon_f64936d7: "advarsels ikon"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Advarsel: Hvis der er nogen brugere med denne rolle, vil de beholde de nuværende tilladelser, men du vil ikke være i stand til at oprette nye brugere med denne rolle."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Advarsel Dette trin har børn, der ikke er StepItem-komponenter"
@@ -27293,6 +27493,7 @@ da:
   you_are_not_enrolled_in_any_courses_a5c63286: "Du er ikke tilmeldt fag."
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Du er ikke abonneret på dette emne. Klik for at abonnere."
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Du er ikke den valgte bedømmer til denne opgave"
+  you_are_observing_observeduser_afd2f245: "Du observerer %{observedUser}"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Du er klar til at synkronisere 1 opgave."
     other: "Du er klar til at synkronisere %{count} opgaver."
