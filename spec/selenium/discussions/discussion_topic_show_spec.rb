@@ -33,11 +33,11 @@ describe "Discussion Topic Show" do
         user: @teacher
       )
     end
-    
+
     before(:each) do
       user_session(@teacher)
     end
-    
+
     it "displays properly for a teacher" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       expect(f("input[placeholder='Search entries or author...']")).to be_present

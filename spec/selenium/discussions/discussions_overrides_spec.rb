@@ -61,10 +61,24 @@ describe "discussions overrides" do
       @discussion_topic.save!
       @default_due_at_time = format_time_for_view(default_due_at)
       @override_due_at_time = format_time_for_view(override_due_at)
-      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
+    end
+
+    context "when Discussions Redesign feature flag is ON" do
+      before :once do
+        Account.site_admin.enable_feature! :react_discussions_post
+      end
+
+      it "shows correct assignment dates in the tray" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
+        fj("button:contains('Show Due Dates (2)')").click
+        rows = ff("tr[data-testid='assignment-override-row']")
+        expect(rows[0].text).to eq "Dec 17, 2016 10am New Section Dec 14, 2016 10am Dec 18, 2016 10am"
+        expect(rows[1].text).to eq "Dec 16, 2016 10am Everyone Else No Start Date No End Date"
+      end
     end
 
     it "should toggle between due dates", priority: "2", test_id: 114317 do
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       f(' .toggle_due_dates').click
       wait_for_ajaximations
       expect(f('.discussion-topic-due-dates')).to be_present
@@ -80,6 +94,7 @@ describe "discussions overrides" do
 
     it "should not show the add due date button after the last available section is selected", priority: "2", test_id: 114319 do
       skip('Example skipped due to an issue in the assignment add button for due dates')
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       @new_section_1 = @course.course_sections.create!(name: 'Additional Section')
       expect_new_page_load{f('.edit-btn').click}
       f('#add_due_date').click
@@ -90,6 +105,7 @@ describe "discussions overrides" do
     end
 
     it "should allow to not set due dates for everyone", priority: "2", test_id: 114320 do
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect_new_page_load{f('.edit-btn').click}
       f('#bordered-wrapper .Container__DueDateRow-item:nth-of-type(2) button[title = "Remove These Dates"]').click
       f('.form-actions button[type=submit]').click
