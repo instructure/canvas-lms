@@ -100,12 +100,6 @@ disable_lti_post_only:
   applies_to: RootAccount
   root_opt_in: true
   beta: true
-duplicate_modules:
-  state: allowed
-  display_name: Duplicate Modules
-  description: Allows the duplicating of modules in Canvas
-  applies_to: Account
-  root_opt_in: true
 embedded_release_notes:
   type: setting
   state: allowed_on

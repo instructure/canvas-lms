@@ -76,7 +76,6 @@ describe "Modules API", type: :request do
 
     describe "duplicating" do
       it "can duplicate if no quiz" do
-        @course.account.enable_feature!(:duplicate_modules)
         course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
         assignment = @course.assignments.create!(
           :name => "some assignment to duplicate",
@@ -102,7 +101,6 @@ describe "Modules API", type: :request do
       end
 
       it "cannot duplicate module with quiz" do
-        @course.account.enable_feature!(:duplicate_modules)
         course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
         # To be rigorous, make a quiz and add it as an *assignment*
         quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
@@ -116,21 +114,11 @@ describe "Modules API", type: :request do
       end
 
       it "cannot duplicate nonexistent module" do
-        @course.account.enable_feature!(:duplicate_modules)
         bad_module_id = ContextModule.maximum(:id) + 1
         api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{bad_module_id}/duplicate",
           { :controller => "context_modules_api", :action => "duplicate", :format => "json",
             :course_id => @course.id.to_s, :module_id => bad_module_id.to_s }, {}, {},
           { :expected_status => 404 })
-      end
-
-      it "cannot duplicate if feature disabled" do
-        @course.account.disable_feature!(:duplicate_modules)
-        course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
-        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
-          { :controller => "context_modules_api", :action => "duplicate", :format => "json",
-            :course_id => @course.id.to_s, :module_id => course_module.id.to_s }, {}, {},
-          { :expected_status => 400 })
       end
     end
 
@@ -766,7 +754,6 @@ describe "Modules API", type: :request do
     end
 
     it "cannot duplicate" do
-      @course.account.enable_feature!(:duplicate_modules)
       course_module = @course.context_modules.create!(:name => "empty module")
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
                { :controller => "context_modules_api", :action => "duplicate", :format => "json",
