@@ -109,7 +109,7 @@ const DiscussionTopicManager = props => {
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-and-network'
   })
 
   const updateCache = (cache, result) => {
