@@ -20,16 +20,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {fireEvent} from '@testing-library/react'
 
-import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
-import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel.js'
+import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi'
+import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel'
 
 const MAX = '100'
 const MIN = '0'
 const BORDER_VALUES = ['0', '0.01', '0.1', '99', '99.9', '99.99', '100']
 const EXTRA_ZEROS_MAP = {
-  '0': ['00', '000000000', '0.0', '00.', '0.', '.0', '.00', '.000'],
-  '0.1': ['0.10', '0.100', '00.100', '000.10', '0000.1', '000.1000'],
-  '1': [
+  0: ['00', '000000000', '0.0', '00.', '0.', '.0', '.00', '.000'],
+  0.1: ['0.10', '0.100', '00.100', '000.10', '0000.1', '000.1000'],
+  1: [
     '01',
     '001',
     '0001',
@@ -261,15 +261,15 @@ QUnit.module(
     }
 
     function getGradePercentageForMissingSubmissionsInput() {
-      return findInput('Grade percentage for missing submissions')
+      return findInput('Grade for missing submissions')
     }
 
     function getLateSubmissionDeductionPercentInput() {
-      return findInput('Late submission deduction percent')
+      return findInput('Late submission deduction')
     }
 
     function getLowestPossibleGradePercentInput() {
-      return findInput('Lowest possible grade percent')
+      return findInput('Lowest possible grade')
     }
 
     QUnit.module('Late Policies:', contextHooks => {
