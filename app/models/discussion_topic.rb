@@ -1439,6 +1439,7 @@ class DiscussionTopic < ActiveRecord::Base
       # user is the topic's author
       next true if user && user.id == self.user_id
 
+      next false unless context
       next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
       # Don't have visibilites for any of the specific sections in a section specific topic
