@@ -1233,6 +1233,10 @@ class Account < ActiveRecord::Base
           au.account = Account.site_admin
           au.user = user
           au.role_id = role_id
+          # Marking this record as not new means `persisted?` will be true,
+          # which means that `clear_association_cache` will work correctly on
+          # these objects.
+          au.instance_variable_set(:@new_record, false)
           au.readonly!
           au
         end
