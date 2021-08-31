@@ -231,7 +231,7 @@ module SIS
           parallel_importer.write_attribute(:workflow_state, 'retry')
           run_parallel_importer(parallel_importer)
         end
-        if attempt < Setting('number_of_tries_before_failing', 5).to_i
+        if attempt < Setting.get('number_of_tries_before_failing', 5).to_i
           parallel_importer.write_attribute(:workflow_state, 'queued')
           attempt += 1
           delay(**job_args(importer_type)).run_parallel_importer(parallel_importer, attempt: attempt)
