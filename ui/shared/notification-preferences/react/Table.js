@@ -91,16 +91,12 @@ const formatCategoryKey = category => {
   return categoryStrings.join('_').replace(/\s/g, '')
 }
 
-const smsNotificationCategoryDeprecated = category => {
-  return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
-}
-
 const pushNotificationCategoryRestricted = category => {
   return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
 }
 
 const menuShouldBeDisabled = (category, pathType) => {
-  if (pathType === 'sms') return smsNotificationCategoryDeprecated(category)
+  if (pathType === 'sms') return true
   else if (pathType === 'push') return pushNotificationCategoryRestricted(category)
   else return false
 }

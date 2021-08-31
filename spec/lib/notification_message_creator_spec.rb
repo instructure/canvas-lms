@@ -793,31 +793,21 @@ describe NotificationMessageCreator do
     end
   end
 
-  context 'deprecate_sms is enabled' do
-    before do
-      Account.site_admin.enable_feature!(:deprecate_sms)
-      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
-    end
+  it "User just receives email notification" do
+    allow_any_instance_of(Message).to receive(:get_template).and_return('template')
+    assignment_model
+    notification_model
 
-    after do
-      Account.site_admin.disable_feature!(:deprecate_sms)
-    end
+    user = user_model(:workflow_state => "registered")
+    cc = communication_channel_model(:path => "7871234567@txt.att.net", :path_type => "sms", :workflow_state => 'active')
 
-    it "User just receives email notification" do
-      assignment_model
-      notification_model
+    notification_policy_model(:communication_channel => cc,
+                                :notification => @notification,
+                                :frequency => "immediately")
 
-      user = user_model(:workflow_state => "registered")
-      cc = communication_channel_model(:path => "7871234567@txt.att.net", :path_type => "sms", :workflow_state => 'active')
+    messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => [user]).create_message
 
-      notification_policy_model(:communication_channel => cc,
-                                  :notification => @notification,
-                                  :frequency => "immediately")
-
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => [user]).create_message
-
-      # User just receives email because SMS is deprecated.
-      expect(messages.length).to eql(1)
-    end
+    # User just receives email because SMS is deprecated.
+    expect(messages.length).to eql(1)
   end
 end
