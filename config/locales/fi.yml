@@ -19919,7 +19919,11 @@ fi:
                 
                 Kiitos,
                 Canvasin tuki
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Viestiä, jonka aiheena oli \"%{subject}\", ei toimitettu. Jos haluat vastata Canvasin viesteihin tästä sähköpostiosoitteesta, sen täytyy ensin olla lisättynä Canvas-profiiliisi. Käy profiilissasi ja lähetä vahvistusviesti uudelleen tälle sähköpostiosoitteelle. Sinun täytyy myös ottaa yhteyttä tähän henkilöön Canvasin tulevien laatikon kautta. Käyttäjärooliasi koskevat ohjeet löytyvät tulevien laatikko -kappaleen kautta Canvasin oppaissa. [Katso %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Viestiä, jonka aiheena oli "%{subject}", ei toimitettu. Jos haluat vastata Canvasin viesteihin tästä sähköpostiosoitteesta, sen täytyy ensin olla lisättynä Canvas-profiiliisi. Käy profiilissasi ja lähetä vahvistusviesti uudelleen tälle sähköpostiosoitteelle. Sinun täytyy myös ottaa yhteyttä tähän henkilöön Canvasin tulevien laatikon kautta. Käyttäjärooliasi koskevat ohjeet löytyvät tulevien laatikko -kappaleen kautta Canvasin oppaissa. [Katso %{link}].
+                
+                Kiitos,
+                Canvas-tuki
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Tiliasetuksissa määritetty Microsoft 365 -vuokralainen ei ole koulutusvuokralainen, joten sitä ei voida käyttää Microsoft Teams -synkronisaation integraatioon."
   the_module_item_is_locked_27fe420b: "Moduulin osa on lukittu."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Viimeisimmät pistemäärät käyttäjälle %{current_user_name} ja tulokselle %{outcome_name}."
