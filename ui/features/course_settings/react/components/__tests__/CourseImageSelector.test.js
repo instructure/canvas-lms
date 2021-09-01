@@ -71,7 +71,7 @@ describe('CourseImageSelector', () => {
     store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
     const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} wide />)
 
-    expect(wrapper.find('.CourseImageSelector').hasClass('wide')).toBe(true)
+    expect(wrapper.find('.CourseImageSelectorWrapper').hasClass('wide')).toBe(true)
   })
 
   it('passes the setting prop to actions', () => {

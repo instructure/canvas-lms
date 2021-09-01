@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-large-snapshots */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -16,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildGroup, buildSvg, buildSvgWrapper} from '../index'
+import {buildGroup, buildSvg, buildSvgWrapper, buildStylesheet} from '../index'
 import {DEFAULT_OPTIONS, DEFAULT_SETTINGS} from '../constants'
 
 let settings, options
@@ -43,6 +44,9 @@ describe('buildSvg()', () => {
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
         <svg
           fill="none"
           height="218px"
@@ -133,6 +137,9 @@ describe('buildSvg()', () => {
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
         <svg
           fill="none"
           height="218px"
@@ -153,12 +160,14 @@ describe('buildSvg()', () => {
           </g>
         </svg>
         <path
-          d="M103,100 h12 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-12 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z"
+          d="M103,100 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
           fill=""
         />
         <text
           fill=""
+          font-family="Lato Extended"
           font-size="14"
+          font-weight="bold"
           x="103"
           y="116"
         >
@@ -319,5 +328,23 @@ describe('buildGroup()', () => {
         />
       `)
     })
+  })
+})
+
+describe('buildStylesheet()', () => {
+  it('builds the <style /> element', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        blob: () => Promise.resolve(new Blob())
+      })
+    )
+
+    expect(await buildStylesheet()).toMatchInlineSnapshot(`
+      <style
+        type="text/css"
+      >
+        @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+      </style>
+    `)
   })
 })

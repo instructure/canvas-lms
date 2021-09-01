@@ -25,7 +25,7 @@ export function Group({children, summary, ...props}) {
     <ToggleGroup
       background="default"
       border={false}
-      padding="small"
+      padding="small small 0"
       summary={summary}
       toggleLabel={formatMessage('Toggle {summary} group', {summary})}
       {...props}

@@ -26,7 +26,9 @@ export function buildText({text, textPosition, textSize, textColor, shape, size}
     x: Math.max(TEXT_BACKGROUND_PADDING, Math.floor(getTextXValue(text, textSize, size))),
     y: getTextYValue(textPosition, textSize, shape, size),
     fill: textColor || '',
-    'font-size': TEXT_SIZE[textSize]
+    'font-family': 'Lato Extended',
+    'font-size': TEXT_SIZE[textSize],
+    'font-weight': 'bold'
   })
 
   const lines = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize])
@@ -62,10 +64,11 @@ export function buildTextBackground({
   const pathElement = createSvgElement('path')
 
   const radius = 4
+  const fontWeight = 2
   const initialX = Math.max(0, Math.floor(xValue - TEXT_BACKGROUND_PADDING)) + radius
   const initialY = Math.floor(yValue - TEXT_SIZE[textSize] - TEXT_BACKGROUND_PADDING / 2)
-  const horizontalLineLength = Math.floor(textWidth + paddingSize) - radius * 2
-  const verticalLineLength = Math.floor(textHeight + paddingSize) - radius * 2
+  const horizontalLineLength = Math.floor(textWidth + paddingSize + fontWeight) - radius * 2
+  const verticalLineLength = Math.floor(textHeight + paddingSize + fontWeight) - radius * 2
   const d = `M${initialX},${initialY} h${horizontalLineLength} a${radius},${radius} 0 0 1 ${radius},${radius} v${verticalLineLength} a${radius},${radius} 0 0 1 ${-radius},${radius} h${-horizontalLineLength} a${radius},${radius} 0 0 1 ${-radius},${-radius} v${-verticalLineLength} a${radius},${radius} 0 0 1 ${radius},${-radius} z`
   pathElement.setAttribute('d', d)
   pathElement.setAttribute('fill', textBackgroundColor || '')
@@ -73,8 +76,10 @@ export function buildTextBackground({
 }
 
 export function getContainerWidth({text, textSize, size}) {
+  const fontWeight = 2
   const base = BASE_SIZE[size]
-  const textWidth = Math.floor(getTextWidth(text, textSize)) + TEXT_BACKGROUND_PADDING * 2
+  const textWidth =
+    Math.floor(getTextWidth(text, textSize)) + TEXT_BACKGROUND_PADDING * 2 + fontWeight
   return Math.max(base, textWidth)
 }
 
@@ -90,7 +95,7 @@ export function getContainerHeight({text, textPosition, textSize, shape, size}) 
 function getTextWidth(text, textSize) {
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
-  context.font = `${TEXT_SIZE[textSize]}px LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif`
+  context.font = `${TEXT_SIZE[textSize]}px "Lato Extended"`
   const lines = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize])
   const widths = lines.map(line => context.measureText(line).width)
   return Math.max(...widths)

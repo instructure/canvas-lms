@@ -50,8 +50,29 @@ class AssessmentQuestion < ActiveRecord::Base
   restrict_columns :content, [:name, :question_data]
 
   set_policy do
-    given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
     can :read and can :create and can :update and can :delete
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_add)
+    end
+    can :read and can :create
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
+    can :read and can :update
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_delete)
+    end
+    can :read and can :delete
   end
 
   def user_can_see_through_quiz_question?(user, session=nil)

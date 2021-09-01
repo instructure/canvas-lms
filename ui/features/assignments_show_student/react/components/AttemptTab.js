@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
@@ -32,7 +33,7 @@ import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
@@ -81,11 +82,21 @@ function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
         <View as="div" margin="small 0 0">
           <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
           <Text color={foregroundColor} weight="normal" size="medium">
-            {displayName}
+            <PresentationContent>{displayName}</PresentationContent>
           </Text>
         </View>
       </Button>
     </View>
+  )
+}
+
+function GroupSubmissionReminder({groupSet}) {
+  return (
+    <Alert variant="warning" margin="medium 0">
+      {I18n.t('Keep in mind, this submission will count for everyone in your %{groupName} group.', {
+        groupName: groupSet.name
+      })}
+    </Alert>
   )
 }
 
@@ -253,10 +264,19 @@ export default class AttemptTab extends Component {
       selectedType = assignment.submissionTypes[0]
     }
 
+    const submittingForGroup =
+      assignment.groupSet != null &&
+      !assignment.gradeGroupStudentsIndividually &&
+      !isSubmitted(submission)
+
     return (
       <StudentViewContext.Consumer>
         {context => (
           <div data-testid="attempt-tab">
+            {submittingForGroup && context.allowChangesToSubmission && (
+              <GroupSubmissionReminder groupSet={assignment.groupSet} />
+            )}
+
             {multipleSubmissionTypes &&
               context.allowChangesToSubmission &&
               this.renderSubmissionTypeSelector()}

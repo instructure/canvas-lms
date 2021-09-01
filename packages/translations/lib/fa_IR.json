@@ -23,6 +23,9 @@
     "announcements_a4b8ed4a": {
         "message": "اطلاعیه ها"
     },
+    "apply_781a2546": {
+        "message": "اعمال"
+    },
     "apps_54d24a47": {
         "message": "برنامه ها"
     },
@@ -49,6 +52,9 @@
     },
     "calendar_event_89aadc1c": {
         "message": "رویداد تقویم"
+    },
+    "cancel_caeb1e68": {
+        "message": "لغو"
     },
     "choose_usage_rights_33683854": {
         "message": "انتخاب حقوق استفاده..."
@@ -295,6 +301,9 @@
     },
     "my_files_2f621040": {
         "message": "فایل های من"
+    },
+    "name_1aed4a1b": {
+        "message": "نام"
     },
     "new_13daf639": {
         "message": "جدید"

@@ -277,7 +277,7 @@ recommended to omit this field over using fake email addresses for testing.</td>
 <td>status</td>
 <td>enum</td>
 <td>✓</td>
-<td></td>
+<td>✓</td>
 <td>active, deleted</td>
 </tr>
 </table>

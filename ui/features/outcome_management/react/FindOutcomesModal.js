@@ -37,6 +37,7 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
+import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {isMobileView, isCourse} = useCanvasContext()
@@ -63,35 +64,52 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
-  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
-
+  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
+    useResize()
   const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
 
+  const {
+    importOutcomes,
+    importGroupsStatus,
+    importOutcomesStatus,
+    clearGroupsStatus,
+    clearOutcomesStatus
+  } = useOutcomesImport()
+
+  const onCloseModalHandler = () => {
+    clearGroupsStatus()
+    clearOutcomesStatus()
+    onCloseHandler()
+  }
+
   const onAddAllHandler = () => {
-    if (isCourse && !isConfirmBoxOpen) {
+    if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
       openConfirmBox()
-      // NOTE: Temp until OUT-4333 is merged
       showImportConfirmBox({
-        count: 51,
-        onImportHandler: () => {},
+        count: group.outcomesCount,
+        onImportHandler: () => importOutcomes(selectedGroupId, group.outcomesCount),
         onCloseHandler: closeConfirmBox
       })
+    } else {
+      importOutcomes(selectedGroupId, group.outcomesCount)
     }
   }
 
   const findOutcomesView = (
     <FindOutcomesView
+      outcomesGroup={group}
       collection={collections[selectedGroupId]}
-      outcomesCount={group?.outcomesCount || 0}
-      outcomes={group?.outcomes}
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
       disableAddAllButton={isConfirmBoxOpen}
+      importGroupStatus={importGroupsStatus[selectedGroupId]}
       onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
       mobileScrollContainer={scrollContainer}
+      importOutcomesStatus={importOutcomesStatus}
+      importOutcomeHandler={importOutcomes}
     />
   )
 
@@ -130,7 +148,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   return (
     <Modal
       open={open}
-      onDismiss={onCloseHandler}
+      onDismiss={onCloseModalHandler}
       shouldReturnFocus
       size="fullscreen"
       label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
@@ -165,8 +183,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               height="calc(100vh - 10.25rem)"
               margin="xxx-small 0 0"
             >
+              {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div
-                data-testid="handlerRef"
+                tabIndex="0"
+                role="separator"
+                aria-orientation="vertical"
+                onKeyDown={onKeyDownHandler}
                 ref={setDelimiterRef}
                 style={{
                   width: '1vw',
@@ -176,6 +198,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
+              {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"
@@ -211,7 +234,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseHandler}>
+        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseModalHandler}>
           {I18n.t('Done')}
         </Button>
       </Modal.Footer>

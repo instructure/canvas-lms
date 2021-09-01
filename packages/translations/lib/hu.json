@@ -71,6 +71,9 @@
     "announcements_a4b8ed4a": {
         "message": "Hirdetmények"
     },
+    "apply_781a2546": {
+        "message": "Alkalmazás"
+    },
     "apps_54d24a47": {
         "message": "Alkalmazások"
     },
@@ -142,6 +145,9 @@
     },
     "calendar_event_89aadc1c": {
         "message": "Naptáresemény"
+    },
+    "cancel_caeb1e68": {
+        "message": "Mégse"
     },
     "canvas_planner_98ed106": {
         "message": "Canvas Tervező"
@@ -715,6 +721,9 @@
     },
     "my_grades_98834476": {
         "message": "Az én értékeléseim"
+    },
+    "name_1aed4a1b": {
+        "message": "Név"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigáljon a menün vagy eszköztáron át"

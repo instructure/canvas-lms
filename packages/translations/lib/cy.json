@@ -80,6 +80,9 @@
     "announcements_a4b8ed4a": {
         "message": "Cyhoeddiadau"
     },
+    "apply_781a2546": {
+        "message": "Rhoi ar waith"
+    },
     "apps_54d24a47": {
         "message": "Apiau"
     },
@@ -146,8 +149,14 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Dechrau’r Hanes Tasgau i’w Gwneud"
     },
+    "below_81d4dceb": {
+        "message": "O dan"
+    },
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Isod mae enghraifft o sut bydd myfyrwyr yn gweld eu hamserlen."
+    },
+    "bottom_third_5f5fec1d": {
+        "message": "Traean Isaf"
     },
     "button_color_608a0242": {
         "message": "Lliw’r Botwm"
@@ -776,6 +785,9 @@
     "medium_5a8e9ead": {
         "message": "Cyfrwng"
     },
+    "middle_27dc1d5": {
+        "message": "Canol"
+    },
     "miscellaneous_e9818229": {
         "message": "Amrywiol"
     },
@@ -1148,6 +1160,18 @@
     "text_7f4593da": {
         "message": "Testun"
     },
+    "text_background_color_16e61c3f": {
+        "message": "Lliw Cefndir yTestun"
+    },
+    "text_color_acf75eb6": {
+        "message": "Lliw''r Testun"
+    },
+    "text_position_8df8c162": {
+        "message": "Lleoliad y Testun"
+    },
+    "text_size_887c2f6": {
+        "message": "Maint y Testun"
+    },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Wedi cyrraedd dyddiad ac amser cyflwyno’r dasg hon"
     },
@@ -1285,6 +1309,12 @@
     },
     "use_arrow_keys_to_select_a_size_699a19f4": {
         "message": "Defnyddiwch y saethau i ddewis maint."
+    },
+    "use_arrow_keys_to_select_a_text_position_72f9137c": {
+        "message": "Defnyddiwch y saethau i ddewis lleoliad y testun."
+    },
+    "use_arrow_keys_to_select_a_text_size_65e89336": {
+        "message": "Defnyddiwch y saethau i ddewis maint y testun."
     },
     "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
         "message": "Defnyddiwch y saethau i ddewis maint amlinelliad."

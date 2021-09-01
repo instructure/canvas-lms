@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -32,11 +32,12 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
+import {outcomeGroupShape, groupCollectionShape} from './Management/shapes'
+import {IMPORT_NOT_STARTED, IMPORT_FAILED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesView = ({
+  outcomesGroup,
   collection,
-  outcomesCount,
-  outcomes,
   loading,
   loadMore,
   searchString,
@@ -44,17 +45,21 @@ const FindOutcomesView = ({
   onChangeHandler,
   onClearHandler,
   onAddAllHandler,
-  mobileScrollContainer
+  mobileScrollContainer,
+  importGroupStatus,
+  importOutcomesStatus,
+  importOutcomeHandler
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
-  const enabled = !!outcomesCount && outcomesCount > 0
+  const outcomesCount = outcomesGroup?.outcomesCount || 0
+  const outcomes = outcomesGroup?.outcomes
+  const enabled =
+    !!outcomesCount &&
+    outcomesCount > 0 &&
+    [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
-
-  const onAddedOutcomeHandler = useCallback(_id => {
-    // TODO: OUT-4154
-  }, [])
 
   const countAndAddButton = (
     <Flex.Item>
@@ -93,7 +98,9 @@ const FindOutcomesView = ({
           <Flex.Item>
             <Button
               margin="x-small 0"
-              interaction={enabled && !disableAddAllButton ? 'enabled' : 'disabled'}
+              interaction={
+                enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
+              }
               onClick={onAddAllHandler}
             >
               {I18n.t('Add All Outcomes')}
@@ -183,7 +190,6 @@ const FindOutcomesView = ({
       </View>
     </View>
   )
-
   if (loading && !outcomes) {
     return (
       <View as="div" padding="xx-large 0" textAlign="center" margin="0 auto" data-testid="loading">
@@ -245,18 +251,23 @@ const FindOutcomesView = ({
                   <Text color="primary">{I18n.t('The search returned no results.')}</Text>
                 </View>
               )}
-
-              {outcomes?.edges?.map(({node: {_id, title, description, isImported}}, index) => (
-                <FindOutcomeItem
-                  key={_id}
-                  id={_id}
-                  title={title}
-                  description={description}
-                  isFirst={index === 0}
-                  isAdded={!!isImported}
-                  onAddClickHandler={onAddedOutcomeHandler}
-                />
-              ))}
+              {outcomes?.edges?.map(
+                ({_id: linkId, node: {_id, title, description, isImported}}, index) => (
+                  <FindOutcomeItem
+                    key={linkId}
+                    id={_id}
+                    title={title}
+                    description={description}
+                    isFirst={index === 0}
+                    importOutcomeStatus={importOutcomesStatus?.[_id]}
+                    isImported={isImported}
+                    importGroupStatus={importGroupStatus}
+                    sourceContextId={String(outcomesGroup.contextId)}
+                    sourceContextType={outcomesGroup.contextType}
+                    importOutcomeHandler={importOutcomeHandler}
+                  />
+                )
+              )}
             </View>
           </InfiniteScroll>
         </div>
@@ -265,29 +276,19 @@ const FindOutcomesView = ({
   )
 }
 
+FindOutcomesView.defaultProps = {
+  collection: {
+    id: '0',
+    name: '',
+    isRootGroup: false
+  },
+  importGroupStatus: IMPORT_NOT_STARTED,
+  mobileScrollContainer: null
+}
+
 FindOutcomesView.propTypes = {
-  collection: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    isRootGroup: PropTypes.bool.isRequired
-  }).isRequired,
-  outcomesCount: PropTypes.number.isRequired,
-  outcomes: PropTypes.shape({
-    edges: PropTypes.arrayOf(
-      PropTypes.shape({
-        node: PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-          title: PropTypes.string.isRequired,
-          isImported: PropTypes.bool.isRequired,
-          description: PropTypes.string
-        })
-      })
-    ),
-    pageInfo: PropTypes.shape({
-      endCursor: PropTypes.string,
-      hasNextPage: PropTypes.bool.isRequired
-    })
-  }),
+  collection: groupCollectionShape,
+  outcomesGroup: outcomeGroupShape,
   searchString: PropTypes.string.isRequired,
   disableAddAllButton: PropTypes.bool,
   onChangeHandler: PropTypes.func.isRequired,
@@ -295,11 +296,10 @@ FindOutcomesView.propTypes = {
   onAddAllHandler: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   loadMore: PropTypes.func.isRequired,
-  mobileScrollContainer: PropTypes.instanceOf(Element)
-}
-
-FindOutcomesView.defaultProps = {
-  mobileScrollContainer: null
+  mobileScrollContainer: PropTypes.instanceOf(Element),
+  importGroupStatus: PropTypes.string,
+  importOutcomesStatus: PropTypes.object.isRequired,
+  importOutcomeHandler: PropTypes.func.isRequired
 }
 
 export default FindOutcomesView

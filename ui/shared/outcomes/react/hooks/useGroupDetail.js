@@ -23,7 +23,7 @@ import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
-import {uniqWith, isEqual} from 'lodash'
+import {uniqWith, uniqBy, isEqual} from 'lodash'
 
 const useAbortController = dependencies => {
   const abortRef = useRef()
@@ -120,13 +120,21 @@ const useGroupDetail = ({
           outcomesCursor: group?.outcomes?.pageInfo?.endCursor
         },
         updateQuery: (prevData, {fetchMoreResult}) => {
+          // Reverse to uniq so it'll remove previous result if they appear
+          // again in the load more
+          // then reverse again to keep the order
+          const edges = uniqBy(
+            [...prevData.group.outcomes.edges, ...fetchMoreResult.group.outcomes.edges].reverse(),
+            '_id'
+          ).reverse()
+
           return {
             ...prevData,
             group: {
               ...prevData.group,
               outcomes: {
                 ...prevData.group.outcomes,
-                edges: [...prevData.group.outcomes.edges, ...fetchMoreResult.group.outcomes.edges],
+                edges,
                 pageInfo: fetchMoreResult.group.outcomes.pageInfo
               }
             }
@@ -136,8 +144,10 @@ const useGroupDetail = ({
     }
   }
 
-  const removeLearningOutcomes = contentTagIds => {
-    allVariables.current.forEach(v => {
+  const removeLearningOutcomes = (contentTagIds, allVars = true) => {
+    const vars = allVars ? allVariables.current : [variables]
+
+    vars.forEach(v => {
       const {group: g} = client.readQuery({
         query,
         variables: v
@@ -150,7 +160,7 @@ const useGroupDetail = ({
         outcomes: {
           ...g.outcomes,
           edges: g.outcomes.edges.filter(contentTag => {
-            if (contentTagIds.includes(contentTag.id)) {
+            if (contentTagIds.includes(contentTag._id)) {
               removedCount += 1
               return false
             }

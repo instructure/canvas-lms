@@ -82,6 +82,8 @@ export const FIND_GROUP_OUTCOMES = gql`
       ... on LearningOutcomeGroup {
         _id
         title
+        contextType
+        contextId
         outcomesCount(searchQuery: $searchQuery)
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
@@ -89,7 +91,7 @@ export const FIND_GROUP_OUTCOMES = gql`
             endCursor
           }
           edges {
-            id
+            _id
             node {
               ... on LearningOutcome {
                 _id
@@ -129,7 +131,7 @@ export const SEARCH_GROUP_OUTCOMES = gql`
           }
           edges {
             canUnlink
-            id
+            _id
             node {
               ... on LearningOutcome {
                 _id
@@ -148,6 +150,10 @@ export const SEARCH_GROUP_OUTCOMES = gql`
                 }
               }
             }
+            group {
+              _id
+              title
+            }
           }
         }
       }
@@ -165,6 +171,21 @@ export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
       errors {
         attribute
         message
+      }
+    }
+  }
+`
+
+export const IMPORT_OUTCOMES = gql`
+  mutation ImportOutcomes($input: ImportOutcomesInput!) {
+    importOutcomes(input: $input) {
+      errors {
+        attribute
+        message
+      }
+      progress {
+        _id
+        state
       }
     }
   }

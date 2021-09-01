@@ -274,8 +274,6 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
-  # legacy account settings for allowing course creation
-  # will be handled through :manage_courses_add granular permission role override
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -450,6 +448,11 @@ class Account < ActiveRecord::Base
 
   def enable_as_k5_account?
     enable_as_k5_account[:value]
+  end
+
+  def enable_as_k5_account!
+    self.settings[:enable_as_k5_account] = {value: true}
+    self.save!
   end
 
   def open_registration?
@@ -632,6 +635,14 @@ class Account < ActiveRecord::Base
 
   def root_account
     return self if root_account?
+
+    super
+  end
+
+  def root_account=(value)
+    return if value == self && root_account?
+    raise ArgumentError, "cannot change the root account of a root account" if root_account? && persisted?
+
     super
   end
 
@@ -1001,10 +1012,17 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self).freeze
+    @account_chain ||= Account.account_chain(self).tap do |chain|
+      # preload the root account and parent accounts that we also found here
+      ra = chain.find(&:root_account?)
+      chain.each { |a| a.root_account = ra if a.root_account_id == ra.id }
+      chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
+    end.freeze
+
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
     end
+
     @account_chain
   end
 
@@ -1213,6 +1231,10 @@ class Account < ActiveRecord::Base
           au.account = Account.site_admin
           au.user = user
           au.role_id = role_id
+          # Marking this record as not new means `persisted?` will be true,
+          # which means that `clear_association_cache` will work correctly on
+          # these objects.
+          au.instance_variable_set(:@new_record, false)
           au.readonly!
           au
         end
@@ -1269,8 +1291,6 @@ class Account < ActiveRecord::Base
       given { |user| self.cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses_add
-      # deprecated
-      can :create_courses if permission == :manage_courses
     end
 
     given { |user| !self.cached_account_users_for(user).empty? }
@@ -1281,10 +1301,19 @@ class Account < ActiveRecord::Base
 
     #################### Begin legacy permission block #########################
     given do |user|
+      user && !root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.cached_account_users_for(user).any? do |au|
+          au.has_permission_to?(self, :manage_courses)
+        end
+    end
+    can :create_courses
+    ##################### End legacy permission block ##########################
+
+    given do |user|
       result = false
       next false if user&.fake_student?
 
-      if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
+      if user && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
@@ -1295,44 +1324,6 @@ class Account < ActiveRecord::Base
       end
 
       result
-    end
-    can :create_courses
-    ##################### End legacy permission block ##########################
-
-    # any logged in user with no active enrollments (i.e. FFT)
-    # combined with root account setting that is enabled for Users with no enrollments
-    given do |user|
-      next false if user&.fake_student?
-
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? &&
-        !root_account.enrollments.active.where(user_id: user).exists? &&
-        root_account.no_enrollments_can_create_courses?
-    end
-    can :create_courses
-
-    # grants right to manually created courses account for show user create course button
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self == manually_created_courses_account &&
-        root_account
-          .enrollments
-          .active
-          .where(user_id: user)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-    end
-    can :create_courses
-
-    # any logged in user with an active enrollment granting :manage_courses_add
-    # scope is checked against user's associated courses on the account's residing shard
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self.shard.activate do
-        Enrollment
-          .active
-          .where(user_id: user, course_id: self.associated_courses)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-      end
     end
     can :create_courses
 
@@ -1781,7 +1772,7 @@ class Account < ActiveRecord::Base
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
       tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_assignments)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings

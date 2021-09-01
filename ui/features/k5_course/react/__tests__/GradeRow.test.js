@@ -25,7 +25,7 @@ describe('GradeRow', () => {
   const getProps = (overrides = {}) => ({
     id: '3',
     assignmentName: 'Essay #2',
-    url: 'http://localhost/essay2',
+    url: 'http://localhost:3000/courses/30/assignments/3',
     dueDate: '2020-04-18T05:59:59Z',
     assignmentGroupName: 'Essays',
     assignmentGroupId: '5',
@@ -38,6 +38,8 @@ describe('GradeRow', () => {
     late: false,
     excused: false,
     missing: false,
+    hasComments: false,
+    currentUserId: '1',
     ...overrides
   })
 
@@ -45,7 +47,7 @@ describe('GradeRow', () => {
     const {getByText} = render(<GradeRow {...getProps()} />)
     const title = getByText('Essay #2')
     expect(title).toBeInTheDocument()
-    expect(title.href).toBe('http://localhost/essay2')
+    expect(title.href).toBe('http://localhost:3000/courses/30/assignments/3')
   })
 
   describe('unread badge', () => {
@@ -187,6 +189,18 @@ describe('GradeRow', () => {
         />
       )
       expect(getByText('Excused')).toBeInTheDocument()
+    })
+
+    it('shows a feedback link if hasComments is true', () => {
+      const {getByRole} = render(<GradeRow {...getProps({hasComments: true})} />)
+      const link = getByRole('link', {name: 'View feedback'})
+      expect(link).toBeInTheDocument()
+      expect(link.href).toBe('http://localhost:3000/courses/30/assignments/3/submissions/1')
+    })
+
+    it('does not render the feedback link if no comments exist', () => {
+      const {queryByText} = render(<GradeRow {...getProps()} />)
+      expect(queryByText('View feedback')).not.toBeInTheDocument()
     })
   })
 

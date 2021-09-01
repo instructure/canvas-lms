@@ -87,7 +87,7 @@ export default class IndexView extends Backbone.View
         externalTools: [],
         modalIsOpen: false,
         selectedTool: null
-      });
+      })
 
       contextInfo = ENV.context_asset_string.split('_')
       contextType = contextInfo[0]
@@ -126,7 +126,7 @@ export default class IndexView extends Backbone.View
         @$bulkEditRoot[0]
       )
 
-    @filterKeyBindings() if !@canManage()
+    @filterKeyBindings()
 
     unless (ENV.disable_keyboard_shortcuts)
       @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
@@ -228,12 +228,19 @@ export default class IndexView extends Backbone.View
       unless($(e.target).is(":input"))
         $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
 
-  canManage: ->
-    ENV.PERMISSIONS.manage
-
   filterKeyBindings: =>
+    canManage = ENV.PERMISSIONS.manage
+    canAdd = ENV.PERMISSIONS.manage_assignments_add
+    canDelete = ENV.PERMISSIONS.manage_assignments_delete
     @keyBindings = @keyBindings.filter (binding) ->
-      ! [69,68,65].includes(binding.keyCode)
+      if !canManage && binding.keyCode == 69
+        false
+      else if !canAdd && binding.keyCode == 65
+        false
+      else if !canDelete && binding.keyCode == 68
+        false
+      else
+        true
 
   selectGradingPeriod: ->
     gradingPeriodId = userSettings.contextGet('assignments_current_grading_period')

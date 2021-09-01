@@ -215,7 +215,8 @@ describe "Feature.register" do
       display_name: -> { "some feature or other" },
       description: -> { "this does something" },
       applies_to: 'RootAccount',
-      state: 'allowed'
+      state: 'allowed',
+      type: 'feature_option'
     }
   end
 

@@ -299,6 +299,52 @@ describe "Outcome Groups API", type: :request do
       expect(json.map {|j| j['outcome']['id']}).to eq expected_outcome_ids
     end
 
+    it "should return friendly description if friendly description is set on outcome for the given context and feature flag is on" do
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      friendly_description = "a friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @account,
+        description: friendly_description
+      })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+                      controller: 'outcome_groups_api',
+                      action: 'link_index',
+                      account_id: @account.id,
+                      :outcome_style => "full",
+                      format: 'json')
+
+      expected_outcome_descriptions = @links.take(2).map(&:content).map(&:description)
+      expected_outcome_descriptions.append(friendly_description)
+      expect(json.map {|j| j['outcome']['friendly_description']}).to eq expected_outcome_descriptions
+    end
+
+    it "should return course friendly description if outcome has course and account-level friendly descriptions" do
+      course_with_teacher(:user => @user, :active_all => true)
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      @course.root_outcome_group.add_outcome(@outcome)
+      friendly_description = "a course level friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @account,
+        description: "an account level friendly description"
+      })
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: @outcome,
+        context: @course,
+        description: friendly_description
+      })
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+                      controller: 'outcome_groups_api',
+                      action: 'link_index',
+                      course_id: @course.id,
+                      :outcome_style => "full",
+                      format: 'json')
+
+      expected_outcome_descriptions = friendly_description
+      expect(json.map {|j| j['outcome']['friendly_description']}.first).to eq expected_outcome_descriptions
+    end
+
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome, can_edit) do

@@ -140,7 +140,7 @@ $(() => {
 })
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function() {
+  $('#content').on('click', '#mark-as-done-checkbox', function () {
     return MarkAsDone.toggle(this)
   })
 )
@@ -199,7 +199,7 @@ $(() => {
     $('#re_upload_submissions_form').slideToggle()
   })
 
-  $('.download_submissions_link').click(function(event) {
+  $('.download_submissions_link').click(function (event) {
     event.preventDefault()
     INST.downloadSubmissions($(this).attr('href'))
     $('.upload_submissions_link').slideDown()
@@ -228,4 +228,12 @@ $(() => {
       parseInt(ENV.ASSIGNMENT_ID, 10)
     )
   }
+})
+
+$('#accessibility_warning').on('focus', function () {
+  $('#accessibility_warning').removeClass('screenreader-only')
+})
+
+$('#accessibility_warning').on('blur', function () {
+  $('#accessibility_warning').addClass('screenreader-only')
 })

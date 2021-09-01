@@ -89,8 +89,7 @@ describe CoursesController do
     describe "homeroom courses" do
       before :once do
         @account = Account.default
-        @account.settings[:enable_as_k5_account] = {value: true}
-        @account.save!
+        @account.enable_as_k5_account!
 
         @teacher1 = user_factory(active_all: true, account: @account)
         @student1 = user_factory(active_all: true, account: @account)
@@ -403,8 +402,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           @student = user_factory
 
           # past unpublished course
@@ -420,10 +419,6 @@ describe CoursesController do
           course_with_student course: course2, user: @student, active_all: true
 
           user_session(@student)
-          get_index
-          expect(assigns[:past_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:past_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
         end
@@ -505,8 +500,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           # unpublished course
           course1 = Account.default.courses.create! name: 'A'
           enrollment1 = course_with_student user: @student, course: course1
@@ -519,10 +514,6 @@ describe CoursesController do
           course_with_student course: course2, user: @student, active_all: true
 
           user_session(@student)
-          get_index
-          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
         end
@@ -637,8 +628,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq [enrollment1] # show it because it's accessible now
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           # unpublished course
           course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
           expect(course1).to be_unpublished
@@ -650,10 +641,6 @@ describe CoursesController do
           course_with_student user: @student, course: course2
 
           user_session(@student)
-          get_index
-          expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:future_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
         end
@@ -831,8 +818,7 @@ describe CoursesController do
     end
 
     it "should only set course color js_env vars for elementary courses" do
-      @course.account.settings[:enable_as_k5_account] = {value: true}
-      @course.account.save!
+      @course.account.enable_as_k5_account!
       @course.course_color = "#BAD"
       @course.save!
 
@@ -1036,7 +1022,6 @@ describe CoursesController do
     end
 
     it "should not find deleted courses" do
-      skip('flaky spec: LS-2269')
       user_session(@teacher)
       @course.destroy
       assert_page_not_found do
@@ -2184,7 +2169,6 @@ describe CoursesController do
     end
 
     it 'should not allow unpublishing of the course if submissions present' do
-      skip('flaky spec: LS-2269')
       course_with_student_submissions({active_all: true, submission_points: true})
       put 'update', params: {:id => @course.id, :course => {:event => 'claim'}}
       @course.reload
@@ -3524,6 +3508,16 @@ describe CoursesController do
       }
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
+
+      get 'users', params: {
+        search_term: 'us',
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        per_page: 1
+      }
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
     it 'only returns group_ids for active group memberships when requested' do

@@ -130,22 +130,37 @@ class ActiveRecord::Base
     255
   end
 
-  def self.find_by_asset_string(string, asset_types=nil)
+  def self.find_by_asset_string(string, asset_types = nil)
     find_all_by_asset_string([string], asset_types)[0]
   end
 
-  def self.find_all_by_asset_string(strings, asset_types=nil)
-    # TODO: start checking asset_types, if provided
-    strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
-      next result if asset_types && !asset_types.include?(klass)
-      result.concat((klass.constantize.where(id: id_pairs.map(&:last)).to_a rescue []))
-    end
+  def self.find_all_by_asset_string(strings, asset_types = nil)
+    assets = strings.is_a?(Hash) ? strings : parse_asset_string_list(strings)
+
+    assets.map do |klass, ids|
+      next if asset_types && asset_types.exclude?(klass)
+
+      begin
+        klass = klass.constantize
+      rescue NameError
+        next
+      end
+      next unless klass < ActiveRecord::Base
+
+      klass.where(id: ids).to_a
+    end.compact.flatten
   end
 
-  # takes an asset string list, like "course_5,user_7" and turns it into an
-  # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
+  # takes an asset string list, like "course_5,user_7,course_9" and turns it into an
+  # hash of { class_name => [ id ] } like { "Course" => [5, 9], "User" => [7] }
   def self.parse_asset_string_list(asset_string_list)
-    asset_string_list.to_s.split(",").map { |str| parse_asset_string(str) }
+    asset_strings = asset_string_list.is_a?(Array) ? asset_string_list : asset_string_list.to_s.split(",")
+    result = {}
+    asset_strings.each do |str|
+      type, id = parse_asset_string(str)
+      (result[type] ||= []) << id
+    end
+    result
   end
 
   def self.parse_asset_string(str)
@@ -792,6 +807,14 @@ module UsefulFindInBatches
     activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
   end
 
+  def in_batches_needs_temp_table?
+    order_values.any? ||
+      group_values.any? ||
+      select_values.to_s =~ /DISTINCT/i ||
+      distinct_value ||
+      in_batches_select_values_necessitate_temp_table?
+  end
+
   def infer_in_batches_strategy
     strategy ||= :copy if in_batches_can_use_copy?
     strategy ||= :cursor if in_batches_can_use_cursor?
@@ -807,14 +830,6 @@ module UsefulFindInBatches
 
   def in_batches_can_use_cursor?
     eager_load_values.empty? && (GuardRail.environment == :secondary || connection.readonly?)
-  end
-
-  def in_batches_needs_temp_table?
-    order_values.any? ||
-      group_values.any? ||
-      select_values.to_s =~ /DISTINCT/i ||
-      distinct_value ||
-      in_batches_select_values_necessitate_temp_table?
   end
 
   def in_batches_select_values_necessitate_temp_table?
@@ -1013,8 +1028,9 @@ module UsefulFindInBatches
           end
         end
 
-        klass.unscoped do
-          batch_relation = klass.from(table).select("*").limit(of).preload(includes_values + preload_values)
+        base_class = klass.base_class
+        base_class.unscoped do
+          batch_relation = base_class.from(table).select("*").limit(of).preload(includes_values + preload_values)
           batch_relation = batch_relation.order(Arel.sql(connection.quote_column_name(index))) if index
           yielded_relation = batch_relation
           loop do
@@ -1059,8 +1075,8 @@ module UsefulBatchEnumerator
   end
 
   def delete_all
-    if @strategy.nil? && (strategy = @relation.infer_in_batches_strategy) == :id
-      sum = 0
+    sum = 0
+    if @strategy.nil? && !@relation.in_batches_needs_temp_table?
       loop do
         current = @relation.limit(@of).delete_all
         sum += current
@@ -1069,13 +1085,29 @@ module UsefulBatchEnumerator
       return sum
     end
 
-    @relation.in_batches(strategy: strategy, load: false, **@kwargs, &:delete_all)
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+      sum += relation.delete_all
+    end
+    sum
   end
 
-  def update_all(*args)
-    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
-      relation.update_all(*args)
+  def update_all(updates)
+    sum = 0
+    if @strategy.nil? && !@relation.in_batches_needs_temp_table? && relation_has_condition_on_updates?(updates)
+      loop do
+        current = @relation.limit(@of).update_all(updates)
+        sum += current
+        break unless current == @of
+      end
+      return sum
     end
+
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+      sum += relation.update_all(updates)
+    end
+    sum
   end
 
   def destroy_all
@@ -1096,6 +1128,50 @@ module UsefulBatchEnumerator
       .select(*args)
       .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
       yield relation.pluck(*args)
+    end
+  end
+
+  private
+
+  def relation_has_condition_on_updates?(updates)
+    return false unless updates.is_a?(Hash)
+    return false if updates.empty?
+
+    # is the column we're updating mentioned in the where clause?
+    predicates = @relation.where_clause.send(:predicates)
+    return false if predicates.empty?
+
+    @relation.send(:_substitute_values, updates).any? do |(attr, update)|
+      found_match = false
+      predicates.any? do |pred|
+        next unless pred.is_a?(Arel::Nodes::Binary)
+        next unless pred.left == attr
+
+        found_match = true
+
+        raw_update = update.value.value_before_type_cast 
+        # we want to check exact class here, not ancestry, since we want to ignore
+        # subclasses we don't understand
+        if pred.class == Arel::Nodes::Equality
+          update != pred.right
+        elsif pred.class == Arel::Nodes::NotEqual
+          update == pred.right
+        elsif pred.class == Arel::Nodes::GreaterThanOrEqual
+          raw_update < pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::GreaterThan
+          raw_update <= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::LessThanOrEqual
+          raw_update >= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::LessThan
+          raw_update >= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::Between
+          raw_update < pred.right.left.value.value_before_type_cast || raw_update > pred.right.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::In && pred.right.is_a?(Array)
+          !pred.right.include?(update)
+        elsif pred.class == Arel::Nodes::NotIn && pred.right.is_a?(Array)
+          pred.right.include?(update)
+        end
+      end && found_match
     end
   end
 end
@@ -1206,10 +1282,13 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
-    sub_query = scopes.map do |s|
-      scope = s.except(:select, :order)
-      scope = scope.select(primary_key) unless from
-      scope.to_sql
+    scopes = scopes.reject { |s| s.is_a?(ActiveRecord::NullRelation) }
+    return scopes.first if scopes.length == 1
+    return self if scopes.empty?
+
+    sub_query = scopes.map do |scope|
+      scope = scope.except(:select, :order).select(primary_key) unless from
+      "(#{scope.to_sql})"
     end.join(" UNION ALL ")
     return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
 

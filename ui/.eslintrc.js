@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*eslint no-commonjs: [2, "allow-primitive-modules"]*/
-
+// eslint-disable-next-line import/no-commonjs
 module.exports = {
   // 0 - off, 1 - warning, 2 - error
   rules: {
-    "import/no-commonjs": [2]
+    'import/no-commonjs': [2]
   }
-};
+}

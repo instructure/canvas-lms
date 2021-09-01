@@ -35,6 +35,7 @@ import {
 import {getAssignmentPostPolicies, setCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
 import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
+import ViewOptionsTabPanel from './ViewOptionsTabPanel'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}) {
@@ -102,7 +103,8 @@ export default class GradebookSettingsModal extends React.Component {
       }),
       setAssignmentPostPolicies: func.isRequired,
       setCoursePostPolicy: func.isRequired
-    })
+    }),
+    enhancedGradebookFilters: bool
   }
 
   static defaultProps = {
@@ -306,6 +308,16 @@ export default class GradebookSettingsModal extends React.Component {
                     courseSettings={this.state.courseSettings}
                     onCourseSettingsChange={this.handleCourseSettingsChange}
                   />
+                </Tabs.Panel>
+              )}
+
+              {this.props.enhancedGradebookFilters && (
+                <Tabs.Panel
+                  renderTitle={I18n.t('View Options')}
+                  id="tab-panel-view"
+                  isSelected={tab === 'tab-panel-view'}
+                >
+                  <ViewOptionsTabPanel />
                 </Tabs.Panel>
               )}
             </Tabs>

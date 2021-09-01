@@ -79,7 +79,8 @@ describe("I18nliner", function() {
           relative_key: "Relative key in nested scope"
         },
         yay_coffee_d4d65736: 'yay coffee',
-        yay_jsx_49700f4a: 'yay jsx'
+        yay_jsx_49700f4a: 'yay jsx',
+        yay_typescript_2a26bb91: 'yay typescript'
       });
     });
   });

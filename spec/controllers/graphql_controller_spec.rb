@@ -29,7 +29,7 @@ describe GraphQLController do
     {
       query: 'query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }',
       variables: {
-        representations: [ {__typename: "Course", id: "1"} ]
+        representations: [ {__typename: "Course", id: "Q291cnNlLTE="} ]
       }
     }
   end

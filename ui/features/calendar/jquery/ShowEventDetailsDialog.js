@@ -404,7 +404,7 @@ export default class ShowEventDetailsDialog {
       })
     )
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED && params.webConference) {
+    if (params.webConference) {
       const conferenceNode = this.popover.el.find('.conferencing')[0]
       ReactDOM.render(
         <Conference

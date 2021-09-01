@@ -26,7 +26,7 @@ describe AuthenticationMethods do
     include Canvas::RequestForgeryProtection
     include AuthenticationMethods
 
-    attr_accessor :redirects, :params, :session, :request, :render_hash
+    attr_accessor :redirects, :params, :session, :request, :render_hash, :fix_ms_office_redirects
 
     def initialize(request:, root_account: Account.default, params: {})
       @request = request
@@ -100,6 +100,16 @@ describe AuthenticationMethods do
         expect(@controller.send(:load_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_pseudonym)).to be_nil
+      end
+
+      it "destroys the session if the pseudonym was suspended" do
+        @pseudonym.reload
+        @pseudonym.update!(workflow_state: 'suspended')
+        expect(@controller).to receive(:destroy_session).once
+        expect(@controller.send(:load_user)).to be_nil
+        expect(@controller.instance_variable_get(:@current_user)).to be_nil
+        expect(@controller.instance_variable_get(:@current_pseudonym)).to be_nil
+
       end
 
       it "should not destroy session if user was logged out in the future" do

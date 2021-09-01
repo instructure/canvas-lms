@@ -26,7 +26,7 @@ describe('ManageOutcomesFooter', () => {
   const generateOutcomes = (num, canUnlink) =>
     new Array(num).fill(0).reduce(
       (_val, idx) => ({
-        [idx + 1]: {_id: `idx + 1`, title: `Outcome ${idx + 1}`, canUnlink}
+        [idx + 1]: {_id: idx + 100, linkId: idx + 1, title: `Outcome ${idx + 1}`, canUnlink}
       }),
       {}
     )

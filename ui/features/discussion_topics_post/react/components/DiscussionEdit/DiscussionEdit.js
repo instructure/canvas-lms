@@ -28,6 +28,7 @@ import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
+import positionCursor from './PositionCursorHook'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
@@ -74,7 +75,8 @@ export const DiscussionEdit = props => {
             onInit={() => {
               setTimeout(() => {
                 rceRef?.current?.focus()
-              }, 1500)
+                positionCursor(rceRef)
+              }, 1000)
             }}
             ref={rceRef}
             onContentChange={content => {
@@ -89,65 +91,80 @@ export const DiscussionEdit = props => {
             mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({mobile: true, desktop: true})}
+          props={{
+            mobile: {
+              direction: 'column',
+              display: 'block',
+              marginCancel: 'xx-small',
+              marginReply: 'xx-small',
+              viewAs: 'div'
+            },
+            desktop: {
+              direction: 'row',
+              display: 'inline-block',
+              marginCancel: '0 0 0 0',
+              marginReply: '0 0 0 small',
+              viewAs: 'span'
+            }
+          }}
+          render={(responsiveProps, matches) => {
+            const rceButtons = [
+              <View
+                as={responsiveProps.viewAs}
+                padding={responsiveProps.marginCancel}
+                key="cancelButton"
+              >
+                <Button
+                  onClick={() => {
+                    if (props.onCancel) {
+                      props.onCancel()
+                    }
+                  }}
+                  display={responsiveProps.display}
+                  color="secondary"
+                  data-testid="DiscussionEdit-cancel"
+                  key="rce-cancel-button"
+                >
+                  <Text size="medium">{I18n.t('Cancel')}</Text>
+                </Button>
+              </View>,
+              <View
+                as={responsiveProps.viewAs}
+                padding={responsiveProps.marginReply}
+                key="replyButton"
+              >
+                <Button
+                  onClick={() => {
+                    if (props.onSubmit) {
+                      props.onSubmit(rceContent)
+                    }
+                  }}
+                  display={responsiveProps.display}
+                  color="primary"
+                  data-testid="DiscussionEdit-submit"
+                  key="rce-reply-button"
+                >
+                  <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
+                </Button>
+              </View>
+            ]
+            return matches.includes('mobile') ? (
+              <View as="div" padding={undefined} key="mobileButtons">
+                {rceButtons.reverse()}
+              </View>
+            ) : (
+              <Flex key="nonMobileButtons">
+                <Flex.Item shouldGrow textAlign="end">
+                  {rceButtons}
+                </Flex.Item>
+              </Flex>
+            )
+          }}
+        />
       </View>
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({mobile: true, desktop: true})}
-        props={{
-          mobile: {
-            direction: 'column-reverse',
-            display: 'block',
-            marginCancel: 'small 0 0 0',
-            marginReply: '0 0 0 0'
-          },
-          desktop: {
-            direction: 'row',
-            display: 'inline-block',
-            marginCancel: '0 0 0 0',
-            marginReply: '0 0 0 small'
-          }
-        }}
-        render={responsiveProps => (
-          <Flex margin="small none none none" direction={responsiveProps.direction}>
-            <Flex.Item
-              shouldGrow
-              shouldShrink
-              textAlign="end"
-              overflowY="hidden"
-              overflowX="hidden"
-            >
-              <Button
-                onClick={() => {
-                  if (props.onCancel) {
-                    props.onCancel()
-                  }
-                }}
-                margin={responsiveProps.marginCancel}
-                display={responsiveProps.display}
-                color="secondary"
-                data-testid="DiscussionEdit-cancel"
-              >
-                <Text size="medium">{I18n.t('Cancel')}</Text>
-              </Button>
-            </Flex.Item>
-            <Flex.Item shouldShrink textAlign="end" overflowY="hidden" overflowX="hidden">
-              <Button
-                onClick={() => {
-                  if (props.onSubmit) {
-                    props.onSubmit(rceContent)
-                  }
-                }}
-                display={responsiveProps.display}
-                color="primary"
-                margin={responsiveProps.marginReply}
-                data-testid="DiscussionEdit-submit"
-              >
-                <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')} </Text>
-              </Button>
-            </Flex.Item>
-          </Flex>
-        )}
-      />
     </div>
   )
 }

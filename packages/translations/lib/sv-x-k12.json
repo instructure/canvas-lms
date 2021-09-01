@@ -80,6 +80,9 @@
     "announcements_a4b8ed4a": {
         "message": "Anslag"
     },
+    "apply_781a2546": {
+        "message": "Tillämpa"
+    },
     "apps_54d24a47": {
         "message": "Appar"
     },
@@ -146,8 +149,14 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Början av din att göra-historik"
     },
+    "below_81d4dceb": {
+        "message": "Nedan"
+    },
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Nedan visas ett exempel på hur eleverna kommer att se sina scheman"
+    },
+    "bottom_third_5f5fec1d": {
+        "message": "Tredje nerifrån"
     },
     "button_color_608a0242": {
         "message": "Knappfärg"
@@ -776,6 +785,9 @@
     "medium_5a8e9ead": {
         "message": "Medium"
     },
+    "middle_27dc1d5": {
+        "message": "Mitten"
+    },
     "miscellaneous_e9818229": {
         "message": "Blandat"
     },
@@ -1148,6 +1160,18 @@
     "text_7f4593da": {
         "message": "Text"
     },
+    "text_background_color_16e61c3f": {
+        "message": "Bakgrundsfärg för text"
+    },
+    "text_color_acf75eb6": {
+        "message": "Textfärg"
+    },
+    "text_position_8df8c162": {
+        "message": "Textposition"
+    },
+    "text_size_887c2f6": {
+        "message": "Textstorlek"
+    },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Datum och tid dessa att göra-uppgifter ska vara klara"
     },
@@ -1285,6 +1309,12 @@
     },
     "use_arrow_keys_to_select_a_size_699a19f4": {
         "message": "Använd pilknapparna för att välja en storlek."
+    },
+    "use_arrow_keys_to_select_a_text_position_72f9137c": {
+        "message": "Använd pilknapparna för att välja en textposition."
+    },
+    "use_arrow_keys_to_select_a_text_size_65e89336": {
+        "message": "Använd pilknapparna för att välja en textstorlek."
     },
     "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
         "message": "Använd pilknapparna för att välja en konturstorlek."

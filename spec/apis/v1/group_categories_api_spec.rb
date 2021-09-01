@@ -103,6 +103,25 @@ describe "Group Categories API", type: :request do
         end
       end
 
+      context 'granular permissions' do
+        it "should succeed" do
+          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+          status = raw_api_call(:get, api_url, api_route)
+          expect(status).to eq 200
+        end
+
+        it "should not succeed if :manage_groups_add is not enabled" do
+          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+          @course.account.role_overrides.create!(
+            permission: 'manage_groups_manage',
+            role: teacher_role,
+            enabled: false
+          )
+          raw_api_call(:get, api_url, api_route)
+          assert_unauthorized
+        end
+      end
+
       it "should return active group_memberships" do
         g1 = @category.groups.create!(name: 'g1', context: @course)
         g2 = @category.groups.create!(name: 'g2', sis_source_id: 'g2sis', context: @course)

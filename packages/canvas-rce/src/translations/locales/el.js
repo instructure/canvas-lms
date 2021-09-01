@@ -24,16 +24,19 @@ const locale = {
   "all_4321c3a1": { "message": "Όλα" },
   "announcement_list_da155734": { "message": "Λίστα Ανακοινώσεων" },
   "announcements_a4b8ed4a": { "message": "Ανακοινώσεις" },
+  "apply_781a2546": { "message": "Εφαρμογή" },
   "apps_54d24a47": { "message": "Εφαρμογές" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Ο λόγος του μήκους της εικόνας προς το ύψος της θα διατηρηθεί"
   },
   "assignments_1e02582c": { "message": "Εργασίες" },
+  "attributes_963ba262": { "message": "Πεδία" },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Ακύρωση" },
-  "canvas_plugins_705a5016": { "message": "Προσθήκες του Canvas" },
-  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-    "message": "Κάντε κλικ σε οποιαδήποτε σελίδα για να εισαγάγετε σύνδεσμο προς αυτή τη σελίδα."
+  "choose_usage_rights_33683854": {
+    "message": "Επιλέξτε δικαιώματα χρήσης..."
   },
+  "clear_2084585f": { "message": "Καθαρισμός" },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Κάντε κλικ για να ενσωματώσετε την εικόνα { imageName }"
   },
@@ -42,13 +45,16 @@ const locale = {
   },
   "close_d634289d": { "message": "Κλείσιμο" },
   "collaborations_5c56c15f": { "message": "Συνεργασίες" },
+  "content_1440204b": { "message": "Περιεχόμενο" },
   "content_type_2cf90d95": { "message": "Τύπος Περιεχομένου" },
+  "copyright_holder_66ee111": { "message": "Κάτοχος Πνευματικών Δικαιωμάτων:" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "Αρχεία Μαθήματος" },
   "course_files_a31f97fc": { "message": "Αρχεία μαθήματος" },
   "course_navigation_dd035109": { "message": "Πλοήγηση στο μάθημα" },
+  "creative_commons_license_725584ae": { "message": "Άδεια Creative Commons:" },
   "decrease_indent_de6343ab": { "message": "Μείωση Εσοχής Κειμένου" },
   "details_98a31b68": { "message": "Λεπτομέρειες" },
   "dimensions_45ddb7b7": { "message": "Διαστάσεις" },
@@ -59,12 +65,22 @@ const locale = {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
   },
   "embed_image_1080badc": { "message": "Ενσωμάτωση εικόνας" },
+  "external_tools_6e77821": { "message": "Εξωτερικά Εργαλεία" },
   "files_c300e900": { "message": "Αρχεία" },
   "files_index_af7c662b": { "message": "Ευρετήριο Αρχείων" },
+  "format_4247a9c5": { "message": "Τύπος" },
   "generating_preview_45b53be0": { "message": "Δημιουργία προεπισκόπησης..." },
   "grades_a61eba0a": { "message": "Βαθμοί" },
   "group_files_82e5dcdb": { "message": "Αρχεία ομάδας" },
   "group_navigation_99f191a": { "message": "Πλοήγηση στην Ομάδα" },
+  "home_351838cd": { "message": "Αρχική Σελίδα" },
+  "html_editor_fb2ab713": { "message": "Επεξεργαστής HTML" },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Έχω τα πνευματικά δικαιώματα"
+  },
   "image_8ad06": { "message": "Εικόνα" },
   "images_7ce26570": { "message": "Εικόνες" },
   "increase_indent_6d550a4a": { "message": "Αύξηση Εσοχής Κειμένου" },
@@ -77,14 +93,9 @@ const locale = {
     "message": "Εισαγωγή Μαθηματικής Εξίσωσης"
   },
   "invalid_file_type_881cc9b2": { "message": "Μη έγκυρος τύπος αρχείου" },
+  "invalid_url_cbde79f": { "message": "Μη έγκυρο URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Συντομεύσεις πληκτρολογίου" },
   "link_7262adec": { "message": "Σύνδεσμος" },
-  "link_to_other_content_in_the_course_879163b5": {
-    "message": "Σύνδεση προς άλλο περιεχόμενο του μαθήματος."
-  },
-  "link_to_other_content_in_the_group_3fe25379": {
-    "message": "Σύνδεση προς άλλο περιεχόμενο της ομάδας."
-  },
   "links_14b70841": { "message": "Σύνδεσμοι" },
   "load_more_results_460f49a9": {
     "message": "Φόρτωση περισσότερων αποτελεσμάτων"
@@ -96,8 +107,13 @@ const locale = {
   "media_af190855": { "message": "Δεδομένα" },
   "modules_c4325335": { "message": "Ενότητες" },
   "my_files_2f621040": { "message": "Τα αρχεία μου" },
+  "name_1aed4a1b": { "message": "Όνομα" },
   "no_e16d9132": { "message": "μη δημοσιευμένο" },
+  "no_preview_is_available_for_this_file_f940114a": {
+    "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."
+  },
   "no_results_940393cf": { "message": "Δεν υπάρχουν Αποτελέσματα" },
+  "none_3b5e34d2": { "message": "Κανένα" },
   "options_3ab0ea65": { "message": "Επιλογές" },
   "pages_e5414c2c": { "message": "Σελίδες" },
   "people_b4ebb13c": { "message": "Κοινό" },
@@ -105,22 +121,28 @@ const locale = {
   "published_c944a23d": { "message": "δημοσιευμένο/α" },
   "quizzes_7e598f57": { "message": "Κουίζ" },
   "record_7c9448b": { "message": "Ηχογράφηση" },
-  "recording_98da6bda": { "message": "Εγγράφεται" },
   "rich_content_editor_2708ef21": {
     "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
   },
-  "save_11a80ec3": { "message": "Αποθήκευση" },
   "search_280d00bd": { "message": "Αναζήτηση" },
   "size_b30e1077": { "message": "Μέγεθος" },
-  "start_over_f7552aa9": { "message": "Ξεκινήστε Ξανά" },
+  "star_8d156e09": { "message": " " },
   "submit_a3cc6859": { "message": "Υποβολή" },
   "syllabus_f191f65b": { "message": "Αναλυτικό Πρόγραμμα" },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Το υλικό βρίσκεται στο δημόσιο domain"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Το υλικό φέρει άδεια Creative Commons"
+  },
   "title_ee03d132": { "message": "Τίτλος" },
   "unpublished_dfd8801": { "message": "μη δημοσιευμένο" },
   "upload_file_fd2361b8": { "message": "Φόρτωση Αρχείου" },
   "upload_media_ce31135a": { "message": "Μεταφόρτωση Αρχείου Πολυμέσων" },
+  "uploading_19e8a4e7": { "message": "Γίνεται φόρτωση..." },
   "url_22a5f3b8": { "message": "URL" },
-  "video_player_b371005": { "message": "Πρόγραμμα Αναπαραγωγής Βίντεο" },
+  "usage_right_ff96f3e2": { "message": "Δικαίωμα Χρήσης:" },
+  "view_ba339f93": { "message": "Προβολή" },
   "wiki_home_9cd54d0": { "message": "Αρχική Σελίδα Wiki" },
   "yes_dde87d5": { "message": "Ναι" }
 }

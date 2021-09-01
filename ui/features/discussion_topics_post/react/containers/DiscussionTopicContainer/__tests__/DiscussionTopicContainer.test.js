@@ -148,7 +148,11 @@ describe('DiscussionTopicContainer', () => {
         assignment: Assignment.mock({onlyVisibleToOverrides: true})
       })
     })
-    expect(await container.findByTestId('differentiated-alert')).toBeTruthy()
+    expect(
+      container.getByText(
+        'Note: for differentiated group topics, some threads may not have any students assigned.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('non-readAsAdmin does not see Diff. Group Assignments alert', async () => {
@@ -290,16 +294,20 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Mark All as Read')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
+  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Add Rubric')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('Renders Show Rubric in the kabob menu if the user has permission', () => {
-    const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
+  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: Discussion.mock({
+        permissions: DiscussionPermissions.mock({
+          addRubric: false
+        })
+      })
+    })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Show Rubric')).toBeInTheDocument()
   })

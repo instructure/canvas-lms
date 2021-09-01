@@ -43,7 +43,7 @@ describe('HomeroomPage', () => {
     const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} loadingAnnouncements />)
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
-    expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()
+    expect(getByText('Loading Announcement Content')).toBeInTheDocument()
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {
@@ -60,8 +60,8 @@ describe('HomeroomPage', () => {
           id: '56',
           assetString: 'course_56',
           href: '/courses/56',
-          shortName: 'CS 101',
-          originalName: 'Computer Science 101',
+          shortName: 'Computer Science 101',
+          originalName: 'UGLY-SIS-COMP-SCI-101',
           courseCode: 'CS-001',
           isHomeroom: false,
           canManage: false,

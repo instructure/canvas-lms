@@ -101,20 +101,11 @@ QUnit.module('FileSelectBox', {
   }
 })
 
-test('it renders', function() {
+test('it renders', function () {
   ok(this.component)
 })
 
-test('it renders singular use of file', function() {
-  ok(wrapper.innerText.match(/ New File /))
-  ok(
-    $(this.component.refs.selectBox)
-      .attr('aria-label')
-      .match(/file you/)
-  )
-})
-
-test('it should alphabetize the folder list', function() {
+test('it should alphabetize the folder list', function () {
   this.server.respond()
   // This also tests that folders without files are not shown.
   const childrenLabels = $(this.component.refs.selectBox)
@@ -125,7 +116,7 @@ test('it should alphabetize the folder list', function() {
   deepEqual(childrenLabels, expected)
 })
 
-test('it should show the loading state while files are loading', function() {
+test('it should show the loading state while files are loading', function () {
   // Has aria-busy attr set to true for a11y
   equal($(this.component.refs.selectBox).attr('aria-busy'), 'true')
   equal($(this.component.refs.selectBox).children()[1].text, 'Loading...')
@@ -137,32 +128,6 @@ test('it should show the loading state while files are loading', function() {
     .toArray()
     .filter(x => x.text === 'Loading...')
   equal(loading.length, 0)
-})
-
-QUnit.module('FileSelectBox with module_dnd enabled', {
-  setup() {
-    this.reset_env = window.ENV
-    window.ENV = {FEATURES: {module_dnd: true}}
-    wrapper = document.getElementById('fixtures')
-    this.server = setupServer()
-    this.component = renderComponent()
-  },
-
-  teardown() {
-    window.ENV = this.reset_env
-    ReactDOM.unmountComponentAtNode(wrapper)
-  }
-})
-
-test('it renders plural use of file', function() {
-  ReactDOM.unmountComponentAtNode(wrapper)
-  this.component = renderComponent()
-  ok(wrapper.innerText.match(/ New File\(s\) /))
-  ok(
-    $(this.component.refs.selectBox)
-      .attr('aria-label')
-      .match(/files you/)
-  )
 })
 
 QUnit.module('FileSelectBox with new_quizzes_modules_support enabled', {
@@ -180,8 +145,8 @@ QUnit.module('FileSelectBox with new_quizzes_modules_support enabled', {
   }
 })
 
-test('it renders Create instead of New', function() {
+test('it renders Create instead of New', function () {
   ReactDOM.unmountComponentAtNode(wrapper)
   this.component = renderComponent()
-  ok(wrapper.innerText.match(/ Create File /))
+  ok(wrapper.innerText.match(/\[ Create File\(s\) \]/))
 })

@@ -111,5 +111,115 @@ describe "Learning Outcome exporting" do
       outcome_titles = doc.xpath('/learningOutcomes/learningOutcomeGroup/learningOutcomes/learningOutcome/title/text()')
       expect(outcome_titles.map(&:text)).to match_array [outcome1.title, outcome2.title]
     end
+
+    it 'exports an outcome and populates its friendly description if the outcome_friendly_description ff is enabled' do
+      @context = @course
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      root_group = outcome_group_model(title: 'root group')
+      outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
+      friendly_description = "a friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: outcome1,
+        context: @course,
+        description: friendly_description
+      })
+      @ce.selected_content = {
+        'learning_outcomes' => {
+          @ce.create_key(outcome1) => "1"
+        }
+      }
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/learning_outcomes.xml"))
+      # for shorter xpath queries
+      doc.remove_namespaces!
+      # root outcome was selected for export
+      expect(doc.xpath('/learningOutcomes/learningOutcome').count).to eq 1
+      # with friendly description
+      friendly_descriptions = doc.xpath('/learningOutcomes/learningOutcome/friendly_description/text()')
+      expect(friendly_descriptions.count).to eq 1
+      expect(friendly_descriptions[0].text).to eq friendly_description
+      Account.site_admin.disable_feature! :outcomes_friendly_description
+    end
+
+    it 'does not populate the friendly description if there is none, even if the outcome_friendly_description ff is enabled' do
+      @context = @course
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      root_group = outcome_group_model(title: 'root group')
+      outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
+      @ce.selected_content = {
+        'learning_outcomes' => {
+          @ce.create_key(outcome1) => "1"
+        }
+      }
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/learning_outcomes.xml"))
+      # for shorter xpath queries
+      doc.remove_namespaces!
+      # root outcome was selected for export
+      expect(doc.xpath('/learningOutcomes/learningOutcome').count).to eq 1
+      # with friendly description
+      friendly_descriptions = doc.xpath('/learningOutcomes/learningOutcome/friendly_description/text()')
+      expect(friendly_descriptions.count).to eq 0
+      Account.site_admin.disable_feature! :outcomes_friendly_description
+    end
+
+    it 'does not populate the friendly description if the outcome_friendly_description ff is disabled' do
+      @context = @course
+      root_group = outcome_group_model(title: 'root group')
+      outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
+      friendly_description = "a friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: outcome1,
+        context: @course,
+        description: friendly_description
+      })
+      @ce.selected_content = {
+        'learning_outcomes' => {
+          @ce.create_key(outcome1) => "1"
+        }
+      }
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/learning_outcomes.xml"))
+      # for shorter xpath queries
+      doc.remove_namespaces!
+      # root outcome was selected for export
+      expect(doc.xpath('/learningOutcomes/learningOutcome').count).to eq 1
+      # with friendly description
+      friendly_descriptions = doc.xpath('/learningOutcomes/learningOutcome/friendly_description/text()')
+      expect(friendly_descriptions.count).to eq 0
+    end
+
+    it 'exports an outcome and populates its course-level friendly description if there is a course-level and account-level friendly description' do
+      @context = @course
+      Account.site_admin.enable_feature! :outcomes_friendly_description
+      root_group = outcome_group_model(title: 'root group')
+      outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: outcome1,
+        context: @course.account,
+        description: 'an account-level friendly description'
+      })
+      friendly_description = "a course-level friendly description"
+      OutcomeFriendlyDescription.create!({
+        learning_outcome: outcome1,
+        context: @course,
+        description: friendly_description
+      })
+      @ce.selected_content = {
+        'learning_outcomes' => {
+          @ce.create_key(outcome1) => "1"
+        }
+      }
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/learning_outcomes.xml"))
+      # for shorter xpath queries
+      doc.remove_namespaces!
+      # root outcome was selected for export
+      expect(doc.xpath('/learningOutcomes/learningOutcome').count).to eq 1
+      # with friendly description
+      friendly_descriptions = doc.xpath('/learningOutcomes/learningOutcome/friendly_description/text()')
+      expect(friendly_descriptions.count).to eq 1
+      expect(friendly_descriptions[0].text).to eq friendly_description
+    end
   end
 end

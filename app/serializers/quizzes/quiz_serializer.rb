@@ -372,7 +372,7 @@ module Quizzes
     end
 
     def user_may_manage?
-      context.grants_right?(current_user, :manage_assignments)
+      context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
     end
 
     def user_finder

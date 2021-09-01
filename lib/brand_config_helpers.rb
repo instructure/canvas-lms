@@ -42,7 +42,6 @@ module BrandConfigHelpers
     chain = self.account_chain(include_site_admin: true).dup
     chain.shift unless include_self
     chain.select! { |a| a.shard == self.shard }
-    ActiveRecord::Associations::Preloader.new.preload(chain, :root_account)
     chain
   end
 end

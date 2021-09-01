@@ -126,7 +126,7 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
-      const requests = rangeOfLength(4).map(getJSON)
+      const requests = rangeOfLength(4).map(() => getJSON())
       for await (const [index] of requests.entries()) {
         // Get the next request
         const request = network.getRequests()[index]

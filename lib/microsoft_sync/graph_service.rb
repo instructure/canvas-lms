@@ -45,7 +45,17 @@ module MicrosoftSync
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_education_classes(options={}, &blk)
-      get_paginated_list('education/classes', quota: [1, 0], **options, &blk)
+      check_for_expected_errors = lambda do |resp|
+        if resp.code == 400 && resp.body =~ /Education_ObjectType.*does not exist as.*property/
+          Errors::NotEducationTenant.new
+        end
+      end
+
+      get_paginated_list(
+        'education/classes', quota: [1, 0],
+        expected_error_block: check_for_expected_errors,
+        **options, &blk
+      )
     end
 
     def create_education_class(params)
@@ -87,6 +97,9 @@ module MicrosoftSync
         group_remove_user_requests(group_id, members, 'members') +
         group_remove_user_requests(group_id, owners, 'owners')
       quota = [reqs.count, reqs.count]
+
+      expected_error = nil
+
       failed_req_ids = run_batch('group_remove_users', reqs, quota: quota) do |resp|
         (
           resp['status'] == 404 && resp['body'].to_s =~
@@ -95,8 +108,16 @@ module MicrosoftSync
           # This variant seems to happen right after removing a user with the UI
           resp['status'] == 400 && resp['body'].to_s =~
             /One or more removed object references do not exist for the following modified/i
+        ) || (
+          # Check for this here so run_batch doesn't increment error counters. Record
+          # the failure in expected_error and raise below.
+          resp['status'] == 400 && resp['body'].to_s =~
+            /must have at least one owner, hence this owner cannot be removed./ &&
+          (expected_error = :missing_owners)
         )
       end
+
+      raise Errors::MissingOwners if expected_error == :missing_owners
       split_request_ids_to_hash(failed_req_ids)
     end
 
@@ -167,8 +188,6 @@ module MicrosoftSync
           MicrosoftSync::Errors::TeamAlreadyExists.new
         end
       end
-
-      raise response if response.is_a?(Exception)
     end
 
     # === Users ===

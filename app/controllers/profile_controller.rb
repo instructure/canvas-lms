@@ -207,7 +207,7 @@ class ProfileController < ApplicationController
     @other_channels = @channels.select{|c| c.path_type != "email"}
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
-    @pseudonyms = @user.pseudonyms.active
+    @pseudonyms = @user.pseudonyms.active_only
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = @user.profile
     set_active_tab "profile_settings"

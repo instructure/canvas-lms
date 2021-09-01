@@ -26,7 +26,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Mask} from '@instructure/ui-overlays'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import splitAssetString from './splitAssetString'
 import {
   IconOpenFolderSolid,
   IconFolderSolid,
@@ -129,7 +128,7 @@ class FileBrowser extends React.Component {
     this.source
       .fetchRootFolder({
         contextType: context,
-        contextId: contextId
+        contextId
       })
       .then(result => {
         this.populateRootFolder(result.folders[0], opts)
@@ -169,6 +168,24 @@ class FileBrowser extends React.Component {
     )
   })
 
+  fetchFiles(id) {
+    this.source.fetchBookmarkedData(
+      this.source.fetchFilesForFolder.bind(this.source),
+      {
+        searchString: this.props.searchString,
+        perPage: 50,
+        filesUrl: this.state.collections[id]?.api?.filesUrl
+      },
+      result => {
+        this.populateItemsList(result.files)
+      },
+      error => {
+        this.props.onLoading(false)
+        console.error(error)
+      }
+    )
+  }
+
   getFolderData(id) {
     if (!this.state.collections[id].locked) {
       this.setState(
@@ -182,38 +199,10 @@ class FileBrowser extends React.Component {
         },
         () => {
           this.fetchSubFolders(id)
-          this.getPaginatedData(this.folderFileApiUrl(id), this.populateItemsList)
+          this.fetchFiles(id)
         }
       )
     }
-  }
-
-  getPaginatedData(url, callback) {
-    this.props.onLoading(true)
-    axios
-      .get(url)
-      .then(response => {
-        callback(response.data)
-        const nextUrl = parseLinkHeader(response.headers.link).next
-        if (nextUrl) {
-          this.getPaginatedData(nextUrl, callback)
-        } else {
-          this.props.onLoading(false)
-        }
-      })
-      .catch(error => {
-        this.props.onLoading(false)
-        /* eslint-disable no-console */
-        console.error('Error fetching data from API')
-        console.error(error)
-        /* eslint-enable no-console */
-      })
-  }
-
-  folderFileApiUrl(folderId, type = 'files') {
-    const search_term =
-      type === 'files' && this.props.searchString ? `&search_term=${this.props.searchString}` : ''
-    return `/api/v1/folders/${folderId}/${type}?per_page=50${search_term}`
   }
 
   populateCollectionsList = (folderList, opts = {}) => {
@@ -253,10 +242,10 @@ class FileBrowser extends React.Component {
       const newItems = _.cloneDeep(state.items)
       const newCollections = _.cloneDeep(state.collections)
       fileList.forEach(file => {
-        if (this.contentTypeIsAllowed(file['content-type'])) {
+        if (this.contentTypeIsAllowed(file.type)) {
           const item = this.formatFileInfo(file)
           newItems[item.id] = item
-          const folder_id = file.folder_id
+          const folder_id = file.folderId
           const collectionItems = newCollections[folder_id].items
           if (!collectionItems.includes(item.id)) {
             collectionItems.push(item.id)
@@ -298,30 +287,30 @@ class FileBrowser extends React.Component {
   // SVG data URL for the thumbnail.  This can go away
   // when TreeBrowser is better.
   getThumbnail(file) {
-    if (file.thumbnail_url) {
-      return file.thumbnail_url
+    if (file.thumbnailUrl) {
+      return file.thumbnailUrl
     }
-    const svgicon = getSVGIconFromType(file['content-type'])
+    const svgicon = getSVGIconFromType(file.type)
     return `data:image/svg+xml;utf8,${svgicon}`
   }
 
   formatFileInfo(apiFile, opts = {}) {
     const {collections} = this.state
-    const context = collections[apiFile.folder_id].context
+    const context = collections[apiFile.folderId].context
     const file = {
       api: apiFile,
       id: apiFile.id,
-      name: apiFile.display_name,
+      name: apiFile.name,
       thumbnail: this.getThumbnail(apiFile),
       src: `${context}/files/${apiFile.id}/preview${
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
-      alt: apiFile.display_name,
+      alt: apiFile.name,
       ...opts
     }
-    if (apiFile.embedded_iframe_url) {
+    if (apiFile.iframeUrl) {
       // it's a media_object
-      file.src = apiFile.embedded_iframe_url
+      file.src = apiFile.iframeUrl
     }
     return file
   }

@@ -97,7 +97,7 @@ def featureFlagStage(stages, buildConfig) {
         slackSend(
           channel: configuration.getString('feature-flag-report-channel'),
           color: 'warning',
-          message: "${env.GERRIT_CHANGE_URL} is changing a feature flag."
+          message: "Patchset <${env.GERRIT_CHANGE_URL}|${env.GERRIT_CHANGE_SUBJECT}> by ${env.GERRIT_EVENT_ACCOUNT_NAME} is changing a feature flag"
         )
 
         node('master') {

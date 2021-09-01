@@ -96,16 +96,6 @@ module Types
       get_entries(args)
     end
 
-    field :root_discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
-      argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
-      argument :sort_order, DiscussionSortOrderType, required: false
-    end
-    def root_discussion_entries_connection(**args)
-      args[:root_entries] = true
-      get_entries(args)
-    end
-
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
@@ -202,6 +192,16 @@ module Types
       get_entries(args).then do |entries|
         entries.count
       end
+    end
+
+    field :mentionable_users_connection, Types::MessageableUserType.connection_type, null: true do
+      argument :search_term, String, required: false
+    end
+    def mentionable_users_connection(search_term: nil)
+      Loaders::MentionableUserLoader.for(
+        current_user: current_user,
+        search_term: search_term
+      ).load(object)
     end
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)

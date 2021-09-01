@@ -15,29 +15,29 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import I18n from 'i18n!broken_images'
+import ready from '@instructure/ready'
 
-export function attachErrorHandler(imgElement) {
-  $(imgElement).on('error', e => {
-    if (e.currentTarget.src) {
-      $.get(e.currentTarget.src, undefined, undefined, 'text').fail(response => {
-        if (response.status === 403) {
-          // Replace the image with a lock image
-          $(e.currentTarget).attr({
-            src: '/images/svg-icons/icon_lock.svg',
-            alt: I18n.t('Locked image'),
-            width: 100,
-            height: 100
-          })
+export function attachErrorHandler(imgEl) {
+  imgEl.addEventListener('error', e => {
+    const img = e.currentTarget
+    const broken = () => img.classList.add('broken-image')
+    if (img.src) {
+      // eslint-disable-next-line promise/catch-or-return
+      fetch(img.src).then(res => {
+        if (res.status === 403) {
+          // if 403 Forbidden, replace the image with a lock image
+          img.src = '/images/svg-icons/icon_lock.svg'
+          img.alt = I18n.t('Locked image')
+          img.width = 100
+          img.height = 100
         } else {
-          // Add the broken-image class
-          $(e.currentTarget).addClass('broken-image')
+          // in all other cases just add the broken-image class
+          broken()
         }
-      })
+      }, broken)
     } else {
-      // Add the broken-image class (if there is no source)
-      $(e.currentTarget).addClass('broken-image')
+      broken()
     }
   })
 }
@@ -48,4 +48,4 @@ export function getImagesAndAttach() {
 
 // this behavior will set up all broken images on the page with an error handler that
 // can apply the broken-image class if there is an error loading the image.
-$(document).ready(() => getImagesAndAttach())
+ready(getImagesAndAttach)

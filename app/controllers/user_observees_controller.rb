@@ -141,7 +141,7 @@ class UserObserveesController < ApplicationController
       common_root_accounts = common_root_accounts_for(observer, student)
       code.destroy
     else
-      observee_pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(params[:observee][:unique_id]).first
+      observee_pseudonym = @domain_root_account.pseudonyms.active_only.by_unique_id(params[:observee][:unique_id]).first
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?

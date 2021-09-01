@@ -80,6 +80,7 @@ class RoleOverride < ActiveRecord::Base
 
   # Common set of granular permissions for checking rights against
   GRANULAR_FILE_PERMISSIONS = [:manage_files_add, :manage_files_edit, :manage_files_delete].freeze
+  GRANULAR_MANAGE_GROUPS_PERMISSIONS = [:manage_groups_add, :manage_groups_manage, :manage_groups_delete].freeze
   GRANULAR_MANAGE_USER_PERMISSIONS = [
     :allow_course_admin_actions,
     :add_student_to_course,
@@ -92,6 +93,11 @@ class RoleOverride < ActiveRecord::Base
     :remove_ta_from_course,
     :remove_observer_from_course,
     :remove_designer_from_course
+  ].freeze
+  GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS = [
+    :manage_assignments,
+    :manage_assignments_add,
+    :manage_assignments_delete
   ].freeze
 
   # immediately register stock canvas-lms permissions
@@ -173,18 +179,9 @@ class RoleOverride < ActiveRecord::Base
     manage_courses_add: {
       label: lambda { t('Add courses') },
       label_v2: lambda { t('Courses - add') },
-      group: 'manage_courses',
-      group_label: lambda { t('Manage Courses') },
-      available_to: %w[
-        StudentEnrollment
-        TaEnrollment
-        DesignerEnrollment
-        TeacherEnrollment
-        ObserverEnrollment
-        AccountAdmin
-        AccountMembership
-      ],
+      available_to: %w[AccountAdmin AccountMembership],
       true_for: %w[AccountAdmin],
+      account_only: true,
       account_allows:
         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
     },
@@ -761,9 +758,21 @@ class RoleOverride < ActiveRecord::Base
     },
 
     :manage_assignments => {
-      :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
-      :label_v2 => lambda { t("Assignments and Quizzes - add / edit / delete") },
-      :available_to => [
+      label: -> {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_assignments)
+          t("Manage / edit assignments and quizzes")
+        else
+          t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes")
+        end
+      },
+      label_v2: -> {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_assignments)
+          t("Assignments and Quizzes - manage / edit")
+        else
+          t("Assignments and Quizzes - add / edit / delete")
+        end
+      },
+      available_to: [
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
@@ -771,13 +780,57 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin',
         'AccountMembership'
       ],
-      :true_for => [
+      true_for: [
         'TaEnrollment',
         'DesignerEnrollment',
         'TeacherEnrollment',
         'AccountAdmin'
       ],
-      :acts_as_access_token_scope => true
+      acts_as_access_token_scope: true
+    },
+    manage_assignments_add: {
+      label: -> { t("Add assignments and quizzes") },
+      label_v2: -> { t("Assignments and Quizzes - add") },
+      available_to: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      true_for: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ],
+      acts_as_access_token_scope: true,
+      group: "manage_assignments_and_quizzes",
+      group_label: -> { t("Manage Assignments and Quizzes") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
+    },
+    :manage_assignments_delete => {
+      label: -> { t("Delete assignments and quizzes") },
+      label_v2: -> { t("Assignments and Quizzes - delete") },
+      available_to: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      true_for: [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ],
+      acts_as_access_token_scope: true,
+      group: "manage_assignments_and_quizzes",
+      group_label: -> { t("Manage Assignments and Quizzes") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
     },
     :manage_calendar => {
       :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
@@ -938,24 +991,73 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ]
      },
-     :manage_groups => {
-       :label => lambda { t('permissions.manage_groups', "Manage (create / edit / delete) groups") },
-       :label_v2 => lambda { t("Groups - add / edit / delete") },
-       :available_to => [
-         'TaEnrollment',
-         'DesignerEnrollment',
-         'TeacherEnrollment',
-         'AccountAdmin',
-         'AccountMembership'
-      ],
-      :true_for => [
-        'TaEnrollment',
-        'DesignerEnrollment',
-        'TeacherEnrollment',
-        'AccountAdmin'
-      ],
-     :acts_as_access_token_scope => true
-    },
+     # lagacy role override
+     manage_groups: {
+       label: lambda { t('Manage (create / edit / delete) groups') },
+       label_v2: lambda { t('Groups - add / edit / delete') },
+       available_to: %w[
+         TaEnrollment
+         DesignerEnrollment
+         TeacherEnrollment
+         AccountAdmin
+         AccountMembership
+       ],
+       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+       acts_as_access_token_scope: true,
+       account_allows:
+         lambda { |a| !a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+     },
+     manage_groups_add: {
+       label: lambda { t('Add groups') },
+       label_v2: lambda { t('Groups - add') },
+       group: 'manage_groups',
+       group_label: lambda { t('Manage Groups') },
+       available_to: %w[
+         TaEnrollment
+         DesignerEnrollment
+         TeacherEnrollment
+         AccountAdmin
+         AccountMembership
+       ],
+       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+       acts_as_access_token_scope: true,
+       account_allows:
+         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+     },
+     manage_groups_manage: {
+       label: lambda { t('Manage groups') },
+       label_v2: lambda { t('Groups - manage') },
+       group: 'manage_groups',
+       group_label: lambda { t('Manage Groups') },
+       available_to: %w[
+         TaEnrollment
+         DesignerEnrollment
+         TeacherEnrollment
+         AccountAdmin
+         AccountMembership
+       ],
+       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+       acts_as_access_token_scope: true,
+       account_allows:
+         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+     },
+     manage_groups_delete: {
+       label: lambda { t('Delete groups') },
+       label_v2: lambda { t('Groups - delete') },
+       group: 'manage_groups',
+       group_label: lambda { t('Manage Groups') },
+       available_to: %w[
+         TaEnrollment
+         DesignerEnrollment
+         TeacherEnrollment
+         AccountAdmin
+         AccountMembership
+       ],
+       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+       acts_as_access_token_scope: true,
+       account_allows:
+         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+     },
     :manage_interaction_alerts => {
       :label => lambda { t('permissions.manage_interaction_alerts', "Manage alerts") },
       :label_v2 => lambda { t("Alerts - add / edit / delete") },

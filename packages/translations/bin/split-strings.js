@@ -37,7 +37,7 @@ async function getEnglishSourceFilePaths() {
   return packages
     .filter(packageName => !packageName.startsWith('.'))
     .map(packageName => ({
-      englishPath: `${packageName}/locales/en.json`,
+      englishPath: `${PACKAGES_DIR}/${packageName}/locales/en.json`,
       packageName
     }))
 }

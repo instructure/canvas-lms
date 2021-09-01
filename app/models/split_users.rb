@@ -159,6 +159,7 @@ class SplitUsers
     fix_communication_channels(records.where(context_type: 'CommunicationChannel'))
     move_user_observers(records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: restored_user))
     move_attachments(records.where(context_type: 'Attachment'))
+    handle_submissions(records)
     enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: restored_user).pluck(:context_id)
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
@@ -166,7 +167,6 @@ class SplitUsers
     Shard.partition_by_shard(pseudonyms) do |pseudonyms|
       move_new_enrollments(enrollment_ids, pseudonyms)
     end
-    handle_submissions(records)
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
 
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|

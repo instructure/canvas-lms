@@ -257,6 +257,18 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  // Fetches all files for a given folder
+  fetchFilesForFolder(props, bookmark) {
+    let uri
+
+    if (!bookmark) {
+      const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
+      uri = `${props.filesUrl}?${perPageQuery}${getSearchParam(props.searchString)}`
+    }
+
+    return this.fetchPage(uri || bookmark, this.jwt)
+  }
+
   fetchSubFolders(props, bookmark) {
     const uri = bookmark || `${this.baseUri('folders', props.host)}/${props.folderId}`
     return this.apiFetch(uri, headerFor(this.jwt))

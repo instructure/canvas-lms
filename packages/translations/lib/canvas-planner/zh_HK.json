@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "開始您的待辦事項歷程紀錄"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "下面是學生看到的排程的範例"
+  },
   "calendar_a8563bb2": { "message": "行事曆：" },
   "calendar_event_89aadc1c": { "message": "行事曆活動" },
   "canvas_planner_98ed106": { "message": "Canvas 手冊" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# 機會}\n    one {# 機會}\n  other {# 機會}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {隱藏 # 個缺失項目}\n  other {隱藏 # 個缺失項目}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {顯示 # 個已完成項目}\n  other {顯示 # 個已完成項目}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {顯示 # 個缺失項目}\n  other {顯示 # 個缺失項目}\n}"
   },
   "course_8a63b4a3": { "message": "課程" },
   "course_to_do_bcbbab54": { "message": "{ course } 待辦事項" },
@@ -80,9 +89,16 @@
   "edit_c5fbea07": { "message": "編輯" },
   "edit_title_72e5a21e": { "message": "編輯 { title }" },
   "error_loading_grades_e0b38f4d": { "message": "載入成績時發生錯誤" },
+  "error_loading_items_5218438e": { "message": "載入項目時發生錯誤" },
   "error_loading_more_items_3f109d9f": { "message": "載入更多項目時發生錯誤" },
   "error_loading_past_items_2881dbb1": { "message": "載入過去項目時發生錯誤" },
   "excused_cf8792eb": { "message": "已免除" },
+  "failed_peeking_into_your_future_e95b9306": { "message": "無法窺視您的未來" },
+  "failed_peeking_into_your_past_5bec2323": { "message": "無法窺視您的過去" },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "無法儲存對 { name } 的變更。"
+  },
+  "failed_to_delete_name_bdd7b810": { "message": "無法刪除 { name }。" },
   "failed_to_delete_to_do_64edff49": { "message": "未能刪除待辦事項" },
   "failed_to_get_new_activity_17e7ec7c": { "message": "未能取得最新活動" },
   "failed_to_load_opportunities_52ab6404": { "message": "未能載入機會" },
@@ -95,10 +111,9 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } 已完成 { items, plural,\n     =1 { 個項目}\n  other { 個項目}\n}"
   },
+  "jump_to_navigation_toolbar_2952cd8b": { "message": "跳轉到導航工具欄" },
+  "jump_to_today_254ccf41": { "message": "跳轉到今天" },
   "late_2be42b88": { "message": "逾期" },
-  "list_collapsed_9ac35920": { "message": "名單收起。" },
-  "list_collapsed_dde87718": { "message": "名單收起" },
-  "list_expanded_efec2d0": { "message": "名單展開。" },
   "load_more_a36f9cf9": { "message": "載入更多" },
   "load_prior_dates_f2b0f6f0": { "message": "載入先前日期" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -123,6 +138,7 @@
   "next_month_749b1778": { "message": "下個月" },
   "no_due_dates_assigned_e8f5bac8": { "message": "無指定截止日期" },
   "no_grade_3b4d7f3e": { "message": "無評分" },
+  "nothing_due_this_week_d45c9ef9": { "message": "無本週截止事項" },
   "nothing_for_now_e3e3ce2a": { "message": "未有內容" },
   "nothing_here_needs_attention_c4eaded6": { "message": "這裡暫無事項。" },
   "nothing_more_to_do_b665da42": { "message": "沒有待辦事項" },
@@ -139,9 +155,6 @@
     "message": "*只顯示最近的評分期。"
   },
   "opportunities_popup_f6703842": { "message": "機會彈出視窗" },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "已選擇 { option }。名單收起。"
-  },
   "optional_add_course_ef0d70fc": { "message": "可選：添加課程" },
   "page_50c4823d": { "message": "頁面" },
   "peer_review_74f26a13": { "message": "同儕互評" },
@@ -153,9 +166,11 @@
   "previous_month_bb1e3c84": { "message": "上個月" },
   "pts_699bd9aa": { "message": "分數" },
   "quiz_e0dcce8f": { "message": "測驗" },
+  "redo_363c58b7": { "message": "重做" },
   "reminder_date_4564d12d": { "message": "提醒：{ date }" },
   "replies_4a8577c8": { "message": "回覆" },
   "save_11a80ec3": { "message": "儲存" },
+  "schedule_preview_3bcda153": { "message": "排程預覽" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "向上捲動以查看您的歷程記錄！"
   },
@@ -185,6 +200,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "沒有與此項目關聯的分數。"
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "今天沒有任何規劃項目。"
+  },
   "time_2b5aac58": { "message": "時間" },
   "title_ee03d132": { "message": "標題" },
   "title_is_required_6ddcab69": { "message": "標題為必填" },
@@ -199,6 +217,9 @@
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "使用箭頭鍵導航選項。"
   },
+  "view_next_week_7f61f755": { "message": "檢視下一周" },
+  "view_previous_week_6f83849f": { "message": "檢視上一周" },
+  "weekly_schedule_navigation_6b042645": { "message": "每週排程導航工具" },
   "yesterday_at_date_1aa6d18e": { "message": "昨天 { date }" },
   "yesterday_c6bd6abf": { "message": "昨天" },
   "you_have_media_feedback_f5f9aba8": { "message": "您有媒體反饋。" },

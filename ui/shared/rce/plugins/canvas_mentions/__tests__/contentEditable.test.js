@@ -68,6 +68,9 @@ describe('contentEditable', () => {
 
     beforeEach(() => {
       editor = new FakeEditor()
+      editor.selection.getBookmark = jest.fn()
+      editor.selection.moveToBookmark = jest.fn()
+
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
@@ -86,9 +89,14 @@ describe('contentEditable', () => {
       expect(editor.getBody().getAttribute('contenteditable')).toEqual('true')
     })
 
-    it('removes all attributes from the marker', () => {
+    it('gets the current cursor position', () => {
       subject()
-      expect(screen.getByText('wes').attributes.length).toEqual(0)
+      expect(editor.selection.getBookmark).toHaveBeenCalled()
+    })
+
+    it('sets the cursor position', () => {
+      subject()
+      expect(editor.selection.moveToBookmark).toHaveBeenCalled()
     })
   })
 })

@@ -36,15 +36,19 @@ const ManageOutcomeItem = ({
   linkId,
   title,
   description,
+  friendlyDescription,
   canManageOutcome,
   isChecked,
+  parentGroupId,
+  parentGroupTitle,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
-  const onChangeHandler = () => onCheckboxHandler({_id, linkId, title, canUnlink})
+  const onChangeHandler = () =>
+    onCheckboxHandler({_id, linkId, title, canUnlink, parentGroupId, parentGroupTitle})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
 
   // This allows account admins to edit global outcomes
@@ -85,7 +89,7 @@ const ManageOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={description ? 'enabled' : 'disabled'}
+                  interaction={description || friendlyDescription ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
@@ -120,13 +124,14 @@ const ManageOutcomeItem = ({
       <Flex as="div" alignItems="start">
         <Flex.Item size="4.125rem" />
         <Flex.Item size="50%" shouldGrow>
-          {description && (
+          {(description || friendlyDescription) && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
                 withExternalControl
                 description={description}
                 truncate={truncate}
                 onClickHandler={onClickHandler}
+                friendlyDescription={friendlyDescription}
               />
             </View>
           )}
@@ -141,7 +146,10 @@ ManageOutcomeItem.propTypes = {
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
+  friendlyDescription: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
+  parentGroupId: PropTypes.string.isRequired,
+  parentGroupTitle: PropTypes.string.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,

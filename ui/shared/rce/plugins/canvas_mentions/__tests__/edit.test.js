@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {insert, replace} from '../edit'
+import {insert, insertMentionFor, replace} from '../edit'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 
 let editor
@@ -88,4 +88,29 @@ describe('replace()', () => {
   })
 
   returnValueExamples(subject)
+})
+
+describe('insertMentionFor()', () => {
+  const user = {
+    id: '123',
+    shortName: 'Test User'
+  }
+
+  const subject = () => insertMentionFor(user, editor)
+
+  beforeEach(() => {
+    editor.setContent('<span id="mentions-marker"></div>')
+  })
+
+  it('inserts the content into the editor with correct username', () => {
+    subject()
+    expect(editor.getContainer().querySelector('.mention').innerHTML).toEqual('Test User')
+  })
+
+  it('inserts the content into the editor with correct mentions user id', () => {
+    subject()
+    expect(editor.getContainer().querySelector('.mention').getAttribute('data-mention')).toEqual(
+      '123'
+    )
+  })
 })

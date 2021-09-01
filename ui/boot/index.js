@@ -21,18 +21,19 @@ import canvasHighContrastTheme from '@instructure/canvas-high-contrast-theme'
 import moment from 'moment'
 import tz from '@canvas/timezone'
 import './initializers/fakeRequireJSFallback.js'
+import {
+  up as configureDateTimeMomentParser
+} from './initializers/configureDateTimeMomentParser'
+import {
+  up as configureTimezone
+} from './initializers/configureTimezone'
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
 // on the page from rails, so this should not cause a new network request.
 moment().locale(ENV.MOMENT_LOCALE)
 
-// These timezones and locales should already be put on the page as <script>
-// tags from rails. this block should not create any network requests.
-if (typeof ENV !== 'undefined') {
-  if (ENV.TIMEZONE) tz.changeZone(ENV.TIMEZONE)
-  if (ENV.CONTEXT_TIMEZONE) tz.preload(ENV.CONTEXT_TIMEZONE)
-  if (ENV.BIGEASY_LOCALE) tz.changeLocale(ENV.BIGEASY_LOCALE, ENV.MOMENT_LOCALE)
-}
+configureDateTimeMomentParser()
+configureTimezone()
 
 // This will inject and set up sentry for deprecation reporting.  It should be
 // stripped out and be a no-op in production.

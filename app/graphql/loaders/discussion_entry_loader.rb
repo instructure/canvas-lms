@@ -36,9 +36,21 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope.reorder("created_at #{@sort_order}")
       scope = scope.where(parent_id: nil) if @root_entries
       if @search_term.present?
-        scope = scope.where.not(:workflow_state => 'deleted')
-        scope = scope.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
+        # search results cannot look at the messages from deleted
+        # discussion_entries, so they need to be excluded.
+        scope = scope.active.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
           .or(scope.joins(:user).where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(@search_term)))
+      end
+
+      if @root_entries
+        sort_sql = ActiveRecord::Base.sanitize_sql("COALESCE(children.created_at, discussion_entries.created_at) #{@sort_order}")
+        scope = scope
+          .joins("LEFT OUTER JOIN #{DiscussionEntry.quoted_table_name} AS children
+                  ON children.root_entry_id=discussion_entries.id
+                  AND children.created_at = (SELECT MAX(children2.created_at)
+                                             FROM #{DiscussionEntry.quoted_table_name} AS children2
+                                             WHERE children2.root_entry_id=discussion_entries.id)")
+          .reorder(Arel.sql(sort_sql))
       end
 
       if @relative_entry_id
@@ -48,7 +60,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         scope = scope.where("created_at #{condition}?", relative_entry.created_at)
       end
 
-      scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
+      # unread filter is used like search results and need to exclude deleted entries
+      scope = scope.active.unread_for_user(@current_user) if @filter == 'unread'
       scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
       fulfill(object, scope)
     end

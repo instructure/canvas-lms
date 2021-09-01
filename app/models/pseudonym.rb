@@ -60,7 +60,7 @@ class Pseudonym < ActiveRecord::Base
   alias_method :context, :account
 
   include StickySisFields
-  are_sis_sticky :unique_id
+  are_sis_sticky :unique_id, :workflow_state
 
   validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
             length: { within: 1..MAX_UNIQUE_ID_LENGTH },
@@ -157,7 +157,7 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
 
-    active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
+    active_only.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
       AuthenticationProvider.active.where(auth_type: ['canvas', 'ldap'])
         .where("authentication_provider_id=authentication_providers.id"))
         .order("authentication_provider_id NULLS LAST").first
@@ -165,8 +165,8 @@ class Pseudonym < ActiveRecord::Base
 
   def self.for_auth_configuration(unique_id, aac)
     auth_id = aac.try(:auth_provider_filter)
-    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).
-      order("authentication_provider_id NULLS LAST").take
+    active_only.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
+      .order("authentication_provider_id NULLS LAST").take
   end
 
   def set_password_changed
@@ -276,6 +276,7 @@ class Pseudonym < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+    state :suspended
   end
 
   set_policy do
@@ -412,8 +413,9 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def valid_arbitrary_credentials?(plaintext_password)
-    return false if self.deleted?
+    return false unless active?
     return false if plaintext_password.blank?
+
     require 'net/ldap'
     res = false
     res ||= valid_ldap_credentials?(plaintext_password)
@@ -515,8 +517,11 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :active_only, -> { where(workflow_state: 'active') }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
 
+  
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
   def self.associated_shards(unique_id_or_sis_user_id)
@@ -532,6 +537,7 @@ class Pseudonym < ActiveRecord::Base
       # a failed login instead of an error.
       raise ImpossibleCredentialsError, "pseudonym cannot have a unique_id of length #{credentials[:unique_id].length}"
     end
+
     too_many_attempts = false
     begin
       associated_shards = associated_shards(credentials[:unique_id])
@@ -540,19 +546,21 @@ class Pseudonym < ActiveRecord::Base
       # by searching all accounts the slow way
       Canvas::Errors.capture(e)
     end
-    pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
+    pseudonyms = Shard.partition_by_shard(account_ids) do |shard_account_ids|
       next if GlobalLookups.enabled? && associated_shards && !associated_shards.include?(Shard.current)
-      active.
-        by_unique_id(credentials[:unique_id]).
-        where(:account_id => account_ids).
-        preload(:user).
-        select { |p|
+
+      active_only
+        .by_unique_id(credentials[:unique_id])
+        .where(account_id: shard_account_ids)
+        .preload(:user)
+        .select do |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
           too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts
           valid
-        }
+        end
     end
     return :too_many_attempts if too_many_attempts
+
     pseudonyms
   end
 

@@ -24,7 +24,7 @@ import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/
 import AssignmentSyncSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSyncSettingsView.coffee'
 import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView.coffee'
 import IndexView from 'ui/features/assignment_index/backbone/views/IndexView.coffee'
-import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView.js'
+import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
@@ -96,7 +96,7 @@ function assignmentIndex(opts = {withAssignmentSettings: false}) {
   return app.render()
 }
 
-QUnit.module('assignmentIndex', {
+QUnit.module('AssignmentIndex', {
   setup() {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
@@ -114,6 +114,7 @@ QUnit.module('assignmentIndex', {
   }
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = assignmentIndex()
   const done = assert.async()
@@ -147,7 +148,7 @@ test('should enable search on assignmentGroup reset', () => {
 })
 
 test('enable search handler should only fire on the first reset', function () {
-  const view = assignmentIndex()
+  assignmentIndex()
   assignmentGroups.reset()
   ok(this.enable_spy.calledOnce)
   // reset a second time and make sure it was still only called once
@@ -183,7 +184,7 @@ test('should show modules column', () => {
 })
 
 test("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
-  ENV.PERMISSIONS.manage_assignments = true
+  ENV.PERMISSIONS.manage_assignments_add = true
   ENV.QUIZ_LTI_ENABLED = true
   const view = assignmentIndex()
   const $button = view.$('.new_quiz_lti')
@@ -192,7 +193,7 @@ test("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
 })
 
 test("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => {
-  ENV.PERMISSIONS.manage_assignments = true
+  ENV.PERMISSIONS.manage_assignments_add = true
   ENV.QUIZ_LTI_ENABLED = false
   const view = assignmentIndex()
   equal(view.$('.new_quiz_lti').length, 0)
@@ -235,7 +236,7 @@ test('should clear search on toggle', () => {
   ok(clear_spy.called)
 })
 
-QUnit.module('bulk edit', {
+QUnit.module('AssignmentIndex - bulk edit', {
   setup() {
     fakeENV.setup({
       PERMISSIONS: {manage_assignments: true}

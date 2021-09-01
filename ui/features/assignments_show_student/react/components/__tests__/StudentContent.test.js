@@ -119,7 +119,7 @@ describe('Assignment Student Content View', () => {
       expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
     })
 
-    it('renders the rubric if the assignment has one', async () => {
+    it.skip('renders the rubric if the assignment has one', async () => {
       window.ENV.ASSIGNMENT_ID = 1
       window.ENV.COURSE_ID = 1
       props.assignment.rubric = {}
@@ -205,40 +205,6 @@ describe('Assignment Student Content View', () => {
       )
       fireEvent.click(getByText('View Feedback'))
       expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
-    })
-  })
-
-  describe('when there is an unread comment', () => {
-    const makeMocks = async () => {
-      const variables = {submissionAttempt: 0, submissionId: '1'}
-      const overrides = {
-        Node: {__typename: 'Submission'},
-        SubmissionCommentConnection: {nodes: [{read: false}]}
-      }
-      const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
-      const mocks = [
-        {
-          request: {
-            query: SUBMISSION_COMMENT_QUERY,
-            variables
-          },
-          result
-        }
-      ]
-      return mocks
-    }
-
-    it.skip('opens the feedback panel', async () => {
-      const mocks = await makeMocks()
-      const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1}
-      })
-      const {getByText} = render(
-        <MockedProvider mocks={mocks}>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
     })
   })
 

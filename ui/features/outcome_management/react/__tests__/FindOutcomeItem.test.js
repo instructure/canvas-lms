@@ -15,27 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import FindOutcomeItem from '../FindOutcomeItem'
+import {
+  IMPORT_COMPLETED,
+  IMPORT_NOT_STARTED,
+  IMPORT_PENDING
+} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+
+jest.useFakeTimers()
 
 describe('FindOutcomeItem', () => {
   let onMenuHandlerMock
-  let onAddClickHandlerMock
+  let onImportOutcomeHandlerMock
   const defaultProps = (props = {}) => ({
     id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
-    isAdded: false,
+    isImported: false,
+    importGroupStatus: IMPORT_NOT_STARTED,
+    sourceContextId: '100',
+    sourceContextType: 'Account',
     onMenuHandler: onMenuHandlerMock,
-    onAddClickHandler: onAddClickHandlerMock,
+    importOutcomeHandler: onImportOutcomeHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
-    onAddClickHandlerMock = jest.fn()
+    onImportOutcomeHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -52,28 +61,44 @@ describe('FindOutcomeItem', () => {
     expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
-  it('if outcome has not been added, add button should be enabled with Add as the text', () => {
+  it('enables add button with Add as text if outcome is not imported', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
     expect(getByText('Add')).toBeInTheDocument()
-    expect(getByText('Add').closest('button')).not.toBeDisabled()
+    expect(getByText('Add').closest('button')).toBeEnabled()
   })
 
-  it('if outcome has been added, add button should be disabled with Added as the text', () => {
-    const {getByText} = render(<FindOutcomeItem {...defaultProps({isAdded: true})} />)
+  it('disables add button with Added as text if outcome is imported', () => {
+    const {getByText} = render(<FindOutcomeItem {...defaultProps({isImported: true})} />)
     expect(getByText('Added')).toBeInTheDocument()
     expect(getByText('Added').closest('button')).toBeDisabled()
   })
 
-  it('handles click on add button handler', () => {
-    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Add'))
-    expect(onAddClickHandlerMock).toHaveBeenCalledTimes(1)
+  it('disables add button with Added as text if group has been imported', () => {
+    const {getByText} = render(
+      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_COMPLETED})} />
+    )
+    expect(getByText('Added')).toBeInTheDocument()
+    expect(getByText('Added').closest('button')).toBeDisabled()
   })
 
-  it('passes item id to add button handler', () => {
+  it('displays loader instead of Add button if group import status is pending', () => {
+    const {queryByText, getByTestId} = render(
+      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_PENDING})} />
+    )
+    expect(getByTestId('outcome-import-pending')).toBeInTheDocument()
+    expect(queryByText('Add')).not.toBeInTheDocument()
+  })
+
+  it('handles click on add button', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
     fireEvent.click(getByText('Add'))
-    expect(onAddClickHandlerMock).toHaveBeenCalledWith('1')
+    expect(onImportOutcomeHandlerMock).toHaveBeenCalled()
+  })
+
+  it('passes item id and sourceContextId/sourceContextType to add button handler', () => {
+    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
+    fireEvent.click(getByText('Add'))
+    expect(onImportOutcomeHandlerMock).toHaveBeenCalledWith('1', 1, false, '100', 'Account')
   })
 
   it('displays right pointing caret when description is collapsed', () => {
@@ -103,5 +128,13 @@ describe('FindOutcomeItem', () => {
   it('displays disabled caret button if no description', () => {
     const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />)
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
+  })
+
+  it('calls onImportHandler if Add button is clicked', () => {
+    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />, {
+      contextType: 'Course'
+    })
+    fireEvent.click(getByText('Add'))
+    expect(onImportOutcomeHandlerMock).toHaveBeenCalled()
   })
 })

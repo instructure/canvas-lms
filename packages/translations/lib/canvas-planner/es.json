@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Inicio de su Historial de cosas por hacer"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "A continuación se muestra un ejemplo de cómo verán los estudiantes su cronograma."
+  },
   "calendar_a8563bb2": { "message": "Calendario:" },
   "calendar_event_89aadc1c": { "message": "Evento del calendario" },
   "canvas_planner_98ed106": { "message": "Planificador de Canvas" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Ocultar # elemento faltante}\n  other {Ocultar # elementos faltantes}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostrar # ítem completado}\n  other {Mostrar # ítems completados}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Mostrar # elemento faltante}\n  other {Mostrar # elementos faltantes}\n}"
   },
   "course_8a63b4a3": { "message": "Curso" },
   "course_to_do_bcbbab54": { "message": "{ course } POR HACER" },
@@ -86,6 +95,7 @@
   "error_loading_grades_e0b38f4d": {
     "message": "Error al cargar las calificaciones"
   },
+  "error_loading_items_5218438e": { "message": "Error al cargar elementos" },
   "error_loading_more_items_3f109d9f": {
     "message": "Error al cargar más ítems"
   },
@@ -93,6 +103,18 @@
     "message": "Error al cargar ítems anteriores"
   },
   "excused_cf8792eb": { "message": "Justificado" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Error al echar un vistazo a su futuro"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Error al echar un vistazo a su pasado"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "No se pudieron guardar los cambios en { name }."
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "No se puedo eliminar { name }."
+  },
   "failed_to_delete_to_do_64edff49": {
     "message": "Error al eliminar tareas por hacer"
   },
@@ -117,10 +139,11 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } { items, plural,\n     =1 {ítem}\n  other {ítems}\n} completado(s)"
   },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Salte a la barra de herramientas de navegación"
+  },
+  "jump_to_today_254ccf41": { "message": "Salte a hoy" },
   "late_2be42b88": { "message": "Atrasado" },
-  "list_collapsed_9ac35920": { "message": "Lista colapsada." },
-  "list_collapsed_dde87718": { "message": "Lista colapsada" },
-  "list_expanded_efec2d0": { "message": "Lista expandida." },
   "load_more_a36f9cf9": { "message": "Cargar más" },
   "load_prior_dates_f2b0f6f0": { "message": "Cargar fechas anteriores" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -153,6 +176,7 @@
     "message": "No hay fechas de entrega asignadas"
   },
   "no_grade_3b4d7f3e": { "message": "Sin calificación" },
+  "nothing_due_this_week_d45c9ef9": { "message": "Nada vence esta semana" },
   "nothing_for_now_e3e3ce2a": { "message": "Nada por ahora" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "No hay nada aquí que requiera atención."
@@ -175,9 +199,6 @@
   "opportunities_popup_f6703842": {
     "message": "Ventana emergente de oportunidades"
   },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } seleccionado. Lista colapsada."
-  },
   "optional_add_course_ef0d70fc": { "message": "Opcional: Agregar curso" },
   "page_50c4823d": { "message": "Página" },
   "peer_review_74f26a13": { "message": "Revisión entre pares" },
@@ -189,9 +210,11 @@
   "previous_month_bb1e3c84": { "message": "Mes anterior" },
   "pts_699bd9aa": { "message": "ptos." },
   "quiz_e0dcce8f": { "message": "Evaluación" },
+  "redo_363c58b7": { "message": "Rehacer" },
   "reminder_date_4564d12d": { "message": "Recordatorio: { date }" },
   "replies_4a8577c8": { "message": "Respuestas" },
   "save_11a80ec3": { "message": "Guardar" },
+  "schedule_preview_3bcda153": { "message": "Vista previa del horario" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "¡Desplácese para ver su historial!"
   },
@@ -219,6 +242,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "No hay puntos asociados con este ítem"
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "No hay nada planeado para hoy."
+  },
   "time_2b5aac58": { "message": "Hora" },
   "title_ee03d132": { "message": "Título" },
   "title_is_required_6ddcab69": { "message": "se requiere un título" },
@@ -234,6 +260,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Use las teclas de flecha para navegar entre las opciones."
+  },
+  "view_next_week_7f61f755": { "message": "Ver semana próxima" },
+  "view_previous_week_6f83849f": { "message": "Ver semana anterior" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Navegación de programación semanal"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ayer a las { date }" },
   "yesterday_c6bd6abf": { "message": "Ayer" },

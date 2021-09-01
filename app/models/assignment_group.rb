@@ -94,13 +94,34 @@ class AssignmentGroup < ActiveRecord::Base
     given { |user, session| self.context.grants_any_right?(user, session, :read, :view_all_grades, :manage_grades) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :read and can :create and can :update
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
+    can :create
 
     given do |user, session|
-      self.context.grants_right?(user, session, :manage_assignments) &&
-        (self.context.account_membership_allows(user) ||
-         !any_assignment_in_closed_grading_period?)
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_add)
+    end
+    can :read and can :create
+
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    can :read and can :update
+
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments) &&
+          (self.context.account_membership_allows(user) ||
+           !any_assignment_in_closed_grading_period?)
+    end
+    can :delete
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_delete) &&
+          (self.context.account_membership_allows(user) ||
+           !any_assignment_in_closed_grading_period?)
     end
     can :delete
   end
@@ -237,7 +258,7 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
-    scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
+    scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       context.active_assignments.where(:assignment_group_id => assignment_groups)
     elsif user.nil?
       context.active_assignments.published.where(:assignment_group_id => assignment_groups)

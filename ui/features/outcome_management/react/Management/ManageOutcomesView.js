@@ -178,16 +178,24 @@ const ManageOutcomesView = ({
               </View>
             ))}
           {outcomes?.edges?.map(
-            ({canUnlink, id: linkId, node: {_id, title, description, canEdit}}) => (
+            ({
+              canUnlink,
+              _id: linkId,
+              group: {_id: parentGroupId, title: parentGroupTitle},
+              node: {_id, title, description, friendlyDescription, canEdit}
+            }) => (
               <ManageOutcomeItem
                 key={linkId}
                 _id={_id}
                 linkId={linkId}
                 title={title}
                 description={description}
+                friendlyDescription={friendlyDescription?.description}
                 canManageOutcome={canEdit}
                 canUnlink={canUnlink}
                 isChecked={!!selectedOutcomes[linkId]}
+                parentGroupId={parentGroupId}
+                parentGroupTitle={parentGroupTitle}
                 onMenuHandler={onOutcomeMenuHandler}
                 onCheckboxHandler={onSelectOutcomesHandler}
               />
@@ -208,6 +216,7 @@ ManageOutcomesView.propTypes = {
     outcomes: PropTypes.shape({
       edges: PropTypes.arrayOf(
         PropTypes.shape({
+          _id: PropTypes.string.isRequired,
           canUnlink: PropTypes.bool.isRequired,
           node: PropTypes.shape({
             _id: PropTypes.string.isRequired,

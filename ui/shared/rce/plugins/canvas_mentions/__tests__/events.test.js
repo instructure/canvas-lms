@@ -17,12 +17,17 @@
  */
 
 import {makeBodyEditable} from '../contentEditable'
+import {insertMentionFor} from '../edit'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onActiveDescendantChange} from '../events'
+import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onFocusedUserChange} from '../events'
 import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
   makeBodyEditable: jest.fn()
+}))
+
+jest.mock('../edit', () => ({
+  insertMentionFor: jest.fn()
 }))
 
 jest.mock('../constants', () => ({
@@ -31,7 +36,8 @@ jest.mock('../constants', () => ({
 }))
 
 jest.mock('react-dom', () => ({
-  render: jest.fn()
+  render: jest.fn(),
+  unmountComponentAtNode: jest.fn()
 }))
 
 jest.mock('../components/MentionAutoComplete/MentionDropdown')
@@ -60,6 +66,12 @@ describe('events', () => {
         paste: false,
         editor
       }
+
+      editor.setContent('<span id="mention-menu"></span><span id="mentions-marker"></span>')
+    })
+
+    afterEach(() => {
+      document.body.innerHTML = ''
     })
 
     it('makes the body editable', () => {
@@ -102,13 +114,15 @@ describe('events', () => {
     beforeEach(() => {
       event = {
         editor,
-        which: 1
+        which: 1,
+        preventDefault: () => {}
       }
 
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
           </span>
         </div>`
       )
@@ -116,7 +130,9 @@ describe('events', () => {
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
     })
 
-    describe('when the current node is not he marker', () => {
+    afterEach(() => (document.body.innerHTML = ''))
+
+    describe('when the current node is not the marker', () => {
       beforeEach(() => editor.selection.select(editor.dom.select('#test')[0]))
 
       it('makes the body editable', () => {
@@ -126,7 +142,20 @@ describe('events', () => {
     })
 
     describe('when the the key is "enter"', () => {
-      beforeEach(() => (event.which = 13))
+      beforeEach(() => {
+        event.which = 13
+
+        editor.setContent(
+          `<div data-testid="fake-body" contenteditable="false">
+            <span id="test"> @
+              <span id="mentions-marker" contenteditable="true" aria-activedescendant="test"->wes</span>
+              <span id="mention-menu"></span>
+            </span>
+          </div>`
+        )
+      })
+
+      afterEach(() => (document.body.innerHTML = ''))
 
       it('does make the body editable', () => {
         subject()
@@ -135,14 +164,25 @@ describe('events', () => {
     })
 
     describe('when the key is "backspace" with offset 1', () => {
+      let mountElement
+
       beforeEach(() => {
         event.which = 8
         editor.selection.setRng({endOffset: 1, startOffset: 1})
+
+        mountElement = document.createElement('span')
+        mountElement.id = 'mention-menu'
+        document.body.appendChild(mountElement)
       })
 
       it('makes the body editable', () => {
         subject()
         expect(makeBodyEditable).toHaveBeenCalled()
+      })
+
+      it('closes the MentionsMenu', () => {
+        subject()
+        expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalled()
       })
     })
 
@@ -235,10 +275,53 @@ describe('events', () => {
           expectedValue = 'Enter'
           expectedMessageType = 'mentions.SelectionEvent'
 
-          onActiveDescendantChange('#foo', editor)
+          onFocusedUserChange(
+            {
+              ariaActiveDescendantId: '#foo',
+              name: 'Test User',
+              id: '12345'
+            },
+            editor
+          )
         })
 
-        examplesForMentionsEvents()
+        it('prevents the event default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('inserts the mention', () => {
+          subject()
+          expect(insertMentionFor).toHaveBeenCalled()
+        })
+      })
+
+      describe('when the key is "esc"', () => {
+        beforeEach(() => {
+          event.which = 27
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+        })
+
+        it('prevents default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('does not broadcast the message', () => {
+          subject()
+          expect(global.postMessage).not.toHaveBeenCalled()
+        })
+
+        it('unmounts the component', () => {
+          subject()
+          expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalledTimes(1)
+        })
+
+        it('removes the mount element', () => {
+          subject()
+          expect(document.getElementById('mention-menu')).toBeNull()
+        })
       })
     })
   })
@@ -313,10 +396,21 @@ describe('events', () => {
         editor,
         target: {}
       }
+
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+          <span id="mention-menu"></span>
+        </div>`
+      )
     })
 
     describe('when the current target is the marker', () => {
-      beforeEach(() => (event.target.id = 'mentions-marker'))
+      beforeEach(() => {
+        event.target.id = 'mentions-marker'
+      })
 
       it('does not make the body editable', () => {
         subject()
@@ -327,20 +421,24 @@ describe('events', () => {
     describe('when the current target is not the marker', () => {
       beforeEach(() => (event.target.id = undefined))
 
-      it('does not make the body editable', () => {
+      it('makes the body editable', () => {
         subject()
         expect(makeBodyEditable).toHaveBeenCalled()
       })
     })
   })
 
-  describe('onActiveDescendantChange()', () => {
-    let activeDescendant
+  describe('onFocusedUserChange()', () => {
+    let focusedUser
 
-    const subject = () => onActiveDescendantChange(activeDescendant, editor)
+    const subject = () => onFocusedUserChange(focusedUser, editor)
 
     beforeEach(() => {
-      activeDescendant = '#foo'
+      focusedUser = {
+        ariaActiveDescendantId: '#foo',
+        name: 'Test User',
+        id: '12345'
+      }
 
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
@@ -360,14 +458,38 @@ describe('events', () => {
       ).toEqual('#foo')
     })
 
-    describe('when the active descendant is blank', () => {
-      beforeEach(() => (activeDescendant = undefined))
+    it('sets the data-userId attribute', () => {
+      subject()
+      expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-userId')).toEqual('12345')
+    })
+
+    it('sets the data-displayName attribute', () => {
+      subject()
+      expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
+        'Test User'
+      )
+    })
+
+    describe('when the focused user is blank', () => {
+      beforeEach(() => (focusedUser = undefined))
 
       it('sets the active descendant attribute to an empty string', () => {
         subject()
         expect(
           editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
         ).toEqual('')
+      })
+
+      it('sets the data-displayname attribute to an empty string', () => {
+        subject()
+        expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
+          ''
+        )
+      })
+
+      it('sets the data-userId attribute to an empty string', () => {
+        subject()
+        expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-userId')).toEqual('')
       })
     })
   })

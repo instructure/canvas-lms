@@ -152,10 +152,17 @@ class CollaborationsController < ApplicationController
     @etherpad_only = Collaboration.collaboration_types.length == 1 &&
                      Collaboration.collaboration_types[0]['type'] == "etherpad"
     @hide_create_ui = @sunsetting_etherpad && @etherpad_only
-    js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
-           :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
-           :collaboration_types => Collaboration.collaboration_types,
-           :POTENTIAL_COLLABORATORS_URL => polymorphic_url([:api_v1, @context, :potential_collaborators])
+    js_env TITLE_MAX_LEN: Collaboration::TITLE_MAX_LENGTH,
+           CAN_MANAGE_GROUPS:
+             @context.grants_any_right?(
+               @current_user,
+               session,
+               :manage_groups,
+               *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
+             ),
+           collaboration_types: Collaboration.collaboration_types,
+           POTENTIAL_COLLABORATORS_URL:
+             polymorphic_url([:api_v1, @context, :potential_collaborators])
 
     set_tutorial_js_env
   end

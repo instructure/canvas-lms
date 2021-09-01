@@ -23,7 +23,7 @@ const momentLocaleBundles = require('./momentBundles')
 
 const entries = {}
 
-const bundlesPattern = path.resolve(__dirname, '../ui/features/*/index.js')
+const bundlesPattern = path.resolve(__dirname, '../ui/features/*/index.{js,ts,tsx}')
 const pluginBundlesPattern = `${__dirname}/../gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}`
 const bundleNameRegexp = /\/(coffeescripts|jsx)\/bundles\/(.*).(coffee|js)/
 const fileNameRegexp = /\/([^/]+)\.(coffee|js)/

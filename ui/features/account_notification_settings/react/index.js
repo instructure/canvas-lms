@@ -21,15 +21,19 @@ import {ApolloProvider, createClient} from '@canvas/apollo'
 import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
 import React from 'react'
 
-const client = createClient()
-
-export default function NotificationSettings() {
+export default function NotificationSettings(options = {}) {
+  const apolloClientOpts = {}
+  const envDict = options.envDict || ENV
+  if (envDict.API_GATEWAY_URI) {
+    apolloClientOpts.apiGatewayUri = envDict.API_GATEWAY_URI
+  }
+  const client = createClient(apolloClientOpts)
   return (
     <ApolloProvider client={client}>
       <AlertManager>
         <AccountNotificationSettingsQuery
-          accountId={ENV.DOMAIN_ROOT_ACCOUNT_ID}
-          userId={ENV.current_user_id}
+          accountId={envDict.DOMAIN_ROOT_ACCOUNT_ID}
+          userId={envDict.current_user_id}
         />
       </AlertManager>
     </ApolloProvider>

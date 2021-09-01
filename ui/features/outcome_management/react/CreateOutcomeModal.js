@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
@@ -30,7 +30,6 @@ import {Mask} from '@instructure/ui-overlays'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
-import useRCE from './hooks/useRCE'
 import TargetGroupSelector from './shared/TargetGroupSelector'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -41,18 +40,25 @@ import {
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
+import OutcomesRceField from './shared/OutcomesRceField'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
-  const [setRCERef, getRCECode, setRCECode] = useRCE()
+  const [description, setDescription] = useState('')
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const [selectedGroupId, setSelectedGroupId] = useState(null)
-  const {addNewGroup} = useManageOutcomes('OutcomeManagementPanel')
+  const {rootId, collections} = useManageOutcomes('OutcomeManagementPanel')
+  const [targetGroup, setTargetGroup] = useState(null)
+
+  useEffect(() => {
+    if (rootId && collections[rootId] && !targetGroup) {
+      setTargetGroup(collections[rootId])
+    }
+  }, [collections, rootId, targetGroup])
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -66,12 +72,11 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     setShowTitleError(false)
     titleChangeHandler('')
     displayNameChangeHandler('')
-    setRCECode('')
     onCloseHandler()
   }
 
-  const handleSetTargetGroup = group => {
-    setSelectedGroupId(group?.id)
+  const handleSetTargetGroup = ({targetGroup}) => {
+    setTargetGroup(targetGroup)
   }
 
   const onCreateOutcomeHandler = () => {
@@ -80,10 +85,10 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {
             input: {
-              groupId: selectedGroupId,
+              groupId: targetGroup.id,
               title,
               displayName,
-              description: getRCECode()
+              description
             }
           }
         })
@@ -109,7 +114,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
         }
 
         showFlashAlert({
-          message: I18n.t('Outcome "%{title}" was successfully created', {title}),
+          message: I18n.t('Outcome "%{title}" was successfully created.', {title}),
           type: 'success'
         })
       } catch (err) {
@@ -181,7 +186,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             </>
           )}
           <View as="div" padding="small 0 0">
-            <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
+            <Text weight="bold">{I18n.t('Description')}</Text> <br />
+            {isOpen && <OutcomesRceField onChangeHandler={setDescription} />}
           </View>
           {friendlyDescriptionFF && (
             <View as="div" padding="small 0">
@@ -200,12 +206,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             <Text size="medium" weight="bold">
               {isMobileView ? I18n.t('Select a location') : I18n.t('Location')}
             </Text>
-            <TargetGroupSelector
-              groupId={selectedGroupId}
-              setTargetGroup={handleSetTargetGroup}
-              onGroupCreated={addNewGroup}
-              modalName="CreateOutcomeModal"
-            />
+            <TargetGroupSelector setTargetGroup={handleSetTargetGroup} />
           </View>
         </Modal.Body>
         <Modal.Footer>
@@ -217,7 +218,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             color="primary"
             margin="0 x-small 0 0"
             interaction={
-              !invalidTitle && !invalidDisplayName && selectedGroupId ? 'enabled' : 'disabled'
+              !invalidTitle && !invalidDisplayName && targetGroup ? 'enabled' : 'disabled'
             }
             onClick={onCreateOutcomeHandler}
           >

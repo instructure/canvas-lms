@@ -148,7 +148,8 @@ export default class GroupDetailView extends View {
     const json = this.model.toJSON()
     json.leader = this.model.get('leader')
     json.canAssignUsers = ENV.IS_LARGE_ROSTER && !this.model.isLocked()
-    json.canEdit = !this.model.isLocked()
+    json.canManage = ENV.permissions.can_manage_groups && !this.model.isLocked()
+    json.canDelete = ENV.permissions.can_delete_groups && !this.model.isLocked()
     json.summary = this.summary()
     return json
   }

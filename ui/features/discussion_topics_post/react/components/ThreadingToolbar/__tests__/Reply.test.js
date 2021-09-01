@@ -19,6 +19,27 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {Reply} from '../Reply'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 const setup = props => {
   return render(
@@ -37,5 +58,21 @@ describe('Reply', () => {
     expect(onClickMock.mock.calls.length).toBe(0)
     fireEvent.click(getByText('Reply'))
     expect(onClickMock.mock.calls.length).toBe(1)
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('uses mobile prop values', () => {
+      const container = setup()
+      const outerHTML = container.getByTestId('threading-toolbar-reply').outerHTML
+
+      const expectedMargin = `margin: 0px 1rem 0px 0px`
+      expect(outerHTML.includes(expectedMargin)).toBeTruthy()
+    })
   })
 })

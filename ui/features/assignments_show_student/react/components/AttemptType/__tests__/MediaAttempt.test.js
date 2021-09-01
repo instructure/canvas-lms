@@ -61,6 +61,12 @@ describe.skip('MediaAttempt', () => {
       expect(getByText('Add Media')).toBeInTheDocument()
     })
 
+    it('moves focus to the media modal button after render', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-modal-launch-button')).toHaveFocus()
+    })
+
     it('renders the current submission draft', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)

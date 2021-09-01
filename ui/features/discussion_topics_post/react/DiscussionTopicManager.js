@@ -76,8 +76,8 @@ const getOptimisticResponse = text => {
           __typename: 'DiscussionEntryPermissions'
         },
         rootEntry: null,
-        discussionTopic: null,
-        parent: null,
+        rootEntryId: null,
+        parentId: 'PLACEHOLDER',
         __typename: 'DiscussionEntry'
       },
       errors: null,
@@ -110,6 +110,7 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
+  const [replyId, setReplyId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
@@ -134,8 +135,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, withRCE, relativeId = null) => {
-    setIsolatedEntryId(discussionEntryId)
+  const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
+    setIsolatedEntryId(rootEntryId || discussionEntryId)
+    setReplyId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -157,7 +159,10 @@ const DiscussionTopicManager = props => {
     courseID: window.ENV?.course_id
   }
 
-  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
+  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
+    variables,
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
+  })
 
   const updateCache = (cache, result) => {
     try {
@@ -230,9 +235,9 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          onOpenIsolatedView={(discussionEntryId, withRCE, relativeId) => {
+          onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, relativeId) => {
             setHighlightEntryId(relativeId)
-            openIsolatedView(discussionEntryId, withRCE, relativeId)
+            openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
         />
@@ -242,6 +247,7 @@ const DiscussionTopicManager = props => {
           relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
+          replyId={replyId}
           open={isolatedViewOpen}
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}

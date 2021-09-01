@@ -178,6 +178,22 @@ describe Api do
       expect(@api.api_find(User, "lti_context_id:#{@user.lti_context_id}")).to eq @user
     end
 
+    it "should find user by lti_context_id, aliased to lti_user_id" do
+      @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
+      @user.save!
+      expect(@api.api_find(User, "lti_user_id:#{@user.lti_context_id}")).to eq @user
+    end
+
+    it "should find user by lti_context_id, aliased to lti_1_1_id" do
+      @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
+      @user.save!
+      expect(@api.api_find(User, "lti_1_1_id:#{@user.lti_context_id}")).to eq @user
+    end
+
+    it "should find user by lti_1_3_id" do
+      expect(@api.api_find(User, "lti_1_3_id:#{@user.lti_id}")).to eq @user
+    end
+
     it "should find course by lti_context_id" do
       lti_course = course_factory
       lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')

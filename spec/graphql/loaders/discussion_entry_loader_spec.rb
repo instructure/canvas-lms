@@ -175,7 +175,7 @@ describe Loaders::DiscussionEntryLoader do
     end
   end
 
-  context 'allow fitering discussion entries' do
+  context 'allow filtering discussion entries' do
 
     it 'by any workflow state' do
       GraphQL::Batch.batch do
@@ -189,14 +189,21 @@ describe Loaders::DiscussionEntryLoader do
     end
 
     it 'by unread workflow state' do
-      @de1.change_read_state('unread', @teacher)
+      # explicit and implicit read states
+      @de1.change_read_state('read', @teacher)
+      @de2.change_read_state('unread', @teacher)
+      @de4.discussion_entry_participants.where(user_id: @teacher).delete_all
 
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           filter: 'unread'
         ).load(@discussion).then { |discussion_entries|
-          expect(discussion_entries).to match [@de1]
+          # @de1 has a read entry_participant and will be excluded.
+          # @de2 has a unread entry_participant and will be included.
+          # @de3 is deleted and will be excluded.
+          # @de4 has no entry_participant and is considered unread and will be included.
+          expect(discussion_entries).to match_array([@de2, @de4])
         }
       end
     end

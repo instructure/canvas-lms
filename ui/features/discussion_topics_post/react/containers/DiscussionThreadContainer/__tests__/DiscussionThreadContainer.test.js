@@ -31,6 +31,7 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {graphql} from 'msw'
+import {User} from '../../../../graphql/User'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -134,6 +135,23 @@ describe('DiscussionThreadContainer', () => {
 
       const deletes = queryAllByText('Delete')
       expect(deletes.length).toBe(1)
+    })
+  })
+
+  describe('Roles', () => {
+    it('does not display author role if not the author', async () => {
+      const {queryByTestId} = setup(defaultProps())
+      expect(queryByTestId('pill-Author')).toBeFalsy()
+    })
+
+    it('displays author role if the post is from the author', async () => {
+      const new_prop = defaultProps({
+        discussionOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})},
+        discussionEntryOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})}
+      })
+      const {queryByTestId} = setup(new_prop)
+
+      expect(queryByTestId('pill-Author')).toBeTruthy()
     })
   })
 
@@ -253,6 +271,52 @@ describe('DiscussionThreadContainer', () => {
 
       await waitFor(() => {
         expect(goToTopic.mock.calls.length).toBe(1)
+      })
+    })
+  })
+
+  describe('Unread Badge', () => {
+    describe('should find unread badge', () => {
+      it('root is read and child reply is unread', () => {
+        const container = setup(defaultProps())
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+
+      it('root is unread and child reply is unread', () => {
+        const container = setup(defaultProps({discussionEntryOverrides: {read: false}}))
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+      it('root is unread and child is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              read: false,
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+    })
+
+    describe('should not find unread badge', () => {
+      it('root is read and child reply is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.queryByTestId('is-unread')).toBeNull()
       })
     })
   })

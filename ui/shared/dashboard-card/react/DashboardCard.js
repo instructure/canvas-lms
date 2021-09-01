@@ -375,17 +375,15 @@ export default class DashboardCard extends Component {
               )}
             </div>
           </a>
-          {window.ENV?.FEATURES?.unpublished_courses &&
-            !this.props.published &&
-            this.props.canChangeCoursePublishState && (
-              <PublishButton
-                courseNickname={this.state.nicknameInfo.nickname}
-                defaultView={this.props.defaultView}
-                pagesUrl={this.props.pagesUrl}
-                frontPageTitle={this.props.frontPageTitle}
-                courseId={this.props.id}
-              />
-            )}
+          {!this.props.published && this.props.canChangeCoursePublishState && (
+            <PublishButton
+              courseNickname={this.state.nicknameInfo.nickname}
+              defaultView={this.props.defaultView}
+              pagesUrl={this.props.pagesUrl}
+              frontPageTitle={this.props.frontPageTitle}
+              courseId={this.props.id}
+            />
+          )}
           {this.renderHeaderButton()}
         </div>
         <nav

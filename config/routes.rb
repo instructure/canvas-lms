@@ -1008,6 +1008,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/content_share_users', action: :content_share_users, as: 'course_content_share_users'
       get 'courses/:course_id/activity_stream', action: :activity_stream, as: 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', action: :activity_stream_summary, as: 'course_activity_stream_summary'
+      get 'courses/:course_id/bulk_user_progress', action: :bulk_user_progress, as: 'course_bulk_user_progress'
       get 'courses/:course_id/todo', action: :todo_items, as: 'course_todo_list_items'
       post 'courses/:course_id/preview_html', action: :preview_html
       post 'courses/:course_id/course_copy', controller: :content_imports, action: :copy_course_content

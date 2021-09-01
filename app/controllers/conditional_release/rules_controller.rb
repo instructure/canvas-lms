@@ -23,7 +23,8 @@ module ConditionalRelease
     include Concerns::ApiToNestedAttributes
 
     before_action :get_context, :require_user
-    before_action :require_course_assignment_edit_permissions, only: [ :create, :update, :destroy ]
+    before_action :require_course_assignment_edit_permissions, only: [ :update, :destroy ]
+    before_action :require_course_assignment_add_or_edit_permissions, only: [ :create ]
     before_action :require_course_view_permissions
 
     # GET /api/rules
@@ -137,6 +138,10 @@ module ConditionalRelease
 
     def require_course_assignment_edit_permissions
       return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_assignments)
+    end
+
+    def require_course_assignment_add_or_edit_permissions
+      return render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_add)
     end
   end
 end

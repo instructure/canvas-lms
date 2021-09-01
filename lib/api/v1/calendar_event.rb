@@ -167,8 +167,7 @@ module Api::V1::CalendarEvent
       end
     end
 
-    if Account.site_admin.feature_enabled?(:calendar_conferences) &&
-      include.include?('web_conference') &&
+    if include.include?('web_conference') &&
       event.web_conference_id.present? &&
       event.web_conference.grants_right?(user, session, :read)
       hash['web_conference'] = api_conference_json(event.web_conference, user, session)

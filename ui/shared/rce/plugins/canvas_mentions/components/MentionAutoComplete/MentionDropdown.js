@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React, {useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo} from 'react'
 import MentionDropdownMenu from './MentionDropdownMenu'
 import PropTypes from 'prop-types'
-import {nanoid} from 'nanoid'
 import getPosition from './getPosition'
 import {
+  ARIA_ID_TEMPLATES,
   MARKER_ID,
   TRUSTED_MESSAGE_ORIGIN,
   NAVIGATION_MESSAGE,
@@ -28,99 +29,90 @@ import {
   KEY_NAMES,
   KEY_CODES
 } from '../../constants'
+import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
+import {useQuery} from '@apollo/react-hooks'
 
-const MentionMockUsers = [
-  {
-    id: 1,
-    name: 'Jeffrey Johnson'
-  },
-  {
-    id: 2,
-    name: 'Matthew Lemon'
-  },
-  {
-    id: 3,
-    name: 'Rob Orton'
-  },
-  {
-    id: 4,
-    name: 'Davis Hyer'
-  },
-  {
-    id: 5,
-    name: 'Drake Harper'
-  },
-  {
-    id: 6,
-    name: 'Omar Soto-Fortuño'
-  },
-  {
-    id: 7,
-    name: 'Chawn Neal'
-  },
-  {
-    id: 8,
-    name: 'Mauricio Ribeiro'
-  },
-  {
-    id: 9,
-    name: 'Caleb Guanzon'
-  },
-  {
-    id: 10,
-    name: 'Jason Gillett'
-  }
-]
-
-const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
+const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => {
   // Setup State
-  const [menitonCordinates, setMenitonCordinates] = useState(null)
+  const [mentionCoordinates, setMentionCoordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
   const [inputText, setInputText] = useState('')
+  const [debouncedInputText, setDebouncedInputText] = useState('')
+  const [shouldExit, setShouldExit] = useState(false)
+  const [noResults, setNoResults] = useState(false)
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
-  const uniqueInstanceId = useRef(nanoid())
+  const filteredOptionsRef = useRef([])
+  const noResultsRef = useRef(noResults)
+
+  useEffect(() => {
+    const debouncer = setTimeout(() => {
+      setDebouncedInputText(inputText?.trim())
+    }, 500)
+
+    return () => {
+      clearTimeout(debouncer)
+    }
+  }, [inputText])
+
+  const {data} = useQuery(MENTIONABLE_USERS_QUERY, {
+    variables: {
+      discussionTopicId: ENV.discussion_topic_id,
+      searchTerm: debouncedInputText
+    }
+  })
+
+  const mentionData = data?.legacyNode?.mentionableUsersConnection?.nodes || []
 
   const filteredOptions = useMemo(() => {
     return mentionData?.filter(o => {
       return o.name.toLowerCase().includes(inputText?.toLowerCase().trim())
     })
-  }, [inputText, mentionData])
+  }, [mentionData, inputText])
+
+  useEffect(() => {
+    filteredOptionsRef.current = filteredOptions
+  }, [filteredOptions])
 
   const getXYPosition = useCallback(() => {
     const responseObj = getPosition(tinyMCE.activeEditor, `#${MARKER_ID}`)
-    setMenitonCordinates(responseObj)
+    setMentionCoordinates(responseObj)
   }, [])
 
   // Navigates highlight of mention
   const navigateFocusedUser = dir => {
     // Return if no options present
-    if (filteredOptions.length === 0) {
+    if (filteredOptionsRef.current.length === 0) {
       return
     }
 
     // When no user is selected or filterSet doesn't contain focused user
-    if (focusedUserRef.current === null || !filteredOptions.includes(focusedUserRef.current)) {
-      setFocusedUser(filteredOptions[0])
+    if (
+      focusedUserRef.current === null ||
+      !filteredOptionsRef.current.includes(focusedUserRef.current)
+    ) {
+      setFocusedUser(filteredOptionsRef.current[0])
       return
     }
 
     const selectedUser = focusedUserRef.current
-    const selectedUserIndex = filteredOptions.findIndex(m => m.id === selectedUser.id)
+    const selectedUserIndex = filteredOptionsRef.current.findIndex(m => m.id === selectedUser.id)
 
     switch (dir) {
       case 'down':
         setFocusedUser(
-          filteredOptions[
-            selectedUserIndex + 1 >= filteredOptions.length ? 0 : selectedUserIndex + 1
+          filteredOptionsRef.current[
+            selectedUserIndex + 1 >= filteredOptionsRef.current.length ? 0 : selectedUserIndex + 1
           ]
         )
         break
       case 'up':
         setFocusedUser(
-          filteredOptions[
-            selectedUserIndex - 1 < 0 ? filteredOptions.length - 1 : selectedUserIndex - 1
+          filteredOptionsRef.current[
+            selectedUserIndex - 1 < 0
+              ? filteredOptionsRef.current.length - 1
+              : selectedUserIndex - 1
           ]
         )
         break
@@ -145,6 +137,12 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
   }
 
   const handleInputChange = value => {
+    // If no results then exit
+    if (noResultsRef.current) {
+      onExited(editor, false)
+      return
+    }
+
     getXYPosition()
     setInputText(value)
   }
@@ -169,10 +167,17 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
     }
   }
 
-  // Used to generate unique ID's for each Menu Item for ARIA compatibility
-  const generateMenuItemId = id => {
-    return `${uniqueInstanceId.current}-mention-popup-${id}`
-  }
+  // Prepare for exiting naturally
+  useEffect(() => {
+    // Check that last character isn't space and we have results
+    if (mentionData.length === 0 && inputText.length > 0) {
+      setNoResults(true)
+      noResultsRef.current = true
+    } else if (mentionData.length > 0) {
+      setNoResults(false)
+      noResultsRef.current = false
+    }
+  }, [inputText, mentionData])
 
   // Make us maintain a focused user when open
   useEffect(() => {
@@ -184,12 +189,15 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
   // Keep Focus User and active decendant always up to date
   useEffect(() => {
     if (focusedUser) {
-      onActiveDescendantChange(generateMenuItemId(focusedUser.id))
+      onFocusedUserChange({
+        ...focusedUser,
+        ariaActiveDescendantId: ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id)
+      })
     } else {
-      onActiveDescendantChange(null)
+      onFocusedUserChange(null)
     }
     focusedUserRef.current = focusedUser
-  }, [focusedUser, onActiveDescendantChange])
+  }, [editor.id, focusedUser, onFocusedUserChange])
 
   // Window listeners handler
   useLayoutEffect(() => {
@@ -210,16 +218,23 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
     getXYPosition()
   }, [getXYPosition])
 
+  // Used to closing menu and selecting user after click
+  useEffect(() => {
+    if (shouldExit) {
+      onExited(editor, true)
+    }
+  }, [editor, onExited, shouldExit])
+
   return (
     <MentionDropdownMenu
-      popupId={uniqueInstanceId.current}
+      instanceId={editor.id}
       mentionOptions={filteredOptions}
       show
-      coordiantes={menitonCordinates}
+      coordiantes={mentionCoordinates}
       selectedUser={focusedUser?.id}
-      generateItemAria={generateMenuItemId}
       onSelect={user => {
         setFocusedUser(user)
+        setShouldExit(true)
       }}
     />
   )
@@ -228,16 +243,15 @@ const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
 export default MentionUIManager
 
 MentionUIManager.propTypes = {
-  mentionData: PropTypes.array,
   rceRef: PropTypes.object,
-  onActiveDescendantChange: PropTypes.func,
+  onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
-  onSelect: PropTypes.func
+  onSelect: PropTypes.func,
+  editor: PropTypes.object
 }
 
 MentionUIManager.defaultProps = {
-  mentionData: MentionMockUsers,
-  onActiveDescendantChange: () => {},
+  onFocusedUserChange: () => {},
   onExited: () => {},
   onSelect: () => {}
 }

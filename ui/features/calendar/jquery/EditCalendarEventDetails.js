@@ -50,7 +50,6 @@ export default class EditCalendarEventDetails {
         location_name: this.event.location_name,
         date: this.event.startDate(),
         is_child: this.event.object.parent_event_id != null,
-        include_conference_selection: ENV.CALENDAR?.CONFERENCES_ENABLED,
         important_dates: this.event.important_dates
       })
     )
@@ -97,9 +96,6 @@ export default class EditCalendarEventDetails {
   }
 
   renderConferenceWidget = () => {
-    if (!ENV.CALENDAR?.CONFERENCES_ENABLED) {
-      return
-    }
     const conferenceNode = document.getElementById('calendar_event_conference_selection')
     const activeConferenceTypes = this.getActiveConferenceTypes()
     const setConference = this.canUpdateConference() ? this.setConference : null
@@ -199,7 +195,7 @@ export default class EditCalendarEventDetails {
     if (data.duplicate) params.duplicate = data.duplicate
     if (data.important != null) params.important_dates = data.important
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+    if (this.canUpdateConference()) {
       if (this.conference) {
         params.web_conference = this.conference
       } else {
@@ -233,7 +229,7 @@ export default class EditCalendarEventDetails {
     }
     this.$form.find('.more_options_link').attr('href', moreOptionsHref)
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+    if (this.canUpdateConference()) {
       // check conference is still valid in context
       if (
         this.conference &&
@@ -297,7 +293,7 @@ export default class EditCalendarEventDetails {
       'calendar_event[location_name]': location_name,
       'calendar_event[important_dates]': data.important
     }
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+    if (this.canUpdateConference()) {
       if (this.conference) {
         const webConference = {
           ...this.conference,

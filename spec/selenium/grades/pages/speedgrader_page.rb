@@ -619,5 +619,62 @@ class Speedgrader
       HideGradesTray.select_sections(sections: sections)
       HideGradesTray.hide_grades
     end
+
+    # comment library
+    def comment_library_link
+      f('[data-testid="comment-library-link"]')
+    end
+
+    def comment_library_count
+      f('[data-testid="comment-library-count"]').text
+    end
+
+    def comment_library_text_area
+      f('[data-testid="comment-library-text-area"]')
+    end
+
+    def comment_library_edit_text_area
+      f('[data-testid="comment-library-edit-text-area"]')
+    end
+
+    def comment_library_save_button
+      f('[data-testid="comment-library-edit-save-button"]')
+    end
+
+    def comment_library_add_button
+      f('[data-testid="add-to-library-button"]')
+    end
+
+    def comment_library_close_button
+      f('[data-testid="close-comment-library-button"]')
+    end
+
+    def comment_library_area
+      f('[data-testid="library-comment-area"]')
+    end
+
+    def comment_library_delete_button
+      f('[data-testid="comment-library-delete-button"]')
+    end
+
+    def comment_library_edit_button
+      f('[data-testid="comment-library-edit-button"]')
+    end
+
+    def comment_library_suggestions_toggle
+      f('[data-testid="comment-suggestions-when-typing"]')
+    end
+
+    def comment_library_suggestion
+      f('[data-testid="comment-suggestion"]')
+    end
+
+    def add_comment_to_library(comment)
+      comment_library_link.click
+      comment_library_text_area.send_keys(comment)
+      comment_library_add_button.click
+      f('.flashalert-message button').click
+      Speedgrader.comment_library_close_button.click
+    end
   end
 end

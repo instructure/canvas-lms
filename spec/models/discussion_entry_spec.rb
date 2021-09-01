@@ -117,17 +117,32 @@ describe DiscussionEntry do
 
   context "reply preview" do
     before :once do
-      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, name: 'captain america', short_name: 'steve')
+      @entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
+      @entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
+      @entry.save!
     end
 
     let(:student) { student_in_course(active_all: true) }
 
     it "should mark include_reply_preview as true" do
-      entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
-      entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
-      entry.save!
-      expect(entry.include_reply_preview).to be true
-      expect(entry.message).to eql("<p>only this should stay</p>")
+      expect(@entry.include_reply_preview).to be true
+      expect(@entry.message).to eql("<p>only this should stay</p>")
+    end
+
+    it "should mark include_reply_preview as false" do
+      @entry.update({message: "<p>not a reply preview anymore</p>"})
+      @entry.save!
+      expect(@entry.include_reply_preview).to be false
+      expect(@entry.message).to eql("<p>not a reply preview anymore</p>")
+    end
+
+    it 'should show "Deleted by <user>" when deleted' do
+      entry = topic.discussion_entries.create!(user: student.user, message: "this is a message")
+      entry.editor_id = @teacher.id
+      entry.destroy
+      expect(entry.quoted_reply_html).not_to include("this is a message")
+      expect(entry.quoted_reply_html).to include("Deleted by steve")
     end
   end
 
@@ -469,11 +484,6 @@ describe DiscussionEntry do
       student_in_course(:active_all => true); @s5 = @student
       @topic.change_all_read_state("read", @s5)
       expect(@topic.unread_count(@s5)).to eq 0
-    end
-
-    it "should use unique_constaint_retry when updating read state" do
-      expect(DiscussionEntry).to receive(:unique_constraint_retry).once
-      @entry.change_read_state("read", @student)
     end
 
     it "should not increment unread count for students in group topics when posting to the root" do

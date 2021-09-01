@@ -323,8 +323,7 @@ describe AccessToken do
       let(:root_account_key) { DeveloperKey.create!(account: root_account) }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:sub_account) do
-        account = account_model
-        account.update!(root_account: root_account)
+        account = account_model(root_account: root_account)
         account
       end
 

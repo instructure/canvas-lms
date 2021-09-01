@@ -48,12 +48,28 @@ describe FeatureFlags do
   })
   end
 
-  it "should report feature_enabled? correctly" do
-    expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
-    expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
-    expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
-    Account.ensure_dummy_root_account
-    expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
+  describe "#feature_enabled?" do
+    it "should report correctly" do
+      expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
+      expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
+      expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
+      Account.ensure_dummy_root_account
+      expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
+    end
+
+    it "should log feature enablement" do
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", tags: {
+        feature: :course_feature,
+        enabled: 'false'
+      }).exactly(:once)
+      t_sub_account.feature_enabled?(:course_feature)
+
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", tags: {
+        feature: :account_feature,
+        enabled: 'true'
+      }).exactly(:once)
+      t_sub_account.feature_enabled?(:account_feature)
+    end
   end
 
   describe "#feature_allowed?" do

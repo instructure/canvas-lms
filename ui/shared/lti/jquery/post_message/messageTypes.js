@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {
+  NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
+  INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
+  SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE
+} from '../../../rce/plugins/canvas_mentions/constants'
 
 export const whitelist = [
   'requestFullWindowLaunch',
@@ -23,4 +28,10 @@ export const whitelist = [
 ]
 
 // These are handled elsewhere so ignore them
-export const ignorelist = ['A2ExternalContentReady', 'LtiDeepLinkingResponse']
+export const ignorelist = [
+  'A2ExternalContentReady',
+  'LtiDeepLinkingResponse',
+  MENTIONS_NAVIGATION_MESSAGE,
+  MENTIONS_INPUT_CHANGE_MESSAGE,
+  MENTIONS_SELECTION_MESSAGE
+]

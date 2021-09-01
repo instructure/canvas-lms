@@ -259,8 +259,7 @@ describe "announcements" do
 
     context "in a homeroom course" do
       before :each do
-        @course.account.settings[:enable_as_k5_account] = {value: true}
-        @course.account.save!
+        @course.account.enable_as_k5_account!
         @course.homeroom_course = true
         @course.save!
       end

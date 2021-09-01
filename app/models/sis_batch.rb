@@ -851,7 +851,7 @@ class SisBatch < ActiveRecord::Base
     # state was, we will assume deleted and restore the scores and submissions
     # for students, if it was not deleted, it will not break anything.
     Enrollment.where(id: ids, type: 'StudentEnrollment').order(:course_id).preload(:course).find_in_batches do |batch|
-      Enrollment.restore_submissions_and_scores_for_enrollments(batch)
+      StudentEnrollment.restore_submissions_and_scores_for_enrollments(batch)
     end
   end
 

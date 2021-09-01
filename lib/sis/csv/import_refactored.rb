@@ -216,25 +216,38 @@ module SIS
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
-      def run_parallel_importer(id, csv: nil)
+      def run_parallel_importer(id, csv: nil, attempt: 0)
+        ensure_later = false
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
+        in_retry =  parallel_importer.workflow_state == 'retry'
+
         if should_stop_import?
           parallel_importer.abort
           return
         end
+        InstStatsd::Statsd.increment("sis_parallel_worker", tags: { attempt: attempt, retry: in_retry})
+
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
         try_importing_segment(csv, parallel_importer, importer_object, skip_progress: @run_immediately)
       rescue => e
-        if parallel_importer.workflow_state != 'retry'
+        if !in_retry
+          ensure_later = true
           parallel_importer.write_attribute(:workflow_state, 'retry')
-          run_parallel_importer(parallel_importer)
+          run_parallel_importer(parallel_importer, attempt: attempt)
+        elsif attempt < Setting.get('number_of_tries_before_failing', 5).to_i
+          ensure_later = true
+          parallel_importer.write_attribute(:workflow_state, 'queued')
+          attempt += 1
+          args = job_args(importer_type, attempt: attempt)
+          delay_if_production(**args).run_parallel_importer(parallel_importer, attempt: attempt)
+        else
+          parallel_importer.fail
+          csv ||= { file: parallel_importer.attachment.display_name }
+          fail_with_error!(e, csv: csv)
         end
-        parallel_importer.fail
-        csv ||= { file: parallel_importer.attachment.display_name }
-        fail_with_error!(e, csv: csv)
       ensure
-        unless @run_immediately
+        unless @run_immediately || ensure_later
           if is_last_parallel_importer_of_type?(parallel_importer)
             queue_next_importer_set unless should_stop_import?
           end
@@ -311,16 +324,27 @@ module SIS
         finish
       end
 
-      def queue_next_importer_set
-        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
-        return finish unless next_importer_type
-
-        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error!, :max_attempts => 5}
+      def job_args(next_importer_type, attempt: nil)
+        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error!, :max_attempts => 5 }
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
           enqueue_args[:n_strand] = ["sis_parallel_import", @batch.data[:strand_account_id] || @root_account.global_id]
         end
+
+        if attempt
+          # small delay for retries.
+          enqueue_args[:run_at] = (3**attempt).seconds.from_now
+        end
+
+        enqueue_args
+      end
+
+      def queue_next_importer_set
+        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
+        return finish unless next_importer_type
+
+        enqueue_args = job_args(next_importer_type)
 
         importers_to_queue = @parallel_importers[next_importer_type]
         updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending").

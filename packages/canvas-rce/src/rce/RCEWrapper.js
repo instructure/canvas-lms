@@ -40,6 +40,7 @@ import indicate from '../common/indicate'
 import bridge from '../bridge'
 import CanvasContentTray, {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from './StatusBar'
+import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 import {isAudio, isImage, isVideo} from './plugins/shared/fileTypeUtils'
@@ -700,6 +701,9 @@ class RCEWrapper extends React.Component {
     if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
       document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
     }
+
+    // Emit view change event
+    this.mceInstance().fire(VIEW_CHANGE, {target: this.editor, newView: newState.editorView})
   }
 
   _isFullscreen() {

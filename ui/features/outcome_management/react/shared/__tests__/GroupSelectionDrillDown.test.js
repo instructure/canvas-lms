@@ -26,28 +26,28 @@ describe('GroupSelectionDrillDown', () => {
   const defaultProps = (props = {}) => ({
     collections: {
       1: {
-        id: 1,
+        id: '1',
         name: 'Root Group',
-        collections: [2, 3],
+        collections: ['2', '3'],
         parentGroupId: 0
       },
       2: {
-        id: 2,
+        id: '2',
         name: 'Group 2',
-        collections: [4],
-        parentGroupId: 1
+        collections: ['4'],
+        parentGroupId: '1'
       },
       3: {
-        id: 3,
+        id: '3',
         name: 'Group 3',
-        collections: [4],
-        parentGroupId: 1
+        collections: ['4'],
+        parentGroupId: '1'
       },
       4: {
-        id: 4,
+        id: '4',
         name: 'Group 4',
         collections: [],
-        parentGroupId: 3
+        parentGroupId: '3'
       }
     },
     rootId: '0',
@@ -80,5 +80,11 @@ describe('GroupSelectionDrillDown', () => {
     const {getByText} = render(<GroupSelectionDrillDown {...props} />)
     fireEvent.click(getByText(props.collections[2].name))
     expect(mockOnCollectionClick).toHaveBeenCalled()
+  })
+
+  it('does not render the group that is being moved', () => {
+    const {name, id} = defaultProps().collections[2]
+    const {queryByText} = render(<GroupSelectionDrillDown {...defaultProps({movingGroupId: id})} />)
+    expect(queryByText(name)).not.toBeInTheDocument()
   })
 })

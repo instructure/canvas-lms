@@ -26,16 +26,17 @@ import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
+import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
 export const ROOT_ID = '0'
 export const ACCOUNT_FOLDER_ID = '-1'
 
-const structFromGroup = (g, parentGroupId) => ({
+const structFromGroup = g => ({
   id: g._id,
   name: g.title,
   collections: [],
   isRootGroup: g.isRootGroup,
-  parentGroupId
+  parentGroupId: g.parentOutcomeGroup?._id
 })
 
 const formatNewGroup = g => ({
@@ -43,7 +44,10 @@ const formatNewGroup = g => ({
   title: g.title,
   description: g.description,
   isRootGroup: false,
-  parentGroupId: g.parent_outcome_group.id,
+  parentOutcomeGroup: {
+    _id: g.parent_outcome_group.id,
+    __typename: 'LearningOutcomeGroup'
+  },
   __typename: 'LearningOutcomeGroup'
 })
 
@@ -51,7 +55,7 @@ const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
   description: null,
   title: null,
-  parentGroupId: null,
+  parentOutcomeGroup: null,
   isRootGroup: false,
   ...group
 })
@@ -60,16 +64,19 @@ const extractGroups = parentGroup =>
   (parentGroup?.childGroups?.nodes || [])
     .map(g => ({
       ...g,
-      parentGroupId: parentGroup._id
+      parentOutcomeGroup: {
+        _id: parentGroup._id,
+        __typename: 'LearningOutcomeGroup'
+      }
     }))
     .concat(parentGroup)
     .map(ensureAllGroupFields)
 
 const getCollectionsByParentId = groups =>
   (groups || []).reduce((memo, g) => {
-    if (g.parentGroupId) {
-      memo[g.parentGroupId] = memo[g.parentGroupId] || []
-      memo[g.parentGroupId].push(g._id)
+    if (g.parentOutcomeGroup) {
+      memo[g.parentOutcomeGroup._id] = memo[g.parentOutcomeGroup._id] || []
+      memo[g.parentOutcomeGroup._id].push(g._id)
     }
 
     return memo
@@ -80,7 +87,9 @@ const GROUPS_QUERY = gql`
     groups(collection: $collection) {
       ${groupFields}
       isRootGroup
-      parentGroupId
+      parentOutcomeGroup {
+        _id
+      }
     }
   }
 `
@@ -89,7 +98,7 @@ const useTreeBrowser = queryVariables => {
   const {isCourse} = useCanvasContext()
   const client = useApolloClient()
   const [rootId, setRootId] = useState(ROOT_ID)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingRootGroup, setIsLoadingRootGroup] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
@@ -114,7 +123,7 @@ const useTreeBrowser = queryVariables => {
       (memo, g) => ({
         ...memo,
         [g._id]: {
-          ...structFromGroup(g, g.parentGroupId),
+          ...structFromGroup(g),
           collections: collectionsByParentId[g._id] || []
         }
       }),
@@ -205,8 +214,8 @@ const useTreeBrowser = queryVariables => {
     setSelectedGroupId,
     error,
     setError,
-    isLoading,
-    setIsLoading,
+    isLoading: isLoadingRootGroup,
+    setIsLoading: setIsLoadingRootGroup,
     setRootId,
     rootId,
     selectedParentGroupId,
@@ -245,6 +254,14 @@ export const useManageOutcomes = collection => {
   })
 
   useEffect(() => {
+    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
+      setIsLoading(false)
+    } else if (isLoading && error) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
+
+  useEffect(() => {
     client
       .query({
         query: CHILD_GROUPS_QUERY,
@@ -255,19 +272,39 @@ export const useManageOutcomes = collection => {
       })
       .then(({data}) => {
         const rootGroup = data?.context?.rootOutcomeGroup
-        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
         addLoadedGroups([rootGroup._id])
         setRootId(rootGroup._id)
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const createGroup = async (groupName, parentGroupId = rootId) => {
+    try {
+      const newGroup = await addOutcomeGroup(contextType, contextId, parentGroupId, groupName)
+      addNewGroup(newGroup.data)
+      showFlashAlert({
+        message: I18n.t('"%{groupName}" has been created.', {groupName}),
+        type: 'success'
+      })
+      return structFromGroup(formatNewGroup(newGroup.data))
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
+              groupName,
+              message: err.message
+            })
+          : I18n.t('An error occurred adding group "%{groupName}".', {
+              groupName
+            }),
+        type: 'error'
+      })
+    }
+  }
 
   return {
     error,
@@ -281,7 +318,8 @@ export const useManageOutcomes = collection => {
     clearCache,
     addNewGroup,
     removeGroup,
-    loadedGroups
+    loadedGroups,
+    createGroup
   }
 }
 
@@ -306,6 +344,14 @@ export const useFindOutcomeModal = open => {
     collection: 'findOutcomesView'
   })
 
+  useEffect(() => {
+    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
+      setIsLoading(false)
+    } else if (isLoading && error) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
+
   const {
     search: searchString,
     debouncedSearch: debouncedSearchString,
@@ -319,7 +365,11 @@ export const useFindOutcomeModal = open => {
   }
 
   useEffect(() => {
-    if (!open && selectedGroupId !== null) setSelectedGroupId(null)
+    if (!open && selectedGroupId !== null) {
+      setTimeout(() => {
+        setSelectedGroupId(null)
+      }, 500)
+    }
   }, [open, selectedGroupId, setSelectedGroupId])
 
   useEffect(() => {
@@ -374,7 +424,10 @@ export const useFindOutcomeModal = open => {
             extractGroups({
               ...g,
               isRootGroup: true,
-              parentGroupId: ACCOUNT_FOLDER_ID
+              parentOutcomeGroup: {
+                _id: ACCOUNT_FOLDER_ID,
+                __typename: 'LearningOutcomeGroup'
+              }
             })
           ),
           ...extractGroups({
@@ -387,17 +440,13 @@ export const useFindOutcomeModal = open => {
           })
         ]
 
-        addGroups(groups)
-        addLoadedGroups([ACCOUNT_FOLDER_ID])
+        addLoadedGroups([ACCOUNT_FOLDER_ID, ROOT_ID])
         setRootId(ROOT_ID)
+        addGroups(groups)
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -417,19 +466,19 @@ export const useFindOutcomeModal = open => {
   }
 }
 
-export const useTargetGroupSelector = (groupId, collection) => {
+export const useTargetGroupSelector = groupId => {
   const {
     error,
     isLoading,
     collections,
     rootId,
-    clearCache,
     queryCollections: treeBrowserQueryCollection,
     addNewGroup,
     selectedGroupId,
     selectedParentGroupId,
-    loadedGroups
-  } = useManageOutcomes(collection)
+    loadedGroups,
+    createGroup
+  } = useManageOutcomes('OutcomeManagementPanel')
 
   const queryCollections = ({id, parentGroupId, shouldLoad}) => {
     // Do not query for more collections if the groupId is the same as the id passed
@@ -437,19 +486,6 @@ export const useTargetGroupSelector = (groupId, collection) => {
       treeBrowserQueryCollection({id, parentGroupId, shouldLoad})
     }
   }
-
-  // This will prevent to show child groups if the group id is the same as the
-  // id passed
-  // This will happen when user wants to move group A, load group B children,
-  // closes the move modal and opens group B to be moved.
-  // We won't query group b children, but this will be on cache, so to prevent
-  // of showing, we clear the cache
-  useEffect(() => {
-    return () => {
-      clearCache()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return {
     error,
@@ -460,6 +496,7 @@ export const useTargetGroupSelector = (groupId, collection) => {
     addNewGroup,
     selectedGroupId,
     selectedParentGroupId,
-    loadedGroups
+    loadedGroups,
+    createGroup
   }
 }

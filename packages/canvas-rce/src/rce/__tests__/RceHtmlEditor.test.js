@@ -25,7 +25,7 @@ import RceHtmlEditor from '../RceHtmlEditor'
 // mock. Let's just test that it renders and rely on INSTUI having
 // tested the CodeEditor component
 
-if (!document.createRange) {
+if (!document.createRange || !document.createRange().setStart) {
   document.createRange = () => {
     return {
       setStart: () => {},
@@ -48,9 +48,35 @@ if (!document.createRange) {
 }
 
 describe('RceHtmlEditor', () => {
+  beforeEach(() => jest.useFakeTimers())
+
   it('renders', () => {
     const editorRef = {current: null}
     const {getByText} = render(<RceHtmlEditor ref={editorRef} code="" />)
     expect(getByText('html code editor')).toBeInTheDocument()
+  })
+
+  it('beautifies the passed-in code', () => {
+    const editorRef = {current: null}
+    const {container} = render(<RceHtmlEditor ref={editorRef} code="<div><div>Text</div></div>" />)
+
+    jest.advanceTimersByTime(1000)
+
+    const el = container.querySelector('.CodeMirror')
+
+    expect(el.CodeMirror.getValue()).toBe('<div>\n    <div>Text</div>\n</div>')
+  })
+
+  it('does not add non-semantic whitespace when beautifying', () => {
+    const editorRef = {current: null}
+    const {container} = render(
+      <RceHtmlEditor ref={editorRef} code="<a><span>Links</span> are great</a>" />
+    )
+
+    jest.advanceTimersByTime(1000)
+
+    const el = container.querySelector('.CodeMirror')
+
+    expect(el.CodeMirror.getValue()).toBe('<a><span>Links</span> are great</a>')
   })
 })

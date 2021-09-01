@@ -18,12 +18,13 @@
 
 import mentionWasInitiated from '../mentionWasInitiated'
 
-let anchorNode, anchorOffset, selection, triggerChar
+let anchorNode, anchorOffset, selection, triggerChar, selectedNode
 
-const subject = () => mentionWasInitiated(selection, triggerChar)
+const subject = () => mentionWasInitiated(selection, selectedNode, triggerChar)
 
 describe('mentionWasInitiated', () => {
   beforeEach(() => {
+    selectedNode = {id: 'foo'}
     triggerChar = '@'
     anchorNode = {wholeText: ''}
     anchorOffset = 2
@@ -44,6 +45,16 @@ describe('mentionWasInitiated', () => {
   describe('when anchorNode is falsey', () => {
     beforeEach(() => {
       anchorNode = undefined
+    })
+
+    it('returns false', () => {
+      expect(subject()).toBe(false)
+    })
+  })
+
+  describe('when the selected node is the marker', () => {
+    beforeEach(() => {
+      selectedNode.id = 'mentions-marker'
     })
 
     it('returns false', () => {

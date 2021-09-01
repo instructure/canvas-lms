@@ -143,11 +143,11 @@ RSpec.shared_examples "DiscussionType" do
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
     expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq true
-    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 0
+    expect(type_with_student.resolve('discussionEntriesConnection { nodes { message } }').count).to eq 0
 
     discussion.discussion_entries.create!(message: 'Here is my entry', user: @student)
     expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq false
-    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 2
+    expect(type_with_student.resolve('discussionEntriesConnection { nodes { message } }').count).to eq 2
   end
 
   it 'allows querying for entry counts' do
@@ -179,20 +179,22 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
   end
 
-  it "allows querying root discussion entries (via rootEntries param)" do
+  it "orders root_entries by last_reply_at" do
     de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
-    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
-
-    result = discussion_type.resolve('discussionEntriesConnection(rootEntries:true) { nodes { message } }')
-    expect(result.count).to be 1
-    expect(result[0]).to eq de.message
+    de2 = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    de3 = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de2.id)
+    expect(discussion_type.resolve('discussionEntriesConnection(sortOrder: asc, rootEntries: true) { nodes { _id } }')).to eq [de.id, de3.id, de2.id].map(&:to_s)
+    expect(discussion_type.resolve('discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }')).to eq [de2.id, de3.id, de.id].map(&:to_s)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de3.id)
+    expect(discussion_type.resolve('discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }')).to eq [de3.id, de2.id, de.id].map(&:to_s)
   end
 
   it "allows querying root discussion entries" do
     de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
     discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
 
-    result = discussion_type.resolve('rootDiscussionEntriesConnection { nodes { message } }')
+    result = discussion_type.resolve('discussionEntriesConnection(rootEntries:true) { nodes { message } }')
     expect(result.count).to be 1
     expect(result[0]).to eq de.message
   end
@@ -276,6 +278,7 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "by unread workflow state" do
+      @de.change_read_state('read', @teacher)
       result = discussion_type.resolve('discussionEntriesConnection(filter:unread) { nodes { message } }')
       expect(result.count).to be 1
       expect(result[0]).to eq @de2.message
@@ -360,11 +363,23 @@ describe Types::DiscussionType do
   context "course discussion" do
     let_once(:discussion) { graded_discussion_topic }
     include_examples "DiscussionType"
+
+    describe 'mentionable users connection' do
+      it 'finds lists the user' do
+        expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.users.map(&:id).map(&:to_s))
+      end
+    end
   end
 
   context "group discussion" do
     let_once(:discussion) { group_discussion_assignment.child_topics.take }
     include_examples "DiscussionType"
+
+    describe 'mentionable users connection' do
+      it 'finds lists the user' do
+        expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.participating_users_in_context.map(&:id).map(&:to_s))
+      end
+    end
   end
 
   context "announcement" do

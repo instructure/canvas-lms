@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, act} from '@testing-library/react'
 import React from 'react'
-import useRCE from '../../hooks/useRCE'
 import GroupEditForm from '../GroupEditForm'
 import {focusChange} from './helpers'
 
 jest.useFakeTimers()
-jest.mock('../../hooks/useRCE')
-useRCE.mockReturnValue([() => {}, () => 'Updated description', null, null, null])
 
 describe('GroupEditForm', () => {
   let onCloseHandler, onSubmit
@@ -39,11 +36,14 @@ describe('GroupEditForm', () => {
     onCloseHandler = jest.fn()
     onSubmit = jest.fn()
   })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('renders form with empty data', () => {
-    const {getByLabelText} = render(<GroupEditForm {...defaultProps()} />)
+    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
     expect(getByLabelText('Group Name')).toBeInTheDocument()
-    expect(getByLabelText('Group Description')).toBeInTheDocument()
+    expect(getByText('Group Description')).toBeInTheDocument()
   })
 
   it('renders form with initial title', () => {
@@ -55,22 +55,29 @@ describe('GroupEditForm', () => {
     expect(getByDisplayValue('The Group Name')).toBeInTheDocument()
   })
 
-  it('renders form with initial description', () => {
+  it('renders form with initial description', async () => {
     const initialValues = {
       title: 'The Group Name',
       description: 'The Group Description'
     }
 
     const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
+    await act(async () => jest.runAllTimers())
     expect(getByDisplayValue('The Group Description')).toBeInTheDocument()
   })
 
-  it('calls onSubmit when submission', () => {
-    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
-    focusChange(getByLabelText('Group Name'), 'Group Name value')
+  it('calls onSubmit when submission', async () => {
+    const initialValues = {
+      title: 'The Group Name',
+      description: 'The Group Description'
+    }
+    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
+    await act(async () => jest.runAllTimers())
+    focusChange(getByLabelText('Group Name'), 'New group name')
+    focusChange(getByText('The Group Description'), 'Updated description')
     fireEvent.click(getByText('Save'))
     expect(onSubmit.mock.calls[0][0]).toEqual({
-      title: 'Group Name value',
+      title: 'New group name',
       description: 'Updated description'
     })
   })

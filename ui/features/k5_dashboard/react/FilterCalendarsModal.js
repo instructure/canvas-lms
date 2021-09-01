@@ -38,7 +38,7 @@ export const ContextCheckbox = ({
   assetString,
   color,
   maxContextsReached,
-  originalName,
+  shortName,
   onChange,
   selected
 }) => (
@@ -52,7 +52,7 @@ export const ContextCheckbox = ({
   >
     <Checkbox
       data-testid="subject-calendars"
-      label={originalName}
+      label={shortName}
       value={`${assetString}_selected`}
       checked={selected}
       disabled={maxContextsReached && !selected}

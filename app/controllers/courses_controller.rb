@@ -544,16 +544,11 @@ class CoursesController < ApplicationController
       end
     end
 
-    if @domain_root_account.feature_enabled?(:unpublished_courses)
-      @past_enrollments.sort_by! {|e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]}
-      [@current_enrollments, @future_enrollments].each do |list|
-        list.sort_by! do |e|
-          [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]
-        end
+    @past_enrollments.sort_by! {|e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]}
+    [@current_enrollments, @future_enrollments].each do |list|
+      list.sort_by! do |e|
+        [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]
       end
-    else
-      @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name)}
-      [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]}}
     end
   end
   helper_method :load_enrollments_for_index
@@ -894,7 +889,9 @@ class CoursesController < ApplicationController
              :is_public, :is_public_to_auth_users, :public_syllabus, :public_syllabus_to_auth, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
+             :restrict_enrollments_to_course_dates, :hide_final_grades],
+            nil,
+            prefer_friendly_name: false)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -1061,7 +1058,9 @@ class CoursesController < ApplicationController
 
         page_opts = {}
         # don't calculate a total count/last page for this endpoint.
-        page_opts[:total_entries] = nil unless @domain_root_account.allow_last_page_on_course_users? # doesn't calculate a total count
+        if search_term || !@domain_root_account.allow_last_page_on_course_users?
+          page_opts[:total_entries] = nil # doesn't calculate a total count
+        end
         users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
         includes = Array(params[:include]).concat(['sis_user_id', 'email'])
 
@@ -1624,7 +1623,9 @@ class CoursesController < ApplicationController
       :homeroom_course,
       :sync_enrollments_from_homeroom,
       :homeroom_course_id,
-      :course_color
+      :course_color,
+      :friendly_name,
+      :enable_pace_plans
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY).
@@ -2098,7 +2099,7 @@ class CoursesController < ApplicationController
           end_date = start_date + 28.days
           scope = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
             .ordered_between(start_date, end_date)
-          unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+          unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
             scope = scope.visible_to_student_sections(@current_user)
           end
           latest_announcement = scope.limit(1).first
@@ -2107,7 +2108,7 @@ class CoursesController < ApplicationController
         js_env({
                  COURSE: {
                    id: @context.id.to_s,
-                   name: @context.name,
+                   name: @context.nickname_for(@current_user),
                    long_name: "#{@context.name} - #{@context.short_name}",
                    image_url: @context.image,
                    banner_image_url: @context.elementary_subject_course? ? @context.banner_image : nil,
@@ -2184,22 +2185,24 @@ class CoursesController < ApplicationController
           load_announcements
         else
           set_active_tab "home"
-          if @context.grants_right?(@current_user, session, :manage_groups)
+          if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
             @contexts += @context.groups
-          else
-            @contexts += @user_groups if @user_groups
+          elsif @user_groups
+            @contexts += @user_groups
           end
           web_conferences = @context.web_conferences.active.to_a
           @current_conferences = web_conferences.select {|c| c.active?(false, false) && c.users.include?(@current_user)}
           @scheduled_conferences = web_conferences.select {|c| c.scheduled? && c.users.include?(@current_user)}
-          @stream_items = @current_user.try(:cached_recent_stream_items, {:contexts => @contexts}) || []
+          @stream_items = @current_user.try(:cached_recent_stream_items, {contexts: @contexts}) || []
         end
 
-        if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
+        if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
-        @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user).to_a
+        @course_home_sub_navigation_tools =
+          ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
+                                            root_account: @domain_root_account, current_user: @current_user).to_a
         unless @context.grants_right?(@current_user, session, :manage_content)
           @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
         end
@@ -2736,6 +2739,15 @@ class CoursesController < ApplicationController
   # @argument course[course_color] [String]
   #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the course
   #   is associated with a Canvas for Elementary-enabled account.
+  #
+  # @argument course[friendly_name] [String]
+  #   Set a friendly name for the course. If this is provided and the course is associated with a Canvas for
+  #   Elementary account, it will be shown instead of the course name. This setting takes priority over
+  #   course nicknames defined by individual users.
+  #
+  # @argument course[enable_pace_plans] [Boolean]
+  #   Enable or disable Pace Plans for the course. This setting only has an effect when the Pace Plans feature flag is
+  #   enabled for the sub-account. Otherwise, Pace Plans are always disabled.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -3301,6 +3313,71 @@ class CoursesController < ApplicationController
     render json: @context.rights_status(@current_user, session, *permissions)
   end
 
+  # @API Get bulk user progress
+  # Returns progress information for all users enrolled in the given course.
+  #
+  # You must be a user who has permission to view all grades in the course (such as a teacher or administrator).
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/bulk_user_progress \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   [
+  #     {
+  #       "id": 1,
+  #       "display_name": "Test Student 1",
+  #       "avatar_image_url": "https://<canvas>/images/messages/avatar-50.png",
+  #       "html_url": "https://<canvas>/courses/1/users/1",
+  #       "pronouns": null,
+  #       "progress": {
+  #         "requirement_count": 2,
+  #         "requirement_completed_count": 1,
+  #         "next_requirement_url": "https://<canvas>/courses/<course_id>/modules/items/<item_id>",
+  #         "completed_at": null
+  #       }
+  #     },
+  #     {
+  #       "id": 2,
+  #       "display_name": "Test Student 2",
+  #       "avatar_image_url": "https://<canvas>/images/messages/avatar-50.png",
+  #       "html_url": "https://<canvas>/courses/1/users/2",
+  #       "pronouns": null,
+  #       "progress": {
+  #         "requirement_count": 2,
+  #         "requirement_completed_count": 2,
+  #         "next_requirement_url": null,
+  #         "completed_at": "2021-08-10T16:26:08Z"
+  #       }
+  #     }
+  #   ]
+  def bulk_user_progress
+    get_context
+    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :view_all_grades)
+
+
+    unless @context.module_based?
+      return render :json => {
+        error: { message: 'No progress available because this course is not module based (meaning, it does not have modules and module completion requirements).' }
+      }, :status => :bad_request
+    end
+
+    # NOTE: Similar to #user_progress, this endpoint should remain on the primary db
+    users = Api.paginate(UserSearch.scope_for(@context, @current_user, :enrollment_type => %w(Student)), self, api_v1_course_bulk_user_progress_url)
+    cmps = ContextModuleProgression.where(user_id: users.map(&:id))
+      .joins(:context_module)
+      .where(context_modules: { context: @context, context_type: 'Course' })
+    cmps_by_user = cmps.group_by(&:user_id)
+
+    progress = users.map do |user|
+      progressions = {}
+      progressions[@context.id] = cmps_by_user[user.id] || []
+      user_display_json(user, @context).merge(:progress => CourseProgress.new(@context, user, read_only: true, preloaded_progressions: progressions).to_json)
+    end
+
+    render :json => progress.to_json, :status => :ok
+  end
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
@@ -3678,7 +3755,7 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_pace_plans
     )
   end
 end

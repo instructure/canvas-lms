@@ -17,20 +17,40 @@
  */
 
 import React, {useState} from 'react'
+import I18n from 'i18n!OutcomeManagement'
 import PropTypes from 'prop-types'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const OutcomeDescription = ({description, withExternalControl, truncate, onClickHandler}) => {
+const OutcomeDescription = ({
+  description,
+  friendlyDescription,
+  withExternalControl,
+  truncate,
+  onClickHandler
+}) => {
   const [truncateInternal, setTruncateInternal] = useState(true)
   const truncated = withExternalControl ? truncate : truncateInternal
-  const textDescription = description ? stripHtmlTags(description) : ''
   const onToggleHandler = () =>
     withExternalControl ? onClickHandler() : setTruncateInternal(prevState => !prevState)
+  const {friendlyDescriptionFF, isStudent} = useCanvasContext()
+  const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
+  let fullDescription = description
+  let truncatedDescription = stripHtmlTags(fullDescription || '')
+  if (shouldShowFriendlyDescription && (!description || isStudent)) {
+    fullDescription = truncatedDescription = friendlyDescription
+  }
+  const shouldShowFriendlyDescriptionSection =
+    !truncated &&
+    shouldShowFriendlyDescription &&
+    !isStudent &&
+    truncatedDescription !== friendlyDescription
 
-  if (!description) return null
+  if (!description && !friendlyDescription) return null
 
   return (
     <Button
@@ -48,7 +68,7 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
         secondaryGhostHoverBackground: 'transparent'
       }}
     >
-      {truncated && textDescription && (
+      {truncated && truncatedDescription && (
         <View as="div" padding="0 small 0 0" data-testid="description-truncated">
           <PresentationContent>
             <div
@@ -59,18 +79,39 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
                 textOverflow: 'ellipsis'
               }}
             >
-              {textDescription}
+              {truncatedDescription}
             </div>
           </PresentationContent>
-          <ScreenReaderContent>{textDescription}</ScreenReaderContent>
+          <ScreenReaderContent>{truncatedDescription}</ScreenReaderContent>
         </View>
       )}
-      {!truncated && description && (
+      {shouldShowFriendlyDescriptionSection && (
+        <>
+          <View
+            as="div"
+            margin="x-small small 0 0"
+            padding="small small x-small small"
+            background="secondary"
+          >
+            <Text weight="bold">{I18n.t('Friendly Description')}</Text>
+          </View>
+          <View
+            as="div"
+            margin="0 small 0 0"
+            padding="0 small small small"
+            background="secondary"
+            data-testid="friendly-description-expanded"
+          >
+            <Text>{friendlyDescription}</Text>
+          </View>
+        </>
+      )}
+      {!truncated && fullDescription && (
         <View
           as="div"
           padding="0 small 0 0"
           data-testid="description-expanded"
-          dangerouslySetInnerHTML={{__html: description}}
+          dangerouslySetInnerHTML={{__html: fullDescription}}
         />
       )}
     </Button>
@@ -78,11 +119,13 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
 }
 
 OutcomeDescription.defaultProps = {
-  withExternalControl: false
+  withExternalControl: false,
+  friendlyDescription: ''
 }
 
 OutcomeDescription.propTypes = {
   description: PropTypes.string,
+  friendlyDescription: PropTypes.string,
   withExternalControl: PropTypes.bool,
   truncate: PropTypes.bool,
   onClickHandler: PropTypes.func

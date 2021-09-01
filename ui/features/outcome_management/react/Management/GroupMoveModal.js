@@ -34,11 +34,13 @@ const GroupMoveModal = ({
   parentGroupId,
   isOpen,
   onCloseHandler,
-  onGroupCreated,
-  onSuccess
+  onSuccess,
+  rootGroup
 }) => {
-  const [targetGroup, setTargetGroup] = useState(null)
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
   const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
+  const disableGroupMove =
+    !targetGroup || targetGroup?.id === parentGroupId || targetGroup?.id === groupId
 
   const onMoveGroupHandler = () => {
     ;(async () => {
@@ -67,11 +69,11 @@ const GroupMoveModal = ({
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}', {
+            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}.', {
                 groupTitle,
                 message: err.message
               })
-            : I18n.t('An error occurred moving group "%{groupTitle}"', {
+            : I18n.t('An error occurred moving group "%{groupTitle}".', {
                 groupTitle
               }),
           type: 'error'
@@ -98,10 +100,8 @@ const GroupMoveModal = ({
           </Text>
           <TargetGroupSelector
             groupId={groupId}
-            parentGroupId={parentGroupId}
-            setTargetGroup={setTargetGroup}
-            onGroupCreated={onGroupCreated}
-            modalName="groupMoveModal"
+            // eslint-disable-next-line no-shadow
+            setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
           />
         </View>
       </Modal.Body>
@@ -113,7 +113,7 @@ const GroupMoveModal = ({
           type="button"
           color="primary"
           margin="0 x-small 0 0"
-          disabled={!targetGroup}
+          disabled={disableGroupMove}
           onClick={onMoveGroupHandler}
         >
           {I18n.t('Move')}
@@ -129,13 +129,12 @@ GroupMoveModal.propTypes = {
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired
+  onSuccess: PropTypes.func.isRequired,
+  rootGroup: PropTypes.object.isRequired
 }
 
 GroupMoveModal.defaultProps = {
-  onSuccess: () => {},
-  onGroupCreated: () => {}
+  onSuccess: () => {}
 }
 
 export default GroupMoveModal

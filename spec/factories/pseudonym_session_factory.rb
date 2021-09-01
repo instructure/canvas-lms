@@ -33,7 +33,8 @@ module Factories
         :global_account_id => '10000000000001',
         :sis_user_id => 'U001',
         :shard => Shard.default,
-        :works_for_account? => true
+        :works_for_account? => true,
+        :suspended? => false,
       )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if

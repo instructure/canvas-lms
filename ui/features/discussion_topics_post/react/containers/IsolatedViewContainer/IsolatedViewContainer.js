@@ -17,7 +17,7 @@
  */
 
 import {
-  updateDiscussionTopicRepliesCount,
+  updateDiscussionTopicEntryCounts,
   addReplyToDiscussionEntry,
   getSpeedGraderUrl
 } from '../../utils'
@@ -53,7 +53,7 @@ export const IsolatedViewContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
-      discussionEntryID: newDiscussionEntry.parent.id,
+      discussionEntryID: newDiscussionEntry.rootEntryId,
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
@@ -61,7 +61,7 @@ export const IsolatedViewContainer = props => {
       includeRelativeEntry: !!props?.relativeEntryId
     }
 
-    updateDiscussionTopicRepliesCount(cache, props.discussionTopic.id)
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
@@ -70,8 +70,12 @@ export const IsolatedViewContainer = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
-      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.parent.id) {
-        props.onOpenIsolatedView(data.createDiscussionEntry.discussionEntry.parent.id, false)
+      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.rootEntryId) {
+        props.onOpenIsolatedView(
+          data.createDiscussionEntry.discussionEntry.rootEntryId,
+          data.createDiscussionEntry.discussionEntry.rootEntryId,
+          false
+        )
       }
     },
     onError: () =>
@@ -100,7 +104,26 @@ export const IsolatedViewContainer = props => {
     onError: () => setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
   })
 
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    const entry = [
+      ...isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes,
+      ...isolatedEntryNewerDirection.data.legacyNode.discussionSubentriesConnection.nodes
+    ].find(
+      oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
+    )
+    if (entry && entry.read !== result.data.updateDiscussionEntryParticipant.discussionEntry.read) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange
+      })
+    }
+  }
+
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    update: updateDiscussionEntryParticipantCache,
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
@@ -126,16 +149,6 @@ export const IsolatedViewContainer = props => {
       variables: {
         discussionEntryId: discussionEntry._id,
         read: !discussionEntry.read,
-        forcedReadState: discussionEntry.read || null
-      }
-    })
-  }
-
-  const markAsRead = discussionEntry => {
-    updateDiscussionEntryParticipant({
-      variables: {
-        discussionEntryId: discussionEntry._id,
-        read: true,
         forcedReadState: discussionEntry.read || null
       }
     })
@@ -172,11 +185,11 @@ export const IsolatedViewContainer = props => {
     )
   }
 
-  const onReplySubmit = (message, discussionEntry) => {
+  const onReplySubmit = (message, replyId) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: discussionEntry.id,
+        parentEntryId: replyId,
         message
       }
     })
@@ -188,7 +201,8 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId: props.relativeEntryId,
+      relativeEntryId:
+        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
       includeRelativeEntry: !!props.relativeEntryId
     }
   })
@@ -283,6 +297,19 @@ export const IsolatedViewContainer = props => {
     })
   }
 
+  const replyPreview = (nodes, previewId) => {
+    if (!nodes) return ''
+    let preview = ''
+    nodes.every(reply => {
+      if (reply._id === previewId) {
+        preview = reply.replyPreview
+        return false
+      }
+      return true
+    })
+    return preview
+  }
+
   return (
     <Tray
       data-testid="isolated-view-container"
@@ -306,7 +333,7 @@ export const IsolatedViewContainer = props => {
     >
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
-          <Heading margin="medium medium medium" theme={{h2FontWeight: 700}}>
+          <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
             Thread
           </Heading>
         </Flex.Item>
@@ -348,54 +375,59 @@ export const IsolatedViewContainer = props => {
                 display="block"
                 background="primary"
                 borderWidth="none none none none"
-                padding="none none small none"
-                margin="none none x-small none"
+                padding="none small small"
+                margin="none none x-small"
               >
                 <DiscussionEdit
                   onSubmit={text => {
-                    onReplySubmit(text, isolatedEntryOlderDirection.data.legacyNode)
+                    onReplySubmit(text, props.replyId)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  replyPreview={isolatedEntryOlderDirection.data?.legacyNode?.replyPreview}
+                  replyPreview={replyPreview(
+                    isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                      .nodes,
+                    props.replyId
+                  )}
                 />
               </View>
             )}
           </IsolatedParent>
           {!props.RCEOpen && (
-            <IsolatedThreadsContainer
-              discussionTopic={props.discussionTopic}
-              discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
-              onToggleRating={toggleRating}
-              onToggleUnread={toggleUnread}
-              onDelete={onDelete}
-              markAsRead={markAsRead}
-              onOpenInSpeedGrader={onOpenInSpeedGrader}
-              showOlderReplies={() => {
-                setFetchingMoreOlderReplies(true)
-                fetchOlderEntries()
-              }}
-              showNewerReplies={() => {
-                setFetchingMoreNewerReplies(true)
-                fetchNewerEntries()
-              }}
-              onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
-                props.setHighlightEntryId(highlightEntryId)
-                props.onOpenIsolatedView(discussionEntryId, withRCE)
-              }}
-              goToTopic={props.goToTopic}
-              highlightEntryId={props.highlightEntryId}
-              hasMoreOlderReplies={
-                isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                  ?.pageInfo?.hasPreviousPage
-              }
-              hasMoreNewerReplies={
-                isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
-                  ?.pageInfo?.hasNextPage && !!props.relativeEntryId
-              }
-              fetchingMoreOlderReplies={fetchingMoreOlderReplies}
-              fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-            />
+            <View as="div" borderWidth="medium none none none" padding="medium none none">
+              <IsolatedThreadsContainer
+                discussionTopic={props.discussionTopic}
+                discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
+                onToggleRating={toggleRating}
+                onToggleUnread={toggleUnread}
+                onDelete={onDelete}
+                onOpenInSpeedGrader={onOpenInSpeedGrader}
+                showOlderReplies={() => {
+                  setFetchingMoreOlderReplies(true)
+                  fetchOlderEntries()
+                }}
+                showNewerReplies={() => {
+                  setFetchingMoreNewerReplies(true)
+                  fetchNewerEntries()
+                }}
+                onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, highlightEntryId) => {
+                  props.setHighlightEntryId(highlightEntryId)
+                  props.onOpenIsolatedView(discussionEntryId, rootEntryId, withRCE)
+                }}
+                goToTopic={props.goToTopic}
+                highlightEntryId={props.highlightEntryId}
+                hasMoreOlderReplies={
+                  isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                    ?.pageInfo?.hasPreviousPage
+                }
+                hasMoreNewerReplies={
+                  isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
+                    ?.pageInfo?.hasNextPage && !!props.relativeEntryId
+                }
+                fetchingMoreOlderReplies={fetchingMoreOlderReplies}
+                fetchingMoreNewerReplies={fetchingMoreNewerReplies}
+              />
+            </View>
           )}
         </>
       )}
@@ -413,6 +445,7 @@ IsolatedViewContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
+  replyId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string
 }
