@@ -24611,7 +24611,11 @@ mi:
                 
                 Ngā mihi
                 Canvas Tautoko
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Te karere i tukuna e koe me te kaupapa raina \"%{subject}\" kaore i tukuna. Ki te whakahoki ki te Canvas karere mai i tēnei īmēra, i te tuatahi me tautoko te haurahi kōrerorero i roto i tō Canvas āhua. Tēnā koa haere ki tō āhua ka tono anō te tautoko īmēra mo tēnei wāhitau īmēra. Ka taea anō hoki e koe te whakapā ki tēnei tangata ma te Canvas Pouakaroto. Mo te āwhina, tēna koa titiro ki te pouakaroto wāhanga mo tō kaiwhakamahi tūnga i roto i te Canvas Kaiārahi. [Tirohia te %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Te karere i tukuna e koe me te kaupapa raina "%{subject}" kaore i tukuna. Ki te whakahoki ki te Canvas karere mai i tēnei īmēra, i te tuatahi me tautoko te haurahi kōrerorero i roto i tō Canvas āhua. Tēnā koa haere ki tō āhua ka tono anō te tautoko īmēra mo tēnei wāhitau īmēra. Ka taea anō hoki e koe te whakapā ki tēnei tangata ma te Canvas Pouakaroto. Mo te āwhina, tēna koa titiro ki te pouakaroto wāhanga mo tō kaiwhakamahi tūnga i roto i te Canvas Kaiārahi. [Tirohia te %{link}].
+                  
+                  Ngā mihi
+                  Tautoko Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Te Microsoft 365 kaiwhakamahi pūtake i whiwhia i roto i te pūkete tautuhinga kaore i te kaiwhakamahi pūtake o te Mātauranga, ana kaore e taea te whakamahi me Microsoft Teams Tukutahi whakauru."
   the_module_item_is_locked_27fe420b: "Kiia te tūemi kōwae te."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Ko te tatau tino tata mō te kaiwhakamahi %{current_user_name} me te putanga %{outcome_name}."
