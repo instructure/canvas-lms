@@ -41,6 +41,7 @@ import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
+import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
 
 const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
@@ -115,10 +116,16 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
   }
+
+  const {selectParentGroupInLhs, treeBrowserViewRef} = useLhsTreeBrowserSelectParentGroup({
+    selectedParentGroupId,
+    selectedGroupId,
+    collections,
+    queryCollections
+  })
+
   const onSucessGroupRemove = () => {
-    if (selectedParentGroupId) {
-      queryCollections({id: selectedParentGroupId})
-    }
+    selectParentGroupInLhs()
     removeGroup(selectedGroupId)
     clearSelectedOutcomes()
   }
@@ -260,7 +267,10 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               <Text size="large" weight="light" fontStyle="normal">
                 {I18n.t('Outcome Groups')}
               </Text>
-              <View data-testid="outcomes-management-tree-browser">
+              <View
+                data-testid="outcomes-management-tree-browser"
+                elementRef={el => (treeBrowserViewRef.current = el)}
+              >
                 <TreeBrowser
                   onCollectionToggle={queryCollections}
                   collections={collections}
@@ -352,11 +362,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               parentGroupId={selectedParentGroupId}
               isOpen={isGroupMoveModalOpen}
               onCloseHandler={closeGroupMoveModal}
-              onSuccess={() => {
-                queryCollections({
-                  id: selectedParentGroupId
-                })
-              }}
+              onSuccess={selectParentGroupInLhs}
               rootGroup={collections[rootId]}
             />
           )}
