@@ -21944,7 +21944,11 @@ cy:
                 
                 Diolch,
                 Tîm Cymorth Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Dydy’r neges y gwnaethoch chi ei hanfon gyda’r llinell pwnc \"%{subject}\" ddim wedi cael ei danfon. I ateb i neges Canvas o’r e-bost hwn, mae’n rhaid ei gadarnhau fel ffordd o gyfathrebu yn eich proffil Canvas. Ewch i’ch proffil ac ailanfon yr e-bost cadarnhau ar gyfer y cyfeiriad e-bost hwn. Gallwch hefyd gysylltu â’r person hwn drwy Flwch Derbyn Canvas. Am gymorth, gweler y bennod Blwch Derbyn ar gyfer eich rôl defnyddiwr yn Canvas Guides. [Gweler %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Dydy’r neges y gwnaethoch chi ei hanfon gyda’r llinell pwnc "%{subject}" ddim wedi cael ei danfon. I ateb i neges Canvas o’r e-bost hwn, mae’n rhaid ei gadarnhau fel ffordd o gyfathrebu yn eich proffil Canvas. Ewch i’ch proffil ac ailanfon yr e-bost cadarnhau ar gyfer y cyfeiriad e-bost hwn. Gallwch hefyd gysylltu â’r person hwn drwy Flwch Derbyn Canvas. Am gymorth, gweler y bennod Blwch Derbyn ar gyfer eich rôl defnyddiwr yn Canvas Guides. [Gweler %{link}].
+                  
+                  Diolch yn fawr,
+                  Tîm Cymorth Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Nid yw’r tenant Microsoft 365 a ddarperir yng ngosodiadau’r cyfrif yn denant Addysg, felly nid oes modd ei ddefnyddio gydag integreiddio Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "Mae’r eitem yn y modiwl wedi’i chloi."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Y sgoriau diweddaraf ar gyfer y defnyddiwr %{current_user_name} a’r deilliant %{outcome_name}."
