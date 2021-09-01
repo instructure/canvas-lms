@@ -21981,7 +21981,11 @@ it:
                 
                 Grazie,
                 Il team di assistenza Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Il messaggio inviato con la riga dell'oggetto \"%{subject}\" non è stato consegnato. Per rispondere ai messaggi Canvas da questa email, è necessario che sia un canale di comunicazione confermato nel tuo profilo Canvas. Visita il tuo profilo e invia di nuovo l'e-mail di conferma per questo indirizzo e-mail. Puoi anche contattare questa persona tramite la Posta in arrivo Canvas. Per aiuto, vedere il capitolo dedicato alla posta in arrivo per il ruolo utente nelle guide Canvas. [Vedi %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Il messaggio inviato con la riga dell'oggetto "%{subject}" non è stato consegnato. Per rispondere ai messaggi Canvas da questa email, è necessario che sia un canale di comunicazione confermato nel tuo profilo Canvas. Visita il tuo profilo e invia di nuovo l'e-mail di conferma per questo indirizzo e-mail. Puoi anche contattare questa persona tramite la Posta in arrivo Canvas. Per aiuto, vedere il capitolo dedicato alla posta in arrivo per il ruolo utente nelle guide Canvas. [Vedi %{link}].
+                  
+                  Grazie,
+                  Il team di assistenza Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Il tenant di Microsoft 365 fornito nelle impostazioni dell'account non è un tenant Education, quindi non può essere utilizzato con l'integrazione Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "L'elemento del modulo è bloccato."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "I punteggi più recenti per l'utente %{current_user_name} e l'esito %{outcome_name}."
