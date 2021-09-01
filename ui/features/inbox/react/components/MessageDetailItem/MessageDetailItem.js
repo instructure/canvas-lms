@@ -17,15 +17,11 @@
  */
 
 import {Avatar} from '@instructure/ui-avatar'
-import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconMiniArrowDownLine, IconReplyLine, IconSettingsLine} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
+import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
@@ -45,41 +41,6 @@ export const MessageDetailItem = ({...props}) => {
           {participantsStr}
         </TruncateText>
       </Text>
-    )
-  }
-
-  const renderActionButtons = () => {
-    return (
-      <>
-        <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
-          <IconButton
-            size="small"
-            margin="0 x-small 0 0"
-            screenReaderLabel={I18n.t('Reply')}
-            onClick={() => props.handleOptionSelect('reply')}
-          >
-            <IconReplyLine />
-          </IconButton>
-        </Tooltip>
-        <Menu
-          placement="bottom"
-          onSelect={(event, value) => {
-            props.handleOptionSelect(value)
-          }}
-          trigger={
-            <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-              <Button margin="0 x-small 0 0" size="small" renderIcon={IconSettingsLine}>
-                <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
-                <IconMiniArrowDownLine />
-              </Button>
-            </Tooltip>
-          }
-        >
-          <Menu.Item value="reply-all">{I18n.t('Reply All')}</Menu.Item>
-          <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
-          <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
-        </Menu>
-      </>
     )
   }
 
@@ -116,7 +77,7 @@ export const MessageDetailItem = ({...props}) => {
           <View as="div" margin="none none x-small">
             <Text weight="light">{createdAt}</Text>
           </View>
-          {renderActionButtons()}
+          <MessageDetailActions handleOptionSelect={props.handleOptionSelect} />
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
@@ -132,6 +93,5 @@ MessageDetailItem.propTypes = {
 }
 
 MessageDetailItem.defaultProps = {
-  conversationMessage: {},
-  context: {}
+  conversationMessage: {}
 }
