@@ -24679,7 +24679,11 @@ fr:
                 
                 Merci,
                 l'assistance Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Le message que vous avez envoyé avec l'objet \"%{subject}\" n'a pas été délivré. Pour répondre aux messages Canvas provenant de ce courriel, vous devez d'abord confirmer votre canal de communication dans votre profil Canvas. Veuillez consulter votre profil et renvoyer le courriel de confirmation pour cette adresse électronique. Vous pouvez également contacter cette personne via la boîte de réception Canvas. Pour obtenir de l'aide, veuillez consulter le chapitre Boîte de réception pour connaître votre rôle d'utilisateur dans les Guides Canvas. [Consulter %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Le message que vous avez envoyé avec l'objet "%{subject}" n'a pas été délivré. Pour répondre aux messages Canvas provenant de ce courriel, vous devez d'abord confirmer votre canal de communication dans votre profil Canvas. Veuillez consulter votre profil et renvoyer le courriel de confirmation pour cette adresse électronique. Vous pouvez également contacter cette personne via la boîte de réception Canvas. Pour obtenir de l'aide, veuillez consulter le chapitre Boîte de réception pour connaître votre rôle d'utilisateur dans les Guides Canvas. [Consulter %{link}].
+                  
+                  Merci,
+                  L’assistance technique Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Le locataire Microsoft 365 fournit dans les paramètres de compte n’est pas un locataire de type Éducation. Par conséquent, il ne peut être utilisé avec l’intégration Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et l'acquis %{outcome_name}."
