@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -16,20 +15,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class PacePlanModuleItem < ActiveRecord::Base
-  belongs_to :pace_plan
-  belongs_to :module_item, class_name: 'ContentTag'
-  belongs_to :root_account, class_name: 'Account'
+class AddReplicaIdentityForPacePlanModuleItems < ActiveRecord::Migration[6.0]
+  tag :postdeploy
+  disable_ddl_transaction!
 
-  extend RootAccountResolver
-  resolves_root_account through: :pace_plan
+  def up
+    add_replica_identity 'PacePlanModuleItem', :root_account_id, 0
+    remove_index :pace_plan_module_items, column: :root_account_id, if_exists: true
+  end
 
-  validates :pace_plan, presence: true
-  validates :module_item_id, presence: true
-
-  scope :active, -> { joins(:module_item).merge(ContentTag.active) }
-  scope :ordered, -> { joins(module_item: :context_module).
-    order('context_modules.position, context_modules.id, content_tags.position, content_tags.id') }
+  def down
+    add_index :pace_plan_module_items, :root_account_id, algorithm: :concurrently, if_not_exists: true
+    remove_replica_identity 'PacePlanModuleItem'
+  end
 end
