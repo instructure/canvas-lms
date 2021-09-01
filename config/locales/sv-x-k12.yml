@@ -21480,7 +21480,11 @@ sv-x-k12:
                 
                 Tack,
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Meddelandet med ämnet ”%{subject}” levererades inte. För att svara på Canvas-meddelanden från den här e-postadressen måste den först vara en bekräftad kommunikationskanal i din Canvas-profil. Besök din profil och skicka om bekräftelsemeddelandena för den här e-postadressen. Du kan även kontakta den här personen via Canvas Inbox. Se avsnittet om Inbox för din användarroll i Canvas Guides om du behöver hjälp. [Se %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Meddelandet med ämnet ”%{subject}” levererades inte. För att svara på Canvas-meddelanden från den här e-postadressen måste den först vara en bekräftad kommunikationskanal i din Canvas-profil. Besök din profil och skicka om bekräftelsemeddelandena för den här e-postadressen. Du kan även kontakta den här personen via Canvas Inbox. Se avsnittet om Inbox för din användarroll i Canvas Guides om du behöver hjälp. [Se %{link}].
+                
+                Tack!
+                Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-användaren som angavs i kontoinställningarna är inte en utbildningsanvändare och kan inte användas med Microsoft Teams Sync-integreringen."
   the_module_item_is_locked_27fe420b: "Modulobjektet är låst"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De senaste resultaten för användaren %{current_user_name} och lärandemålen %{outcome_name}."
