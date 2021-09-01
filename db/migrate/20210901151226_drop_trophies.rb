@@ -17,29 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class DropTrophies < ActiveRecord::Migration[6.0]
+  tag :postdeploy
 
-module Types
-  class TrophyType < ApplicationObjectType
-    graphql_name 'Trophy'
+  def up
+    drop_table :trophies
+  end
 
-    implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
-
-    global_id_field :id
-
-    field :user_id, ID, null: true
-
-    field :name, String, null: false
-
-    field :display_name, String, null: true
-    def display_name
-      object.is_a?(Hash) ? object[:display_name] : object.display_name
-    end
-
-    field :description, String, null: true
-    def description
-      object.is_a?(Hash) ? object[:description] : object.description
+  def down
+    create_table :trophies do |t|
+      t.belongs_to :user, foreign_key: true, limit: 8, index: true, null: false
+      t.string :name
+      t.timestamps
     end
   end
 end

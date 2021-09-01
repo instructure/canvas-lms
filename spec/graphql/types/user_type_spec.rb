@@ -291,19 +291,6 @@ describe Types::UserType do
     end
   end
 
-  context 'trophies' do
-    it 'returns empty values for the trophies the user has not unlocked' do
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response[0]).to be_nil
-    end
-
-    it 'returns values for the trophies the user has unlocked' do
-      @student.trophies.create!(name: 'balloon')
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response.include?('Balloon')).to be true
-    end
-  end
-
   context 'notificationPreferences' do
     it 'returns the users notification preferences' do
       Notification.delete_all

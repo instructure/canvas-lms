@@ -101,14 +101,6 @@ module Types
       end
     end
 
-    field :trophies, [TrophyType], null: true
-    def trophies
-      Loaders::AssociationLoader.for(User, :trophies).load(object).then do |trophies|
-        locked_trophies = Trophy.trophy_names - trophies.map(&:name)
-        trophies.to_a.concat(locked_trophies.map { |name| Trophy.blank_trophy(name) })
-      end
-    end
-
     field :notification_preferences_enabled, Boolean, null: false do
       argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
       argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
