@@ -24747,7 +24747,11 @@ en-GB:
                 
                 Thank you,
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "The message you sent with the subject line \"%{subject}\" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
+                  
+                  Thank you,
+                  Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "The Microsoft 365 tenant provided in account settings is not an Education tenant, so cannot be used with the Microsoft Teams Sync integration."
   the_module_item_is_locked_27fe420b: "The module item is locked."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Most recent scores for user %{current_user_name} and outcome %{outcome_name}."
