@@ -19,31 +19,14 @@
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
+import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
 
 export const MessageDetailItem = ({...props}) => {
-  const formatParticipants = () => {
-    const participantsStr = props.conversationMessage.recipients
-      .filter(p => p.name !== props.conversationMessage.author.name)
-      .reduce((prev, curr) => {
-        return prev + ', ' + curr.name
-      }, '')
-
-    return (
-      <Text as="div">
-        <TruncateText>
-          <b>{props.conversationMessage.author.name}</b>
-          {participantsStr}
-        </TruncateText>
-      </Text>
-    )
-  }
-
   const dateOptions = {
     month: 'short',
     day: 'numeric',
@@ -66,7 +49,7 @@ export const MessageDetailItem = ({...props}) => {
           />
         </Flex.Item>
         <Flex.Item shouldGrow>
-          {formatParticipants()}
+          <MessageDetailParticipants conversationMessage={props.conversationMessage} />
           <View as="div" margin="xx-small none xxx-small">
             <Text color="secondary" weight="light">
               {props.contextName}
