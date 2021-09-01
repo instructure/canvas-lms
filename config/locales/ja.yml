@@ -24669,7 +24669,10 @@ ja:
                 
                 よろしくお願いします。
                 Canvas サポート係りより
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "件名「%{subject}」で送信したメッセージは配信されませんでした。このメールアドレスから Canvas メッセージに返信するには、まず Canvas プロファイルで確認済みの通信チャネルでなければなりません。プロフィールにアクセスして、このメールアドレスの確認メールを再送してください。Canvas の受信トレイからこの人物に連絡することもできます。ヘルプが必要な場合は、Canvas ガイドのユーザー役割の受信トレイの章をご覧ください。[%{link}を参照してください]。"
+  the_message_you_sent_with_the_subject_line_subject_ca925315: "件名「%{subject}」で送信したメッセージは配信されませんでした。このメールアドレスから Canvas メッセージに返信するには、まず Canvas プロファイルで確認済みの通信チャネルでなければなりません。プロフィールにアクセスして、このメールアドレスの確認メールを再送してください。Canvas の受信トレイからこの人物に連絡することもできます。ヘルプが必要な場合は、Canvas ガイドのユーザー役割の受信トレイの章をご覧ください。[%{link}を参照してください]。\n\
+      \x20           \n\
+      \x20           今後ともよろしくお願いいたします。\n\
+      \x20           Canvas サポート    "
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "アカウント設定で指定されている Microsoft 365 テナントは教育機関向けテナントではないため、Microsoft Teams Sync インテグレーションでは使用できません。"
   the_module_item_is_locked_27fe420b: "モジュール アイテムはロックされています。"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "ユーザ %{current_user_name} の最近のスコアと結果 %{outcome_name}。"

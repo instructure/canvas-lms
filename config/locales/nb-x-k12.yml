@@ -21627,7 +21627,11 @@ nb-x-k12:
                 
                 Tusen takk,
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Meldingen du sendte med emnet «%{subject}», ble ikke levert. For å svare på Canvas-meldinger fra denne e-posten, må den først være en bekreftet kommunikasjonskanal i din Canvas-profil. Besøk profilen din og send bekreftelsesmeldingen på nytt for denne e-postadressen. Du kan også kontakte denne personen via innboksen i Canvas. For hjelp, se innboks-kapittelet for brukerrollen din i Canvas-guider. [Se %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Meldingen du sendte med emnet «%{subject}», ble ikke levert. For å svare på Canvas-meldinger fra denne e-posten, må den først være en bekreftet kommunikasjonskanal i din Canvas-profil. Besøk profilen din og send bekreftelsesmeldingen på nytt for denne e-postadressen. Du kan også kontakte denne personen via innboksen i Canvas. For hjelp, se innboks-kapittelet for brukerrollen din i Canvas-guider. [Se %{link}].
+        
+        Takk,
+        Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-leietakeren som er oppgitt i kontoinnstillingene, er ikke en Education-leietaker, så den kan ikke brukes med integrering av Microsoft Teams synk."
   the_module_item_is_locked_27fe420b: "Modul elementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De siste resultatene for brukeren %{current_user_name} og målet %{outcome_name}."

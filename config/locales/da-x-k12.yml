@@ -21522,7 +21522,11 @@ da-x-k12:
                 
                 Med venlig hilsen
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Den meddelelse, du sendte med emnelinjen \"%{subject}\" blev ikke leveret. For at kunne svare på Canvas-beskeder fra denne e-mail, skal den først være en bekræftet kommunikationskanal i din Canvas-profil. Gå ind på din profil, og send bekræftelses-e-mailen til denne e-mailadresse igen. Du kan også kontakte denne person via Canvas-indbakken. For hjælp henvises der til kapitlet Indbakke for din brugerrolle i Canvas-vejledningerne. [Se %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Den meddelelse, du sendte med emnelinjen "%{subject}" blev ikke leveret. For at kunne svare på Canvas-beskeder fra denne e-mail, skal den først være en bekræftet kommunikationskanal i din Canvas-profil. Gå ind på din profil, og send bekræftelses-e-mailen til denne e-mailadresse igen. Du kan også kontakte denne person via Canvas-indbakken. For hjælp henvises der til kapitlet Indbakke for din brugerrolle i Canvas-vejledningerne. [Se %{link}].
+                  
+                  Tak,
+                  Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-lejeren, der er angivet i kontoindstillinger, er ikke en Uddannelses-lejer, så den kan ikke bruges med Microsoft Teams Sync-integrationen."
   the_module_item_is_locked_27fe420b: "Forløbelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De seneste resultater for bruger %{current_user_name} og læringsudbytte %{outcome_name}."

@@ -24672,7 +24672,11 @@ nl:
                 
                 Bedankt,
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Het bericht dat je stuurde met onderwerpregel \"%{subject}\" is niet afgeleverd. Om Canvas-berichten vanaf dit e-mailadres te beantwoorden, moet het eerst een bevestigd communcatiekanaal in je Canvas-profiel zijn. Ga naar je profiel en stuur de bevestigingsmail voor dit e-mailadres. Je kunt ook contact opnemen met deze persoon via de Canvas-inbox. Meer informatie hierover kun je vinden in het hoofdstuk Inbox voor je gebruikersrol in de Canvas-handleidingen. [Zie %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Het bericht dat je stuurde met onderwerpregel "%{subject}" is niet afgeleverd. Om Canvas-berichten vanaf dit e-mailadres te beantwoorden, moet het eerst een bevestigd communcatiekanaal in je Canvas-profiel zijn. Ga naar je profiel en stuur de bevestigingsmail voor dit e-mailadres. Je kunt ook contact opnemen met deze persoon via de Canvas-inbox. Meer informatie hierover kun je vinden in het hoofdstuk Inbox voor je gebruikersrol in de Canvas-handleidingen. [Zie %{link}].
+                  
+                  Bedankt!
+                  Canvas Ondersteuning
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "De Microsoft 365 tenant verstrekt in de accountinstellingen is geen Education-tenant en kan daarom niet met de Microsoft Teams Sync-integratie worden gebruikt."
   the_module_item_is_locked_27fe420b: "Het item van de module is vergrendeld."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De meest recente scores voor gebruiker %{current_user_name} en %{outcome_name} resultaat."

@@ -18459,7 +18459,11 @@ ca:
                 
                 Gràcies,
                 Assistència tècnica del Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "El missatge que heu enviat amb l'assumpte \"%{subject}\" no s'ha lliurat. Per respondre els missatges del Canvas des d'aquesta adreça electrònica, primer ha de ser un canal de comunicació confirmat al vostre perfil del Canvas. Visiteu el vostre perfil i torneu a enviar el correu electrònic de confirmació per a aquesta adreça electrònica. També podeu contactar amb aquesta persona a través de la safata d'entrada del Canvas. Si necessiteu ajuda, vegeu el capítol sobre la safata d'entrada per al vostre rol d’usuari a les Guies del Canvas. (Consulteu %{link}.)"
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      El missatge que heu enviat amb l'assumpte "%{subject}" no s'ha lliurat. Per respondre els missatges del Canvas des d'aquesta adreça electrònica, primer ha de ser un canal de comunicació confirmat al vostre perfil del Canvas. Visiteu el vostre perfil i torneu a enviar el correu electrònic de confirmació per a aquesta adreça electrònica. També podeu contactar amb aquesta persona a través de la safata d'entrada del Canvas. Si necessiteu ajuda, vegeu el capítol sobre la safata d'entrada per al vostre rol d’usuari a les Guies del Canvas. (Consulteu %{link}.)
+                
+                Gràcies,
+                Assistència tècnica del Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "L’inquilí de Microsoft 365 proporcionat a la configuració del compte no és un inquilí d'Educació; per tant, no es pot utilitzar amb la integració de la sincronització de Microsoft Teams."
   the_module_item_is_locked_27fe420b: "L'element del mòdul està bloquejat."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les puntuacions més recents de l'usuari %{current_user_name} i el resultat %{outcome_name}."

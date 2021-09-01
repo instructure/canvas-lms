@@ -24588,7 +24588,11 @@ de:
                 
                 Danke,
                 Canvas Support
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Die von Ihnen gesendete Nachricht mit dem Betreff „%{subject}“ wurde nicht ausgeliefert. Um auf Canvas-Nachrichten aus dieser E-Mail zu antworten, muss zuerst ein Kommunikationskanal in Ihrem Canvas-Profil bestätigt werden. Besuchen Sie bitte Ihr Profil und senden Sie die Bestätigungs-E-Mail für diese E-Mail-Adresse zurück. Sie können diese Person auch über den Canvas-Posteingang kontaktieren. Hilfe finden Sie im Kapitel „Posteingang“ für Ihre Benutzerrolle in den Canvas-Anleitungen. [Siehe %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Die von Ihnen gesendete Nachricht mit dem Betreff „%{subject}“ wurde nicht ausgeliefert. Um auf Canvas-Nachrichten aus dieser E-Mail zu antworten, muss zuerst ein Kommunikationskanal in Ihrem Canvas-Profil bestätigt werden. Besuchen Sie bitte Ihr Profil und senden Sie die Bestätigungs-E-Mail für diese E-Mail-Adresse zurück. Sie können diese Person auch über den Canvas-Posteingang kontaktieren. Hilfe finden Sie im Kapitel „Posteingang“ für Ihre Benutzerrolle in den Canvas-Anleitungen. [Siehe %{link}].
+                  
+                  Vielen Dank,
+                  Ihr Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Der in den Kontoeinstellungen bereitgestellte Microsoft 365-Mandant ist kein Schulungs-Mandant, also nicht verwendbar mit der Integration der Microsoft Teams-Synchronisation."
   the_module_item_is_locked_27fe420b: "Das Modulelement ist gesperrt."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Die letzten Punkte für den Benutzer %{current_user_name} sowie das Lernziel %{outcome_name}"
