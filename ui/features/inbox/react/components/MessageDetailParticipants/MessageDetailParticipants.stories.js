@@ -31,7 +31,25 @@ export const WithMultipleRecipients = Template.bind({})
 WithMultipleRecipients.args = {
   conversationMessage: {
     author: {name: 'Bob Barker'},
-    recipients: [{name: 'Bob Barker'}, {name: 'Sally Ford'}, {name: 'Russel Franks'}],
+    recipients: [
+      {name: 'Bob Barker'},
+      {name: 'Sally Ford'},
+      {name: 'Russel Franks'},
+      {name: 'Dipali Vega'},
+      {name: 'Arlet Tuân'},
+      {name: 'Tshepo Jehoiachin'},
+      {name: 'Ráichéal Mairead'},
+      {name: 'Renāte Tarik'},
+      {name: "Jocelin 'Avshalom"},
+      {name: 'Marisa Ninurta'},
+      {name: 'Régine Teige'},
+      {name: 'Norman Iustina'},
+      {name: 'Ursula Siddharth'},
+      {name: 'Cristoforo Gülnarə'},
+      {name: 'Katka Lauge'},
+      {name: 'Sofia Fernanda'},
+      {name: 'Orestes Etheldreda'}
+    ],
     createdAt: 'November 5, 2020 at 2:25pm',
     body: 'This is the body text for the message.'
   }

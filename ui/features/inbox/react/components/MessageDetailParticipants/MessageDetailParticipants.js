@@ -16,29 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Link} from '@instructure/ui-link'
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
+import {Flex} from '@instructure/ui-flex'
+
+import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../util/constants'
 
 export const MessageDetailParticipants = ({...props}) => {
-  const participantsStr = props.conversationMessage.recipients
-    .filter(p => p.name !== props.conversationMessage.author.name)
-    .reduce((prev, curr) => {
-      return prev + ', ' + curr.name
-    }, '')
+  const [participantsExpanded, setParticipantsExpanded] = useState(false)
+
+  const uniqueMessageRecipients = props.conversationMessage.recipients.filter(
+    p => p.name !== props.conversationMessage.author.name
+  )
+
+  const participantsToShow = participantsExpanded
+    ? uniqueMessageRecipients
+    : uniqueMessageRecipients.slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
+
+  const participantStr = `, ${participantsToShow.map(participant => participant.name).join(', ')}`
+
+  const participantCount = uniqueMessageRecipients.length - PARTICIPANT_EXPANSION_THRESHOLD
+  const participantExpansionButtonText = participantsExpanded
+    ? I18n.t('%{participantCount} less', {
+        participantCount
+      })
+    : I18n.t('%{participantCount} more', {
+        participantCount
+      })
 
   return (
-    <Text as="div">
-      <TruncateText>
-        <b>{props.conversationMessage.author.name}</b>
-        {participantsStr}
-      </TruncateText>
-    </Text>
+    <Flex>
+      <Flex.Item shouldShrink>
+        <Text weight="bold">{props.conversationMessage.author.name}</Text>
+        <Text>
+          {participantStr}
+          {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
+            <Link
+              margin="0 0 0 x-small"
+              data-testid="expand-participants-button"
+              onClick={() => {
+                setParticipantsExpanded(!participantsExpanded)
+              }}
+            >
+              {participantExpansionButtonText}
+            </Link>
+          )}
+        </Text>
+      </Flex.Item>
+    </Flex>
   )
 }
 
 MessageDetailParticipants.propTypes = {
-  // TODO: not sure yet the exact shape of the data that will be fetched, so these will likely change
   conversationMessage: PropTypes.object
 }
