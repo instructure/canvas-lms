@@ -22913,7 +22913,11 @@ fr-CA:
                 
                 Merci,
                 Soutien technique de Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Le message que vous avez envoyé avec la ligne d’objet « %{subject} » n’a pas été livré. Pour répondre aux messages Canvas de ce courriel, il doit d’abord s’agir d’un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse courriel. Vous pouvez également contacter cette personne par le biais de la boîte de réception Canvas. Pour obtenir de l’aide, consultez le chapitre « Boîte de réception » pour votre rôle utilisateur dans les Guides Canvas. [Voir %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Le message que vous avez envoyé avec la ligne d’objet « %{subject} » n’a pas été livré. Pour répondre aux messages Canvas de ce courriel, il doit d’abord s’agir d’un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse courriel. Vous pouvez également contacter cette personne par le biais de la boîte de réception Canvas. Pour obtenir de l’aide, consultez le chapitre « Boîte de réception » pour votre rôle utilisateur dans les Guides Canvas. [Voir %{link}].
+                  
+                  Merci,
+                  L’assistance technique Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Le client Microsoft 365 fourni dans les paramètres du compte n’est pas un client Éducation, il ne peut donc pas être utilisé avec l’intégration Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et le résultat %{outcome_name}."
