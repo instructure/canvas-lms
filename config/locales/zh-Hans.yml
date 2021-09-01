@@ -24645,7 +24645,11 @@ zh-Hans:
       \x20         \n\
       \x20         谢谢，\n\
       \x20         Canvas 支持团队 "
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "您发送的标题行为“%{subject}”的消息未送达。要从此电子邮件中回复 Canvas 消息，它首先必须是您的 Canvas 个人资料中的已确认的通信渠道。请访问您的个人资料并重新发送此电子邮件地址的确认邮件。还可以通过 Canvas 收件箱联系此人。如需获取帮助，请查看 Canvas 指南的“收件箱”一节中有关用户角色的部分。[参阅 %{link}]。"
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      您发送的标题行为“%{subject}”的消息未送达。要从此电子邮件中回复 Canvas 消息，它首先必须是您的 Canvas 个人资料中的已确认的通信渠道。请访问您的个人资料并重新发送此电子邮件地址的确认邮件。还可以通过 Canvas 收件箱联系此人。如需获取帮助，请查看 Canvas 指南的“收件箱”一节中有关用户角色的部分。[参阅 %{link}]。
+        
+        谢谢您，
+        Canvas的支持团队
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "在帐户设置中提供的 Microsoft 365 租户不是教育租户，因此无法和 Microsoft Teams Sync 集成一起使用。"
   the_module_item_is_locked_27fe420b: 单元项已锁定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "为用户的最新得分 %{current_user_name} 和结果 %{outcome_name}。"
