@@ -22636,7 +22636,11 @@ ht:
                 
                 Mèsi,
                 Sèsiv Sipò Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Mesaj ou voye ki gen pou sijè \"%{subject}\" pa t rive delivre. Pou reponn mesaj Canvas apati de imèl sa a, toudabò li dwe se yon kanal kominikasyon ki konfime sou pwofil ou. Tanpri al vizite pwofil ou epi revoye imèl konfimasyon an pou adrès imèl sa a. Ou dwe kontakte moun sa a tou atravè Beat Resepsyon Canvas la. Pou w ka jwenn èd, tanpri gade chapit sou Bwat Resepsyon an pou w ka konnen wòl ou kòm itilizatè nan Gid Canvas yo. [Afiche %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Mesaj ou voye ki gen pou sijè "%{subject}" pa t rive delivre. Pou reponn mesaj Canvas apati de imèl sa a, toudabò li dwe se yon kanal kominikasyon ki konfime sou pwofil ou. Tanpri al vizite pwofil ou epi revoye imèl konfimasyon an pou adrès imèl sa a. Ou dwe kontakte moun sa a tou atravè Beat Resepsyon Canvas la. Pou w ka jwenn èd, tanpri gade chapit sou Bwat Resepsyon an pou w ka konnen wòl ou kòm itilizatè nan Gid Canvas yo. [Afiche %{link}].
+                  
+                  Mèsi,
+                  Sèvis Sipò Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Lokatè Microsoft 365 yo bay nan paramèt kont la pa yon lokatè Edikasyon, kidonk li pa p kapab itilize ak entegrasyon senkwonizasyon Microsoft Team nan."
   the_module_item_is_locked_27fe420b: "Eleman modil sa a bloke."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Nòt ki pi resan pou %{current_user_name} e rezilta %{outcome_name}."
