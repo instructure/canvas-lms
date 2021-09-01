@@ -292,7 +292,7 @@ export const K5Dashboard = ({
     <>
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
-          {parentSupportEnabled && (
+          {parentSupportEnabled && currentUserRoles.includes('observer') && (
             <View as="div" maxWidth="16em">
               <ObserverOptions
                 observerList={observerList}
@@ -345,6 +345,8 @@ export const K5Dashboard = ({
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
               currentUserRoles={currentUserRoles}
+              observedUserId={observedUserId}
+              currentUser={currentUser}
             />
             {cards && (
               <ResourcesPage

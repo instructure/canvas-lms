@@ -788,7 +788,13 @@ describe('K-5 Dashboard', () => {
     }
 
     it('shows picker when user is an observer', () => {
-      const {getByRole} = render(<K5Dashboard {...defaultProps} parentSupportEnabled />)
+      const {getByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          parentSupportEnabled
+          currentUserRoles={['user', 'observer']}
+        />
+      )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
       expect(select.value).toBe('Student 4')
