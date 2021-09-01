@@ -1126,5 +1126,42 @@ describe "new groups" do
       expect(f('.ic-Layout-contentMain')).to contain_css("button[title='Import']")
       expect(f('.ic-Layout-contentMain')).to contain_css("button[title='Add Group']")
     end
+
+    it 'should allow editing individual course-level groups' do
+      gc = @course.group_categories.create!(name: 'Course Groups')
+      group = Group.create!(name: 'group', group_category: gc, context: @course)
+
+      get "/courses/#{@course.id}/groups"
+
+      f("#group-#{group.id}-actions").click
+      expect(f('.al-options')).to contain_css('a.icon-edit')
+    end
+
+    it 'should allow editing individual course-level groups (granular permissions)' do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      gc = @course.group_categories.create!(name: 'Course Groups')
+      group = Group.create!(name: 'group', group_category: gc, context: @course)
+
+      get "/courses/#{@course.id}/groups"
+
+      f("#group-#{group.id}-actions").click
+      expect(f('.al-options')).to contain_css('a.icon-edit')
+    end
+
+    it 'should not allow editing individual course-level groups (granular permissions)' do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_manage',
+        role: teacher_role,
+        enabled: false
+      )
+      gc = @course.group_categories.create!(name: 'Course Groups')
+      group = Group.create!(name: 'group', group_category: gc, context: @course)
+
+      get "/courses/#{@course.id}/groups"
+
+      f("#group-#{group.id}-actions").click
+      expect(f('.al-options')).not_to contain_css('a.icon-edit')
+    end
   end
 end
