@@ -24659,7 +24659,11 @@ zh-Hant:
                 
                 謝謝！
                 Canvas 支援團隊
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "您發送的主題為「%{subject}」的訊息未能投遞。如希望透過本郵件回覆 Canvas 訊息，您的 Canvas 個人檔案中必須有經確認的通訊渠道。請瀏覽您的個人檔案並重新發送此電郵地址的確認電郵。您亦可以透過 Canvas 收件匣聯絡此人。如需協助，請參閱 Canvas 指南內有關您的使用者身份的收件匣章節。[請參閱 %{link}]。"
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      您發送的主題為「%{subject}」的訊息未能投遞。如希望透過本郵件回覆 Canvas 訊息，您的 Canvas 個人檔案中必須有經確認的通訊渠道。請瀏覽您的個人檔案並重新發送此電郵地址的確認電郵。您亦可以透過 Canvas 收件匣聯絡此人。如需協助，請參閱 Canvas 指南內有關您的使用者身份的收件匣章節。[請參閱 %{link}]。
+        
+        謝謝！
+        Canvas支援團隊
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "帳戶設定中提供的 Microsoft 365 租借用戶不是「教育」租借用戶，因此無法配合「Microsoft Teams 同步」整合一起使用。"
   the_module_item_is_locked_27fe420b: 該單元項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
