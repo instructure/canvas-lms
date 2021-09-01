@@ -19,6 +19,7 @@
 import I18n from 'i18n!k5_utils'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
+import buildURL from 'axios/lib/helpers/buildURL'
 
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
@@ -35,46 +36,70 @@ export const countByCourseId = arr =>
     return acc
   }, {})
 
-export const fetchGrades = (userId = 'self') =>
-  asJson(
-    window.fetch(
-      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&enrollment_state=active`,
-      defaultFetchOptions
-    )
-  ).then(courses =>
+export const fetchGrades = (includeObservedUsers, userId = 'self') => {
+  const include = [
+    'total_scores',
+    'current_grading_period_scores',
+    'grading_periods',
+    'course_image'
+  ]
+  if (includeObservedUsers) {
+    include.push('observed_users')
+  }
+  const coursesURL = buildURL(`/api/v1/users/${userId}/courses`, {
+    enrollment_state: 'active',
+    include
+  })
+  return asJson(window.fetch(coursesURL, defaultFetchOptions)).then(courses =>
     courses.map(course => {
-      // Grades are the same across all enrollments, just look at first one
       const hasGradingPeriods = course.has_grading_periods
-      const enrollment = course.enrollments[0]
-      const showTotalsForAllGradingPeriods = enrollment.totals_for_all_grading_periods_option
-      return {
+      const basicCourseInfo = {
         courseId: course.id,
         courseName: course.name,
         courseImage: course.image_download_url,
         courseColor: course.course_color,
-        currentGradingPeriodId: enrollment.current_grading_period_id,
-        currentGradingPeriodTitle: enrollment.current_grading_period_title,
-        enrollmentType: enrollment.type,
         finalGradesHidden: course.hide_final_grades,
         gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
         hasGradingPeriods,
-        score: hasGradingPeriods
-          ? enrollment.current_period_computed_current_score
-          : enrollment.computed_current_score,
-        grade: hasGradingPeriods
-          ? enrollment.current_period_computed_current_grade
-          : enrollment.computed_current_grade,
         isHomeroom: course.homeroom_course,
-        showTotalsForAllGradingPeriods,
-        totalScoreForAllGradingPeriods: showTotalsForAllGradingPeriods
-          ? enrollment.computed_current_score
-          : null,
-        totalGradeForAllGradingPeriods: showTotalsForAllGradingPeriods
-          ? enrollment.computed_current_grade
-          : null
+        enrollments: course.enrollments
       }
+      return getCourseGrades(basicCourseInfo)
     })
   )
+}
+export const getCourseGrades = (course, observedUserId) => {
+  const hasGradingPeriods = course.hasGradingPeriods
+  // Getting the observee enrollment if observedUserId is provided, as the observer enrollment
+  // does not include the observee grades information, if the observedUserId is null,
+  // just take the first enrollment as grades are the same across all non-observer enrollments
+  const enrollment = observedUserId
+    ? course.enrollments.find(e => e.user_id === observedUserId)
+    : course.enrollments.filter(e => e.type !== 'observer')[0]
+  // There could be the case in which the observed user enrollment is not active, if the student
+  // has not accepted the course invitation for example, in this case we are going to get a
+  // undefined enrollment
+  const showTotalsForAllGradingPeriods = enrollment?.totals_for_all_grading_periods_option
+  return {
+    ...course,
+    currentGradingPeriodId: enrollment?.current_grading_period_id,
+    currentGradingPeriodTitle: enrollment?.current_grading_period_title,
+    enrollmentType: enrollment?.type,
+    score: hasGradingPeriods
+      ? enrollment?.current_period_computed_current_score
+      : enrollment?.computed_current_score,
+    grade: hasGradingPeriods
+      ? enrollment?.current_period_computed_current_grade
+      : enrollment?.computed_current_grade,
+    showTotalsForAllGradingPeriods,
+    totalScoreForAllGradingPeriods: showTotalsForAllGradingPeriods
+      ? enrollment?.computed_current_score
+      : null,
+    totalGradeForAllGradingPeriods: showTotalsForAllGradingPeriods
+      ? enrollment?.computed_current_grade
+      : null
+  }
+}
 
 export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
   asJson(
