@@ -70,3 +70,30 @@
     left: 39%;
   }
 }
+
+// grades
+.grade-details {
+  .grade-details__title {
+    display: flex;
+    flex-direction: column;
+  }
+  .grade-details__score {
+    display: flex;
+    flex-direction: column;
+  }
+  &.narrow {
+    .grade-details__title {
+      display: inline;
+      margin-inline-start: 0.5rem;
+    }
+    .grade-details__status {
+      margin-inline-start: 0.5rem;
+    }
+    .grade-details__score {
+      display: inline;
+      .points-possible {
+        margin-inline-start: 0.5rem;
+      }
+    }
+  }
+}

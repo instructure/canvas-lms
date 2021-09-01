@@ -19,10 +19,8 @@
 import React from 'react'
 import I18n from 'i18n!grade_row'
 import tz from '@canvas/timezone'
-import PropTypes from 'prop-types'
 
 import {Table} from '@instructure/ui-table'
-import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {IconCheckDarkSolid, IconXSolid} from '@instructure/ui-icons'
@@ -31,6 +29,11 @@ import {Badge} from '@instructure/ui-badge'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 
+// For the instui Table to render correctly with layout="stacked", (see GradeDetails)
+// its body's children must be Table.Rows. It doesn't work to trick it by setting
+// displayName="row".
+// For this reason GradeRow is plain old js function and not a React function component.
+// Except for having no PropTypes, the code is exactly the same.
 export const GradeRow = ({
   assignmentName,
   url,
@@ -45,8 +48,11 @@ export const GradeRow = ({
   excused,
   missing,
   hasComments,
-  currentUserId
+  currentUserId,
+  isStacked
 }) => {
+  const cellTheme = isStacked ? {padding: '.5rem .75rem'} : undefined
+
   const renderStatus = () => {
     if (late) {
       return (
@@ -130,7 +136,7 @@ export const GradeRow = ({
   }
 
   const renderTitleCell = () => (
-    <Flex direction="column" margin="0 0 0 small">
+    <div className="grade-details__title">
       <Link
         href={url}
         isWithinText={false}
@@ -141,13 +147,13 @@ export const GradeRow = ({
       >
         {assignmentName}
       </Link>
-      {renderStatus()}
-    </Flex>
+      <span className="grade-details__status">{renderStatus()}</span>
+    </div>
   )
 
   return (
     <Table.Row data-testid="grades-table-row">
-      <Table.Cell>
+      <Table.Cell theme={cellTheme}>
         {unread ? (
           <Badge
             type="notification"
@@ -167,55 +173,31 @@ export const GradeRow = ({
           renderTitleCell()
         )}
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell theme={cellTheme}>
         {dueDate && <Text>{tz.format(dueDate, 'date.formats.full_with_weekday')}</Text>}
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell theme={cellTheme}>
         <Text>{assignmentGroupName}</Text>
       </Table.Cell>
-      <Table.Cell>
-        <Flex direction="column">
+      <Table.Cell theme={cellTheme}>
+        <div className="grade-details__score">
           {renderScore()}
           {pointsPossible && (
-            <Text size="x-small">{I18n.t('Out of %{pointsPossible} pts', {pointsPossible})}</Text>
+            <span className="points-possible">
+              <Text size="x-small">{I18n.t('Out of %{pointsPossible} pts', {pointsPossible})}</Text>
+            </span>
           )}
           {hasComments && (
             <Link
               href={`${url}/submissions/${currentUserId}`}
               isWithinText={false}
-              margin="xx-small 0"
+              margin={isStacked ? '0 0 0 xx-small' : 'xx-small 0'}
             >
               {I18n.t('View feedback')}
             </Link>
           )}
-        </Flex>
+        </div>
       </Table.Cell>
     </Table.Row>
   )
 }
-
-GradeRow.propTypes = {
-  assignmentName: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  dueDate: PropTypes.string,
-  assignmentGroupName: PropTypes.string.isRequired,
-  pointsPossible: PropTypes.number,
-  gradingType: PropTypes.oneOf([
-    'pass_fail',
-    'percent',
-    'letter_grade',
-    'gpa_scale',
-    'points',
-    'not_graded'
-  ]).isRequired,
-  grade: PropTypes.string,
-  submissionDate: PropTypes.string,
-  unread: PropTypes.bool.isRequired,
-  late: PropTypes.bool,
-  excused: PropTypes.bool,
-  missing: PropTypes.bool,
-  hasComments: PropTypes.bool.isRequired,
-  currentUserId: PropTypes.string.isRequired
-}
-
-GradeRow.displayName = 'Row'
