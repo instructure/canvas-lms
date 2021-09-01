@@ -25196,7 +25196,11 @@ pl:
                 
                 Dziękujemy,
                 Zespół ds. pomocy Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Wysłana wiadomość o temacie \"%{subject}\" nie została dostarczona. Aby odpowiedzieć na wiadomości Canvas z tego adresu e-mail, należy najpierw potwierdzić go jako kanał komunikacji w profilu Canvas. Odwiedź swój profil i ponownie wyślij wiadomość potwierdzającą dla tego adresu e-mail. Można również skontaktować się z tą osobą za pomocą skrzynki odbiorczej Canvas. Aby uzyskać pomoc na temat roli użytkownika, patrz rozdział Skrzynka odbiorcza w Przewodniku Canvas. [patrz %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Wysłana wiadomość o temacie "%{subject}" nie została dostarczona. Aby odpowiedzieć na wiadomości Canvas z tego adresu e-mail, należy najpierw potwierdzić go jako kanał komunikacji w profilu Canvas. Odwiedź swój profil i ponownie wyślij wiadomość potwierdzającą dla tego adresu e-mail. Można również skontaktować się z tą osobą za pomocą skrzynki odbiorczej Canvas. Aby uzyskać pomoc na temat roli użytkownika, patrz rozdział Skrzynka odbiorcza w Przewodniku Canvas. [patrz %{link}].
+                  
+                  Dziekujemy
+                  Pomoc techniczna Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Dzierżawca Microsoft 365 podany w ustawieniach konta nie jest dzierżawcą Education, dlatego nie można go używać do integracji z synchronizacją Microsoft Teams."
   the_module_item_is_locked_27fe420b: "Element modułu jest zablokowany."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Najnowsze wyniki użytkownika %{current_user_name} i rezultat %{outcome_name}."
