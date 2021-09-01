@@ -22172,7 +22172,11 @@ is:
                 
                 Kærar þakkir,
                 þjónustudeild Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "Skilaboðin sem þú sendir með efnislínunni „%{subject}“ voru ekki send. Til þess að svara Canvas-skilaboðum úr þessu netfangi þarf fyrst að staðfesta það sem samskiptarás á Canvas-notandasíðunni. Farðu á notandasíðuna þína og sendu staðfestingartölvupóstinn aftur úr þessu netfangi. Þú getur einnig haft samband við þennan einstakling í gegnum Canvas-innhólfið. Til að fá aðstoð skaltu skoða innhólfskaflann fyrir notandahlutverk þitt í Canvas leiðbeiningum. [Sjá %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Skilaboðin sem þú sendir með efnislínunni „%{subject}“ voru ekki send. Til þess að svara Canvas-skilaboðum úr þessu netfangi þarf fyrst að staðfesta það sem samskiptarás á Canvas-notandasíðunni. Farðu á notandasíðuna þína og sendu staðfestingartölvupóstinn aftur úr þessu netfangi. Þú getur einnig haft samband við þennan einstakling í gegnum Canvas-innhólfið. Til að fá aðstoð skaltu skoða innhólfskaflann fyrir notandahlutverk þitt í Canvas leiðbeiningum. [Sjá %{link}].
+                  
+                  Takk fyrir
+                  Canvas hjálparsveitin
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365 tengdur notandi sem gefinn er uppí reikningsstillingum er ekki tengdur notandi grunnskóla og getur því ekki verið notaður með Microsoft Teams Sync samþættingu."
   the_module_item_is_locked_27fe420b: "Námsefni atriði er læst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Nýjustu einkunnir fyrir %{current_user_name} og niðurstaða %{outcome_name}."
