@@ -78,10 +78,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     result = run_mutation(discussion_entry_id: @root_entry.id, read: true)
     expect(result.dig('errors')).to be nil
     expect(@root_entry.reload.read?(@student)).to eq true
-    expect(@root_entry.find_existing_participant(@student).forced_read_state).to be false
     expect(@parent_entry.reload.read?(@student)).to eq true
-    expect(@parent_entry.find_existing_participant(@student).forced_read_state).to be false
     expect(@child_entry.reload.read?(@student)).to eq true
-    expect(@child_entry.find_existing_participant(@student).forced_read_state).to be false
   end
 end
