@@ -1629,6 +1629,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     test('hides the status menu component when the current submission is not the newest', () => {
       finishSetup()
       SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
+      window.jsonData.gradingPeriods[8].is_closed = false
       SpeedGrader.EG.handleSubmissionSelectionChange()
       const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
       strictEqual(mountPoint.children.length, 0)
@@ -1637,6 +1638,22 @@ QUnit.module('SpeedGrader', rootHooks => {
     test('shows the status menu component when the current submission is the newest', () => {
       finishSetup()
       SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 1
+      window.jsonData.gradingPeriods[8].is_closed = false
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 1)
+    })
+
+    test('hides the status menu component when the current assignment is in a closed grading period', () => {
+      finishSetup()
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 0)
+    })
+
+    test('shows the status menu component when the current assignment is not in a closed grading period', () => {
+      finishSetup()
+      window.jsonData.gradingPeriods[8].is_closed = false
       SpeedGrader.EG.handleSubmissionSelectionChange()
       const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
       strictEqual(mountPoint.children.length, 1)

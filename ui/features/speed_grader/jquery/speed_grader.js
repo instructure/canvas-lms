@@ -2037,13 +2037,6 @@ EG = {
         submissionHistory[currentSelectedIndex]
     }
 
-    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
-    if (mountPoint) {
-      styleSubmissionStatusPills(getLateAndMissingPills())
-      const component = isMostRecent ? statusMenuComponent(this.currentStudent.submission) : null
-      renderStatusMenu(component)
-    }
-
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'
     const vericiteEnabled =
@@ -2263,6 +2256,15 @@ EG = {
     if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass('with_enrollment_notice')
     }
+
+    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
+    if (mountPoint) {
+      const shouldRender = isMostRecent && !isClosedForSubmission
+      styleSubmissionStatusPills(getLateAndMissingPills())
+      const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
+      renderStatusMenu(component)
+    }
+
     EG.showDiscussion()
   },
 
