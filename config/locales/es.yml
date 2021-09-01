@@ -24665,7 +24665,11 @@ es:
                 
                 Gracias,
                 Soporte de Canvas
-  the_message_you_sent_with_the_subject_line_subject_ca925315: "El mensaje que envió con el tema “%{subject}” no se entregó. Para responder los mensajes de Canvas desde este correo electrónico, primero debe ser un canal de comunicación confirmado en su perfil de Canvas. Visite su perfil y vuelva a enviar el correo electrónico de confirmación para este correo electrónico. También puede contactar a esta persona mediante la bandeja de entrada de Canvas. Para obtener ayuda, consulte el capítulo sobre la bandeja de entrada para su rol de usuario en las guías de Canvas. [Ver %{link}]."
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      El mensaje que envió con el tema “%{subject}” no se entregó. Para responder los mensajes de Canvas desde este correo electrónico, primero debe ser un canal de comunicación confirmado en su perfil de Canvas. Visite su perfil y vuelva a enviar el correo electrónico de confirmación para este correo electrónico. También puede contactar a esta persona mediante la bandeja de entrada de Canvas. Para obtener ayuda, consulte el capítulo sobre la bandeja de entrada para su rol de usuario en las guías de Canvas. [Ver %{link}].
+                
+                Gracias.
+                Asistencia técnica de Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "El inquilino de Microsoft 365 proporcionado en las configuraciones de la cuenta no es un inquilino de Educación, por lo que no puede utilizarse para integrar la sincronización de Microsoft Teams."
   the_module_item_is_locked_27fe420b: "El item del módulo está bloqueado."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Los puntajes más recientes para el usuario %{current_user_name} y la competencia %{outcome_name}."
