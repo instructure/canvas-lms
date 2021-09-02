@@ -2084,6 +2084,12 @@ describe ApplicationController do
           expect(controller.send(:show_immersive_reader?)).to be true
         end
 
+        it "is true for the course page" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
+
         it "is true for the syllabus page" do
           controller.params[:controller] = "assignments"
           controller.params[:action] = "syllabus"
@@ -2098,6 +2104,12 @@ describe ApplicationController do
 
         it "is false for the assignments show page" do
           controller.params[:controller] = "assignments"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be false
+        end
+
+        it "is false for the course page" do
+          controller.params[:controller] = "courses"
           controller.params[:action] = "show"
           expect(controller.send(:show_immersive_reader?)).to be false
         end
