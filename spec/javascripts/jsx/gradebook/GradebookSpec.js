@@ -32,6 +32,7 @@ import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/Async
 import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert'
+import Gradebook from 'ui/features/gradebook/react/default_gradebook/Gradebook'
 import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator'
 import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
@@ -47,6 +48,7 @@ import {
 
 import {
   createGradebook,
+  defaultGradebookProps,
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
@@ -9005,8 +9007,8 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, false)
     })
 
-    QUnit.module('viewOptions prop', () => {
-      const viewOptions = () => gradebookSettingsModalProps().viewOptions
+    QUnit.module('loadCurrentViewOptions prop', () => {
+      const viewOptions = () => gradebookSettingsModalProps().loadCurrentViewOptions()
 
       test('sets columnSortSettings to the current sort criterion and direction', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
@@ -9106,10 +9108,10 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, undefined)
     })
 
-    test('does not set viewOptions', () => {
+    test('does not set loadCurrentViewOptions', () => {
       gradebook = createGradebook()
       gradebook.renderGradebookSettingsModal()
-      strictEqual(gradebookSettingsModalProps().viewOptions, undefined)
+      strictEqual(gradebookSettingsModalProps().loadCurrentViewOptions, undefined)
     })
   })
 })
@@ -9805,6 +9807,394 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
     gradebook.toggleViewUngradedAsZero()
 
     strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
+  })
+})
+
+QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
+  let gradebook
+  let container
+
+  hooks.beforeEach(() => {
+    // We need to actually mount and render the Gradebook component here to
+    // ensure that grid colors (which use setState) are properly updated
+    container = document.body.appendChild(document.createElement('div'))
+    const component = React.createElement(Gradebook, {
+      ...defaultGradebookProps,
+      allow_view_ungraded_as_zero: true,
+      context_id: '100',
+      enhanced_gradebook_filters: true,
+      ref: el => {
+        gradebook = el
+      },
+      settings: {
+        show_unpublished_assignments: false
+      },
+      view_ungraded_as_zero: false
+    })
+    ReactDOM.render(component, container)
+
+    gradebook.gotAllAssignmentGroups([
+      {
+        id: '2201',
+        position: 1,
+        name: 'Assignments',
+        assignments: [
+          {id: '2301', name: 'assignment1', points_possible: 100, published: true},
+          {id: '2302', name: 'assignment2', points_possible: 50, published: true},
+          {id: '2303', name: 'unpublished', points_possible: 1500, published: false}
+        ]
+      }
+    ])
+
+    sinon.stub(gradebook, 'createGrid')
+    sinon.stub(gradebook, 'updateGrid')
+    sinon.stub(gradebook, 'updateAllTotalColumns')
+
+    gradebook.setColumnOrder({sortType: 'due_date', direction: 'ascending'})
+    gradebook.gotCustomColumns([])
+    gradebook.initGrid()
+
+    sinon.stub(GradebookApi, 'createTeacherNotesColumn').resolves({
+      data: {
+        id: '9999',
+        hidden: false,
+        name: 'Notes',
+        position: 1,
+        teacher_notes: true
+      }
+    })
+    sinon.stub(GradebookApi, 'saveUserSettings').resolves()
+    sinon.stub(GradebookApi, 'updateColumnOrder').resolves()
+    sinon.stub(GradebookApi, 'updateTeacherNotesColumn').resolves()
+
+    sinon.stub(FlashAlert, 'showFlashError')
+  })
+
+  hooks.afterEach(() => {
+    FlashAlert.showFlashError.restore()
+
+    GradebookApi.updateTeacherNotesColumn.restore()
+    GradebookApi.updateColumnOrder.restore()
+    GradebookApi.saveUserSettings.restore()
+    GradebookApi.createTeacherNotesColumn.restore()
+
+    ReactDOM.unmountComponentAtNode(container)
+    container.remove()
+  })
+
+  const teacherNotesColumn = () =>
+    gradebook.listVisibleCustomColumns().find(column => column.id === '9999')
+
+  QUnit.module('when updating column sort settings', () => {
+    test('calls the updateColumnOrder API function with the updated settings', async () => {
+      await gradebook.handleViewOptionsUpdated({
+        columnSortSettings: {criterion: 'points', direction: 'ascending'}
+      })
+
+      strictEqual(GradebookApi.updateColumnOrder.callCount, 1)
+      deepEqual(GradebookApi.updateColumnOrder.lastCall.args, [
+        '100',
+        {
+          direction: 'ascending',
+          sortType: 'points',
+          freezeTotalGrade: false
+        }
+      ])
+    })
+
+    test('does not call updateColumnOrder if the column settings have not changed', async () => {
+      gradebook.setColumnOrder({sortType: 'due_date', direction: 'ascending'})
+      await gradebook.handleViewOptionsUpdated({
+        columnSortSettings: {criterion: 'due_date', direction: 'ascending'}
+      })
+
+      strictEqual(GradebookApi.updateColumnOrder.callCount, 0)
+    })
+
+    test('sorts the grid columns when the API call completes', async () => {
+      await gradebook.handleViewOptionsUpdated({
+        columnSortSettings: {criterion: 'points', direction: 'ascending'}
+      })
+      deepEqual(gradebook.gridData.columns.scrollable, [
+        'assignment_2302',
+        'assignment_2301',
+        'assignment_group_2201',
+        'total_grade'
+      ])
+    })
+
+    test('does not sort the grid columns if the API call fails', async () => {
+      QUnit.expect(1)
+      GradebookApi.updateColumnOrder.rejects(new Error('no'))
+
+      try {
+        await gradebook.handleViewOptionsUpdated({
+          columnSortSettings: {criterion: 'points', direction: 'ascending'}
+        })
+      } catch {
+        deepEqual(gradebook.gridData.columns.scrollable, [
+          'assignment_2301',
+          'assignment_2302',
+          'assignment_group_2201',
+          'total_grade'
+        ])
+      }
+    })
+  })
+
+  QUnit.module('when updating teacher notes settings', () => {
+    QUnit.module('when the notes column does not exist', () => {
+      test('calls the createTeacherNotesColumn API function if showNotes is true', async () => {
+        await gradebook.handleViewOptionsUpdated({showNotes: true})
+        strictEqual(GradebookApi.createTeacherNotesColumn.callCount, 1)
+        deepEqual(GradebookApi.createTeacherNotesColumn.lastCall.args, ['100'])
+      })
+
+      test('does not call createTeacherNotesColumn if showNotes is false', async () => {
+        await gradebook.handleViewOptionsUpdated({showNotes: false})
+        strictEqual(GradebookApi.createTeacherNotesColumn.callCount, 0)
+      })
+
+      test('shows the notes column when the API call completes', async () => {
+        await gradebook.handleViewOptionsUpdated({showNotes: true})
+        ok(teacherNotesColumn())
+      })
+
+      test('does not update the visibility of the notes column if the API call fails', async () => {
+        QUnit.expect(1)
+        GradebookApi.createTeacherNotesColumn.rejects(new Error('NO!'))
+
+        try {
+          await gradebook.handleViewOptionsUpdated({showNotes: true})
+        } catch {
+          notOk(teacherNotesColumn())
+        }
+      })
+    })
+
+    QUnit.module('when the notes column already exists', createColumnHooks => {
+      createColumnHooks.beforeEach(() => {
+        gradebook.gotCustomColumns([
+          {id: '9999', teacher_notes: true, hidden: false, title: 'Notes'}
+        ])
+      })
+
+      test('calls the updateTeacherNotesColumn API function if showNotes changes', async () => {
+        await gradebook.handleViewOptionsUpdated({showNotes: false})
+        strictEqual(GradebookApi.updateTeacherNotesColumn.callCount, 1)
+        deepEqual(GradebookApi.updateTeacherNotesColumn.lastCall.args, [
+          '100',
+          '9999',
+          {hidden: true}
+        ])
+      })
+
+      test('does not call updateTeacherNotesColumn if showNotes has not changed', async () => {
+        await gradebook.handleViewOptionsUpdated({showNotes: true})
+        strictEqual(GradebookApi.updateTeacherNotesColumn.callCount, 0)
+      })
+
+      QUnit.module('when the API call completes', () => {
+        test('shows the notes column if showNotes was set to true', async () => {
+          gradebook.hideNotesColumn()
+
+          await gradebook.handleViewOptionsUpdated({showNotes: true})
+          ok(teacherNotesColumn())
+        })
+
+        test('hides the notes column if showNotes was set to false', async () => {
+          gradebook.showNotesColumn()
+
+          await gradebook.handleViewOptionsUpdated({showNotes: false})
+          notOk(teacherNotesColumn())
+        })
+      })
+
+      test('does not update the visibility of the notes column if the API call fails', async () => {
+        QUnit.expect(1)
+        GradebookApi.updateTeacherNotesColumn.rejects(new Error('NOOOOO'))
+
+        try {
+          await gradebook.handleViewOptionsUpdated({showNotes: false})
+        } catch {
+          strictEqual(teacherNotesColumn().hidden, false)
+        }
+      })
+    })
+
+    QUnit.module('when updating items stored in user settings', () => {
+      const updateParams = (overrides = {}) => ({
+        showUnpublishedAssignments: false,
+        statusColors: gradebook.state.gridColors,
+        viewUngradedAsZero: false,
+        ...overrides
+      })
+
+      test('calls the saveUserSettings API function with the changed values', async () => {
+        await gradebook.handleViewOptionsUpdated(
+          updateParams({
+            showUnpublishedAssignments: true,
+            statusColors: {...gradebook.state.gridColors, dropped: '#000000'},
+            viewUngradedAsZero: true
+          })
+        )
+
+        strictEqual(GradebookApi.saveUserSettings.callCount, 1)
+        const [courseId, params] = GradebookApi.saveUserSettings.lastCall.args
+        strictEqual(courseId, '100')
+        strictEqual(params.colors.dropped, '#000000')
+        strictEqual(params.show_unpublished_assignments, true)
+        strictEqual(params.view_ungraded_as_zero, true)
+      })
+
+      test('does not call saveUserSettings if no value has changed', async () => {
+        await gradebook.handleViewOptionsUpdated(updateParams())
+        strictEqual(GradebookApi.saveUserSettings.callCount, 0)
+      })
+
+      QUnit.module('updating showing unpublished assignments', () => {
+        test('shows unpublished assignments when showUnpublishedAssignments is set to true', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({showUnpublishedAssignments: true}))
+          ok(gradebook.gridData.columns.scrollable.includes('assignment_2303'))
+        })
+
+        test('hides unpublished assignments when showUnpublishedAssignments is set to false', async () => {
+          gradebook.gridDisplaySettings.showUnpublishedAssignments = true
+          gradebook.setVisibleGridColumns()
+
+          await gradebook.handleViewOptionsUpdated(
+            updateParams({showUnpublishedAssignments: false})
+          )
+          notOk(gradebook.gridData.columns.scrollable.includes('assignment_2303'))
+        })
+
+        test('does not update the list of visible assignments if the request fails', async () => {
+          QUnit.expect(1)
+          GradebookApi.saveUserSettings.rejects(new Error('no way'))
+
+          try {
+            await gradebook.handleViewOptionsUpdated(
+              updateParams({showUnpublishedAssignments: true})
+            )
+          } catch {
+            notOk(gradebook.gridData.columns.scrollable.includes('assignment_2303'))
+          }
+        })
+      })
+
+      QUnit.module('updating view ungraded as zero', () => {
+        test('makes updates to the grid when the request completes', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({viewUngradedAsZero: true}))
+          strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
+          strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, true)
+        })
+
+        test('does not make updates to grid if the request fails', async () => {
+          QUnit.expect(2)
+          GradebookApi.saveUserSettings.rejects(new Error('STILL NO'))
+
+          try {
+            await gradebook.handleViewOptionsUpdated(updateParams({viewUngradedAsZero: true}))
+          } catch {
+            strictEqual(gradebook.updateAllTotalColumns.callCount, 0)
+            strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, false)
+          }
+        })
+      })
+
+      QUnit.module('updating status colors', () => {
+        test('updates the grid colors when the request completes', async () => {
+          // FIXME need to render this dumb gradebook component so setState can happen
+          const newColors = {...gradebook.state.gridColors, dropped: '#AAAAAA'}
+
+          await gradebook.handleViewOptionsUpdated(updateParams({statusColors: newColors}))
+          strictEqual(gradebook.state.gridColors.dropped, '#AAAAAA')
+        })
+
+        test('does not update the grid colors if the request fails', async () => {
+          QUnit.expect(1)
+          GradebookApi.saveUserSettings.rejects(new Error('no :|'))
+
+          const oldColors = gradebook.state.gridColors
+
+          try {
+            await gradebook.handleViewOptionsUpdated(
+              updateParams({statusColors: {dropped: '#AAAAAA'}})
+            )
+          } catch {
+            deepEqual(gradebook.state.gridColors, oldColors)
+          }
+        })
+      })
+    })
+
+    test('does not update the grid until all requests complete', async () => {
+      let resolveSettingsRequest
+
+      GradebookApi.saveUserSettings.returns(
+        new Promise(resolve => {
+          resolveSettingsRequest = resolve
+        })
+      )
+
+      const promise = gradebook.handleViewOptionsUpdated({
+        columnSortSettings: {criterion: 'points', direction: 'ascending'},
+        showNotes: true,
+        showUnpublishedAssignments: true
+      })
+
+      strictEqual(gradebook.updateGrid.callCount, 0)
+
+      resolveSettingsRequest()
+      await promise
+
+      ok(gradebook.updateGrid.called)
+    })
+
+    QUnit.module('when updates have completed', () => {
+      QUnit.module('when at least one API call has failed', failureHooks => {
+        failureHooks.beforeEach(() => {
+          GradebookApi.saveUserSettings.rejects(new Error('...'))
+        })
+
+        test('shows a flash error', async () => {
+          QUnit.expect(1)
+
+          try {
+            await gradebook.handleViewOptionsUpdated({
+              columnSortSettings: {criterion: 'points', direction: 'ascending'},
+              showNotes: true,
+              showUnpublishedAssignments: true
+            })
+          } catch {
+            strictEqual(FlashAlert.showFlashError.callCount, 1)
+          }
+        })
+
+        test('nevertheless updates the grid', async () => {
+          QUnit.expect(1)
+
+          try {
+            await gradebook.handleViewOptionsUpdated({
+              columnSortSettings: {criterion: 'points', direction: 'ascending'},
+              showNotes: true,
+              showUnpublishedAssignments: true
+            })
+          } catch {
+            ok(gradebook.updateGrid.called)
+          }
+        })
+      })
+
+      test('updates the grid if all requests succeeded', async () => {
+        await gradebook.handleViewOptionsUpdated({
+          columnSortSettings: {criterion: 'points', direction: 'ascending'},
+          showNotes: true,
+          showUnpublishedAssignments: true
+        })
+        ok(gradebook.updateGrid.called)
+      })
+    })
   })
 })
 

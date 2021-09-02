@@ -44,10 +44,13 @@ export default {
       setAssignmentPostPolicies: true,
       setCoursePostPolicy: true
     },
+    // The component uses a function prop to retrieve the viewOptions data
+    // dynamically, but we specify the data itself here so it can be
+    // customized
     viewOptions: {
       columnSortSettings: {
-        criterion: '',
-        direction: ''
+        criterion: 'name',
+        direction: 'ascending'
       },
       showNotes: true,
       showUnpublishedAssignments: true,
@@ -67,5 +70,14 @@ function openGradebookSettingsModalRef(modal) {
   if (modal) modal.open()
 }
 
-const Template = args => <GradebookSettingsModal {...args} ref={openGradebookSettingsModalRef} />
+const Template = args => {
+  const {viewOptions, ...rest} = args
+  return (
+    <GradebookSettingsModal
+      {...rest}
+      loadCurrentViewOptions={() => viewOptions}
+      ref={openGradebookSettingsModalRef}
+    />
+  )
+}
 export const Default = Template.bind({})
