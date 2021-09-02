@@ -22,6 +22,7 @@ export const defaultGradebookProps = {
   gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
   gridColorNode: document.createElement('div'),
+  filterNavNode: document.createElement('div'),
 
   allow_separate_first_last_names: true,
   api_max_per_page: 50,
