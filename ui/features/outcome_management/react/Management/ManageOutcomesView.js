@@ -144,7 +144,7 @@ const ManageOutcomesView = ({
             ({
               canUnlink,
               _id: linkId,
-              node: {_id, title, description, friendlyDescription, canEdit}
+              node: {_id, title, description, friendlyDescription, contextType, contextId, canEdit}
             }) => (
               <ManageOutcomeItem
                 key={linkId}
@@ -153,6 +153,8 @@ const ManageOutcomesView = ({
                 title={title}
                 description={description}
                 friendlyDescription={friendlyDescription?.description}
+                outcomeContextType={contextType}
+                outcomeContextId={contextId}
                 canManageOutcome={canEdit}
                 canUnlink={canUnlink}
                 isChecked={!!selectedOutcomes[linkId]}

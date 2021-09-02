@@ -31,7 +31,7 @@ import {
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 
-const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescription}) => {
+const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupDescription}) => {
   const isGroup = groupDescription !== undefined
   const hasDescription = groupDescription !== ''
   return (
@@ -43,7 +43,7 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescriptio
       }
       onSelect={onMenuHandler}
     >
-      <Menu.Item value="edit">
+      <Menu.Item disabled={!canEdit} value="edit">
         <IconEditLine size="x-small" />
         <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-edit">
           {I18n.t('Edit')}
@@ -76,11 +76,13 @@ OutcomeKebabMenu.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
   menuTitle: PropTypes.string,
   canDestroy: PropTypes.bool.isRequired,
-  groupDescription: PropTypes.string
+  groupDescription: PropTypes.string,
+  canEdit: PropTypes.bool
 }
 
 OutcomeKebabMenu.defaultProps = {
-  menuTitle: ''
+  menuTitle: '',
+  canEdit: true
 }
 
 export default OutcomeKebabMenu

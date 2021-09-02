@@ -30,7 +30,8 @@ describe('OutcomeKebabMenu', () => {
       {
         menuTitle: groupMenuTitle,
         onMenuHandler: onMenuHandlerMock,
-        canDestroy: true
+        canDestroy: true,
+        canEdit: true
       },
       props
     )
@@ -124,6 +125,15 @@ describe('OutcomeKebabMenu', () => {
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
       const menuItem = getByText('Remove')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(0)
+    })
+
+    it('does not call menuHandler if canEdit is false', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({canEdit: false})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('Edit')
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(0)
     })

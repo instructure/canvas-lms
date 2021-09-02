@@ -33,6 +33,8 @@ export default {
     canUnlink: true,
     parentGroupId: '100',
     parentGroupTitle: 'Outcome Group',
+    outcomeContextType: 'Account',
+    outcomeContextId: 1,
     onMenuHandler: () => {},
     onCheckboxHandler: () => {}
   }
@@ -58,4 +60,9 @@ withoutManagePermission.args = {
 export const withoutDestroyPermission = Template.bind({})
 withoutDestroyPermission.args = {
   canUnlink: false
+}
+
+export const withoutEditPermission = Template.bind({})
+withoutEditPermission.args = {
+  outcomeContextId: 2
 }

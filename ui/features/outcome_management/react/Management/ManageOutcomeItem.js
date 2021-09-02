@@ -36,12 +36,15 @@ const ManageOutcomeItem = ({
   title,
   description,
   friendlyDescription,
+  outcomeContextType,
+  outcomeContextId,
   canManageOutcome,
   isChecked,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
 }) => {
+  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
@@ -51,6 +54,9 @@ const ManageOutcomeItem = ({
   // within a course. See OUT-1415, OUT-1511
   const {canManage, isAdmin, isCourse} = useCanvasContext()
   const allowAdminEdit = isCourse && canManage && isAdmin
+  const canEdit =
+    friendlyDescriptionFF ||
+    (outcomeContextType === contextType && String(outcomeContextId) === contextId)
 
   if (!title) return null
 
@@ -111,6 +117,7 @@ const ManageOutcomeItem = ({
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}
+              canEdit={canEdit}
               menuTitle={I18n.t('Outcome Menu')}
               onMenuHandler={onMenuHandlerWrapper}
             />
@@ -142,6 +149,8 @@ ManageOutcomeItem.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   friendlyDescription: PropTypes.string,
+  outcomeContextType: PropTypes.string,
+  outcomeContextId: PropTypes.number,
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,

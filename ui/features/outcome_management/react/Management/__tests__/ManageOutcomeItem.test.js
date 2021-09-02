@@ -41,6 +41,8 @@ describe('ManageOutcomeItem', () => {
     linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
+    outcomeContextType: 'Account',
+    outcomeContextId: 1,
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,

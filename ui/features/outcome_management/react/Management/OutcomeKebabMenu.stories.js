@@ -23,10 +23,34 @@ export default {
   title: 'Examples/Outcomes/OutcomeKebabMenu',
   component: OutcomeKebabMenu,
   args: {
-    menuTitle: 'Kebab Menu'
+    menuTitle: 'Kebab Menu',
+    canEdit: true,
+    canDestroy: true,
+    groupDescription: undefined,
+    onMenuHandler: () => {}
   }
 }
 
 const Template = args => <OutcomeKebabMenu {...args} />
 
 export const Default = Template.bind({})
+
+export const withoutDestroyPermission = Template.bind({})
+withoutDestroyPermission.args = {
+  canDestroy: false
+}
+
+export const withoutEditPermission = Template.bind({})
+withoutEditPermission.args = {
+  canEdit: false
+}
+
+export const withGroupDescription = Template.bind({})
+withGroupDescription.args = {
+  groupDescription: 'Group description'
+}
+
+export const withEmptyGroupDescription = Template.bind({})
+withEmptyGroupDescription.args = {
+  groupDescription: ''
+}
