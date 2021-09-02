@@ -78,13 +78,15 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     importGroupsStatus,
     importOutcomesStatus,
     clearGroupsStatus,
-    clearOutcomesStatus
+    clearOutcomesStatus,
+    hasAddedOutcomes,
+    setHasAddedOutcomes
   } = useOutcomesImport()
 
   const onCloseModalHandler = () => {
     clearGroupsStatus()
     clearOutcomesStatus()
-    onCloseHandler()
+    onCloseHandler(hasAddedOutcomes)
   }
 
   const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useBoolean()
@@ -95,6 +97,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   useEffect(() => {
     if (shouldFocusDoneBtn) doneBtnRef.current?.focus()
   }, [shouldFocusDoneBtn])
+
+  useEffect(() => {
+    if (open) {
+      setHasAddedOutcomes(false)
+    }
+  }, [open, setHasAddedOutcomes])
 
   const onAddAllHandler = () => {
     if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
