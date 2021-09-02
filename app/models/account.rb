@@ -355,6 +355,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_push_notifications, boolean: true, root_only: true, default: true
   add_setting :allow_last_page_on_course_users, boolean: true, root_only: true, default: false
   add_setting :allow_last_page_on_account_courses, boolean: true, root_only: true, default: false
+  add_setting :allow_last_page_on_users, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
