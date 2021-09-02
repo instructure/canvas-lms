@@ -1,4 +1,13 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Ein glimrande diskusjon"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Ei fin oppgåve"
+    },
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "Gå til HTML-editor"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "Sjekk av universell utforming"
     },
@@ -10,6 +19,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "Legg til undertekstar"
+    },
+    "add_image_60b2de07": {
+        "message": "Legg til bilde"
     },
     "add_to_do_7537af64": {
         "message": "Legg til gjeremål"
@@ -38,6 +50,9 @@
     "all_4321c3a1": {
         "message": "Alle"
     },
+    "all_apps_a50dea49": {
+        "message": "Alle appar"
+    },
     "all_day_fb42c4fc": {
         "message": "Heile dagen"
     },
@@ -49,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternativ tekst"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Ei super diskusjonsoppgåve"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Det oppstod eit problem under lesing av fila"
@@ -122,6 +140,9 @@
     "attributes_963ba262": {
         "message": "Attributt"
     },
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "Opptak av lyd og bilde støttast ikkje: bruk ein annan nettlesar."
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Audiospelar for { title }"
     },
@@ -136,6 +157,27 @@
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Starten på gjeremålshistorikken din"
+    },
+    "below_81d4dceb": {
+        "message": "Nedanfor"
+    },
+    "button_color_608a0242": {
+        "message": "Knappefarge"
+    },
+    "button_outline_cf14f071": {
+        "message": "Knappeomriss"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Storleik på knappeomriss"
+    },
+    "button_shape_dbecb573": {
+        "message": "Knappeform"
+    },
+    "button_size_20f5fce1": {
+        "message": "Knappestorleik"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Knappar og ikonar"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -158,6 +200,9 @@
     "choose_usage_rights_33683854": {
         "message": "Vel bruksrett..."
     },
+    "circle_484abe63": {
+        "message": "Sirkel"
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "sirkulær uordna liste"
     },
@@ -169,6 +214,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Fjern vald fil: { filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "Klikk eller shift+klikk for å gå til html-editoren."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikk for å sette inn { imageName }"
@@ -199,6 +247,9 @@
     },
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Skjul og lukk { types }"
+    },
+    "color_color_eb64b08": {
+        "message": "Farge { color }"
     },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
