@@ -393,19 +393,21 @@ class UsersController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     search_term = params[:search_term].presence
-    page_opts = { total_entries: nil } # doesn't calculate a total count
+    page_opts = {}
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
         {
           order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
           enrollment_type: params[:enrollment_type]
         })
+      page_opts[:total_entries] = nil # doesn't calculate a total count
     else
       users = UserSearch.scope_for(@context, @current_user,
         {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
           enrollment_type: params[:enrollment_type]})
       users = users.with_last_login if params[:sort] == 'last_login'
     end
+    page_opts[:total_entries] = nil unless @context.root_account.allow_last_page_on_users?
 
     includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
     includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
