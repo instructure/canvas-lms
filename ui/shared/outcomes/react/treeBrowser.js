@@ -245,7 +245,7 @@ const useTreeBrowser = queryVariables => {
   }
 }
 
-export const useManageOutcomes = collection => {
+export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
   const {
@@ -315,45 +315,49 @@ export const useManageOutcomes = collection => {
     }
   }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
 
-  useEffect(() => {
-    const saveRootGroupId = id => {
-      addLoadedGroups([id])
-      setRootId(id)
-    }
+  const saveRootGroupId = id => {
+    addLoadedGroups([id])
+    setRootId(id)
+  }
 
-    if (!rootGroupId) {
-      client
-        .query({
-          query: CHILD_GROUPS_QUERY,
+  const fetchContextGroups = () => {
+    client
+      .query({
+        query: CHILD_GROUPS_QUERY,
+        variables: {
+          id: contextId,
+          type: contextType
+        },
+        fetchPolicy: 'network-only'
+      })
+      .then(({data}) => {
+        const rootGroup = data.context.rootOutcomeGroup
+        client.writeQuery({
+          query: CONTEXT_GROUPS_QUERY,
           variables: {
-            id: contextId,
-            type: contextType
+            contextId,
+            contextType
           },
-          fetchPolicy: 'network-only'
+          data: {
+            rootGroupId: rootGroup._id
+          }
         })
-        .then(({data}) => {
-          const rootGroup = data.context.rootOutcomeGroup
-          client.writeQuery({
-            query: CONTEXT_GROUPS_QUERY,
-            variables: {
-              contextId,
-              contextType
-            },
-            data: {
-              rootGroupId: rootGroup._id
-            }
-          })
-          saveRootGroupId(rootGroup._id)
-          addGroups(extractGroups({...rootGroup, isRootGroup: true}))
-        })
-        .catch(err => {
-          setError(err.message)
-        })
-    } else {
+        saveRootGroupId(rootGroup._id)
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+      })
+      .catch(err => {
+        setError(err.message)
+      })
+  }
+
+  useEffect(() => {
+    if (importNumber === 0 && rootGroupId) {
       saveRootGroupId(rootGroupId)
+    } else {
+      fetchContextGroups()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [importNumber])
 
   const createGroup = async (groupName, parentGroupId = rootId) => {
     try {

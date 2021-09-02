@@ -129,14 +129,6 @@ describe('FindOutcomesModal', () => {
       expect(queryByText('Close')).not.toBeInTheDocument()
     })
 
-    it('calls onCloseHandlerMock on Close button click', async () => {
-      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      const closeBtn = getByText('Close')
-      fireEvent.click(closeBtn)
-      expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
     describe('error handling', () => {
       describe('within an account', () => {
         it('displays a screen reader error and text error on failed request', async () => {
@@ -324,6 +316,39 @@ describe('FindOutcomesModal', () => {
       const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       expect(queryByText('Groups')).not.toBeInTheDocument()
+    })
+
+    describe('onCloseHandlerMock', () => {
+      it('calls with false when the modal is closed and no outcomes are added', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        const closeBtn = getByText('Close')
+        fireEvent.click(closeBtn)
+        expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+        expect(onCloseHandlerMock).toHaveBeenCalledWith(false)
+      })
+
+      it('calls with true when the modal is closed and outcomes were added', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({groupId: '300'}),
+            ...importGroupMocks({groupId: '300'})
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await act(async () => jest.runAllTimers())
+        const closeBtn = getByText('Close')
+        fireEvent.click(closeBtn)
+        expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+        expect(onCloseHandlerMock).toHaveBeenCalledWith(true)
+      })
     })
 
     describe('group import', () => {

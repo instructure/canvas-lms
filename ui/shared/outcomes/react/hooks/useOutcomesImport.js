@@ -34,6 +34,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
   const [importOutcomesStatus, setImportOutcomesStatus] = useState({})
   const {contextId: targetContextId, contextType: targetContextType, isCourse} = useCanvasContext()
   const [importOutcomesMutation] = useMutation(IMPORT_OUTCOMES)
+  const [hasAddedOutcomes, setHasAddedOutcomes] = useState(false)
 
   const setStatus = useCallback(
     (outcomeOrGroupId, status, isGroup) => {
@@ -137,12 +138,20 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         if (importErrors !== null) throw new Error(importErrors?.[0]?.message)
 
         trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle)
+        setHasAddedOutcomes(true)
       } catch (err) {
         showFlashError(err, isGroup)
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
       }
     },
-    [importOutcomesMutation, setStatus, trackProgress, targetContextId, targetContextType]
+    [
+      importOutcomesMutation,
+      setStatus,
+      trackProgress,
+      targetContextId,
+      targetContextType,
+      setHasAddedOutcomes
+    ]
   )
 
   const clearGroupsStatus = () => setImportGroupsStatus({})
@@ -154,7 +163,9 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     importGroupsStatus,
     importOutcomesStatus,
     clearGroupsStatus,
-    clearOutcomesStatus
+    clearOutcomesStatus,
+    hasAddedOutcomes,
+    setHasAddedOutcomes
   }
 }
 

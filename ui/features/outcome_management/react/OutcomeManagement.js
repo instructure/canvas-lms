@@ -52,6 +52,7 @@ export const OutcomePanel = () => {
 export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
   const [importRef, setImportRef] = useState(null)
+  const [importNumber, setImportNumber] = useState(0)
   const [isImporting, setIsImporting] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
@@ -150,9 +151,17 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
 
   const isMobileView = !breakpoints?.tablet
 
+  const onAddOutcomes = addedOutcomes => {
+    if (addedOutcomes) {
+      setImportNumber(prevState => prevState + 1)
+    }
+  }
+
   return (
     <OutcomesContext.Provider value={getContext(isMobileView)}>
-      {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
+      {improvedManagement && (
+        <ManagementHeader handleAddOutcomes={onAddOutcomes} handleFileDrop={onFileDrop} />
+      )}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel
           padding="0"
@@ -160,7 +169,11 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
           isSelected={selectedIndex === 0}
           id="management"
         >
-          {improvedManagement ? !isImporting && <OutcomeManagementPanel /> : <OutcomePanel />}
+          {improvedManagement ? (
+            !isImporting && <OutcomeManagementPanel importNumber={importNumber} />
+          ) : (
+            <OutcomePanel />
+          )}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1} id="scale">
           <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />

@@ -41,7 +41,7 @@ import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 
-const OutcomeManagementPanel = () => {
+const OutcomeManagementPanel = ({importNumber}) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
@@ -64,7 +64,7 @@ const OutcomeManagementPanel = () => {
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
     clearCache
-  } = useManageOutcomes('OutcomeManagementPanel')
+  } = useManageOutcomes('OutcomeManagementPanel', {importNumber})
 
   useEffect(() => {
     return () => {
