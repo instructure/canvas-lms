@@ -302,18 +302,19 @@ describe('SubmissionManager', () => {
         }
       })
 
-      const {getByTestId, getByText} = render(
+      const {getByRole} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const submitButton = getByText('Submit Assignment')
+      const submitButton = getByRole('button', {name: /Submit Assignment/})
       fireEvent.click(submitButton)
 
-      expect(getByTestId('submission-confirmation-modal')).toBeInTheDocument()
-      expect(getByTestId('cancel-submit')).toBeInTheDocument()
-      expect(getByTestId('confirm-submit')).toBeInTheDocument()
+      const confirmationDialog = await screen.findByRole('dialog', {label: 'Delete your work?'})
+      expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
+      expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
+      expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
     })
   })
 

@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AttemptTab from './AttemptTab'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import Confetti from '@canvas/confetti/react/Confetti'
 import {
   CREATE_SUBMISSION,
@@ -37,7 +37,6 @@ import I18n from 'i18n!assignments_2_file_upload'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import {Modal} from '@instructure/ui-modal'
 import {Mutation, useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
@@ -163,7 +162,6 @@ export default class SubmissionManager extends Component {
     draftStatus: null,
     editingDraft: false,
     focusAttemptOnInit: false,
-    openSubmitModal: false,
     similarityPledgeChecked: false,
     showConfetti: false,
     submittingAssignment: false,
@@ -344,15 +342,26 @@ export default class SubmissionManager extends Component {
 
   handleSubmitConfirmation(submitMutation) {
     this.submitAssignment(submitMutation)
-    this.setState({openSubmitModal: false, draftStatus: null})
+    this.setState({draftStatus: null})
   }
 
-  handleSubmitButton(submitMutation) {
+  async handleSubmitButton(submitMutation) {
     if (multipleTypesDrafted(this.props.submission)) {
-      this.setState({openSubmitModal: true})
-    } else {
-      this.handleSubmitConfirmation(submitMutation)
+      const confirmed = await showConfirmationDialog({
+        body: I18n.t(
+          'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
+          {submissionType: friendlyTypeName(this.state.activeSubmissionType)}
+        ),
+        confirmText: I18n.t('Okay'),
+        label: I18n.t('Confirm Submission')
+      })
+
+      if (!confirmed) {
+        return
+      }
     }
+
+    this.handleSubmitConfirmation(submitMutation)
   }
 
   handleSuccess() {
@@ -394,49 +403,6 @@ export default class SubmissionManager extends Component {
           </View>
         )}
       </Mutation>
-    )
-  }
-
-  renderSubmitConfirmation(submitMutation) {
-    return (
-      <Modal
-        data-testid="submission-confirmation-modal"
-        label={I18n.t('Submit Confirmation')}
-        onDismiss={() => this.setState({openSubmitModal: false})}
-        open={this.state.openSubmitModal}
-        size="small"
-      >
-        <Modal.Body>
-          <CloseButton
-            offset="x-small"
-            onClick={() => this.setState({openSubmitModal: false})}
-            placement="end"
-            variant="icon"
-          >
-            {I18n.t('Close')}
-          </CloseButton>
-          {I18n.t(
-            'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
-            {submissionType: friendlyTypeName(this.state.activeSubmissionType)}
-          )}
-          <div>
-            <Button
-              data-testid="cancel-submit"
-              margin="x-small x-small 0 0"
-              onClick={() => this.setState({openSubmitModal: false})}
-            >
-              {I18n.t('Cancel')}
-            </Button>
-            <Button
-              data-testid="confirm-submit"
-              onClick={() => this.handleSubmitConfirmation(submitMutation)}
-              variant="primary"
-            >
-              {I18n.t('Okay')}
-            </Button>
-          </div>
-        </Modal.Body>
-      </Modal>
     )
   }
 
@@ -607,7 +573,6 @@ export default class SubmissionManager extends Component {
             >
               {I18n.t('Submit Assignment')}
             </Button>
-            {this.state.openSubmitModal && this.renderSubmitConfirmation(submitMutation)}
           </>
         )}
       </Mutation>
