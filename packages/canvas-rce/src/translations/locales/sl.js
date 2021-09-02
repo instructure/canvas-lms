@@ -80,6 +80,7 @@ const locale = {
   "c_2001_acme_inc_283f7f80": {
     "message": "Avtorske pravice (c) 2001 Acme Inc."
   },
+  "cancel_caeb1e68": { "message": "Prekliči" },
   "choose_caption_file_9c45bc4e": {
     "message": "Izberite datoteko spremnega besedila"
   },
@@ -298,6 +299,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Moje datoteke" },
   "my_images_427f9b0c": { "message": "Moje slike" },
+  "name_1aed4a1b": { "message": "Ime" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigirajte skozi meni ali orodno vrstico"
   },
@@ -461,6 +463,7 @@ const locale = {
     "message": "pritisnite Ctrl+F9 za dostop do možnosti preglednice. { text }"
   },
   "unpublished_dfd8801": { "message": "neobjavljeno" },
+  "untitled_efdc2d7d": { "message": "brez naslova" },
   "upload_document_253f0478": { "message": "Naloži dokument" },
   "upload_file_fd2361b8": { "message": "Naloži datoteko" },
   "upload_image_6120b609": { "message": "Naloži sliko" },

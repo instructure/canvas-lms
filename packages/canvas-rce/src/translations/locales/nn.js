@@ -20,18 +20,21 @@ import formatMessage from '../../format-message'
 import '../tinymce/nb_NO'
 
 const locale = {
+  "access_the_pretty_html_editor_37168efe": { "message": "Gå til HTML-editor" },
   "accessibility_checker_b3af1f6c": {
     "message": "Sjekk av universell utforming"
   },
   "add_8523c19b": { "message": "Legg til" },
   "add_another_f4e50d57": { "message": "Legg til ei ny" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til undertekstar" },
+  "add_image_60b2de07": { "message": "Legg til bilde" },
   "align_11050992": { "message": "Juster" },
   "align_center_ca078feb": { "message": "Midtstill" },
   "align_left_e9f1f93b": { "message": "Venstrejuster" },
   "align_right_9bad3ac1": { "message": "Høgrejuster" },
   "alignment_and_lists_5cebcb69": { "message": "Justering og lister" },
   "all_4321c3a1": { "message": "Alle" },
+  "all_apps_a50dea49": { "message": "Alle appar" },
   "alphabetical_55b5b4e0": { "message": "Alfabetisk" },
   "alt_text_611fb322": { "message": "Alternativ tekst" },
   "an_error_occured_reading_the_file_ff48558b": {
@@ -52,6 +55,9 @@ const locale = {
   },
   "assignments_1e02582c": { "message": "Oppgåver" },
   "attributes_963ba262": { "message": "Attributt" },
+  "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+    "message": "Opptak av lyd og bilde støttast ikkje: bruk ein annan nettlesar."
+  },
   "audio_player_for_title_20cc70d": { "message": "Audiospelar for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
@@ -60,15 +66,26 @@ const locale = {
     "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
   },
   "available_folders_694d0436": { "message": "Tilgjengelege mapper" },
+  "below_81d4dceb": { "message": "Nedanfor" },
+  "button_color_608a0242": { "message": "Knappefarge" },
+  "button_outline_cf14f071": { "message": "Knappeomriss" },
+  "button_outline_size_cc1d1df7": { "message": "Storleik på knappeomriss" },
+  "button_shape_dbecb573": { "message": "Knappeform" },
+  "button_size_20f5fce1": { "message": "Knappestorleik" },
+  "buttons_and_icons_e66ee12c": { "message": "Knappar og ikonar" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
   "choose_usage_rights_33683854": { "message": "Vel bruksrett..." },
+  "circle_484abe63": { "message": "Sirkel" },
   "circle_unordered_list_9e3a0763": { "message": "sirkulær uordna liste" },
   "clear_2084585f": { "message": "Fjern" },
   "clear_selected_file_82388e50": { "message": "Fjern vald fil" },
   "clear_selected_file_filename_2fe8a58e": {
     "message": "Fjern vald fil: { filename }"
+  },
+  "click_or_shift_click_for_the_html_editor_25d70bb4": {
+    "message": "Klikk eller shift+klikk for å gå til html-editoren."
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klikk for å sette inn { imageName }"
@@ -89,6 +106,7 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "Undertekstar" },
   "collaborations_5c56c15f": { "message": "Samarbeid" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Skjul og lukk { types }" },
+  "color_color_eb64b08": { "message": "Farge { color }" },
   "computer_1d7dfa6f": { "message": "Datamaskin" },
   "content_1440204b": { "message": "Innhald" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
