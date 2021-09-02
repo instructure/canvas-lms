@@ -152,8 +152,9 @@ export function Portal({node, children}) {
 }
 
 class Gradebook extends React.Component {
-  constructor(options1) {
-    super(options1)
+  constructor(props) {
+    super(props)
+    this.state = {gridColors: statusColors(props.colors)}
     this.gradebookSettingsModalButton = React.createRef()
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
@@ -247,7 +248,6 @@ class Gradebook extends React.Component {
     this.getActionMenuProps = this.getActionMenuProps.bind(this)
     this.renderActionMenu = this.renderActionMenu.bind(this)
     this.renderFilters = this.renderFilters.bind(this)
-    this.renderGridColor = this.renderGridColor.bind(this)
     this.renderGradebookSettingsModal = this.renderGradebookSettingsModal.bind(this)
     this.renderStatusesModal = this.renderStatusesModal.bind(this)
     this.weightedGroups = this.weightedGroups.bind(this)
@@ -392,8 +392,6 @@ class Gradebook extends React.Component {
     this.setSortRowsBySetting = this.setSortRowsBySetting.bind(this)
     this.getSortRowsBySetting = this.getSortRowsBySetting.bind(this)
     this.updateGridColors = this.updateGridColors.bind(this)
-    this.setGridColors = this.setGridColors.bind(this)
-    this.getGridColors = this.getGridColors.bind(this)
     this.listAvailableViewOptionsFilters = this.listAvailableViewOptionsFilters.bind(this)
     this.setSelectedViewOptionsFilters = this.setSelectedViewOptionsFilters.bind(this)
     this.listSelectedViewOptionsFilters = this.listSelectedViewOptionsFilters.bind(this)
@@ -450,7 +448,7 @@ class Gradebook extends React.Component {
     // aspect of their presence here.
     this._gridHasRendered = this._gridHasRendered.bind(this)
     this._updateEssentialDataLoaded = this._updateEssentialDataLoaded.bind(this)
-    this.options = options1
+    this.options = props
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {
@@ -500,7 +498,7 @@ class Gradebook extends React.Component {
     this.gradebookContent = getInitialGradebookContent(this.options)
     this.gridDisplaySettings = getInitialGridDisplaySettings(
       this.options.settings,
-      this.options.colors
+      this.props.colors
     )
     this.contentLoadStates = getInitialContentLoadStates(this.options)
     this.actionStates = getInitialActionStates()
@@ -518,7 +516,7 @@ class Gradebook extends React.Component {
     this.calculatedGradesByStudentId = {}
     this.initPostGradesStore()
     this.initPostGradesLtis()
-    return this.checkForUploadComplete()
+    this.checkForUploadComplete()
   }
 
   loadSettings() {
@@ -1912,7 +1910,7 @@ class Gradebook extends React.Component {
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
-      onSelectViewUngradedAsZero: async () => {
+      onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
           currentValue: this.gridDisplaySettings.viewUngradedAsZero,
           onAccepted: () => {
@@ -2016,14 +2014,6 @@ class Gradebook extends React.Component {
     this.renderAssignmentSearchFilter(this.assignments)
   }
 
-  renderGridColor() {
-    const gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
-    const gridColorProps = {
-      colors: this.getGridColors()
-    }
-    return renderComponent(GridColor, gridColorMountPoint, gridColorProps)
-  }
-
   renderGradebookSettingsModal() {
     this.gradebookSettingsModal = React.createRef(null)
     const props = {
@@ -2070,7 +2060,7 @@ class Gradebook extends React.Component {
         columnSortSettings: {criterion, direction},
         showNotes: this.isTeacherNotesColumnShown(),
         showUnpublishedAssignments,
-        statusColors: this.getGridColors(),
+        statusColors: this.state.gridColors,
         viewUngradedAsZero
       }
     }
@@ -2082,7 +2072,7 @@ class Gradebook extends React.Component {
       onClose: () => {
         return this.viewOptionsMenu.focus()
       },
-      colors: this.getGridColors(),
+      colors: this.state.gridColors,
       afterUpdateStatusColors: this.updateGridColors
     }
     return (this.statusesModal = renderComponent(
@@ -2409,8 +2399,7 @@ class Gradebook extends React.Component {
     this.gridData.columns.definitions[totalGradeColumn.id] = totalGradeColumn
     const totalGradeOverrideColumn = this.buildTotalGradeOverrideColumn()
     this.gridData.columns.definitions[totalGradeOverrideColumn.id] = totalGradeOverrideColumn
-    this.renderGridColor()
-    return this.createGrid()
+    this.createGrid()
   }
 
   addAssignmentColumnDefinition(assignment) {
@@ -2593,7 +2582,7 @@ class Gradebook extends React.Component {
       studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
       sortRowsBy = this.getSortRowsBySetting(),
       viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
-      colors = this.getGridColors()
+      colors = this.state.gridColors
     } = {},
     successFn,
     errorFn
@@ -3179,7 +3168,7 @@ class Gradebook extends React.Component {
       this.assignmentGroups[assignment.assignment_group_id].group_weight === 0
     return {
       assignment: camelize(assignment),
-      colors: this.getGridColors(),
+      colors: this.state.gridColors,
       comments,
       courseId: this.options.context_id,
       currentUserId: this.options.currentUserId,
@@ -3722,19 +3711,11 @@ class Gradebook extends React.Component {
 
   updateGridColors(colors, successFn, errorFn) {
     const setAndRenderColors = () => {
-      this.setGridColors(colors)
-      this.renderGridColor()
+      this.gridDisplaySettings.colors = colors
+      this.setState({gridColors: statusColors(this.gridDisplaySettings.colors)})
       return successFn()
     }
     return this.saveSettings({colors}, setAndRenderColors, errorFn)
-  }
-
-  setGridColors(colors) {
-    return (this.gridDisplaySettings.colors = colors)
-  }
-
-  getGridColors() {
-    return statusColors(this.gridDisplaySettings.colors)
   }
 
   listAvailableViewOptionsFilters() {
@@ -4276,6 +4257,9 @@ class Gradebook extends React.Component {
             learningMasteryEnabled={this.options.outcome_gradebook_enabled}
             variant="DefaultGradebook"
           />
+        </Portal>
+        <Portal node={this.props.gridColorNode}>
+          <GridColor colors={this.state.gridColors} />
         </Portal>
       </>
     )

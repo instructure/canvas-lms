@@ -18,12 +18,13 @@
 
 import React from 'react'
 import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
+import {darken, statusColors, defaultColors} from '../../constants/colors'
 import {render, within} from '@testing-library/react'
 import Gradebook from '../../Gradebook'
 import '@testing-library/jest-dom/extend-expect'
 
 describe('Gradebook', () => {
-  it('GradebookMenu is rendered', () => {
+  it('renders', () => {
     const node = document.createElement('div')
     render(<Gradebook {...defaultGradebookProps} gradebookMenuNode={node} />)
     const {getByText} = within(node)
@@ -31,11 +32,43 @@ describe('Gradebook', () => {
   })
 })
 
-describe('compareAssignmentPositions', () => {
-  it('renders gradebookSettingsModalButton', () => {
+describe('SettingsModalButton', () => {
+  it('renders', () => {
     const node = document.createElement('div')
     render(<Gradebook {...defaultGradebookProps} settingsModalButtonContainer={node} />)
     const {getByText} = within(node)
     expect(node).toContainElement(getByText(/Gradebook Settings/i))
+  })
+})
+
+describe('GridColor', () => {
+  it('renders', () => {
+    const node = document.createElement('div')
+    render(<Gradebook {...defaultGradebookProps} gridColorNode={node} />)
+    const {getByTestId} = within(node)
+    expect(node).toContainElement(getByTestId('grid-color'))
+  })
+
+  it('renders the correct styles', () => {
+    const node = document.createElement('div')
+    render(<Gradebook {...defaultGradebookProps} gridColorNode={node} colors={statusColors()} />)
+    const styleText = [
+      `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }`,
+      `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }`,
+      '.slick-cell.editable .gradebook-cell.late { background-color: white; }',
+      `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }`,
+      `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }`,
+      '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
+      `.even .gradebook-cell.resubmitted { background-color: ${defaultColors.green}; }`,
+      `.odd .gradebook-cell.resubmitted { background-color: ${darken(defaultColors.green, 5)}; }`,
+      '.slick-cell.editable .gradebook-cell.resubmitted { background-color: white; }',
+      `.even .gradebook-cell.dropped { background-color: ${defaultColors.orange}; }`,
+      `.odd .gradebook-cell.dropped { background-color: ${darken(defaultColors.orange, 5)}; }`,
+      '.slick-cell.editable .gradebook-cell.dropped { background-color: white; }',
+      `.even .gradebook-cell.excused { background-color: ${defaultColors.yellow}; }`,
+      `.odd .gradebook-cell.excused { background-color: ${darken(defaultColors.yellow, 5)}; }`,
+      '.slick-cell.editable .gradebook-cell.excused { background-color: white; }'
+    ].join('')
+    expect(node.innerHTML).toContain(styleText)
   })
 })
