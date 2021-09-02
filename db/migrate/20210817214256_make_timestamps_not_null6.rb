@@ -102,10 +102,13 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
   }.freeze
 
   def change
+    tries = 0
     TABLES.each do |table|
       change_column_null(table, :created_at, false)
       change_column_null(table, :updated_at, false)
-    rescue ActiveRecord::NotNullViolation
+      tries = 0
+    rescue ActiveRecord::NotNullViolation => e
+      tries += 1
       # check if it was a one-time event (all rows missing values are within a 1 week timespan)
       klass = table.classify.constantize
       min_id = klass.where(created_at: nil).minimum(:id)
@@ -114,6 +117,15 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
       upper_bound = klass.where("id>?", max_id).order(:id).limit(1).pluck(:created_at).first
       upper_bound ||= lower_bound if klass.where("id>=?", min_id).count < 10_000
       lower_bound ||= upper_bound if klass.where("id<=?", max_id).count < 10_000
+
+      # allow a single block at the beginning or end, if it's less than 10_000
+      if !upper_bound && !lower_bound && e.message.include?("created_at") && klass.where(created_at: nil).count < 10_000
+        raise if tries == 2
+
+        klass.where(created_at: nil).update_all("created_at=updated_at")
+        retry
+      end
+
       raise unless upper_bound && lower_bound
       raise if upper_bound - lower_bound > 1.week.to_i
 
