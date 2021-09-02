@@ -142,6 +142,9 @@ const DiscussionTopicManager = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (sort === 'asc') {
+        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+      }
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
