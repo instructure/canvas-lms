@@ -355,7 +355,11 @@ QUnit.module('SpeedGrader', rootHooks => {
         submission: {score: 7, grade: 70, submission_history: []}
       }
       setupFixtures(`
-        <div id="submission_details">Submission Details</div>
+        <div id="submission_details">
+          Submission Details
+          <div id="speed_grader_edit_status_mount_point"></div>
+          <div id="speed_grader_edit_status_secondary_mount_point"></div>
+        </div>
         <div id="reassign_assignment"></div>
       `)
       sinon.stub($, 'getJSON')
@@ -1467,7 +1471,11 @@ QUnit.module('SpeedGrader', rootHooks => {
       </div>
       <div id='submission_attachment_viewed_at_container'>
       </div>
-      <div id="speed_grader_edit_status_mount_point"></div>`)
+      <div id="submission_details">
+        Submission Details
+        <div id="speed_grader_edit_status_mount_point"></div>
+        <div id="speed_grader_edit_status_secondary_mount_point"></div>
+      </div>`)
       sinon.stub($, 'ajaxJSON')
 
       // Defer the rest of the setup until the tests themselves so we can edit
@@ -1630,8 +1638,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       finishSetup()
       SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
       window.jsonData.gradingPeriods[8].is_closed = false
-      SpeedGrader.EG.handleSubmissionSelectionChange()
-      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+      SpeedGrader.EG.showSubmissionDetails()
+      const mountPoint = document.getElementById('speed_grader_edit_status_secondary_mount_point')
       strictEqual(mountPoint.children.length, 0)
     })
 
@@ -1639,24 +1648,60 @@ QUnit.module('SpeedGrader', rootHooks => {
       finishSetup()
       SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 1
       window.jsonData.gradingPeriods[8].is_closed = false
-      SpeedGrader.EG.handleSubmissionSelectionChange()
-      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+      SpeedGrader.EG.showSubmissionDetails()
+      const mountPoint = document.getElementById('speed_grader_edit_status_secondary_mount_point')
       strictEqual(mountPoint.children.length, 1)
     })
 
     test('hides the status menu component when the current assignment is in a closed grading period', () => {
       finishSetup()
-      SpeedGrader.EG.handleSubmissionSelectionChange()
-      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+      SpeedGrader.EG.showSubmissionDetails()
+      const mountPoint = document.getElementById('speed_grader_edit_status_secondary_mount_point')
       strictEqual(mountPoint.children.length, 0)
     })
 
     test('shows the status menu component when the current assignment is not in a closed grading period', () => {
       finishSetup()
       window.jsonData.gradingPeriods[8].is_closed = false
-      SpeedGrader.EG.handleSubmissionSelectionChange()
-      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+      SpeedGrader.EG.showSubmissionDetails()
+      const mountPoint = document.getElementById('speed_grader_edit_status_secondary_mount_point')
       strictEqual(mountPoint.children.length, 1)
+    })
+
+    test('renders StatusMenu component in secondary mount point when the current assignment have a future due date', function () {
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2525, 1, 1).toISOString(),
+        workflow_state: 'unsubmitted',
+        submission_history: [{missing: false}],
+        submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      const mainMountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      const secondaryMountPoint = document.getElementById(
+        'speed_grader_edit_status_secondary_mount_point'
+      )
+      strictEqual(mainMountPoint.children.length, 0)
+      strictEqual(secondaryMountPoint.children.length, 1)
+    })
+
+    test('renders StatusMenu component in secondary mount point when the current assignment have not a due date', function () {
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{missing: false}],
+        submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      const mainMountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      const secondaryMountPoint = document.getElementById(
+        'speed_grader_edit_status_secondary_mount_point'
+      )
+      strictEqual(mainMountPoint.children.length, 0)
+      strictEqual(secondaryMountPoint.children.length, 1)
     })
 
     test('includes last-viewed date for attachments if not anonymizing students', () => {

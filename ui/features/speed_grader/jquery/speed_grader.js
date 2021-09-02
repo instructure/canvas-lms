@@ -111,6 +111,8 @@ const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
+const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
+  'speed_grader_edit_status_secondary_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -1143,8 +1145,20 @@ function allowsReassignment(submission) {
   )
 }
 
-function renderStatusMenu(component) {
-  ReactDOM.render(component, document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT))
+function availableMountPointForStatusMenu() {
+  const elementId = $submission_details.is(':hidden')
+    ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
+    : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+  return document.getElementById(elementId)
+}
+
+function renderStatusMenu(component, mountPoint) {
+  const unmountPoint =
+    mountPoint.id === SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+      ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
+      : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+  ReactDOM.render(null, document.getElementById(unmountPoint))
+  ReactDOM.render(component, mountPoint)
 }
 
 function statusMenuComponent(submission) {
@@ -1174,7 +1188,7 @@ function updateSubmissionAndPageEffects(data) {
       refreshGrades(() => {
         EG.refreshSubmissionsToView()
         styleSubmissionStatusPills(getLateMissingAndExcusedPills())
-        renderStatusMenu(statusMenuComponent(submission))
+        renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
       })
     })
     .catch(showFlashError())
@@ -2259,12 +2273,12 @@ EG = {
       $full_width_container.addClass('with_enrollment_notice')
     }
 
-    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
+    const mountPoint = availableMountPointForStatusMenu()
     if (mountPoint) {
       const shouldRender = isMostRecent && !isClosedForSubmission
       styleSubmissionStatusPills(getLateMissingAndExcusedPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
-      renderStatusMenu(component)
+      renderStatusMenu(component, mountPoint)
     }
 
     EG.showDiscussion()
