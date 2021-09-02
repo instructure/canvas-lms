@@ -1771,17 +1771,9 @@ class Course < ActiveRecord::Base
     end
     can :reset_content
 
-    # delete and undelete manually created course
+    # delete or undelete a given course
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
-        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
-    end
-    can :delete
-
-    # delete course managed by SIS
-    given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
-        self.sis_source_id && self.account_membership_allows(user, :manage_sis) && !template? &&
         self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
