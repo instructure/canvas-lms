@@ -78,8 +78,8 @@ const regularActions = {
 const thunkActions = {
   publishPlan: (
     publishForOption: PublishOptions,
-    publishForSectionIds: Array<string | number>,
-    publishForEnrollmentIds: Array<string | number>
+    publishForSectionIds: Array<string>,
+    publishForEnrollmentIds: Array<string>
   ): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay('Publishing...'))
@@ -109,7 +109,7 @@ const thunkActions = {
   },
   resetToLastPublished: (
     contextType: PlanContextTypes,
-    contextId: string | number
+    contextId: string
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay('Loading...'))
@@ -133,7 +133,7 @@ const thunkActions = {
   },
   loadLatestPlanByContext: (
     contextType: PlanContextTypes,
-    contextId: number | string,
+    contextId: string,
     afterAction: LoadingAfterAction = pacePlanActions.setPacePlan
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
@@ -160,7 +160,7 @@ const thunkActions = {
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
-      return Api.relinkToParentPlan(getState().pacePlan.id as number)
+      return Api.relinkToParentPlan(getState().pacePlan.id)
         .then(response => {
           const plan: PacePlan = response.data.pace_plan
           dispatch(pacePlanActions.setPacePlan(plan))

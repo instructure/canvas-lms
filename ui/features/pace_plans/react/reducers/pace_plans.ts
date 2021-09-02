@@ -208,7 +208,7 @@ export default (
         modules: action.payload.modules,
         published_at: action.payload.published_at
       }
-    case UIConstants.SET_SELECTED_PLAN_TYPE:
+    case UIConstants.SET_SELECTED_PLAN_CONTEXT:
       return action.payload.newSelectedPlan
     case PacePlanConstants.TOGGLE_EXCLUDE_WEEKENDS:
       if (state.exclude_weekends) {

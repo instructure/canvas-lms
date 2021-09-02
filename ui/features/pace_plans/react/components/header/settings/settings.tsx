@@ -34,7 +34,7 @@ import {actions as uiActions} from '../../../actions/ui'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
 
 interface StoreProps {
-  readonly courseId: number | string
+  readonly courseId: string
   readonly pacePlan: PacePlan
 }
 
@@ -79,11 +79,11 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   }
 
   onCloseBlackoutDatesModal = () => {
-    this.setState({
+    this.setState(({changeMadeToBlackoutDates}) => ({
       showBlackoutDatesModal: false,
-      showUpdateExistingPlansModal: this.state.changeMadeToBlackoutDates,
+      showUpdateExistingPlansModal: changeMadeToBlackoutDates,
       changeMadeToBlackoutDates: false
-    })
+    }))
     if (!this.state.changeMadeToBlackoutDates) {
       this.props.setEditingBlackoutDates(false)
     }

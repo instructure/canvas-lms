@@ -16,24 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import {Provider} from 'react-redux'
-import k5Theme from '@canvas/k5/react/k5-theme'
-import ready from '@instructure/ready'
-
-import App from './react/app'
-import reducers from './react/reducers/reducers'
-import createStore from './react/shared/create_store'
-
-k5Theme.use({fontOnly: true})
-
-const CoursePage: React.FC = () => (
-  <Provider store={createStore(reducers)}>
-    <App />
-  </Provider>
-)
-
-ready(() => {
-  ReactDOM.render(<CoursePage />, document.getElementById('pace_plans'))
-})
+// This is a workaround for an InstUI v7 issue with the Menu component not being
+// properly themeable. This should be removed once we're on InstUI v8
+[data-position-content="pace-plan-menu"] [role="menu"] {
+  max-width: 20rem;
+}

@@ -24,6 +24,7 @@ class PacePlansController < ApplicationController
   before_action :load_pace_plan, only: [:api_show, :update]
 
   include Api::V1::Course
+  include K5Mode
 
   def show
     not_found unless @context.account.feature_enabled?(:pace_plans) && @context.settings[:enable_pace_plans]
@@ -38,6 +39,7 @@ class PacePlansController < ApplicationController
              PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json
            })
     js_bundle :pace_plans
+    css_bundle :pace_plans
   end
 
   def api_show
@@ -90,8 +92,8 @@ class PacePlansController < ApplicationController
         id: section.id,
         course_id: section.course_id,
         name: section.name,
-        start_date: section.start_at,
-        end_date: section.end_at
+        start_at: section.start_at,
+        end_at: section.end_at
       }
     end
     json.index_by {|h| h[:id]}

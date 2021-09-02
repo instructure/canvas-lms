@@ -22,25 +22,15 @@ import {View} from '@instructure/ui-view'
 
 import PlanLengthPicker from './plan_length_picker/plan_length_picker'
 import PlanPicker from './plan_picker'
-import PlanTypePicker from './plan_type_picker'
 import Settings from './settings/settings'
 
 const Header: React.FC = () => (
-  <Flex wrap="wrap" alignItems="center" justifyItems="space-between">
-    <Flex
-      as="div"
-      height="9rem"
-      direction="column"
-      justifyItems="space-between"
-      margin="0 x-small medium 0"
-    >
-      <Flex alignItems="center" margin="0 0 x-small 0">
-        <PlanTypePicker />
-        <View margin="0 0 0 small">
-          <Settings />
-        </View>
-      </Flex>
+  <Flex wrap="wrap" alignItems="start" justifyItems="space-between">
+    <Flex alignItems="end" margin="0 small small 0">
       <PlanPicker />
+      <View margin="0 0 0 small">
+        <Settings />
+      </View>
     </Flex>
     <PlanLengthPicker />
   </Flex>

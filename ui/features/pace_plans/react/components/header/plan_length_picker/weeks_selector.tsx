@@ -48,6 +48,10 @@ interface DispatchProps {
   readonly setPlanDays: typeof actions.setPlanDays
 }
 
+type ConnectedComponentProps = StoreProps & {
+  readonly key: string
+}
+
 type ComponentProps = StoreProps & DispatchProps
 
 interface LocalState {
@@ -135,7 +139,7 @@ export class WeeksSelector extends React.Component<ComponentProps, LocalState> {
   }
 }
 
-const mapStateToProps = (state: StoreState): StoreProps => {
+const mapStateToProps = (state: StoreState): ConnectedComponentProps => {
   const planWeeks = getPlanWeeks(state)
   return {
     planDays: getPlanDays(state),

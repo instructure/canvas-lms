@@ -23,8 +23,8 @@
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 
-import {PlanTypes, StoreState, PacePlan, Enrollment} from '../types'
-import {Course, createAction, ActionsUnion} from '../shared/types'
+import {PlanContextTypes, StoreState, PacePlan} from '../types'
+import {createAction, ActionsUnion} from '../shared/types'
 import {pacePlanActions} from './pace_plans'
 
 export enum Constants {
@@ -34,7 +34,7 @@ export enum Constants {
   TOGGLE_DIVIDE_INTO_WEEKS = 'UI/TOGGLE_DIVIDE_INTO_WEEKS',
   PUBLISH_PLAN_STARTED = 'UI/PUBLISH_PLAN_STARTED',
   PUBLISH_PLAN_FINISHED = 'UI/PUBLISH_PLAN_FINISHED',
-  SET_SELECTED_PLAN_TYPE = 'UI/SET_SELECTED_PLAN_TYPE',
+  SET_SELECTED_PLAN_CONTEXT = 'UI/SET_SELECTED_PLAN_CONTEXT',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
   SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES',
@@ -54,32 +54,30 @@ export const regularActions = {
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
   setEditingBlackoutDates: (editing: boolean) =>
     createAction(Constants.SET_EDITING_BLACKOUT_DATES, editing),
-  setSelectedPlanType: (planType: PlanTypes, newSelectedPlan: PacePlan) =>
-    createAction(Constants.SET_SELECTED_PLAN_TYPE, {planType, newSelectedPlan}),
+  setSelectedPlanContext: (
+    contextType: PlanContextTypes,
+    contextId: string,
+    newSelectedPlan: PacePlan
+  ) => createAction(Constants.SET_SELECTED_PLAN_CONTEXT, {contextType, contextId, newSelectedPlan}),
   setAdjustingHardEndDatesAfter: (position: number | undefined) =>
     createAction(Constants.SET_ADJUSTING_HARD_END_DATES_AFTER, position)
 }
 
 export const thunkActions = {
-  setSelectedPlanType: (
-    planType: PlanTypes,
-    enrollmentId: number | string = 0
+  setSelectedPlanContext: (
+    contextType: PlanContextTypes,
+    contextId: string
   ): ThunkAction<void, StoreState, void, Action> => {
     // Switch to the other plan type, and load the exact plan we should switch to
-    return (dispatch, getState) => {
-      const state = getState()
-      const newSelectPlanContext: Course | Enrollment =
-        planType === 'template' ? state.course : state.enrollments[enrollmentId]
-      const contextType = planType === 'template' ? 'Course' : 'Enrollment'
+    return dispatch => {
       const afterLoadActionCreator = (newSelectedPlan: PacePlan): SetSelectedPlanType => {
-        return {type: Constants.SET_SELECTED_PLAN_TYPE, payload: {planType, newSelectedPlan}}
+        return {
+          type: Constants.SET_SELECTED_PLAN_CONTEXT,
+          payload: {contextType, contextId, newSelectedPlan}
+        }
       }
       dispatch(
-        pacePlanActions.loadLatestPlanByContext(
-          contextType,
-          newSelectPlanContext.id,
-          afterLoadActionCreator
-        )
+        pacePlanActions.loadLatestPlanByContext(contextType, contextId, afterLoadActionCreator)
       )
     }
   }
@@ -88,4 +86,4 @@ export const thunkActions = {
 export const actions = {...regularActions, ...thunkActions}
 
 export type UIAction = ActionsUnion<typeof regularActions>
-export type SetSelectedPlanType = ReturnType<typeof regularActions.setSelectedPlanType>
+export type SetSelectedPlanType = ReturnType<typeof regularActions.setSelectedPlanContext>

@@ -34,8 +34,8 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import moment from 'moment-timezone'
 
-import {PacePlanItem, PacePlan, StoreState, Enrollment, Section} from '../../types'
-import {BlackoutDate, Course} from '../../shared/types'
+import {PacePlanItem, PacePlan, StoreState} from '../../types'
+import {BlackoutDate} from '../../shared/types'
 import {
   getPacePlan,
   getDueDate,
@@ -43,7 +43,6 @@ import {
   getPacePlanItems,
   getPacePlanItemPosition,
   isPlanCompleted,
-  getActivePlanContext,
   getDisabledDaysOfWeek
 } from '../../reducers/pace_plans'
 import {autoSavingActions as actions} from '../../actions/pace_plan_items'
@@ -68,7 +67,6 @@ interface StoreProps {
   readonly autosaving: boolean
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
-  readonly activePlanContext: Course | Enrollment | Section
   readonly disabledDaysOfWeek: number[]
 }
 
@@ -388,7 +386,6 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
     ),
     adjustingHardEndDatesAfter: getAdjustingHardEndDatesAfter(state),
-    activePlanContext: getActivePlanContext(state),
     disabledDaysOfWeek: getDisabledDaysOfWeek(state)
   }
 }
