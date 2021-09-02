@@ -27,3 +27,16 @@ export function isValidDeepLinkingEvent(event, env) {
     event.data.messageType === deepLinkingResponseMessageType
   )
 }
+
+export const addDeepLinkingListener = cb => {
+  window.addEventListener('message', handleDeepLinking(cb))
+}
+
+export const handleDeepLinking = cb => async event => {
+  // Don't attempt to process invalid messages
+  if (!isValidDeepLinkingEvent(event, ENV)) {
+    return
+  }
+
+  await cb(event)
+}

@@ -34,18 +34,26 @@ module Lti::Ims::Concerns
       params[:context_module_id].present?
     end
 
+    def create_new_module?
+      params[:create_new_module] && @context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+    end
+
     def multiple_module_items?
       adding_module_item? && lti_resource_links.length > 1
     end
 
+    def should_add_module_items?
+      multiple_module_items? || create_new_module?
+    end
+
     def require_context_update_rights
-      return unless multiple_module_items?
+      return unless should_add_module_items?
 
       authorized_action(@context, @current_user, %i[manage_content update])
     end
 
     def require_tool
-      return unless multiple_module_items?
+      return unless should_add_module_items?
 
       render_unauthorized_action if tool.blank?
     end
@@ -66,7 +74,14 @@ module Lti::Ims::Concerns
       }
     end
 
+    def create_module
+      @context_module =
+        @context.context_modules.create!(name: 'New Module', workflow_state: 'unpublished')
+    end
+
     def add_module_items
+      create_module if create_new_module?
+
       lti_resource_links.each do |content_item|
         tag =
           context_module.add_item(

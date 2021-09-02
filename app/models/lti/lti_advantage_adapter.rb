@@ -154,6 +154,11 @@ module Lti
         return resource_link_request.generate_post_payload
       end
 
+      if resource_type&.to_sym == :module_index_menu &&
+         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+        return resource_link_request.generate_post_payload
+      end
+
       message_type = @tool.extension_setting(resource_type, :message_type)
       if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
         deep_linking_request.generate_post_payload
