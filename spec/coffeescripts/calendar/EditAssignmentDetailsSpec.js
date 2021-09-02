@@ -20,18 +20,18 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails.js'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
-import tz from '@canvas/timezone'
+import timezone from 'timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const fixtures = $('#fixtures')
 
 QUnit.module('EditAssignmentDetails', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.$holder = $('<table />').appendTo(document.getElementById('fixtures'))
     this.event = {
       possibleContexts() {
@@ -70,8 +70,7 @@ QUnit.module('EditAssignmentDetails', {
     this.$holder.detach()
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
-    tz.restore(this.snapshot)
-    I18nStubber.clear()
+    tzInTest.restore()
   }
 })
 const createView = function(model, event) {
@@ -119,20 +118,27 @@ test('should include start date only if all day', function() {
 })
 
 test('should treat start date as fudged', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    },
+    formats: getI18nFormats()
+  })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 1:00pm')
 })
 
 test('should localize start date', function() {
-  I18nStubber.pushFrame()
-  tz.changeLocale(french, 'fr_FR', 'fr')
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
-    'date.formats.medium': '%a %-d %b %Y %-k:%M',
-    'date.month_names': ['août'],
-    'date.abbr_month_names': ['août']
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr',
+    formats: {
+      'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
+      'date.formats.medium': '%a %-d %b %Y %-k:%M',
+      'date.month_names': ['août'],
+      'date.abbr_month_names': ['août']
+    }
   })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')

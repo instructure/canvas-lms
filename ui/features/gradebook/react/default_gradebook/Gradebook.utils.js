@@ -19,6 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import I18n from 'i18n!gradebook'
+import _ from 'lodash'
+import htmlEscape from 'html-escape'
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
@@ -34,9 +38,9 @@ export function ensureAssignmentVisibility(assignment, submission) {
 }
 
 export function forEachSubmission(students, fn) {
-  Object.keys(students).forEach(function(studentIdx) {
+  Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
-    Object.keys(student).forEach(function(key) {
+    Object.keys(student).forEach(function (key) {
       const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
         fn(student[key])
@@ -46,7 +50,7 @@ export function forEachSubmission(students, fn) {
 }
 
 export function getAssignmentGroupPointsPossible(assignmentGroup) {
-  return assignmentGroup.assignments.reduce(function(sum, assignment) {
+  return assignmentGroup.assignments.reduce(function (sum, assignment) {
     return sum + (assignment.points_possible || 0)
   }, 0)
 }
@@ -109,11 +113,58 @@ export function renderComponent(reactClass, mountPoint, props = {}, children = n
   return ReactDOM.render(component, mountPoint)
 }
 
-export function compareAssignmentPositions(a, b) {
-  const diffOfAssignmentGroupPosition =
-    a.object.assignment_group.position - b.object.assignment_group.position
-  const diffOfAssignmentPosition = a.object.position - b.object.position
-  // order first by assignment_group position and then by assignment position
-  // will work when there are less than 1000000 assignments in an assignment_group
-  return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
+export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
+  const showDialog = () =>
+    showConfirmationDialog({
+      body: I18n.t(
+        'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
+      ),
+      confirmText: I18n.t('OK'),
+      label: I18n.t('View Ungraded as Zero')
+    })
+
+  // If the setting was already enabled, no need to show the confirmation
+  // dialog since we're turning it off
+  const userAccepted = currentValue || (await showDialog())
+  if (userAccepted) {
+    onAccepted()
+  }
+}
+
+export function hiddenStudentIdsForAssignment(studentIds, assignment) {
+  return _.difference(studentIds, assignment.assignment_visibility)
+}
+
+export function getDefaultSettingKeyForColumnType(columnType) {
+  if (
+    columnType === 'assignment' ||
+    columnType === 'assignment_group' ||
+    columnType === 'total_grade'
+  ) {
+    return 'grade'
+  } else if (columnType === 'student') {
+    return 'sortable_name'
+  }
+}
+
+export function sectionList(sections) {
+  return _.values(sections)
+    .sort((a, b) => {
+      return a.id - b.id
+    })
+    .map(section => {
+      return {...section, name: htmlEscape.unescape(section.name)}
+    })
+}
+
+export function getCustomColumnId(customColumnId) {
+  return `custom_col_${customColumnId}`
+}
+
+export function getAssignmentColumnId(assignmentId) {
+  return `assignment_${assignmentId}`
+}
+
+export function getAssignmentGroupColumnId(assignmentGroupId) {
+  return `assignment_group_${assignmentGroupId}`
 }

@@ -88,7 +88,8 @@ export const DiscussionPostToolbar = props => {
           dividingMargin: '0 0 small 0',
           search: {
             shouldGrow: true,
-            width: null
+            shouldShrink: true,
+            width: '100%'
           },
           filter: {
             shouldGrow: true,
@@ -100,8 +101,9 @@ export const DiscussionPostToolbar = props => {
           direction: 'row',
           dividingMargin: '0 small 0 0',
           search: {
-            shouldGrow: false,
-            width: '308px'
+            shouldGrow: true,
+            shouldShrink: true,
+            width: null
           },
           filter: {
             shouldGrow: false,
@@ -113,7 +115,7 @@ export const DiscussionPostToolbar = props => {
       render={responsiveProps => (
         <View maxWidth="56.875em">
           <Flex width="100%" direction={responsiveProps.direction}>
-            <Flex.Item margin={responsiveProps.dividingMargin}>
+            <Flex.Item margin={responsiveProps.dividingMargin} shouldShrink>
               <Flex>
                 {/* Groups */}
                 {props.childTopics && (
@@ -126,6 +128,7 @@ export const DiscussionPostToolbar = props => {
                   overflowY="hidden"
                   overflowX="hidden"
                   shouldGrow={responsiveProps.search.shouldGrow}
+                  shouldShrink={responsiveProps.search.shouldShrink}
                 >
                   <TextInput
                     data-testid="search-filter"

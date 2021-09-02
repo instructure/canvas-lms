@@ -32,7 +32,8 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     discussion_topic_id: nil,
     message: nil,
     parent_entry_id: nil,
-    file_id: nil
+    file_id: nil,
+    include_reply_preview: nil
   )
     <<~GQL
       mutation {
@@ -41,7 +42,8 @@ RSpec.describe Mutations::CreateDiscussionEntry do
           message: "#{message}"
           #{"parentEntryId: #{parent_entry_id}" unless parent_entry_id.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
-        }) {
+          #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
+          }) {
           discussionEntry {
             _id
             message
@@ -106,6 +108,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parent', '_id')).to eq parent_entry.id.to_s
     expect(entry.root_entry_id).to eq root_entry.id
+    expect(entry.include_reply_preview?).to be false
   end
 
   it 'adds an attachment when creating a discussion entry' do
@@ -118,6 +121,46 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     entry = @topic.discussion_entries.last
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'attachment', '_id')).to eq attachment.id.to_s
     expect(entry.reload.attachment_id).to eq attachment.id
+  end
+
+  context 'include reply preview' do
+    it 'cannot be a root entry' do
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey', include_reply_preview: true)
+      expect(result.dig('errors')).to be nil
+      expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
+
+      entry = @topic.discussion_entries.last
+      expect(entry.include_reply_preview?).to be false
+    end
+
+    it 'cannot be a reply to a root entry' do
+      root_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic)
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey', include_reply_preview: true, parent_entry_id: root_entry.id)
+
+      expect(result.dig('errors')).to be nil
+      expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
+
+      entry = @topic.discussion_entries.last
+      expect(entry.include_reply_preview?).to be false
+    end
+
+    it 'does set on reply to a child reply' do
+      root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
+      parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: true)
+
+      entry = @topic.discussion_entries.last
+      expect(entry.include_reply_preview?).to be true
+    end
+
+    it 'allows creating with include reply preview as false' do
+      root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
+      parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: false)
+
+      entry = @topic.discussion_entries.last
+      expect(entry.include_reply_preview?).to be false
+    end
   end
 
   context 'errors' do

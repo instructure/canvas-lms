@@ -21,11 +21,12 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
 import PostAssignmentGradesTray from '@canvas/post-assignment-grades-tray'
-import AssignmentPostingPolicyTray from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/index.js'
+import AssignmentPostingPolicyTray from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/index'
+import {getAssignmentColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 QUnit.module('Gradebook PostPolicies', suiteHooks => {
   let $container
@@ -540,28 +541,25 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
 
       test('calls updateColumnHeaders', async () => {
         await postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
-        const [
-          {onAssignmentPostPolicyUpdated}
-        ] = AssignmentPostingPolicyTray.prototype.show.lastCall.args
+        const [{onAssignmentPostPolicyUpdated}] =
+          AssignmentPostingPolicyTray.prototype.show.lastCall.args
         onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
         strictEqual(updateColumnHeadersStub.callCount, 1)
       })
 
       test('calls updateColumnHeaders with the column ID of the affected assignment', async () => {
         await postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
-        const columnId = gradebook.getAssignmentColumnId('2301')
-        const [
-          {onAssignmentPostPolicyUpdated}
-        ] = AssignmentPostingPolicyTray.prototype.show.lastCall.args
+        const columnId = getAssignmentColumnId('2301')
+        const [{onAssignmentPostPolicyUpdated}] =
+          AssignmentPostingPolicyTray.prototype.show.lastCall.args
         onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
         deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
       })
 
       test('updates the post_manually field of the assignment', async () => {
         await postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
-        const [
-          {onAssignmentPostPolicyUpdated}
-        ] = AssignmentPostingPolicyTray.prototype.show.lastCall.args
+        const [{onAssignmentPostPolicyUpdated}] =
+          AssignmentPostingPolicyTray.prototype.show.lastCall.args
         onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: false})
         deepEqual(gradebook.getAssignment('2301').post_manually, false)
       })
@@ -659,14 +657,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     })
 
     test('does not update the post_manually value for assignments not specified', () => {
-      const assignmentPostPoliciesById = {'2301': {postManually: true}}
+      const assignmentPostPoliciesById = {2301: {postManually: true}}
 
       postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
       strictEqual(gradebook.getAssignment('2302').post_manually, false)
     })
 
     test('does not throw an error if given an assignment ID not in the gradebook', () => {
-      const assignmentPostPoliciesById = {'2399': {postManually: true}}
+      const assignmentPostPoliciesById = {2399: {postManually: true}}
 
       postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
       ok('setAssignmentPostPolicies with a nonexistent assignment does not cause an error')

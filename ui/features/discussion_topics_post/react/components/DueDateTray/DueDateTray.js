@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!discussion_posts'
-
-import PropTypes from 'prop-types'
-import React from 'react'
+import {AssignmentOverride} from '../../../graphql/AssignmentOverride'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
+import I18n from 'i18n!discussion_posts'
+import PropTypes from 'prop-types'
+import React, {useState} from 'react'
 import {responsiveQuerySizes} from '../../utils'
 
-import {Text} from '@instructure/ui-text'
-import {Table} from '@instructure/ui-table'
+import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
+import {Table} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
 
 export function DueDateTray({...props}) {
   return (
@@ -80,7 +81,7 @@ export function DueDateTray({...props}) {
                 </Table.Cell>
                 <Table.Cell>
                   <Text size={responsiveProps.textSize}>
-                    {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
+                    <DueDatesFor assignmentOverride={item} />
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
@@ -106,7 +107,48 @@ export function DueDateTray({...props}) {
   )
 }
 
-DueDateTray.prototype = {
-  assignmentOverrides: PropTypes.array,
+DueDateTray.propTypes = {
+  assignmentOverrides: PropTypes.arrayOf(AssignmentOverride.shape),
   tableCaption: PropTypes.string
+}
+
+const DueDatesFor = props => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const truncateLength = 10
+  const truncateTo = 5
+  const isExpandable = props.assignmentOverride.set?.students?.length > truncateLength
+
+  if (props.assignmentOverride.set?.students?.length > 0) {
+    return (
+      <>
+        {isExpanded || !isExpandable
+          ? props.assignmentOverride.set.students.map(student => student.shortName).join(', ') + ' '
+          : props.assignmentOverride.set.students
+              .slice(0, truncateTo)
+              .map(student => student.shortName)
+              .join(', ')}
+        {isExpandable && (
+          <Text>
+            {isExpanded ? ' ' : '... '}
+            <Link onClick={() => setIsExpanded(!isExpanded)}>
+              {isExpanded
+                ? I18n.t('%{count} less', {
+                    count: props.assignmentOverride.set.students.length - truncateTo
+                  })
+                : I18n.t('%{count} more', {
+                    count: props.assignmentOverride.set.students.length - truncateTo
+                  })}
+            </Link>
+          </Text>
+        )}
+      </>
+    )
+  } else {
+    return <Text wrap="break-word">{props.assignmentOverride.title}</Text>
+  }
+}
+
+DueDatesFor.propTypes = {
+  assignmentOverride: AssignmentOverride.shape,
+  textSize: PropTypes.string
 }

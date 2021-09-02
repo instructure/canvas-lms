@@ -154,7 +154,12 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
     <OutcomesContext.Provider value={getContext(isMobileView)}>
       {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
       <Tabs onRequestTabChange={handleTabChange}>
-        <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0} id="management">
+        <Tabs.Panel
+          padding="0"
+          renderTitle={I18n.t('Manage')}
+          isSelected={selectedIndex === 0}
+          id="management"
+        >
           {improvedManagement ? !isImporting && <OutcomeManagementPanel /> : <OutcomePanel />}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1} id="scale">

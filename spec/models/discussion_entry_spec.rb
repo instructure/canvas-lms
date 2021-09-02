@@ -109,40 +109,34 @@ describe DiscussionEntry do
 
     it 'should create on entry save' do
       entry = topic.discussion_entries.new(user: student)
-      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
+      allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
     end
-  end
 
-  context "reply preview" do
-    before :once do
-      course_with_teacher(active_all: true, name: 'captain america', short_name: 'steve')
-      @entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
-      @entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
-      @entry.save!
-    end
+    describe "edits to an entry" do
+      let!(:entry) {
+        topic.discussion_entries.create(
+          user: student,
+          message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>"
+        )
+      }
 
-    let(:student) { student_in_course(active_all: true) }
+      context "a new user is mentioned" do
+        it "should create a mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
+          }.to change {entry.mentions.count}.by 1
+        end
+      end
 
-    it "should mark include_reply_preview as true" do
-      expect(@entry.include_reply_preview).to be true
-      expect(@entry.message).to eql("<p>only this should stay</p>")
-    end
-
-    it "should mark include_reply_preview as false" do
-      @entry.update({message: "<p>not a reply preview anymore</p>"})
-      @entry.save!
-      expect(@entry.include_reply_preview).to be false
-      expect(@entry.message).to eql("<p>not a reply preview anymore</p>")
-    end
-
-    it 'should show "Deleted by <user>" when deleted' do
-      entry = topic.discussion_entries.create!(user: student.user, message: "this is a message")
-      entry.editor_id = @teacher.id
-      entry.destroy
-      expect(entry.quoted_reply_html).not_to include("this is a message")
-      expect(entry.quoted_reply_html).to include("Deleted by steve")
+      context "the same user is mentioned" do
+        it "should not create a new mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude?!</p>")
+          }.to not_change {entry.mentions.count}
+        end
+      end
     end
   end
 

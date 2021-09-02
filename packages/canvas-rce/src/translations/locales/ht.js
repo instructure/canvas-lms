@@ -72,6 +72,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Gwosè Bouton" },
   "buttons_and_icons_e66ee12c": { "message": "Bouton ak Ikòn" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Anile" },
   "choose_caption_file_9c45bc4e": { "message": "Chwazi fichye soutit" },
   "choose_usage_rights_33683854": {
     "message": "Itilizasyon dwa itilizasyon..."
@@ -159,6 +160,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Delè: Plizyè Dat" },
   "due_when_7eed10c6": { "message": "Delè: { when }" },
+  "edit_c5fbea07": { "message": "Modifye" },
   "edit_equation_f5279959": { "message": "Modifye Ekwasyon" },
   "edit_link_7f53bebb": { "message": "Chanje Lyen" },
   "editor_statusbar_26ac81fc": { "message": "Editè Ba Estati" },
@@ -179,8 +181,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Zouti Ekstèn" },
   "extra_large_b6cdf1ff": { "message": "Ekxtra Laj" },
   "extra_small_9ae33252": { "message": "Piti Anpil" },
-  "file_upload_failed_af22dd91": { "message": "Transfè fichye echwe" },
-  "file_uploading_56c9c0c8": { "message": "Transfè fichye" },
   "file_url_c12b64be": { "message": "URL Fichye" },
   "filename_file_icon_602eb5de": { "message": "{ filename } ikòn fichye" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } apèsi imaj" },
@@ -271,6 +271,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Fichye Mwen" },
   "my_images_427f9b0c": { "message": "Imaj Mwen" },
+  "name_1aed4a1b": { "message": "Non" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navige atravè meni oswa ba zouti a"
   },
@@ -374,7 +375,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stil" },
   "submit_a3cc6859": { "message": "Soumèt" },
   "subscript_59744f96": { "message": "Endis" },
-  "success_file_uploaded_8174e93f": { "message": "Reyisi: Fichye transfere" },
   "superscript_8cb349a2": { "message": "An Ekspozan" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tip fichye ki aksepte: SRT oswa WebVTT"
@@ -425,13 +425,11 @@ const locale = {
     "message": "tape Control F9 pouw gen aksè a opsyon tablo yo. { text }"
   },
   "unpublished_dfd8801": { "message": "pa pibliye" },
+  "untitled_efdc2d7d": { "message": "san tit" },
   "upload_document_253f0478": { "message": "Chaje Dokiman" },
   "upload_file_fd2361b8": { "message": "Transfere Fichye" },
   "upload_image_6120b609": { "message": "Transfere Imaj" },
   "upload_media_ce31135a": { "message": "Transfè Medya" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Transfè pa disponib pou dosye sa a"
-  },
   "upload_record_media_e4207d72": { "message": "Transfè/Anrejistre Medya" },
   "uploading_19e8a4e7": { "message": "Chajman" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

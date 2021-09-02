@@ -76,6 +76,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "ขนาดปุ่ม" },
   "buttons_and_icons_e66ee12c": { "message": "ปุ่มและไอคอน" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "ยกเลิก" },
   "choose_caption_file_9c45bc4e": { "message": "เลือกไฟล์คำบรรยาย" },
   "choose_usage_rights_33683854": { "message": "เลือกสิทธิ์การใช้งาน..." },
   "circle_484abe63": { "message": "วงกลม" },
@@ -169,6 +170,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "ครบกำหนด: วันที่หลายรายการ" },
   "due_when_7eed10c6": { "message": "ครบกำหนด: { when }" },
+  "edit_c5fbea07": { "message": "แก้ไข" },
   "edit_equation_f5279959": { "message": "แก้ไขสมการ" },
   "edit_link_7f53bebb": { "message": "แก้ไขลิงค์" },
   "editor_statusbar_26ac81fc": { "message": "แถบสถานะโปรแกรมแก้ไข" },
@@ -191,8 +193,6 @@ const locale = {
   "external_tools_6e77821": { "message": "เครื่องมือจากภายนอก" },
   "extra_large_b6cdf1ff": { "message": "ใหญ่พิเศษ" },
   "extra_small_9ae33252": { "message": "เล็กพิเศษ" },
-  "file_upload_failed_af22dd91": { "message": "อัพโหลดไฟล์ล้มเหลว" },
-  "file_uploading_56c9c0c8": { "message": "กำลังอัพโหลดไฟล์" },
   "file_url_c12b64be": { "message": "URL ไฟล์" },
   "filename_file_icon_602eb5de": { "message": "ไอคอนไฟล์ { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -285,6 +285,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "ไฟล์ของฉัน" },
   "my_images_427f9b0c": { "message": "ภาพของฉัน" },
+  "name_1aed4a1b": { "message": "ชื่อ" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "ดูรายการเมนูหรือแถบเครื่องมือ"
   },
@@ -388,7 +389,6 @@ const locale = {
   "styles_2aa721ef": { "message": "รูปแบบ" },
   "submit_a3cc6859": { "message": "ส่ง" },
   "subscript_59744f96": { "message": "ตัวห้อย" },
-  "success_file_uploaded_8174e93f": { "message": "เสร็จสิ้น: อัพโหลดไฟล์แล้ว" },
   "superscript_8cb349a2": { "message": "ตัวยก" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "ประเภทไฟล์ที่รองรับ: SRT หรือ WebVTT"
@@ -439,13 +439,11 @@ const locale = {
     "message": "พิมพ์ Control F9 เพื่อเข้าไปยังตัวเลือกสำหรับตาราง { text }"
   },
   "unpublished_dfd8801": { "message": "เลิกเผยแพร่แล้ว" },
+  "untitled_efdc2d7d": { "message": "ไม่ระบุชื่อ" },
   "upload_document_253f0478": { "message": "อัพโหลดเอกสาร" },
   "upload_file_fd2361b8": { "message": "อัพโหลดไฟล์" },
   "upload_image_6120b609": { "message": "อัพโหลดภาพ" },
   "upload_media_ce31135a": { "message": "อัพโหลดสื่อ" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "ไม่สามารถอัพโหลดได้สำหรับโฟลเดอร์นี้"
-  },
   "upload_record_media_e4207d72": { "message": "อัพโหลด/บันทึกสื่อ" },
   "uploading_19e8a4e7": { "message": "กำลังอัพโหลด" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

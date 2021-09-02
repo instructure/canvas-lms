@@ -26,33 +26,34 @@ import qs from 'qs'
 
 import fakeENV from 'helpers/fakeENV'
 import UserSettings from '@canvas/user-settings'
-import natcompare from '@canvas/util/natcompare'
 import round from 'round'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
-import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
+import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
-import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert.js'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi.js'
-import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator.js'
-import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi.js'
+import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert'
+import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
+import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator'
+import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
-import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants.js'
+import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import {
   darken,
   statusColors,
   defaultColors
-} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
-import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu.js'
+} from 'ui/features/gradebook/react/default_gradebook/constants/colors'
+import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
-
-import {compareAssignmentDueDates} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils.js'
+import {
+  getAssignmentColumnId,
+  getAssignmentGroupColumnId
+} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -172,6 +173,21 @@ test('adds teacher notes to custom columns when provided', () => {
 test('custom columns remain empty when teacher notes are not provided', () => {
   const gradebook = createGradebook()
   deepEqual(gradebook.gradebookContent.customColumns, [])
+})
+
+QUnit.module('Gradebook#getAssignmentOrder', () => {
+  test('returns the IDs of the ordered assignments in Gradebook', () => {
+    const gradebook = createGradebook()
+    gradebook.gridData.columns.scrollable = [
+      'assignment_3',
+      'custom_col_8',
+      'assignment_2',
+      'assignment_group_1',
+      'assignment_7',
+      'total_grade'
+    ]
+    propEqual(gradebook.getAssignmentOrder(), ['3', '2', '7'])
+  })
 })
 
 QUnit.module('Gradebook#gotCustomColumnDataChunk', {
@@ -517,34 +533,6 @@ test('does not calculate when the student is not initialized', function () {
   notOk(CourseGradeCalculator.calculate.called)
 })
 
-QUnit.module('Gradebook#localeSort')
-
-test('delegates to natcompare.strings', () => {
-  sandbox.spy(natcompare, 'strings')
-  const gradebook = createGradebook()
-  gradebook.localeSort('a', 'b')
-  equal(natcompare.strings.callCount, 1)
-  deepEqual(natcompare.strings.getCall(0).args, ['a', 'b'])
-})
-
-test('substitutes falsy args with empty string', () => {
-  sandbox.spy(natcompare, 'strings')
-  const gradebook = createGradebook()
-  gradebook.localeSort(0, false)
-  equal(natcompare.strings.callCount, 1)
-  deepEqual(natcompare.strings.getCall(0).args, ['', ''])
-})
-
-test('returns 1 if nullsLast is true and only first item is null', function () {
-  const gradebook = createGradebook()
-  equal(gradebook.localeSort(null, 'fred', {nullsLast: true}), 1)
-})
-
-test('returns -1 if nullsLast is true and only second item is null', function () {
-  const gradebook = createGradebook()
-  equal(gradebook.localeSort('fred', null, {nullsLast: true}), -1)
-})
-
 QUnit.module('Gradebook#gradeSort by an assignment', {
   setup() {
     this.studentA = {
@@ -755,87 +743,9 @@ QUnit.module('Gradebook#makeColumnSortFn', {
 
   setup() {
     this.gradebook = createGradebook()
-    sandbox.stub(this.gradebook, 'wrapColumnSortFn')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
-    sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
   }
-})
-
-QUnit.module('Gradebook#wrapColumnSortFn')
-
-test('returns -1 if second argument is of type total_grade', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({}, {type: 'total_grade'}), -1)
-})
-
-test('returns 1 if first argument is of type total_grade', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({type: 'total_grade'}, {}), 1)
-})
-
-test('returns -1 if second argument is an assignment_group and the first is not', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({}, {type: 'assignment_group'}), -1)
-})
-
-test('returns 1 if first arg is an assignment_group and second arg is not', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  equal(sortFn({type: 'assignment_group'}, {}), 1)
-})
-
-test('returns difference in object.positions if both args are assignement_groups', () => {
-  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub())
-  const a = {type: 'assignment_group', object: {position: 10}}
-  const b = {type: 'assignment_group', object: {position: 5}}
-
-  equal(sortFn(a, b), 5)
-})
-
-test('calls wrapped function when either column is not total_grade nor assignment_group', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn)
-  sortFn({}, {})
-  ok(wrappedFn.called)
-})
-
-test('calls wrapped function with arguments in given order when no direction is given', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn)
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [first, second]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
-})
-
-test('calls wrapped function with arguments in given order when direction is ascending', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'ascending')
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [first, second]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
-})
-
-test('calls wrapped function with arguments in reverse order when direction is descending', () => {
-  const wrappedFn = sinon.stub()
-  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'descending')
-  const first = {field: 1}
-  const second = {field: 2}
-  const expectedArgs = [second, first]
-
-  sortFn(first, second)
-
-  strictEqual(wrappedFn.callCount, 1)
-  deepEqual(wrappedFn.firstCall.args, expectedArgs)
 })
 
 QUnit.module('Gradebook#rowFilter', {
@@ -930,32 +840,6 @@ test('comparison does not group uppercase letters together', function () {
   const thirdRecord = this.getRecord('Omega')
 
   strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.secondRecord), 1)
-})
-
-QUnit.module('Gradebook#compareAssignmentPointsPossible', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.firstRecord = {object: {points_possible: 1}}
-    this.secondRecord = {object: {points_possible: 2}}
-  }
-})
-
-test('returns a negative number if the points_possible field is smaller in the first record', function () {
-  strictEqual(
-    this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord),
-    -1
-  )
-})
-
-test('returns 0 if the points_possible field is the same in both records', function () {
-  strictEqual(this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0)
-})
-
-test('returns a positive number if the points_possible field is greater in the first record', function () {
-  strictEqual(
-    this.gradebook.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord),
-    1
-  )
 })
 
 QUnit.module('Gradebook#compareAssignmentModulePositions - when both records have module info', {
@@ -1488,37 +1372,6 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
   })
 })
 
-QUnit.module('Gradebook#isDefaultSortOrder', {
-  setup() {
-    this.gradebook = createGradebook()
-  }
-})
-
-test('returns false if called with due_date', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('due_date'), false)
-})
-
-test('returns false if called with name', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('name'), false)
-})
-
-test('returns false if called with points', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('points'), false)
-})
-
-test('returns false if called with points', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('custom'), false)
-})
-
-test('returns false if called with module_position', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('module_position'), false)
-})
-
-test('returns true if called with anything else', function () {
-  strictEqual(this.gradebook.isDefaultSortOrder('alpha'), true)
-  strictEqual(this.gradebook.isDefaultSortOrder('assignment_group'), true)
-})
-
 QUnit.module('Gradebook#isInvalidSort', {
   setup() {
     this.gradebook = createGradebook()
@@ -1557,46 +1410,75 @@ test('returns false if sorting by custom and there is a custom column order stor
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: true)', {
-  setup() {
-    setFixtureHtml($fixtures)
-    this.gradebook = createGradebook({enhanced_gradebook_filters: true})
-    this.gradebook.setStudentsLoaded(true)
-    this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderSearchFilter([])
-  },
+QUnit.module(
+  'Gradebook#renderAssignmentSearchFilter (gradebook_assignment_search_and_redesign: true)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: true})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderAssignmentSearchFilter([])
+    },
 
-  teardown() {
-    $fixtures.innerHTML = ''
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
   }
+)
+
+test('renders Assignment Names label', function () {
+  this.gradebook.renderAssignmentSearchFilter([])
+  const assignmentSearch = document.querySelector('#gradebook-assignment-search')
+  ok(assignmentSearch.textContent.includes('Assignment Names'))
 })
 
+QUnit.module(
+  'Gradebook#renderStudentSearchFilter (gradebook_assignment_search_and_redesign: true)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: true})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderStudentSearchFilter([])
+    },
+
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
+  }
+)
+
 test('does not render old set up/search field', function () {
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, false, 'input is not disabled')
   strictEqual(input.getAttribute('aria-disabled'), null, 'input is not aria-disabled')
 })
 
 test('renders Student Names label', function () {
-  this.gradebook.renderSearchFilter([])
-  const toolbar = document.querySelector('#gradebook-secondary-toolbar')
-  ok(toolbar.textContent.includes('Student Names'))
+  this.gradebook.renderStudentSearchFilter([])
+  const studentSearch = document.querySelector('#gradebook-student-search')
+  ok(studentSearch.textContent.includes('Student Names'))
 })
 
-QUnit.module('Gradebook#renderSearchFilter (enhanced_gradebook_filters: false)', {
-  setup() {
-    setFixtureHtml($fixtures)
-    this.gradebook = createGradebook({enhanced_gradebook_filters: false})
-    this.gradebook.setStudentsLoaded(true)
-    this.gradebook.setSubmissionsLoaded(true)
-    this.gradebook.renderSearchFilter([])
-  },
+QUnit.module(
+  'Gradebook#renderStudentSearchFilter (gradebook_assignment_search_and_redesign: false)',
+  {
+    setup() {
+      setFixtureHtml($fixtures)
+      this.gradebook = createGradebook({gradebook_assignment_search_and_redesign: false})
+      this.gradebook.setStudentsLoaded(true)
+      this.gradebook.setSubmissionsLoaded(true)
+      this.gradebook.renderStudentSearchFilter([])
+    },
 
-  teardown() {
-    $fixtures.innerHTML = ''
+    teardown() {
+      $fixtures.innerHTML = ''
+    }
   }
-})
+)
 
 test('binds an InputFilterView to the search filter markup', function () {
   equal(this.gradebook.userFilter.constructor.name, 'InputFilterView')
@@ -1604,7 +1486,7 @@ test('binds an InputFilterView to the search filter markup', function () {
 
 test('does not create a new InputFilterView when already bound', function () {
   const userFilter = this.gradebook.userFilter
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   strictEqual(this.gradebook.userFilter, userFilter)
 })
 
@@ -1616,7 +1498,7 @@ test('enables the input when students and submissions are loaded', () => {
 
 test('disables the input when students are not loaded', function () {
   this.gradebook.setStudentsLoaded(false)
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
@@ -1624,7 +1506,7 @@ test('disables the input when students are not loaded', function () {
 
 test('disables the input when submissions are not loaded', function () {
   this.gradebook.setSubmissionsLoaded(false)
-  this.gradebook.renderSearchFilter([])
+  this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
@@ -3169,19 +3051,31 @@ test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
   equal(buttonText, 'View')
 })
 
-test('ActionMenu is rendered on renderActionMenu', function () {
+test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters is enabled', function () {
+  this.gradebook = createGradebook({
+    context_allows_gradebook_uploads: true,
+    export_gradebook_csv_url: 'http://someUrl',
+    gradebook_import_url: 'http://someUrl',
+    enhanced_gradebook_filters: true,
+    navigate() {}
+  })
   this.gradebook.renderActionMenu()
-  const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim()
-  equal(buttonText, 'Actions')
+  const importButtonText = document
+    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[0]
+    .innerText.trim()
+  const exportButtonText = document
+    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[1]
+    .innerText.trim()
+  equal(importButtonText, 'Import')
+  equal(exportButtonText, 'Export')
 })
 
-test('GradebookMenu is rendered on renderGradebookMenu', function () {
-  this.gradebook.options.assignmentOrOutcome = 'assignment'
-  this.gradebook.renderGradebookMenu()
+test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters is disabled', function () {
+  this.gradebook.renderActionMenu()
   const buttonText = document
-    .querySelector('[data-component="GradebookMenu"] Button')
+    .querySelectorAll('[data-component="ActionMenu"] Button')[0]
     .innerText.trim()
-  equal(buttonText, 'Gradebook')
+  equal(buttonText, 'Actions')
 })
 
 test('StatusesModal is mounted on renderStatusesModal', function () {
@@ -4222,27 +4116,6 @@ QUnit.module('Gradebook Grid Events', () => {
   })
 })
 
-QUnit.module('Gradebook#getCustomColumnId')
-
-test('returns a unique key for the custom column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getCustomColumnId('2401'), 'custom_col_2401')
-})
-
-QUnit.module('Gradebook#getAssignmentColumnId')
-
-test('returns a unique key for the assignment column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getAssignmentColumnId('201'), 'assignment_201')
-})
-
-QUnit.module('Gradebook#getAssignmentGroupColumnId')
-
-test('returns a unique key for the assignment group column', () => {
-  const gradebook = createGradebook()
-  equal(gradebook.getAssignmentGroupColumnId('301'), 'assignment_group_301')
-})
-
 QUnit.module('Gradebook#updateColumnHeaders', {
   setup() {
     const columns = [
@@ -4642,17 +4515,6 @@ test('sorts by descending when asc is false', function () {
 
   equal(firstRow.id, '3', 'when fn is false, order first')
   equal(secondRow.id, '4', 'when fn is true, order second')
-})
-
-test('relies on localeSort when rows have equal sorting criteria results', function () {
-  const value = 0
-  this.gradebook.gridData.rows[0].someProperty = value
-  this.gradebook.gridData.rows[1].someProperty = value
-  this.gradebook.sortRowsWithFunction(this.sortFn)
-  const [firstRow, secondRow] = this.gradebook.gridData.rows
-
-  equal(firstRow.sortable_name, 'A Firstington', 'A Firstington sorts first')
-  equal(secondRow.sortable_name, 'Z Lastington', 'Z Lastington sorts second')
 })
 
 test('relies on idSort when rows have equal sorting criteria and the same sortable name', function () {
@@ -5078,7 +4940,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
     test('sets the column definition postAssignmentGradesTrayOpenForAssignmentId', () => {
       gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
-      const columnId = gradebook.getAssignmentColumnId('2301')
+      const columnId = getAssignmentColumnId('2301')
       const definition = gradebook.gridData.columns.definitions[columnId]
       strictEqual(definition.postAssignmentGradesTrayOpenForAssignmentId, true)
     })
@@ -6874,6 +6736,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     })
 
     test('is false when filter_speed_grader_by_student_group is not enabled', () => {
+      gradebook.options.course_settings.filter_speed_grader_by_student_group = false
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       strictEqual(props.requireStudentGroupForSpeedGrader, false)
@@ -8975,6 +8838,153 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, false)
     })
   })
+
+  QUnit.module('when enhanced gradebook filters are enabled', () => {
+    test('sets allowSortingByModules to true if modules are enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.setContextModules([{id: '1', name: 'Module 1', position: 1}])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, true)
+    })
+
+    test('sets allowSortingByModules to false if modules are not enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, false)
+    })
+
+    test('sets allowViewUngradedAsZero to true if view ungraded as zero is enabled', () => {
+      gradebook = createGradebook({
+        allow_view_ungraded_as_zero: true,
+        enhanced_gradebook_filters: true
+      })
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, true)
+    })
+
+    test('sets allowViewUngradedAsZero to false if view ungraded as zero is not enabled', () => {
+      gradebook = createGradebook({enhanced_gradebook_filters: true})
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, false)
+    })
+
+    QUnit.module('viewOptions prop', () => {
+      const viewOptions = () => gradebookSettingsModalProps().viewOptions
+
+      test('sets columnSortSettings to the current sort criterion and direction', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.setColumnOrder({sortType: 'due_date', direction: 'descending'})
+        gradebook.renderGradebookSettingsModal()
+
+        deepEqual(viewOptions().columnSortSettings, {
+          criterion: 'due_date',
+          direction: 'descending'
+        })
+      })
+
+      test('sets showNotes to true if the notes column is shown', () => {
+        gradebook = createGradebook({
+          enhanced_gradebook_filters: true,
+          teacher_notes: {
+            id: '2401',
+            title: 'Notes',
+            position: 1,
+            teacher_notes: true,
+            hidden: false
+          }
+        })
+        gradebook.renderGradebookSettingsModal()
+
+        strictEqual(viewOptions().showNotes, true)
+      })
+
+      test('sets showNotes to false if the notes column is hidden', () => {
+        gradebook = createGradebook({
+          enhanced_gradebook_filters: true,
+          teacher_notes: {
+            id: '2401',
+            title: 'Notes',
+            position: 1,
+            teacher_notes: true,
+            hidden: true
+          }
+        })
+        gradebook.renderGradebookSettingsModal()
+
+        strictEqual(viewOptions().showNotes, false)
+      })
+
+      test('sets showNotes to false if the notes column does not exist', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showNotes, false)
+      })
+
+      test('sets showUnpublishedAssignments to true if unpublished assignments are shown', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.initShowUnpublishedAssignments('true')
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showUnpublishedAssignments, true)
+      })
+
+      test('sets showUnpublishedAssignments to false if unpublished assignments are not shown', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.initShowUnpublishedAssignments('not true')
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().showUnpublishedAssignments, false)
+      })
+
+      test('sets statusColors to the current status colors', () => {
+        gradebook = createGradebook({enhanced_gradebook_filters: true})
+        gradebook.renderGradebookSettingsModal()
+        deepEqual(viewOptions().statusColors, statusColors())
+      })
+
+      test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
+        gradebook = createGradebook({
+          allow_view_ungraded_as_zero: true,
+          enhanced_gradebook_filters: true
+        })
+        gradebook.gridDisplaySettings.viewUngradedAsZero = true
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().viewUngradedAsZero, true)
+      })
+
+      test('sets viewUngradedAsZero to true if view ungraded as 0 is not active', () => {
+        gradebook = createGradebook({
+          allow_view_ungraded_as_zero: true,
+          enhanced_gradebook_filters: true
+        })
+        gradebook.gridDisplaySettings.viewUngradedAsZero = false
+        gradebook.renderGradebookSettingsModal()
+        strictEqual(viewOptions().viewUngradedAsZero, false)
+      })
+    })
+  })
+
+  QUnit.module('when enhanced gradebook filters are not enabled', () => {
+    test('does not set allowSortingByModules', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().allowSortingByModules, undefined)
+    })
+
+    test('does not set allowViewUngradedAsZero', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().allowViewUngradedAsZero, undefined)
+    })
+
+    test('does not set viewOptions', () => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      strictEqual(gradebookSettingsModalProps().viewOptions, undefined)
+    })
+  })
 })
 
 QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {
@@ -9352,7 +9362,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
       '{}'
     ])
     gradebook = createGradebook(options)
-    columnId = gradebook.getAssignmentColumnId('2301')
+    columnId = getAssignmentColumnId('2301')
   })
 
   hooks.afterEach(() => {
@@ -9374,11 +9384,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
 
   test('when sorted by assignment group of an anonymous assignment, gradebook changes sort', () => {
     const groupId = '7'
-    gradebook.setSortRowsBySetting(
-      gradebook.getAssignmentGroupColumnId(groupId),
-      'grade',
-      'ascending'
-    )
+    gradebook.setSortRowsBySetting(getAssignmentGroupColumnId(groupId), 'grade', 'ascending')
     gradebook.handleSubmissionPostedChange({
       id: '2301',
       anonymize_students: true,
@@ -9401,7 +9407,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
   })
 
   test('when gradebook is sorted by an unrelated column, gradebook does not change sort', () => {
-    gradebook.setSortRowsBySetting(gradebook.getAssignmentColumnId('2222'), 'grade', 'ascending')
+    gradebook.setSortRowsBySetting(getAssignmentColumnId('2222'), 'grade', 'ascending')
     const sortSettings = gradebook.getSortRowsBySetting()
     gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: true})
     deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
@@ -9672,80 +9678,6 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
     gradebook.toggleViewUngradedAsZero()
 
     strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
-  })
-})
-
-QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
-  let gradebook
-
-  const confirmationDialog = () =>
-    document.querySelector('span[role=dialog][aria-label="View Ungraded as Zero"]')
-  const acceptConfirmation = () => {
-    const okButton = [...confirmationDialog().querySelectorAll('button')].find(
-      button => button.textContent === 'OK'
-    )
-    okButton.click()
-  }
-  const denyConfirmation = () => {
-    const cancelButton = [...confirmationDialog().querySelectorAll('button')].find(
-      button => button.textContent === 'Cancel'
-    )
-    cancelButton.click()
-  }
-
-  hooks.beforeEach(() => {
-    gradebook = createGradebook({
-      grid: {
-        getColumns: () => [],
-        updateCell: sinon.stub()
-      },
-      settings: {
-        allow_view_ungraded_as_zero: 'true'
-      }
-    })
-    sinon.stub(gradebook, 'toggleViewUngradedAsZero')
-  })
-
-  test('shows a confirmation dialog if not viewing ungraded as zero', async () => {
-    const promise = gradebook.confirmViewUngradedAsZero()
-
-    ok(confirmationDialog())
-    acceptConfirmation()
-    await promise
-  })
-
-  test('does not show a confirmation dialog if already viewing ungraded as zero', async () => {
-    gradebook.gridDisplaySettings.viewUngradedAsZero = true
-    const promise = gradebook.confirmViewUngradedAsZero()
-
-    notOk(confirmationDialog())
-    await promise
-  })
-
-  QUnit.module('when the confirmation is requested and accepted', () => {
-    const confirmAndAccept = async () => {
-      const promise = gradebook.confirmViewUngradedAsZero()
-      acceptConfirmation()
-      await promise
-    }
-
-    test('calls toggleViewUngradedAsZero', async () => {
-      await confirmAndAccept()
-      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 1)
-    })
-  })
-
-  QUnit.module('when the confirmation is requested and denied', () => {
-    const confirmAndDeny = async () => {
-      const promise = gradebook.confirmViewUngradedAsZero()
-      denyConfirmation()
-      await promise
-    }
-
-    test('does not call toggleViewUngradedAsZero', async () => {
-      await confirmAndDeny()
-      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 0)
-    })
   })
 })
 

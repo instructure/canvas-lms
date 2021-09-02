@@ -19,7 +19,7 @@
 import React from 'react'
 import moxios from 'moxios'
 import tz from '@canvas/timezone'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, act} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
 import {
@@ -31,10 +31,12 @@ import {
   MOCK_ENROLLMENTS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
+import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
 
 const currentUser = {
   id: '1',
-  display_name: 'Geoffrey Jellineck'
+  display_name: 'Geoffrey Jellineck',
+  avatar_image_url: 'http://avatar'
 }
 const defaultEnv = {
   current_user: currentUser,
@@ -83,7 +85,9 @@ const defaultProps = {
   },
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
-  hasSyllabusBody: true
+  hasSyllabusBody: true,
+  parentSupportEnabled: true,
+  observerList: MOCK_OBSERVER_LIST
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -131,7 +135,7 @@ const createStudentView = () => {
   return studentViewBarContainer
 } */
 
-beforeAll(() => {
+beforeEach(() => {
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
@@ -139,14 +143,6 @@ beforeAll(() => {
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-})
-
-afterAll(() => {
-  moxios.uninstall()
-  fetchMock.restore()
-})
-
-beforeEach(() => {
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
 })
@@ -156,6 +152,8 @@ afterEach(() => {
   const modulesContainer = document.getElementById('k5-modules-container')
   modulesContainer.remove()
   localStorage.clear()
+  moxios.uninstall()
+  fetchMock.restore()
 })
 
 describe('K-5 Subject Course', () => {
@@ -423,6 +421,28 @@ describe('K-5 Subject Course', () => {
     })
   })
 
+  describe('schedule tab', () => {
+    it('shows a planner preview scoped to a single course if user has no student enrollments', async () => {
+      const {findByTestId, getByText, queryByText} = render(
+        <K5Course
+          {...defaultProps}
+          defaultTab={TAB_IDS.SCHEDULE}
+          canManage
+          userIsStudent={false}
+          userIsInstructor
+        />
+      )
+      expect(await findByTestId('kinder-panda')).toBeInTheDocument()
+      expect(getByText('Schedule Preview')).toBeInTheDocument()
+      expect(
+        getByText('Below is an example of how students will see their schedule')
+      ).toBeInTheDocument()
+      expect(queryByText('Math')).not.toBeInTheDocument()
+      expect(getByText('A wonderful assignment')).toBeInTheDocument()
+      expect(queryByText('Exciting discussion')).not.toBeInTheDocument()
+    })
+  })
+
   describe('modules tab', () => {
     it('shows modules content if modules tab is selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />)
@@ -544,6 +564,28 @@ describe('K-5 Subject Course', () => {
         const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
       })
+    })
+
+    it('does not load content until tab is active', async () => {
+      const {getByText, findByText} = render(
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />
+      )
+      expect(getByText('Time to learn!')).toBeInTheDocument()
+      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeFalsy()
+      expect(fetchMock.called(FETCH_APPS_URL)).toBeFalsy()
+      act(() => getByText('Resources').click())
+      expect(await findByText('This is really important.')).toBeInTheDocument()
+      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeTruthy()
+      expect(fetchMock.called(FETCH_APPS_URL)).toBeTruthy()
+    })
+  })
+
+  describe('Parent Support', () => {
+    it('shows picker when user is an observer', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} />)
+      const select = getByRole('combobox', {name: 'Select a student to view'})
+      expect(select).toBeInTheDocument()
+      expect(select.value).toBe('Zelda')
     })
   })
 })

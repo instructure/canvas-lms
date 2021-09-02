@@ -1375,11 +1375,7 @@ class ApplicationController < ActionController::Base
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true, context: nil)
-    # ideally this could just be `user = file_access_user` now, but that causes
-    # problems with some integration specs where getting @files_domain set
-    # reliably is... difficult
-    user = @current_user
-    user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
+    user = file_access_user
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
 
@@ -1844,7 +1840,6 @@ class ApplicationController < ActionController::Base
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
             domain: HostUrl.context_host(@domain_root_account, request.host),
-            include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1952,7 +1947,7 @@ class ApplicationController < ActionController::Base
   def external_tool_redirect_display_type
     if params['display'].present?
       params['display']
-    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
+    elsif @assignment&.quiz_lti? && @module_tag
       'in_nav_context'
     else
       @tool&.extension_setting(:assignment_selection)&.dig('display_type')

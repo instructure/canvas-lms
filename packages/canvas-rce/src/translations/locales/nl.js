@@ -77,6 +77,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Knopgrootte" },
   "buttons_and_icons_e66ee12c": { "message": "Knoppen en pictogrammen" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annuleren" },
   "choose_caption_file_9c45bc4e": { "message": "Ondertitelingsbestand kiezen" },
   "choose_usage_rights_33683854": { "message": "Gebruiksrechten kiezen..." },
   "circle_484abe63": { "message": "Cirkel" },
@@ -176,6 +177,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Inleverdatum: Meerdere datums" },
   "due_when_7eed10c6": { "message": "Inleverdatum: { when }" },
+  "edit_c5fbea07": { "message": "Bewerken" },
   "edit_equation_f5279959": { "message": "Vergelijking bewerken" },
   "edit_link_7f53bebb": { "message": "Link bewerken" },
   "editor_statusbar_26ac81fc": { "message": "Statusbalk van editor" },
@@ -200,8 +202,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Externe tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groot" },
   "extra_small_9ae33252": { "message": "Extra klein" },
-  "file_upload_failed_af22dd91": { "message": "Bestand uploaden mislukt" },
-  "file_uploading_56c9c0c8": { "message": "Bestand wordt geüpload" },
   "file_url_c12b64be": { "message": "Bestands-URL" },
   "filename_file_icon_602eb5de": {
     "message": "{ filename } bestandspictogram"
@@ -306,6 +306,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mijn bestanden" },
   "my_images_427f9b0c": { "message": "Mijn afbeeldingen" },
+  "name_1aed4a1b": { "message": "Naam" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigeer door het menu of de werkbalk"
   },
@@ -411,7 +412,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stijlen" },
   "submit_a3cc6859": { "message": "Inleveren" },
   "subscript_59744f96": { "message": "Subscript" },
-  "success_file_uploaded_8174e93f": { "message": "Gelukt: Bestand geüpload" },
   "superscript_8cb349a2": { "message": "Superscript" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Ondersteunde bestandstypen: SRT of WebVTT"
@@ -466,13 +466,11 @@ const locale = {
     "message": "typ Ctrl+F9 om opties voor tabellen te openen. { text }"
   },
   "unpublished_dfd8801": { "message": "niet-gepubliceerd" },
+  "untitled_efdc2d7d": { "message": "zonder titel" },
   "upload_document_253f0478": { "message": "Document uploaden" },
   "upload_file_fd2361b8": { "message": "Bestand uploaden" },
   "upload_image_6120b609": { "message": "Afbeelding uploaden" },
   "upload_media_ce31135a": { "message": "Media uploaden" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Upload niet beschikbaar voor deze map"
-  },
   "upload_record_media_e4207d72": { "message": "Media uploaden/opnemen" },
   "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

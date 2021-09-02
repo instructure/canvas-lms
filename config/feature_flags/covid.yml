@@ -1,4 +1,5 @@
 product_tours:
+  type: setting
   state: hidden
   applies_to: RootAccount
   display_name: "Product Tours"

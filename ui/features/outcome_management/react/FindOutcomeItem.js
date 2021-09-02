@@ -54,6 +54,8 @@ const FindOutcomeItem = ({
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
   const importStatus = [importGroupStatus, importOutcomeStatus]
+  const shouldShowSpinner =
+    !isImported && importOutcomeStatus !== IMPORT_COMPLETED && importStatus.includes(IMPORT_PENDING)
   const isOutcomeImported = isImported || importStatus.includes(IMPORT_COMPLETED)
   const onAddHandler = () => importOutcomeHandler(id, 1, false, sourceContextId, sourceContextType)
 
@@ -67,7 +69,7 @@ const FindOutcomeItem = ({
           flexFlow: 'row-reverse nowrap'
         }}
       >
-        {importStatus.includes(IMPORT_PENDING) ? (
+        {shouldShowSpinner ? (
           <View as="div" margin="0 medium" data-testid="outcome-import-pending">
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </View>
@@ -78,6 +80,7 @@ const FindOutcomeItem = ({
             margin={isMobileView ? '0' : '0 x-small 0 0'}
             renderIcon={IconAddSolid}
             onClick={onAddHandler}
+            data-testid="add-find-outcome-item"
           >
             {isOutcomeImported ? I18n.t('Added') : I18n.t('Add')}
           </Button>
@@ -89,7 +92,12 @@ const FindOutcomeItem = ({
   if (!title) return null
 
   return (
-    <View as="div" padding={isMobileView ? 'small 0 x-small' : 'small 0'} borderWidth="0 0 small">
+    <View
+      as="div"
+      padding={isMobileView ? 'small 0 x-small' : 'small 0'}
+      borderWidth="0 0 small"
+      data-testid="find-outcome-item"
+    >
       <Flex as="div" alignItems="start">
         <Flex.Item as="div" size={isMobileView ? '' : '3rem'}>
           <Flex as="div" alignItems="start" justifyItems="center">

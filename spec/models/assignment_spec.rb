@@ -3649,13 +3649,16 @@ describe Assignment do
                       :unlock_at => "Sep 3 2008 12:00am",
                       :course => @course)
       expect(@assignment.all_day).to eql(false)
+
+      @assignment.due_at = Time.zone.parse("Sep 4 2008 12:00am")
+      @assignment.lock_at = Time.zone.parse("Sep 4 2008 12:00am")
       @assignment.infer_times
       @assignment.save!
       expect(@assignment.all_day).to eql(true)
       expect(@assignment.due_at.strftime("%H:%M")).to eql("23:59")
       expect(@assignment.lock_at.strftime("%H:%M")).to eql("23:59")
       expect(@assignment.unlock_at.strftime("%H:%M")).to eql("00:00")
-      expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
+      expect(@assignment.all_day_date).to eql(Date.parse("Sep 4 2008"))
     end
 
     it "should not set to all_day without infer_times call" do
@@ -3664,6 +3667,62 @@ describe Assignment do
       expect(@assignment.all_day).to eql(false)
       expect(@assignment.due_at.strftime("%H:%M")).to eql("00:00")
       expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
+    end
+
+    it "adjusts due_at when it has been modified on the object" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.due_at = "Sep 4 2008 12:00am"
+      assignment.infer_times
+
+      expect(assignment.due_at.to_s(:time)).to eq "23:59"
+    end
+
+    it "does not adjust due_at when it has not been modified" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.due_at
+      }
+    end
+
+    it "does not adjust due_at when it is not set to midnight" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.due_at = "Sep 3 2008 10:30pm"
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.due_at
+      }
+    end
+
+    it "adjusts lock_at when it has been modified on the object" do
+      assignment = @course.assignments.create!(
+        lock_at: "Sep 3 2008 12:00am"
+      )
+      assignment.lock_at = "Sep 4 2008 12:00am"
+      assignment.infer_times
+
+      expect(assignment.lock_at.to_s(:time)).to eq "23:59"
+    end
+
+    it "does not adjust lock_at when it has not been modified" do
+      assignment = @course.assignments.create!(lock_at: "Sep 3 2008 12:00am")
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.lock_at
+      }
+    end
+
+    it "does not adjust lock_at when it is not set to midnight" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.lock_at = "Sep 3 2008 10:30pm"
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.lock_at
+      }
     end
   end
 

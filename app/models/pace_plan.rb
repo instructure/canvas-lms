@@ -25,6 +25,8 @@ class PacePlan < ActiveRecord::Base
   belongs_to :course, inverse_of: :pace_plans
   has_many :pace_plan_module_items, dependent: :destroy
 
+  accepts_nested_attributes_for :pace_plan_module_items, allow_destroy: true
+
   belongs_to :course_section
   belongs_to :user
   belongs_to :root_account, class_name: 'Account'

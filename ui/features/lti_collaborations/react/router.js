@@ -18,16 +18,41 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import $ from 'jquery'
 import page from 'page'
 import qs from 'qs'
 import CollaborationsApp from './CollaborationsApp'
 import CollaborationsToolLaunch from './CollaborationsToolLaunch'
 import actions from './actions'
 import store from './store'
+import {isValidDeepLinkingEvent} from '@canvas/deep-linking/DeepLinking'
+import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 
-$(window).on('externalContentReady', (e, data) =>
-  store.dispatch(actions.externalContentReady(e, data))
-)
+const attachListeners = () => {
+  // LTI 1.3 deep linking handler
+  window.addEventListener('message', async event => {
+    // Don't attempt to process invalid messages
+    if (!isValidDeepLinkingEvent(event, ENV)) {
+      return
+    }
+
+    processSingleContentItem(event)
+      .then(item =>
+        store.dispatch(
+          actions.externalContentReady({
+            service_id: item.service_id,
+            contentItems: [item]
+          })
+        )
+      )
+      .catch(() => store.dispatch(actions.externalContentRetrievalFailed))
+  })
+
+  // called by LTI 1.1 content item handler
+  $(window).on('externalContentReady', (e, data) =>
+    store.dispatch(actions.externalContentReady(data))
+  )
+}
 
 let unsubscribe
 /**
@@ -87,6 +112,8 @@ page('/:context(courses|groups)/:contextId/lti_collaborations/external_tools*', 
 
 export default {
   start() {
+    attachListeners()
     page.start()
-  }
+  },
+  attachListeners
 }

@@ -127,7 +127,6 @@ const createView = function (model, options) {
   }
 
   ENV.POST_TO_SIS = options.post_to_sis
-  ENV.DUPLICATE_ENABLED = options.duplicateEnabled
   ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
   ENV.COURSE_ID = options.courseId
 
@@ -698,8 +697,7 @@ test('can duplicate when assignment can be duplicated', () => {
   })
   const view = createView(model, {
     userIsAdmin: true,
-    canManage: true,
-    duplicateEnabled: true
+    canManage: true
   })
   const json = view.toJSON()
   ok(json.canDuplicate)
@@ -740,8 +738,7 @@ test('cannot duplicate when user is not admin', () => {
   })
   const view = createView(model, {
     userIsAdmin: false,
-    canManage: false,
-    duplicateEnabled: true
+    canManage: false
   })
   const json = view.toJSON()
   notOk(json.canDuplicate)

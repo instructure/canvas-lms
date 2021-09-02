@@ -692,13 +692,7 @@ class Message < ActiveRecord::Base
 
     check_acct = infer_feature_account
 
-    if path_type == 'sms'
-      if Account.site_admin.feature_enabled?(:deprecate_sms)
-        return skip_and_cancel
-      elsif Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
-        return skip_and_cancel
-      end
-    end
+    return skip_and_cancel if path_type == 'sms'
 
     if path_type == "push"
       if Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?

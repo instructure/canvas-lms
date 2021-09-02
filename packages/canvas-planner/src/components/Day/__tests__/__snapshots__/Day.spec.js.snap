@@ -18,7 +18,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
     </div>
   </Heading>
   <div>
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={1}
       color="#00AC18"
       currentUser={
@@ -42,6 +42,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         ]
       }
       key="Course128"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -51,7 +52,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       }
       timeZone="America/Denver"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={2}
       color="#00AC18"
       currentUser={
@@ -75,6 +76,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         ]
       }
       key="Course256"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -106,7 +108,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
     </div>
   </Heading>
   <div>
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={1}
       color="#00AC18"
       currentUser={
@@ -130,6 +132,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         ]
       }
       key="Course128"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -139,7 +142,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       timeZone="America/Denver"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={2}
       color="#00AC18"
       currentUser={
@@ -171,6 +174,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         ]
       }
       key="Course256"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -180,7 +184,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       timeZone="America/Denver"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={3}
       color="#00AC18"
       currentUser={
@@ -199,6 +203,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         ]
       }
       key="Notes"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -230,7 +235,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
     </div>
   </Heading>
   <div>
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={1}
       color="#00AC18"
       currentUser={
@@ -254,6 +259,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         ]
       }
       key="Course128"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -263,7 +269,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       timeZone="America/Denver"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={2}
       color="#00AC18"
       currentUser={
@@ -295,6 +301,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         ]
       }
       key="Course256"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -304,7 +311,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       timeZone="America/Denver"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={3}
       color="#00AC18"
       currentUser={
@@ -323,6 +330,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         ]
       }
       key="Notes"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -354,7 +362,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
     </div>
   </Heading>
   <div>
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={101}
       color="#00AC18"
       currentUser={
@@ -379,6 +387,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         ]
       }
       key="Course128"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -389,7 +398,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       timeZone="America/Denver"
       url="http://www.non_default_url.com"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={102}
       color="#00AC18"
       currentUser={
@@ -423,6 +432,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         ]
       }
       key="Course256"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={
@@ -433,7 +443,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       timeZone="America/Denver"
       url="http://www.non_default_url.com"
     />
-    <Animatable(ResponsiveGrouping)
+    <Animatable(Grouping)
       animatableIndex={103}
       color="#00AC18"
       currentUser={
@@ -457,6 +467,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         ]
       }
       key="Group256"
+      responsiveSize="large"
       simplifiedControls={false}
       singleCourseView={false}
       theme={

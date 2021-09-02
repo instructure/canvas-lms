@@ -36,14 +36,7 @@ describe "observer k5 dashboard" do
 
   before :each do
     user_session @observer
-  end
-
-  context 'single observed student' do
-    it 'provides the label for one observed student' do
-      get "/"
-
-      expect(observed_student_label).to be_displayed
-    end
+    driver.manage.delete_cookie('k5_observed_user_id')
   end
 
   context 'multiple observed students' do

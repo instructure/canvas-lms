@@ -32,7 +32,7 @@ import {
   IconStudentViewLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -55,9 +55,14 @@ import K5Announcement from '@canvas/k5/react/K5Announcement'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import EmptyModules from './EmptyModules'
 import EmptyHome from './EmptyHome'
+import ObserverOptions, {
+  ObserverListShape,
+  shouldShowObserverOptions
+} from '@canvas/k5/react/ObserverOptions'
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 100
+const MOBILE_NAV_BREAKPOINT_PX = 768
 
 const COURSE_TABS = [
   {
@@ -165,9 +170,74 @@ export function CourseHeaderOptions({
   showStudentView,
   studentViewPath,
   canReadAsAdmin,
-  courseContext
+  courseContext,
+  parentSupportEnabled,
+  observerList,
+  currentUser,
+  handleChangeObservedUser,
+  showingMobileNav
 }) {
-  return (
+  const buttonProps = {
+    id: 'manage-subject-btn',
+    'data-testid': 'manage-button',
+    href: settingsPath,
+    renderIcon: <IconEditSolid />
+  }
+  const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
+  const showObserverOptions =
+    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
+  const collapseManageButton = showingMobileNav && showObserverOptions
+  const sideItemsWidth = '200px'
+
+  const manageButton = (
+    <Flex.Item size={collapseManageButton ? undefined : sideItemsWidth}>
+      {collapseManageButton ? (
+        <IconButton {...buttonProps} screenReaderLabel={altText} margin="0 small 0 0" />
+      ) : (
+        <Button {...buttonProps}>
+          <AccessibleContent alt={altText}>{I18n.t('Manage Subject')}</AccessibleContent>
+        </Button>
+      )}
+    </Flex.Item>
+  )
+
+  const observerOptions = (
+    <Flex.Item shouldGrow textAlign="center">
+      <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
+        <ObserverOptions
+          observerList={observerList}
+          currentUser={currentUser}
+          handleChangeObservedUser={handleChangeObservedUser}
+        />
+      </View>
+    </Flex.Item>
+  )
+
+  const studentViewButton = (
+    <Flex.Item textAlign="end" size={sideItemsWidth}>
+      <Button
+        id="student-view-btn"
+        href={studentViewPath}
+        data-method="post"
+        renderIcon={<IconStudentViewLine />}
+      >
+        {I18n.t('Student View')}
+      </Button>
+    </Flex.Item>
+  )
+
+  const headerItems = []
+  if (canReadAsAdmin) {
+    headerItems.push(manageButton)
+  }
+  if (showObserverOptions) {
+    headerItems.push(observerOptions)
+  }
+  if (showStudentView && !showingMobileNav) {
+    headerItems.push(studentViewButton)
+  }
+
+  return headerItems.length > 0 ? (
     <View
       id="k5-course-header-options"
       as="section"
@@ -175,36 +245,11 @@ export function CourseHeaderOptions({
       padding="0 0 medium 0"
       margin="0 0 medium 0"
     >
-      <Flex direction="row">
-        {canReadAsAdmin && (
-          <Flex.Item shouldGrow shouldShrink>
-            <Button
-              id="manage-subject-btn"
-              data-testid="manage-button"
-              href={settingsPath}
-              renderIcon={<IconEditSolid />}
-            >
-              <AccessibleContent alt={I18n.t('Manage Subject: %{courseContext}', {courseContext})}>
-                {I18n.t('Manage Subject')}
-              </AccessibleContent>
-            </Button>
-          </Flex.Item>
-        )}
-        {showStudentView && (
-          <Flex.Item shouldGrow shouldShrink textAlign="end">
-            <Button
-              id="student-view-btn"
-              href={studentViewPath}
-              data-method="post"
-              renderIcon={<IconStudentViewLine />}
-            >
-              {I18n.t('Student View')}
-            </Button>
-          </Flex.Item>
-        )}
+      <Flex alignItems="center" justifyItems="space-between">
+        {headerItems}
       </Flex>
     </View>
-  )
+  ) : null
 }
 
 CourseHeaderOptions.propTypes = {
@@ -212,7 +257,12 @@ CourseHeaderOptions.propTypes = {
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,
   canReadAsAdmin: PropTypes.bool.isRequired,
-  courseContext: PropTypes.string.isRequired
+  courseContext: PropTypes.string.isRequired,
+  parentSupportEnabled: PropTypes.bool.isRequired,
+  observerList: ObserverListShape.isRequired,
+  handleChangeObservedUser: PropTypes.func.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  showingMobileNav: PropTypes.bool.isRequired
 }
 
 export function K5Course({
@@ -230,6 +280,7 @@ export function K5Course({
   timeZone,
   canManage = false,
   canReadAsAdmin,
+  canReadAnnouncements,
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
@@ -244,7 +295,9 @@ export function K5Course({
   latestAnnouncement,
   pagesPath,
   hasWikiPages,
-  hasSyllabusBody
+  hasSyllabusBody,
+  parentSupportEnabled,
+  observerList
 }) {
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
@@ -266,6 +319,7 @@ export function K5Course({
   const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
+  const [observedUserId, setObservedUserId] = useState(null)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
@@ -327,15 +381,18 @@ export function K5Course({
       isWindowTooSmall
     return (
       <View id="k5-course-header" as="div" padding={sticky && shouldShrink ? 'medium 0 0 0' : '0'}>
-        {(canReadAsAdmin || showStudentView) && (
-          <CourseHeaderOptions
-            canReadAsAdmin={canReadAsAdmin}
-            settingsPath={settingsPath}
-            showStudentView={showStudentView}
-            studentViewPath={`${studentViewPath + window.location.hash}`}
-            courseContext={name}
-          />
-        )}
+        <CourseHeaderOptions
+          canReadAsAdmin={canReadAsAdmin}
+          settingsPath={settingsPath}
+          showStudentView={showStudentView}
+          studentViewPath={`${studentViewPath + window.location.hash}`}
+          courseContext={name}
+          parentSupportEnabled={parentSupportEnabled}
+          observerList={observerList}
+          currentUser={currentUser}
+          handleChangeObservedUser={setObservedUserId}
+          showingMobileNav={windowSize.width < MOBILE_NAV_BREAKPOINT_PX}
+        />
         <CourseHeaderHero
           name={name}
           image={bannerImageUrl || cardImageUrl}
@@ -366,7 +423,8 @@ export function K5Course({
     id,
     shortName: name,
     href: `/courses/${id}`,
-    canManage
+    canManage,
+    canReadAnnouncements
   })
 
   return (
@@ -405,6 +463,7 @@ export function K5Course({
           timeZone={timeZone}
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
+          singleCourse
         />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage
@@ -418,15 +477,13 @@ export function K5Course({
             outcomeProficiency={outcomeProficiency}
           />
         )}
-        {currentTab === TAB_IDS.RESOURCES && (
-          <ResourcesPage
-            cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
-            cardsSettled
-            visible={currentTab === TAB_IDS.RESOURCES}
-            showStaff={false}
-            isSingleCourse
-          />
-        )}
+        <ResourcesPage
+          cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
+          cardsSettled
+          visible={currentTab === TAB_IDS.RESOURCES}
+          showStaff={false}
+          isSingleCourse
+        />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
       </View>
     </K5DashboardContext.Provider>
@@ -445,6 +502,7 @@ K5Course.propTypes = {
   cardImageUrl: PropTypes.string,
   canManage: PropTypes.bool,
   canReadAsAdmin: PropTypes.bool.isRequired,
+  canReadAnnouncements: PropTypes.bool.isRequired,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
@@ -462,7 +520,9 @@ K5Course.propTypes = {
   latestAnnouncement: PropTypes.object,
   pagesPath: PropTypes.string.isRequired,
   hasWikiPages: PropTypes.bool.isRequired,
-  hasSyllabusBody: PropTypes.bool.isRequired
+  hasSyllabusBody: PropTypes.bool.isRequired,
+  parentSupportEnabled: PropTypes.bool.isRequired,
+  observerList: ObserverListShape.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

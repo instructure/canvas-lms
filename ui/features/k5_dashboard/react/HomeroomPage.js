@@ -41,7 +41,8 @@ const HomeroomPage = ({
   createPermissions,
   homeroomAnnouncements,
   loadingAnnouncements,
-  visible
+  visible,
+  loadingCards
 }) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [courseModalOpen, setCourseModalOpen] = useState(false)
@@ -117,7 +118,7 @@ const HomeroomPage = ({
         </Flex>
         <LoadingWrapper
           id="course-cards"
-          isLoading={!cards}
+          isLoading={loadingCards}
           skeletonsNum={cards?.filter(c => !c.isHomeroom)?.length}
           defaultSkeletonsNum={ENV?.INITIAL_NUM_K5_CARDS}
           renderCustomSkeleton={skeletonCard}
@@ -142,7 +143,8 @@ HomeroomPage.propTypes = {
   createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
-  visible: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired,
+  loadingCards: PropTypes.bool.isRequired
 }
 
 export default HomeroomPage

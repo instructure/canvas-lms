@@ -57,11 +57,11 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     },
     {
       id: 'feature_option',
-      title: I18n.t('Feature Option')
+      title: I18n.t('Feature Previews')
     },
     {
       id: 'setting',
-      title: I18n.t('Setting')
+      title: I18n.t('Stable Features')
     }
   ]
 

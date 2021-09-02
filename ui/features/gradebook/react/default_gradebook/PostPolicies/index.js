@@ -19,7 +19,7 @@
 import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import {getAssignmentColumnId} from '../Gradebook.utils'
 import AsyncComponents from '../AsyncComponents'
 
 function getSubmission(student, assignmentId) {
@@ -76,7 +76,7 @@ export default class PostPolicies {
     const assignment = this._gradebook.getAssignment(assignmentId)
     assignment.post_manually = postManually
 
-    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+    const columnId = getAssignmentColumnId(assignmentId)
     this._gradebook.updateColumnHeaders([columnId])
   }
 

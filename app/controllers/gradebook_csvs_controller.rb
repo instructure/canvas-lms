@@ -22,7 +22,7 @@ class GradebookCsvsController < ApplicationController
   before_action :require_context
   before_action :require_user
 
-  def show
+  def create
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       current_time = Time.zone.now.strftime('%FT%H%M')
       name = t('grades_filename', "Grades") + "-" + @context.short_name.to_s
@@ -32,6 +32,10 @@ class GradebookCsvsController < ApplicationController
         include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         grading_period_id: params[:grading_period_id]
       }
+
+      if params[:assignment_order]
+        csv_options[:assignment_order] = params[:assignment_order].map(&:to_i)
+      end
 
       attachment_progress = @context.gradebook_to_csv_in_background(filename, @current_user, csv_options)
       render json: attachment_progress, status: :ok

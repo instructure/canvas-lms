@@ -19,6 +19,7 @@
 import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!important_dates'
+import getCookie from 'get-cookie'
 import moment from 'moment-timezone'
 
 import {View} from '@instructure/ui-view'
@@ -36,6 +37,7 @@ import FilterCalendarsModal from './FilterCalendarsModal'
 import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
+import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
 
 const ImportantDates = ({
   contexts,
@@ -78,7 +80,11 @@ const ImportantDates = ({
   const contextsLoaded = !!contexts && !!selectedContextCodes
   const tooManyContexts = contextsLoaded && contexts.length > selectedContextsLimit
 
-  const fetchPath = '/api/v1/calendar_events'
+  const observedUserId = getCookie(SELECTED_OBSERVED_USER_COOKIE)
+  const fetchPath =
+    ENV.FEATURES?.k5_parent_support && observedUserId && observedUserId !== ENV.current_user_id
+      ? `/api/v1/users/${observedUserId}/calendar_events`
+      : '/api/v1/calendar_events'
   const fetchParams = {
     important_dates: true,
     context_codes: [...(selectedContextCodes || [])], // need to clone this list so the fetchApi effect will trigger on change

@@ -264,6 +264,10 @@ class RceApiSource {
     if (!bookmark) {
       const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
       uri = `${props.filesUrl}?${perPageQuery}${getSearchParam(props.searchString)}`
+
+      if (props.sortBy) {
+        uri += `${getSortParams(props.sortBy.sort, props.sortBy.order)}`
+      }
     }
 
     return this.fetchPage(uri || bookmark, this.jwt)
@@ -274,9 +278,42 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
-  fetchButtonsAndIconsFolder(props) {
-    const uri = this.uriFor('folders/buttons_and_icons', props)
+  fetchButtonsAndIconsFolder({contextId, contextType}) {
+    const uri = this.uriFor('folders/buttons_and_icons', {
+      contextId,
+      contextType,
+      host: this.host,
+      jwt: this.jwt
+    })
     return this.fetchPage(uri)
+  }
+
+  fetchButtonsAndIcons(
+    {contextId, contextType},
+    bookmark = null,
+    searchString = null,
+    sortBy,
+    onSuccess
+  ) {
+    const onSuccessWithFixedFileData = data => {
+      onSuccess({
+        ...data,
+        files: data.files.map(file => fixupFileUrl(contextType, contextId, file))
+      })
+    }
+
+    if (bookmark) {
+      this.fetchFilesForFolder(null, bookmark).then(onSuccessWithFixedFileData)
+    } else {
+      this.fetchButtonsAndIconsFolder({contextId, contextType}).then(({folders}) => {
+        this.fetchFilesForFolder({
+          filesUrl: folders[0].filesUrl,
+          perPage: 25,
+          searchString,
+          sortBy
+        }).then(onSuccessWithFixedFileData)
+      })
+    }
   }
 
   fetchMediaFolder(props) {

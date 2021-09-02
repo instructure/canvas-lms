@@ -17,44 +17,47 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {ACCOUNT_FOLDER_ID, ROOT_ID} from '@canvas/outcomes/react/treeBrowser'
+import OutcomesContext, {
+  ACCOUNT_GROUP_ID,
+  ROOT_GROUP_ID
+} from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('GroupActionDrillDown', () => {
   let onCollectionClick, showFlashAlertSpy, setShowOutcomesView
 
   const collections = {
-    [ROOT_ID]: {
-      id: ROOT_ID,
+    [ROOT_GROUP_ID]: {
+      id: ROOT_GROUP_ID,
       name: 'Root folder',
-      collections: [ACCOUNT_FOLDER_ID, '2'],
+      collections: [ACCOUNT_GROUP_ID, '2'],
       parentGroupId: null
     },
-    [ACCOUNT_FOLDER_ID]: {
-      id: ACCOUNT_FOLDER_ID,
+    [ACCOUNT_GROUP_ID]: {
+      id: ACCOUNT_GROUP_ID,
       name: 'Account folder',
       collections: ['100', '101'],
-      parentGroupId: ROOT_ID
+      parentGroupId: ROOT_GROUP_ID
     },
     2: {
       id: '2',
       name: 'State folder',
       collections: [],
-      parentGroupId: ROOT_ID
+      parentGroupId: ROOT_GROUP_ID
     },
     100: {
       id: '100',
       name: 'Folder with groups',
       collections: ['101'],
-      parentGroupId: ACCOUNT_FOLDER_ID
+      parentGroupId: ACCOUNT_GROUP_ID
     },
     101: {
       id: '101',
       name: 'Leaf folder',
       collections: [],
-      parentGroupId: ACCOUNT_FOLDER_ID
+      parentGroupId: ACCOUNT_GROUP_ID
     }
   }
 
@@ -62,7 +65,7 @@ describe('GroupActionDrillDown', () => {
     collections,
     rootId: '0',
     onCollectionClick,
-    loadedGroups: ['0', ACCOUNT_FOLDER_ID, '2', '100', '101'],
+    loadedGroups: ['0', ACCOUNT_GROUP_ID, '2', '100', '101'],
     setShowOutcomesView,
     isLoadingGroupDetail: false,
     outcomesCount: 2,
@@ -79,6 +82,19 @@ describe('GroupActionDrillDown', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  const render = (
+    children,
+    {
+      renderer = rtlRender,
+      globalRootId = '',
+      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
+    } = {}
+  ) => {
+    return renderer(
+      <OutcomesContext.Provider value={{env: {rootIds}}}>{children}</OutcomesContext.Provider>
+    )
+  }
 
   it('initially renders the children of the root group', () => {
     const {getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
@@ -112,7 +128,7 @@ describe('GroupActionDrillDown', () => {
     const {getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
     fireEvent.click(getByText('Groups'))
     fireEvent.click(getByText('Account folder'))
-    expect(onCollectionClick).toHaveBeenCalledWith({id: ACCOUNT_FOLDER_ID})
+    expect(onCollectionClick).toHaveBeenCalledWith({id: ACCOUNT_GROUP_ID})
   })
 
   it('renders a loading spinner while a group is loading', () => {
@@ -133,10 +149,19 @@ describe('GroupActionDrillDown', () => {
   })
 
   describe('action links', () => {
-    it('does not render an action link for the folder with an id of ACCOUNT_FOLDER_ID', () => {
+    it('does not render an action link for the folder with an id of ACCOUNT_GROUP_ID', () => {
       const {queryByText, getByText} = render(<GroupActionDrillDown {...defaultProps()} />)
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('Account folder'))
+      expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
+    })
+
+    it('does not render an action link for the globalRootId folder', () => {
+      const {queryByText, getByText} = render(<GroupActionDrillDown {...defaultProps()} />, {
+        globalRootId: '2'
+      })
+      fireEvent.click(getByText('Groups'))
+      fireEvent.click(getByText('State folder'))
       expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
     })
 
@@ -204,7 +229,9 @@ describe('GroupActionDrillDown', () => {
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('State folder'))
       expect(getByText('View 2 Outcomes')).toBeInTheDocument()
-      rerender(<GroupActionDrillDown {...defaultProps({isLoadingGroupDetail: true})} />)
+      render(<GroupActionDrillDown {...defaultProps({isLoadingGroupDetail: true})} />, {
+        renderer: rerender
+      })
       expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
     })
 

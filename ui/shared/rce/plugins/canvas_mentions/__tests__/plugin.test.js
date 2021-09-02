@@ -159,7 +159,7 @@ describe('pluginDefinition', () => {
     const subject = () => editor.fire('SetContent', {content: insertionContent, target: editor})
 
     beforeEach(() => {
-      onFocusedUserChange({name: 'wes', id: 1})
+      onFocusedUserChange({name: 'wes', _id: 1})
 
       insertionContent = '<h1>Hello!</h1>'
       editor.setContent(

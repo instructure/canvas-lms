@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -25,13 +25,12 @@ import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!OutcomeManagement'
-import {isRTL} from '@canvas/i18n/rtlHelper'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
+import SearchBreadcrumb from './shared/SearchBreadcrumb'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {outcomeGroupShape, groupCollectionShape} from './Management/shapes'
 import {IMPORT_NOT_STARTED, IMPORT_FAILED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
@@ -48,7 +47,8 @@ const FindOutcomesView = ({
   mobileScrollContainer,
   importGroupStatus,
   importOutcomesStatus,
-  importOutcomeHandler
+  importOutcomeHandler,
+  shouldFocusAddAllBtn
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -60,6 +60,11 @@ const FindOutcomesView = ({
     [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
+
+  const addAllBtnRef = useRef()
+  useEffect(() => {
+    if (shouldFocusAddAllBtn) addAllBtnRef.current?.focus()
+  }, [shouldFocusAddAllBtn])
 
   const countAndAddButton = (
     <Flex.Item>
@@ -102,6 +107,7 @@ const FindOutcomesView = ({
                 enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
               }
               onClick={onAddAllHandler}
+              ref={addAllBtnRef}
             >
               {I18n.t('Add All Outcomes')}
             </Button>
@@ -134,56 +140,11 @@ const FindOutcomesView = ({
       <View as="div" position="relative" padding={isMobileView ? '0 0 0 xx-small' : '0 0 small'}>
         <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
           <Flex.Item size="50%" shouldGrow>
-            <Heading level="h4">
-              {searchString ? (
-                <Flex>
-                  <Flex.Item shouldShrink>
-                    <div
-                      style={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        padding: '0.375rem 0'
-                      }}
-                    >
-                      <View data-testid="group-name-ltr">
-                        {isRTL() ? searchString : groupTitle}
-                      </View>
-                      <div
-                        style={{
-                          display: 'inline-block',
-                          transform: 'scale(0.6)',
-                          height: '1em'
-                        }}
-                      >
-                        <IconArrowOpenEndSolid title={I18n.t('search results for')} />
-                      </div>
-                      <View data-testid="search-string-ltr">
-                        {isRTL() ? groupTitle : searchString}
-                      </View>
-                    </div>
-                  </Flex.Item>
-                  <Flex.Item size="2.5rem">
-                    {loading && (
-                      <Spinner
-                        renderTitle={I18n.t('Loading')}
-                        size="x-small"
-                        margin="0 0 0 x-small"
-                        data-testid="search-loading"
-                      />
-                    )}
-                  </Flex.Item>
-                </Flex>
-              ) : (
-                <View as="div" padding="xx-small 0">
-                  <Text wrap="break-word">
-                    {I18n.t('All %{groupTitle} Outcomes', {
-                      groupTitle: addZeroWidthSpace(groupTitle)
-                    })}
-                  </Text>
-                </View>
-              )}
-            </Heading>
+            <SearchBreadcrumb
+              groupTitle={groupTitle}
+              searchString={searchString}
+              loading={loading}
+            />
           </Flex.Item>
           {countAndAddButton}
         </Flex>
@@ -283,7 +244,8 @@ FindOutcomesView.defaultProps = {
     isRootGroup: false
   },
   importGroupStatus: IMPORT_NOT_STARTED,
-  mobileScrollContainer: null
+  mobileScrollContainer: null,
+  shouldFocusAddAllBtn: false
 }
 
 FindOutcomesView.propTypes = {
@@ -299,7 +261,8 @@ FindOutcomesView.propTypes = {
   mobileScrollContainer: PropTypes.instanceOf(Element),
   importGroupStatus: PropTypes.string,
   importOutcomesStatus: PropTypes.object.isRequired,
-  importOutcomeHandler: PropTypes.func.isRequired
+  importOutcomeHandler: PropTypes.func.isRequired,
+  shouldFocusAddAllBtn: PropTypes.bool
 }
 
 export default FindOutcomesView

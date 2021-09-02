@@ -277,5 +277,15 @@ export const handlers = [
         }
       })
     )
+  }),
+  graphql.mutation('UpdateDiscussionReadState', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        updateDiscussionReadState: {
+          discussionTopic: Discussion.mock(),
+          __typename: 'UpdateDiscussionReadStatePayload'
+        }
+      })
+    )
   })
 ]

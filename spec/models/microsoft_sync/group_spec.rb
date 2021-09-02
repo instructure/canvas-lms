@@ -84,8 +84,8 @@ describe MicrosoftSync::Group do
         group
       end
 
-      it 'resets the job state' do
-        expect(subject.job_state).to be_nil
+      it 'resets the job state to {restored: true}' do
+        expect(subject.job_state).to eq(restored: true)
       end
 
       it 'resets the last error' do

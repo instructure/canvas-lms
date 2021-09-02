@@ -1,5 +1,6 @@
 ---
 anonymous_marking:
+  type: setting
   state: allowed
   display_name: Anonymous Grading
   description: Enable anonymous grading of assignments.

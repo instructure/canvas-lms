@@ -22,6 +22,7 @@ import getDroppableDashboardCardBox from './react/getDroppableDashboardCardBox'
 import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
 import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
+import buildURL from 'axios/lib/helpers/buildURL'
 
 let promiseToGetDashboardCards
 
@@ -47,12 +48,13 @@ function renderIntoDOM(dashboardCards) {
   ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
 }
 
-export default function loadCardDashboard(renderFn = renderIntoDOM) {
+export default function loadCardDashboard(renderFn = renderIntoDOM, observedUser) {
   if (!promiseToGetDashboardCards) {
     let xhrHasReturned = false
     let sessionStorageTimeout
     const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
-    const url = '/api/v1/dashboard/dashboard_cards'
+    const urlPrefix = '/api/v1/dashboard/dashboard_cards'
+    const url = buildURL(urlPrefix, {observed_user: observedUser})
     promiseToGetDashboardCards =
       asJson(getPrefetchedXHR(url)) || axios.get(url).then(({data}) => data)
     promiseToGetDashboardCards.then(() => (xhrHasReturned = true))
@@ -76,7 +78,8 @@ export default function loadCardDashboard(renderFn = renderIntoDOM) {
         // on the follow-up xhr request to complete.
         renderFn(dashboardCards, xhrHasReturned)
         // calling it with `true` indicates that all outstanding card promises have settled.
-        if (!xhrHasReturned) promiseToGetDashboardCards.then(cards => renderFn(cards, true))
+        if (!xhrHasReturned)
+          return promiseToGetDashboardCards.then(cards => renderFn(cards, true, observedUser))
       }
     )
 

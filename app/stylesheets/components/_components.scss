@@ -20,7 +20,9 @@
   padding: $contentBoxPadding * 0.5;
   @include fontSize($ic-font-size--small);
   line-height: $baseLineHeight;
-  .header { @include fontSize($ic-font-size--medium); }
+  .header {
+    @include fontSize($ic-font-size--medium);
+  }
 }
 
 // List View
@@ -31,7 +33,7 @@
   #section-tabs-header {
     @include fontSize($ic-font-size--small);
     font-weight: bold;
-    margin: 0 0 $ic-sp*0.5;
+    margin: 0 0 $ic-sp * 0.5;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -67,7 +69,7 @@
         padding: ($ic-sp - 4) 0 ($ic-sp - 4) ($ic-sp * 0.5);
         overflow-wrap: break-word;
         word-wrap: break-word;
-        hyphens: auto;
+        hyphens: none;
         line-height: $ic-label-line-height;
 
         @if $use_high_contrast {
@@ -129,7 +131,7 @@
 }
 
 .box-shadow {
-  box-shadow: 0 2px 4px rgba(0,0,0,.25)
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .page-action-list {
@@ -141,11 +143,14 @@
     font-weight: bold;
     border-bottom: 1px solid $ic-border-light;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: var(--ic-link-color);
     }
 
-    @if $use_high_contrast { text-decoration: none; }
+    @if $use_high_contrast {
+      text-decoration: none;
+    }
 
     &:active {
       color: $grayLight;
@@ -153,4 +158,6 @@
   }
 }
 
-* + .page-action-list { margin-top: $ic-sp; }
+* + .page-action-list {
+  margin-top: $ic-sp;
+}

@@ -20,6 +20,7 @@ import I18n from 'i18n!discussion_posts'
 import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {responsiveQuerySizes} from '../../utils'
@@ -28,11 +29,14 @@ import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
-import positionCursor from './PositionCursorHook'
+import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
   const [rceContent, setRceContent] = useState(false)
+  const [includeReplyPreview, setIncludeReplyPreview] = useState(
+    !!props.quotedEntry?.previewMessage
+  )
   const textAreaId = useRef(`message-body-${nanoid()}`)
 
   const rceMentionsIsEnabled = () => {
@@ -66,6 +70,22 @@ export const DiscussionEdit = props => {
       }}
       data-testid="DiscussionEdit-container"
     >
+      {props.quotedEntry?.previewMessage && (
+        <>
+          <View as="div" margin="0 0 small 0">
+            <Checkbox
+              label={I18n.t('Include quoted reply in message')}
+              variant="toggle"
+              value="medium"
+              checked={includeReplyPreview}
+              onChange={() => {
+                setIncludeReplyPreview(!includeReplyPreview)
+              }}
+            />
+          </View>
+          <ReplyPreview {...props.quotedEntry} />
+        </>
+      )}
       <View display="block">
         <span>
           <CanvasRce
@@ -75,7 +95,6 @@ export const DiscussionEdit = props => {
             onInit={() => {
               setTimeout(() => {
                 rceRef?.current?.focus()
-                positionCursor(rceRef)
               }, 1000)
             }}
             ref={rceRef}
@@ -87,7 +106,7 @@ export const DiscussionEdit = props => {
               plugins: getPlugins()
             }}
             height={300}
-            defaultContent={props.replyPreview + props.value}
+            defaultContent={props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
@@ -139,7 +158,7 @@ export const DiscussionEdit = props => {
                 <Button
                   onClick={() => {
                     if (props.onSubmit) {
-                      props.onSubmit(rceContent)
+                      props.onSubmit(rceContent, includeReplyPreview)
                     }
                   }}
                   display={responsiveProps.display}
@@ -175,13 +194,13 @@ DiscussionEdit.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isEdit: PropTypes.bool,
-  replyPreview: PropTypes.string
+  quotedEntry: PropTypes.object
 }
 
 DiscussionEdit.defaultProps = {
   show: true,
   isEdit: false,
-  replyPreview: '',
+  quotedEntry: null,
   value: ''
 }
 

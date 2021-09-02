@@ -294,6 +294,38 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Mark All as Read')).toBeInTheDocument()
   })
 
+  it('Should show Mark All as Unread discussion topic menu if initialPostRequiredForCurrentUser = false', async () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Mark All as Unread')).toBeInTheDocument()
+  })
+
+  it('Should be able to click Mark All as Read and call mutation', async () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Mark All as Read'))
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as read.')
+    )
+  })
+
+  it('Should be able to click Mark All as Unread and call mutation', async () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Mark All as Unread'))
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as unread.')
+    )
+  })
+
   it('Renders Add Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))

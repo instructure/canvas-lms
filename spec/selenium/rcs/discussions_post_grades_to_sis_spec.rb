@@ -65,15 +65,22 @@ describe "sync grades to sis" do
     end
   end
 
-  context "gradebook_sync_grades" do
+  shared_examples "gradebook_sync_grades" do
     before :each do
+      if @enhanced_filters
+        Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      end
       @assignment = @course.assignments.create!(name: 'assignment', assignment_group: @assignment_group,
                                                 post_to_sis: true)
     end
 
     def post_grades_dialog
       Gradebook.visit(@course)
-      Gradebook.open_action_menu
+      if @enhanced_filters
+        Gradebook.select_sync
+      else
+        Gradebook.open_action_menu
+      end
       expect(Gradebook.action_menu_item_selector('post_grades_feature_tool')).to be_displayed
 
       Gradebook.action_menu_item_selector('post_grades_feature_tool').click
@@ -104,5 +111,21 @@ describe "sync grades to sis" do
       f('.form-controls button[type=button]').click
       expect(f('.assignments-to-post-count')).to include_text("You are ready to sync 1 assignment")
     end
+  end
+
+  context "when enhanced filters is enabled" do
+    before(:each) do
+      @enhanced_filters = true
+    end
+
+    it_behaves_like "gradebook_sync_grades"
+  end
+
+  context "when enhanced filters is not enabled" do
+    before(:each) do
+      @enhanced_filters = false
+    end
+
+    it_behaves_like "gradebook_sync_grades"
   end
 end

@@ -42,19 +42,6 @@ class Notification < Switchman::UnshardedRecord
     "Show In Feed",
   ].freeze
 
-  ALLOWED_SMS_NOTIFICATION_CATEGORIES = [
-    'announcement',
-    'grading'
-  ].freeze
-
-  ALLOWED_SMS_NOTIFICATION_TYPES = [
-    'Assignment Graded',
-    'Confirm SMS Communication Channel',
-    'New Announcement',
-    'Submission Grade Changed',
-    'Submission Graded'
-  ].freeze
-
   ALLOWED_PUSH_NOTIFICATION_CATEGORIES = [
     "all_submissions",
     "announcement",
@@ -258,16 +245,6 @@ class Notification < Switchman::UnshardedRecord
 
   def self.types_to_show_in_feed
      TYPES_TO_SHOW_IN_FEED
-  end
-
-  # TODO: Remove after deprecate_sms occurs.
-  def self.categories_to_send_in_sms(root_account)
-    root_account.settings[:allowed_sms_notification_categories] || Setting.get('allowed_sms_notification_categories', ALLOWED_SMS_NOTIFICATION_CATEGORIES.join(',')).split(',')
-  end
-
-  # TODO: Remove after deprecate_sms occurs.
-  def self.types_to_send_in_sms(root_account)
-    root_account.settings[:allowed_sms_notification_types] || Setting.get('allowed_sms_notification_types', ALLOWED_SMS_NOTIFICATION_TYPES.join(',')).split(',')
   end
 
   def self.categories_to_send_in_push

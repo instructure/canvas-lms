@@ -21,8 +21,9 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
+import {getCustomColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
   let $container
@@ -54,7 +55,7 @@ QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
       {id: '2401', teacher_notes: true, title: 'Notes'},
       {id: '2402', teacher_notes: false, title: 'Other Notes'}
     ])
-    column = {id: gradebook.getCustomColumnId('2401'), customColumnId: '2401'}
+    column = {id: getCustomColumnId('2401'), customColumnId: '2401'}
     renderer = new CustomColumnHeaderRenderer(gradebook)
   })
 
@@ -74,10 +75,7 @@ QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
     })
 
     test('uses translated label for teacher notes', () => {
-      sinon
-        .stub(I18n, 't')
-        .withArgs('Notes')
-        .returns('Translated Notes')
+      sinon.stub(I18n, 't').withArgs('Notes').returns('Translated Notes')
       render()
       equal(component.props.title, 'Translated Notes')
       I18n.t.restore()

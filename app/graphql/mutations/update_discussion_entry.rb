@@ -25,6 +25,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
   argument :message, String, required: false
   argument :remove_attachment, Boolean, required: false
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
+  argument :include_reply_preview, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)
@@ -38,6 +39,12 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
 
     unless input[:remove_attachment].nil?
       entry.attachment_id = nil if input[:remove_attachment]
+    end
+
+    unless input[:include_reply_preview].nil?
+      if entry.parent_entry && entry.parent_entry.id != entry.root_entry_id
+        entry.include_reply_preview = input[:include_reply_preview]
+      end
     end
 
     unless input[:file_id].nil?

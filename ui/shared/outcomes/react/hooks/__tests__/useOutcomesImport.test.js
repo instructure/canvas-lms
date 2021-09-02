@@ -156,7 +156,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '2 outcomes have been successfully added to this account.',
+        message: 'All outcomes from 2 have been successfully added to this account.',
         type: 'success'
       })
     })
@@ -178,7 +178,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '2 outcomes have been successfully added to this course.',
+        message: 'All outcomes from 2 have been successfully added to this course.',
         type: 'success'
       })
     })

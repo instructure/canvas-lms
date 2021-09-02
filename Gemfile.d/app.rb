@@ -20,13 +20,13 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
-  gem 'rails', '6.0.4'
+  gem 'rails', '6.0.4.1'
     gem 'tzinfo', '1.2.7'
   gem 'switchman', '2.2.1'
     gem 'guardrail', '2.0.1'
   gem 'switchman-inst-jobs', '3.1.2'
 else
-  gem 'rails', '6.1.4'
+  gem 'rails', '6.1.4.1'
     gem 'tzinfo', '2.0.4'
   gem 'switchman', '3.0.5'
     gem 'guardrail', '3.0.0'
@@ -130,7 +130,6 @@ gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby2_keywords', '0.0.3'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
-gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.1.0'
   gem 'nokogiri-xmlsec-instructure', '0.10.1', require: false
 gem 'sanitize', '5.2.3', require: false

@@ -206,7 +206,8 @@ describe CalendarEventsApiController, type: :request do
     it 'should return events from up to 10 contexts by default' do
       contexts = [@course.asset_string]
       course_ids = create_courses(15, enroll_user: @me)
-      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
+      now = Time.now.utc
+      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now}})
       contexts.concat course_ids.map{ |id| "course_#{id}" }
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
@@ -219,7 +220,8 @@ describe CalendarEventsApiController, type: :request do
       Account.default.settings[:calendar_contexts_limit] = 15
       Account.default.save!
       course_ids = create_courses(20, enroll_user: @me)
-      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
+      now = Time.now.utc
+      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now}})
       contexts.concat course_ids.map{ |id| "course_#{id}" }
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',

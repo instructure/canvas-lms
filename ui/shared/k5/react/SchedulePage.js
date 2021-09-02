@@ -23,7 +23,8 @@ import {
   createPlannerApp,
   createPlannerPreview,
   renderWeeklyPlannerHeader,
-  JumpToHeaderButton
+  JumpToHeaderButton,
+  preloadInitialItems
 } from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 
@@ -35,9 +36,11 @@ const SchedulePage = ({
   plannerInitialized,
   timeZone,
   userHasEnrollments,
-  visible
+  visible,
+  singleCourse
 }) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
+  const [hasPreloadedItems, setHasPreloadedItems] = useState(false)
   const plannerApp = useRef()
 
   useEffect(() => {
@@ -46,6 +49,21 @@ const SchedulePage = ({
       setPlannerCreated(true)
     }
   }, [plannerInitialized])
+
+  // Only preload the previous and next weeks' items once the schedule tab is active
+  // The present week's items are loaded regardless of tab state
+  useEffect(() => {
+    if (
+      visible &&
+      isPlannerCreated &&
+      plannerInitialized &&
+      userHasEnrollments &&
+      !hasPreloadedItems
+    ) {
+      preloadInitialItems()
+      setHasPreloadedItems(true)
+    }
+  }, [visible, isPlannerCreated, plannerInitialized, userHasEnrollments, hasPreloadedItems])
 
   let content = <></>
   if (plannerInitialized && isPlannerCreated) {
@@ -59,7 +77,7 @@ const SchedulePage = ({
   } else if (!userHasEnrollments) {
     content = <EmptyDashboardState />
   } else if (!plannerEnabled) {
-    content = createPlannerPreview(timeZone)
+    content = createPlannerPreview(timeZone, singleCourse)
   }
 
   return (
@@ -83,7 +101,8 @@ SchedulePage.propTypes = {
   plannerInitialized: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
   timeZone: PropTypes.string.isRequired,
   userHasEnrollments: PropTypes.bool.isRequired,
-  visible: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired,
+  singleCourse: PropTypes.bool.isRequired
 }
 
 export default SchedulePage

@@ -130,7 +130,9 @@ module LiveEvents
       def call
         {
           'kinesis_stream_name' => kinesis_stream_name,
-          'aws_region' => aws_region
+          'aws_region' => aws_region,
+          'aws_access_key_id' => 'key',
+          'aws_secret_access_key_dec' => 'secret'
         }
       end
     end

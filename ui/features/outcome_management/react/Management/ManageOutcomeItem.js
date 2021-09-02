@@ -32,23 +32,19 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const ManageOutcomeItem = ({
-  _id,
   linkId,
   title,
   description,
   friendlyDescription,
   canManageOutcome,
   isChecked,
-  parentGroupId,
-  parentGroupTitle,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
-  const onChangeHandler = () =>
-    onCheckboxHandler({_id, linkId, title, canUnlink, parentGroupId, parentGroupTitle})
+  const onChangeHandler = () => onCheckboxHandler({linkId})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
 
   // This allows account admins to edit global outcomes
@@ -142,14 +138,11 @@ const ManageOutcomeItem = ({
 }
 
 ManageOutcomeItem.propTypes = {
-  _id: PropTypes.string.isRequired,
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   friendlyDescription: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
-  parentGroupId: PropTypes.string.isRequired,
-  parentGroupTitle: PropTypes.string.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,

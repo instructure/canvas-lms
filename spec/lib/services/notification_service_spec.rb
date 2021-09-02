@@ -55,13 +55,6 @@ module Services
         expect{@message.deliver}.not_to raise_error
       end
 
-      it "processes twilio message type" do
-        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
-        expect(@queue).to receive(:send_message).once
-        @message.path_type = "sms"
-        expect{@message.deliver}.not_to raise_error
-      end
-
       it 'processes slack message type' do
         encrypted_slack_key, salt = Canvas::Security.encrypt_password('testkey'.to_s, 'instructure_slack_encrypted_key')
         @account.settings[:encrypted_slack_key] = encrypted_slack_key
@@ -70,32 +63,6 @@ module Services
         @au.reload
         expect(@queue).to receive(:send_message).once
         @message.path_type = "slack"
-        expect{@message.deliver}.not_to raise_error
-      end
-
-      it "processes sms message type" do
-        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
-        expect(@queue).to receive(:send_message).once
-        @message.path_type = "sms"
-        @message.to = "+18015550100"
-        expect{@message.deliver}.not_to raise_error
-      end
-
-      it "expects email sms message type to go through mailer" do
-        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
-        expect(@queue).to receive(:send_message).once
-        expect(Mailer).to receive(:create_message).once
-        @message.path_type = "sms"
-        @message.to = "18015550100@vtext.com"
-        expect{@message.deliver}.not_to raise_error
-      end
-
-      it "expects twilio to not call mailer create_message" do
-        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
-        expect(@queue).to receive(:send_message).once
-        expect(Mailer).to receive(:create_message).never
-        @message.path_type = "sms"
-        @message.to = "+18015550100"
         expect{@message.deliver}.not_to raise_error
       end
 

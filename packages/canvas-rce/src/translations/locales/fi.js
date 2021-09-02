@@ -78,6 +78,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Painikkeen koko" },
   "buttons_and_icons_e66ee12c": { "message": "Painikkeet ja kuvakkeet" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Peruuta" },
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
   "choose_usage_rights_33683854": { "message": "Valitse käyttöoikeudet..." },
   "circle_484abe63": { "message": "Ympyrä" },
@@ -179,6 +180,7 @@ const locale = {
     "message": "Määräpäivä: Useita päivämääriä"
   },
   "due_when_7eed10c6": { "message": "Määräpäivä: { when }" },
+  "edit_c5fbea07": { "message": "Muokkaa" },
   "edit_equation_f5279959": { "message": "Muokkaa kaavaa" },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
   "editor_statusbar_26ac81fc": { "message": "Editorin tilapalkki" },
@@ -203,8 +205,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Ulkoiset työkalut" },
   "extra_large_b6cdf1ff": { "message": "Erittäin suuri" },
   "extra_small_9ae33252": { "message": "Erittäin pieni" },
-  "file_upload_failed_af22dd91": { "message": "Tiedoston lataus epäonnistui" },
-  "file_uploading_56c9c0c8": { "message": "Tiedostoa ladataan" },
   "file_url_c12b64be": { "message": "Tiedoston URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } tiedostokuvake" },
   "filename_image_preview_6cef8f26": {
@@ -299,6 +299,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Omat tiedostot" },
   "my_images_427f9b0c": { "message": "Omat kuvat" },
+  "name_1aed4a1b": { "message": "Nimi" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Siirry valikon tai työkalupalkin läpi"
   },
@@ -402,9 +403,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Tyylit" },
   "submit_a3cc6859": { "message": "Lähetä" },
   "subscript_59744f96": { "message": "Alaindeksi" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Onnistuminen: Tiedoston ladattu"
-  },
   "superscript_8cb349a2": { "message": "Yläindeksi" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tuetut tiedostotyypit: SRT tai WebVTT"
@@ -455,13 +453,11 @@ const locale = {
     "message": "käytä taulukon asetuksia kirjoittamalla Control F9. { text }"
   },
   "unpublished_dfd8801": { "message": "julkaisematon" },
+  "untitled_efdc2d7d": { "message": "Nimetön" },
   "upload_document_253f0478": { "message": "Lataa asiakirja" },
   "upload_file_fd2361b8": { "message": "Lataa tiedosto" },
   "upload_image_6120b609": { "message": "Lisää kuva" },
   "upload_media_ce31135a": { "message": "Lataa mediaa" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Lataus ei ole saatavissa tälle kansiolle"
-  },
   "upload_record_media_e4207d72": { "message": "Lataa/Tallennusväline" },
   "uploading_19e8a4e7": { "message": "Ladataan" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

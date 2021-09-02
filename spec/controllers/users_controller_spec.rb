@@ -2623,63 +2623,72 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
         end
-      end
-    end
 
-    context "ENV.INITIAL_NUM_K5_CARDS" do
-      before :once do
-        course_with_student
-      end
-
-      before :each do
-        user_session @student
-      end
-
-      it "is set to cached count" do
-        enable_cache do
-          Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+        it "sets ENV.OBSERVER_LIST with self and observed users" do
           get 'user_dashboard'
-          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
-          Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+
+          observers = assigns[:js_env][:OBSERVER_LIST]
+          expect(observers.length).to be(1)
+          expect(observers[0][:name]).to eq(@student.name)
+          expect(observers[0][:id]).to eq(@student.id)
         end
-      end
 
-      it "is set to 5 if not cached" do
-        enable_cache do
-          get 'user_dashboard'
-          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+        context "ENV.INITIAL_NUM_K5_CARDS" do
+          before :once do
+            course_with_student
+          end
+
+          before :each do
+            user_session @student
+          end
+
+          it "is set to cached count" do
+            enable_cache do
+              Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+              get 'user_dashboard'
+              expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
+              Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+            end
+          end
+
+          it "is set to 5 if not cached" do
+            enable_cache do
+              get 'user_dashboard'
+              expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+            end
+          end
         end
-      end
-    end
 
-    context "ENV.PERMISSIONS" do
-      it "sets :create_courses_as_admin to true if user is admin" do
-        account_admin_user
-        user_session @user
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
-      end
+        context "ENV.PERMISSIONS" do
+          it "sets :create_courses_as_admin to true if user is admin" do
+            account_admin_user
+            user_session @user
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
+          end
 
-      it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
-        Account.default.settings[:teachers_can_create_courses] = true
-        course_with_teacher_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
-      end
+          it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
+            Account.default.settings[:teachers_can_create_courses] = true
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
+          end
 
-      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
-        course_with_teacher_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
-      end
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
 
-      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
-        course_with_student_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
+            course_with_student_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
+        end
       end
     end
   end

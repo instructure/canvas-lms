@@ -34,7 +34,6 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {uploadFile, getSVGIconFromType} from './apiFileUtils'
-import parseLinkHeader from './parseLinkHeader'
 import {showFlashSuccess, showFlashError} from './FlashAlert'
 import natcompare from './natcompare'
 
@@ -360,30 +359,6 @@ class FileBrowser extends React.Component {
     this.props.selectFile(this.state.items[file.id])
   }
 
-  onInputChange = files => {
-    if (files) {
-      this.submitFile(files[0])
-    }
-  }
-
-  submitFile = file => {
-    this.setState({uploading: true})
-    uploadFile(file, this.state.uploadFolder, this.onUploadSucceed, this.onUploadFail)
-  }
-
-  onUploadSucceed = response => {
-    this.populateItemsList([response])
-    this.clearUploadInfo()
-    const folder = this.state.collections[response.folder_id]
-    this.setSuccessMessage(formatMessage('Success: File uploaded'))
-    if ($(`button:contains('${response.display_name}')`).length === 0) {
-      $(`button:contains('${folder && folder.name}')`).click()
-    }
-    const button = $(`button:contains('${response.display_name}')`)
-    $('.file-browser__tree').scrollTo(button)
-    button.click()
-  }
-
   findFolderForFile(file) {
     const {collections} = this.state
     const folderKey = Object.keys(collections).find(key => {
@@ -393,76 +368,8 @@ class FileBrowser extends React.Component {
     return collections[folderKey]
   }
 
-  onUploadFail = () => {
-    this.clearUploadInfo()
-    this.setFailureMessage(formatMessage('File upload failed'))
-  }
-
-  clearUploadInfo() {
-    this.setState({uploading: false})
-    this.uploadInput.value = ''
-  }
-
-  setSuccessMessage = message => {
-    showFlashSuccess(message)()
-  }
-
   setFailureMessage = message => {
     showFlashError(message)()
-  }
-
-  selectLocalFile = () => {
-    this.uploadInput.click()
-  }
-
-  renderUploadDialog() {
-    if (!this.props.allowUpload) {
-      return null
-    }
-    const uploadFolder = this.state.collections[this.state.uploadFolder]
-    const disabled = !uploadFolder || uploadFolder.locked || !uploadFolder.canUpload
-    const srError = disabled ? (
-      <ScreenReaderContent>
-        {formatMessage('Upload not available for this folder')}
-      </ScreenReaderContent>
-    ) : (
-      ''
-    )
-    const acceptContentTypes = this.props.contentTypes.join(',')
-    return (
-      <div className="image-upload__form">
-        <input
-          onChange={e => this.onInputChange(e.target.files)}
-          ref={i => {
-            this.uploadInput = i
-          }}
-          type="file"
-          accept={acceptContentTypes}
-          className="hidden"
-        />
-        <Button
-          id="image-upload__upload"
-          onClick={this.selectLocalFile}
-          disabled={disabled}
-          variant="ghost"
-          icon={IconUploadSolid}
-        >
-          {formatMessage('Upload File')} {srError}
-        </Button>
-      </div>
-    )
-  }
-
-  renderMask() {
-    if (this.state.uploading) {
-      return (
-        <Mask>
-          <Spinner renderTitle={formatMessage('File uploading')} />
-        </Mask>
-      )
-    } else {
-      return null
-    }
   }
 
   renderLoading() {
@@ -493,10 +400,8 @@ class FileBrowser extends React.Component {
             itemIcon={IconImageSolid}
             selectionType="single"
           />
-          {this.renderMask()}
           {this.renderLoading()}
         </div>
-        {this.renderUploadDialog()}
       </div>
     )
     return element

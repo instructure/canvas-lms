@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -24,7 +24,6 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!OutcomeManagement'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
-import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -44,16 +43,10 @@ import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 
 const OutcomeManagementPanel = () => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
-  const {
-    search: searchString,
-    debouncedSearch: debouncedSearchString,
-    onChangeHandler: onSearchChangeHandler,
-    onClearHandler: onSearchClearHandler
-  } = useSearch()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
-  const {selectedOutcomes, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
+  const {selectedOutcomeIds, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
     useSelectedOutcomes()
   const {
     error,
@@ -65,14 +58,27 @@ const OutcomeManagementPanel = () => {
     selectedParentGroupId,
     removeGroup,
     loadedGroups,
-    createGroup
+    createGroup,
+    searchString,
+    debouncedSearchString,
+    updateSearch: onSearchChangeHandler,
+    clearSearch: onSearchClearHandler,
+    clearCache
   } = useManageOutcomes('OutcomeManagementPanel')
 
-  const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
+  useEffect(() => {
+    return () => {
+      clearCache()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString
   })
 
+  const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -110,6 +116,7 @@ const OutcomeManagementPanel = () => {
       queryCollections({id: selectedParentGroupId})
     }
     removeGroup(selectedGroupId)
+    clearSelectedOutcomes()
   }
 
   const groupMenuHandler = useCallback(
@@ -130,7 +137,14 @@ const OutcomeManagementPanel = () => {
   const outcomeMenuHandler = useCallback(
     (linkId, action) => {
       const edge = group.outcomes.edges.find(edgeEl => edgeEl._id === linkId)
-      setSelectedOutcome({linkId, canUnlink: edge.canUnlink, ...edge.node})
+      const parentGroup = edge.group
+      setSelectedOutcome({
+        linkId,
+        canUnlink: edge.canUnlink,
+        parentGroupId: parentGroup._id,
+        parentGroupTitle: parentGroup.title,
+        ...edge.node
+      })
       if (action === 'remove') {
         openOutcomeRemoveModal()
       } else if (action === 'edit') {
@@ -213,26 +227,20 @@ const OutcomeManagementPanel = () => {
               <Text size="large" weight="light" fontStyle="normal">
                 {I18n.t('Outcome Groups')}
               </Text>
-              <TreeBrowser
-                onCollectionToggle={queryCollections}
-                collections={collections}
-                rootId={rootId}
-                showRootCollection
-                defaultExpandedIds={[rootId]}
-                onCreateGroup={createGroup}
-                loadedGroups={loadedGroups}
-              />
+              <View data-testid="outcomes-management-tree-browser">
+                <TreeBrowser
+                  onCollectionToggle={queryCollections}
+                  collections={collections}
+                  rootId={rootId}
+                  showRootCollection
+                  defaultExpandedIds={[rootId]}
+                  onCreateGroup={createGroup}
+                  loadedGroups={loadedGroups}
+                />
+              </View>
             </View>
           </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="1%"
-            height="60vh"
-            margin="small none none none"
-            padding="small none large none"
-            display="inline-block"
-          >
+          <Flex.Item as="div" position="relative" width="1%" height="60vh" display="inline-block">
             {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             <div
               tabIndex="0"
@@ -263,7 +271,7 @@ const OutcomeManagementPanel = () => {
               setScrollContainer(el)
             }}
           >
-            <View as="div" padding="x-small none none x-small">
+            <View as="div" padding="small none none x-small">
               {selectedGroupId && (
                 <ManageOutcomesView
                   key={selectedGroupId}

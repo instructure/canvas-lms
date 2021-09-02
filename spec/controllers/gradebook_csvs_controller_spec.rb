@@ -30,11 +30,11 @@ describe GradebookCsvsController do
     expect(controller).to be_an_instance_of(GradebookCsvsController)
   end
 
-  describe "GET 'show'" do
+  describe "POST 'create'" do
     it "returns the attachment and progress" do
       user_session @teacher
 
-      get 'show', params: {course_id: @course.id}, format: :json
+      post :create, params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       expect(response).to be_successful
       expect(json).to have_key 'attachment_id'
@@ -44,16 +44,32 @@ describe GradebookCsvsController do
     it "creates the attachment and progress" do
       user_session @teacher
 
-      get 'show', params: {course_id: @course.id}, format: :json
+      post :create, params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       expect(Attachment.find json['attachment_id']).not_to be_nil
       expect(Progress.find json['progress_id']).not_to be_nil
     end
 
+    it "accepts an assignment_order param to be passed to the CSV exporter" do
+      assignment = @course.assignments.create!
+      assignment2 = @course.assignments.create!
+      user_session(@teacher)
+
+      expect_any_instance_of(Progress).to receive(:process_job).with(
+        anything,
+        :generate_csv,
+        anything,
+        anything,
+        hash_including(assignment_order: [assignment2.id, assignment.id]),
+        anything
+      )
+      post :create, params: { course_id: @course.id, assignment_order: [assignment2.id, assignment.id] }
+    end
+
     it "names the CSV file after course#short_name" do
       user_session @teacher
 
-      get 'show', params: {course_id: @course.id}, format: :json
+      post :create, params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       attachment = Attachment.find(json['attachment_id'])
       expect(File.basename(attachment.filename.split("-").last, ".csv")).to eq("ENG__101")
@@ -63,7 +79,7 @@ describe GradebookCsvsController do
       user_session @teacher
       now = Time.zone.now
       Timecop.freeze(now) do
-        get :show, params: { course_id: @course.id }, format: :json
+        post :create, params: { course_id: @course.id }, format: :json
       end
 
       filename = Attachment.find(json_parse(response.body)['attachment_id']).filename

@@ -283,6 +283,7 @@ export const parseAnnouncementDetails = (announcement, course) => {
     courseName: course.shortName,
     courseUrl: course.href,
     canEdit: course.canManage,
+    canReadAnnouncements: course.canReadAnnouncements,
     published: course.published
   }
   if (announcement) {
@@ -376,7 +377,14 @@ export const saveSelectedContexts = selected_contexts =>
     params: {selected_contexts}
   }).then(data => data.json)
 
-export const parseObservedUsers = (enrollments, isOnlyObserver, currentUser) => {
+export const parseObserverList = users =>
+  users.map(u => ({
+    id: u.id,
+    name: u.name,
+    avatarUrl: u.avatar_url
+  }))
+
+export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentUser) => {
   const users = enrollments
     .filter(e => e.observed_user)
     .reduce((acc, e) => {

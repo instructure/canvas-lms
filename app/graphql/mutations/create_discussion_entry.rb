@@ -25,6 +25,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   argument :message, String, required: true
   argument :parent_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
+  argument :include_reply_preview, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)
@@ -37,6 +38,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     if input[:parent_entry_id]
       parent_entry = topic.discussion_entries.find(input[:parent_entry_id])
       entry.parent_entry = parent_entry
+      entry.include_reply_preview = input[:include_reply_preview].present? if parent_entry.root_entry_id.present?
     end
 
     if input[:file_id]
@@ -45,6 +47,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
 
       entry.attachment = attachment
     end
+
     entry.save!
 
     {discussion_entry: entry}

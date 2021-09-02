@@ -72,7 +72,8 @@ describe('PostContainer', () => {
     isForcedRead = false,
     timingDisplay = 'Jan 1 1:00pm',
     editedTimingDisplay = 'Feb 2 2:00pm',
-    lastReplyAtDisplay = null
+    lastReplyAtDisplay = null,
+    quotedEntry = null
   } = {}) => ({
     isTopic,
     postUtilities,
@@ -89,7 +90,8 @@ describe('PostContainer', () => {
     isForcedRead,
     timingDisplay,
     editedTimingDisplay,
-    lastReplyAtDisplay
+    lastReplyAtDisplay,
+    quotedEntry
   })
 
   const setup = props => {
@@ -130,6 +132,26 @@ describe('PostContainer', () => {
     it('should render the edited timestamp', () => {
       const container = setup(defaultProps())
       expect(container.getByText('Edited by George Weasley Feb 2 2:00pm')).toBeInTheDocument()
+    })
+
+    it('should render the reply preview', () => {
+      const container = setup(
+        defaultProps({
+          quotedEntry: {
+            createdAt: '2021-08-10T12:10:38-06:00',
+            previewMessage:
+              'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
+            author: {
+              shortName: 'Albus Dumbledore'
+            },
+            editor: {
+              shortName: 'Albus Dumbledore'
+            },
+            deleted: false
+          }
+        })
+      )
+      expect(container.getByTestId('reply-preview')).toBeInTheDocument()
     })
   })
 })

@@ -197,6 +197,14 @@ module K5DashboardPageObject
     "[aria-label='Create Subject']"
   end
 
+  def next_announcement_button_selector
+    "button:contains('Next announcement')"
+  end
+
+  def no_recent_announcements_selector
+    "[data-testid='no-recent-announcements']"
+  end
+
   def nothing_due_selector(subject_course_title)
     "//*[@aria-label = '#{subject_course_title}']//*[text() = 'Nothing due today']"
   end
@@ -215,6 +223,10 @@ module K5DashboardPageObject
 
   def planner_assignment_header_selector
     ".Grouping-styles__overlay"
+  end
+
+  def previous_announcement_button_selector
+    "button:contains('Previous announcement')"
   end
 
   def resources_tab_selector
@@ -419,6 +431,14 @@ module K5DashboardPageObject
     fxpath(new_course_modal_create_selector)
   end
 
+  def next_announcement_button
+    ffj(next_announcement_button_selector)
+  end
+
+  def no_recent_announcements
+    f(no_recent_announcements_selector)
+  end
+
   def nothing_due(subject_course_title)
     fxpath(nothing_due_selector(subject_course_title))
   end
@@ -433,6 +453,10 @@ module K5DashboardPageObject
 
   def pink_color_button
     fxpath(pink_color_button_selector)
+  end
+
+  def previous_announcement_button
+    ffj(previous_announcement_button_selector)
   end
 
   def resources_tab
@@ -536,12 +560,20 @@ module K5DashboardPageObject
     new_course_modal_create.click
   end
 
+  def click_next_announcement_button(button_number)
+    next_announcement_button[button_number].click
+  end
+
   def click_observed_student_option(student_name)
     click_option(observed_student_dropdown_selector, student_name)
   end
 
   def click_pink_color_button
     pink_color_button.click
+  end
+
+  def click_previous_announcement_button(button_number)
+    previous_announcement_button[button_number].click
   end
 
   def click_student_view_button

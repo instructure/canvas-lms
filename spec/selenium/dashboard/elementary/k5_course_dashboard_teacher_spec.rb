@@ -25,6 +25,7 @@ require_relative '../pages/k5_modules_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../courses/pages/course_settings_page'
+require_relative '../shared_examples/k5_announcements_shared_examples'
 
 describe "teacher k5 course dashboard" do
   include_context "in-process server selenium tests"
@@ -116,6 +117,8 @@ describe "teacher k5 course dashboard" do
 
       expect(leave_student_view).to include_text("Leave Student View")
     end
+
+    it_behaves_like "K5 Subject Home Tab"
   end
 
   context 'course modules tab' do

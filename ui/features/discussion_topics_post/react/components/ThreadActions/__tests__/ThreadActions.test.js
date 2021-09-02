@@ -35,6 +35,7 @@ const createProps = overrides => {
     onDelete: jest.fn(),
     onOpenInSpeedGrader: jest.fn(),
     onMarkAllAsRead: jest.fn(),
+    onMarkThreadAsRead: jest.fn(),
     ...overrides
   }
 }
@@ -55,7 +56,7 @@ describe('ThreadActions', () => {
     expect(getByTestId('delete')).toBeInTheDocument()
     expect(getByTestId('inSpeedGrader')).toBeInTheDocument()
 
-    expect(queryByText('Mark Thread as Read')).toBeTruthy()
+    expect(queryByText('Mark All as Read')).toBeTruthy()
     expect(queryByText('Go To Topic')).toBeTruthy()
     expect(queryByText('Edit')).toBeTruthy()
     expect(queryByText('Delete')).toBeTruthy()
@@ -69,7 +70,7 @@ describe('ThreadActions', () => {
     expect(menu).toBeInTheDocument()
     fireEvent.click(menu)
 
-    expect(queryByText('Mark Thread as Read')).toBeFalsy()
+    expect(queryByText('Mark All as Read')).toBeFalsy()
     expect(queryByText('Go To Topic')).toBeFalsy()
     expect(queryByText('Edit')).toBeFalsy()
     expect(queryByText('Delete')).toBeFalsy()
@@ -83,15 +84,51 @@ describe('ThreadActions', () => {
   })
 
   describe('menu options', () => {
-    describe('mark thread as read', () => {
+    describe('mark all as read', () => {
+      it('calls provided callback when clicked', () => {
+        const props = createProps()
+        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        expect(props.onMarkAllAsRead.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Mark All as Read'))
+        expect(props.onMarkAllAsRead.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('mark all as unread', () => {
       it('calls provided callback when clicked', () => {
         const props = createProps()
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onMarkAllAsUnread.mock.calls.length).toBe(0)
-        fireEvent.click(getByText('Mark Thread as Read'))
+        fireEvent.click(getByText('Mark All as Unread'))
         expect(props.onMarkAllAsUnread.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('mark thread as read', () => {
+      it('calls provided callback when clicked', () => {
+        const props = createProps()
+        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Mark Thread as Read'))
+        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('mark thread as unread', () => {
+      it('calls provided callback when clicked', () => {
+        const props = createProps()
+        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Mark Thread as Unread'))
+        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(1)
       })
     })
 

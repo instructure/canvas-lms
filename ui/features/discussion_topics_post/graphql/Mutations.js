@@ -130,6 +130,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $message: String!
     $parentEntryId: ID
     $fileId: ID
+    $includeReplyPreview: Boolean
   ) {
     createDiscussionEntry(
       input: {
@@ -137,6 +138,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         message: $message
         parentEntryId: $parentEntryId
         fileId: $fileId
+        includeReplyPreview: $includeReplyPreview
       }
     ) {
       discussionEntry {
@@ -197,6 +199,17 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
     }
   }
   ${User.fragment}
+  ${DiscussionEntry.fragment}
+`
+
+export const UPDATE_DISCUSSION_THREAD_READ_STATE = gql`
+  mutation UpdateDiscussionThreadReadState($discussionEntryId: ID!, $read: Boolean!) {
+    updateDiscussionThreadReadState(input: {discussionEntryId: $discussionEntryId, read: $read}) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+    }
+  }
   ${DiscussionEntry.fragment}
 `
 

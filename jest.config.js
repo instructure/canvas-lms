@@ -52,7 +52,7 @@ module.exports = {
     '@testing-library/jest-dom/extend-expect',
     './packages/validated-apollo/src/ValidatedApolloCleanup.js'
   ],
-  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 

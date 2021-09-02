@@ -75,7 +75,8 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
     }, []),
     params: {
       per_page: 100,
-      include: ['account']
+      include: ['account'],
+      enrollment_type: 'teacher'
     }
   }
 

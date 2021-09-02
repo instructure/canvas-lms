@@ -96,10 +96,55 @@ describe "Gradebook - post grades to SIS" do
     end
   end
 
+  describe "Plugin with enhanced filters enabed" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      export_plugin_setting.update(disabled: false)
+    end
+
+    it "should not be visible by default", priority: "1", test_id: 244958 do
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+
+      expect(f('body')).not_to contain_css("[data-menu-id='post_grades_feature_tool']")
+    end
+
+    it "should be visible when enabled on course with sis_source_id" do
+      mock_feature_flag(:post_grades, true)
+      @course.sis_source_id = 'xyz'
+      @course.save
+
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+
+      expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
+    end
+
+    it 'does not show assignment errors when clicking the post grades button if all ' \
+       'assignments have due dates for each section', priority: '1', test_id: 3036003 do
+      mock_feature_flag(:post_grades, true)
+
+      @course.update!(sis_source_id: 'xyz')
+      @course.course_sections.each do |section|
+        @attendance_assignment.assignment_overrides.create! do |override|
+          override.set = section
+          override.title = 'section override'
+          override.due_at = Time.zone.now
+          override.due_at_overridden = true
+        end
+      end
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+      Gradebook.action_menu_item_selector('post_grades_feature_tool').click
+
+      expect(f('.post-grades-dialog')).not_to contain_css('#assignment-errors')
+    end
+  end
+
   describe 'LTI' do
     def create_post_grades_tool(opts={})
       course = opts[:course] || @course
-      post_grades_tool = course.context_external_tools.create!(
+      course.context_external_tools.create!(
         name: opts[:name] || 'test tool',
         domain: 'example.com',
         url: 'http://example.com/lti',
@@ -111,7 +156,6 @@ describe "Gradebook - post grades to SIS" do
           }
         }
       )
-      post_grades_tool
     end
 
     let!(:tool) { create_post_grades_tool }
@@ -155,6 +199,73 @@ describe "Gradebook - post grades to SIS" do
 
       switch_to_section('the other section')
       Gradebook.open_action_menu
+
+      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
+    end
+  end
+
+  describe 'LTI with enhanced filters enabled' do
+    def create_post_grades_tool(opts={})
+      course = opts[:course] || @course
+      course.context_external_tools.create!(
+        name: opts[:name] || 'test tool',
+        domain: 'example.com',
+        url: 'http://example.com/lti',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        settings: {
+          post_grades: {
+            url: 'http://example.com/lti/post_grades'
+          }
+        }
+      )
+    end
+
+    before(:once) do
+      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+    end
+
+    let!(:tool) { create_post_grades_tool }
+    let(:tool_name) { "post_grades_lti_#{tool.id}" }
+
+    it "should show when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+
+      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
+
+      Gradebook.action_menu_item_selector(tool_name).click
+
+      expect(f('iframe.post-grades-frame')).to be_displayed
+    end
+
+    it "should show post grades lti button when only one section available" do
+      course = Course.new(name: 'Math 201', account: @account, sis_source_id: 'xyz')
+      course.save
+      course.enroll_teacher(@user).accept!
+      course.assignments.create!(name: 'Assignment1', post_to_sis: true)
+      create_post_grades_tool(course: course)
+
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+
+      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
+
+      Gradebook.action_menu_item_selector(tool_name).click
+
+      expect(f('iframe.post-grades-frame')).to be_displayed
+    end
+
+    it "should not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
+      create_post_grades_tool
+
+      Gradebook.visit(@course)
+      Gradebook.select_sync
+
+      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
+
+      switch_to_section('the other section')
+      Gradebook.select_sync
 
       expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
     end

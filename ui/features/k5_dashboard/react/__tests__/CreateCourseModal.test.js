@@ -66,7 +66,9 @@ const ENROLLMENTS = [
 ]
 
 const MANAGEABLE_COURSES_URL = '/api/v1/manageable_accounts?per_page=100'
-const ENROLLMENTS_URL = encodeURI('/api/v1/users/self/courses?per_page=100&include[]=account')
+const ENROLLMENTS_URL = encodeURI(
+  '/api/v1/users/self/courses?per_page=100&include[]=account&enrollment_type=teacher'
+)
 
 describe('CreateCourseModal', () => {
   const setModalOpen = jest.fn()

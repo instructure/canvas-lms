@@ -309,40 +309,34 @@ describe "context modules" do
         @mod = @course.context_modules.create!(:name => "files module")
       end
 
-      describe 'with duplicate modules enabled' do
-        before(:once) do
-          @course.root_account.enable_feature!(:duplicate_modules)
-        end
+      it 'duplicate of an empty module should display a drag and drop area' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
 
-        it 'duplicate of an empty module should display a drag and drop area' do
-          get "/courses/#{@course.id}/modules"
-          wait_for_ajaximations
+        f('button.al-trigger').click
+        wait_for_ajaximations
 
-          f('button.al-trigger').click
-          wait_for_ajaximations
+        f('a.duplicate_module_link').click
+        wait_for_ajaximations
 
-          f('a.duplicate_module_link').click
-          wait_for_ajaximations
+        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+      end
 
-          expect(ff('.module_dnd input[type="file"]')).to have_size(2)
-        end
+      it 'duplicate of a non-empty module should not display a drag and drop area' do
+        pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
+        @course.context_modules.first.add_item(type: 'assignment', id: pub_assignment.id)
 
-        it 'duplicate of a non-empty module should not display a drag and drop area' do
-          pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
-          @course.context_modules.first.add_item(type: 'assignment', id: pub_assignment.id)
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
 
-          get "/courses/#{@course.id}/modules"
-          wait_for_ajaximations
+        f('button.al-trigger').click
+        wait_for_ajaximations
 
-          f('button.al-trigger').click
-          wait_for_ajaximations
+        f('a.duplicate_module_link').click
+        wait_for_ajaximations
 
-          f('a.duplicate_module_link').click
-          wait_for_ajaximations
-
-          # non-empty module should not have a DnD area
-          expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
-        end
+        # non-empty module should not have a DnD area
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
       end
 
       it "should add multiple file items to a module" do

@@ -78,7 +78,11 @@ const GroupSelectionDrillDown = ({
 
   return (
     <>
-      <Options onKeyDown={handleKeyDown} tabIndex="0">
+      <Options
+        onKeyDown={handleKeyDown}
+        tabIndex="0"
+        data-testid="outcomes-management-target-group-selector"
+      >
         {selected.parentGroupId && (
           <Options.Item
             key="Back"

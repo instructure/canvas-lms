@@ -54,9 +54,10 @@ class RubricsController < ApplicationController
           manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
         }
       mastery_scales_js_env
-      @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
-      @actual_rubric = @rubric_association&.rubric
-      raise ActiveRecord::RecordNotFound if !@actual_rubric || @actual_rubric.deleted?
+      @rubric_association = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])
+      raise ActiveRecord::RecordNotFound unless @rubric_association
+
+      @actual_rubric = @rubric_association.rubric
     else
       raise ActiveRecord::RecordNotFound
     end

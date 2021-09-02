@@ -16,15 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import Gradebook from './react/default_gradebook/Gradebook'
 
 import('@canvas/context-cards/react/StudentContextCardTrigger')
 
-const gradebook = new Gradebook({
+const mountPoint = document.querySelector('#gradebook_app')
+const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu"]')
+const settingsModalButtonContainer = document.getElementById(
+  'gradebook-settings-modal-button-container'
+)
+
+const props = {
   ...ENV.GRADEBOOK_OPTIONS,
   currentUserId: ENV.current_user_id,
-  locale: ENV.LOCALE
-})
+  locale: ENV.LOCALE,
+  gradebookMenuNode,
+  settingsModalButtonContainer
+}
 
-gradebook.initialize()
-gradebook.onShow()
+const component = React.createElement(Gradebook, props)
+ReactDOM.render(component, mountPoint)

@@ -58,17 +58,17 @@ class Linter
   def run
     if git_dir && !Dir.exist?(git_dir)
       puts "No plugin #{plugin} found"
-      return
+      return false
     end
 
     if skip_wips && wip?
       puts "WIP detected, #{linter_name} will not run."
-      return
+      return true
     end
 
     if !skip_file_size_check && files.size == 0
       puts "No #{file_regex} file changes found, skipping #{linter_name} check!"
-      return
+      return true
     end
 
     if heavy_mode
@@ -170,6 +170,7 @@ class Linter
         puts "Fix and/or git add the corrections and try to commit again."
       end
     end
+    processed_comments.size.zero?
   end
 
   def publish_gergich_comments(comments)

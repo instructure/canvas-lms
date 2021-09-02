@@ -239,6 +239,7 @@ class RoleOverridesController < ApplicationController
   #         add_course_template          -- Course Templates - add
   #         delete_course_template       -- Course Templates - delete
   #         edit_course_template         -- Course Templates - edit
+  #     manage_courses_add               -- Courses - add
   #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
   #     manage_feature_flags             -- Feature Previews - enable / disable
@@ -273,12 +274,14 @@ class RoleOverridesController < ApplicationController
   #     import_outcomes                  -- [ TaDo] Learning Outcomes - import
   #     lti_add_edit                     -- [ TAD ] LTI - add / edit / delete
   #     manage_account_banks             -- [ td  ] Item Banks - manage account
-  #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete
+  #     manage_assignments               -- [ TADo] Assignments and Quizzes - manage / edit
+  #     Manage Assignments and Quizzes granular permissions
+  #         manage_assignments_add       -- [ TADo] Assignments and Quizzes - add
+  #         manage_assignments_delete    -- [ TADo] Assignments and Quizzes - delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete
   #     manage_course_visibility         -- [ TAD ] Course - change visibility
   #     Manage Courses granular permissions
-  #         manage_courses_add           -- [sTADo] Courses - add
   #         manage_courses_conclude      -- [ TaD ] Courses - conclude
   #         manage_courses_delete        -- [ TaD ] Courses - delete
   #         manage_courses_publish       -- [ TaD ] Courses - publish
@@ -288,7 +291,10 @@ class RoleOverridesController < ApplicationController
   #         manage_files_edit            -- [ TADo] Course Files - edit
   #         manage_files_delete          -- [ TADo] Course Files - delete
   #     manage_grades                    -- [ TA  ] Grades - edit
-  #     manage_groups                    -- [ TAD ] Groups - add / edit / delete
+  #     Manage Groups granular permissions
+  #         manage_groups_add            -- [ TAD ] Groups - add
+  #         manage_groups_delete         -- [ TAD ] Groups - delete
+  #         manage_groups_manage         -- [ TAD ] Groups - manage
   #     manage_interaction_alerts        -- [ Ta  ] Alerts - add / edit / delete
   #     manage_outcomes                  -- [sTaDo] Learning Outcomes - add / edit / delete
   #     manage_proficiency_calculations  -- [ t d ] Outcome Proficiency Calculations - add / edit / delete

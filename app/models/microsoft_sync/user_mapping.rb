@@ -62,7 +62,10 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # for the Course's root account. Works in batches, yielding arrays of user ids.
   def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
     user_ids = GuardRail.activate(:secondary) do
-      Enrollment.active.where(course_id: course.id).joins(%{
+      Enrollment
+        .microsoft_sync_relevant
+        .where(course_id: course.id)
+        .joins(%{
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
@@ -126,7 +129,8 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # Returns a scope that can be used with find_each.
   def self.enrollments_and_aads(course)
     Enrollment
-      .active.not_fake.where(course_id: course.id)
+      .microsoft_sync_relevant
+      .where(course_id: course.id)
       .joins(%{
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id

@@ -18,9 +18,10 @@
 
 import $ from 'jquery'
 import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails.js'
+import timezone from 'timezone'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
 import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
@@ -40,7 +41,6 @@ const note = {
 
 QUnit.module('EditAssignmentDetails', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.$holder = $('<table />').appendTo(document.getElementById('fixtures'))
     fakeENV.setup()
   },
@@ -48,8 +48,7 @@ QUnit.module('EditAssignmentDetails', {
     this.$holder.detach()
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
-    tz.restore(this.snapshot)
-    I18nStubber.clear()
+    tzInTest.restore()
   }
 })
 const createView = function(event = note) {
@@ -63,15 +62,16 @@ test('should initialize input with start date', () => {
 })
 
 test('should localize start date', () => {
-  I18nStubber.pushFrame()
-  tz.changeLocale(french, 'fr_FR', 'fr')
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
-    'date.formats.medium_with_weekday': '%a %-d %b %Y',
-    'date.formats.medium': '%-d %b %Y',
-    'date.month_names': ['août'],
-    'date.abbr_month_names': ['août']
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr',
+    formats: {
+      'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
+      'date.formats.medium_with_weekday': '%a %-d %b %Y',
+      'date.formats.medium': '%-d %b %Y',
+      'date.month_names': ['août'],
+      'date.abbr_month_names': ['août']
+    }
   })
   const view = createView(commonEvent())
   equal(view.$('.date_field').val(), '22 juil. 2017')

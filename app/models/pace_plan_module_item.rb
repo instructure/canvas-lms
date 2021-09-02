@@ -24,7 +24,7 @@ class PacePlanModuleItem < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
 
   before_save :infer_root_account_id
-  validates :pace_plan_id, presence: true
+  validates :pace_plan, presence: true
   validates :module_item_id, presence: true
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }

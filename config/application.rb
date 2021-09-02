@@ -17,18 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Put this in config/application.rb
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
-require_relative '../lib/canvas_yaml'
-
-# Yes, it doesn't seem DRY to list these both in the if and else
-# but this used to be "require 'rails/all'" which included sprockets.
-# I needed to explicitly opt-out of sprockets but since I'm not sure
-# about the other frameworks, I left this so it would be exactly the same
-# as "require 'rails/all'" but without sprockets--even though it is a little
-# different then the rails 3 else block. If the difference is not intended,
-# they can be pulled out of the if/else
 require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
@@ -248,25 +238,6 @@ module CanvasRails
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQL::OID::TypeMapInitializer",
                     TypeMapInitializerExtensions,
                     method: :prepend)
-
-    SafeYAML.singleton_class.send(:attr_accessor, :safe_parsing)
-    module SafeYAMLWithFlag
-      def load(*args)
-        previous, self.safe_parsing = safe_parsing, true
-        super
-      ensure
-        self.safe_parsing = previous
-      end
-    end
-    SafeYAML.singleton_class.prepend(SafeYAMLWithFlag)
-
-    Psych.add_domain_type("ruby/object", "Class") do |_type, val|
-      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
-        raise "Cannot load class #{val} from YAML"
-      end
-      val.constantize
-    end
-
     module PatchThorWarning
       # active_model_serializers should be passing `type: :boolean` here:
       # https://github.com/rails-api/active_model_serializers/blob/v0.9.0.alpha1/lib/active_model/serializer/generators/serializer/scaffold_controller_generator.rb#L10
@@ -382,6 +353,15 @@ module CanvasRails
       app.config.middleware.insert_after(config.session_store, RequestContext::Session)
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
+    end
+
+    initializer("set_allowed_request_id_setters", after: :finisher_hook) do |app|
+      # apparently there is no initialization hook that comes late enough for
+      # routes to already be loaded, so we have to load them explicitly
+      app.reload_routes!
+      RequestContext::Generator.allow_unsigned_request_context_for(
+        app.routes.url_helpers.api_graphql_subgraph_path
+      )
     end
   end
 end

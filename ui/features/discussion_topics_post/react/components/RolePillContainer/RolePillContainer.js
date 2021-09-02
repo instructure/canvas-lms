@@ -32,9 +32,9 @@ export function RolePillContainer({...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           display: 'inline',
           delimiter: 'pipe'
         },
@@ -49,12 +49,12 @@ export function RolePillContainer({...props}) {
             <InlineList delimiter={responsiveProps.delimiter} data-testid="pill-container">
               {baseRolesToDisplay.map(baseRole => (
                 <InlineList.Item key={baseRole}>
-                  {matches.includes('mobile') ? (
+                  {matches.includes('desktop') ? (
+                    <Pill data-testid={`pill-${baseRole}`}>{baseRole}</Pill>
+                  ) : (
                     <Text size="x-small" transform="uppercase" data-testid={`mobile-${baseRole}`}>
                       {baseRole}
                     </Text>
-                  ) : (
-                    <Pill data-testid={`pill-${baseRole}`}>{baseRole}</Pill>
                   )}
                 </InlineList.Item>
               ))}

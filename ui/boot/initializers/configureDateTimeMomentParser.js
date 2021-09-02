@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!instructure'
-import { useI18nFormats } from 'date-time-moment-parser'
+import { useI18nFormats } from 'datetime-moment-parser'
 
 const dateFormat = key => () => (
   I18n.lookup(`date.formats.${key}`)

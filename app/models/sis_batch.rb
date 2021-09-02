@@ -930,7 +930,7 @@ class SisBatch < ActiveRecord::Base
         begin
           ids = data[:downloadable_attachment_ids]
           if ids.present?
-            Attachment.where(:id => ids).polymorphic_where(:context => self).to_a
+            Attachment.where(id: ids, context: self).to_a
           else
             []
           end

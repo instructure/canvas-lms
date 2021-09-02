@@ -58,7 +58,8 @@ export default function LinkOptionsDialog(props) {
       target: '_blank',
       href: url,
       userText: props.showText,
-      class: 'inline_disabled'
+      class: 'inline_disabled',
+      forceRename: true
     })
   }
 

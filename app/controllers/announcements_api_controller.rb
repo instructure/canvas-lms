@@ -88,7 +88,6 @@ class AnnouncementsApiController < ApplicationController
   # @returns [DiscussionTopic]
   def index
     courses = api_find_all(Course, @course_ids)
-    return unless courses.all? { |course| authorized_action(course, @current_user, :read_announcements) }
 
     scope = Announcement.where(:context_type => 'Course', :context_id => courses)
 

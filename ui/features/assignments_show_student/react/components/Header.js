@@ -91,7 +91,7 @@ class Header extends React.Component {
           />
         )
 
-        if (this.isSubmissionLate(submission)) {
+        if (this.isSubmissionLate(submission) && !submission.gradeHidden) {
           return (
             <Tooltip
               as="div"

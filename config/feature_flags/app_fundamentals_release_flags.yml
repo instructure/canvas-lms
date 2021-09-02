@@ -1,5 +1,6 @@
 ---
 default_recaptcha_registration_enable:
+  type: setting
   state: hidden
   display_name: Enable Recaptcha by default for self-registration
   description: Requires Recaptcha for self-registration by default
@@ -30,6 +31,7 @@ persist_inferred_authentication_providers:
   display_name: Require Authentication Provider on Logins
   description: Persists the used authentication provider when logging in, and defaults new logins to the default provider
 allow_unconfirmed_users_in_user_list:
+  type: setting
   state: hidden
   applies_to: RootAccount
   display_name: Allow Unconfirmed E-mail Addresses When Adding Users

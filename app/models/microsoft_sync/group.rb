@@ -91,7 +91,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
     update!(
       workflow_state: 'pending',
-      job_state: nil,
+      job_state: {restored: true},
       last_error: nil
     )
   end

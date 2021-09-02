@@ -18,6 +18,9 @@
 
 import React from 'react'
 
+const SMALL_MEDIA_QUERY = '(max-width: 37em)' // == 592px
+const MEDIUM_MEDIA_QUERY = '(max-width: 56em)' // == 896px
+
 // Watches for changes in the match state of a media-query
 class MediaQueryWatcher {
   size = 'large'
@@ -32,8 +35,8 @@ class MediaQueryWatcher {
     // Note: specifying max-widths in ems so planner will adjust its layout
     // even if the browser window is physicallly wide, but the font-size is
     // enlarged. This will make for a better experience.
-    this.mediaQueries.small = window.matchMedia('(max-width: 37em)') // == 592px
-    this.mediaQueries.medium = window.matchMedia('(max-width: 56em)') // == 896px
+    this.mediaQueries.small = window.matchMedia(SMALL_MEDIA_QUERY)
+    this.mediaQueries.medium = window.matchMedia(MEDIUM_MEDIA_QUERY)
     if (this.mediaQueries.small.matches) {
       this.size = 'small'
     } else if (this.mediaQueries.medium.matches) {
@@ -134,7 +137,7 @@ class MediaQueryWatcher {
 // one listener and has interested parties register to be notified of
 // a change in state.
 function responsiviser() {
-  return function(ComposedComponent) {
+  return function (ComposedComponent) {
     class ResponsiveComponent extends React.Component {
       static propTypes = {
         ...ComposedComponent.propTypes
@@ -171,4 +174,4 @@ function responsiviser() {
 }
 responsiviser.mqwatcher = new MediaQueryWatcher() // create the one and only one (for now)
 
-export default responsiviser
+export {responsiviser as default, SMALL_MEDIA_QUERY, MEDIUM_MEDIA_QUERY}

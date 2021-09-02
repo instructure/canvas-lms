@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import PropTypes from 'prop-types'
-import React, {useMemo} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import MentionDropdownOption from './MentionDropdownOption'
 import {View} from '@instructure/ui-view'
 import {usePopper} from 'react-popper'
@@ -24,14 +24,18 @@ import {ARIA_ID_TEMPLATES} from '../../constants'
 
 const MentionDropdownMenu = ({
   onSelect,
+  onMouseEnter,
   mentionOptions,
-  show,
   coordiantes,
   selectedUser,
-  instanceId
+  instanceId,
+  highlightMouse,
+  onOptionMouseEnter,
+  isInteractive
 }) => {
-  // Variables
+  // Hooks & Variables
   const directionality = tinyMCE?.activeEditor?.getParam('directionality')
+  const menuRef = useRef(null)
 
   // Setup Popper
   const virtualReference = useMemo(() => {
@@ -41,7 +45,7 @@ const MentionDropdownMenu = ({
       }
     }
   }, [coordiantes])
-  const [popperElement, setPopperElement] = React.useState(null)
+  const [popperElement, setPopperElement] = useState(null)
   const {styles, attributes} = usePopper(virtualReference, popperElement, {
     placement: directionality === 'rtl' ? 'bottom-end' : 'bottom-start',
     modifiers: [
@@ -70,21 +74,36 @@ const MentionDropdownMenu = ({
           isSelected={selectedUser === user.id}
           key={user.id}
           id={ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)}
+          highlightMouse={highlightMouse}
+          onOptionMouseEnter={() => {
+            onOptionMouseEnter(user)
+          }}
+          menuRef={menuRef}
+          isInteractive={isInteractive}
         />
       )
     })
-  }, [mentionOptions, onSelect, instanceId, selectedUser])
+  }, [
+    mentionOptions,
+    selectedUser,
+    instanceId,
+    highlightMouse,
+    isInteractive,
+    onSelect,
+    onOptionMouseEnter
+  ])
 
   // Don't show if menu is empty
-  if (!show || mentionOptions?.length === 0) {
+  if (mentionOptions?.length === 0) {
     return null
   }
 
   return (
     <div
       className="mention-dropdown-menu"
-      ref={setPopperElement}
-      style={{...styles.popper, zIndex: 10000}}
+      ref={isInteractive ? setPopperElement : null}
+      style={isInteractive ? {...styles.popper, zIndex: 10000} : null}
+      onMouseEnter={isInteractive ? onMouseEnter : null}
       {...attributes.popper}
     >
       <View
@@ -99,6 +118,9 @@ const MentionDropdownMenu = ({
         padding="none"
         shadow="above"
         width="auto"
+        elementRef={el => {
+          menuRef.current = el
+        }}
       >
         <ul
           aria-label="Mentionable Users"
@@ -130,10 +152,6 @@ MentionDropdownMenu.proptypes = {
    */
   instanceId: PropTypes.string,
   /**
-   * Bool that controls visibility of menu
-   */
-  show: PropTypes.bool,
-  /**
    * cordinates for menu on screen
    */
   coordiantes: PropTypes.object,
@@ -144,5 +162,27 @@ MentionDropdownMenu.proptypes = {
   /**
    * ID of selected user
    */
-  selectedUser: PropTypes.string
+  selectedUser: PropTypes.string,
+  /**
+   * Event for triggering onMosueOver
+   */
+  onMouseEnter: PropTypes.func,
+  /**
+   * Bool to control mouse highlighting
+   */
+  highlightMouse: PropTypes.bool,
+  /**
+   * Callback to set user on hover
+   */
+  onOptionMouseEnter: PropTypes.func,
+  /**
+   * isInteractive determines if menu will recieve events
+   * This is used for the hidden menu offscreen in the RCE
+   */
+  isInteractive: PropTypes.bool
+}
+
+MentionDropdownMenu.defaultProps = {
+  isInteractive: true,
+  onSelect: () => {}
 }

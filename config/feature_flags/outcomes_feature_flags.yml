@@ -45,11 +45,13 @@ improved_outcomes_management:
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
 assignment_comment_library:
+  type: setting
   state: hidden
   applies_to: RootAccount
   display_name: Comment Library
   description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
 improved_lmgb:
+  type: setting
   state: hidden
   applies_to: RootAccount
   display_name: Learning Mastery Gradebook Redesign

@@ -79,6 +79,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Rozmiar przycisku" },
   "buttons_and_icons_e66ee12c": { "message": "Przycisk i ikony" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Anuluj" },
   "choose_caption_file_9c45bc4e": { "message": "Wybierz plik z napisami" },
   "choose_usage_rights_33683854": { "message": "Wybierz prawa użytkowania..." },
   "circle_484abe63": { "message": "Okrąg" },
@@ -176,6 +177,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Termin: Wiele dat" },
   "due_when_7eed10c6": { "message": "Termin: { when }" },
+  "edit_c5fbea07": { "message": "Edytuj" },
   "edit_equation_f5279959": { "message": "Edytuj równanie" },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
   "editor_statusbar_26ac81fc": { "message": "Pasek stanu edytora" },
@@ -200,10 +202,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Narzędzia zewnętrzne" },
   "extra_large_b6cdf1ff": { "message": "Wyjątkowo duże" },
   "extra_small_9ae33252": { "message": "Bardzo małe" },
-  "file_upload_failed_af22dd91": {
-    "message": "Niepowodzenie przesyłania pliku."
-  },
-  "file_uploading_56c9c0c8": { "message": "Przesyłanie pliku" },
   "file_url_c12b64be": { "message": "Adres URL pliku" },
   "filename_file_icon_602eb5de": { "message": "Ikona pliku { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -296,6 +294,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Moje pliki" },
   "my_images_427f9b0c": { "message": "Moje obrazy" },
+  "name_1aed4a1b": { "message": "Nazwa" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
@@ -405,9 +404,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Style" },
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Zakończono powodzeniem: Przesłane pliki"
-  },
   "superscript_8cb349a2": { "message": "Indeks górny" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Obsługiwane typy plików: SRT lub WebVTT"
@@ -460,13 +456,11 @@ const locale = {
     "message": "Wpisz Control F9, aby uzyskać dostęp do opcji tabeli. { text }"
   },
   "unpublished_dfd8801": { "message": "nieopublikowane" },
+  "untitled_efdc2d7d": { "message": "bez tytułu" },
   "upload_document_253f0478": { "message": "Prześlij dokument" },
   "upload_file_fd2361b8": { "message": "Prześlij plik" },
   "upload_image_6120b609": { "message": "Prześlij obraz" },
   "upload_media_ce31135a": { "message": "Przekaż pliki multimedialne" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Przesyłanie nie jest dostępne dla danego zadania."
-  },
   "upload_record_media_e4207d72": {
     "message": "Przekaż/zapisz pliki multimedialne"
   },

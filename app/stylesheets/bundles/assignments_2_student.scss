@@ -33,9 +33,12 @@ $student-view-banner-height: 50px;
 }
 
 #assignments-student-footer {
+  position: fixed;
+  bottom: 0;
   height: $student-footer-height;
-  #{direction(right)}: 0;
-  width: 100%;
+  // don't get covered by the navigation bar
+  #{direction(left)}: 90px;
+  #{direction(right)}: 10px;
   box-sizing: border-box;
   padding: 0;
   border-top: 1px solid gray;

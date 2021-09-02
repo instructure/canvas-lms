@@ -201,15 +201,21 @@ actions.updateCollaboration = (context, contextId, contentItems, collaborationId
   }
 }
 
-actions.externalContentReady = (e, data) => {
+actions.externalContentReady = ({contentItems, service_id}) => {
   return dispatch => {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)
-    if (data.service_id) {
-      dispatch(actions.updateCollaboration(context, contextId, data.contentItems, data.service_id))
+    if (service_id) {
+      dispatch(actions.updateCollaboration(context, contextId, contentItems, service_id))
     } else {
-      dispatch(actions.createCollaboration(context, contextId, data.contentItems))
+      dispatch(actions.createCollaboration(context, contextId, contentItems))
     }
   }
+}
+
+actions.externalContentRetrievalFailed = () => {
+  $.flashError(I18n.t('Error retrieving content from tool'))
+  const [context, contextId] = splitAssetString(ENV.context_asset_string)
+  page(`/${context}/${contextId}/lti_collaborations`)
 }
 
 export default actions

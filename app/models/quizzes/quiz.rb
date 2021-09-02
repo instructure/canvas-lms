@@ -205,6 +205,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def build_assignment(force: false)
+    # There is no need to create a new assignment if the quiz being deleted
+    return if self.workflow_state == 'deleted'
+
     if !self.assignment_id && self.graded? && (force || ![:assignment, :clone, :migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')

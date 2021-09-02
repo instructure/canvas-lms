@@ -63,7 +63,9 @@ describe Canvas::LiveEvents do
     def call
       {
         'kinesis_stream_name' => 'fake_stream',
-        'aws_region' => 'us-east-1'
+        'aws_region' => 'us-east-1',
+        'aws_access_key_id' => 'key',
+        'aws_secret_access_key_dec' => 'secret'
       }
     end
   end
@@ -1939,6 +1941,55 @@ describe Canvas::LiveEvents do
 
       expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
       Canvas::LiveEvents.grade_override(score, old_score, @enrollment, @course)
+    end
+  end
+
+  describe 'outcome friendly description' do
+    before do
+      @context = course_model
+      outcome = @context.created_learning_outcomes.create!({:title => 'new outcome'})
+      description = 'A friendly description'
+      @friendlyDescription = OutcomeFriendlyDescription.create!(
+        learning_outcome: outcome,
+        context: @context,
+        description: description
+      )
+    end
+
+    context 'created' do
+      it 'should trigger an outcome_friendly_description_created live event' do
+        expect_event('outcome_friendly_description_created', {
+          outcome_friendly_description_id: @friendlyDescription.id.to_s,
+          context_type: @friendlyDescription.context_type,
+          context_id: @friendlyDescription.context_id.to_s,
+          description: @friendlyDescription.description,
+          workflow_state: @friendlyDescription.workflow_state,
+          learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+          root_account_id: @friendlyDescription.root_account_id.to_s
+        }).once
+
+        Canvas::LiveEvents.outcome_friendly_description_created(@friendlyDescription)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger an outcome_friendly_description_updated live event' do
+        new_description = 'A new friendly description'
+        @friendlyDescription.description = new_description
+        @friendlyDescription.save!
+        expect_event('outcome_friendly_description_updated', {
+          outcome_friendly_description_id: @friendlyDescription.id.to_s,
+          context_type: @friendlyDescription.context_type,
+          context_id: @friendlyDescription.context_id.to_s,
+          workflow_state: @friendlyDescription.workflow_state,
+          learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+          root_account_id: @friendlyDescription.root_account_id.to_s,
+          description: new_description,
+          updated_at: @friendlyDescription.updated_at,
+        }).once
+
+        Canvas::LiveEvents.outcome_friendly_description_updated(@friendlyDescription)
+      end
     end
   end
 end

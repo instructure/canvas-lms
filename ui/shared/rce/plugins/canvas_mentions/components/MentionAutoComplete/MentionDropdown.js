@@ -18,6 +18,7 @@
 
 import React, {useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo} from 'react'
 import MentionDropdownMenu from './MentionDropdownMenu'
+import MentionDropdownPortal from './MentionDropdownPortal'
 import PropTypes from 'prop-types'
 import getPosition from './getPosition'
 import {
@@ -32,7 +33,10 @@ import {
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
 import {useQuery} from '@apollo/react-hooks'
 
-const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => {
+const MOUSE_FOCUS_TYPE = 'mouse'
+const KEYBOARD_FOCUS_TYPE = 'keyboard'
+
+const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   // Setup State
   const [mentionCoordinates, setMentionCoordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -40,6 +44,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
   const [debouncedInputText, setDebouncedInputText] = useState('')
   const [shouldExit, setShouldExit] = useState(false)
   const [noResults, setNoResults] = useState(false)
+  const [focusType, setFocusType] = useState(null) // Options are 'keyboard' and 'mouse'
 
   // Setup Refs for listener access
   const focusedUserRef = useRef(focusedUser)
@@ -82,6 +87,8 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
 
   // Navigates highlight of mention
   const navigateFocusedUser = dir => {
+    setFocusType(KEYBOARD_FOCUS_TYPE)
+
     // Return if no options present
     if (filteredOptionsRef.current.length === 0) {
       return
@@ -179,6 +186,13 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
     }
   }, [inputText, mentionData])
 
+  // When only spces exit without saving mention
+  useEffect(() => {
+    if (!inputText.replace(/\s/g, '').length && inputText.length > 0) {
+      onExited(editor, false)
+    }
+  }, [editor, inputText, onExited])
+
   // Make us maintain a focused user when open
   useEffect(() => {
     if (!filteredOptions.includes(focusedUser)) {
@@ -226,17 +240,31 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, onSelect}) => 
   }, [editor, onExited, shouldExit])
 
   return (
-    <MentionDropdownMenu
-      instanceId={editor.id}
-      mentionOptions={filteredOptions}
-      show
-      coordiantes={mentionCoordinates}
-      selectedUser={focusedUser?.id}
-      onSelect={user => {
-        setFocusedUser(user)
-        setShouldExit(true)
-      }}
-    />
+    <>
+      <MentionDropdownMenu
+        instanceId={editor.id}
+        mentionOptions={filteredOptions}
+        coordiantes={mentionCoordinates}
+        selectedUser={focusedUser?.id}
+        onSelect={user => {
+          setFocusedUser(user)
+          setShouldExit(true)
+        }}
+        onMouseEnter={() => {
+          setFocusType(MOUSE_FOCUS_TYPE)
+        }}
+        onOptionMouseEnter={user => {
+          setFocusedUser(user)
+        }}
+        highlightMouse={focusType === MOUSE_FOCUS_TYPE}
+      />
+      <MentionDropdownPortal
+        instanceId={editor.id}
+        mentionOptions={filteredOptions}
+        selectedUser={focusedUser?.id}
+        rceBodyRef={rceRef}
+      />
+    </>
   )
 }
 
@@ -246,12 +274,10 @@ MentionUIManager.propTypes = {
   rceRef: PropTypes.object,
   onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
-  onSelect: PropTypes.func,
   editor: PropTypes.object
 }
 
 MentionUIManager.defaultProps = {
   onFocusedUserChange: () => {},
-  onExited: () => {},
-  onSelect: () => {}
+  onExited: () => {}
 }

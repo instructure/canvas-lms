@@ -69,4 +69,28 @@ describe('SpeedGraderStatusMenu', () => {
     selectMenuItem('None')
     expect(props.updateSubmission).toHaveBeenCalledTimes(0)
   })
+
+  it('invokes updateSubmission prop callback with "excuse: true" param when new selection is "excused"', () => {
+    selectMenuItem('Excused')
+    expect(props.updateSubmission).toHaveBeenLastCalledWith({excuse: true})
+  })
+
+  it('invokes updateSubmission prop callback with latePolicyStatus of "late" and a secondsLateOverride param when new selection is "late"', () => {
+    selectMenuItem('Late')
+    expect(props.updateSubmission).toHaveBeenLastCalledWith({
+      latePolicyStatus: 'late',
+      secondsLateOverride: props.secondsLate
+    })
+  })
+
+  it('invokes updateSubmission prop callback with latePolicyStatus of "missing" when new selection is "missing"', () => {
+    selectMenuItem('Missing')
+    expect(props.updateSubmission).toHaveBeenLastCalledWith({latePolicyStatus: 'missing'})
+  })
+
+  it('invokes updateSubmission prop callback with latePolicyStatus of "none" when new selection is "none"', () => {
+    props.selection = 'missing'
+    selectMenuItem('None')
+    expect(props.updateSubmission).toHaveBeenLastCalledWith({latePolicyStatus: 'none'})
+  })
 })

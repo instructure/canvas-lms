@@ -26,6 +26,7 @@ import {User} from '../../../graphql/User'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
+import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const PostContainer = props => {
   if (props.deleted) {
@@ -43,9 +44,9 @@ export const PostContainer = props => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           direction: 'column-reverse',
           authorInfo: {
             padding: '0'
@@ -120,6 +121,7 @@ export const PostContainer = props => {
             overflowY="hidden"
             overflowX="hidden"
           >
+            {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
               title={props.title}
               message={props.message}
@@ -155,7 +157,8 @@ PostContainer.propTypes = {
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
   deleted: PropTypes.bool,
-  isTopicAuthor: PropTypes.bool
+  isTopicAuthor: PropTypes.bool,
+  quotedEntry: PropTypes.object
 }
 
 PostContainer.defaultProps = {

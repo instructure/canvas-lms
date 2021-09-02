@@ -35,7 +35,6 @@ export const DiscussionEntry = {
       ratingSum
       rating
       read
-      replyPreview
       forcedReadState
       subentriesCount
       rootEntryParticipantCounts {
@@ -49,14 +48,18 @@ export const DiscussionEntry = {
         ...DiscussionEntryPermissions
       }
       rootEntryId
-      rootEntry {
-        id
-        rootEntryParticipantCounts {
-          unreadCount
-          repliesCount
-        }
-      }
       parentId
+      quotedEntry {
+        createdAt
+        previewMessage
+        author {
+          shortName
+        }
+        editor {
+          shortName
+        }
+        deleted
+      }
     }
     ${DiscussionEntryPermissions.fragment}
   `,
@@ -72,7 +75,6 @@ export const DiscussionEntry = {
     ratingSum: number,
     rating: bool,
     read: bool,
-    replyPreview: string,
     forcedReadState: bool,
     subentriesCount: number,
     author: User.shape,
@@ -86,14 +88,18 @@ export const DiscussionEntry = {
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
-    rootEntry: shape({
-      id: string,
-      rootEntryParticipantCounts: shape({
-        unreadCount: number,
-        repliesCount: number
-      })
-    }),
-    parentId: string
+    parentId: string,
+    quotedEntry: shape({
+      createdAt: string,
+      previewMessage: string,
+      author: shape({
+        shortName: string
+      }),
+      editor: shape({
+        shortName: string
+      }),
+      deleted: bool
+    })
   }),
 
   mock: ({
@@ -107,7 +113,6 @@ export const DiscussionEntry = {
     ratingSum = null,
     rating = false,
     read = true,
-    replyPreview = '',
     forcedReadState = false,
     subentriesCount = 2,
     author = User.mock(),
@@ -128,8 +133,8 @@ export const DiscussionEntry = {
       __typename: 'DiscussionSubentriesConnection'
     },
     rootEntryId = '77',
-    rootEntry = null,
-    parentId = '77'
+    parentId = '77',
+    quotedEntry = null
   } = {}) => ({
     id,
     _id,
@@ -141,7 +146,6 @@ export const DiscussionEntry = {
     ratingSum,
     rating,
     read,
-    replyPreview,
     forcedReadState,
     subentriesCount,
     author,
@@ -151,8 +155,8 @@ export const DiscussionEntry = {
     permissions,
     discussionSubentriesConnection,
     rootEntryId,
-    rootEntry,
     parentId,
+    quotedEntry,
     __typename: 'DiscussionEntry'
   })
 }

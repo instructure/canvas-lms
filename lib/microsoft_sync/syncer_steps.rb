@@ -355,7 +355,7 @@ module MicrosoftSync
       mappings.each { |user_id, aad_id| diff.set_member_mapping(user_id, aad_id) }
 
       users_with_mappings = mappings.map(&:first)
-      enrollments = Enrollment.active.not_fake
+      enrollments = Enrollment.microsoft_sync_relevant
         .where(course: course, user_id: users_with_mappings)
         .pluck(:user_id, :type)
       enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
@@ -384,6 +384,13 @@ module MicrosoftSync
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e)
+    end
+
+    # Only serialize Group (AR model, so really just Group id) when enqueueing
+    # a job. The rest of the instance variables should be reloaded when the job
+    # starts again.
+    def encode_with(coder)
+      coder['group'] = @group
     end
 
     private

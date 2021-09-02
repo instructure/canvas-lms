@@ -223,9 +223,6 @@ class ContextModulesApiController < ApplicationController
   def duplicate
     if authorized_action(@context, @current_user, :manage_content)
       old_module = @context.modules_visible_to(@current_user).find(params[:module_id])
-      if !@context.root_account.feature_enabled?(:duplicate_modules)
-        return render json: { error: 'duplicating objects not enabled' }, status: :bad_request
-      end
       return render json: { error: 'unable to find module to duplicate' }, status: :bad_request unless old_module
       return render json: { error: 'cannot duplicate this module' }, status: :bad_request unless old_module.can_be_duplicated?
 

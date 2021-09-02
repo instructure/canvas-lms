@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useStoreProps} from '../../../shared/StoreContext'
 
 import {DEFAULT_SETTINGS} from '../../svg/constants'
+import {BTN_AND_ICON_ATTRIBUTE} from '../../registerEditToolbar'
 import {buildSvg, buildStylesheet} from '../../svg'
 import formatMessage from '../../../../../format-message'
 
@@ -61,7 +62,12 @@ export const CreateButtonForm = ({editor, onClose}) => {
   }
 
   const writeButtonToRCE = ({url}) => {
-    const img = editor.dom.createHTML('img', {src: url, alt: settings.alt})
+    const img = editor.dom.createHTML('img', {
+      src: url,
+      alt: settings.alt,
+      [BTN_AND_ICON_ATTRIBUTE]: true
+    })
+
     editor.insertContent(img)
   }
 

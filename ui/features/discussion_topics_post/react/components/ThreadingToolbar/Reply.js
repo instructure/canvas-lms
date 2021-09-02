@@ -53,7 +53,7 @@ export function Reply({...props}) {
             alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
           >
             <Text weight="bold" size={responsiveProps.textSize}>
-              {I18n.t('Reply')}
+              {props.isIsolatedView ? I18n.t('Quote') : I18n.t('Reply')}
             </Text>
           </AccessibleContent>
         </CondensedButton>
@@ -63,7 +63,8 @@ export function Reply({...props}) {
 }
 
 Reply.defaultProps = {
-  withBackground: false
+  withBackground: false,
+  isIsolatedView: false
 }
 
 Reply.propTypes = {
@@ -87,5 +88,9 @@ Reply.propTypes = {
   /**
    * Disable/Enable for the button
    */
-  isReadOnly: PropTypes.bool
+  isReadOnly: PropTypes.bool,
+  /**
+   * True if rendered in isolated view
+   */
+  isIsolatedView: PropTypes.bool
 }

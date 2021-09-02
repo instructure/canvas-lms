@@ -28,6 +28,10 @@ const KEYCODES = {
   SPACE: 32
 }
 
+const iconStyles = {
+  display: 'inline-block'
+}
+
 const contentItem = ({
   id,
   showAddContent,
@@ -35,7 +39,8 @@ const contentItem = ({
   expanded,
   containerRefs,
   onRefChange,
-  onCreateGroup
+  onCreateGroup,
+  iconMargin
 }) => {
   const onClick = e => {
     e.stopPropagation()
@@ -76,7 +81,13 @@ const contentItem = ({
       containerRef={el => onRefChange(el, id)}
       onKeyDown={onKeyDown}
       onClick={onClick}
-      itemIcon={expanded ? null : IconPlusLine}
+      itemIcon={
+        expanded ? null : (
+          <div style={{...iconStyles, ...iconMargin}}>
+            <IconPlusLine size="x-small" />
+          </div>
+        )
+      }
       variant="indent"
     >
       {expanded ? (
@@ -107,7 +118,10 @@ const TreeBrowser = ({
   const [expandedContentId, setExpandedContentId] = useState(null)
   const [containerRefs, setContainerRefs] = useState({})
   const margin = '0.8em'
-  const iconMargin = isRTL() ? {marginLeft: margin} : {marginRight: margin}
+  const marginBottom = {marginBottom: '0.25em'}
+  const iconMargin = isRTL()
+    ? {...marginBottom, marginLeft: margin}
+    : {...marginBottom, marginRight: margin}
 
   const onRefChange = useCallback((node, id) => {
     setContainerRefs(prevState => ({
@@ -141,7 +155,8 @@ const TreeBrowser = ({
           expanded: expandedContentId === col.id,
           containerRefs,
           onRefChange,
-          onCreateGroup
+          onCreateGroup,
+          iconMargin
         })
     }))
     .reduce((dict, collection) => {
@@ -158,12 +173,12 @@ const TreeBrowser = ({
       onCollectionToggle={handleCollectionToggle}
       onCollectionClick={onCollectionClick}
       collectionIcon={() => (
-        <span style={{display: 'inline-block', ...iconMargin}}>
+        <span style={{...iconStyles, ...iconMargin}}>
           <IconArrowOpenEndLine size="x-small" />
         </span>
       )}
       collectionIconExpanded={() => (
-        <span style={{display: 'inline-block', ...iconMargin}}>
+        <span style={{...iconStyles, ...iconMargin}}>
           <IconArrowOpenDownLine size="x-small" />
         </span>
       )}

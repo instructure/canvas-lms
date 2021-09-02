@@ -87,6 +87,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.outcome_proficiency_created(obj)
     when OutcomeCalculationMethod
       Canvas::LiveEvents.outcome_calculation_method_created(obj)
+    when OutcomeFriendlyDescription
+      Canvas::LiveEvents.outcome_friendly_description_created(obj)
     end
   end
 
@@ -184,6 +186,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.outcome_proficiency_updated(obj)
     when OutcomeCalculationMethod
       Canvas::LiveEvents.outcome_calculation_method_updated(obj)
+    when OutcomeFriendlyDescription
+      Canvas::LiveEvents.outcome_friendly_description_updated(obj)
     end
   end
 

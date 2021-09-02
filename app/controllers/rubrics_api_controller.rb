@@ -291,8 +291,8 @@ class RubricsApiController < ApplicationController
   def show
     return unless authorized_action(@context, @current_user, :manage_rubrics)
 
-    rubric = @context.rubrics.active.find_by(id: params[:id])
-    return render json: {message: "Rubric not found"}, status: :not_found unless rubric.present?
+    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
+    return render json: {message: "Rubric not found"}, status: :not_found unless rubric.present? && !rubric.deleted?
 
     if !@context.errors.present?
       assessments = rubric_assessments(rubric)

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if Rails.env.development? || Rails.env.test?
+if Rails.env.test?
 
   # This prevents timeouts from occurring once you've started debugging a
   # process. It hooks into the specific raise used by Timeout, and if we're
@@ -37,12 +37,15 @@ if Rails.env.development? || Rails.env.test?
   #
   module NoRaiseTimeoutsWhileDebugging
     def raise(*args)
-      if args.first.is_a?(Class) && args.first < Timeout::Error
+      if defined?(SpecTimeLimit) && args.first == SpecTimeLimit::Error
         have_ever_run_a_debugger = (
           defined?(Byebug) && Byebug.respond_to?(:started?) ||
           defined?(Pry) && Pry::InputLock.input_locks.any?
         )
-        return if have_ever_run_a_debugger
+        if have_ever_run_a_debugger
+          Rails.logger.warn "Ignoring timeout because we're debugging"
+          return
+        end
       end
       super
     end

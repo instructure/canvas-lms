@@ -1,5 +1,6 @@
 ---
 immersive_reader_wiki_pages:
+  type: setting
   state: hidden
   display_name: Microsoft Immersive Reader
   description: |-

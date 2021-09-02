@@ -1279,22 +1279,20 @@ class Attachment < ActiveRecord::Base
     }
     can :read and can :download
 
-    given { |user, session|
-        session && session['file_access_user_id'].present? &&
-        (u = User.where(id: session['file_access_user_id']).first) &&
+    given { |_user, session|
+        (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
-        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
+        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
     }
     can :read
 
-    given { |user, session|
-        session && session['file_access_user_id'].present? &&
-        (u = User.where(id: session['file_access_user_id']).first) &&
+    given { |_user, session|
+        (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         !self.locked_for?(u, :check_policies => true) &&
-        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
+        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
     }
     can :download
 

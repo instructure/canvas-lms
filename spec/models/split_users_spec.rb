@@ -128,6 +128,14 @@ describe SplitUsers do
     end
 
     describe 'with merge data' do
+      it 'should restore users without merge data items' do
+        UserMerge.from(restored_user).into(source_user)
+        UserMergeDataItem.where(user_id: restored_user).find_each(&:destroy)
+        SplitUsers.split_db_users(source_user)
+        expect(restored_user.reload).not_to be_deleted
+        expect(restored_user.name).to eq 'restored user'
+        expect(source_user.reload).not_to be_deleted
+      end
 
       it "should move lti_id to the new user" do
         course1.enroll_user(source_user)

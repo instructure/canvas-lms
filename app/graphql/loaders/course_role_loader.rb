@@ -26,22 +26,23 @@ class Loaders::CourseRoleLoader < GraphQL::Batch::Loader
   end
 
   def perform(objects)
+    scope = Enrollment
+      .joins(:course)
+      .where.not(enrollments: {workflow_state: "deleted"})
+      .where.not(courses: {workflow_state: "deleted"})
+      .where(course_id: @course_id)
+      .where(user_id: objects)
+      .select(:type, :user_id)
+      .distinct
+
+    scope = scope.where(type: @role_types) if @role_types.present?
+
+    scope = scope.joins(:role).where(roles: {workflow_state: "built_in"}) if @built_in_only
+
+    enrollments = scope.group_by(&:user_id)
+
     objects.each do |object|
-
-      scope = Enrollment
-        .joins(:course)
-        .where.not(enrollments: {workflow_state: "deleted"})
-        .where.not(courses: {workflow_state: "deleted"})
-        .where(course_id: @course_id)
-        .where(user_id: object.id)
-        .select(:type)
-        .distinct
-
-      scope = scope.where(type: @role_types) if @role_types.present?
-
-      scope = scope.joins(:role).where(roles: {workflow_state: "built_in"}) if @built_in_only
-
-    fulfill(object, scope)
+      fulfill(object, enrollments[object.id]&.map(&:type))
     end
   end
 end
