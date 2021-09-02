@@ -31,7 +31,6 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
 
   const onEditGroupHandler = group => {
     ;(async () => {
-      const groupTitle = outcomeGroup.title
       const input = {
         id: outcomeGroup._id,
         title: group.title
@@ -51,18 +50,11 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
 
         showFlashAlert({
           type: 'success',
-          message: I18n.t('The group "%{groupTitle}" was successfully updated.', {groupTitle})
+          message: I18n.t('"%{groupTitle}" was successfully updated.', {groupTitle: group.title})
         })
       } catch (err) {
         showFlashAlert({
-          message: err.message
-            ? I18n.t('An error occurred while updating group "%{groupTitle}": %{message}.', {
-                groupTitle,
-                message: err.message
-              })
-            : I18n.t('An error occurred while updating group "%{groupTitle}".', {
-                groupTitle
-              }),
+          message: I18n.t('An error occurred while editing this group. Please try again.'),
           type: 'error'
         })
       }
