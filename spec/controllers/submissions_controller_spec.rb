@@ -316,6 +316,19 @@ describe SubmissionsController do
       expect(flash[:error]).to eq "Assignment does not accept this submission type"
     end
 
+    it "prevents submitting unpublished submissions from ui" do
+      course_with_student_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_text_entry")
+      @assignment.update(workflow_state: 'unpublished')
+      post 'create', params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        submission: {submission_type: "online_text_entry", body: "some online text entry"}
+      }
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "You can't submit an assignment when it is unpublished"
+    end
+
     it 'accepts eula agreement timestamp when api submission' do
       timestamp = Time.zone.now.to_i.to_s
       course_with_student_logged_in(:active_all => true)

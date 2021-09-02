@@ -262,6 +262,11 @@ class SubmissionsController < SubmissionsBaseController
         return redirect_to(course_assignment_url(@context, @assignment))
       end
 
+      unless @assignment.published?
+        flash[:error] = t("You can't submit an assignment when it is unpublished")
+        return redirect_to(course_assignment_url(@context, @assignment))
+      end
+
       unless @assignment.accepts_submission_type?(params[:submission][:submission_type])
         flash[:error] = t("Assignment does not accept this submission type")
         return redirect_to(course_assignment_url(@context, @assignment))
