@@ -150,9 +150,11 @@ export function AssignmentDetails({...props}) {
       }}
       render={responsiveProps => (
         <Flex data-testid="graded-discussion-info">
-          {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
-            ? multipleDueDates
-            : singleDueDate}
+          <Flex.Item shouldGrow shouldShrink>
+            {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
+              ? multipleDueDates
+              : singleDueDate}
+          </Flex.Item>
           <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
               {responsiveProps.text}

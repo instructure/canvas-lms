@@ -102,42 +102,67 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       })
     }
 
-    const showSingleOverrideDueDate = () => {
-      return assignmentOverrides[0]?.dueAt
-        ? I18n.t('%{title}: Due %{date}', {
-            title: assignmentOverrides[0]?.title,
-            date: DateHelper.formatDatetimeForDiscussions(assignmentOverrides[0]?.dueAt)
-          })
-        : I18n.t('%{title}: No Due Date', {
-            title: assignmentOverrides[0]?.title
-          })
-    }
+    const processDueDate = (group, dueDate, availableDate, untilDate) => {
+      let dueDateFormatted
+      if (group && dueDate) {
+        dueDateFormatted = I18n.t('%{title} Due %{date}', {
+          title: group,
+          date: dueDate
+        })
+      } else if (!group && props.discussionTopic.permissions?.readAsAdmin && dueDate) {
+        dueDateFormatted = I18n.t('Everyone Due %{date}', {
+          date: dueDate
+        })
+      } else if (dueDate) {
+        dueDateFormatted = I18n.t('Due %{date}', {
+          title: group,
+          date: dueDate
+        })
+      } else if (group) {
+        dueDateFormatted = I18n.t('%{title} No Due Date', {
+          title: group
+        })
+      } else if (!group && props.discussionTopic.permissions?.readAsAdmin && !dueDate) {
+        dueDateFormatted = I18n.t('Everyone No Due Date', {
+          date: dueDate
+        })
+      } else {
+        I18n.t('No Due Date')
+      }
 
-    const showDefaultDueDate = () => {
-      return props.discussionTopic.assignment?.dueAt
-        ? I18n.t('Everyone: Due %{dueAtDisplayDate}', {
-            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
-              props.discussionTopic.assignment?.dueAt
-            )
-          })
-        : I18n.t('No Due Date')
-    }
+      let availableFromUntilFormatted = ''
+      if (availableDate && untilDate) {
+        availableFromUntilFormatted = I18n.t('Available from %{availableDate} until %{untilDate}', {
+          availableDate,
+          untilDate
+        })
+      } else if (availableDate) {
+        availableFromUntilFormatted = I18n.t('Available from %{availableDate}', {
+          availableDate
+        })
+      } else if (untilDate) {
+        availableFromUntilFormatted = I18n.t('Available until %{untilDate}', {
+          untilDate
+        })
+      }
 
-    const showNonAdminDueDate = () => {
-      return props.discussionTopic.assignment?.dueAt
-        ? I18n.t('Due: %{dueAtDisplayDate}', {
-            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
-              props.discussionTopic.assignment?.dueAt
-            )
-          })
-        : I18n.t('No Due Date')
+      return [dueDateFormatted, availableFromUntilFormatted].join(' ')
     }
 
     const getDueDateText = () => {
-      if (props.discussionTopic.permissions?.readAsAdmin)
-        return singleOverrideWithNoDefault ? showSingleOverrideDueDate() : showDefaultDueDate()
-
-      return showNonAdminDueDate()
+      return singleOverrideWithNoDefault
+        ? processDueDate(
+            assignmentOverrides[0]?.title,
+            DateHelper.formatDatetimeForDiscussions(assignmentOverrides[0]?.dueAt),
+            DateHelper.formatDateForDisplay(assignmentOverrides[0]?.unlockAt, 'short'),
+            DateHelper.formatDateForDisplay(assignmentOverrides[0]?.lockAt, 'short')
+          )
+        : processDueDate(
+            '',
+            DateHelper.formatDatetimeForDiscussions(props.discussionTopic.assignment?.dueAt),
+            DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.unlockAt, 'short'),
+            DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.lockAt, 'short')
+          )
     }
 
     dueAt = getDueDateText()

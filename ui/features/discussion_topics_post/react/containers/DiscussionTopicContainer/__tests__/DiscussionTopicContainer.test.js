@@ -169,7 +169,7 @@ describe('DiscussionTopicContainer', () => {
   it('renders without optional props', async () => {
     const container = setup({discussionTopic: Discussion.mock({assignment: {}})})
     expect(container.getByTestId('replies-counter')).toBeInTheDocument()
-    expect(container.getByText('No Due Date')).toBeInTheDocument()
+    expect(container.getByText('Everyone No Due Date')).toBeInTheDocument()
     expect(container.getByText('0 points possible')).toBeInTheDocument()
   })
 
@@ -260,7 +260,9 @@ describe('DiscussionTopicContainer', () => {
         permissions: DiscussionPermissions.mock({readAsAdmin: false})
       })
     })
-    expect(await container.findByText('Due: Mar 31 5:59am')).toBeTruthy()
+    expect(
+      await container.findByText('Due Mar 31 5:59am Available from Mar 24 until Apr 4')
+    ).toBeTruthy()
   })
 
   it('Should not be able to see post menu if no permissions and initialPostRequiredForCurrentUser', () => {
@@ -471,7 +473,9 @@ describe('DiscussionTopicContainer', () => {
     const container = setup({
       discussionTopic: Discussion.mock({assignment: Assignment.mock({assignmentOverrides: null})})
     })
-    expect(await container.findByText('Everyone: Due Mar 31 5:59am')).toBeTruthy()
+    expect(
+      await container.findByText('Everyone Due Mar 31 5:59am Available from Mar 24 until Apr 4')
+    ).toBeTruthy()
   })
 
   it('Should find "Show Due Dates" link button', async () => {
@@ -498,7 +502,11 @@ describe('DiscussionTopicContainer', () => {
     props.discussionTopic.assignment.unlockAt = null
     props.discussionTopic.assignment.lockAt = null
     const container = setup(props)
-    expect(await container.findByText('assignment override 3: Due Apr 5 1:40pm')).toBeTruthy()
+    expect(
+      await container.findByText(
+        'assignment override 3 Due Apr 5 1:40pm Available from Mar 21 until Sep 4'
+      )
+    ).toBeTruthy()
   })
 
   it('Should find no due date text for "assignment override 3"', async () => {
@@ -519,7 +527,80 @@ describe('DiscussionTopicContainer', () => {
     props.discussionTopic.assignment.unlockAt = null
     props.discussionTopic.assignment.lockAt = null
     const container = setup(props)
-    expect(await container.findByText('assignment override 3: No Due Date')).toBeTruthy()
+
+    expect(
+      container.getByText('assignment override 3 No Due Date Available from Mar 21 until Sep 4')
+    ).toBeTruthy()
+  })
+
+  it('Should find no available date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '2021-04-05T13:40:50Z',
+        lockAt: '2021-09-03T23:59:59-06:00',
+        unlockAt: '',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+
+    expect(
+      container.getByText('assignment override 3 Due Apr 5 1:40pm Available until Sep 4')
+    ).toBeTruthy()
+  })
+
+  it('Should find no until date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '2021-04-05T13:40:50Z',
+        lockAt: '',
+        unlockAt: '2021-03-21T00:00:00-06:00',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+
+    expect(
+      container.getByText('assignment override 3 Due Apr 5 1:40pm Available from Mar 21')
+    ).toBeTruthy()
+  })
+
+  it('Should find no text after due date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '2021-04-05T13:40:50Z',
+        lockAt: '',
+        unlockAt: '',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+
+    expect(container.getByText('assignment override 3 Due Apr 5 1:40pm')).toBeTruthy()
   })
 
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
