@@ -78,10 +78,6 @@ const useGroupDetail = ({
     ...queryVars
   }
 
-  if (!skip) {
-    allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
-  }
-
   const {loading, error, data, fetchMore} = useQuery(query, {
     variables,
     skip,
@@ -89,6 +85,9 @@ const useGroupDetail = ({
       fetchOptions: {
         signal: abortController.signal
       }
+    },
+    onCompleted: () => {
+      allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
     }
   })
 

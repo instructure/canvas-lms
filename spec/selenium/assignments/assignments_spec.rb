@@ -610,6 +610,56 @@ describe "assignments" do
       end
     end
 
+    context 'with an LTI 1.3 Tool with custom params' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          name: 'LTI Test Tool',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          use_1_3: true,
+          developer_key: DeveloperKey.create!,
+          tool_id: 'LTI Test Tool',
+          url: 'http://lti13testtool.docker/launch'
+        )
+      end
+      let(:custom_params) do
+        {
+          "lti_assignment_id" => "$com.instructure.Assignment.lti.id"
+        }
+      end
+      let(:content_tag) { ContentTag.new(url: tool.url, content: tool) }
+      let(:assignment) do
+        @course.assignment_groups.first.assignments.create!(title: "custom params",
+                                                            lti_resource_link_custom_params: custom_params,
+                                                            submission_types: "external_tool", context: @course,
+                                                            points_possible: 10, external_tool_tag: content_tag,
+                                                            workflow_state: "unpublished")
+      end
+
+      it "doesn't delete the custom params when publishing from the index page" do
+        assignment
+        get "/courses/#{@course.id}/assignments"
+        f("#assignment_#{assignment.id} .publish-icon").click
+        wait_for_ajaximations
+
+        expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
+      end
+
+      it "doesn't delete the custom params when editing from the index page" do
+        assignment
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        f("#assign_#{assignment.id}_manage_link").click
+        wait_for_ajaximations
+        f("#assignment_#{assignment.id} .edit_assignment").click
+        f("#assign_#{assignment.id}_assignment_points").send_keys("5")
+
+        submit_form(fj('.form-dialog:visible'))
+
+        expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
+      end
+    end
+
     context 'publishing' do
       before do
         ag = @course.assignment_groups.first

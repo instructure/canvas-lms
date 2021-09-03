@@ -2219,6 +2219,136 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    context 'LTI 1.3' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          name: 'LTI Test Tool',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          use_1_3: true,
+          developer_key: DeveloperKey.create!,
+          tool_id: 'LTI Test Tool',
+          url: 'http://lti13testtool.docker/launch'
+        )
+      end
+      let(:external_tool_tag_attributes) do
+        {
+          content_id: tool.id,
+          content_type: 'context_external_tool',
+          custom_params: nil,
+          external_data: '',
+          new_tab: '0',
+          url: 'http://lti13testtool.docker/launch'
+        }
+      end
+      let(:assignment_params) do
+        {
+          submission_types: ['external_tool'],
+          external_tool_tag_attributes: external_tool_tag_attributes
+        }
+      end
+
+      context "with custom_params" do
+        let(:external_tool_tag_attributes) { super().merge({custom_params: custom_params })}
+        let(:custom_params) do
+          {
+            'context_id' => '$Context.id'
+          }
+        end
+
+        it "creates the assignment and sets `custom_params` on the Lti::ResourceLink" do
+          response = api_call(:post,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              controller: 'assignments_api',
+              action: 'create',
+              format: 'json',
+              course_id: @course.id.to_s
+            }, { assignment: assignment_params }, { expected_status: 200 })
+
+          expect(response["external_tool_tag_attributes"]["custom_params"]).to eq custom_params
+          @course.reload
+          expect(@course.assignments.count).to be 1
+          expect(@course.assignments.last.primary_resource_link.custom).to eq custom_params
+        end
+
+        context "invalid custom params" do
+          let(:custom_params) do
+            {
+              "hello" => {
+                "there" => "general"
+              }
+            }
+          end
+
+          it "returns a 400 and doesn't create the assignment" do
+            response = api_call(:post,
+              "/api/v1/courses/#{@course.id}/assignments",
+              {
+                controller: 'assignments_api',
+                action: 'create',
+                format: 'json',
+                course_id: @course.id.to_s
+              }, { assignment: assignment_params }, { expected_status: 400 })
+            expect(response["errors"].length).to be 1
+            expect(@course.assignments.count).to be 0
+          end
+        end
+
+        context 'when Quizzes 2 tool is selected' do
+          let(:tool) do
+            @course.context_external_tools.create!(
+              :name => 'Quizzes.Next',
+              :consumer_key => 'test_key',
+              :shared_secret => 'test_secret',
+              :tool_id => 'Quizzes 2',
+              :url => 'http://example.com/launch'
+            )
+          end
+          let(:external_tool_tag_attributes) do
+            {
+              content_id: tool.id,
+              content_type: 'context_external_tool',
+              custom_params: custom_params,
+              external_data: '',
+              new_tab: '0',
+              url: 'http://example.com/launch'
+            }
+          end
+
+          it "doesn't retain peer review settings" do
+            response = api_call(:post,
+              "/api/v1/courses/#{@course.id}/assignments",
+              {
+                controller: 'assignments_api',
+                action: 'create',
+                format: 'json',
+                course_id: @course.id.to_s
+              }, { assignment: assignment_params }, { expected_status: 200 }
+            )
+
+            expect(@course.assignments.last.peer_reviews).to be_falsey
+          end
+        end
+
+        context "custom params isn't a Hash/JS Object" do
+          let(:custom_params) { "Lies, deception!" }
+
+          it "responds with a 400 and doesn't create the assignment" do
+            api_call(:post,
+              "/api/v1/courses/#{@course.id}/assignments",
+              {
+                :controller => 'assignments_api',
+                :action => 'create',
+                :format => 'json',
+                :course_id => @course.id.to_s
+              }, {:assignment => assignment_params }, { expected_status: 400 })
+            expect(@course.reload.assignments.count).to be 0
+          end
+        end
+      end
+    end
+
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
@@ -4697,6 +4827,195 @@ describe AssignmentsApiController, type: :request do
         end
       end
     end
+
+    context "assignment that uses LTI 1.3" do
+      let(:course) do
+        course = course_factory
+        course_with_teacher_logged_in({user: user_factory, course: course})
+        course
+      end
+      let(:assignment) do
+        course.assignments.create!(title: "custom", submission_types: "external_tool", points_possible: 10,
+                                   external_tool_tag: content_tag, workflow_state: "published")
+      end
+      let(:tool) do
+        course.context_external_tools.create!(
+          name: 'LTI Test Tool',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          use_1_3: true,
+          developer_key: DeveloperKey.create!,
+          tool_id: 'LTI Test Tool',
+          url: 'http://lti13testtool.docker/launch'
+        )
+      end
+      let(:content_tag) { ContentTag.new(url: tool.url, content: tool) }
+      let(:external_tool_tag_attributes) do
+        {
+          content_id: course.context_external_tools.last.id,
+          content_type: 'context_external_tool',
+          external_data: '',
+          new_tab: '0',
+          url: 'http://lti13testtool.docker/launch'
+        }
+      end
+      let(:assignment_params) do
+        {
+          submission_types: ["external_tool"],
+          external_tool_tag_attributes: external_tool_tag_attributes
+        }
+      end
+
+      context 'that uses custom parameters' do
+        let(:external_tool_tag_attributes) { super().merge({custom_params: custom_params}) }
+        let(:custom_params) { {"hello" => "there"} }
+
+        it "saves the new custom params" do
+          response = api_call(
+            :put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}",
+            {
+              controller: "assignments_api",
+              action: "update",
+              format: "json",
+              course_id: course.id.to_s,
+              id: assignment.to_param
+            },
+            { assignment: assignment_params },
+            {},
+            { expected_status: 200 }
+          )
+          expect(response["external_tool_tag_attributes"]["custom_params"]).to eq custom_params
+          expect(assignment.reload.primary_resource_link.custom).to eq custom_params
+        end
+
+        context "custom params already exist" do
+          let(:assignment) do
+            a = super()
+            a.update!(lti_resource_link_custom_params: saved_custom_params)
+            a
+          end
+          let(:saved_custom_params) do
+            {
+              "already" => "saved"
+            }
+          end
+
+          context "passing no custom params" do
+            let(:external_tool_tag_attributes) do
+              prev = super()
+              prev.delete(:custom_params)
+              prev
+            end
+
+            it "doesn't delete the existing custom params" do
+              response = api_call(
+                :put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}",
+                {
+                  controller: "assignments_api",
+                  action: "update",
+                  format: "json",
+                  course_id: course.id.to_s,
+                  id: assignment.to_param
+                },
+                { assignment: assignment_params },
+                {},
+                { expected_status: 200 }
+              )
+              expect(response["external_tool_tag_attributes"]["custom_params"]).to eq saved_custom_params
+              expect(assignment.reload.primary_resource_link.custom).to eq saved_custom_params
+            end
+          end
+
+          context "passing a falsey value for custom params" do
+            let(:custom_params) { nil }
+
+            it "deletes the existing custom params" do
+              response = api_call(
+                :put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}",
+                {
+                  controller: "assignments_api",
+                  action: "update",
+                  format: "json",
+                  course_id: course.id.to_s,
+                  id: assignment.to_param
+                },
+                { assignment: assignment_params },
+                {},
+                { expected_status: 200 }
+              )
+
+              expect(response["external_tool_tag_attributes"]["custom_params"]).to eq({})
+              expect(assignment.reload.primary_resource_link.reload.custom).to eq({})
+            end
+          end
+
+          context "passing a new value for custom params" do
+            let(:custom_params) { { "general" => "kenobi"} }
+
+            it "updates the custom params on the Lti::ResourceLink" do
+              response = api_call(
+                :put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}",
+                {
+                  controller: "assignments_api",
+                  action: "update",
+                  format: "json",
+                  course_id: course.id.to_s,
+                  id: assignment.to_param
+                },
+                { assignment: assignment_params },
+                {},
+                { expected_status: 200 }
+              )
+
+              expect(response["external_tool_tag_attributes"]["custom_params"]).to eq custom_params
+              expect(assignment.reload.primary_resource_link.reload.custom).to eq custom_params
+            end
+          end
+        end
+
+        context "invalid custom params" do
+          shared_examples_for "an invalid custom params request" do
+            it "returns a 400 and doesn't save the custom params" do
+              response = api_call(
+                :put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}",
+                {
+                  controller: "assignments_api",
+                  action: "update",
+                  format: "json",
+                  course_id: course.id.to_s,
+                  id: assignment.to_param
+                },
+                { assignment: assignment_params },
+                {},
+                { expected_status: 400 }
+              )
+              expect(response.include?("external_tool_tag_attributes")).to be_falsey
+              expect(response['errors'].length).to be 1
+              expect(assignment.reload.primary_resource_link.reload.custom).to be_nil
+            end
+          end
+
+          context "because it's a nested object" do
+            let(:custom_params) do
+              {
+                "hello" => {
+                  "there" => "general kenobi"
+                },
+                "I'm" => "invalid"
+              }
+            end
+
+            it_behaves_like "an invalid custom params request"
+          end
+
+          context "because it's not an object at all" do
+            let(:custom_params) { "Lies, deception!" }
+
+            it_behaves_like "an invalid custom params request"
+          end
+        end
+      end
+    end
   end
 
   describe "DELETE /courses/:course_id/assignments/:id (#delete)" do
@@ -5126,39 +5445,66 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "external tool assignment" do
-
-        before :once do
-          @assignment = @course.assignments.create!
-          @tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
-          @tool_tag.context = @assignment
-          @tool_tag.save!
-          @assignment.submission_types = 'external_tool'
-          @assignment.save!
+        let(:course) { course_model }
+        let(:assignment) do
+          course.assignments.create!(external_tool_tag: content_tag, submission_types: 'external_tool',
+                                     points_possible: 10)
         end
-
-        before :each do
-          @json = api_get_assignment_in_course(@assignment, @course)
+        let(:content_tag) { ContentTag.new(content: tool, url: tool.url, new_tab: false) }
+        let(:tool) do
+          course.context_external_tools.create!(
+            name: 'LTI Test Tool',
+            consumer_key: 'key',
+            shared_secret: 'secret',
+            developer_key: DeveloperKey.create!,
+            tool_id: 'LTI Test Tool',
+            url: 'http://lti13testtool.docker/launch'
+          )
         end
+        let(:json) { api_get_assignment_in_course(assignment, course) }
 
         it 'has the external tool submission type' do
-          expect(@json['submission_types']).to eq ['external_tool']
+          expect(json['submission_types']).to eq ['external_tool']
         end
 
         it 'includes the external tool attributes' do
-          expect(@json['external_tool_tag_attributes']).to eq({
-            'url' => 'http://www.example.com',
+          expect(json['external_tool_tag_attributes']).to eq({
+            'url' => tool.url,
             'new_tab' => false,
-            'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard),
+            'resource_link_id' => ContextExternalTool.opaque_identifier_for(content_tag, content_tag.context.shard),
             'external_data' => nil,
-            'custom' => nil
+            'custom_params' => nil,
+            'content_id' => tool.id,
+            'content_type' => 'ContextExternalTool'
           })
         end
 
         it 'includes the assignment_id attribute' do
-          expect(@json).to include('url')
-          uri = URI(@json['url'])
-          expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+          expect(json).to include('url')
+          uri = URI(json['url'])
+          expect(uri.path).to eq "/api/v1/courses/#{course.id}/external_tools/sessionless_launch"
           expect(uri.query).to include('assignment_id=')
+        end
+
+        context "that uses LTI 1.3" do
+          let(:tool) do
+            a = super()
+            a.update!(use_1_3: true)
+            a
+          end
+
+          context "with custom_params" do
+            let(:assignment) do
+              a = super()
+              a.update(lti_resource_link_custom_params: custom_params)
+              a
+            end
+            let(:custom_params) { { "hello" => "world" }}
+
+            it 'includes the custom_params' do
+              expect(json['external_tool_tag_attributes']["custom_params"]).to eq custom_params
+            end
+          end
         end
       end
 

@@ -370,10 +370,10 @@ export default class Assignment extends Model
       return JSON.stringify(data)
     return ''
 
-  externalToolCustomParams: (custom) =>
+  externalToolCustomParams: (custom_params) =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
-    return tagAttributes.custom unless arguments.length > 0
-    tagAttributes.custom = custom
+    return tagAttributes.custom_params unless arguments.length > 0
+    tagAttributes.custom_params = custom_params
     @set 'external_tool_tag_attributes', tagAttributes
 
   externalToolCustomParamsStringified: =>
