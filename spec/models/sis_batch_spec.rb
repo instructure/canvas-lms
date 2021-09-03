@@ -95,7 +95,16 @@ describe SisBatch do
     expect(enrollment.scores.exists?).to eq true
   end
 
+  it 'should log stats' do
+    allow(InstStatsd::Statsd).to receive(:increment)
+    expect(InstStatsd::Statsd).to receive(:increment).with("sis_batch_completed", tags: { failed: false })
+    process_csv_data([%{user_id,login_id,status
+                        user_1,user_1,active}])
+
+  end
+
   it 'should restore linked observers when restoring enrollments' do
+    allow(InstStatsd::Statsd).to receive(:increment)
     course = @account.courses.create!(name: 'one', sis_source_id: 'c1', workflow_state: 'available')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
     observer = user_with_managed_pseudonym(account: @account)
@@ -107,6 +116,9 @@ describe SisBatch do
                                 c1,u1,student,deleted,}])
     expect(student_enrollment.reload.workflow_state).to eq 'deleted'
     expect(observer_enrollment.reload.workflow_state).to eq 'deleted'
+    tags = { undelete_only: false, unconclude_only: false, batch_mode: false }
+    expect(InstStatsd::Statsd).to receive(:increment).with("sis_batch_restored", tags: tags)
+
     batch.restore_states_for_batch
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq 'active'
