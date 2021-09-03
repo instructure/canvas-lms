@@ -369,8 +369,8 @@ test_1,TC 101,Test Course 101,,term1,deleted
             batch1.process
             batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => {:import_type => "silly_sis_batch"})
             batch2.process
-            expect(Delayed::Job.where(:tag => "SisBatch.process_all_for_account",
-              :strand => SisBatch.strand_for_account(@account)).count).to eq 1
+            expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
+                                      singleton: SisBatch.strand_for_account(@account)).count).to eq 1
             SisBatch.process_all_for_account(@account)
             expect(batch1.reload.data[:silliness_complete]).to eq true
             expect(batch2.reload.data[:silliness_complete]).to eq true

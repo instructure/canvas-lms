@@ -58,7 +58,6 @@ module Delayed::Backend::DefaultJobAccount
   end
 end
 Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
-Delayed::Backend::Redis::Job.include(Delayed::Backend::DefaultJobAccount)
 
 Delayed::Settings.default_job_options        = ->{ { current_shard: Shard.current }}
 Delayed::Settings.fetch_batch_size           = ->{ Setting.get('jobs_get_next_batch_size', '5').to_i }
@@ -73,6 +72,8 @@ Delayed::Settings.sleep_delay_stagger        = ->{ Setting.get('delayed_jobs_sle
 Delayed::Settings.worker_procname_prefix     = ->{ "#{Shard.current(:delayed_jobs).id}~" }
 Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig('health_check', 'type')&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]('health_check')
+# transitional
+Delayed::Settings.infer_strand_from_singleton = -> { Setting.get('infer_strand_from_singleton', true) == 'true' }
 
 # load our periodic_jobs.yml (cron overrides config file)
 Delayed::Periodic.add_overrides(ConfigFile.load('periodic_jobs').dup || {})

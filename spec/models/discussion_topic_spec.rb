@@ -2061,7 +2061,7 @@ describe DiscussionTopic do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       expect(@topic.materialized_view).to be_nil
       expect(@topic.materialized_view).to be_nil
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
     it "should return the materialized view if it's up to date" do
@@ -2072,24 +2072,24 @@ describe DiscussionTopic do
 
     it "should update the materialized view on new entry" do
       run_jobs
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 0
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 0
       @topic.reply_from(:user => @user, :text => "ohai")
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
     it "should update the materialized view on edited entry" do
       reply = @topic.reply_from(:user => @user, :text => "ohai")
       run_jobs
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 0
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 0
       reply.update(:message => "i got that wrong before")
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
     it "should return empty data for a materialized view on a new (unsaved) topic" do
       new_topic = DiscussionTopic.new(:context => @topic.context, :discussion_type => DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
       expect(new_topic).to be_new_record
       expect(new_topic.materialized_view).to eq [ "[]", [], [], [] ]
-      expect(Delayed::Job.strand_size("materialized_discussion:#{new_topic.id}")).to eq 0
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{new_topic.id}").count).to eq 0
     end
   end
 
