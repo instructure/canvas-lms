@@ -24,6 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {func, string} from 'prop-types'
 
 export default function ErrorTextInputForm(props) {
+  const submitButtonState = props.email.length === 0 ? 'disabled' : 'enabled'
   return (
     <View margin="small">
       <TextArea
@@ -33,13 +34,20 @@ export default function ErrorTextInputForm(props) {
       />
       <View margin="small">
         <TextInput
-          onChange={props.handleChangeOptionalEmail}
-          renderLabel={I18n.t('Email Address (Optional)')}
-          value={props.optionalEmail}
+          onChange={props.handleChangeEmail}
+          renderLabel={I18n.t('Your Email Address')}
+          isRequired
+          placeholder={I18n.t('email@example.com')}
+          value={props.email}
         />
       </View>
       <View textAlign="end" display="block">
-        <Button margin="small 0" variant="primary" onClick={props.handleSubmitErrorReport}>
+        <Button
+          margin="small 0"
+          variant="primary"
+          interaction={submitButtonState}
+          onClick={props.handleSubmitErrorReport}
+        >
           {I18n.t('Submit')}
         </Button>
       </View>
@@ -49,8 +57,8 @@ export default function ErrorTextInputForm(props) {
 
 ErrorTextInputForm.propTypes = {
   textAreaComment: string.isRequired,
-  optionalEmail: string.isRequired,
+  email: string.isRequired,
   handleChangeCommentBox: func.isRequired,
   handleSubmitErrorReport: func.isRequired,
-  handleChangeOptionalEmail: func.isRequired
+  handleChangeEmail: func.isRequired
 }
