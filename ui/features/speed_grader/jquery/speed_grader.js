@@ -1160,8 +1160,10 @@ function statusMenuComponent(submission) {
   )
 }
 
-function getLateAndMissingPills() {
-  return document.querySelectorAll('.submission-missing-pill, .submission-late-pill')
+function getLateMissingAndExcusedPills() {
+  return document.querySelectorAll(
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill'
+  )
 }
 
 function updateSubmissionAndPageEffects(data) {
@@ -1171,7 +1173,7 @@ function updateSubmissionAndPageEffects(data) {
     .then(() => {
       refreshGrades(() => {
         EG.refreshSubmissionsToView()
-        styleSubmissionStatusPills(getLateAndMissingPills())
+        styleSubmissionStatusPills(getLateMissingAndExcusedPills())
         renderStatusMenu(statusMenuComponent(submission))
       })
     })
@@ -2260,7 +2262,7 @@ EG = {
     const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
     if (mountPoint) {
       const shouldRender = isMostRecent && !isClosedForSubmission
-      styleSubmissionStatusPills(getLateAndMissingPills())
+      styleSubmissionStatusPills(getLateMissingAndExcusedPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
       renderStatusMenu(component)
     }
@@ -2332,6 +2334,7 @@ EG = {
           value: i,
           late: s.late,
           missing: s.missing,
+          excused: s.excused,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade
