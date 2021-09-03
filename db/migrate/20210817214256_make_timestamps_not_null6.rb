@@ -109,8 +109,17 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
       tries = 0
     rescue ActiveRecord::NotNullViolation => e
       tries += 1
-      # check if it was a one-time event (all rows missing values are within a 1 week timespan)
       klass = table.classify.constantize
+
+      # if we're failing on updated_at, try to backfill from created_at instead
+      if e.message.include?("updated_at")
+        raise if tries == 2
+
+        klass.where(updated_at: nil).update_all("updated_at=created_at")
+        retry
+      end
+
+      # check if it was a one-time event (all rows missing values are within a 1 week timespan)
       min_id = klass.where(created_at: nil).minimum(:id)
       max_id = klass.where(created_at: nil).maximum(:id)
       lower_bound = klass.where("id<?", min_id).order(id: :desc).limit(1).pluck(:created_at).first
