@@ -31,7 +31,6 @@ import {View} from '@instructure/ui-view'
 import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 
 export const DiscussionThreadsContainer = props => {
-  const discussionTopic = props.discussionTopic
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {searchTerm, setPageNumber} = useContext(SearchContext)
 
@@ -59,7 +58,7 @@ export const DiscussionThreadsContainer = props => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = discussionTopic.discussionEntriesConnection.nodes.filter(
+        const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
           entry => entryIds.includes(entry._id) && entry.read === false
         )
         entryIds = entries.map(entry => entry._id)
@@ -83,7 +82,7 @@ export const DiscussionThreadsContainer = props => {
     }
   }, [
     discussionEntriesToUpdate,
-    discussionTopic.discussionEntriesConnection.nodes,
+    props.discussionTopic.discussionEntriesConnection.nodes,
     updateDiscussionEntriesReadState
   ])
 
@@ -100,13 +99,13 @@ export const DiscussionThreadsContainer = props => {
 
   return (
     <View as="div">
-      {searchTerm && <SearchResultsCount resultsFound={discussionTopic.searchEntryCount} />}
-      {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
+      {searchTerm && <SearchResultsCount resultsFound={props.discussionTopic.searchEntryCount} />}
+      {props.discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer
             key={`discussion-thread-${thread.id}`}
             discussionEntry={thread}
-            discussionTopic={discussionTopic}
+            discussionTopic={props.discussionTopic}
             markAsRead={markAsRead}
             onOpenIsolatedView={props.onOpenIsolatedView}
             goToTopic={props.goToTopic}
@@ -114,13 +113,13 @@ export const DiscussionThreadsContainer = props => {
           />
         )
       })}
-      {discussionTopic.entriesTotalPages > 1 && (
+      {props.discussionTopic.entriesTotalPages > 1 && (
         <ThreadPagination
           setPage={setPage}
           selectedPage={Math.ceil(
-            atob(discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
+            atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
           )}
-          totalPages={discussionTopic.entriesTotalPages}
+          totalPages={props.discussionTopic.entriesTotalPages}
         />
       )}
     </View>
