@@ -201,6 +201,26 @@ window.parent.postMessage(
 )
 ```
 
+## lti.alertMessage
+
+Shows an alert using Canvas's alert system
+
+**Required properties:**
+- subject: "lti.alertMessage"
+- alertType: "success", "warning", or "error"
+- body: The contents of the alert.
+
+```js
+window.parent.postMessage(
+  {
+    subject: "lti.alertMessage",
+    body: "An warning to be shown",
+    alertType: "warning"
+  },
+  "*"
+)
+```
+
 ## lti.enableScrollEvents
 
 Sends a debounced postMessage event to the tool every time its containing

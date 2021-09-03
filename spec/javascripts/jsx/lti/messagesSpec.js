@@ -50,10 +50,18 @@ function showMessage(show = true) {
   }
 }
 
-function alertMessage(message = 'Alert message') {
+function screenreaderAlertMessage(message = 'SR Alert message') {
   return {
     subject: 'lti.screenReaderAlert',
     body: message
+  }
+}
+
+function alertMessage(message = 'Alert message', alertType = 'success') {
+  return {
+    subject: 'lti.alertMessage',
+    body: message,
+    alertType
   }
 }
 
@@ -85,7 +93,7 @@ QUnit.module('Messages', suiteHooks => {
     ltiToolWrapperFixture.append(`
       <div id="content-wrapper" class="ic-Layout-contentWrapper">
         <div id="content" class="ic-Layout-contentMain" role="main">
-          <div class="tool_content_wrapper" data-tool-wrapper-id="b58b20b7-c097-43bd-9f6c-c08adbac0ea3" style="height: ${intialHeight}px;">
+          <div class="tool_content_wrapper" data-tool-wrapper-id="b58b20b7-c097-43bd-9f6c-c08adbac0ea3" data-tool-name="Test Tool" style="height: ${intialHeight}px;">
             <iframe src="about:blank" name="tool_content" id="tool_content" class="tool_launch" allowfullscreen="allowfullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" tabindex="0" title="Tool Content" style="height:100%;width:100%;" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"></iframe>
           </div>
         </div>
@@ -158,7 +166,43 @@ QUnit.module('Messages', suiteHooks => {
 
   test('triggers a screen reader alert', () => {
     sinon.spy($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler(postMessageEvent(alertMessage()))
+    ltiMessageHandler(postMessageEvent(screenreaderAlertMessage()))
     ok($.screenReaderFlashMessageExclusive.calledOnce)
+  })
+
+  test('triggers an success message', () => {
+    sinon.spy($, 'flashMessageSafe')
+    ltiMessageHandler(postMessageEvent(alertMessage()))
+    ok($.flashMessageSafe.calledOnce)
+    $.flashMessageSafe.restore()
+  })
+
+  test('triggers an error message', () => {
+    sinon.spy($, 'flashErrorSafe')
+    ltiMessageHandler(postMessageEvent(alertMessage('Alert message', 'error')))
+    ok($.flashErrorSafe.calledOnce)
+    $.flashErrorSafe.restore()
+  })
+
+  test('triggers a warning message', () => {
+    sinon.spy($, 'flashWarningSafe')
+    ltiMessageHandler(postMessageEvent(alertMessage('Alert message', 'warning')))
+    ok($.flashWarningSafe.calledOnce)
+    $.flashWarningSafe.restore()
+  })
+
+  test('prepends tool name to the message', () => {
+    ltiToolWrapperFixture.append(`
+    <div id="content-wrapper" class="ic-Layout-contentWrapper">
+      <div id="content" class="ic-Layout-contentMain" role="main">
+        <div class="tool_content_wrapper" data-tool-wrapper-id="b58b20b7-c097-43bd-9f6c-c08adbac0ea3" data-tool-name="Test Tool" style="height: ${intialHeight}px;">
+          <iframe src="about:blank" name="tool_content" id="tool_content" class="tool_launch" allowfullscreen="allowfullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" tabindex="0" title="Tool Content" style="height:100%;width:100%;" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"></iframe>
+        </div>
+      </div>
+    </div>
+  `)
+    sinon.spy($, 'flashMessageSafe')
+    ltiMessageHandler(postMessageEvent(alertMessage()))
+    ok($.flashMessageSafe.calledWith('Test Tool: Alert message'))
   })
 })

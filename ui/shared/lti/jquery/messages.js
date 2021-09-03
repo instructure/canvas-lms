@@ -140,6 +140,24 @@ export function ltiMessageHandler(e) {
         )
         break
 
+      case 'lti.alertMessage': {
+        const contents =
+          typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
+        const toolName = $('.tool_content_wrapper').data('tool-name')
+        const prependedMessage = `${toolName}: ${contents}`
+        switch (message.alertType) {
+          case 'success':
+            $.flashMessageSafe(prependedMessage)
+            break
+          case 'warning':
+            $.flashWarningSafe(prependedMessage)
+            break
+          case 'error':
+            $.flashErrorSafe(prependedMessage)
+            break
+        }
+        break
+      }
       case 'lti.enableScrollEvents': {
         const iframe = findDomForWindow(e.source)
         if (iframe) {

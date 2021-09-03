@@ -62,6 +62,10 @@ module Lti
       url.path.presence || '/'
     end
 
+    def tool_name(context)
+      ContextExternalTool.find_external_tool(analytics_id, context).name
+    end
+
     def analytics_id
       @analytics_id || URI.parse(resource_url).host || 'unknown'
     end
