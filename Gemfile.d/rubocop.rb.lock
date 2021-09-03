@@ -63,8 +63,9 @@ GEM
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.7.0, < 2.0)
-    rubocop-rspec (1.33.0)
-      rubocop (>= 0.60.0)
+    rubocop-rspec (2.4.0)
+      rubocop (~> 1.0)
+      rubocop-ast (>= 1.1.0)
     ruby-progressbar (1.10.1)
     sqlite3 (1.4.2)
     thread_safe (0.3.6)
@@ -83,7 +84,7 @@ DEPENDENCIES
   rubocop-canvas!
   rubocop-performance (= 1.11.5)
   rubocop-rails (= 2.11.3)
-  rubocop-rspec (= 1.33.0)
+  rubocop-rspec (= 2.4.0)
 
 BUNDLED WITH
    2.2.24
