@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative './courses/pages/course_settings_page'
 
 describe "course settings" do
   include_context "in-process server selenium tests"
+  include CourseSettingsPage
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -225,12 +227,12 @@ describe "course settings" do
       wait_for_ajaximations
 
       # Show announcements and limit setting elements
-      show_announcements_on_home_page = f('#course_show_announcements_on_home_page')
+      expect(course_show_announcements_on_home_page_label).to be_displayed
       home_page_announcement_limit = f('#course_home_page_announcement_limit')
-      expect(is_checked(show_announcements_on_home_page)).not_to be_truthy
+      expect(is_checked(course_show_announcements_on_home_page)).not_to be_truthy
       expect(home_page_announcement_limit).to be_disabled
 
-      show_announcements_on_home_page.click
+      course_show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
 
