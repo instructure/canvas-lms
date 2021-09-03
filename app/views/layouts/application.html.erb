@@ -131,7 +131,7 @@
             <div id="immersive_reader_mount_point"></div>
           <% end %>
           <% if show_student_view_button? %>
-            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
+            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :role => 'complementary', :method => :post do %>
               <i class="icon-student-view"></i> <%= t('Student View') %>
             <% end %>
           <% end %>
