@@ -91,23 +91,52 @@ describe('PostToolbar', () => {
     expect(queryByText('Go to Reply')).toBeNull()
   })
 
-  it('calls the onOpenIsolatedView callback with the root entry id', async () => {
-    window.ENV.isolated_view = true
-    const onOpenIsolatedView = jest.fn()
-    const container = render(
-      <ThreadingToolbar
-        discussionEntry={DiscussionEntry.mock({
-          id: '1',
-          _id: '1',
-          rootEntryId: '2'
-        })}
-        searchTerm="neato"
-        onOpenIsolatedView={onOpenIsolatedView}
-      />
-    )
+  describe('when rootEntryId is present', () => {
+    it('calls the onOpenIsolatedView callback with the parent entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: '2',
+            parentId: '3'
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
 
-    fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '2', false, '1', '1'))
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('3', '2', false, '1', '1')
+      )
+    })
+  })
+
+  describe('when rootEntryId is not present', () => {
+    it('calls the onOpenIsolatedView callback with the entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: null,
+            parentId: null
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
+      )
+    })
   })
 
   it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {

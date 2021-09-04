@@ -54,7 +54,7 @@ export function ThreadingToolbar({...props}) {
             data-testid="go-to-reply"
             onClick={() => {
               const isolatedId = props.discussionEntry.rootEntryId
-                ? props.discussionEntry.rootEntryId
+                ? props.discussionEntry.parentId || props.discussionEntry.rootEntryId
                 : props.discussionEntry._id
               const relativeId = props.discussionEntry.rootEntryId
                 ? props.discussionEntry._id

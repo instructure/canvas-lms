@@ -84,7 +84,7 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
-    setIsolatedEntryId(rootEntryId || discussionEntryId)
+    setIsolatedEntryId(discussionEntryId || rootEntryId)
     setReplyId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
