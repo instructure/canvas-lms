@@ -30,10 +30,13 @@ import {
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
+import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
 const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupDescription}) => {
   const isGroup = groupDescription !== undefined
-  const hasDescription = groupDescription !== ''
+  const hasDescription =
+    typeof groupDescription === 'string' &&
+    stripHtmlTags(groupDescription).replace(/[\n\r\t\s(&nbsp;)]+/g, '')
   return (
     <Menu
       trigger={
