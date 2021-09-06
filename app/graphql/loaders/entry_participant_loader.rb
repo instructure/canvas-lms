@@ -28,7 +28,7 @@ class Loaders::EntryParticipantLoader < GraphQL::Batch::Loader
 
     objects.each do |object|
       unless deps[object.id]
-        fulfill(object, nil)
+        fulfill(object, {read: false, rating: nil, forced_read_state: nil})
         next
       end
 

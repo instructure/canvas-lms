@@ -32,13 +32,6 @@ module Types
     field :root_entry_id, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
-    field :rating, Boolean, null: true
-    def rating
-      Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
-        r = deps.find_by(user: current_user)&.rating
-        !r.nil? && r == 1
-      end
-    end
 
     field :isolated_entry_id, ID, null: true
     def isolated_entry_id
@@ -67,20 +60,6 @@ module Types
         load_association(:parent_entry)
       else
         nil
-      end
-    end
-
-    field :read, Boolean, null: false
-    def read
-      Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do
-        object.read?(current_user)
-      end
-    end
-
-    field :forced_read_state, Boolean, null: true
-    def forced_read_state
-      Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
-        !!deps.find_by(user: current_user)&.forced_read_state
       end
     end
 

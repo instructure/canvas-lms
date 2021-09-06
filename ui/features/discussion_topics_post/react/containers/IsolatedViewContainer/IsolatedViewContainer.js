@@ -115,9 +115,13 @@ export const IsolatedViewContainer = props => {
     ].find(
       oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
     )
-    if (entry && entry.read !== result.data.updateDiscussionEntryParticipant.discussionEntry.read) {
+    if (
+      entry &&
+      entry.entryParticipant?.read !==
+        result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
+    ) {
       const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
-        .discussionEntry.read
+        .discussionEntry.entryParticipant?.read
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
@@ -143,7 +147,7 @@ export const IsolatedViewContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: discussionEntry._id,
-        rating: discussionEntry.rating ? 'not_liked' : 'liked'
+        rating: discussionEntry.entryParticipants?.rating ? 'not_liked' : 'liked'
       }
     })
   }
@@ -152,8 +156,8 @@ export const IsolatedViewContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: discussionEntry._id,
-        read: !discussionEntry.read,
-        forcedReadState: discussionEntry.read || null
+        read: !discussionEntry.entryParticipant?.read,
+        forcedReadState: discussionEntry.entryParticipant?.read || null
       }
     })
   }

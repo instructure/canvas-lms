@@ -40,7 +40,9 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
           read: #{read}
         }) {
           discussionEntries {
-            read
+            entryParticipant {
+              read
+            }
           }
         }
       }
@@ -67,8 +69,9 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
 
     expect(result.dig('errors')).to be nil
     updated_entries = result.dig('data', 'updateDiscussionEntriesReadState', 'discussionEntries')
+
     updated_entries.each do |entry|
-      expect(entry.dig('read')).to be false
+      expect(entry.dig('entryParticipant', 'read')).to be false
     end
 
     @entries.each do |entry|

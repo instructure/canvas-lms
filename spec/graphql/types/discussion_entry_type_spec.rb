@@ -57,9 +57,7 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("message")).to eq parent_entry.message
     expect(type.resolve("ratingSum")).to eq parent_entry.rating_sum
     expect(type.resolve("ratingCount")).to eq parent_entry.rating_count
-    expect(type.resolve("rating")).to eq parent_entry.rating.present?
     expect(type.resolve("deleted")).to eq parent_entry.deleted?
-    expect(type.resolve("read")).to eq parent_entry.read?
     expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
     expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
@@ -172,11 +170,11 @@ describe Types::DiscussionEntryType do
   describe "forced_read_state attribute" do
     context "forced_read_state is nil" do
       before do
-        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: nil, new_state: 'read' })
+        discussion_entry.update_or_create_participant({ current_user: @teacher, forced: false, new_state: 'read' })
       end
 
       it 'returns false' do
-        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+        expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be false
       end
     end
 
@@ -186,7 +184,7 @@ describe Types::DiscussionEntryType do
       end
 
       it 'returns false' do
-        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+        expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be false
       end
     end
 
@@ -196,7 +194,7 @@ describe Types::DiscussionEntryType do
       end
 
       it 'returns true' do
-        expect(discussion_entry_type.resolve("forcedReadState")).to be true
+        expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be true
       end
     end
   end

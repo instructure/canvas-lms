@@ -44,7 +44,9 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
         }) {
           discussionEntry {
             _id
-            read
+            entryParticipant { 
+              read
+            }
           }
           errors {
             message

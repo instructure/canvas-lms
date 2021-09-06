@@ -66,11 +66,11 @@ export const PostMessageContainer = props => {
           timingDisplay={createdAt}
           showCreatedAsTooltip={wasEdited}
           message={props.discussionEntry.message}
-          isUnread={!props.discussionEntry.read}
+          isUnread={!props.discussionEntry.entryParticipant.read}
           isEditing={props.isEditing}
           onCancel={props.onCancel}
           onSave={props.onSave}
-          isForcedRead={props.discussionEntry.forcedReadState}
+          isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
           discussionRoles={props?.discussionRoles}
         >
           <ThreadingToolbar

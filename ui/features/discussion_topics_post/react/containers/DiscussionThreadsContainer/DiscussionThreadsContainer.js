@@ -59,10 +59,10 @@ export const DiscussionThreadsContainer = props => {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
-          entry => entryIds.includes(entry._id) && entry.read === false
+          entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
         entryIds = entries.map(entry => entry._id)
-        entries.forEach(entry => (entry.read = true))
+        entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({
           variables: {

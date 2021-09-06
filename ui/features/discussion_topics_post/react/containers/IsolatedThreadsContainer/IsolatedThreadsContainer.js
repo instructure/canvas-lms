@@ -66,10 +66,10 @@ export const IsolatedThreadsContainer = props => {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
-          entry => entryIds.includes(entry._id) && entry.read === false
+          entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
         entryIds = entries.map(entry => entry._id)
-        entries.forEach(entry => (entry.read = true))
+        entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({
           variables: {
@@ -186,8 +186,8 @@ const IsolatedThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
-      !props.discussionEntry.read &&
-      !props.discussionEntry?.forcedReadState
+      !props.discussionEntry.entryParticipant?.read &&
+      !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
         () => props.setToBeMarkedAsRead(props.discussionEntry._id),
@@ -204,7 +204,7 @@ const IsolatedThreadContainer = props => {
         if (threadRef.current) observer.unobserve(threadRef.current)
       }
     }
-  }, [threadRef, props.discussionEntry.read, props])
+  }, [threadRef, props.discussionEntry.entryParticipant.read, props])
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -256,7 +256,7 @@ const IsolatedThreadContainer = props => {
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.onToggleRating(props.discussionEntry)}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.rating}
+        isLiked={props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
@@ -298,7 +298,7 @@ const IsolatedThreadContainer = props => {
                     postUtilities={
                       <ThreadActions
                         id={props.discussionEntry.id}
-                        isUnread={!props.discussionEntry.read}
+                        isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
                         onDelete={
                           props.discussionEntry.permissions?.delete
@@ -335,8 +335,8 @@ const IsolatedThreadContainer = props => {
                     onCancel={() => setIsEditing(false)}
                     isIsolatedView
                     editor={props.discussionEntry.editor}
-                    isUnread={!props.discussionEntry.read}
-                    isForcedRead={props.discussionEntry.forcedReadState}
+                    isUnread={!props.discussionEntry.entryParticipant?.read}
+                    isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}

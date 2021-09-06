@@ -66,7 +66,11 @@ describe('DiscussionThreadContainer', () => {
       discussionTopic: {
         ...Discussion.mock(),
         discussionEntriesConnection: {
-          nodes: [DiscussionEntry.mock({read: false})],
+          nodes: [
+            DiscussionEntry.mock({
+              entryParticipant: {read: false, forcedReadState: null, rating: null}
+            })
+          ],
           pageInfo: PageInfo.mock(),
           __typename: 'DiscussionEntriesConnection'
         }
@@ -125,7 +129,7 @@ describe('DiscussionThreadContainer', () => {
     const container = setup(defaultProps())
 
     expect(container.getByTestId('is-unread')).toBeInTheDocument()
-    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe('false')
+    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe(null)
 
     window.setTimeout(
       () => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument(),
@@ -135,7 +139,7 @@ describe('DiscussionThreadContainer', () => {
 
   it('unread discussion entry does not update when forceReadState is true', async () => {
     const props = defaultProps()
-    props.discussionTopic.discussionEntriesConnection.nodes[0].forcedReadState = true
+    props.discussionTopic.discussionEntriesConnection.nodes[0].entryParticipant.forcedReadState = true
 
     const container = setup(props)
     expect(container.getByTestId('is-unread')).toBeInTheDocument()
