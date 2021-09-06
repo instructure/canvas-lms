@@ -9023,6 +9023,7 @@ fa:
         غیرفعال کردن این ویژگی روی درس های موجود تأثیر می گذارد. برای راهنمایی برای غیر فعال کردن این ویژگی، لطفا
         با مدیر موفقیت کانواس خود تماس بگیرید.
     differentiated_assignments_course_disable_warning: "با غیر فعالسازی تکلیف های متمایز، همه تکلیف های منتشر شده برای همه دانشجویان قابل مشاهده خواهد شد."
+    disable_alert_timeouts: "غیرفعال کردن  هشدار اعلام مهلت ها"
     ember_modules: "ماژول های Ember"
     google_docs_domain_restriction: "محدودیت دامنه Google Docs"
     gradebook_list_students_by_sortable_name: "دفتر نمره - فهرست بندی دانشجویان بر اساس نام قابل مرتب سازی"
@@ -11544,6 +11545,9 @@ fa:
       status_unauthorized: "غیر مجاز"
     basic_lti: 
       bad_score: "امتیاز بین 0 و 1 نیست"
+      no_parseable_score: 
+        result: "قادر به  تجزیه نمره نتیجه %{grade} نیست."
+        result_total: "قادر به تجزیه نمره کل نتیجه %{grade}نیست."
       no_points_comment: "یک ابزار بیرونی تلاش کرد نمره این تکلیف را %{grade} تعیین کند، اما از آنجا که تکلیف هیچ امتیاز ممکن ندارد، قادر به انجام این کار نبود."
       no_points_possible: "تکلیف، امتیاز ممکن ندارد."
       no_score: "هیچ نمره ای داده نشده است"
@@ -15265,6 +15269,7 @@ fa:
   page_name_21defa75: "نام صفحه"
   page_name_is_required_d8c2736e: "نام صفحه  لازم است"
   page_not_found_2b0d05f5: "صفحه موجود نیست"
+  page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
   page_views: 
     download_filename: "نماهای صفحه برای %{user}"
@@ -20563,6 +20568,7 @@ fa:
       global_support_desk_description: "ASCهای ما اولین خط پشتیبان شما هستند و درباره مشکلاتی که به کمک بیشتر نیاز دارند، می توانند شما را به میز پشتیبان سراسری  متصل سازند."
       networking_academy_description: "پاسخ های سیسکو به پرسش های متداول را مشاهده کنید."
       networking_academy_faqs: "پرسش های متداول آکادمی شبکه سازی"
+      student_support: "پشتیبانی NetAcad - دانشجویی"
       support_desk_livechat: "گفتگوی زنده میز پشتیبانی"
   svg_d5969386: SVG
   swahili_5caeb4ba: سواحیلی
@@ -21270,6 +21276,7 @@ fa:
     port_moresby: "پورت مورسبی"
     prague: پراگ
     pretoria: پرتوریا
+    puerto_rico: "پورتو ریکو"
     quito: کیتو
     rangoon: رانگون
     riga: ریگا
@@ -22702,7 +22709,9 @@ fa:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "بالاترین نمره از بین همه نمره های شما حفظ خواهد شد"
   will_keep_the_latest_of_all_your_scores_431d23f9: "جدیدترین نمره از بین همه نمره های شما را حفظ خواهد شد"
   will_paginate: 
+    container_aria_label: "صفحه بندی"
     next_label: "&#8594 بعدی؛"
+    page_aria_label: "صفحه %{page}"
     page_entries_info: 
       multi_page: "در حال نمایش %{model} %{from} - %{to} از %{count} در کل"
       multi_page_html: "در حال نمایش %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> از <b>%{count}</b> در کل"
