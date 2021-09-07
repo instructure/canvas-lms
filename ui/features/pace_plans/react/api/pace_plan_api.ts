@@ -52,14 +52,14 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
 /* API methods */
 
 export const update = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.put(`/api/v1/pace_plans/${pacePlan.id}`, {
+  return axios.put(`/api/v1/courses/${pacePlan.course_id}/pace_plans/${pacePlan.id}`, {
     ...extraSaveParams,
     pace_plan: transformPacePlanForApi(pacePlan)
   })
 }
 
 export const create = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.post(`/api/v1/pace_plans`, {
+  return axios.post(`/api/v1/courses/${pacePlan.course_id}/pace_plans`, {
     ...extraSaveParams,
     pace_plan: transformPacePlanForApi(pacePlan)
   })
@@ -71,7 +71,7 @@ export const publish = (
   publishForSectionIds: Array<string>,
   publishForEnrollmentIds: Array<string>
 ): AxiosPromise => {
-  return axios.post(`/api/v1/pace_plans/publish`, {
+  return axios.post(`/api/v1/courses/${plan.course_id}/pace_plans/publish`, {
     context_type: plan.context_type,
     context_id: plan.context_id,
     publish_for_option: publishForOption,
@@ -128,8 +128,8 @@ interface ApiPacePlanModuleItemsAttributes {
 }
 
 interface ApiFormattedPacePlan {
-  readonly start_date: string
-  readonly end_date: string
+  readonly start_date?: string
+  readonly end_date?: string
   readonly workflow_state: WorkflowStates
   readonly exclude_weekends: boolean
   readonly context_type: PlanContextTypes

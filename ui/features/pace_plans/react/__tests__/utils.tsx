@@ -16,22 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createStore, applyMiddleware} from 'redux'
-import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
-import thunkMiddleware from 'redux-thunk'
-import defaultReducers from '../reducers/reducers'
+import React from 'react'
+import {render} from '@testing-library/react'
+import {createStore} from 'redux'
+import {Provider} from 'react-redux'
 
-export default (reducers = defaultReducers) => {
-  const middlewares: any[] = [thunkMiddleware]
+import {DefaultStoreState, DEFAULT_STORE_STATE} from './fixtures'
+import reducers from '../reducers/reducers'
 
-  if (process.env.NODE_ENV === `development`) {
-    const {createLogger} = require(`redux-logger`) // tslint:disable-line
-    const logger = createLogger({
-      diff: true,
-      duration: true
-    })
-    middlewares.push(logger)
-  }
-
-  return createStore(reducers, composeWithDevTools(applyMiddleware(...middlewares)))
-}
+export const renderConnected = (
+  component: React.ReactElement,
+  preloadedState: DefaultStoreState = DEFAULT_STORE_STATE
+) => render(<Provider store={createStore(reducers, preloadedState)}>{component}</Provider>)

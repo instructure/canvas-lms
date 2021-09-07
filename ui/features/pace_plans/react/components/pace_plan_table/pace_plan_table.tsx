@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {Text} from '@instructure/ui-text'
 
 import Module from './module'
 import {StoreState, PacePlan} from '../../types'
@@ -28,23 +27,13 @@ interface StoreProps {
   readonly pacePlan: PacePlan
 }
 
-export const PacePlanTable: React.FC<StoreProps> = props => {
-  const modules: JSX.Element[] = props.pacePlan.modules.map((module, index) => (
-    <Module
-      key={`module-${module.id}`}
-      index={index + 1}
-      module={module}
-      pacePlan={props.pacePlan}
-    />
-  ))
-
-  return (
-    <>
-      <Text weight="bold">Modules</Text>
-      {modules}
-    </>
-  )
-}
+export const PacePlanTable: React.FC<StoreProps> = ({pacePlan}) => (
+  <>
+    {pacePlan.modules.map((module, index) => (
+      <Module key={`module-${module.id}`} index={index + 1} module={module} pacePlan={pacePlan} />
+    ))}
+  </>
+)
 
 const mapStateToProps = (state: StoreState) => {
   return {

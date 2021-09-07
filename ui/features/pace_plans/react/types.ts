@@ -68,8 +68,8 @@ export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
 
 export interface PacePlan {
   readonly id?: string
-  readonly start_date: string
-  readonly end_date: string
+  readonly start_date?: string
+  readonly end_date?: string
   readonly workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean

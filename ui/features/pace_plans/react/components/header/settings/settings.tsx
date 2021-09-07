@@ -17,24 +17,30 @@
  */
 
 import React from 'react'
+import I18n from 'i18n!pace_plans_settings'
 import {connect} from 'react-redux'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
+import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 
 import BlackoutDates from './blackout_dates'
 import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
 import {getCourse} from '../../../reducers/course'
-import {getPacePlan} from '../../../reducers/pace_plans'
-import {pacePlanActions} from '../../../actions/pace_plans'
+import {getExcludeWeekends, getPacePlan} from '../../../reducers/pace_plans'
+import {autoSavingActions, pacePlanActions} from '../../../actions/pace_plans'
 import {actions as uiActions} from '../../../actions/ui'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
 
 interface StoreProps {
   readonly courseId: string
+  readonly excludeWeekends: boolean
   readonly pacePlan: PacePlan
 }
 
@@ -42,25 +48,27 @@ interface DispatchProps {
   readonly loadLatestPlanByContext: typeof pacePlanActions.loadLatestPlanByContext
   readonly setEditingBlackoutDates: typeof uiActions.setEditingBlackoutDates
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
+  readonly toggleExcludeWeekends: typeof autoSavingActions.toggleExcludeWeekends
+  readonly toggleHardEndDates: typeof autoSavingActions.toggleHardEndDates
 }
 
 type ComponentProps = StoreProps & DispatchProps
 
 interface LocalState {
-  readonly showBlackoutDatesModal: boolean
-  readonly showUpdateExistingPlansModal: boolean
   readonly changeMadeToBlackoutDates: boolean
+  readonly showBlackoutDatesModal: boolean
+  readonly showSettingsPopover: boolean
+  readonly showUpdateExistingPlansModal: boolean
 }
 
 export class Settings extends React.Component<ComponentProps, LocalState> {
-  /* Lifecycle */
-
   constructor(props: ComponentProps) {
     super(props)
     this.state = {
+      changeMadeToBlackoutDates: false,
       showBlackoutDatesModal: false,
-      showUpdateExistingPlansModal: false,
-      changeMadeToBlackoutDates: false
+      showSettingsPopover: false,
+      showUpdateExistingPlansModal: false
     }
   }
 
@@ -145,9 +153,47 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           onDismiss={this.onCloseUpdateExistingPlansModal}
           confirm={this.republishAllPlans}
         />
-        <IconButton onClick={this.showBlackoutDatesModal} screenReaderLabel="Settings">
-          <IconSettingsLine />
-        </IconButton>
+        <Popover
+          on="click"
+          renderTrigger={
+            <IconButton screenReaderLabel={I18n.t('Modify Settings')}>
+              <IconSettingsLine />
+            </IconButton>
+          }
+          placement="bottom start"
+          isShowingContent={this.state.showSettingsPopover}
+          onShowContent={() => this.setState({showSettingsPopover: true})}
+          onHideContent={() => this.setState({showSettingsPopover: false})}
+          withArrow={false}
+        >
+          <View as="div" padding="small">
+            <View as="div" margin="0 0 small 0">
+              <Checkbox
+                label={I18n.t('Skip Weekends')}
+                checked={this.props.excludeWeekends}
+                onChange={() => this.props.toggleExcludeWeekends()}
+              />
+            </View>
+            <View as="div" margin="0 0 small 0">
+              <Checkbox
+                label={I18n.t('Require Completion by Specified End Date')}
+                checked={this.props.pacePlan.hard_end_dates}
+                onChange={() => this.props.toggleHardEndDates()}
+                disabled={!this.props.pacePlan.end_date}
+              />
+            </View>
+            <CondensedButton
+              onClick={() => {
+                this.setState({showSettingsPopover: false})
+                this.showBlackoutDatesModal()
+              }}
+            >
+              <AccessibleContent alt={I18n.t('View Blackout Dates')}>
+                {I18n.t('Blackout Dates')}
+              </AccessibleContent>
+            </CondensedButton>
+          </View>
+        </Popover>
       </div>
     )
   }
@@ -156,6 +202,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     courseId: getCourse(state).id,
+    excludeWeekends: getExcludeWeekends(state),
     pacePlan: getPacePlan(state)
   }
 }
@@ -163,5 +210,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   loadLatestPlanByContext: pacePlanActions.loadLatestPlanByContext,
   setEditingBlackoutDates: uiActions.setEditingBlackoutDates,
-  showLoadingOverlay: uiActions.showLoadingOverlay
+  showLoadingOverlay: uiActions.showLoadingOverlay,
+  toggleExcludeWeekends: autoSavingActions.toggleExcludeWeekends,
+  toggleHardEndDates: autoSavingActions.toggleHardEndDates
 })(Settings)

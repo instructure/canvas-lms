@@ -19,7 +19,19 @@
 import {keyBy} from 'lodash'
 
 import {BlackoutDate, Course} from '../shared/types'
-import {Enrollment, Enrollments, Module, PacePlan, PacePlanItem, Section, Sections} from '../types'
+import {
+  Enrollment,
+  Enrollments,
+  EnrollmentsState,
+  Module,
+  PacePlan,
+  PacePlanItem,
+  PacePlansState,
+  Section,
+  Sections,
+  SectionsState,
+  UIState
+} from '../types'
 
 export const BLACKOUT_DATES: BlackoutDate[] = []
 
@@ -164,4 +176,21 @@ export const STUDENT_PLAN: PacePlan = {
   hard_end_dates: true,
   modules: [PLAN_MODULE_1, PLAN_MODULE_2],
   linked_to_parent: false
+}
+
+export interface DefaultStoreState {
+  readonly pacePlan?: PacePlansState
+  readonly enrollments?: EnrollmentsState
+  readonly sections?: SectionsState
+  readonly ui?: UIState
+  readonly course?: Course
+  readonly blackoutDates?: BlackoutDate[]
+}
+
+export const DEFAULT_STORE_STATE: DefaultStoreState = {
+  blackoutDates: BLACKOUT_DATES,
+  course: COURSE,
+  enrollments: ENROLLMENTS,
+  pacePlan: PRIMARY_PLAN,
+  sections: SECTIONS
 }

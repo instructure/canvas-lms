@@ -19,7 +19,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Modal} from '@instructure/ui-modal'
@@ -36,8 +35,6 @@ import WeeksSelector from './weeks_selector'
 import StartDateSelector from './start_date_selector'
 import EndDateSelector from './end_date_selector'
 import {Heading} from '@instructure/ui-heading'
-
-const CheckboxWrapper = ({children}) => <View maxWidth="10.5rem">{children}</View>
 
 interface StoreProps {
   readonly pacePlan: PacePlan
@@ -104,7 +101,7 @@ export class PlanLengthPicker extends React.Component<ComponentProps, LocalState
 
   render() {
     return (
-      <Flex width="32.5rem" alignItems="center">
+      <Flex width="32.5rem" alignItems="center" margin="0 0 medium">
         <View width="100%">
           <Flex justifyItems="space-between">
             <div>
@@ -119,32 +116,6 @@ export class PlanLengthPicker extends React.Component<ComponentProps, LocalState
             <div>
               <DaysSelector />
             </div>
-          </Flex>
-          <Flex alignItems="start" justifyItems="space-between" margin="medium 0 0">
-            <CheckboxWrapper>
-              <Checkbox
-                label="Skip Weekends"
-                checked={this.props.excludeWeekends}
-                onChange={this.toggleExcludeWeekends}
-                disabled={this.props.planCompleted}
-              />
-            </CheckboxWrapper>
-            <CheckboxWrapper>
-              <Checkbox
-                label="Require Completion by Specified End Date"
-                checked={this.props.pacePlan.hard_end_dates}
-                onChange={() => this.setState({showHardEndDateModal: true})}
-                disabled={this.props.planCompleted || !this.props.pacePlan.end_date}
-              />
-            </CheckboxWrapper>
-            <CheckboxWrapper>
-              <Checkbox
-                label="Divide into Weeks"
-                checked={this.props.ignoreWeeks}
-                onChange={this.props.toggleDivideIntoWeeks}
-                disabled={this.props.planCompleted}
-              />
-            </CheckboxWrapper>
           </Flex>
         </View>
 

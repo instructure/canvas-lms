@@ -23,13 +23,12 @@ import k5Theme from '@canvas/k5/react/k5-theme'
 import ready from '@instructure/ready'
 
 import App from './react/app'
-import reducers from './react/reducers/reducers'
 import createStore from './react/shared/create_store'
 
 k5Theme.use({fontOnly: true})
 
 const CoursePage: React.FC = () => (
-  <Provider store={createStore(reducers)}>
+  <Provider store={createStore()}>
     <App />
   </Provider>
 )

@@ -57,7 +57,7 @@ const createDeepEqualSelector = createSelectorCreator(defaultMemoize, equal)
 
 export const getPacePlan = (state: StoreState): PacePlan => state.pacePlan
 export const getExcludeWeekends = (state: StoreState): boolean => state.pacePlan.exclude_weekends
-export const getStartDate = (state: StoreState): string => state.pacePlan.start_date
+export const getStartDate = (state: StoreState): string | undefined => state.pacePlan.start_date
 
 export const getPacePlanItems = createSelector(
   getPacePlan,
@@ -128,7 +128,7 @@ export const getDueDates = createDeepEqualSelector(
   getBlackoutDates,
   (
     items: PacePlanItem[],
-    startDate: string,
+    startDate: string | undefined,
     excludeWeekends: boolean,
     blackoutDates: BlackoutDate[]
   ): PacePlanItemDueDates => {
@@ -217,8 +217,12 @@ export default (
         return {
           ...state,
           exclude_weekends: true,
-          start_date: DateHelpers.adjustDateOnSkipWeekends(state.start_date),
-          end_date: DateHelpers.adjustDateOnSkipWeekends(state.end_date)
+          start_date: state.start_date
+            ? DateHelpers.adjustDateOnSkipWeekends(state.start_date)
+            : state.start_date,
+          end_date: state.end_date
+            ? DateHelpers.adjustDateOnSkipWeekends(state.end_date)
+            : state.end_date
         }
       }
     case PacePlanConstants.TOGGLE_HARD_END_DATES:

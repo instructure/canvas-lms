@@ -61,7 +61,7 @@ const regularActions = {
     // This calculates the new end date based off of the number of plan days specified and invokes
     // a setEndDate action. This would potentially be better with a thunked action, but I'm not
     // sure how to get that to work with a typesafe-actions createAction call.
-    let newEndDate: string
+    let newEndDate: string | undefined
 
     if (planDays === 0) {
       newEndDate = plan.start_date

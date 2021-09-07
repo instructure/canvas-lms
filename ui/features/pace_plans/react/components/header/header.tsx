@@ -25,15 +25,17 @@ import PlanPicker from './plan_picker'
 import Settings from './settings/settings'
 
 const Header: React.FC = () => (
-  <Flex wrap="wrap" alignItems="start" justifyItems="space-between">
-    <Flex alignItems="end" margin="0 small small 0">
-      <PlanPicker />
-      <View margin="0 0 0 small">
-        <Settings />
-      </View>
+  <View as="div" borderWidth="0 0 small 0">
+    <Flex wrap="wrap" alignItems="start" justifyItems="space-between">
+      <Flex alignItems="end" margin="0 small medium 0">
+        <PlanPicker />
+        <View margin="0 0 0 small">
+          <Settings />
+        </View>
+      </Flex>
+      <PlanLengthPicker />
     </Flex>
-    <PlanLengthPicker />
-  </Flex>
+  </View>
 )
 
 export default Header
