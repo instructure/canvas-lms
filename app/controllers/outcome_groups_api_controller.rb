@@ -529,6 +529,7 @@ class OutcomeGroupsApiController < ApplicationController
       end
     end
     @outcome_link = @outcome_group.add_outcome(@outcome)
+    @outcome_link.context = @outcome_group.context
     render :json => outcome_link_json(@outcome_link, @current_user, session)
   end
 
