@@ -37,7 +37,7 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV['RSPECQ_REDIS_URL']
+      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV['RSPECQ_ENABLED'] == '1'
 
     end
 
@@ -93,7 +93,7 @@ module TestDatabaseUtils
 
     def truncate_all_tables!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "truncating all tables..." unless ENV['RSPECQ_REDIS_URL']
+      puts "truncating all tables..." unless ENV['RSPECQ_ENABLED'] == '1'
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?
@@ -120,7 +120,7 @@ module TestDatabaseUtils
 
     def randomize_sequences!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "randomizing db sequences..." unless ENV['RSPECQ_REDIS_URL']
+      puts "randomizing db sequences..." unless ENV['RSPECQ_ENABLED'] == '1'
       seed = ::RSpec.configuration.seed
       i = 0
       each_connection do |connection|

@@ -20,12 +20,14 @@ def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
   def rspecqNodeTotal = env.TEST_QUEUE_NODES.toInteger()
+  def rspecqEnabled = useRspecQ(10)
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20201119',
+    "RSPECQ_ENABLED=${env.RSPECQ_ENABLED}"
   ]
 
   def rspecEnvVars = baseEnvVars + [
@@ -61,7 +63,7 @@ def createDistribution(nestedStages) {
 
   def rspecNodeRequirements = [label: 'canvas-docker']
 
-  if (configuration.isRspecqEnabled()) {
+  if (rspecqEnabled) {
     rspecqNodeTotal.times { index ->
       extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
         .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
@@ -100,11 +102,8 @@ def createDistribution(nestedStages) {
 
 def setupNode() {
   distribution.unstashBuildScripts()
-
-  if (configuration.isRspecqEnabled()) {
-    def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD}", 'UTF-8')
-    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
-  }
+  def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD}", 'UTF-8')
+  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
 
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
@@ -174,6 +173,7 @@ def runRspecqSuite() {
       workers[workerName] = { ->
         def workerStartTime = System.currentTimeMillis()
         sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
+                                        -e RSPECQ_ENABLED \
                                         -e SENTRY_DSN \
                                         -e RAILS_DB_NAME_TEST=canvas_test_${index} \
                                         -T canvas bundle exec rspecq \
@@ -256,4 +256,18 @@ def runReporter() {
 
     throw e
   }
+}
+
+def useRspecQ(percentage) {
+  if (configuration.isRspecqEnabled()) {
+    return true
+  }
+
+  java.security.SecureRandom random = new java.security.SecureRandom()
+  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
+    env.RSPECQ_ENABLED = '0'
+    return false
+  }
+
+  return true
 }
