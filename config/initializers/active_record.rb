@@ -27,9 +27,8 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
-    def find_ids_in_ranges(opts = {}, &block)
-      opts.reverse_merge!(:loose => true)
-      all.find_ids_in_ranges(opts, &block)
+    def find_ids_in_ranges(loose: true, **kwargs, &block)
+      all.find_ids_in_ranges(loose: loose, **kwargs, &block)
     end
 
     attr_accessor :in_migration
@@ -367,34 +366,31 @@ class ActiveRecord::Base
     base_class.name.underscore
   end
 
-  def wildcard(*args)
+  ruby2_keywords def wildcard(*args)
     self.class.wildcard(*args)
   end
 
-  def self.wildcard(*args)
-    options = args.last.is_a?(Hash) ? args.pop : {}
-    options[:type] ||= :full
-
+  def self.wildcard(*args, type: :full, delimiter: nil, case_sensitive: false)
     value = args.pop
-    if options[:delimiter]
-      options[:type] = :full
-      value = options[:delimiter] + value + options[:delimiter]
-      delimiter = connection.quote(options[:delimiter])
+    if delimiter
+      type = :full
+      value = delimiter + value + delimiter
+      delimiter = connection.quote(delimiter)
       column_str = "#{delimiter} || %s || #{delimiter}"
       args = args.map { |a| column_str % a.to_s }
     end
 
-    value = wildcard_pattern(value, options)
-    cols = args.map { |col| like_condition(col, '?', !options[:case_sensitive]) }
-    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+    value = wildcard_pattern(value, case_sensitive: case_sensitive, type: type)
+    cols = args.map { |col| like_condition(col, '?', !case_sensitive) }
+    sanitize_sql_array ["(#{cols.join(' OR ')})", *([value] * cols.size)]
   end
 
-  def self.wildcard_pattern(value, options = {})
+  def self.wildcard_pattern(value, case_sensitive: false, type: :full)
     value = value.to_s
-    value = value.downcase unless options[:case_sensitive]
+    value = value.downcase unless case_sensitive
     value = value.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
-    value = '%' + value unless options[:type] == :right
-    value += '%' unless options[:type] == :left
+    value = "%#{value}" unless type == :right
+    value += '%' unless type == :left
     value
   end
 
@@ -1276,38 +1272,36 @@ ActiveRecord::Relation.class_eval do
   # smallest to largest.
   #
   # note this does a raw connection.select_values, so it doesn't work with scopes
-  def find_ids_in_batches(options = {})
-    batch_size = options[:batch_size] || 1000
+  def find_ids_in_batches(batch_size: 1000, no_integer_cast: false)
     key = "#{quoted_table_name}.#{primary_key}"
     scope = except(:select).select(key).reorder(Arel.sql(key)).limit(batch_size)
     ids = connection.select_values(scope.to_sql)
-    ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    ids = ids.map(&:to_i) unless no_integer_cast
     while ids.present?
       yield ids
       break if ids.size < batch_size
 
       last_value = ids.last
       ids = connection.select_values(scope.where("#{key}>?", last_value).to_sql)
-      ids = ids.map(&:to_i) unless options[:no_integer_cast]
+      ids = ids.map(&:to_i) unless no_integer_cast
     end
   end
 
   # returns 2 ids at a time (the min and the max of a range), working through
   # the primary key from smallest to largest.
-  def find_ids_in_ranges(options = {})
+  def find_ids_in_ranges(loose: false, batch_size: 1000, end_at: nil, start_at: nil)
     is_integer = columns_hash[primary_key.to_s].type == :integer
-    loose_mode = options[:loose] && is_integer
+    loose_mode = loose && is_integer
     # loose_mode: if we don't care about getting exactly batch_size ids in between
     # don't get the max - just get the min and add batch_size so we get that many _at most_
     values = loose_mode ? "MIN(id)" : "MIN(id), MAX(id)"
 
-    batch_size = options[:batch_size].try(:to_i) || 1000
     quoted_primary_key = "#{klass.connection.quote_local_table_name(table_name)}.#{klass.connection.quote_column_name(primary_key)}"
     as_id = " AS id" unless primary_key == 'id'
     subquery_scope = except(:select).select("#{quoted_primary_key}#{as_id}").reorder(primary_key.to_sym).limit(loose_mode ? 1 : batch_size)
-    subquery_scope = subquery_scope.where("#{quoted_primary_key} <= ?", options[:end_at]) if options[:end_at]
+    subquery_scope = subquery_scope.where("#{quoted_primary_key} <= ?", end_at) if end_at
 
-    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_primary_key} >= ?", options[:start_at]) : subquery_scope
+    first_subquery_scope = start_at ? subquery_scope.where("#{quoted_primary_key} >= ?", start_at) : subquery_scope
 
     ids = connection.select_rows("SELECT #{values} FROM (#{first_subquery_scope.to_sql}) AS subquery").first
 
