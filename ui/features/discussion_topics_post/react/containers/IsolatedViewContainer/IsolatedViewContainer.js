@@ -340,6 +340,11 @@ export const IsolatedViewContainer = props => {
           return
         }
 
+        // don't close if the user clicks on a modal presented over the Tray
+        if (e.target.closest('.ui-dialog')) {
+          return
+        }
+
         if (props.onClose) {
           props.onClose()
         }

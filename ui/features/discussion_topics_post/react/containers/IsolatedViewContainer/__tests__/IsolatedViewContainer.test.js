@@ -72,9 +72,7 @@ describe('IsolatedViewContainer', () => {
   afterEach(() => {
     mswClient.resetStore()
     server.resetHandlers()
-    setOnFailure.mockClear()
-    setOnSuccess.mockClear()
-    onOpenIsolatedView.mockClear()
+    jest.clearAllMocks()
   })
 
   afterAll(() => {
@@ -166,7 +164,7 @@ describe('IsolatedViewContainer', () => {
 
     const goToTopicButton = await findByText('Go To Topic')
     expect(goToTopicButton).toBeInTheDocument()
-    fireEvent.click(goToTopicButton)
+    fireEvent.click(goToTopicButton, {clientY: 100})
 
     expect(onClose).toHaveBeenCalled()
   })
@@ -180,9 +178,34 @@ describe('IsolatedViewContainer', () => {
 
     const goToTopicButton = await findByText('Go To Topic')
     expect(goToTopicButton).toBeInTheDocument()
-    fireEvent.click(goToTopicButton)
+    fireEvent.click(goToTopicButton, {clientY: 100})
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  describe('when a ui-dialog is clicked', () => {
+    const modalTestId = 'test-modal'
+
+    beforeEach(() => {
+      const elem = document.createElement('div')
+      elem.classList.add('ui-dialog')
+      elem.setAttribute('data-testid', modalTestId)
+      document.body.prepend(elem)
+    })
+
+    it('does not call "onClose"', async () => {
+      const {findAllByTestId, findByTestId} = setup(defaultProps())
+
+      const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+      expect(threadActionsMenus[1]).toBeInTheDocument()
+      fireEvent.click(threadActionsMenus[1])
+
+      const modal = await findByTestId(modalTestId)
+      expect(modal).toBeInTheDocument()
+      fireEvent.click(modal, {clientY: 100})
+
+      expect(onClose).not.toHaveBeenCalled()
+    })
   })
 
   it('should not render a back button', async () => {
