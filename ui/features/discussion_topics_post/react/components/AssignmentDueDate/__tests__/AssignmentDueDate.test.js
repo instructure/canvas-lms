@@ -86,9 +86,9 @@ describe('AssignmentDueDate', () => {
   describe('desktop', () => {
     it('displays due date when there are no overrides', () => {
       const {queryByText} = setup()
-      expect(
-        queryByText('Everyone Due Mar 31 5:59am Available from Mar 24 until Apr 4')
-      ).toBeTruthy()
+      expect(queryByText('Everyone')).toBeTruthy()
+      expect(queryByText('Due Mar 31 5:59am')).toBeTruthy()
+      expect(queryByText('Available from Mar 24 until Apr 4')).toBeTruthy()
     })
 
     it('displays "Show due dates" button when there are overrides', () => {

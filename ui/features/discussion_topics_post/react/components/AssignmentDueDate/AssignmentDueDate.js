@@ -30,6 +30,7 @@ import {Tray} from '@instructure/ui-tray'
 import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
+import {InlineList} from '@instructure/ui-list'
 
 export function AssignmentDueDate({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
@@ -59,51 +60,57 @@ export function AssignmentDueDate({...props}) {
       })
     }
 
-    const processDueDate = (group, dueDate, availableDate, untilDate) => {
-      let dueDateFormatted
-      if (group && dueDate) {
-        dueDateFormatted = I18n.t('%{title} Due %{date}', {
-          title: group,
-          date: dueDate
-        })
-      } else if (!group && props.discussionTopic.permissions?.readAsAdmin && dueDate) {
-        dueDateFormatted = I18n.t('Everyone Due %{date}', {
-          date: dueDate
-        })
-      } else if (dueDate) {
-        dueDateFormatted = I18n.t('Due %{date}', {
-          title: group,
-          date: dueDate
-        })
-      } else if (group) {
-        dueDateFormatted = I18n.t('%{title} No Due Date', {
-          title: group
-        })
-      } else if (!group && props.discussionTopic.permissions?.readAsAdmin && !dueDate) {
-        dueDateFormatted = I18n.t('Everyone No Due Date', {
-          date: dueDate
-        })
+    const getTitle = (group, isAdmin) => {
+      if (group) {
+        return group
       } else {
-        I18n.t('No Due Date')
+        return isAdmin ? I18n.t('Everyone') : null
       }
+    }
 
-      let availableFromUntilFormatted = ''
+    const getDueDate = dueDate => {
+      if (dueDate) {
+        return I18n.t('Due %{date}', {
+          date: dueDate
+        })
+      }
+      return I18n.t('No Due Date')
+    }
+
+    const getAvailableFromUntilDate = (availableDate, untilDate) => {
       if (availableDate && untilDate) {
-        availableFromUntilFormatted = I18n.t('Available from %{availableDate} until %{untilDate}', {
+        return I18n.t('Available from %{availableDate} until %{untilDate}', {
           availableDate,
           untilDate
         })
       } else if (availableDate) {
-        availableFromUntilFormatted = I18n.t('Available from %{availableDate}', {
+        return I18n.t('Available from %{availableDate}', {
           availableDate
         })
       } else if (untilDate) {
-        availableFromUntilFormatted = I18n.t('Available until %{untilDate}', {
+        return I18n.t('Available until %{untilDate}', {
           untilDate
         })
       }
+      return null
+    }
 
-      return [dueDateFormatted, availableFromUntilFormatted].join(' ')
+    const processDueDate = (group, dueDate, availableDate, untilDate) => {
+      return (
+        <InlineList delimiter="none">
+          {[
+            getTitle(group, props.discussionTopic.permissions?.readAsAdmin),
+            getDueDate(dueDate),
+            getAvailableFromUntilDate(availableDate, untilDate)
+          ]
+            .filter(item => item !== null)
+            .map(item => (
+              <InlineList.Item>
+                <Text>{item}</Text>
+              </InlineList.Item>
+            ))}
+        </InlineList>
+      )
     }
 
     const getDueDateText = () => {
