@@ -2008,6 +2008,7 @@ fa:
   allow_bulk_grade_export_to_sis_e11a6e66: "اجازه دادن به صدور نمره گروهی به سامانه اطلاعات دانشجو"
   allow_comments_a1f45d8: "اجازه دادن به نظرات"
   allow_comments_for_title_7ac9e00: "اجازه دادن به نظرات برای %{title}"
+  allow_conference_selection_lti_placement_c020ad8d: "اجازه انتخاب محل کنفرانس LTI"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "اجازه دادن به بارگیری و مشاهده محتوای درس به صورت آفلاین"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "امکان تخصیص تصاویر به درس و استفاده از کارت های داشبورد فراهم شود."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "اجازه دهید کارت های داشبورد برای هر کاربر دوباره مرتب شوند."
@@ -2021,6 +2022,7 @@ fa:
   allow_multiple_attempts_e67a0a37: "اجازه دادن به چند تلاش"
   allow_opt_out_of_inbox: "به کاربران اجازه داده شود از صندوق ورودی گفتگو انتخاب کنند. این امر همه اطلاعیه ها و پیام های گفتگو را به عنوان اطلاعیه های فوری به پست الکترونیکی اولیه کاربر ارسال خواهد کرد، نشانه پیام های خوانده نشده صندوق ورودی گفتگو در صندوق ورودی را مخفی خواهد کرد و تنظیمات دلخواه اطلاعیه گفتگو را مخفی خواهد کرد."
   allow_outcome_extra_credit_57c1e84e: "امتیاز اضافی برای نتایج مجاز است."
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "اجازه دهید صفحات به صورت دسته ای حذف شوند. "
   allow_passive_acceptance_of_terms_of_service_63ef5994: "اجازه دادن به پذیرش انفعالی شرایط خدمت"
   allow_reorder_dashboard_cards_78215947: "اجازه دادن برای مرتب سازی کارت های داشبورد"
   allow_students_to_download_course_content_and_view_810e66ec: "به دانشجویان اجازه داده شود محتوای درس را بارگیری و به صورت آفلاین مشاهده کنند"
@@ -2041,6 +2043,7 @@ fa:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
       جهش GraphQL
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "امکان تراز کردن نتایج با محتوای بدون نمره را فراهم می کند"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "امکان ایجاد اطلاعیه برای یک بخش را فراهم می کند"
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "به نقش‌های مبتنی بر استاد/ طراح /  دستیار آموزشی  امکان دسترسی به ابزار گفتگو را می دهد."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "به نقش‌های مبتنی بر استاد / دستیار آموزشی اجازه می‌دهد تا به ابزار حضور و غیاب دسترسی پیدا کنند."
@@ -2290,6 +2293,7 @@ fa:
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "به کاربر اجازه می دهد تا ستون شناسه سامانه اطلاعات دانشجویی کاربر را در فایل CSV تحلیل پرسش آزمون مشاهده کند."
   allows_user_to_view_user_sis_ids_68a9d218: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی کاربر را مشاهده کند."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "به کاربر اجازه می دهد تا شناسه های سامانه اطلاعات دانشجویی کاربر را در یک صفحه افراد یک درس مشاهده کند."
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: "به کاربران امکان دهد کنفرانس هایی را از تقویم اضافه کنند"
   allows_users_to_edit_conferences_2d3c960c: "به کاربران اجازه می دهد کنفرانس ها را ویرایش کنند."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "به کاربران اجازه می دهد تا گزینه \"راه اندازی نمره گذاری سریع فیلتر شده توسط گروه دانشجویی\" را برای درس‌ها در صفحه تنظیمات درس فعال کنند. وقتی فعال است و گروه دانشجویی در نمره‌گذاری سریع  جدید انتخاب می شود، نمره‌گذاری سریع فقط دانشجویان گروه انتخاب شده را بارگیری می کند."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
@@ -3808,6 +3812,7 @@ fa:
   bottom_15a2a9be: پایین
   bounce_count_reset_c4c2218f: "تعداد بازگشت بازنشانی شد!"
   bounce_reason_689ed4c6: "دلیل بازگشت"
+  bounced_emails_admin_tool_9730a5e4: "ابزار مدیریت ایمیل های بازنشانی"
   brand_configs_b465a03f: "پیکربندی علامت تجاری"
   brazil_55_34103ffa: "برزیل (+55)"
   breadcrumb_1_cb3c504: "برد کرامپ 1"
@@ -7564,6 +7569,7 @@ fa:
   disable_and_lock_7d0ef0e8: "غیر فعال کردن و قفل کردن"
   disable_content_security_policy_8660a787: "سیاست امنیت محتوا را غیر فعال کنید. "
   disable_extra_filter_options_1d1cdc02: "گزینه‌های فیلتر اضافی را غیرفعال کنید"
+  disable_keyboard_shortcuts_9db78832: "میانبرهای صفحه کلید را غیرفعال کنید."
   disable_scope_6ba4e4d4: "غیر فعال سازی محدوده"
   disable_sync_to_name_10c371dc: "غیرفعال کردن همگام‌سازی برای %{name}"
   disabled_18c33a73: "(غیر فعال شد)"
@@ -8102,6 +8108,7 @@ fa:
   edit_assignment_name_mastery_paths_40b50541: "ویرایش مسیرهای تسلط تکلیف‌ %{name}"
   edit_bank_92eb8e14: "ویرایش %{bank}"
   edit_c5fbea07: ویرایش
+  edit_closed_captions_e5fdeb79: "ویرایش زیرنویس های بسته"
   edit_collaboration_b014c18b: "ویرایش همکاری"
   edit_comment_comment_e74afa04: "ویرایش نظر: %{comment}"
   edit_conference_title_6e234815: "ویرایش \"%{conference_title}\""
@@ -8271,6 +8278,7 @@ fa:
   enable_dashboard_images_for_courses_5af458b0: "فعالسازی تصاویر داشبورد برای درس ها"
   enable_extra_filter_options_b52c23e6: "گزینه‌های فیلتر اضافی را فعال کنید"
   enable_feature_title_987d8e9a: "فعالسازی ویژگی: %{title}"
+  enable_fullstory_5c673a06: "فعال کردن  fullstory"
   enable_gradebook_list_students_by_sortable_name: "دانشجوها را بر اساس نام قابل مرتب سازی آنها در دفتر نمره فهرست بندی کنید. نام فایل مرتب سازی به طور پیش فرض بر اساس «نام خانوادگی، نام» است و می توان آن در قسمت تنظیمات تغییر داد."
   enable_gravatar_8a865b41: "فعال کردن گرآواتار"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "ویژگی های i18n را در صدور نتایج فعال کنید."
@@ -8309,6 +8317,7 @@ fa:
   ends_at_9a62b528: "پایان می یابد در"
   enforce_scopes_be28989c: "اجبار کردن محدوده‌ها"
   english_c60612e2: انگلیسی
+  enhanced_grade_change_auditing_2b155dfa: "ارتقا حسابرسی تغییر نمره "
   enrolled_a6a517cd: "ثبت نام شده"
   enrolled_as_272da3b9: "ثبت نام شده به عنوان"
   enrollment: 
@@ -9023,7 +9032,7 @@ fa:
         غیرفعال کردن این ویژگی روی درس های موجود تأثیر می گذارد. برای راهنمایی برای غیر فعال کردن این ویژگی، لطفا
         با مدیر موفقیت کانواس خود تماس بگیرید.
     differentiated_assignments_course_disable_warning: "با غیر فعالسازی تکلیف های متمایز، همه تکلیف های منتشر شده برای همه دانشجویان قابل مشاهده خواهد شد."
-    disable_alert_timeouts: "غیرفعال کردن  هشدار اعلام مهلت ها"
+    disable_alert_timeouts: "غیرفعال کردن  هشدار اعلام  پایان مهلت"
     ember_modules: "ماژول های Ember"
     google_docs_domain_restriction: "محدودیت دامنه Google Docs"
     gradebook_list_students_by_sortable_name: "دفتر نمره - فهرست بندی دانشجویان بر اساس نام قابل مرتب سازی"
@@ -17960,6 +17969,7 @@ fa:
   ratings_2433172b: "رتبه بندی ها"
   ratio_answered_correctly_b0c1e7d: "%{ratio}% درست پاسخ داد"
   ratio_responded_correctly_6d890107: "%{ratio}% درست پاسخ داد"
+  rce_auto_save_f004fba9: "دخیره خودکار RCE "
   rce_contents_replace_description: "جایگزینی متن کامل RCE را از LTI فعال کنید."
   rce_contents_replace_display_name: " جایگزین کردن محتوا RCE"
   rce_enhancements_5701e06: "ارتقای RCE"
