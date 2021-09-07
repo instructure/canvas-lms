@@ -22,9 +22,10 @@ class PacePlansController < ApplicationController
   before_action :load_course
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_pace_plan, only: [:api_show, :update]
+  before_action :load_pace_plan, only: [:api_show, :update, :publish]
 
   include Api::V1::Course
+  include Api::V1::Progress
   include K5Mode
 
   def index
@@ -107,6 +108,12 @@ class PacePlansController < ApplicationController
       end
     end
     render json: { pace_plan: PacePlanPresenter.new(@pace_plan).as_json }
+  end
+
+  def publish
+    progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+    progress.process_job(@pace_plan, :publish, {})
+    render json: progress_json(progress, @current_user, session)
   end
 
   private
