@@ -160,7 +160,7 @@ describe "observer k5 dashboard" do
       expect(dashboard_card_specific_subject('Science')).to be_displayed
     end
 
-    it 'shows the observers name first if observer is also a student', ignore_js_errors: true do
+    it 'shows the observers name first if observer is also a student' do
       course_with_student(
         active_all: true,
         user: @observer,
@@ -171,6 +171,84 @@ describe "observer k5 dashboard" do
 
       expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('Mom')
       expect(dashboard_card_specific_subject('Art')).to be_displayed
+    end
+
+    it 'shows the dropdown picker on subject dashboard and first student on list' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('K5Student')
+    end
+
+    it 'selects student from list on subject drop down menu', ignore_js_errors: true do
+      get "/courses/#{@subject_course.id}#home"
+
+      click_observed_student_option('My2 Student')
+
+      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+    end
+
+    it 'allows for searching for a student in subject dropdown list', ignore_js_errors: true do
+      get "/courses/#{@subject_course.id}#home"
+
+      observed_student_dropdown.send_keys([:control, 'a'], :backspace, 'My2')
+      click_observed_student_option('My2 Student')
+
+      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+    end
+  end
+
+  context 'k5 subject dashboard observee selections' do
+    let (:wiki_page_data) { "Here's where we have content" }
+
+    before :once do
+      @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+    end
+
+    it 'has students front page displayed if there is one' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(front_page_info.text).to eq(wiki_page_data)
+    end
+
+    it 'shows schedule info for course items' do
+      skip("LS-2481 Planner work todo")
+      create_dated_assignment(@subject_course, 'today assignment1', @now)
+
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(today_header).to be_displayed
+      expect(schedule_item.text).to include('today assignment1')
+    end
+
+    it 'shows late assignment as Missing' do
+      skip("LS-2582 grades not working right now")
+      create_dated_assignment(@subject_course, "assignment 2 missing", 1.day.ago(Time.zone.now), 15)
+
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(grades_assignments_list[0].text).to include("Missing")
+    end
+
+    it 'shows the Important Info for subject resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@subject_course, important_info_text)
+      create_lti_resource("fake LTI")
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(important_info_content).to include_text(important_info_text)
+    end
+
+    it 'shows the observers name first if observer is also a student' do
+      course_with_student(
+        active_all: true,
+        user: @observer,
+        course: @subject_course
+      )
+
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('Mom')
+      expect(front_page_info.text).to eq(wiki_page_data)
     end
   end
 end
