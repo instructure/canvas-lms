@@ -19,105 +19,14 @@
 import I18n from 'i18n!discussion_posts'
 
 import PropTypes from 'prop-types'
-import React, {useMemo, useState} from 'react'
+import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Tray} from '@instructure/ui-tray'
-import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
-import {DueDateTray} from '../DueDateTray/DueDateTray'
 
 export function AssignmentDetails({...props}) {
-  const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
-
-  const singleDueDate = useMemo(
-    () => (
-      <Flex.Item padding="xx-small" shouldGrow align="start">
-        <Responsive
-          match="media"
-          query={responsiveQuerySizes({tablet: true, desktop: true})}
-          props={{
-            tablet: {
-              textSize: 'x-small'
-            },
-            desktop: {
-              textSize: 'small'
-            }
-          }}
-          render={responsiveProps => (
-            <Text weight="normal" size={responsiveProps.textSize}>
-              {props.dueAtDisplayText}
-            </Text>
-          )}
-        />
-      </Flex.Item>
-    ),
-    [props.dueAtDisplayText]
-  )
-
-  const multipleDueDates = useMemo(
-    () => (
-      <Flex.Item padding="xx-small" shouldGrow align="start" overflowY="hidden">
-        <CondensedButton
-          onClick={() => {
-            setDueDateTrayOpen(true)
-          }}
-          data-testid="show-due-dates-button"
-        >
-          <Responsive
-            match="media"
-            query={responsiveQuerySizes({tablet: true, desktop: true})}
-            props={{
-              tablet: {
-                text: I18n.t('Due Dates (%{dueDateCount})', {
-                  dueDateCount: props.assignmentOverrides.length
-                }),
-                textSize: 'x-small'
-              },
-              desktop: {
-                text: I18n.t('Show Due Dates (%{dueDateCount})', {
-                  dueDateCount: props.assignmentOverrides.length
-                }),
-                textSize: 'small'
-              }
-            }}
-            render={responsiveProps => (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                {responsiveProps.text}
-              </Text>
-            )}
-          />
-        </CondensedButton>
-        <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
-          <View as="div" padding="medium">
-            <Flex direction="column">
-              <Flex.Item>
-                <CloseButton
-                  placement="end"
-                  offset="small"
-                  screenReaderLabel="Close"
-                  onClick={() => {
-                    setDueDateTrayOpen(false)
-                  }}
-                />
-              </Flex.Item>
-              <Flex.Item padding="none none medium none" shouldGrow shouldShrink>
-                <Text size="x-large" weight="bold" data-testid="due-dates-tray-heading">
-                  {I18n.t('Due Dates')}
-                </Text>
-              </Flex.Item>
-              <DueDateTray assignmentOverrides={props.assignmentOverrides} />
-            </Flex>
-          </View>
-        </Tray>
-      </Flex.Item>
-    ),
-    [dueDateTrayOpen, props.assignmentOverrides]
-  )
-
   return (
     <Responsive
       match="media"
@@ -151,9 +60,7 @@ export function AssignmentDetails({...props}) {
       render={responsiveProps => (
         <Flex data-testid="graded-discussion-info">
           <Flex.Item shouldGrow shouldShrink>
-            {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
-              ? multipleDueDates
-              : singleDueDate}
+            {props.assignmentDueDate}
           </Flex.Item>
           <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
@@ -168,9 +75,7 @@ export function AssignmentDetails({...props}) {
 
 AssignmentDetails.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
-  dueAtDisplayText: PropTypes.string.isRequired,
-  assignmentOverrides: PropTypes.array.isRequired,
-  canSeeMultipleDueDates: PropTypes.bool
+  assignmentDueDate: PropTypes.node.isRequired
 }
 
 export default AssignmentDetails
