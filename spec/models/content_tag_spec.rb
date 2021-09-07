@@ -530,6 +530,20 @@ describe ContentTag do
     expect(mod.reload.updated_at).to be > 5.seconds.ago
   end
 
+  it 'should not touch modules that have been recently touched on save' do
+    Setting.set('touch_personal_space', '10')
+    course_factory
+    mod = @course.context_modules.create!
+    recent = Time.now
+    ContextModule.where(id: mod).update_all(updated_at: recent)
+    Timecop.travel(recent + 1.second) do
+      ContextModule.transaction do
+        mod.add_item(type: 'context_module_sub_header', title: 'blah')
+      end
+      expect(mod.reload.updated_at).to eq recent
+    end
+  end
+
   it "should allow skipping touches on save" do
     course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
