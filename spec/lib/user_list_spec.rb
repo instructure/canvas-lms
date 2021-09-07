@@ -40,6 +40,12 @@ describe UserList do
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eq [["senor molé", "blah@instructure.com"]]
   end
 
+  it "should not cause error with nothing past to it" do
+    ul = UserList.new(nil)
+    expect(ul.errors).to eq []
+    expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eq []
+  end
+
   it "should find by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
