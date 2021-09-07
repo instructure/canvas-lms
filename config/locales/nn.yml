@@ -7990,6 +7990,7 @@ nn:
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller"
   drag_to_rearrange_sections_637efee3: "Dra for å ordne klassa på nytt"
   drag_up_or_down_to_reorder_382126ff: "Dra opp eller ned for å omorganisere"
+  drop_files_here_to_add_to_module_236304f5: "Dra filer hit for å legge til i modulen."
   drop_files_here_to_upload_ce0f50f9: "Slepp filer her for å laste opp"
   drop_image_62a2a071: "Fjern bildet"
   dropdown_changed_state_to_expanded_517689c2: "nedtrekksmeny endra utsjånad til %{expanded}."
