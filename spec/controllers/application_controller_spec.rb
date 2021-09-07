@@ -2036,6 +2036,42 @@ describe ApplicationController do
     end
   end
 
+  describe "show_immersive_reader? helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before(:each) do
+      user_session(@student)
+      controller.instance_variable_set(:@context, @course)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "is false when no immersive reader flags are enabled, even on supported pages" do
+      controller.params[:controller] = "wiki_pages"
+      controller.params[:action] = "show"
+      expect(controller.send(:show_immersive_reader?)).to be false
+    end
+
+    context "when root account has immersive reader flag enabled" do
+      before(:once) do
+        @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
+      end
+
+      it "is true for wiki_pages#show" do
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
+
+      it "is false on pages where immersive reader is not supported" do
+        controller.params[:controller] = "courses"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be false
+      end
+    end
+  end
+
   describe "new math equation handling feature" do
     let(:root_account) {Account.default}
 
