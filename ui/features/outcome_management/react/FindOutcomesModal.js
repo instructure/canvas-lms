@@ -200,11 +200,13 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               elementRef={setLeftColumnRef}
             >
               <View as="div" padding="small x-small none x-small">
-                <Heading level="h3">
-                  <Text size="large" weight="light" fontStyle="normal">
-                    {I18n.t('Outcome Groups')}
-                  </Text>
-                </Heading>
+                <div style={{paddingBottom: '6px'}}>
+                  <Heading level="h3">
+                    <Text size="large" weight="light" fontStyle="normal">
+                      {I18n.t('Outcome Groups')}
+                    </Text>
+                  </Heading>
+                </div>
                 {renderGroupNavigation}
               </View>
             </Flex.Item>
