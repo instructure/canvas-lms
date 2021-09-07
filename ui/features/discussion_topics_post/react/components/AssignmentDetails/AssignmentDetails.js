@@ -59,7 +59,7 @@ export function AssignmentDetails({...props}) {
       }}
       render={responsiveProps => (
         <Flex data-testid="graded-discussion-info">
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item padding="xx-small" shouldGrow shouldShrink align="start">
             {props.assignmentDueDate}
           </Flex.Item>
           <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">

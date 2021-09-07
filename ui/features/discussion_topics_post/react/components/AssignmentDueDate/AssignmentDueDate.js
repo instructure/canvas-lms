@@ -34,9 +34,10 @@ import {InlineList} from '@instructure/ui-list'
 
 export function AssignmentDueDate({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
+  let dueAt = ''
+  let mobileDueAt = ''
 
   let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
-  let dueAt = ''
 
   const canSeeMultipleDueDates = !!(
     props.discussionTopic.permissions?.readAsAdmin && assignmentOverrides.length > 0
@@ -49,6 +50,72 @@ export function AssignmentDueDate({...props}) {
 
   const singleOverrideWithNoDefault = !defaultDateSet && assignmentOverrides.length === 1
 
+  const getTitle = (group, isAdmin) => {
+    if (group) {
+      return group
+    } else {
+      return isAdmin ? I18n.t('Everyone') : null
+    }
+  }
+
+  const getDueDate = dueDate => {
+    if (dueDate) {
+      return I18n.t('Due %{date}', {
+        date: dueDate
+      })
+    }
+    return I18n.t('No Due Date')
+  }
+
+  const getAvailableFromUntilDate = (availableDate, untilDate) => {
+    if (availableDate && untilDate) {
+      return I18n.t('Available from %{availableDate} until %{untilDate}', {
+        availableDate,
+        untilDate
+      })
+    } else if (availableDate) {
+      return I18n.t('Available from %{availableDate}', {
+        availableDate
+      })
+    } else if (untilDate) {
+      return I18n.t('Available until %{untilDate}', {
+        untilDate
+      })
+    }
+    return null
+  }
+
+  const processDueDate = (group, dueDate, availableDate, untilDate) => {
+    return (
+      <InlineList delimiter="none">
+        {[
+          getTitle(group, props.discussionTopic.permissions?.readAsAdmin),
+          getDueDate(dueDate),
+          getAvailableFromUntilDate(availableDate, untilDate)
+        ]
+          .filter(item => item !== null)
+          .map(item => (
+            <InlineList.Item key={`assignement-due-date-section-${item.slice(0, 5)}`}>
+              <Text>{item}</Text>
+            </InlineList.Item>
+          ))}
+      </InlineList>
+    )
+  }
+
+  const getMobileDueDate = dueDate => {
+    if (dueDate) {
+      return (
+        <Text>
+          {I18n.t('Due %{date}', {
+            date: dueDate
+          })}
+        </Text>
+      )
+    }
+    return <Text>{I18n.t('No Due Date')}</Text>
+  }
+
   if (props.discussionTopic.assignment) {
     if (assignmentOverrides.length > 0 && canSeeMultipleDueDates && defaultDateSet) {
       assignmentOverrides = assignmentOverrides.concat({
@@ -60,106 +127,55 @@ export function AssignmentDueDate({...props}) {
       })
     }
 
-    const getTitle = (group, isAdmin) => {
-      if (group) {
-        return group
-      } else {
-        return isAdmin ? I18n.t('Everyone') : null
-      }
-    }
+    dueAt = singleOverrideWithNoDefault
+      ? processDueDate(
+          assignmentOverrides[0]?.title,
+          DateHelper.formatDatetimeForDiscussions(assignmentOverrides[0]?.dueAt),
+          DateHelper.formatDateForDisplay(assignmentOverrides[0]?.unlockAt, 'short'),
+          DateHelper.formatDateForDisplay(assignmentOverrides[0]?.lockAt, 'short')
+        )
+      : processDueDate(
+          '',
+          DateHelper.formatDatetimeForDiscussions(props.discussionTopic.assignment?.dueAt),
+          DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.unlockAt, 'short'),
+          DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.lockAt, 'short')
+        )
 
-    const getDueDate = dueDate => {
-      if (dueDate) {
-        return I18n.t('Due %{date}', {
-          date: dueDate
-        })
-      }
-      return I18n.t('No Due Date')
-    }
-
-    const getAvailableFromUntilDate = (availableDate, untilDate) => {
-      if (availableDate && untilDate) {
-        return I18n.t('Available from %{availableDate} until %{untilDate}', {
-          availableDate,
-          untilDate
-        })
-      } else if (availableDate) {
-        return I18n.t('Available from %{availableDate}', {
-          availableDate
-        })
-      } else if (untilDate) {
-        return I18n.t('Available until %{untilDate}', {
-          untilDate
-        })
-      }
-      return null
-    }
-
-    const processDueDate = (group, dueDate, availableDate, untilDate) => {
-      return (
-        <InlineList delimiter="none">
-          {[
-            getTitle(group, props.discussionTopic.permissions?.readAsAdmin),
-            getDueDate(dueDate),
-            getAvailableFromUntilDate(availableDate, untilDate)
-          ]
-            .filter(item => item !== null)
-            .map(item => (
-              <InlineList.Item>
-                <Text>{item}</Text>
-              </InlineList.Item>
-            ))}
-        </InlineList>
-      )
-    }
-
-    const getDueDateText = () => {
-      return singleOverrideWithNoDefault
-        ? processDueDate(
-            assignmentOverrides[0]?.title,
-            DateHelper.formatDatetimeForDiscussions(assignmentOverrides[0]?.dueAt),
-            DateHelper.formatDateForDisplay(assignmentOverrides[0]?.unlockAt, 'short'),
-            DateHelper.formatDateForDisplay(assignmentOverrides[0]?.lockAt, 'short')
-          )
-        : processDueDate(
-            '',
-            DateHelper.formatDatetimeForDiscussions(props.discussionTopic.assignment?.dueAt),
-            DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.unlockAt, 'short'),
-            DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.lockAt, 'short')
-          )
-    }
-
-    dueAt = getDueDateText()
+    mobileDueAt = getMobileDueDate(
+      singleOverrideWithNoDefault
+        ? DateHelper.formatDateForDisplay(assignmentOverrides[0]?.dueAt, 'short')
+        : DateHelper.formatDateForDisplay(props.discussionTopic.assignment?.dueAt, 'short')
+    )
   }
 
   const singleDueDate = useMemo(
     () => (
-      <Flex.Item padding="xx-small" shouldGrow align="start">
-        <Responsive
-          match="media"
-          query={responsiveQuerySizes({tablet: true, desktop: true})}
-          props={{
-            tablet: {
-              textSize: 'x-small'
-            },
-            desktop: {
-              textSize: 'small'
-            }
-          }}
-          render={responsiveProps => (
-            <Text weight="normal" size={responsiveProps.textSize}>
-              {dueAt}
-            </Text>
-          )}
-        />
-      </Flex.Item>
+      <Responsive
+        match="media"
+        query={responsiveQuerySizes({tablet: true, desktop: true})}
+        props={{
+          tablet: {
+            textSize: 'x-small',
+            displayText: mobileDueAt
+          },
+          desktop: {
+            textSize: 'small',
+            displayText: dueAt
+          }
+        }}
+        render={responsiveProps => (
+          <Text weight="normal" size={responsiveProps.textSize}>
+            {responsiveProps.displayText}
+          </Text>
+        )}
+      />
     ),
-    [dueAt]
+    [dueAt, mobileDueAt]
   )
 
   const multipleDueDates = useMemo(
     () => (
-      <Flex.Item padding="xx-small" shouldGrow align="start" overflowY="hidden">
+      <>
         <CondensedButton
           onClick={() => {
             setDueDateTrayOpen(true)
@@ -212,7 +228,7 @@ export function AssignmentDueDate({...props}) {
             </Flex>
           </View>
         </Tray>
-      </Flex.Item>
+      </>
     ),
     [dueDateTrayOpen, assignmentOverrides]
   )
