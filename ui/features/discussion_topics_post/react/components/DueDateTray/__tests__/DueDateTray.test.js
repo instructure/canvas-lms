@@ -153,7 +153,7 @@ describe('DueDateTray', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'}
       }))
     })
 

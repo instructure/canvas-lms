@@ -153,5 +153,17 @@ describe('AssignmentDueDate', () => {
       })
       expect(queryByText('No Due Date')).toBeTruthy()
     })
+
+    it('opens due date tray for single due date', () => {
+      const {queryByText, getByText, getByTestId} = setup({
+        assignmentOverrides: {nodes: []}
+      })
+
+      expect(queryByText('Due Mar 31')).toBeInTheDocument()
+      const dueDateTrayButton = queryByText('Due Mar 31')
+      fireEvent.click(dueDateTrayButton)
+      expect(getByText('Due Mar 31')).toBeTruthy()
+      expect(getByTestId('assignment-override-row')).toBeTruthy()
+    })
   })
 })

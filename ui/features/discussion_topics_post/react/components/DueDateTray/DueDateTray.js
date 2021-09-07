@@ -32,9 +32,9 @@ export function DueDateTray({...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           layout: 'stacked',
           textSize: 'small'
         },
