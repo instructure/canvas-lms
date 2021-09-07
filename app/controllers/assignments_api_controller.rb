@@ -857,7 +857,7 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
-      if @context.grants_right?(user, :manage_assignments)
+      if @context.grants_any_right?(user, :manage_assignments, :manage_assignments_edit)
         Assignment.preload_can_unpublish(assignments)
       end
 
@@ -1393,7 +1393,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    return render_json_unauthorized unless @context.grants_right?(@current_user, session, :manage_assignments)
+    return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
     data = params.permit(:_json => [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]).to_h[:_json]
     return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }

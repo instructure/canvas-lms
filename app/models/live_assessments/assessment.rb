@@ -37,7 +37,7 @@ module LiveAssessments
         !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
           self.context.grants_right?(user, session, :manage_assignments)
       end
-      can :create
+      can :create and can :update
 
       given do |user, session|
         self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
@@ -45,7 +45,10 @@ module LiveAssessments
       end
       can :create
 
-      given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
+      given do |user, session|
+        self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          self.context.grants_right?(user, session, :manage_assignments_edit)
+      end
       can :update
 
       given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }

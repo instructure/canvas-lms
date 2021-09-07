@@ -1769,7 +1769,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def user_can_update?(user, session=nil)
-    return false unless context.grants_right?(user, session, :manage_assignments)
+    return false unless context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
     return true unless moderated_grading?
 
     # a moderated assignment may only be edited by the assignment's moderator (assuming one has

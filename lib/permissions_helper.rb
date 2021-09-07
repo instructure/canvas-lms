@@ -39,7 +39,7 @@ module PermissionsHelper
   end
 
   # will return a hash linking global course ids with precalculated permissions
-  # e.g. {10000000000001 => {:manage_calendar => true, :manage_assignments => false}}
+  # e.g. {10000000000001 => {:manage_calendar => true, :manage_grades => false}}
   def precalculate_permissions_for_courses(courses, permissions, loaded_root_accounts=[])
     courses = courses.reject(&:deleted?) # just in case
     permissions = permissions.map(&:to_sym)
