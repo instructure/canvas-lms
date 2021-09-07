@@ -144,7 +144,7 @@ describe Quizzes::QuizSubmissionService do
     context 'as an anonymous participant' do
       before :each do
         participant.user = nil
-        quiz.context = Account.default.courses.new
+        quiz.context = Account.default.courses.new.tap { |c| c.root_account = Account.default }
       end
 
       it 'should allow taking a quiz in a public course' do
@@ -265,8 +265,8 @@ describe Quizzes::QuizSubmissionService do
 
     context 'as someone else' do
       it 'should deny access' do
-        quiz.context = Course.new
         participant.user = nil
+        quiz.context = Account.default.courses.new.tap { |c| c.root_account = Account.default }
 
         expect do
           subject.complete qs, qs.attempt

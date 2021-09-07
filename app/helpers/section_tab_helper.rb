@@ -25,6 +25,7 @@ module SectionTabHelper
     manage_admin_users
     manage_assignments
     manage_assignments_add
+    manage_assignments_edit
     manage_assignments_delete
     manage_content
     manage_files_add

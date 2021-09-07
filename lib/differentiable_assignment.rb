@@ -83,7 +83,7 @@ module DifferentiableAssignment
         if !context.includes_user?(user)
           true
         else
-          permissions_implying_visibility = [:read_as_admin, :manage_grades, :manage_assignments]
+          permissions_implying_visibility = [:read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS]
           permissions_implying_visibility << :manage_content if context.is_a?(Course)
           context.grants_any_right?(user, *permissions_implying_visibility)
         end
