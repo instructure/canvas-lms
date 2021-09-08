@@ -128,7 +128,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
   mutation CreateDiscussionEntry(
     $discussionTopicId: ID!
     $message: String!
-    $parentEntryId: ID
+    $replyFromEntryId: ID
     $fileId: ID
     $includeReplyPreview: Boolean
   ) {
@@ -136,7 +136,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
       input: {
         discussionTopicId: $discussionTopicId
         message: $message
-        parentEntryId: $parentEntryId
+        parentEntryId: $replyFromEntryId
         fileId: $fileId
         includeReplyPreview: $includeReplyPreview
       }

@@ -58,7 +58,7 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
-  const [replyId, setReplyId] = useState(null)
+  const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
@@ -84,8 +84,8 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
+    setReplyFromId(discussionEntryId)
     setIsolatedEntryId(discussionEntryId || rootEntryId)
-    setReplyId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -206,7 +206,7 @@ const DiscussionTopicManager = props => {
           relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
-          replyId={replyId}
+          replyFromId={replyFromId}
           open={isolatedViewOpen}
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}

@@ -319,7 +319,7 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        parentEntryId: props.discussionEntry._id,
+        replyFromEntryId: props.discussionEntry._id,
         message: text
       }
     })
