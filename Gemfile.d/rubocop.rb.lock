@@ -33,7 +33,7 @@ GEM
     jira_ref_parser (1.0.1)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0704)
+    mime-types-data (3.2021.0901)
     minitest (5.14.4)
     multi_xml (0.6.0)
     outrigger (2.1.1)
@@ -79,6 +79,7 @@ PLATFORMS
 
 DEPENDENCIES
   gergich (= 1.2.3)
+  mime-types-data (= 3.2021.0901)
   rainbow (= 3.0.0)
   rubocop (= 1.19.1)
   rubocop-canvas!
