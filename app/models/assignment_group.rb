@@ -98,7 +98,7 @@ class AssignmentGroup < ActiveRecord::Base
       !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :manage_assignments)
     end
-    can :create
+    can :read and can :create and can :update
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
@@ -106,7 +106,10 @@ class AssignmentGroup < ActiveRecord::Base
     end
     can :read and can :create
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_edit)
+    end
     can :read and can :update
 
     given do |user, session|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,19 +16,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-module Assignments
-  class ScopedToUser < ScopeFilter
-    def scope
-      concat_scope { context.active_assignments }
-      concat_scope do
-        unless can?(:read_as_admin) || can?(:manage_assignments) || can?(:manage_assignments_add) || can?(:manage_assignments_edit) || can?(:manage_assignments_delete)
-          @relation.published
-        end
-      end
-      concat_scope do
-        DifferentiableAssignment.scope_filter(@relation, user, context)
-      end
-    end
+
+class GranularManageAssignmentsPermissionsEdit < ActiveRecord::Migration[6.0]
+  tag :postdeploy
+
+  def up
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_assignments, :manage_assignments_edit)
   end
 end

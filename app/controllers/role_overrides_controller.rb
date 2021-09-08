@@ -274,9 +274,10 @@ class RoleOverridesController < ApplicationController
   #     import_outcomes                  -- [ TaDo] Learning Outcomes - import
   #     lti_add_edit                     -- [ TAD ] LTI - add / edit / delete
   #     manage_account_banks             -- [ td  ] Item Banks - manage account
-  #     manage_assignments               -- [ TADo] Assignments and Quizzes - manage / edit
+  #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete (deprecated)
   #     Manage Assignments and Quizzes granular permissions
   #         manage_assignments_add       -- [ TADo] Assignments and Quizzes - add
+  #         manage_assignments_edit      -- [ TADo] Assignments and Quizzes - edit / manage
   #         manage_assignments_delete    -- [ TADo] Assignments and Quizzes - delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete

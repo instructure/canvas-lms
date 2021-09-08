@@ -58,7 +58,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :read_question_banks) &&
-          self.context.grants_right?(user, session, :manage_assignments)
+          self.context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :read and can :update and can :manage
 

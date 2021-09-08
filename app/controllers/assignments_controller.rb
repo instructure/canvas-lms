@@ -296,8 +296,12 @@ class AssignmentsController < ApplicationController
           @external_tools = []
         end
 
+        context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
+        if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
+          context_rights[:manage_assignments] = context_rights[:manage_assignments_edit]
+        end
         permissions = {
-          context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
+          context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
           can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         }
