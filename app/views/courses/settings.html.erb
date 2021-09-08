@@ -159,7 +159,7 @@
         <div class="form-row friendly-name-row">
           <div class="form-label nobr"><%= f.blabel :friendly_name, :en => "Friendly Name" %></div>
           <div class="tall-row">
-            <% if can_rename_course %>
+            <% if can_manage %>
               <%= f.text_field :friendly_name, :maxlength => '255' %>
             <% else %>
               <span id="course_friendly_name"><%= @context.friendly_name %></span>
