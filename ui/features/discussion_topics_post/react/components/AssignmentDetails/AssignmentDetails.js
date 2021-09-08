@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 
+import {AssignmentAvailabilityContainer} from '../AssignmentAvailabilityContainer/AssignmentAvailabilityContainer'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
@@ -60,7 +61,7 @@ export function AssignmentDetails({...props}) {
       render={responsiveProps => (
         <Flex data-testid="graded-discussion-info">
           <Flex.Item padding="xx-small" shouldGrow shouldShrink align="start">
-            {props.assignmentDueDate}
+            <AssignmentAvailabilityContainer discussionTopic={props.discussionTopic} />
           </Flex.Item>
           <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
@@ -75,7 +76,7 @@ export function AssignmentDetails({...props}) {
 
 AssignmentDetails.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
-  assignmentDueDate: PropTypes.node.isRequired
+  discussionTopic: PropTypes.object.isRequired
 }
 
 export default AssignmentDetails

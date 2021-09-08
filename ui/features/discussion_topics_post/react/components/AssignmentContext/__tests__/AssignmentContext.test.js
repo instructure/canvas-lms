@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentDueDate} from '../AssignmentDueDate'
+import {AssignmentContext} from '../AssignmentContext'
 
 import {responsiveQuerySizes} from '../../../utils/index'
 
@@ -37,16 +37,19 @@ beforeAll(() => {
   })
 })
 
-const mockProps = {
-  dueDate: '2021-03-30T23:59:59-06:00',
-  onSetDueDateTrayOpen: jest.fn()
-}
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
+
+const mockProps = ({group = 'group 1'} = {}) => ({group})
 
 const setup = props => {
-  return render(<AssignmentDueDate {...props} />)
+  return render(<AssignmentContext {...props} />)
 }
 
-describe('AssignmentDueDate', () => {
+describe('AssignmentContext', () => {
   describe('Desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -54,16 +57,17 @@ describe('AssignmentDueDate', () => {
       }))
     })
 
-    it('should render due date', () => {
-      const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31 5:59am')).toBeInTheDocument()
+    it('should render context', () => {
+      const container = setup(mockProps())
+      expect(container.getByText('group 1')).toBeInTheDocument()
     })
 
-    it('should not find open due date tray button', () => {
-      const container = setup(mockProps)
-      expect(container.queryByTestId('mobile-due-date-tray-expansion')).toBeNull()
+    it('should render "Everyone" as context when no context is provided', () => {
+      const container = setup(mockProps({group: ''}))
+      expect(container.getByText('Everyone')).toBeInTheDocument()
     })
   })
+
   describe('Tablet', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -71,14 +75,9 @@ describe('AssignmentDueDate', () => {
       }))
     })
 
-    it('should render due date', () => {
-      const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31')).toBeInTheDocument()
-    })
-
-    it('should find open due date tray button', () => {
-      const container = setup(mockProps)
-      expect(container.queryByTestId('mobile-due-date-tray-expansion')).toBeInTheDocument()
+    it('should render not render context', () => {
+      const container = setup(mockProps())
+      expect(container.queryByText('group 1')).toBeNull()
     })
   })
 })

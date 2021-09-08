@@ -17,7 +17,6 @@
  */
 
 import {AssignmentDetails} from '../../components/AssignmentDetails/AssignmentDetails'
-import {AssignmentDueDate} from '../../components/AssignmentDueDate/AssignmentDueDate'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
@@ -302,9 +301,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         >
                           <AssignmentDetails
                             pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
-                            assignmentDueDate={
-                              <AssignmentDueDate discussionTopic={props.discussionTopic} />
-                            }
+                            discussionTopic={props.discussionTopic}
                           />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (

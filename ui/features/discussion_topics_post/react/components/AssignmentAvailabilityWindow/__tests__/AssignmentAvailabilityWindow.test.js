@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentDueDate} from '../AssignmentDueDate'
+import {AssignmentAvailabilityWindow} from '../AssignmentAvailabilityWindow'
 
 import {responsiveQuerySizes} from '../../../utils/index'
 
@@ -37,16 +37,25 @@ beforeAll(() => {
   })
 })
 
-const mockProps = {
-  dueDate: '2021-03-30T23:59:59-06:00',
-  onSetDueDateTrayOpen: jest.fn()
-}
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
+
+const mockProps = ({
+  availableDate = '2021-03-24T00:00:00-06:00',
+  untilDate = '2021-04-03T23:59:59-06:00'
+} = {}) => ({
+  availableDate,
+  untilDate
+})
 
 const setup = props => {
-  return render(<AssignmentDueDate {...props} />)
+  return render(<AssignmentAvailabilityWindow {...props} />)
 }
 
-describe('AssignmentDueDate', () => {
+describe('AssignmentAvailabilityWindow', () => {
   describe('Desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -54,16 +63,22 @@ describe('AssignmentDueDate', () => {
       }))
     })
 
-    it('should render due date', () => {
-      const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31 5:59am')).toBeInTheDocument()
+    it('should render availability window', () => {
+      const container = setup(mockProps())
+      expect(container.getByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
     })
 
-    it('should not find open due date tray button', () => {
-      const container = setup(mockProps)
-      expect(container.queryByTestId('mobile-due-date-tray-expansion')).toBeNull()
+    it('should render only from section', () => {
+      const container = setup(mockProps({untilDate: ''}))
+      expect(container.getByText('Available from Mar 24')).toBeInTheDocument()
+    })
+
+    it('should render only until section', () => {
+      const container = setup(mockProps({availableDate: ''}))
+      expect(container.getByText('Available until Apr 4')).toBeInTheDocument()
     })
   })
+
   describe('Tablet', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -71,14 +86,9 @@ describe('AssignmentDueDate', () => {
       }))
     })
 
-    it('should render due date', () => {
-      const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31')).toBeInTheDocument()
-    })
-
-    it('should find open due date tray button', () => {
-      const container = setup(mockProps)
-      expect(container.queryByTestId('mobile-due-date-tray-expansion')).toBeInTheDocument()
+    it('should render not render availability window', () => {
+      const container = setup(mockProps())
+      expect(container.queryByText('Available from Mar 24 until Apr 4')).toBeNull()
     })
   })
 })

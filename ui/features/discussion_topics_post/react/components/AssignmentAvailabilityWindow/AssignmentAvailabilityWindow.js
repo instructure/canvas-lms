@@ -23,18 +23,25 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
 
 import PropTypes from 'prop-types'
-import {Text} from '@instructure/ui-text'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
 
-export function AssignmentDueDate({...props}) {
-  let assignmentDueDate = null
-  if (props.dueDate) {
-    assignmentDueDate = I18n.t('Due %{date}', {
-      date: DateHelper.formatDatetimeForDiscussions(props.dueDate)
+export function AssignmentAvailabilityWindow({...props}) {
+  let availabilityWindow = null
+
+  if (props.availableDate && props.untilDate) {
+    availabilityWindow = I18n.t('Available from %{availableDate} until %{untilDate}', {
+      availableDate: DateHelper.formatDateForDisplay(props.availableDate, 'short'),
+      untilDate: DateHelper.formatDateForDisplay(props.untilDate, 'short')
     })
-  } else {
-    assignmentDueDate = I18n.t('No Due Date')
+  } else if (props.availableDate) {
+    availabilityWindow = I18n.t('Available from %{availableDate}', {
+      availableDate: DateHelper.formatDateForDisplay(props.availableDate, 'short')
+    })
+  } else if (props.untilDate) {
+    availabilityWindow = I18n.t('Available until %{untilDate}', {
+      untilDate: DateHelper.formatDateForDisplay(props.untilDate, 'short')
+    })
   }
 
   return (
@@ -43,33 +50,18 @@ export function AssignmentDueDate({...props}) {
       query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {
-          textSize: 'x-small'
+          textSize: 'x-small',
+          displayText: null
         },
         desktop: {
-          textSize: 'small'
+          textSize: 'small',
+          displayText: availabilityWindow
         }
       }}
-      render={(responsiveProps, matches) => {
-        if (matches.includes('tablet') && props.dueDate) {
-          return (
-            <CondensedButton
-              data-testid="mobile-due-date-tray-expansion"
-              onClick={() => {
-                props.onSetDueDateTrayOpen(true)
-              }}
-            >
-              <Text weight="normal" size={responsiveProps.textSize}>
-                {I18n.t('Due %{date}', {
-                  date: DateHelper.formatDateForDisplay(props.dueDate, 'short')
-                })}
-              </Text>
-            </CondensedButton>
-          )
-        }
-
-        return assignmentDueDate ? (
+      render={responsiveProps => {
+        return responsiveProps.displayText ? (
           <Text weight="normal" size={responsiveProps.textSize}>
-            {assignmentDueDate}
+            {responsiveProps.displayText}
           </Text>
         ) : null
       }}
@@ -77,7 +69,7 @@ export function AssignmentDueDate({...props}) {
   )
 }
 
-AssignmentDueDate.propsTypes = {
-  dueDate: PropTypes.string,
-  onSetDueDateTrayOpen: PropTypes.func
+AssignmentAvailabilityWindow.prototypes = {
+  availableDate: PropTypes.string,
+  untilDate: PropTypes.string
 }
