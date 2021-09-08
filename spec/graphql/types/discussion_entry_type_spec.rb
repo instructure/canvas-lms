@@ -65,6 +65,12 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
+  it 'queries the isolated entry id' do
+    expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.parent_id.to_s
+    sub_entry.update!(legacy: false)
+    expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.root_entry_id.to_s
+  end
+
   describe 'quoted entry' do
     before do
       allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)

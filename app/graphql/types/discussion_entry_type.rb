@@ -40,6 +40,11 @@ module Types
       end
     end
 
+    field :isolated_entry_id, ID, null: true
+    def isolated_entry_id
+      object.legacy? ? object.parent_id : object.root_entry_id
+    end
+
     field :message, String, null: true
     def message
       if object.deleted?
