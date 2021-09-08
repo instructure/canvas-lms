@@ -17,10 +17,14 @@
 %>
 <% provide :right_side do %>
   <div class="rs-margin-bottom">
-    <% if can_do(@bank, @current_user, :manage) %>
+    <% if can_do(@bank.assessment_questions.temp_record, @current_user, :create) %>
       <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
+    <% end %>
+    <% if can_do(@bank, @current_user, :update) %>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
       <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right" role="presentation"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
+    <% end %>
+    <% if can_do(@bank, @current_user, :delete) %>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end" role="presentation"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>

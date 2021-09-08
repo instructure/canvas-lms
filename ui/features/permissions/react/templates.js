@@ -1545,6 +1545,9 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
       description: I18n.t('Allows user to edit and publish/unpublish quizzes.')
     },
     {
+      description: I18n.t('Allows user to edit question banks in a course or account.')
+    },
+    {
       title: I18n.t('Assignments and Quizzes - delete'),
       description: I18n.t('Allows user to delete assignments in a course.')
     },
@@ -1553,6 +1556,9 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     },
     {
       description: I18n.t('Allows user to delete quizzes in a course.')
+    },
+    {
+      description: I18n.t('Allows user to delete question banks in a course or account.')
     }
   ],
   [
