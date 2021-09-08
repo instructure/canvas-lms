@@ -76,7 +76,7 @@ export default function loadCardDashboard(renderFn = renderIntoDOM, observedUser
         clearTimeout(sessionStorageTimeout)
         // calling the renderFn with `false` indicates to consumers that we're still waiting
         // on the follow-up xhr request to complete.
-        renderFn(dashboardCards, xhrHasReturned)
+        renderFn(dashboardCards, xhrHasReturned, observedUser)
         // calling it with `true` indicates that all outstanding card promises have settled.
         if (!xhrHasReturned)
           return promiseToGetDashboardCards.then(cards => renderFn(cards, true, observedUser))
@@ -89,7 +89,7 @@ export default function loadCardDashboard(renderFn = renderIntoDOM, observedUser
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )
   } else {
-    promiseToGetDashboardCards.then(cards => renderFn(cards, true))
+    promiseToGetDashboardCards.then(cards => renderFn(cards, true, observedUser))
   }
 }
 
