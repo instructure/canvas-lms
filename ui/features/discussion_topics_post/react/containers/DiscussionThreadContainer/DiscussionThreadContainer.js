@@ -204,7 +204,7 @@ export const DiscussionThreadContainer = props => {
           if (ENV.isolated_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
-              props.discussionEntry.rootEntryid,
+              props.discussionEntry.isolatedEntryId,
               true
             )
           }
@@ -244,7 +244,7 @@ export const DiscussionThreadContainer = props => {
           if (ENV.isolated_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
-              props.discussionEntry.rootEntryId,
+              props.discussionEntry.isolatedEntryId,
               false
             )
           } else {
