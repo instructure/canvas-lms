@@ -27,17 +27,17 @@ import TodosPage, {sortTodos} from '../TodosPage'
 
 const FETCH_TODOS_URL = /\/api\/v1\/users\/self\/todo.*/
 
-beforeEach(() => {
-  fetchMock.get(FETCH_TODOS_URL, MOCK_TODOS)
-})
-
-afterEach(() => {
-  fetchMock.restore()
-  // Clear flash alerts between tests
-  destroyContainer()
-})
-
 describe('TodosPage', () => {
+  beforeEach(() => {
+    fetchMock.get(FETCH_TODOS_URL, MOCK_TODOS)
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+    // Clear flash alerts between tests
+    destroyContainer()
+  })
+
   it('renders todo items for each todo once loaded', async () => {
     const {getAllByTestId, getAllByText, getByRole, findByRole, rerender, queryByRole} = render(
       <TodosPage visible={false} timeZone="America/Denver" />
@@ -65,6 +65,31 @@ describe('TodosPage', () => {
     fetchMock.get(FETCH_TODOS_URL, 500, {overwriteRoutes: true})
     const {findAllByText} = render(<TodosPage visible timeZone="America/Denver" />)
     expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
+  })
+
+  it('ignores submitting-type todos', async () => {
+    const {findByRole, queryByText} = render(<TodosPage visible timeZone="America/Denver" />)
+    expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
+    expect(queryByText('Long essay', {exact: false})).not.toBeInTheDocument()
+  })
+})
+
+describe('Empty todos', () => {
+  beforeEach(() => {
+    fetchMock.get(FETCH_TODOS_URL, [])
+  })
+
+  it('shows an empty state if there are no todos', async () => {
+    const {getAllByText, findByText, findByTestId} = render(
+      <TodosPage visible timeZone="America/Denver" />
+    )
+    expect(getAllByText('Loading Todo Title')[0]).toBeInTheDocument()
+
+    // Displays the empty state if no todos were found
+    expect(
+      await findByText("Relax and take a break. There's nothing to do yet.")
+    ).toBeInTheDocument()
+    expect(await findByTestId('empty-todos-panda')).toBeInTheDocument()
   })
 })
 

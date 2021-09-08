@@ -62,6 +62,9 @@ export default class FileUpload extends Component {
   componentDidMount() {
     this._isMounted = true
     window.addEventListener('message', this.handleLTIFiles)
+    if (document.getElementById('inputFileDrop')) {
+      document.getElementById('inputFileDrop').focus()
+    }
   }
 
   componentWillUnmount() {
@@ -141,6 +144,13 @@ export default class FileUpload extends Component {
         this.setState({filesToUpload: []})
       }
     })
+  }
+
+  handleWebcamPhotoUpload = async ({filename, image}) => {
+    const {blob} = image
+    blob.name = filename
+
+    await this.handleDropAccepted([blob])
   }
 
   uploadFiles = async files => {
@@ -301,6 +311,16 @@ export default class FileUpload extends Component {
     return (
       <div data-testid="upload-box">
         <Flex direction="column" padding="xx-small">
+          <Flex.Item padding="xx-small" textAlign="center">
+            <MoreOptions
+              assignmentID={this.props.assignment._id}
+              courseID={this.props.assignment.env.courseId}
+              handleCanvasFiles={this.handleCanvasFiles}
+              handleWebcamPhotoUpload={this.handleWebcamPhotoUpload}
+              renderCanvasFiles
+              userID={this.props.assignment.env.currentUser.id}
+            />
+          </Flex.Item>
           <Flex.Item margin="0 0 small 0" overflowY="visible">
             <FileDrop
               accept={
@@ -317,15 +337,6 @@ export default class FileUpload extends Component {
               renderLabel={fileDropLabel}
               shouldAllowMultiple
               shouldEnablePreview
-            />
-          </Flex.Item>
-          <Flex.Item padding="xx-small" textAlign="center">
-            <MoreOptions
-              assignmentID={this.props.assignment._id}
-              courseID={this.props.assignment.env.courseId}
-              handleCanvasFiles={this.handleCanvasFiles}
-              renderCanvasFiles
-              userID={this.props.assignment.env.currentUser.id}
             />
           </Flex.Item>
         </Flex>
@@ -419,7 +430,7 @@ export default class FileUpload extends Component {
     return (
       <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
         <Flex direction="column" width="100%" alignItems="stretch">
-          <Flex.Item>{this.renderUploadBox()}</Flex.Item>
+          <Flex.Item overflowY="visible">{this.renderUploadBox()}</Flex.Item>
 
           {files.length > 0 && <Flex.Item>{this.renderUploadedFiles(files)}</Flex.Item>}
         </Flex>

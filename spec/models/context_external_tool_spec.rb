@@ -1589,6 +1589,43 @@ describe ContextExternalTool do
       end
 
     end
+
+    describe "validation" do
+      def set_visibility(v)
+        tool.file_menu = {enabled: true, visibility: v}
+        tool.save!
+        tool.reload
+      end
+
+      context "when visibility is included in placement config" do
+        it 'accepts `admins`' do
+          set_visibility('admins')
+          expect(tool.file_menu[:visibility]).to eq 'admins'
+        end
+
+        it 'accepts `members`' do
+          set_visibility('members')
+          expect(tool.file_menu[:visibility]).to eq 'members'
+        end
+
+        it 'accepts `public`' do
+          set_visibility('public')
+          expect(tool.file_menu[:visibility]).to eq 'public'
+        end
+
+        it 'does not accept any other values' do
+          set_visibility('public')
+          set_visibility('fake')
+          expect(tool.file_menu[:visibility]).to eq 'public'
+        end
+
+        it 'accepts `nil` and removes visibility' do
+          set_visibility('members')
+          set_visibility(nil)
+          expect(tool.file_menu.key?(:visibility)).to be false
+        end
+      end
+    end
   end
 
   describe "#extension_default_value" do

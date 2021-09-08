@@ -52,9 +52,7 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def enabled?
-    status = state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: status.to_s})
-    status
+    state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
   end
 
   def can_override?
@@ -66,19 +64,22 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def clear_cache
-    if self.context
-      self.class.connection.after_transaction_commit { self.context.feature_flag_cache.delete(self.context.feature_flag_cache_key(feature)) }
-      self.context.touch if Feature.definitions[feature].try(:touch_context)
-      if self.context.is_a?(Account)
-        if self.context.site_admin?
-          Switchman::DatabaseServer.send_in_each_region(self.context, :clear_cache_key, {}, :feature_flags)
-        else
-          self.context.clear_cache_key(:feature_flags)
-        end
-      end
+    if context
+      self.class.connection.after_transaction_commit do
+        context.feature_flag_cache.delete(context.feature_flag_cache_key(feature))
+        context.touch if Feature.definitions[feature].try(:touch_context) || context.try(:root_account?)
 
-      if ::Rails.env.development? && self.context.is_a?(Account) && Account.all_special_accounts.include?(self.context)
-        Account.clear_special_account_cache!(true)
+          if context.is_a?(Account)
+          if context.site_admin?
+            Switchman::DatabaseServer.send_in_each_region(context, :clear_cache_key, {}, :feature_flags)
+          else
+            context.clear_cache_key(:feature_flags)
+          end
+        end
+
+        if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
+          Account.clear_special_account_cache!(true)
+        end
       end
     end
   end
@@ -96,12 +97,8 @@ class FeatureFlag < ActiveRecord::Base
       # this should catch a programatic/console user if one is acting
       # outside the request/response cycle
       acting_user = @current_user || Canvas.infer_user
-      prior_state = if operation == :create
-        'nonexistant'
-      else
-        self.state_in_database
-      end
-      post_state = (operation == :destroy ? 'removed' : self.state)
+      prior_state = prior_flag_state(operation)
+      post_state = post_flag_state(operation)
       Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
     end
   end
@@ -112,6 +109,18 @@ class FeatureFlag < ActiveRecord::Base
 
   def audit_log_destroy
     audit_log_update(operation: :destroy)
+  end
+
+  def prior_flag_state(operation)
+    operation == :create ? self.default_for_flag : self.state_in_database
+  end
+
+  def post_flag_state(operation)
+    operation == :destroy ? self.default_for_flag : self.state
+  end
+
+  def default_for_flag
+    Feature.definitions[self.feature]&.state || 'undefined'
   end
   private
 

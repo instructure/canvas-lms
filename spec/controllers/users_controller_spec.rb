@@ -315,9 +315,13 @@ describe UsersController do
       expect(courses.map { |c| c['label'] }).to eq %w(E c d a b)
     end
 
-    it "should not include courses that an admin doesn't have rights to see" do
+    it "should not include courses that an admin can't content-manage" do
       @role1 = custom_account_role('subadmin', :account => Account.default)
-      account_admin_user_with_role_changes(:role => @role1, :role_changes => {})
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {
+        :read_course_content => true,
+        :read_course_list => true,
+        :manage_content => false
+      })
       user_session(@admin)
 
       course_with_teacher(:course_name => "A", :active_all => true, :user => @admin)
@@ -326,6 +330,23 @@ describe UsersController do
       course_with_teacher(:course_name => "D", :active_all => true)
 
       get 'manageable_courses', params: {:user_id => @admin.id}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+    end
+
+    it "should not include courses that an admin doesn't have rights to see" do
+      @role1 = custom_account_role('subadmin', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_content => true })
+      user_session(@admin)
+
+      course_with_teacher(:course_name => "A", :active_all => true, :user => @admin)
+      course_with_teacher(:course_name => "B", :active_all => true)
+      course_with_teacher(:course_name => "C", :active_all => true, :user => @admin)
+      course_with_teacher(:course_name => "D", :active_all => true)
+
+      get 'manageable_courses', params: {:user_id => @admin.id }
       expect(response).to be_successful
 
       courses = json_parse
@@ -387,6 +408,20 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
+      end
+
+      it "should not include courses that an admin doesn't have rights to see when passing include = 'concluded'" do
+        @role1 = custom_account_role('subadmin', :account => Account.default)
+        account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_content => true })
+        user_session(@admin)
+
+        course_with_teacher(:course_name => "MyAdminCourse", :active_all => true, :user => @admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id, :include => 'concluded'}
+        expect(response).to be_successful
+        courses = json_parse
+
+        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyAdminCourse'].sort
       end
 
       it "should include concluded courses for teachers when passing include = 'concluded'" do
@@ -2444,6 +2479,26 @@ describe UsersController do
       expect(json['errored_users'].first['existing_users'].first['user_id']).to eq existing_user.id
       expect(json['errored_users'].first['existing_users'].first['user_token']).to eq existing_user.token
     end
+
+    it 'checks for pre-existing users with unconfirmed communication channels' do
+      user = user_with_pseudonym(active_all: true, username: 'example1@example.com')
+      user.communication_channels.first.update!(workflow_state: 'unconfirmed')
+      unconfirmed_email_message =
+        "The email address provided conflicts with an existing user's email that is awaiting verification."
+
+      allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
+      course_with_teacher_logged_in(active_all: true)
+
+      user_list = [{ 'email' => 'example1@example.com' }]
+
+      post 'invite_users', params: { course_id: @course.id, users: user_list }
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body)
+      expect(json['invited_users']).to be_empty
+      expect(json['errored_users'].count).to eq 1
+      expect(json['errored_users'].first['errors'].first['message']).to include(unconfirmed_email_message)
+    end
   end
 
   describe "#user_dashboard" do
@@ -2568,63 +2623,72 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
         end
-      end
-    end
 
-    context "ENV.INITIAL_NUM_K5_CARDS" do
-      before :once do
-        course_with_student
-      end
-
-      before :each do
-        user_session @student
-      end
-
-      it "is set to cached count" do
-        enable_cache do
-          Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+        it "sets ENV.OBSERVER_LIST with self and observed users" do
           get 'user_dashboard'
-          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
-          Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+
+          observers = assigns[:js_env][:OBSERVER_LIST]
+          expect(observers.length).to be(1)
+          expect(observers[0][:name]).to eq(@student.name)
+          expect(observers[0][:id]).to eq(@student.id)
         end
-      end
 
-      it "is set to 5 if not cached" do
-        enable_cache do
-          get 'user_dashboard'
-          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+        context "ENV.INITIAL_NUM_K5_CARDS" do
+          before :once do
+            course_with_student
+          end
+
+          before :each do
+            user_session @student
+          end
+
+          it "is set to cached count" do
+            enable_cache do
+              Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+              get 'user_dashboard'
+              expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
+              Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+            end
+          end
+
+          it "is set to 5 if not cached" do
+            enable_cache do
+              get 'user_dashboard'
+              expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+            end
+          end
         end
-      end
-    end
 
-    context "ENV.PERMISSIONS" do
-      it "sets :create_courses_as_admin to true if user is admin" do
-        account_admin_user
-        user_session @user
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
-      end
+        context "ENV.PERMISSIONS" do
+          it "sets :create_courses_as_admin to true if user is admin" do
+            account_admin_user
+            user_session @user
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
+          end
 
-      it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
-        Account.default.settings[:teachers_can_create_courses] = true
-        course_with_teacher_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
-      end
+          it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
+            Account.default.settings[:teachers_can_create_courses] = true
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
+          end
 
-      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
-        course_with_teacher_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
-      end
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
 
-      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
-        course_with_student_logged_in
-        get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
+            course_with_student_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
+        end
       end
     end
   end

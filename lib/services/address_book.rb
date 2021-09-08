@@ -121,10 +121,7 @@ module Services
     class << self
       private
       def setting(key)
-        Canvas::DynamicSettings.find("address-book", default_ttl: 5.minutes)[key]
-      rescue Diplomat::KeyNotFound => e
-        Canvas::Errors.capture_exception(:address_book, e, :warn)
-        nil
+        Canvas::DynamicSettings.find("address-book", default_ttl: 5.minutes)[key, failsafe: nil]
       end
 
       def app_host

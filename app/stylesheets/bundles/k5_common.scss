@@ -29,8 +29,14 @@
   padding-top: 1px;
   // These offsets let the sticky header cover content that spills over into the
   // page padding, otherwise it's still visible behind the sticky header.
-  margin-left: -24px;
-  padding-left: 24px;
+  margin-#{direction(left)}: -$ic-sp*2;
+  padding-#{direction(left)}: $ic-sp*2;
+  @include mobile-only {
+    & {
+      margin-#{direction(left)}: -$ic-sp;
+      padding-#{direction(left)}: $ic-sp;
+    }
+  }
   // We need a higher z-index than the planner items, some of which are at 1.
   z-index: 2;
 

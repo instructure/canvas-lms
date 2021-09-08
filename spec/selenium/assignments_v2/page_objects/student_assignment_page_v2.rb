@@ -31,6 +31,14 @@ class StudentAssignmentPageV2
       f("img[alt='Assignment Locked']")
     end
 
+    def assignment_future_locked_image
+      f("img[alt='Assignment locked until future date']")
+    end
+
+    def assignment_prerequisite_locked_image
+      f("img[alt='Assignment Locked with Prerequisite']")
+    end
+
     def attempt_dropdown
       f("input[data-testid='attemptSelect']")
     end
@@ -65,6 +73,10 @@ class StudentAssignmentPageV2
 
     def assignment_group_link
       f("a[data-testid='assignmentgroup-link']")
+    end
+
+    def modules_link
+      f("a[data-testid='modules-link']")
     end
 
     def due_date_css(due_at)

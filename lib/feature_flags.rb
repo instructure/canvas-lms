@@ -24,16 +24,16 @@ module FeatureFlags
   end
 
   def feature_enabled?(feature)
-    if id&.zero?
-      InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
-      return false
-    end
-
-    flag = lookup_feature_flag(feature)
-    return flag.enabled? if flag
-
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
-    false
+    # This method is doing a bit more than initially appears. 🤞 this helps you in your
+    # future travels, fellow spelunker.
+    #
+    # persist_result - takes the feature state, logs it to Datadog, then returns it.
+    #
+    # The feature state is determined by three different cases:
+    #   1. the context's id is zero, in which case it should always be false
+    #   2. feature lookup fails, in which case it should always be false
+    #   3. feature lookup succeeds, in which case it should be the evaluation of enabled?
+    persist_result(feature, !id&.zero? && !!lookup_feature_flag(feature)&.enabled?)
   end
 
   def feature_allowed?(feature)
@@ -45,12 +45,12 @@ module FeatureFlags
 
   def set_feature_flag!(feature, state)
     feature = feature.to_s
-    flag = self.feature_flags.where(feature: feature).first
-    flag ||= self.feature_flags.build(feature: feature)
+    flag = feature_flags.find_or_initialize_by(feature: feature)
     flag.state = state
     @feature_flag_cache ||= {}
     @feature_flag_cache[feature] = flag
     flag.save!
+    association(:feature_flags).reset
   end
 
   def allow_feature!(feature)
@@ -91,7 +91,7 @@ module FeatureFlags
         result = RequestCache.cache("feature_flag", self, feature) do
           feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
             # keep have the context association unloaded in case we can't marshal it
-            FeatureFlag.where(feature: feature.to_s).polymorphic_where(:context => self).first
+            FeatureFlag.where(feature: feature.to_s, context: self).first
           end
         end
         result.context = self if result
@@ -104,13 +104,20 @@ module FeatureFlags
   # starting with site admin
   def feature_flag_account_ids
     return [Account.site_admin.global_id] if is_a?(User)
-    return [] if self.is_a?(Account) && self.site_admin?
+    return [] if is_a?(Account) && site_admin?
 
-    cache = self.is_a?(Account) && root_account? ? MultiCache.cache : Rails.cache
+    # don't use a cache at all for root account, because
+    # it won't even hit the database
+    if is_a?(Account) && root_account?
+      chain = account_chain(include_site_admin: true).dup
+      chain.shift
+      return chain.reverse.map(&:global_id)
+    end
+
     RequestCache.cache('feature_flag_account_ids', self) do
       shard.activate do
-        cache.fetch(['feature_flag_account_ids', self].cache_key) do
-          chain = account_chain(include_site_admin: true)
+        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+          chain = account_chain(include_site_admin: true).dup
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
         end
@@ -141,6 +148,10 @@ module FeatureFlags
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
     accounts = feature_flag_account_ids.map do |id|
+      # optimizations for accounts we likely already have loaded (including their feature flags!)
+      next Account.site_admin if id == Account.site_admin.global_id
+      next Account.current_domain_root_account if id == Account.current_domain_root_account&.global_id
+
       account = Account.new
       account.id = id
       account.shard = Shard.shard_for(id, self.shard)
@@ -150,9 +161,10 @@ module FeatureFlags
 
     all_contexts = (accounts + [self]).uniq
     all_contexts -= [self] if inherited_only
-    all_contexts.each_with_index do |context, idx|
+    all_contexts.each do |context|
       flag = context.feature_flag(feature, skip_cache: context == self && skip_cache)
       next unless flag
+
       retval = flag
       break unless flag.can_override?
     end
@@ -189,6 +201,12 @@ module FeatureFlags
     )
       retval
     end
+  end
+
+  private
+  def persist_result(feature, result)
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: result.to_s})
+    result
   end
 end
 

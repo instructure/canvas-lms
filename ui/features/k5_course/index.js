@@ -29,9 +29,12 @@ ready(() => {
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
+        canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
+        canReadAnnouncements={ENV.PERMISSIONS.read_announcements}
         currentUser={ENV.current_user}
         id={ENV.COURSE.id}
-        imageUrl={ENV.COURSE.image_url}
+        bannerImageUrl={ENV.COURSE.banner_image_url}
+        cardImageUrl={ENV.COURSE.image_url}
         color={ENV.COURSE.color}
         name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
@@ -52,6 +55,8 @@ ready(() => {
         pagesPath={ENV.COURSE.pages_url}
         hasWikiPages={ENV.COURSE.has_wiki_pages}
         hasSyllabusBody={ENV.COURSE.has_syllabus_body}
+        parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
+        observerList={ENV.OBSERVER_LIST}
       />,
       courseContainer
     )

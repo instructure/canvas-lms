@@ -115,6 +115,26 @@ test('comment_change does not submit if no comment', () => {
   ok($.ajaxJSON.notCalled)
 })
 
+test('comment_change submits an empty comment if submitting a media comment', () => {
+  const mediaFixtures = `
+    <div id="media_fixtures">
+      <div id="media_media_recording" data-comment_id="asdf" data-comment_type="video">
+        <div class="media_recording">
+        </div>
+      </div>
+      <button class="media_comment_link"></button>
+    </div>
+  `
+
+  $(mediaFixtures).appendTo('#fixtures')
+  $(document).triggerHandler('comment_change')
+
+  const [, , callParams] = $.ajaxJSON.getCall(0).args
+  strictEqual(callParams['submission[comment]'], '')
+
+  $('#media_fixtures').remove()
+})
+
 test('grading_change posts to update_submission_url', () => {
   $(document).triggerHandler('grading_change')
   equal($.ajaxJSON.getCall(0).args[0], 'submission_data_url.com')

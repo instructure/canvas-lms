@@ -27,28 +27,24 @@ const ImportTray = () => (
     image="/images/tutorial-tray-images/Panda_Map.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I copy a Canvas course into a new course shell?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712'
+        href: I18n.t('#community.instructor_copy_course')
       },
       {
         label: I18n.t('How do I import a Canvas course export package?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795'
+        href: I18n.t('#community.instructor_import_package')
       },
       {
         label: I18n.t('How do I select specific content as part of a course import?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091'
+        href: I18n.t('#community.instructor_select_import_content')
       },
       {
         label: I18n.t('How do I adjust events and due dates in a course import?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090'
+        href: I18n.t('#community.instructor_adjust_dates_on_import')
       }
     ]}
   >

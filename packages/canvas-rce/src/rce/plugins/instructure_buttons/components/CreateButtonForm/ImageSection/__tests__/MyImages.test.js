@@ -21,14 +21,31 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import Bridge from '../../../../../../../bridge'
 import {MyImages} from '../MyImages'
+
+jest.mock('../../../../../../../bridge')
+
+Bridge.trayProps = {
+  get: () => ({
+    source: {
+      initializeCollection() {},
+      initializeUpload() {},
+      initializeFlickr() {},
+      initializeImages() {},
+      initializeDocuments() {},
+      initializeMedia() {}
+    }
+  })
+}
 
 describe('<MyImages />', () => {
   it('renders the upload modal', () => {
-    render(<MyImages />)
+    render(<MyImages editor={{}} />)
     userEvent.click(screen.getByText(/add image/i))
     screen.getByRole('heading', {name: /add image/i})
-    userEvent.click(screen.getByText(/close/i))
+    const closeButton = screen.getAllByRole('button', {name: /close/i})[0]
+    userEvent.click(closeButton)
     expect(screen.queryByRole('heading', {name: /add image/i})).toBeNull()
   })
 })

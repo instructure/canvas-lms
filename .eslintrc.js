@@ -39,10 +39,11 @@ module.exports = {
     },
     sourceType: 'module'
   },
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
 
   globals: {
     ENV: true,
+    JSX: true,
     INST: true,
     tinyMCE: true,
     tinymce: true
@@ -57,7 +58,8 @@ module.exports = {
     'lodash',
     'react',
     'react-hooks',
-    'babel'
+    'babel',
+    '@typescript-eslint'
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -86,7 +88,6 @@ module.exports = {
     'no-plusplus': 'off',
     'no-prototype-builtins': 'off',
     'no-return-assign': 'off',
-    'no-shadow': 'warn', // AirBnB says 'error', we downgrade to just 'warn'
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
     'no-useless-escape': 'off',
@@ -186,18 +187,9 @@ module.exports = {
     'jest/no-large-snapshots': 'warn',
 
     // These are things we care about
-    'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
-    'no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_',
-
-        // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
-        ignoreRestSiblings: true
-      }
-    ],
+    'react/jsx-filename-extension': ['error', {extensions: ['.js', 'ts', 'tsx']}],
     'eslint-comments/no-unused-disable': 'error',
-    'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
+    'import/extensions': ['error', 'ignorePackages', {js: 'never', ts: 'never', tsx: 'never'}],
     'import/no-commonjs': 'off', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
@@ -215,9 +207,32 @@ module.exports = {
       }
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
-    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}]
+    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
+
+    // Some rules need to be replaced with typescript versions to work with TS
+    'no-redeclare': 'off',
+    '@typescript-eslint/no-redeclare': 'error',
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': 'warn', // AirBnB says 'error', we downgrade to just 'warn'
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+
+        // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
+        ignoreRestSiblings: true
+      }
+    ],
+    semi: 'off',
+    '@typescript-eslint/semi': ['error', 'never']
   },
   settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'] // add Typescript extensions
+      }
+    },
     react: {
       version: 'detect'
     }

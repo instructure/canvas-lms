@@ -113,5 +113,14 @@ describe('UploadFileModal', () => {
 
       expect(queryByText('Attributes')).not.toBeInTheDocument()
     })
+
+    it('is not renderedd when requireA11yAttributes is false', () => {
+      modalProps.accept = '*/*'
+      modalProps.requireA11yAttributes = false
+
+      const {queryByText} = render(<UploadFileModal {...modalProps} />)
+
+      expect(queryByText('Attributes')).not.toBeInTheDocument()
+    })
   })
 })

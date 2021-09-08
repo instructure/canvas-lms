@@ -98,5 +98,3 @@ class DynamoQuery
     @query = @db.query(params)
   end
 end
-
-GraphQL::Relay::BaseConnection.register_connection_implementation(DynamoQuery, DynamoConnection)

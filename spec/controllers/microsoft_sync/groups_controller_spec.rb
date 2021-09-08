@@ -72,6 +72,15 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
       it { is_expected.to be_unauthorized }
     end
+
+    context 'when the user has the update permission but not manage_students' do
+      before do
+        account_with_role_changes(role: teacher_role, role_changes: {manage_students: false})
+        user_session(teacher)
+      end
+
+      it { is_expected.to_not be_unauthorized }
+    end
   end
 
   shared_examples_for 'endpoints that require a release flag to be on' do
@@ -95,6 +104,14 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
       specify { expect(subject.parsed_body).to_not include('job_state') }
       specify { expect(subject.parsed_body['last_error_report_id']).to eq(123) }
+    end
+
+    it 'deserializes and localizes the error' do
+      serialized = MicrosoftSync::Errors.serialize(StandardError.new)
+      group.update! last_error: serialized
+      allow(MicrosoftSync::Errors).to receive(:deserialize_and_localize).and_call_original
+      subject
+      expect(MicrosoftSync::Errors).to have_received(:deserialize_and_localize).with(serialized)
     end
   end
 

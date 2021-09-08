@@ -34,27 +34,34 @@ describe MicrosoftSync::UserMapping do
       [course.enrollments.first.user, *n_students_in_course(3, course: course)]
     end
 
-    it 'returns the user ids of enrolled users without mappings in batches' do
-      described_class.create!(user: users[1], root_account: course.root_account, aad_id: 'manual')
-      calls_results = []
-      described_class.find_enrolled_user_ids_without_mappings(
-        course: course, batch_size: 2
-      ) do |ids|
-        calls_results << ids
+    %w[active creation_pending].each do |state|
+      context "when the user's enrollment state is #{state}" do
+        it 'returns the user ids of enrolled users without mappings in batches' do
+          described_class.create!(user: users[1], root_account: course.root_account, aad_id: 'manual')
+          Enrollment.update_all(workflow_state: state)
+          calls_results = []
+          described_class.find_enrolled_user_ids_without_mappings(
+            course: course, batch_size: 2
+          ) do |ids|
+            calls_results << ids
+          end
+          expect(calls_results.flatten.sort).to eq((users - [users[1]]).map(&:id))
+          expect(calls_results.length).to eq(2)
+        end
       end
-      expect(calls_results.flatten.sort).to eq((users - [users[1]]).map(&:id))
-      expect(calls_results.length).to eq(2)
     end
 
-    it 'excludes deleted enrollments' do
-      course.enrollments.where(user: users.first).take.update!(workflow_state: 'deleted')
-      calls_results = []
-      described_class.find_enrolled_user_ids_without_mappings(
-        course: course, batch_size: 2
-      ) do |ids|
-        calls_results << ids
+    %w[completed deleted inactive invited rejected].each do |state|
+      it "excludes #{state} enrollments" do
+        course.enrollments.where(user: users.first).take.update!(workflow_state: state)
+        calls_results = []
+        described_class.find_enrolled_user_ids_without_mappings(
+          course: course, batch_size: 2
+        ) do |ids|
+          calls_results << ids
+        end
+        expect(calls_results.flatten.sort).to eq((users - [users.first]).map(&:id))
       end
-      expect(calls_results.flatten.sort).to eq((users - [users.first]).map(&:id))
     end
   end
 
@@ -70,8 +77,10 @@ describe MicrosoftSync::UserMapping do
 
       let(:account) do
         account_model(settings: {
+          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
           microsoft_sync_login_attribute: 'email',
-          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com'
+          microsoft_sync_login_attribute_suffix: nil,
+          microsoft_sync_remote_attribute: 'upn',
         })
       end
       let(:user1) { user_model }
@@ -88,31 +97,27 @@ describe MicrosoftSync::UserMapping do
           eq([[user1.id, 'manual'], [user2.id, 'user2']].sort)
       end
 
-      context 'when the tenant in the Account settings has changed since fetching the account' do
-        before do
-          acct = Account.find(account.id)
-          acct.settings[:microsoft_sync_tenant] = 'EXTRA' + acct.settings[:microsoft_sync_tenant]
-          acct.save
-        end
+      {
+        microsoft_sync_tenant: 'somedifferenttenant.onmicrosoft.com',
+        microsoft_sync_login_attribute: 'sis_user_id',
+        microsoft_sync_login_attribute_suffix: '@thebestschool.edu',
+        microsoft_sync_remote_attribute: 'email',
+      }.each do |setting, value|
+        context "when the #{setting} in the Account settings has changed since fetching the account" do
+          before do
+            acct = Account.find(account.id)
+            acct.settings[setting] = value
+            acct.save
+          end
 
-        it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
-          expect { subject }
-            .to raise_error(described_class::AccountSettingsChanged)
-            .and not_change{described_class.order(:id).map(&:attributes)}
-        end
-      end
+          it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
+            klass = described_class::AccountSettingsChanged
+            msg = /account-wide sync settings were changed/
 
-      context 'when the upn type in the Account settings has changed since fetching the account' do
-        before do
-          acct = Account.find(account.id)
-          acct.settings[:microsoft_sync_login_attribute] = 'sis_user_id'
-          acct.save
-        end
-
-        it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
-          expect { subject }
-            .to raise_error(described_class::AccountSettingsChanged)
-            .and not_change{described_class.order(:id).map(&:attributes)}
+            expect { subject }.to \
+              raise_microsoft_sync_graceful_cancel_error(klass, msg)
+              .and not_change{described_class.order(:id).map(&:attributes)}
+          end
         end
       end
     end
@@ -122,13 +127,6 @@ describe MicrosoftSync::UserMapping do
         expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
           change { described_class.count }.from(0)
       end
-    end
-  end
-
-  describe 'AccountSettingsChanged' do
-    it 'is a graceful cancel error' do
-      expect(described_class::AccountSettingsChanged.new).to \
-        be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
     end
   end
 
@@ -161,6 +159,13 @@ describe MicrosoftSync::UserMapping do
       ])
     end
 
+    it 'does not ignore creation_pending enrollments' do
+      Enrollment.update_all(workflow_state: 'creation_pending')
+      expect(subject).to eq([
+        %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+      ])
+    end
+
     it 'ignores enrollments of type StudentViewEnrollment' do
       enrollments.first.update!(type: 'StudentViewEnrollment')
       expect(subject).to eq([
@@ -168,9 +173,11 @@ describe MicrosoftSync::UserMapping do
       ])
     end
 
-    it 'ignores deleted enrollments' do
-      enrollments[0].destroy
-      expect(subject).to eq([%w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]])
+    %w[completed deleted inactive invited rejected].each do |state|
+      it "ignores #{state} enrollments" do
+        enrollments.first.update!(workflow_state: state)
+        expect(subject).to eq([%w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]])
+      end
     end
 
     it 'ignores enrollments with missing UserMappings' do

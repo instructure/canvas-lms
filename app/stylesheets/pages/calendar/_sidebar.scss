@@ -35,6 +35,7 @@
 .navigation_title_text {
   @include ic-focus-base;
   text-decoration: underline;
+  cursor: pointer;
   &:focus {
     @include ic-focus-variant;
   }

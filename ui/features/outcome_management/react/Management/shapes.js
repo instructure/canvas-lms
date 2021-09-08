@@ -21,7 +21,9 @@ import PropTypes from 'prop-types'
 export const outcomeGroupShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  description: PropTypes.string
+  description: PropTypes.string,
+  contextId: PropTypes.number,
+  contextType: PropTypes.string
 })
 
 export const outcomeShape = PropTypes.shape({
@@ -29,4 +31,29 @@ export const outcomeShape = PropTypes.shape({
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   canUnlink: PropTypes.bool.isRequired
+})
+
+export const groupCollectionShape = PropTypes.shape({
+  collections: PropTypes.arrayOf(PropTypes.string),
+  descriptor: PropTypes.string,
+  isRootGroup: PropTypes.bool,
+  name: PropTypes.string,
+  outcomesCount: PropTypes.number,
+  parentGroupId: PropTypes.string
+})
+
+export const outcomeEdgesNodeShape = PropTypes.shape({
+  _id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  isImported: PropTypes.bool.isRequired,
+  description: PropTypes.string
+})
+
+export const outcomeEdgeShape = PropTypes.shape({
+  node: outcomeEdgesNodeShape
+})
+
+export const outcomePageInfoShape = PropTypes.shape({
+  endCursor: PropTypes.string,
+  hasNextPage: PropTypes.bool.isRequired
 })

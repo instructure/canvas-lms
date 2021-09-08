@@ -120,7 +120,7 @@ class GroupCategoriesController < ApplicationController
     @categories = @context.group_categories.preload(:root_account, :progresses)
     respond_to do |format|
       format.json do
-        if authorized_action(@context, @current_user, :manage_groups)
+        if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
           path = send("api_v1_#{@context.class.to_s.downcase}_group_categories_url")
           paginated_categories = Api.paginate(@categories, self, path)
           includes = ['progress_url']
@@ -144,7 +144,7 @@ class GroupCategoriesController < ApplicationController
   def show
     respond_to do |format|
       format.json do
-        if authorized_action(@group_category.context, @current_user, :manage_groups)
+        if authorized_action(@group_category.context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
           includes = ['progress_url']
           includes.concat(params[:includes]) if params[:includes]
           render :json => group_category_json(@group_category, @current_user, session, :include => includes)
@@ -197,7 +197,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupCategory
   def create
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
@@ -266,7 +266,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns Progress
   def import
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
 
       file_obj = nil
@@ -325,7 +325,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupCategory
   def update
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
       if api_request?
         if populate_group_category_from_params
@@ -365,7 +365,7 @@ class GroupCategoriesController < ApplicationController
   #           -H 'Authorization: Bearer <token>'
   #
   def destroy
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_delete])
       @group_category = @group_category || @context.group_categories.where(id: params[:category_id]).first
       return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
       return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
@@ -396,7 +396,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns [Group]
   def groups
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
       @groups = @group_category.groups.active.by_name.preload(:root_account)
       @groups = Api.paginate(@groups, self, api_v1_group_category_groups_url)
       render :json => @groups.map { |g| group_json(g, @current_user, session) }
@@ -413,7 +413,7 @@ class GroupCategoriesController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   def export
     GuardRail.activate(:secondary) do
-      if authorized_action(@context, @current_user, :manage_groups)
+      if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
         csv_string = CSV.generate do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
@@ -429,9 +429,11 @@ class GroupCategoriesController < ApplicationController
           csv << export_headers(include_sis_id, gms_by_user_id.any?)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
-      end
-      respond_to do |format|
-        format.csv { send_data csv_string, type: 'text/csv', filename: "#{@group_category.name}.csv", disposition: 'attachment' }
+        # keep inside authorized_action block to avoid
+        # double render error if user is not authorized
+        respond_to do |format|
+          format.csv { send_data csv_string, type: 'text/csv', filename: "#{@group_category.name}.csv", disposition: 'attachment' }
+        end
       end
     end
   end
@@ -617,7 +619,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupMembership | Progress
   def assign_unassigned_members
-    return unless authorized_action(@context, @current_user, :manage_groups)
+    return unless authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
 
     # option disabled for student organized groups or section-restricted
     # self-signup groups. (but self-signup is ignored for non-Course groups)
@@ -655,7 +657,7 @@ class GroupCategoriesController < ApplicationController
   end
 
   def clone_with_name
-    if authorized_action(get_category_context, @current_user, :manage_groups)
+    if authorized_action(get_category_context, @current_user, [:manage_groups, :manage_groups_add])
       GroupCategory.transaction do
         group_category = GroupCategory.active.find(params[:id])
         new_group_category = group_category.dup

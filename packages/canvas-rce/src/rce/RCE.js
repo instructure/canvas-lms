@@ -57,6 +57,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     rcsProps,
     use_rce_pretty_html_editor,
     use_rce_buttons_and_icons,
+    use_rce_a11y_checker_notifications,
     onFocus,
     onBlur,
     onInit,
@@ -98,6 +99,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       trayProps: rcsProps,
       use_rce_pretty_html_editor,
       use_rce_buttons_and_icons,
+      use_rce_a11y_checker_notifications,
       editorOptions: Object.assign(editorOptions, editorOptions, {
         selector: `#${textareaId}`,
         height,
@@ -166,6 +168,12 @@ RCE.propTypes = {
   // array of lti tools available to the user
   // {id, favorite} are all that's required, ther fields are ignored
   ltiTools: ltiToolsPropType,
+  // if the rce_limit_init_render_on_page flag is on, this
+  // is the maximum number of RCEs that will render on page load.
+  // Any more than this will be deferred until it is nearly
+  // scrolled into view.
+  // if isNaN or <=0, render them all
+  maxInitRenderedRCEs: number,
   // name:value pairs of attributes to add to the textarea
   // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
@@ -182,6 +190,8 @@ RCE.propTypes = {
   use_rce_pretty_html_editor: bool,
   // enable the custom buttons feature (temporary until the feature is forced on)
   use_rce_buttons_and_icons: bool,
+  // enable the a11y checker notifications (temporary until the feature is forced on)
+  use_rce_a11y_checker_notifications: bool,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
@@ -197,10 +207,12 @@ RCE.defaultProps = {
   instRecordDisabled: false,
   language: 'en',
   liveRegion: () => document.getElementById('flash_screenreader_holder'),
+  maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
   use_rce_pretty_html_editor: true,
   use_rce_buttons_and_icons: true,
+  use_rce_a11y_checker_notifications: true,
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},

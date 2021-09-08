@@ -55,12 +55,7 @@ describe('SimilarityPledge', () => {
 
   it('includes a link to the supplied eulaUrl when one is provided', () => {
     const {getByRole} = render(
-      <SimilarityPledge
-        checked
-        eulaUrl="http://some.url/"
-        onChange={jest.fn()}
-        pledgeText="ignored pledge"
-      />
+      <SimilarityPledge checked eulaUrl="http://some.url/" onChange={jest.fn()} />
     )
 
     const eulaLink = getByRole('link', {name: 'End-User License Agreement'})
@@ -74,6 +69,32 @@ describe('SimilarityPledge', () => {
 
     const checkbox = getByLabelText('a grave and solemn pledge')
     expect(checkbox).toBeInTheDocument()
+  })
+
+  it('renders the eulaUrl when both eulaUrl and pledgeText are provided', () => {
+    const {getByLabelText} = render(
+      <SimilarityPledge
+        checked
+        eulaUrl="http://some.url"
+        pledgeText="a grave and solemn pledge"
+        onChange={jest.fn()}
+      />
+    )
+
+    expect(getByLabelText(/I agree to the tool's End-User License Agreement/)).toBeInTheDocument()
+  })
+
+  it('renders the pledgeText when both eulaUrl and pledgeText are provided', () => {
+    const {getByLabelText} = render(
+      <SimilarityPledge
+        checked
+        eulaUrl="http://some.url"
+        pledgeText="a grave and solemn pledge"
+        onChange={jest.fn()}
+      />
+    )
+
+    expect(getByLabelText(/a grave and solemn pledge/)).toBeInTheDocument()
   })
 
   it('checks the checkbox if "checked" is true', () => {

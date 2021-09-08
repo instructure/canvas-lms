@@ -329,6 +329,38 @@ module BrandableCSS
       fingerprint
     end
 
+    # build a cache of nominal paths to font files to the decorated version we need to request
+    # e.g. "/fonts/lato/extended/Lato-Bold.woff2": "/dist/fonts/lato/extended/Lato-Bold-cccb897485.woff2"
+    # only track .woff2 font files since those will be the only ones ever asked for
+    # (truth be told, could limit it to just lato extended)
+    # this function is more or less modeled after combined_checksums
+    def font_path_cache
+      return @decorated_font_paths if defined?(@decorated_font_paths) && defined?(ActionController) && ActionController::Base.perform_caching
+
+      file = APP_ROOT.join(CONFIG.dig('paths', 'rev_manifest'))
+
+      # in reality, if the rev-manifest.json file is missing you won't get this far, but let's be careful anyway
+      return(
+        @decorated_font_paths =
+          JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
+            memo["/#{k}"] = "/dist/#{v}" if k =~ /^fonts.*woff2/
+          end.freeze
+      ) if file.exist?
+
+      # the file does not exist in production, we have a problem
+      if defined?(Rails) && Rails.env.production?
+        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+      end
+
+      # for dev/test there might be cases where you don't want it to raise an exception
+      # if you haven't run `brandable_css` and the manifest file doesn't exist yet.
+      # eg: you want to test a controller action and you don't care that it links
+      # to a css file that hasn't been created yet.
+      @decorated_font_paths = {
+        anyfont: 'Error: unknown css checksum. you need to run brandable_css'
+      }.freeze
+    end
+
     def all_fingerprints_for(bundle_path)
       variants.each_with_object({}) do |variant, object|
         object[variant] = cache_for(bundle_path, variant)

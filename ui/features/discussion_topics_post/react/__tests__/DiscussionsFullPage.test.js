@@ -18,16 +18,22 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../graphql/Discussion'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {graphql} from 'msw'
 import {handlers} from '../../graphql/mswHandlers'
 import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
-import {Discussion} from '../../graphql/Discussion'
-import {graphql} from 'msw'
 import React from 'react'
+import {responsiveQuerySizes} from '../utils'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('../utils/constants', () => ({
+  ...jest.requireActual('../utils/constants'),
+  HIGHLIGHT_TIMEOUT: 0
+}))
+jest.mock('../utils')
 
 describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
@@ -50,6 +56,16 @@ describe('DiscussionFullPage', () => {
       course_id: '1'
     }
 
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
     window.INST = {
       editorButtons: []
     }
@@ -61,6 +77,9 @@ describe('DiscussionFullPage', () => {
 
   beforeEach(() => {
     mswClient.cache.reset()
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {maxWidth: '1000'}
+    }))
   })
 
   afterEach(() => {
@@ -201,9 +220,32 @@ describe('DiscussionFullPage', () => {
       const container = setup()
       expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
       fireEvent.change(await container.getByLabelText('Search entries or author'), {
-        target: {value: 'a'}
+        target: {value: 'aa'}
       })
       await waitFor(() => expect(container.queryByTestId('discussion-topic-container')).toBeNull())
+    })
+
+    it('hides discussion topic when unread is selected', async () => {
+      const {findByTestId, getByLabelText, getByText, queryByTestId} = setup()
+      expect(await findByTestId('discussion-topic-container')).toBeTruthy()
+
+      const simpleSelect = await getByLabelText('Filter by')
+      await fireEvent.click(simpleSelect)
+      const unread = await getByText('Unread')
+      await fireEvent.click(unread)
+
+      await waitFor(() => expect(queryByTestId('discussion-topic-container')).toBeNull())
+    })
+
+    it('does not hide discussion topic when single character search term is present', async () => {
+      const container = setup()
+      expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
+      fireEvent.change(await container.getByLabelText('Search entries or author'), {
+        target: {value: 'a'}
+      })
+      await waitFor(() =>
+        expect(container.queryByTestId('discussion-topic-container')).toBeTruthy()
+      )
     })
   })
 
@@ -271,7 +313,7 @@ describe('DiscussionFullPage', () => {
     it('renders the dates properly', async () => {
       const container = setup()
       expect(await container.findByText('Nov 23, 2020 6:40pm')).toBeInTheDocument()
-      expect(await container.findByText(', last reply Apr 5 7:41pm')).toBeInTheDocument()
+      expect(await container.findByText('Last reply Apr 5 7:41pm')).toBeInTheDocument()
     })
   })
 
@@ -338,12 +380,9 @@ describe('DiscussionFullPage', () => {
     it('should render Teacher and Ta pills', async () => {
       window.ENV.course_id = 1
       const container = setup()
-      const pillContainer = await container.findAllByTestId('pill-container')
-      const teacherPill = await container.findAllByTestId('pill-Teacher')
-      const taPill = await container.findAllByTestId('pill-TA')
-      expect(pillContainer).toBeTruthy()
-      expect(teacherPill).toBeTruthy()
-      expect(taPill).toBeTruthy()
+      await waitFor(() => expect(container.queryAllByTestId('pill-container')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-Teacher')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-TA')).toBeTruthy())
     })
 
     it('should not render Teacher and Ta if no course is given', async () => {
@@ -355,70 +394,6 @@ describe('DiscussionFullPage', () => {
       expect(pillContainer).toEqual([])
       expect(teacherPill).toEqual([])
       expect(taPill).toEqual([])
-    })
-  })
-
-  describe('isolated view', () => {
-    beforeAll(() => {
-      window.ENV.isolated_view = true
-    })
-
-    afterAll(() => {
-      window.ENV.isolated_view = false
-    })
-
-    afterEach(() => {
-      setOnSuccess.mockClear()
-    })
-
-    it('should be able to post a reply to an entry', async () => {
-      const {findByText, findByTestId, queryByTestId} = setup()
-
-      const replyButton = await findByTestId('threading-toolbar-reply')
-      fireEvent.click(replyButton)
-
-      expect(findByText('Thread')).toBeTruthy()
-
-      const doReplyButton = await findByTestId('DiscussionEdit-submit')
-      fireEvent.click(doReplyButton)
-
-      await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
-      )
-    })
-
-    it('should be able to edit a root entry', async () => {
-      const {findByText, findByTestId, findAllByTestId} = setup()
-
-      const expandButton = await findByTestId('expand-button')
-      fireEvent.click(expandButton)
-
-      const actionsButtons = await findAllByTestId('thread-actions-menu')
-      fireEvent.click(actionsButtons[0]) // Root Entry kebab
-
-      const editButton = await findByText('Edit')
-      fireEvent.click(editButton)
-
-      const saveButton = await findByText('Save')
-      fireEvent.click(saveButton)
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
-      )
-    })
-
-    it('should open isolated view when go to reply button is clicked', async () => {
-      const container = setup()
-      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
-      fireEvent.change(await container.findByTestId('search-filter'), {
-        target: {value: 'a'}
-      })
-      const goToReply = await container.findByTestId('go-to-reply')
-      fireEvent.click(goToReply)
-
-      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
     })
   })
 
@@ -445,6 +420,78 @@ describe('DiscussionFullPage', () => {
       const groupsMenuButton = await container.findByTestId('groups-menu-btn')
       fireEvent.click(groupsMenuButton)
       await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+    })
+  })
+
+  describe('highlighting', () => {
+    it('should allow highlighting the discussion topic multiple times', async () => {
+      const container = setup()
+
+      expect(container.queryByTestId('isHighlighted')).toBeNull()
+
+      fireEvent.click(await container.findByTestId('thread-actions-menu'))
+      fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+      // expect the highlight to disappear
+      await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+
+      // should be able to highlight the topic multiple times
+      fireEvent.click(await container.findByTestId('thread-actions-menu'))
+      fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    })
+  })
+
+  describe('reply with ascending sort order', () => {
+    beforeEach(() => {
+      jest.mock('../utils/constants', () => ({
+        ...jest.requireActual('../utils/constants'),
+        PER_PAGE: 1
+      }))
+    })
+
+    afterEach(() => {
+      jest.mock('../utils/constants', () => ({
+        ...jest.requireActual('../utils/constants'),
+        HIGHLIGHT_TIMEOUT: 0
+      }))
+    })
+
+    it('should change to last page when sort order is asc', async () => {
+      const container = setup()
+
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+
+      const button = await container.getByTestId('sortButton')
+      await button.click()
+
+      const replyButton = await container.findByTestId('discussion-topic-reply')
+      fireEvent.click(replyButton)
+
+      await waitFor(() => {
+        expect(tinymce.editors[0]).toBeDefined()
+      })
+
+      const rce = await container.findByTestId('DiscussionEdit-container')
+      expect(rce.style.display).toBe('')
+
+      document.querySelectorAll('textarea')[0].value = 'This is a reply'
+
+      expect(container.queryAllByText('This is a reply')).toBeTruthy()
+
+      const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
+      fireEvent.click(doReplyButton)
+
+      await waitFor(() =>
+        expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
+      )
+
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+      )
     })
   })
 })

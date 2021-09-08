@@ -168,6 +168,14 @@ module MicrosoftSync
             raise_error(described_class::InternalError, /A job is waiting to be retried/)
         end
       end
+
+      context 'when canceled in an IRB session' do
+        it "doesn't leave state as pending" do
+          expect(steps_object).to receive(:step_initial).and_raise(IRB::Abort)
+          expect { subject.run_synchronously }.to raise_error(IRB::Abort)
+          expect(state_record.reload.workflow_state).to eq('errored')
+        end
+      end
     end
 
     describe '#run_later' do
@@ -294,7 +302,7 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
             expect(state_record.last_error).to \
-              eq(Errors.user_facing_message(Errors::PublicError.new('foo')))
+              eq(Errors.serialize(Errors::PublicError.new('foo')))
           end
 
           it "doesn't run the stash block on the last failure" do
@@ -344,7 +352,7 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
             expect(state_record.last_error).to \
-              eq(Errors.user_facing_message(Errors::PublicError.new('foo')))
+              eq(Errors.serialize(Errors::PublicError.new('foo')))
           end
 
           context 'when delay is an array of integers' do
@@ -505,7 +513,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
-            expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error))
             expect(steps_object.steps_run.last).to eq([:after_failure])
           end
 
@@ -529,9 +537,8 @@ module MicrosoftSync
           end
         end
 
-        context 'when the error includes GracefulCancelErrorMixin' do
-          class GracefulCancelTestError < StandardError
-            include MicrosoftSync::Errors::GracefulCancelErrorMixin
+        context 'when the error is a GracefulCancelError' do
+          class GracefulCancelTestError < MicrosoftSync::Errors::GracefulCancelError
           end
 
           let(:error) { GracefulCancelTestError.new }
@@ -545,7 +552,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
-            expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error))
           end
 
           it 'increments a "canceled" statsd metric' do

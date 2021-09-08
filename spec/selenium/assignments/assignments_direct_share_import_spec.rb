@@ -82,11 +82,19 @@ describe 'assignments' do
     run_jobs
   }
 
-  let(:select_course_and_module_in_tray) {
+  let(:select_course_in_tray) {
     course_search_dropdown.click
     course_dropdown_item(@course2.name).click
+  }
+
+  let(:select_module_in_tray) {
     module_search_dropdown.click
     module_dropdown_item(@module1.name).click
+  }
+
+  let(:select_course_and_module_in_tray) {
+    select_course_in_tray
+    select_module_in_tray
   }
 
   describe 'direct share feature' do
@@ -176,39 +184,32 @@ describe 'assignments' do
         user_session(@teacher2)
       end
 
-      it 'can send an item to another instructor', custom_timeout: 30 do
+      it 'received item appears and can be managed as expected', custom_timeout: 30 do
+        # Item appears
         visit_content_share_page
         expect(received_table_rows[1].text).to include @assignment1.name
-      end
 
-      context 'received item' do
-        before(:each) do
-          visit_content_share_page
-          manage_received_item_button(@assignment1.name).click
-        end
+        manage_received_item_button(@assignment1.name).click
 
-        it 'can preview received item', custom_timeout: 30 do
-          preview_received_item.click
-          # can view the mocked preview page
-          expect(page_body.text).to include "Preview"
-        end
+        # Expected courses are present in the dropdown
+        import_content_share.click
+        course_search_dropdown.click
+        wait_for_ajaximations
+        expect(course_dropdown_list[0].text).to include @course2.name
+        expect(course_dropdown_list[0].text).not_to include @course3.name
 
-        it 'cant be imported into concluded courses', custom_timeout: 30 do
-          import_content_share.click
-          course_search_dropdown.click
-          wait_for_ajaximations
+        # Importing the content is successfully initiated
+        course_dropdown_item(@course2.name).click
+        select_module_in_tray
+        import_button.click
+        run_jobs
+        expect(import_dialog_import_success_alert.text).to include "Import started successfully"
 
-          expect(course_dropdown_list[0].text).to include 'Second Course2'
-          expect(course_dropdown_list[0].text).not_to include 'Third Course3'
-        end
-
-        it 'can be imported into a course', custom_timeout: 30 do
-          import_content_share.click
-          select_course_and_module_in_tray
-          import_button.click
-          run_jobs
-          expect(import_dialog_import_success_alert.text).to include "Import started successfully"
-        end
+        # Mocked preview page renders
+        find_button('Close').click
+        manage_received_item_button(@assignment1.name).click
+        preview_received_item.click
+        expect(page_body.text).to include "Preview"
       end
     end
   end

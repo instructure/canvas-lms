@@ -17,7 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+RSpec.shared_context "services JWT wrapper" do
+  def build_wrapped_token(user_id, real_user_id: nil, encoding_secret: fake_signing_secret)
+    payload = { sub: user_id }
+    payload[:masq_sub] = real_user_id if real_user_id
+    crypted_token = Canvas::Security::ServicesJwt.generate(payload, false)
+    payload = {
+      iss: "some other service",
+      user_token: crypted_token
+    }
+    wrapper_token = Canvas::Security.create_jwt(payload, nil, encoding_secret)
+    # because it will come over base64 encoded from any other service
+    Canvas::Security.base64_encode(wrapper_token)
+  end
+end
+
 RSpec.shared_context "JWT setup" do
+  include_context "services JWT wrapper"
+
   let(:fake_signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
   let(:fake_encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
   let(:fake_secrets){
@@ -42,6 +59,8 @@ RSpec.shared_context "JWT setup" do
 end
 
 RSpec.shared_context "JWT setup with deprecated secret" do
+  include_context "services JWT wrapper"
+
   let(:fake_signing_secret){ "abcdefghijklmnopabcdefghijklmnop" }
   let(:fake_encryption_secret){ "qrstuvwxyzqrstuvwxyzqrstuvwxyzqr" }
   let(:fake_deprecated_signing_secret){ "nowiknowmyabcsnexttimewontyou..." }

@@ -16,6 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  addReplyToDiscussionEntry,
+  getSpeedGraderUrl,
+  updateDiscussionTopicEntryCounts,
+  responsiveQuerySizes,
+  isTopicAuthor
+} from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import {
@@ -24,6 +31,7 @@ import {
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
@@ -32,27 +40,23 @@ import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
+import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useState, useCallback} from 'react'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
+import {Responsive} from '@instructure/ui-responsive'
+
+import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {
-  getSpeedGraderUrl,
-  addReplyToDiscussionEntry,
-  addReplyToSubentries,
-  addReplyToDiscussion,
-  resolveAuthorRoles
-} from '../../utils'
-import theme from '@instructure/canvas-theme'
-import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
   discussionEntry: {
     id: '432',
     author: {
-      name: 'Jeffrey Johnson',
+      displayName: 'Jeffrey Johnson',
       avatarUrl: 'someURL'
     },
     createdAt: '2021-02-08T13:36:05-07:00',
@@ -79,19 +83,24 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const {sort} = useContext(SearchContext)
+  const {searchTerm, sort, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
-  const threadRef = useRef()
+  const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+    const variables = {
+      discussionEntryID: newDiscussionEntry.parentId,
+      first: PER_PAGE,
+      sort,
+      courseID: window.ENV?.course_id
+    }
 
-    addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
+    addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -131,7 +140,23 @@ export const DiscussionThreadContainer = props => {
     }
   })
 
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    if (
+      props.discussionEntry.read !==
+      result.data.updateDiscussionEntryParticipant.discussionEntry.read
+    ) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange
+      })
+    }
+  }
+
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    update: updateDiscussionEntryParticipantCache,
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
@@ -169,15 +194,19 @@ export const DiscussionThreadContainer = props => {
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
-        key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
-        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        key={`reply-${props.discussionEntry._id}`}
+        authorName={props.discussionEntry.author.displayName}
+        delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            props.onOpenIsolatedView(props.discussionEntry._id, true)
+            props.onOpenIsolatedView(
+              props.discussionEntry._id,
+              props.discussionEntry.rootEntryid,
+              true
+            )
           }
         }}
       />
@@ -189,10 +218,10 @@ export const DiscussionThreadContainer = props => {
   ) {
     threadActions.push(
       <ThreadingToolbar.Like
-        key={`like-${props.discussionEntry.id}`}
-        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
+        key={`like-${props.discussionEntry._id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -203,18 +232,21 @@ export const DiscussionThreadContainer = props => {
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
-        key={`expand-${props.discussionEntry.id}`}
-        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
-        )}
+        key={`expand-${props.discussionEntry._id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         onClick={() => {
           if (ENV.isolated_view) {
-            props.onOpenIsolatedView(props.discussionEntry._id, false)
+            props.onOpenIsolatedView(
+              props.discussionEntry._id,
+              props.discussionEntry.rootEntryId,
+              false
+            )
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -256,25 +288,32 @@ export const DiscussionThreadContainer = props => {
   }
 
   // Scrolling auto listener to mark messages as read
+  const onThreadRefCurrentSet = useCallback(refCurrent => {
+    setThreadRefCurrent(refCurrent)
+  }, [])
+
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.read &&
       !props.discussionEntry?.forcedReadState
     ) {
-      const observer = new IntersectionObserver(() => props.markAsRead(props.discussionEntry._id), {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-      })
+      const observer = new IntersectionObserver(
+        ([entry]) => entry.isIntersecting && props.markAsRead(props.discussionEntry._id),
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4
+        }
+      )
 
-      if (threadRef.current) observer.observe(threadRef.current)
+      if (threadRefCurrent) observer.observe(threadRefCurrent)
 
       return () => {
-        if (threadRef.current) observer.unobserve(threadRef.current)
+        if (threadRefCurrent) observer.unobserve(threadRefCurrent)
       }
     }
-  }, [threadRef, props.discussionEntry.read, props])
+  }, [threadRefCurrent, props.discussionEntry.read, props])
 
   const onReplySubmit = text => {
     createDiscussionEntry({
@@ -287,114 +326,151 @@ export const DiscussionThreadContainer = props => {
     setEditorExpanded(false)
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
-    <>
-      <Highlight isHighlighted={highlightEntry}>
-        <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
-          <Flex>
-            <Flex.Item shouldShrink shouldGrow>
-              <PostMessageContainer
-                discussionEntry={props.discussionEntry}
-                onOpenIsolatedView={props.onOpenIsolatedView}
-                threadActions={threadActions}
-                isEditing={isEditing}
-                onCancel={() => {
-                  setIsEditing(false)
-                }}
-                onSave={onUpdate}
-                discussionRoles={resolveAuthorRoles(
-                  props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
-                    !!props?.discussionTopic?.author?.id &&
-                    !!props?.discussionEntry?.author?.id &&
-                    props?.discussionEntry?.author !== null,
-                  props?.discussionEntry?.author?.courseRoles
-                )}
-              />
-            </Flex.Item>
-            {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
-                <ThreadActions
-                  id={props.discussionEntry.id}
-                  isUnread={!props.discussionEntry.read}
-                  onToggleUnread={toggleUnread}
-                  onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                  onEdit={
-                    props.discussionEntry.permissions?.update
-                      ? () => {
-                          setIsEditing(true)
-                        }
-                      : null
-                  }
-                  onOpenInSpeedGrader={
-                    props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
-                  }
-                  goToParent={
-                    props.depth === 0
-                      ? null
-                      : () => {
-                          const topOffset = props.parentRef.current.offsetTop
-                          window.scrollTo(0, topOffset - 44)
-                        }
-                  }
-                  goToTopic={props.goToTopic}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          padding: 'medium xx-small small'
+        },
+        desktop: {
+          padding: 'medium medium small'
+        }
+      }}
+      render={responsiveProps => (
+        <>
+          <Highlight isHighlighted={props.discussionEntry._id === props.highlightEntryId}>
+            <div style={{marginLeft: marginDepth}} ref={onThreadRefCurrentSet}>
+              <Flex padding={responsiveProps.padding}>
+                <Flex.Item shouldShrink shouldGrow>
+                  <PostContainer
+                    isTopic={false}
+                    postUtilities={
+                      !props.discussionEntry.deleted ? (
+                        <ThreadActions
+                          id={props.discussionEntry._id}
+                          isUnread={!props.discussionEntry.read}
+                          onToggleUnread={toggleUnread}
+                          onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                          onEdit={
+                            props.discussionEntry.permissions?.update
+                              ? () => {
+                                  setIsEditing(true)
+                                }
+                              : null
+                          }
+                          onOpenInSpeedGrader={
+                            props.discussionTopic.permissions?.speedGrader
+                              ? onOpenInSpeedGrader
+                              : null
+                          }
+                          goToParent={
+                            props.depth === 0
+                              ? null
+                              : () => {
+                                  const topOffset = props.parentRefCurrent.offsetTop
+                                  window.scrollTo(0, topOffset - 44)
+                                }
+                          }
+                          goToTopic={props.goToTopic}
+                        />
+                      ) : null
+                    }
+                    author={props.discussionEntry.author}
+                    message={props.discussionEntry.message}
+                    isEditing={isEditing}
+                    onSave={onUpdate}
+                    onCancel={() => setIsEditing(false)}
+                    isIsolatedView={false}
+                    editor={props.discussionEntry.editor}
+                    isUnread={
+                      !props.discussionEntry.read ||
+                      !!props.discussionEntry?.rootEntryParticipantCounts?.unreadCount
+                    }
+                    isForcedRead={props.discussionEntry.forcedReadState}
+                    timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.createdAt
+                    )}
+                    editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.updatedAt
+                    )}
+                    lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.lastReply?.createdAt
+                    )}
+                    deleted={props.discussionEntry.deleted}
+                    isTopicAuthor={isTopicAuthor(
+                      props.discussionTopic.author,
+                      props.discussionEntry.author
+                    )}
+                  >
+                    {threadActions.length > 0 && (
+                      <View as="div" padding="x-small none none">
+                        <ThreadingToolbar
+                          searchTerm={searchTerm}
+                          discussionEntry={props.discussionEntry}
+                          onOpenIsolatedView={props.onOpenIsolatedView}
+                          isIsolatedView={false}
+                          filter={filter}
+                        >
+                          {threadActions}
+                        </ThreadingToolbar>
+                      </View>
+                    )}
+                  </PostContainer>
+                </Flex.Item>
+              </Flex>
+            </div>
+          </Highlight>
+          <div style={{marginLeft: replyMarginDepth}}>
+            {editorExpanded && !ENV.isolated_view && (
+              <View
+                display="block"
+                background="primary"
+                borderWidth="none none small none"
+                padding="none none small none"
+                margin="none none x-small none"
+              >
+                <DiscussionEdit
+                  onSubmit={text => {
+                    onReplySubmit(text)
+                  }}
+                  onCancel={() => setEditorExpanded(false)}
                 />
-              </Flex.Item>
+              </View>
             )}
-          </Flex>
-        </div>
-      </Highlight>
-      <div style={{marginLeft: replyMarginDepth}}>
-        {editorExpanded && !ENV.isolated_view && (
-          <View
-            display="block"
-            background="primary"
-            borderWidth="none none small none"
-            padding="none none small none"
-            margin="none none x-small none"
-          >
-            <DiscussionEdit
-              onSubmit={text => {
-                onReplySubmit(text)
-              }}
-              onCancel={() => setEditorExpanded(false)}
+          </div>
+          {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
+            <DiscussionSubentries
+              discussionTopic={props.discussionTopic}
+              discussionEntryId={props.discussionEntry._id}
+              depth={props.depth + 1}
+              markAsRead={props.markAsRead}
+              parentRefCurrent={threadRefCurrent}
             />
-          </View>
-        )}
-      </div>
-      {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
-        <DiscussionSubentries
-          discussionTopic={props.discussionTopic}
-          discussionEntryId={props.discussionEntry._id}
-          depth={props.depth + 1}
-          markAsRead={props.markAsRead}
-          parentRef={threadRef}
-        />
+          )}
+          {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
+            <View
+              as="div"
+              margin="none none none xx-large"
+              width="100%"
+              key={`discussion-thread-collapse-${props.discussionEntry.id}`}
+            >
+              <View
+                background="primary"
+                borderWidth="none none small none"
+                padding="none none small none"
+                display="block"
+                width="100%"
+                margin="none none medium none"
+              >
+                <CollapseReplies onClick={() => setExpandReplies(false)} />
+              </View>
+            </View>
+          )}
+        </>
       )}
-      {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
-        <View
-          as="div"
-          margin="none none none xx-large"
-          width="100%"
-          key={`discussion-thread-collapse-${props.discussionEntry.id}`}
-        >
-          <View
-            background="primary"
-            borderWidth="none none small none"
-            padding="none none small none"
-            display="block"
-            width="100%"
-            margin="none none medium none"
-          >
-            <CollapseReplies onClick={() => setExpandReplies(false)} />
-          </View>
-        </View>
-      )}
-    </>
+    />
   )
 }
 
@@ -403,9 +479,10 @@ DiscussionThreadContainer.propTypes = {
   discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object,
+  parentRefCurrent: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -419,7 +496,7 @@ const DiscussionSubentries = props => {
   const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    perPage: PER_PAGE,
+    first: PER_PAGE,
     sort,
     courseID: window.ENV?.course_id
   }
@@ -436,14 +513,14 @@ const DiscussionSubentries = props => {
     return <LoadingIndicator />
   }
 
-  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
+  return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
       discussionEntry={entry}
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
-      parentRef={props.parentRef}
+      parentRefCurrent={props.parentRefCurrent}
     />
   ))
 }
@@ -453,5 +530,5 @@ DiscussionSubentries.propTypes = {
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object
+  parentRefCurrent: PropTypes.object
 }

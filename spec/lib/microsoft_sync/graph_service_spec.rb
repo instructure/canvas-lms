@@ -30,25 +30,42 @@ describe MicrosoftSync::GraphService do
     }
   end
 
+  before :once do
+    @url_logger = MicrosoftSync::GraphService::SpecHelper::UrlLogger.new
+
+    WebMock.after_request do |request, response|
+      @url_logger.log(request, response)
+    end
+  end
+
+  after :all do
+    @url_logger.verify_responses
+    # Uncomment below when mock responses are actually valid. I plan to do those
+    # in a later commit.
+    # raise "Schema mismatch on the following: \n #{@url_logger.errors.to_yaml}" if @url_logger.errors.any?
+  end
+
   before do
     WebMock.disable_net_connect!
+
     allow(MicrosoftSync::LoginService).to receive(:token).with('mytenant').and_return('mytoken')
     if url
-      if with_params.empty?
-        WebMock.stub_request(http_method, url).and_return(response)
-      else
-        WebMock.stub_request(http_method, url).with(with_params).and_return(response)
-      end
+      @url_logger.stub_request(http_method, url, response, url_variables, with_params)
     end
 
     allow(InstStatsd::Statsd).to receive(:increment).and_call_original
     allow(InstStatsd::Statsd).to receive(:count).and_call_original
+
+    # Test retry on intermittent errors without internal retry
+    MicrosoftSync::GraphServiceHttp # need to load before stubbing
+    stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
   end
 
   after { WebMock.enable_net_connect! }
 
   let(:service) { described_class.new('mytenant', extra_tag: 'abc') }
   let(:url) { nil }
+  let(:url_variables) { [] }
 
   let(:response) { json_response(200, response_body) }
   let(:with_params) { {} }
@@ -120,12 +137,12 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'with a Timeout::Error' do
-      it 'increments an "error" counter and bubbles up the error' do
+      it 'increments an "intermittent" counter and bubbles up the error' do
         error = Timeout::Error.new
         expect(HTTParty).to receive(http_method.to_sym).and_raise error
         expect { subject }.to raise_error(error)
         expect(InstStatsd::Statsd).to have_received(:increment).with(
-          'microsoft_sync.graph_service.error',
+          'microsoft_sync.graph_service.intermittent',
           tags: statsd_tags.merge(status_code: 'Timeout__Error')
         )
       end
@@ -140,10 +157,11 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
-        expect { subject }.to raise_error do |e|
-          expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
-          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        end
+        klass = MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant
+        message = /make sure your admin has granted access/
+
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, message)
+
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
       end
@@ -160,7 +178,7 @@ describe MicrosoftSync::GraphService do
       it 'raises an ApplicationNotAuthorizedForTenant error' do
         expect { subject }.to raise_error do |e|
           expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
-          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelError)
         end
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
@@ -172,7 +190,7 @@ describe MicrosoftSync::GraphService do
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         'microsoft_sync.graph_service.success', tags: {
           msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
-          extra_tag: 'abc',
+          extra_tag: 'abc', status_code: /^20.$/,
         }
       )
     end
@@ -319,10 +337,10 @@ describe MicrosoftSync::GraphService do
 
   shared_examples_for 'a batch request that fails' do
     it 'raises an error with a message with the codes/bodies' do
-      expect { subject }.to raise_error(
-        expected_error,
-        "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
-      )
+      expected_message = "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
+      expect { subject }.to raise_error(expected_error, expected_message) do |e|
+        expect(e).to be_a_microsoft_sync_public_error(/while making a batch request/)
+      end
     end
 
     it 'increments statsd counters based on the responses' do
@@ -443,6 +461,25 @@ describe MicrosoftSync::GraphService do
 
     it_behaves_like 'a paginated list endpoint' do
       it_behaves_like 'an endpoint that uses up quota', [1, 0]
+    end
+
+    context 'when the API says the tenant is not an Education tenant' do
+      let(:http_method) { :get }
+      let(:status) { 400 }
+      let(:response) do
+        {
+          status: 400,
+          body:  "{\"error\":{\"code\":\"Request_UnsupportedQuery\",\"message\":\"Property 'extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType' does not exist as a declared property or extension property.\"}"
+        }
+      end
+
+      it 'raises a graceful cancel NotEducationTenant error' do
+        klass = MicrosoftSync::Errors::NotEducationTenant
+        msg =  /not an Education tenant, so cannot be used/
+        expect {
+          service.list_education_classes
+        }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
+      end
     end
   end
 
@@ -691,6 +728,7 @@ describe MicrosoftSync::GraphService do
     let(:method_name) { :list_group_owners }
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners' }
+    let(:url_variables) { ['mygroup'] }
 
     it_behaves_like 'a paginated list endpoint' do
       it_behaves_like 'an endpoint that uses up quota', [2, 0]
@@ -732,6 +770,11 @@ describe MicrosoftSync::GraphService do
       msg = "One or more removed object references do not exist for the following " \
             "modified properties: 'members'."
       {id: id, status: 400, body: {error: {code:"Request_BadRequest", message: msg}}}
+    end
+
+    def last_owner_removed(id)
+      msg = "The group must have at least one owner, hence this owner cannot be removed."
+      {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: msg}}}
     end
 
     context 'when all are successfully removed' do
@@ -788,6 +831,18 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    context 'when the last owner in a group is removed' do
+      let(:batch_responses) do
+        [succ('members_m1'), succ('members_m2'), last_owner_removed('owners_o1'), succ('owners_o2')]
+      end
+
+      it 'raises an MissingOwners' do
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(
+          MicrosoftSync::Errors::MissingOwners, /must have owners/
+        )
+      end
+    end
+
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
@@ -802,6 +857,7 @@ describe MicrosoftSync::GraphService do
       let(:endpoint_name) { 'group_remove_users' }
       let(:ignored_members_m1_response) { missing('members_m1') }
     end
+
   end
 
   describe '#team_exists?' do
@@ -809,6 +865,7 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+    let(:url_variables) { ['mygroupid'] }
     let(:response_body) { {'foo' => 'bar'} }
 
     it_behaves_like 'a graph service endpoint', ignore_404: true

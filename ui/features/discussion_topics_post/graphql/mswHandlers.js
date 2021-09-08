@@ -90,6 +90,25 @@ export const handlers = [
     )
   }),
   graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+    if (req.body.variables.includeRelativeEntry) {
+      return res(
+        ctx.data({
+          legacyNode: DiscussionEntry.mock({
+            discussionSubentriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  _id: '51',
+                  id: '51',
+                  message: '<p>This is the search result child reply</p>'
+                })
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionSubentriesConnection'
+            }
+          })
+        })
+      )
+    }
     if (req.body.variables.sort === 'asc') {
       return res(
         ctx.data({
@@ -255,6 +274,16 @@ export const handlers = [
         updateDiscussionEntriesReadState: {
           discussionEntries,
           __typename: 'UpdateDiscussionEntriesReadState'
+        }
+      })
+    )
+  }),
+  graphql.mutation('UpdateDiscussionReadState', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        updateDiscussionReadState: {
+          discussionTopic: Discussion.mock(),
+          __typename: 'UpdateDiscussionReadStatePayload'
         }
       })
     )

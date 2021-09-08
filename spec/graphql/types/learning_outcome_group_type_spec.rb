@@ -54,7 +54,7 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("contextId")).to eq @outcome_group.context_id
     expect(outcome_group_type.resolve("contextType")).to eq @outcome_group.context_type
     expect(outcome_group_type.resolve("vendorGuid")).to eq @outcome_group.vendor_guid
-    expect(outcome_group_type.resolve("childGroupsCount")).to be_a Integer
+    expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
@@ -79,7 +79,7 @@ describe Types::LearningOutcomeGroupType do
     root_group = course.root_outcome_group
 
     query = <<~GQL
-      outcomes() {
+      outcomes {
         nodes {
           ... on LearningOutcome {
             isImported(targetContextType: "Course", targetContextId: #{course.id})
@@ -149,8 +149,10 @@ describe Types::LearningOutcomeGroupType do
   end
 
   describe '#child_groups_count' do
-    it 'returns the total nested outcome groups' do
+    it 'returns the total active outcome groups' do
       expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
+      @child_group.destroy
+      expect(outcome_group_type.resolve("childGroupsCount")).to eq 1
     end
   end
 

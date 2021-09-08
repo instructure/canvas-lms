@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AdhocStudents} from './AdhocStudents'
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
 
@@ -28,7 +29,13 @@ export const AssignmentOverride = {
       lockAt
       unlockAt
       title
+      set {
+        ... on AdhocStudents {
+          ...AdhocStudents
+        }
+      }
     }
+    ${AdhocStudents.fragment}
   `,
 
   shape: shape({
@@ -37,7 +44,8 @@ export const AssignmentOverride = {
     dueAt: string,
     lockAt: string,
     unlockAt: string,
-    title: string
+    title: string,
+    set: AdhocStudents.shape
   }),
 
   mock: ({
@@ -46,7 +54,8 @@ export const AssignmentOverride = {
     dueAt = '2021-03-30T23:59:59-06:00',
     lockAt = '2021-04-03T23:59:59-06:00',
     unlockAt = '2021-03-24T00:00:00-06:00',
-    title = 'assignment override title'
+    title = 'assignment override title',
+    adhocStudents = AdhocStudents.mock()
   } = {}) => ({
     id,
     _id,
@@ -54,6 +63,7 @@ export const AssignmentOverride = {
     lockAt,
     unlockAt,
     title,
+    set: adhocStudents,
     __typename: 'AssignmentOverride'
   })
 }

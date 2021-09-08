@@ -27,7 +27,7 @@ class MakeLatePolicyUnique < ActiveRecord::Migration[4.2]
   def change
     reversible do |dir|
       dir.up do
-        DataFixup::MakeLatePolicyUnique.run
+        DataFixup::DeleteDuplicateRows.run(LatePolicy, :course_id, order: "id DESC")
       end
     end
 

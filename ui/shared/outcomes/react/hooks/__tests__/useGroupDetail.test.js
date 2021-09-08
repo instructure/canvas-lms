@@ -20,14 +20,17 @@ import React from 'react'
 import useGroupDetail from '../useGroupDetail'
 import {createCache} from '@canvas/apollo'
 import {renderHook, act} from '@testing-library/react-hooks'
-import {groupDetailMocks} from '../../../mocks/Management'
+import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
-import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import OutcomesContext from '../../contexts/OutcomesContext'
+import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
+
+const outcomeTitles = result => {
+  return result.current.group.outcomes.edges.map(edge => edge.node.title)
+}
 
 describe('groupDetailHook', () => {
   let cache, mocks, showFlashAlertSpy
@@ -45,7 +48,9 @@ describe('groupDetailHook', () => {
 
   const wrapper = ({children}) => (
     <MockedProvider cache={cache} mocks={mocks}>
-      <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+      <OutcomesContext.Provider
+        value={{env: {contextType: 'Account', contextId: '1', rootIds: [ACCOUNT_GROUP_ID]}}}
+      >
         {children}
       </OutcomesContext.Provider>
     </MockedProvider>
@@ -60,20 +65,36 @@ describe('groupDetailHook', () => {
     await act(async () => jest.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.group.title).toBe('Group 1')
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1'
-    ])
+    expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+    expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
       'Outcome 3 - Group 1',
       'Outcome 4 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  it('should move the outcomes to correct order when loading the same outcome', async () => {
+    mocks = groupDetailMocksFetchMore()
+    const {result} = renderHook(() => useGroupDetail({id: '1'}), {
+      wrapper
+    })
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+      'Outcome 1 - Group 1',
+      'Outcome 2 - Group 1'
+    ])
+    act(() => result.current.loadMore())
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+      'Outcome 2 - Group 1',
+      'New Outcome 1 - Group 1',
+      'Outcome 3 - Group 1'
+    ])
   })
 
   it("should flash an error message and return the error when coudn't load by default", async () => {
@@ -96,13 +117,10 @@ describe('groupDetailHook', () => {
     act(() => rerender('2'))
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 2')
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 2',
-      'Outcome 2 - Group 2'
-    ])
+    expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 2', 'Outcome 2 - Group 2'])
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+    expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2',
       'Outcome 3 - Group 2',
@@ -110,12 +128,12 @@ describe('groupDetailHook', () => {
     ])
   })
 
-  it('should not load group info if ACCOUNT_FOLDER_ID passed as id', async () => {
-    const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_FOLDER_ID}), {wrapper})
-    expect(result.current.loading).toBe(true)
+  it('should not load group info if ACCOUNT_GROUP_ID passed as id', async () => {
+    const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_GROUP_ID}), {wrapper})
+    expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
     await act(async () => jest.runAllTimers())
-    expect(result.current.loading).toBe(true)
+    expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
   })
 
@@ -134,31 +152,19 @@ describe('groupDetailHook', () => {
     )
     hook.rerender('')
     await act(async () => jest.runAllTimers())
-    expect(hook.result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1'
-    ])
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('s')
     await act(async () => jest.runAllTimers())
-    expect(hook.result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1'
-    ])
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('se')
     await act(async () => jest.runAllTimers())
-    expect(hook.result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1'
-    ])
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('search')
     await act(async () => jest.runAllTimers())
-    expect(hook.result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 3 - Group 1'
-    ])
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
   })
 
   it('should search for group outcomes correctly with pagination', async () => {
@@ -174,19 +180,72 @@ describe('groupDetailHook', () => {
       {wrapper}
     )
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
-      'Outcome 1 - Group 1',
-      'Outcome 3 - Group 1'
-    ])
+    expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
+    expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 3 - Group 1',
       'Outcome 5 - Group 1',
       'Outcome 6 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  it('Remove outcomes correctly', async () => {
+    const {result} = renderHook(() => useGroupDetail({id: '1'}), {
+      wrapper
+    })
+
+    await act(async () => jest.runAllTimers())
+    let contentTags = result.current.group.outcomes.edges
+    expect(contentTags.length).toBe(2)
+    expect(result.current.group.outcomesCount).toBe(2)
+
+    act(() => result.current.removeLearningOutcomes(['1']))
+    contentTags = result.current.group.outcomes.edges
+
+    expect(result.current.group.outcomesCount).toBe(1)
+    expect(contentTags.length).toBe(1)
+    expect(contentTags[0]._id).toBe('2')
+  })
+
+  it('if searching, should remove outcomes from not searching cache', async () => {
+    mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '1', searchQuery: 'search'})]
+
+    const hook = renderHook(
+      search =>
+        useGroupDetail({
+          id: '1',
+          query: FIND_GROUP_OUTCOMES,
+          loadOutcomesIsImported: false,
+          searchString: search
+        }),
+      {wrapper}
+    )
+
+    // load without search
+    // it'll cache this result in graphql cache
+    await act(async () => jest.runAllTimers())
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
+
+    // load with search
+    hook.rerender('search')
+    await act(async () => jest.runAllTimers())
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
+
+    // remove outcome 1
+    act(() => hook.result.current.removeLearningOutcomes(['1']))
+
+    // should remove outcome 1 from query with search
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 3 - Group 1'])
+
+    // clear search
+    hook.rerender('')
+    await act(async () => jest.runAllTimers())
+
+    // should remove outcome 1 from query without search
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 2 - Group 1'])
   })
 })

@@ -23,6 +23,8 @@ import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/Cr
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import $ from 'jquery'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
@@ -142,14 +144,13 @@ QUnit.module('CreateAssignmentView', {
     this.assignment4 = new Assignment(buildAssignment4())
     this.assignment5 = new Assignment(buildAssignment5())
     this.group = assignmentGroup()
-    this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
     fakeENV.setup()
   },
   teardown() {
     fakeENV.teardown()
-    tz.restore(this.snapshot)
-    I18nStubber.popFrame()
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
@@ -325,12 +326,7 @@ test('openAgain adds datetime picker', function() {
 
 test('adjust datetime to the end of a day for midnight time', function() {
   sandbox.stub(DialogFormView.prototype, 'openAgain')
-  I18nStubber.setLocale('fr_FR')
-  // tz use the key/values to get formats for different locale
-  I18nStubber.stub('fr_FR', {
-    'date.formats.short': '%b %-d',
-    'time.formats.tiny': '%l:%M%P'
-  })
+  I18nStubber.useInitialTranslations()
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = sinon.spy()
   const view = createView(this.assignment2)
@@ -345,12 +341,7 @@ test('adjust datetime to the end of a day for midnight time', function() {
 
 test('it does not adjust datetime for other date time', function() {
   sandbox.stub(DialogFormView.prototype, 'openAgain')
-  I18nStubber.setLocale('fr_FR')
-  // tz use the key/values to get formats for different locale
-  I18nStubber.stub('fr_FR', {
-    'date.formats.short': '%b %-d',
-    'time.formats.tiny': '%l:%M%P'
-  })
+  I18nStubber.useInitialTranslations()
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = sinon.spy()
   const view = createView(this.assignment2)
@@ -553,7 +544,10 @@ test('validates due date for lock and unlock', function() {
 })
 
 test('renders due dates with locale-appropriate format string', function() {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -571,7 +565,13 @@ test('renders due dates with locale-appropriate format string', function() {
 })
 
 test('renders due dates in appropriate time zone', function() {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
+
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.abbr_month_names.8': 'Aug'

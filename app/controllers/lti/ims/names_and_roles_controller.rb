@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# rubocop:disable Metrics/LineLength
+# rubocop:disable Layout/LineLength
 module Lti::Ims
   # @API Names and Role
   #
@@ -260,7 +260,7 @@ module Lti::Ims
   #        }
   #     }
   class NamesAndRolesController < ApplicationController
-    # rubocop:enable Metrics/LineLength
+    # rubocop:enable Layout/LineLength
     include Concerns::AdvantageServices
 
     MIME_TYPE = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'.freeze

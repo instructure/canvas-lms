@@ -34,18 +34,26 @@ module MicrosoftSync
 
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     STATSD_PREFIX = 'microsoft_sync.graph_service'
-    STATSD_NAME_SUCCESS = "#{STATSD_PREFIX}.success"
-    STATSD_NAME_EXPECTED = "#{STATSD_PREFIX}.expected"
 
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'
 
-    class ApplicationNotAuthorizedForTenant < StandardError
-      include Errors::GracefulCancelErrorMixin
+    DEFAULT_N_INTERMITTENT_RETRIES = 1
+
+    class ApplicationNotAuthorizedForTenant < MicrosoftSync::Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Application not authorized for tenant. ' \
+          'Please make sure your admin has granted access for us to access your Microsoft tenant.'
+      end
     end
 
-    class BatchRequestFailed < StandardError; end
-    class BatchRequestThrottled < StandardError
+    class BatchRequestFailed < MicrosoftSync::Errors::PublicError
+      def self.public_message
+        I18n.t 'Got error from Microsoft API while making a batch request.'
+      end
+    end
+
+    class BatchRequestThrottled < MicrosoftSync::Errors::PublicError
       include Errors::Throttled
 
       def initialize(msg, responses)
@@ -56,7 +64,19 @@ module MicrosoftSync
           headers['retry-after'].presence&.to_f
         end.compact.max
       end
+
+      def self.public_message
+        I18n.t 'Received throttled response from Microsoft API while making a batch request.'
+      end
     end
+
+    class ExpectedErrorWrapper < StandardError
+      attr_reader :wrapped_exception
+      def initialize(wrapped_exception)
+        @wrapped_exception = wrapped_exception
+      end
+    end
+    private_constant :ExpectedErrorWrapper
 
     def initialize(tenant, extra_statsd_tags)
       @tenant = tenant
@@ -72,14 +92,15 @@ module MicrosoftSync
     #
     # If check_for_expected_response is given, a block can be passed to check for expected
     # responses before raising an error based on the code. If the block returns non-falsey,
-    # the value is returned, and an "expected" statsd metric is incremented.
-    # This is useful if there are non-200s expected and you don't want to raise an error /
-    # count those these as errors in the stats.
-    def request(method, path, quota: nil, **options, &check_for_expected_response)
+    # the value is returned, and an "expected" statsd metric is incremented. If some
+    # StandardError is returned, the error is raised (and counted as "expected", not
+    # "error"). This is useful if there are non-200s expected and you don't want to raise
+    # an HTTP error / count those these as errors in the stats.
+    def request(method, path,
+                quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES, **options,
+                &check_for_expected_response)
       statsd_tags = statsd_tags_for_request(method, path)
       increment_statsd_quota_points(quota, options, statsd_tags)
-
-      Rails.logger.info("MicrosoftSync::GraphService: #{method} #{path}")
 
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         InstStatsd::Statsd.time("#{STATSD_PREFIX}.time", tags: statsd_tags) do
@@ -88,19 +109,29 @@ module MicrosoftSync
       end
 
       if check_for_expected_response && (result = check_for_expected_response.call(response))
-        statsd_tags[:status_code] = response.code.to_s
-        InstStatsd::Statsd.increment(STATSD_NAME_EXPECTED, tags: statsd_tags)
+        log_and_increment(method, path, statsd_tags, :expected, response.code)
+        raise ExpectedErrorWrapper.new(result) if result.is_a?(StandardError)
+
         return result
       end
 
       raise_error_if_bad_response(response)
 
       result = response.parsed_response
-      InstStatsd::Statsd.increment(STATSD_NAME_SUCCESS, tags: statsd_tags)
+      log_and_increment(method, path, statsd_tags, :success, response.code)
       result
+    rescue ExpectedErrorWrapper => e
+      raise e.wrapped_exception
     rescue => error
-      statsd_tags[:status_code] = response&.code&.to_s || error.class.name.tr(':', '_')
-      InstStatsd::Statsd.increment(statsd_name_for_error(error), tags: statsd_tags)
+      response_code = response&.code&.to_s || error.class.name.tr(':', '_')
+
+      if intermittent_non_throttled?(error) && retries > 0
+        retries -= 1
+        log_and_increment(method, path, statsd_tags, :retried, response_code)
+        retry
+      end
+
+      log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
       raise
     end
 
@@ -117,9 +148,9 @@ module MicrosoftSync
     # multiple pages of results.
     # @param [Hash] options_to_be_expanded: sent to expand_options
     # @param [Array] quota array of [read_quota_used, write_quota_used] for each page/request
-    def get_paginated_list(endpoint, quota:, **options_to_be_expanded)
+    def get_paginated_list(endpoint, quota:, expected_error_block: nil, **options_to_be_expanded)
       request_options = expand_options(**options_to_be_expanded)
-      response = request(:get, endpoint, query: request_options, quota: quota)
+      response = request(:get, endpoint, query: request_options, quota: quota, &expected_error_block)
       return response[PAGINATED_VALUE_KEY] unless block_given?
 
       loop do
@@ -182,7 +213,9 @@ module MicrosoftSync
     # -- Helpers for request():
 
     def request_without_metrics(method, path, options)
-      options[:headers] ||= {}
+      options = options.dup
+      options[:headers] = options[:headers]&.dup || {}
+
       options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
       if options[:body]
         options[:headers]['Content-type'] = 'application/json'
@@ -192,6 +225,10 @@ module MicrosoftSync
       url = path.start_with?('https:') ? path : BASE_URL + path
 
       HTTParty.send(method, url, options)
+    end
+
+    def intermittent_non_throttled?(error)
+      Errors::INTERMITTENT.any?{|klass| error.is_a?(klass)} && !error.is_a?(Errors::Throttled)
     end
 
     def raise_error_if_bad_response(response)
@@ -244,12 +281,21 @@ module MicrosoftSync
     end
 
     def statsd_name_for_error(error)
-      name = case error
-             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
-             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
-             else 'error'
-             end
-      "#{STATSD_PREFIX}.#{name}"
+      case error
+      when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+      when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+      when *MicrosoftSync::Errors::INTERMITTENT then 'intermittent'
+      else 'error'
+      end
+    end
+
+    def log_and_increment(request_method, request_path, statsd_tags, outcome, status_code)
+      Rails.logger.info(
+        "MicrosoftSync::GraphServiceHttp: #{request_method} #{request_path} -- #{status_code}, #{outcome}"
+      )
+      InstStatsd::Statsd.increment(
+        "#{STATSD_PREFIX}.#{outcome}", tags: statsd_tags.merge(status_code: status_code.to_s)
+      )
     end
 
     # -- Helpers for expand_options():

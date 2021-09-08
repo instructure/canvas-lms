@@ -80,6 +80,40 @@ describe NotificationMessageCreator do
       expect(paths).not_to include(d.path)
     end
 
+    it "should default to the account time zone if the user has no time zone" do
+      original_time_zone = Time.zone
+      Time.zone = 'UTC'
+      course_with_teacher
+      account = @course.account
+      account.default_time_zone = 'Pretoria'
+      account.save!
+
+      @user = user_model(:workflow_state => 'registered')
+      communication_channel(@user, {username: 'a@example.com', active_cc: true})
+
+      due_at = Time.zone.parse('2014-06-06 11:59:59')
+      assignment_model(course: @course, due_at: due_at)
+
+      notification = Notification.create!(name: "Assignment Created", category: 'Due Date')
+
+      messages = NotificationMessageCreator.new(
+        notification,
+        @assignment,
+        to_list: @user,
+        data: {
+          course_id: @assignment.context_id,
+          root_account_id: @assignment.root_account_id
+        }
+      ).create_message
+
+      presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new('Pretoria'))
+      due_at_string = presenter.as_string(shorten_midnight: false)
+
+      expect(messages.count).to eq 1
+      expect(messages[0].html_body.include?(due_at_string)).to eq true
+      Time.zone = original_time_zone
+    end
+
     it "should use the default channel if no policies apply" do
       assignment_model
       user_model(:workflow_state => 'registered')
@@ -585,7 +619,6 @@ describe NotificationMessageCreator do
 
     it "should disrespect browser locales" do
       I18n.backend.stub(piglatin: {messages: {test_name: {email: {subject: "Isthay isay ivefay!"}}}}) do
-        I18n.config.available_locales_set.merge([:piglatin, 'piglatin'])
         @user.browser_locale = 'piglatin'
         @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
@@ -596,7 +629,6 @@ describe NotificationMessageCreator do
 
     it "should respect user locales" do
       I18n.backend.stub(shouty: {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
-        I18n.config.available_locales_set.merge([:shouty, 'shouty'])
         @user.locale = 'shouty'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
@@ -608,7 +640,6 @@ describe NotificationMessageCreator do
     it "should respect course locales" do
       course_factory
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
-        I18n.config.available_locales_set.merge([:es, 'es'])
         @course.enroll_teacher(@user).accept!
         @course.update_attribute(:locale, 'es')
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
@@ -620,7 +651,6 @@ describe NotificationMessageCreator do
     it "should respect account locales" do
       course_factory
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
-        I18n.config.available_locales_set.merge([:es, 'es'])
         @course.account.update_attribute(:default_locale, 'es')
         @course.enroll_teacher(@user).accept!
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
@@ -763,31 +793,21 @@ describe NotificationMessageCreator do
     end
   end
 
-  context 'deprecate_sms is enabled' do
-    before do
-      Account.site_admin.enable_feature!(:deprecate_sms)
-      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
-    end
+  it "User just receives email notification" do
+    allow_any_instance_of(Message).to receive(:get_template).and_return('template')
+    assignment_model
+    notification_model
 
-    after do
-      Account.site_admin.disable_feature!(:deprecate_sms)
-    end
+    user = user_model(:workflow_state => "registered")
+    cc = communication_channel_model(:path => "7871234567@txt.att.net", :path_type => "sms", :workflow_state => 'active')
 
-    it "User just receives email notification" do
-      assignment_model
-      notification_model
+    notification_policy_model(:communication_channel => cc,
+                                :notification => @notification,
+                                :frequency => "immediately")
 
-      user = user_model(:workflow_state => "registered")
-      cc = communication_channel_model(:path => "7871234567@txt.att.net", :path_type => "sms", :workflow_state => 'active')
+    messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => [user]).create_message
 
-      notification_policy_model(:communication_channel => cc,
-                                  :notification => @notification,
-                                  :frequency => "immediately")
-
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => [user]).create_message
-
-      # User just receives email because SMS is deprecated.
-      expect(messages.length).to eql(1)
-    end
+    # User just receives email because SMS is deprecated.
+    expect(messages.length).to eql(1)
   end
 end

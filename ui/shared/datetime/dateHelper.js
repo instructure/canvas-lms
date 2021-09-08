@@ -38,8 +38,8 @@ const DateHelper = {
     return $.discussionsDatetimeString(datetime, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
-  formatDateForDisplay(date) {
-    return $.dateString(date, {format: 'medium', timezone: ENV.CONTEXT_TIMEZONE})
+  formatDateForDisplay(date, format = 'medium') {
+    return $.dateString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
   isMidnight(date) {

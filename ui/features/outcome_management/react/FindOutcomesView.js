@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -25,33 +25,46 @@ import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!OutcomeManagement'
-import {isRTL} from '@canvas/i18n/rtlHelper'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
+import SearchBreadcrumb from './shared/SearchBreadcrumb'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
+import {outcomeGroupShape, groupCollectionShape} from './Management/shapes'
+import {IMPORT_NOT_STARTED, IMPORT_FAILED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesView = ({
+  outcomesGroup,
   collection,
-  outcomesCount,
-  outcomes,
   loading,
   loadMore,
   searchString,
+  disableAddAllButton,
   onChangeHandler,
   onClearHandler,
-  onAddAllHandler
+  onAddAllHandler,
+  mobileScrollContainer,
+  importGroupStatus,
+  importOutcomesStatus,
+  importOutcomeHandler,
+  shouldFocusAddAllBtn
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
-  const enabled = !!outcomesCount && outcomesCount > 0
+  const isRootGroup = collection?.isRootGroup
+  const outcomesCount = outcomesGroup?.outcomesCount || 0
+  const outcomes = outcomesGroup?.outcomes
+  const enabled =
+    !!outcomesCount &&
+    outcomesCount > 0 &&
+    [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
 
-  const onSelectOutcomesHandler = useCallback(_id => {
-    // TODO: OUT-4154
-  }, [])
+  const addAllBtnRef = useRef()
+  useEffect(() => {
+    if (shouldFocusAddAllBtn) addAllBtnRef.current?.focus()
+  }, [shouldFocusAddAllBtn])
 
   const countAndAddButton = (
     <Flex.Item>
@@ -62,7 +75,18 @@ const FindOutcomesView = ({
         width={isMobileView ? '100vw' : ''}
         wrap="wrap"
       >
-        <Flex.Item as="div" padding={isMobileView ? 'x-small 0' : 'x-small medium x-small 0'}>
+        <Flex.Item
+          as="div"
+          padding={
+            isMobileView
+              ? 'x-small 0'
+              : isRootGroup
+              ? 'x-small 0'
+              : searchString.length === 0
+              ? 'x-small medium x-small 0'
+              : 'x-small 0'
+          }
+        >
           <Text size="medium">
             {I18n.t(
               {
@@ -75,28 +99,35 @@ const FindOutcomesView = ({
             )}
           </Text>
         </Flex.Item>
-        <Flex.Item>
-          <Button
-            margin="x-small 0"
-            interaction={enabled && !searchString ? 'enabled' : 'disabled'}
-            onClick={onAddAllHandler}
-          >
-            {I18n.t('Add All Outcomes')}
-          </Button>
-        </Flex.Item>
+        {searchString.length === 0 && !isRootGroup && (
+          <Flex.Item>
+            <Button
+              margin="x-small 0"
+              interaction={
+                enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
+              }
+              onClick={onAddAllHandler}
+              ref={addAllBtnRef}
+            >
+              {I18n.t('Add All Outcomes')}
+            </Button>
+          </Flex.Item>
+        )}
       </Flex>
     </Flex.Item>
   )
 
   const searchAndSelectContainer = (
     <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
-      <View as="div" padding={isMobileView ? 'x-small 0 0' : 'small 0 0'}>
-        <Heading level="h2" as="h3">
-          <Text wrap="break-word" weight={isMobileView ? 'bold' : 'normal'}>
-            {addZeroWidthSpace(groupTitle)}
-          </Text>
-        </Heading>
-      </View>
+      {!isMobileView && (
+        <View as="div" padding={isMobileView ? 'x-small 0 0' : 'small 0 0'}>
+          <Heading level="h2" as="h3">
+            <Text wrap="break-word" weight={isMobileView ? 'bold' : 'normal'}>
+              {addZeroWidthSpace(groupTitle)}
+            </Text>
+          </Heading>
+        </View>
+      )}
       <View as="div" padding={isMobileView ? 'x-small 0' : 'large 0 medium'}>
         <OutcomeSearchBar
           enabled={enabled || searchString.length > 0}
@@ -109,63 +140,17 @@ const FindOutcomesView = ({
       <View as="div" position="relative" padding={isMobileView ? '0 0 0 xx-small' : '0 0 small'}>
         <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
           <Flex.Item size="50%" shouldGrow>
-            <Heading level="h4">
-              {searchString ? (
-                <Flex>
-                  <Flex.Item shouldShrink>
-                    <div
-                      style={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        padding: '0.375rem 0'
-                      }}
-                    >
-                      <View data-testid="group-name-ltr">
-                        {isRTL() ? searchString : groupTitle}
-                      </View>
-                      <div
-                        style={{
-                          display: 'inline-block',
-                          transform: 'scale(0.6)',
-                          height: '1em'
-                        }}
-                      >
-                        <IconArrowOpenEndSolid title={I18n.t('search results for')} />
-                      </div>
-                      <View data-testid="search-string-ltr">
-                        {isRTL() ? groupTitle : searchString}
-                      </View>
-                    </div>
-                  </Flex.Item>
-                  <Flex.Item size="2.5rem">
-                    {loading && (
-                      <Spinner
-                        renderTitle={I18n.t('Loading')}
-                        size="x-small"
-                        margin="0 0 0 x-small"
-                        data-testid="search-loading"
-                      />
-                    )}
-                  </Flex.Item>
-                </Flex>
-              ) : (
-                <View as="div" padding="xx-small 0">
-                  <Text wrap="break-word">
-                    {I18n.t('All %{groupTitle} Outcomes', {
-                      groupTitle: addZeroWidthSpace(groupTitle)
-                    })}
-                  </Text>
-                </View>
-              )}
-            </Heading>
+            <SearchBreadcrumb
+              groupTitle={groupTitle}
+              searchString={searchString}
+              loading={loading}
+            />
           </Flex.Item>
           {countAndAddButton}
         </Flex>
       </View>
     </View>
   )
-
   if (loading && !outcomes) {
     return (
       <View as="div" padding="xx-large 0" textAlign="center" margin="0 auto" data-testid="loading">
@@ -179,23 +164,25 @@ const FindOutcomesView = ({
       as="div"
       height="100%"
       minWidth="300px"
-      padding={!isMobileView ? '0 x-large 0 medium' : '0'}
+      padding={isMobileView ? '0 small' : '0 x-large 0 medium'}
       data-testid="find-outcome-container"
     >
-      <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+      <div
+        style={
+          isMobileView
+            ? {}
+            : {height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}
+        }
+      >
         {!isMobileView && searchAndSelectContainer}
         <div
-          style={{
-            flex: '1 0 24rem',
-            overflow: isMobileView ? 'visible' : 'auto',
-            position: 'relative'
-          }}
+          style={isMobileView ? {} : {flex: '1 0 24rem', position: 'relative', overflow: 'auto'}}
           ref={setScrollContainer}
         >
           <InfiniteScroll
             hasMore={outcomes?.pageInfo?.hasNextPage}
             loadMore={loadMore}
-            scrollContainer={scrollContainer}
+            scrollContainer={mobileScrollContainer || scrollContainer}
             loader={
               <Flex
                 as="div"
@@ -222,21 +209,26 @@ const FindOutcomesView = ({
             <View as="div" data-testid="find-outcome-items-list">
               {outcomes?.edges?.length === 0 && searchString && !loading && (
                 <View as="div" textAlign="center" margin="small 0 0">
-                  <Text color="secondary">{I18n.t('The search returned no results')}</Text>
+                  <Text color="primary">{I18n.t('The search returned no results.')}</Text>
                 </View>
               )}
-
-              {outcomes?.edges?.map(({node: {_id, title, description, isImported}}, index) => (
-                <FindOutcomeItem
-                  key={_id}
-                  id={_id}
-                  title={title}
-                  description={description}
-                  isFirst={index === 0}
-                  isChecked={isImported}
-                  onCheckboxHandler={onSelectOutcomesHandler}
-                />
-              ))}
+              {outcomes?.edges?.map(
+                ({_id: linkId, node: {_id, title, description, isImported}}, index) => (
+                  <FindOutcomeItem
+                    key={linkId}
+                    id={_id}
+                    title={title}
+                    description={description}
+                    isFirst={index === 0}
+                    importOutcomeStatus={importOutcomesStatus?.[_id]}
+                    isImported={isImported}
+                    importGroupStatus={importGroupStatus}
+                    sourceContextId={String(outcomesGroup.contextId)}
+                    sourceContextType={outcomesGroup.contextType}
+                    importOutcomeHandler={importOutcomeHandler}
+                  />
+                )
+              )}
             </View>
           </InfiniteScroll>
         </div>
@@ -245,34 +237,32 @@ const FindOutcomesView = ({
   )
 }
 
+FindOutcomesView.defaultProps = {
+  collection: {
+    id: '0',
+    name: '',
+    isRootGroup: false
+  },
+  importGroupStatus: IMPORT_NOT_STARTED,
+  mobileScrollContainer: null,
+  shouldFocusAddAllBtn: false
+}
+
 FindOutcomesView.propTypes = {
-  collection: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired,
-  outcomesCount: PropTypes.number.isRequired,
-  outcomes: PropTypes.shape({
-    edges: PropTypes.arrayOf(
-      PropTypes.shape({
-        node: PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-          title: PropTypes.string.isRequired,
-          isImported: PropTypes.bool.isRequired,
-          description: PropTypes.string
-        })
-      })
-    ),
-    pageInfo: PropTypes.shape({
-      endCursor: PropTypes.string,
-      hasNextPage: PropTypes.bool.isRequired
-    })
-  }),
+  collection: groupCollectionShape,
+  outcomesGroup: outcomeGroupShape,
   searchString: PropTypes.string.isRequired,
+  disableAddAllButton: PropTypes.bool,
   onChangeHandler: PropTypes.func.isRequired,
   onClearHandler: PropTypes.func.isRequired,
   onAddAllHandler: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  loadMore: PropTypes.func.isRequired
+  loadMore: PropTypes.func.isRequired,
+  mobileScrollContainer: PropTypes.instanceOf(Element),
+  importGroupStatus: PropTypes.string,
+  importOutcomesStatus: PropTypes.object.isRequired,
+  importOutcomeHandler: PropTypes.func.isRequired,
+  shouldFocusAddAllBtn: PropTypes.bool
 }
 
 export default FindOutcomesView

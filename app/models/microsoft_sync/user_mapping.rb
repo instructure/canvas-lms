@@ -28,10 +28,13 @@ require_dependency 'microsoft_sync'
 # use Microsoft's APIs.
 #
 # Typically, a user's AAD is looked up by asking Microsoft for the AAD for a given
-# "UPN" (see SyncerSteps#ensure_enrollments_user_mappings_filled). A UPN, or
-# "userPrincipalName", is a field Microsoft has on their users that corresponds
-# to a Canvas user's email address, username, or other field, as chosen by the
-# admin (see microsoft_sync_login_attribute in the root account settings)
+# UserPrincipalName (UPN) or other field on the Microsoft side that corresponds
+# to a Canvas user's email address, username, or other field. The fields on the
+# Canvas side and Microsoft side to match on are configurable in the root account
+# settings (see microsoft_sync_login_attribute setting and other
+# microsoft_sync_* settings). The value passed to the Microsoft API to match on
+# such as the Canvas user's email address is referred to throughout MicrosoftSync
+# as a "ULUV" or User Lookup Value.
 #
 class MicrosoftSync::UserMapping < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
@@ -41,15 +44,28 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   validates_uniqueness_of :user_id, scope: :root_account
   MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
-  class AccountSettingsChanged < StandardError
-    include MicrosoftSync::Errors::GracefulCancelErrorMixin
+  DEPENDED_ON_ACCOUNT_SETTINGS = %i[
+    microsoft_sync_tenant
+    microsoft_sync_login_attribute
+    microsoft_sync_login_attribute_suffix
+    microsoft_sync_remote_attribute
+  ].freeze
+
+  class AccountSettingsChanged < MicrosoftSync::Errors::GracefulCancelError
+    def self.public_message
+      I18n.t 'The account-wide sync settings were changed while syncing. ' \
+        'Please attempt the sync again.'
+    end
   end
 
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
   def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
     user_ids = GuardRail.activate(:secondary) do
-      Enrollment.active.where(course_id: course.id).joins(%{
+      Enrollment
+        .microsoft_sync_relevant
+        .where(course_id: course.id)
+        .joins(%{
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
@@ -75,10 +91,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # duplicates. (Don't need the partition support that bulk_insert provides.)
   #
   # This method also refetches the Account settings after adding to make sure
-  # the UPN type and tenant haven't changed from the root_account that is
+  # the ULUV settings (login_attribute, login_attribute_suffix,
+  # remote_attribute) and tenant haven't changed from the root_account that is
   # passed in. The settings in root_account should be what was used to fetch
   # the aads. This ensures that the values we are adding are actually for the
-  # UPN type and tenant currently in the Account settings. If the settings
+  # ULUV settings and tenant currently in the Account settings. If the settings
   # have changed, the just-added values will be deleted and this method will
   # raise an AccountSettingsChanged error.
   def self.bulk_insert_for_root_account(root_account, user_id_to_aad_hash)
@@ -104,9 +121,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   private_class_method def self.account_microsoft_sync_settings_changed?(root_account)
     current_settings = Account.where(id: root_account.id).select(:settings).take.settings
-    %i[microsoft_sync_tenant microsoft_sync_login_attribute].any? do |key|
-      root_account.settings[key] != current_settings[key]
-    end
+    DEPENDED_ON_ACCOUNT_SETTINGS.any? { |key| root_account.settings[key] != current_settings[key] }
   end
 
   # Find the enrollments for course which have a UserMapping for the user.
@@ -114,7 +129,8 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # Returns a scope that can be used with find_each.
   def self.enrollments_and_aads(course)
     Enrollment
-      .active.not_fake.where(course_id: course.id)
+      .microsoft_sync_relevant
+      .where(course_id: course.id)
       .joins(%{
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id

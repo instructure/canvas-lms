@@ -25,6 +25,7 @@ import RubricTab from './RubricTab'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
+import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 
 export default function RubricsQuery(props) {
   const {loading, error, data} = useQuery(RUBRIC_QUERY, {
@@ -52,12 +53,14 @@ export default function RubricsQuery(props) {
 
   return (
     <RubricTab
-      assessments={data.submission?.rubricAssessmentsConnection?.nodes}
+      assessments={data.submission?.rubricAssessmentsConnection?.nodes?.map(assessment =>
+        transformRubricAssessmentData(assessment)
+      )}
       key={props.submission.attempt}
       proficiencyRatings={
         data.course.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
       }
-      rubric={data.assignment.rubric}
+      rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}
     />
   )

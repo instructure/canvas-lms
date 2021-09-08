@@ -359,7 +359,7 @@ class AssignmentGroupsController < ApplicationController
       closed_grading_period_hash = in_closed_grading_period_hash(context, assignments)
     end
 
-    if assignments.any? && context.grants_right?(current_user, session, :manage_assignments)
+    if assignments.any? && context.grants_any_right?(current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       mc_status = setup_master_course_restrictions(assignments, context)
     end
 
@@ -386,7 +386,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def include_visibility?
-    include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+    include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
   end
 
   def override_dates?

@@ -164,7 +164,7 @@ describe MasterCourses::MasterMigration do
       expect(@migration.imports_completed_at).to be_present
       expect(@migration.migration_results.last.root_account_id).to eq @copy_from.root_account_id
 
-      expect(@template.master_content_tags.polymorphic_where(:content => assmt).first.restrictions).to be_empty # never mind
+      expect(@template.master_content_tags.where(content: assmt).first.restrictions).to be_empty # never mind
 
       [@sub1, @sub2].each do |sub|
         sub.reload
@@ -1149,7 +1149,7 @@ describe MasterCourses::MasterMigration do
       copied_things = [copied_assmt, copied_topic, copied_ann, copied_page, copied_quiz,
         copied_bank, copied_file, copied_event, copied_tool]
       copied_things.each do |copy|
-        expect(MasterCourses::ChildContentTag.all.polymorphic_where(:content => copy).first.migration_id).to eq copy.migration_id
+        expect(MasterCourses::ChildContentTag.where(content: copy).first.migration_id).to eq copy.migration_id
       end
 
       new_text = "<p>some text here</p>"
@@ -1199,7 +1199,7 @@ describe MasterCourses::MasterMigration do
 
       # WikiPage
       copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
-      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_page).first
+      child_tag = sub.child_content_tags.where(content: copied_page).first
       expect(child_tag).to be_present # should create a tag
       new_child_text = "<p>some other text here</p>"
       copied_page.update_attribute(:body, new_child_text)
@@ -1213,7 +1213,7 @@ describe MasterCourses::MasterMigration do
 
       # Assignment
       copied_assignment = @copy_to.assignments.where(:migration_id => mig_id(assignment)).first
-      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_assignment).first
+      child_tag = sub.child_content_tags.where(content: copied_assignment).first
       expect(child_tag).to be_present # should create a tag
       new_child_text = "<p>some other text here</p>"
       copied_assignment.update_attribute(:description, new_child_text)
@@ -1448,9 +1448,9 @@ describe MasterCourses::MasterMigration do
       copied_qq.question_data = copied_qd
       copied_qq.save!
 
-      bank_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_bank).first
+      bank_child_tag = sub.child_content_tags.where(content: copied_bank).first
       expect(bank_child_tag.downstream_changes).to include("assessment_questions_content") # treats all assessment questions like a column
-      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
+      quiz_child_tag = sub.child_content_tags.where(content: copied_quiz).first
       expect(quiz_child_tag.downstream_changes).to include("quiz_questions_content") # treats all assessment questions like a column
 
       new_master_text = "some mastery text"
@@ -1545,8 +1545,8 @@ describe MasterCourses::MasterMigration do
       expect(copied_quiz_assmt.reload.title).to eq new_title # should carry the new title over to the assignments
       expect(copied_topic_assmt.reload.title).to eq new_title
 
-      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
-      topic_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_topic).first
+      quiz_child_tag = sub.child_content_tags.where(content: copied_quiz).first
+      topic_child_tag = sub.child_content_tags.where(content: copied_topic).first
       [quiz_child_tag, topic_child_tag].each do |tag|
         expect(tag.downstream_changes).to be_empty
       end
@@ -2724,7 +2724,7 @@ describe MasterCourses::MasterMigration do
       topic_to = copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
 
       # ensure schedule_delayed_transitions does not cause a spurious downstream change record
-      expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+      expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
 
       Timecop.travel(5.minutes.from_now) do
         # now actually make a downstream change
@@ -2733,7 +2733,7 @@ describe MasterCourses::MasterMigration do
         topic_to.save!
         run_master_migration
         expect(topic_to.reload.lock_at).to eq date2
-        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
+        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
       end
 
       # lock the availability dates and ensure the downstream change is overwritten
@@ -2741,7 +2741,7 @@ describe MasterCourses::MasterMigration do
         @template.content_tag_for(topic).update_attribute(:restrictions, {:availability_dates => true})
         topic.touch
         run_master_migration
-        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
         expect(topic_to.reload.lock_at).to eq date1
       end
     end

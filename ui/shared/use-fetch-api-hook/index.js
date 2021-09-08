@@ -76,8 +76,13 @@ export default function useFetchApi({
   // of the results accumulated thus far. The meta callback will also be called once for each page.
   // If an error occurs on any page, the error callback will be called and pagination will stop. The
   // loading callback will only be called with false when pagination ends. If any of the parameters
-  // change, the pagination starts over.
+  // change, the pagination starts over. Overrides fetchNumPages.
   fetchAllPages = false,
+
+  // Setting fetchNumPages makes useFetchApi continually fetch the next page while the Link header
+  // supplies the next page or until the provided limit is reached. The same implications listed in
+  // comments for fetchAllPages option apply. Overridden by fetchAllPages, if that param is true.
+  fetchNumPages = 0,
 
   fetchOpts = {} // other options to pass to fetch
 }) {
@@ -102,6 +107,7 @@ export default function useFetchApi({
           activeLoading(true)
           let nextPage = false
           let accummulatedResults = []
+          let pagesRemaining = fetchNumPages
           do {
             const paramsWithPage = {...params}
             if (nextPage) paramsWithPage.page = nextPage
@@ -119,9 +125,9 @@ export default function useFetchApi({
             accummulatedResults = accummulatedResults.concat(result)
 
             activeMeta({response, link})
-            if (fetchAllPages) {
+            if (fetchAllPages || pagesRemaining) {
               activeSuccess(accummulatedResults)
-              nextPage = link?.next?.page
+              nextPage = fetchAllPages || --pagesRemaining ? link?.next?.page : false
             } else {
               activeSuccess(result)
             }
@@ -146,6 +152,7 @@ export default function useFetchApi({
       params,
       headers,
       fetchAllPages,
+      fetchNumPages,
       fetchOpts
     ],
     {deep: true}

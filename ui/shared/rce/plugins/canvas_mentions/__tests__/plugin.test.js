@@ -18,9 +18,12 @@
 
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
-import TestEditor from './TestEditor'
+import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
+import {screen} from '@testing-library/dom'
+import {KEY_CODES} from '../constants'
+import {onFocusedUserChange, onMentionsExit} from '../events'
 
-let mockAnchorOffset = 2
+const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
 const mockAnchorNode = {wholeText: mockAnchorWholeText}
 
@@ -42,6 +45,18 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   }
 }))
 
+jest.mock('../events', () => ({
+  ...jest.requireActual('../events'),
+  onMentionsExit: jest.fn()
+}))
+
+jest.mock('../components/MentionAutoComplete/MentionDropdown')
+jest.mock('react-dom')
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
 describe('plugin', () => {
   it('has a name', () => {
     expect(plugin.name).toEqual('canvas_mentions')
@@ -59,62 +74,337 @@ describe('plugin', () => {
   })
 })
 
-describe('on input', () => {
-  let editor
-
-  beforeEach(() => {
-    editor = new TestEditor()
-    plugin.pluginDefinition.init(editor)
-  })
-})
-
 describe('pluginDefinition', () => {
   let editor
-
   beforeEach(() => {
-    editor = new TestEditor()
+    editor = new FakeEditor()
     plugin.pluginDefinition.init(editor)
+    global.tinymce = {
+      activeEditor: editor
+    }
   })
 
-  describe('onInput', () => {
-    let logSpy
+  afterEach(() => editor.setContent(''))
 
+  describe('input', () => {
     beforeEach(() => {
-      logSpy = jest.spyOn(console, 'log')
+      editor.setContent('<span id="test"></span>')
+      editor.selection.select(editor.dom.select('#test')[0])
     })
 
-    afterEach(() => {
-      logSpy.mockRestore()
-    })
-
-    describe('when no mention is triggered', () => {
-      it('does not render the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).not.toHaveBeenCalledWith('Mount the mentions component!')
+    const sharedExamplesForTriggeredMentions = () => {
+      it('renders a the mentions marker', async () => {
+        editor.fire('input', {}, editor)
+        expect(screen.getByTestId('mentions-marker')).toBeInTheDocument()
       })
-    })
+
+      it('makes the marker contenteditable', () => {
+        editor.fire('input', {}, editor)
+        expect(screen.getByTestId('mentions-marker').getAttribute('contenteditable')).toEqual(
+          'true'
+        )
+      })
+
+      it('removes contenteditable from the body', () => {
+        editor.fire('input', {}, editor)
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+    }
 
     describe('when an "inline" mention is triggered', () => {
       beforeEach(() => {
-        mockAnchorNode.wholeText = ' @'
+        editor.setContent(
+          '<div data-testid="fake-body" contenteditable="true"><span id="test"> @</span></div>'
+        )
+        editor.selection.select(editor.dom.select('#test')[0])
+        editor.selection.setAnchorOffset(2)
       })
 
-      it('renders the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
-      })
+      sharedExamplesForTriggeredMentions()
     })
 
     describe('when a "starting" mention is triggered', () => {
       beforeEach(() => {
-        mockAnchorOffset = 1
-        mockAnchorNode.wholeText = '@'
+        editor.setContent(
+          '<div data-testid="fake-body" contenteditable="true"><span id="test">@</span></div>'
+        )
+        editor.selection.select(editor.dom.select('#test')[0])
+        editor.selection.setAnchorOffset(1)
       })
 
-      it('renders the mentions component', () => {
-        editor.trigger('input')
-        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
+      sharedExamplesForTriggeredMentions()
+    })
+  })
+
+  function sharedExamplesForEventHandlers(subject) {
+    it('makes the body contenteditable', () => {
+      subject()
+      expect(editor.getBody().getAttribute('contenteditable')).toEqual('true')
+    })
+
+    it('removes contenteditable from the marker span', () => {
+      subject()
+      expect(screen.getByText('wes').getAttribute('contenteditable')).toBeNull()
+    })
+
+    it('removes the ID from the marker span', () => {
+      subject()
+      expect(screen.getByText('wes').id).toEqual('')
+    })
+  }
+
+  describe('SetContent', () => {
+    let insertionContent
+
+    const subject = () => editor.fire('SetContent', {content: insertionContent, target: editor})
+
+    beforeEach(() => {
+      onFocusedUserChange({name: 'wes', _id: 1})
+
+      insertionContent = '<h1>Hello!</h1>'
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+          <span id="mention-menu"></span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the content being inserted includes the marker', () => {
+      beforeEach(() => {
+        insertionContent = '<span id="mentions-marker" contenteditable="true"></span>'
+      })
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
       })
     })
+  })
+
+  describe('KeyUp', () => {
+    let which
+
+    const subject = () => editor.fire('KeyUp', {which, editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      editor.setSelectedNode(editor.dom.select('#mentions-marker')[0])
+
+      global.postMessage = jest.fn()
+    })
+
+    describe('when the event is for a non-navigation key', () => {
+      beforeEach(() => (which = 69))
+
+      it('broadcasts the message', () => {
+        subject()
+        expect(global.postMessage).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    describe('when the event is for a navigation key', () => {
+      beforeEach(() => (which = KEY_CODES.up))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the marker node is not selected', () => {
+      beforeEach(() => editor.selection.select(editor.dom.select('#test')[0]))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('KeyDown', () => {
+    let which, preventDefault
+
+    const subject = () => editor.fire('KeyDown', {which, editor, preventDefault})
+
+    beforeEach(() => {
+      which = 1
+      preventDefault = jest.fn()
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the active node is the marker', () => {
+      beforeEach(() => {
+        editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      })
+
+      function examplesForMentionEvents() {
+        it('prevents default', () => {
+          subject()
+          expect(preventDefault).toHaveBeenCalled()
+        })
+
+        it('broadcasts the event via postMessage', () => {
+          subject()
+          expect(global.postMessage).toHaveBeenCalled()
+        })
+      }
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+
+      describe('and the key pressed was "up"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.up
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionEvents()
+      })
+
+      describe('and the key pressed was "down"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.down
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionEvents()
+      })
+
+      describe('with the key down for a "backspace" deleting the trigger character', () => {
+        beforeEach(() => {
+          which = 8
+          editor.selection.setRng({endOffset: 1, startOffset: 1})
+        })
+
+        sharedExamplesForEventHandlers(subject)
+      })
+
+      describe('with the key down for a "backspace" not deleting the trigger char', () => {
+        beforeEach(() => {
+          which = 8
+          editor.selection.setRng({endOffset: 1, startOffset: 2})
+        })
+
+        it('does not make the body contenteditable', () => {
+          subject()
+          expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+        })
+      })
+
+      describe('whith the key down for an "enter"', () => {
+        beforeEach(() => {
+          which = 13
+          editor.setContent(
+            `<div data-testid="fake-body" contenteditable="false">
+              <span id="test"> @
+                <span id="mentions-marker" contenteditable="true" aria-activedescendant="test" data-userid="123" data-displayname="Test">wes</span>
+                <span id="mention-menu"></span>
+              </span>
+            </div>`
+          )
+        })
+
+        sharedExamplesForEventHandlers(subject)
+      })
+    })
+  })
+
+  describe('MouseDown', () => {
+    let target
+
+    const subject = () => editor.fire('MouseDown', {editor, target})
+
+    beforeEach(() => {
+      target = {id: ''}
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForEventHandlers(subject)
+
+    describe('when the target of the click is the marker', () => {
+      beforeEach(() => (target = {id: 'mentions-marker'}))
+
+      it('does not make the body contenteditable', () => {
+        subject()
+        expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+    })
+  })
+
+  function sharedExamplesForHandlersThatUnmount(subject) {
+    it('calls "onMentionExit"', () => {
+      subject()
+      expect(onMentionsExit).toHaveBeenCalledWith(editor)
+    })
+  }
+
+  describe('Remove', () => {
+    const subject = () => editor.fire('Remove', {target: editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForHandlersThatUnmount(subject)
+  })
+
+  describe('ViewChange', () => {
+    const subject = () => editor.fire('ViewChange', {target: editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="mention-menu"></span>
+          </span>
+        </div>`
+      )
+      editor.selection.select(editor.dom.select('#test')[0])
+    })
+
+    sharedExamplesForHandlersThatUnmount(subject)
   })
 })

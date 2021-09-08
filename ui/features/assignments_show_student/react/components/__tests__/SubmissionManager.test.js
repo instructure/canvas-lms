@@ -25,6 +25,7 @@ import {
 } from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
+import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -36,6 +37,8 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
 jest.mock('@canvas/rce/RichContentEditor')
+
+jest.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -50,6 +53,10 @@ describe('SubmissionManager', () => {
     window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
+  })
+
+  beforeEach(() => {
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
   })
 
   it('renders the AttemptTab', async () => {
@@ -151,7 +158,9 @@ describe('SubmissionManager', () => {
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
         window.ENV = {
-          CONFETTI_ENABLED: enabled
+          CONFETTI_ENABLED: enabled,
+          ASSIGNMENT_ID: 1,
+          COURSE_ID: 1
         }
       })
 
@@ -980,6 +989,71 @@ describe('SubmissionManager', () => {
       )
 
       expect(queryByTestId('student-footer')).not.toBeInTheDocument()
+    })
+
+    describe('modules', () => {
+      let oldEnv
+
+      beforeEach(() => {
+        oldEnv = window.ENV
+        window.ENV = {
+          ...oldEnv,
+          ASSIGNMENT_ID: '1',
+          COURSE_ID: '1'
+        }
+
+        ContextModuleApi.getContextModuleData.mockClear()
+      })
+
+      afterEach(() => {
+        window.ENV = oldEnv
+      })
+
+      it('renders next and previous module links if they exist for the assignment', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+
+        ContextModuleApi.getContextModuleData.mockResolvedValue({
+          next: {url: '/next', tooltipText: {string: 'some module'}},
+          previous: {url: '/previous', tooltipText: {string: 'some module'}}
+        })
+
+        const {getByTestId} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+        const footer = getByTestId('student-footer')
+        expect(within(footer).getByRole('link', {name: /Previous/})).toBeInTheDocument()
+        expect(within(footer).getByRole('link', {name: /Next/})).toBeInTheDocument()
+      })
+
+      it('does not render module buttons if no next/previous modules exist for the assignment', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+
+        ContextModuleApi.getContextModuleData.mockResolvedValue({})
+
+        const {queryByRole} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
+        expect(queryByRole('link', {name: /Previous/})).not.toBeInTheDocument()
+        expect(queryByRole('link', {name: /Next/})).not.toBeInTheDocument()
+      })
     })
   })
 

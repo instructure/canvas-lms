@@ -100,6 +100,7 @@
         <xs:element name="enable_offline_web_export" type="xs:boolean" minOccurs="0"/>
         <xs:element name="homeroom_course" type="xs:boolean" minOccurs="0"/>
         <xs:element name="course_color" type="xs:string" minOccurs="0"/>
+        <xs:element name="alt_name" type="xs:string" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
@@ -388,6 +389,40 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="pace_plans">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="pace_plan">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
+              <xs:element name="start_date" type="xs:date" minOccurs="0"/>
+              <xs:element name="end_date" type="xs:date" minOccurs="0"/>
+              <xs:element name="published_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="exclude_weekends" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="hard_end_dates" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="module_items" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="module_item">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="duration" type="xs:integer" minOccurs="1"/>
+                          <xs:element name="module_item_identifierref" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="externalFeeds">
     <xs:complexType>
       <xs:sequence>
@@ -526,6 +561,7 @@
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
             <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
+            <xs:element name="friendly_description" type="xs:string" minOccurs="0"/>
             <xs:element name="alignments" minOccurs="0">
               <xs:complexType>
                 <xs:sequence>
@@ -555,6 +591,7 @@
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="learningOutcomes" type="learningOutcomesType" minOccurs="0"/>
             <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
+            <xs:element name="source_outcome_group_id" type="xs:string" minOccurs="0"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>

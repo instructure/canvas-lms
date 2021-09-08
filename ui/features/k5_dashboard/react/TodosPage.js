@@ -24,6 +24,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import EmptyTodos from './EmptyTodos'
 
 import Todo, {getBaseDueAt} from './Todo'
 
@@ -47,8 +48,7 @@ export const TodosPage = ({timeZone, visible}) => {
       path: '/api/v1/users/self/todo',
       success: useCallback(data => {
         if (data) {
-          data.sort(sortTodos)
-          setTodos(data)
+          setTodos(data.filter(todo => todo.type === 'grading').sort(sortTodos))
           setLoading(false)
         }
       }, []),
@@ -94,11 +94,17 @@ export const TodosPage = ({timeZone, visible}) => {
         id="homeroom-todos"
         isLoading={loading}
         renderCustomSkeleton={todoSkeleton}
-        skeletonsCount={5}
+        skeletonsNum={todos?.length}
+        defaultSkeletonsNum={5}
+        allowZeroSkeletons={false}
       >
-        {todos?.map(todo => (
-          <Todo key={`todo-assignment-${todo.assignment?.id}`} timeZone={timeZone} {...todo} />
-        ))}
+        {todos?.length > 0 ? (
+          todos.map(todo => (
+            <Todo key={`todo-assignment-${todo.assignment?.id}`} timeZone={timeZone} {...todo} />
+          ))
+        ) : (
+          <EmptyTodos />
+        )}
       </LoadingWrapper>
     </section>
   )

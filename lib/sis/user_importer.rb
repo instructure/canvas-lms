@@ -252,7 +252,7 @@ module SIS
           pseudo.sis_user_id = user_row.user_id
           pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
           pseudo.account = @root_account
-          pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
+          pseudo.workflow_state = status_is_active ? 'active' : 'deleted' unless pseudo.stuck_sis_fields.include?(:workflow_state)
           if pseudo.new_record? && status_is_active
             should_add_account_associations = true
           elsif pseudo.workflow_state_changed?

@@ -91,6 +91,8 @@ export default class ManageAppListButton extends React.Component {
   }
 
   render() {
+    // xsslint safeString.identifier allowListLink
+    const allowListLink = I18n.t('#community.admin_app_center_allowlist')
     return (
       <View>
         <Button onClick={this.openModal}>{I18n.t('Manage App List')}</Button>
@@ -110,7 +112,7 @@ export default class ManageAppListButton extends React.Component {
                   {
                     wrappers: [
                       '<a href="https://www.eduappcenter.com">$1</a>',
-                      '<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203">$1</a>'
+                      '<a href="' + allowListLink + '">$1</a>'
                     ]
                   }
                 )

@@ -69,9 +69,10 @@ export default class OutcomeView extends OutcomeContentBase {
     )
   }
 
-  initialize({setQuizMastery, useForScoring}) {
+  initialize({setQuizMastery, useForScoring, inFindDialog}) {
     this.setQuizMastery = setQuizMastery
     this.useForScoring = useForScoring
+    this.inFindDialog = inFindDialog
     this.calculationMethodFormView = new CalculationMethodFormView({
       model: this.model
     })
@@ -347,7 +348,7 @@ export default class OutcomeView extends OutcomeContentBase {
               can_unlink,
               setQuizMastery: this.setQuizMastery,
               useForScoring: this.useForScoring,
-              isLargeRoster: ENV.IS_LARGE_ROSTER,
+              doNotRenderTitleLink: ENV.IS_LARGE_ROSTER || this.inFindDialog,
               hideMasteryScale:
                 ENV.ACCOUNT_LEVEL_MASTERY_SCALES && !this.useForScoring && !this.setQuizMastery,
               assessedInContext:

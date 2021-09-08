@@ -24,12 +24,12 @@ module Services
   describe RichContent do
     before do
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).
-        with('rich-content-service', default_ttl: 5.minutes).
-        and_return({
-          "app-host" => "rce-app",
-          "cdn-host" => "rce-cdn"
-        })
+      allow(Canvas::DynamicSettings).to receive(:find)
+        .with('rich-content-service', default_ttl: 5.minutes)
+        .and_return(DynamicSettings::FallbackProxy.new(
+                      "app-host" => "rce-app",
+                      "cdn-host" => "rce-cdn"
+                    ))
       allow(Setting).to receive(:get)
     end
 
@@ -40,29 +40,10 @@ module Services
         expect(env[:RICH_CONTENT_APP_HOST]).to eq("rce-app")
       end
 
-      it "populates hosts with an error signal when consul is down" do
-        allow(Canvas::DynamicSettings).to receive(:find).
-          with('rich-content-service', default_ttl: 5.minutes).
-          and_raise(Diplomat::KeyNotFound, "can't talk to consul")
-        env = described_class.env_for
-        expect(env[:RICH_CONTENT_APP_HOST]).to eq("error")
-      end
-
-      it "logs errors for later consideration" do
-        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).
-          and_raise(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
-        root_account = double("root_account", feature_enabled?: true)
-        expect(Canvas::Errors).to receive(:capture_exception) do |type, e|
-          expect(type).to eq(:rce_flag)
-          expect(e.is_a?(Canvas::DynamicSettings::ConsulError)).to be_truthy
-        end
-        described_class.env_for
-      end
-
       it "includes a generated JWT for the domain, user, context, and workflwos" do
         user = double("user", global_id: 'global id')
         domain = double("domain")
-        ctx = double("ctx", grants_any_right?: true)
+        ctx = double("ctx", grants_right?: true)
         jwt = double("jwt")
         allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(domain, user,
           include(workflows: [:rich_content, :ui],
@@ -94,8 +75,8 @@ module Services
 
       it "lets context decide if uploading is ok" do
         user = double("user", global_id: 'global id')
-        context1 = double("allowed_context", grants_any_right?: true)
-        context2 = double("forbidden_context", grants_any_right?: false)
+        context1 = double("allowed_context", grants_right?: true)
+        context2 = double("forbidden_context", grants_right?: false)
         env1 = described_class.env_for(user: user, context: context1)
         env2 = described_class.env_for(user: user, context: context2)
         expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(true)

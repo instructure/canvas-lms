@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
@@ -29,14 +29,20 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
-import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
+import {showImportConfirmBox} from './ImportConfirmBox'
+import {useFindOutcomeModal} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
+import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
+import GroupActionDrillDown from './shared/GroupActionDrillDown'
+import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {contextType, isMobileView} = useCanvasContext()
+  const {isMobileView, isCourse, rootIds} = useCanvasContext()
+  const [showOutcomesView, setShowOutcomesView] = useState(false)
+  const [scrollContainer, setScrollContainer] = useState(null)
   const {
     rootId,
     isLoading,
@@ -47,7 +53,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     debouncedSearchString,
     updateSearch,
     clearSearch,
-    error
+    error,
+    loadedGroups
   } = useFindOutcomeModal(open)
 
   const {group, loading, loadMore} = useGroupDetail({
@@ -57,35 +64,129 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
-  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
+  useEffect(() => {
+    if (!open) {
+      setShowOutcomesView(false)
+    }
+  }, [open])
+
+  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
+    useResize()
+
+  const {
+    importOutcomes,
+    importGroupsStatus,
+    importOutcomesStatus,
+    clearGroupsStatus,
+    clearOutcomesStatus,
+    hasAddedOutcomes,
+    setHasAddedOutcomes
+  } = useOutcomesImport()
+
+  const onCloseModalHandler = () => {
+    clearGroupsStatus()
+    clearOutcomesStatus()
+    onCloseHandler(hasAddedOutcomes)
+  }
+
+  const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useBoolean()
+  const [shouldFocusAddAllBtn, focusAddAllBtn, blurAddAllBtn] = useBoolean()
+  const [shouldFocusDoneBtn, focusDoneBtn, blurDoneBtn] = useBoolean()
+  const doneBtnRef = useRef()
+
+  useEffect(() => {
+    if (shouldFocusDoneBtn) doneBtnRef.current?.focus()
+  }, [shouldFocusDoneBtn])
+
+  useEffect(() => {
+    if (open) {
+      setHasAddedOutcomes(false)
+    }
+  }, [open, setHasAddedOutcomes])
+
+  const onAddAllHandler = () => {
+    if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
+      blurAddAllBtn()
+      blurDoneBtn()
+      openConfirmBox()
+      showImportConfirmBox({
+        count: group.outcomesCount,
+        onImportHandler: () => {
+          importOutcomes(selectedGroupId, group.title)
+          closeConfirmBox()
+          focusDoneBtn()
+        },
+        onCloseHandler: () => {
+          closeConfirmBox()
+          focusAddAllBtn()
+        }
+      })
+    } else {
+      importOutcomes(selectedGroupId, group.title)
+    }
+  }
 
   const findOutcomesView = (
     <FindOutcomesView
+      outcomesGroup={group}
       collection={collections[selectedGroupId]}
-      outcomesCount={group?.outcomesCount || 0}
-      outcomes={group?.outcomes}
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
-      onAddAllHandler={() => {}}
+      disableAddAllButton={isConfirmBoxOpen}
+      importGroupStatus={importGroupsStatus[selectedGroupId]}
+      onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
+      mobileScrollContainer={scrollContainer}
+      importOutcomesStatus={importOutcomesStatus}
+      importOutcomeHandler={importOutcomes}
+      shouldFocusAddAllBtn={shouldFocusAddAllBtn}
     />
+  )
+
+  const renderGroupNavigation = (
+    <View as="div" padding={isMobileView ? 'small small x-small' : '0'}>
+      {isLoading ? (
+        <div style={{textAlign: 'center', paddingTop: '2rem'}}>
+          <Spinner renderTitle={I18n.t('Loading')} size="large" />
+        </div>
+      ) : error && Object.keys(collections).length === 0 ? (
+        <Text color="danger">
+          {isCourse
+            ? I18n.t('An error occurred while loading course outcomes: %{error}', {
+                error
+              })
+            : I18n.t('An error occurred while loading account outcomes: %{error}', {
+                error
+              })}
+        </Text>
+      ) : isMobileView ? (
+        <GroupActionDrillDown
+          isLoadingGroupDetail={loading}
+          outcomesCount={group?.outcomesCount}
+          onCollectionClick={toggleGroupId}
+          collections={collections}
+          rootId={rootId}
+          loadedGroups={loadedGroups}
+          setShowOutcomesView={setShowOutcomesView}
+        />
+      ) : (
+        <TreeBrowser onCollectionToggle={toggleGroupId} collections={collections} rootId={rootId} />
+      )}
+    </View>
   )
 
   return (
     <Modal
       open={open}
-      onDismiss={onCloseHandler}
+      onDismiss={onCloseModalHandler}
       shouldReturnFocus
       size="fullscreen"
-      label={
-        contextType === 'Course'
-          ? I18n.t('Add Outcomes to Course')
-          : I18n.t('Add Outcomes to Account')
-      }
+      label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
+      shouldCloseOnDocumentClick={false}
     >
-      <Modal.Body padding={isMobileView ? '0 medium small' : '0 small small'}>
+      <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (
           <Flex elementRef={setContainerRef}>
             <Flex.Item
@@ -99,34 +200,14 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               elementRef={setLeftColumnRef}
             >
               <View as="div" padding="small x-small none x-small">
-                <Heading level="h3">
-                  <Text size="large" weight="light" fontStyle="normal">
-                    {I18n.t('Outcome Groups')}
-                  </Text>
-                </Heading>
-                <View>
-                  {isLoading ? (
-                    <div style={{textAlign: 'center', paddingTop: '2rem'}}>
-                      <Spinner renderTitle={I18n.t('Loading')} size="large" />
-                    </div>
-                  ) : error && Object.keys(collections).length === 0 ? (
-                    <Text color="danger">
-                      {contextType === 'Course'
-                        ? I18n.t('An error occurred while loading course outcomes: %{error}', {
-                            error
-                          })
-                        : I18n.t('An error occurred while loading account outcomes: %{error}', {
-                            error
-                          })}
+                <div style={{paddingBottom: '6px'}}>
+                  <Heading level="h3">
+                    <Text size="large" weight="light" fontStyle="normal">
+                      {I18n.t('Outcome Groups')}
                     </Text>
-                  ) : (
-                    <TreeBrowser
-                      onCollectionToggle={toggleGroupId}
-                      collections={collections}
-                      rootId={rootId}
-                    />
-                  )}
-                </View>
+                  </Heading>
+                </div>
+                {renderGroupNavigation}
               </View>
             </Flex.Item>
             <Flex.Item
@@ -136,8 +217,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               height="calc(100vh - 10.25rem)"
               margin="xxx-small 0 0"
             >
+              {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div
-                data-testid="handlerRef"
+                tabIndex="0"
+                role="separator"
+                aria-orientation="vertical"
+                onKeyDown={onKeyDownHandler}
                 ref={setDelimiterRef}
                 style={{
                   width: '1vw',
@@ -147,6 +232,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
+              {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"
@@ -157,7 +243,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               overflowX="auto"
               elementRef={setRightColumnRef}
             >
-              {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
+              {selectedGroupId && !rootIds.includes(selectedGroupId) ? (
                 findOutcomesView
               ) : (
                 <FindOutcomesBillboard />
@@ -165,11 +251,30 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             </Flex.Item>
           </Flex>
         ) : (
-          findOutcomesView
+          <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
+            <div
+              style={{
+                flex: '1 0 24rem',
+                position: 'relative',
+                overflow: 'auto',
+                height: '100%'
+              }}
+              ref={setScrollContainer}
+            >
+              {renderGroupNavigation}
+              {showOutcomesView ? findOutcomesView : isLoading ? null : <FindOutcomesBillboard />}
+            </div>
+          </div>
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseHandler}>
+        <Button
+          type="button"
+          color="primary"
+          margin="0 x-small 0 0"
+          ref={doneBtnRef}
+          onClick={onCloseModalHandler}
+        >
           {I18n.t('Done')}
         </Button>
       </Modal.Footer>

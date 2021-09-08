@@ -67,6 +67,13 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     self.save!
   end
 
+  workflow do
+    state :active
+    state :completed
+    state :deleted
+    state :failed
+  end
+
   def validate_file(csv)
     fail_import(I18n.t("Unable to read file")) unless File.file?(csv[:fullpath])
     fail_import(I18n.t("Only CSV files are supported.")) unless File.extname(csv[:fullpath]).casecmp('.csv').zero?
@@ -74,7 +81,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def fail_import(error)
-    self.worklfow_state = 'failed'
+    self.workflow_state = 'failed'
     self.save!
     progress.message = error
     progress.save!

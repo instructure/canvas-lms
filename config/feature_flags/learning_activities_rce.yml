@@ -26,3 +26,11 @@ rce_better_file_previewing:
   display_name: RCE Better File Previewing
   description: Preview files linked in the RCE in an overlay rather than a new browser tab.
   applies_to: SiteAdmin
+rce_limit_init_render_on_page:
+  state: hidden
+  display_name: RCE Limit number of RCEs initially rendered on the page
+  description: |-
+    Cap the number of RCEs rendered on initial page load. After that
+    initialize each as it is about to enter the viewport.
+  applies_to: RootAccount
+  root_opt_in: true

@@ -35,9 +35,7 @@ describe DataFixup::BackfillDevKeyAccountBindings do
       # Verify
       key.reload
       expect(key.developer_key_account_bindings.count).to eq(1)
-      expect(
-        key.developer_key_account_bindings.first.workflow_state
-      ).to eq(DeveloperKeyAccountBinding::ON_STATE)
+      expect(key.developer_key_account_bindings.first).to be_on
     end
 
     it "does not backfill when a binding is present" do

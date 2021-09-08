@@ -199,6 +199,11 @@ export function getWeeklyPlannerItems(fromMoment) {
     dispatch(getWayFutureItem(fromMoment))
     dispatch(getWayPastItem(fromMoment))
     loadWeekItems(dispatch, getState)
+  }
+}
+
+export function preloadSurroundingWeeks() {
+  return (dispatch, getState) => {
     loadWeekItems(dispatch, getState, -7)
     loadWeekItems(dispatch, getState, 7)
   }

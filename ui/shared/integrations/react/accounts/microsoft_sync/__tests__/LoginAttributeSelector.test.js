@@ -37,6 +37,8 @@ describe('LoginAttributeSelector', () => {
 
     fireEvent.click(container.getByRole('button', {name: /login attribute selector/i}))
     fireEvent.click(container.getByText(/email/i))
+
+    expect(changedMock).toHaveBeenCalledTimes(1)
   })
 
   it('renders the specified login attribute', () => {

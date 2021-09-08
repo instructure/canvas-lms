@@ -13,6 +13,13 @@ development:
       canvas:
         encryption-secret: "astringthatisactually32byteslong"
         signing-secret: "astringthatisactually32byteslong"
+        # regexes for matching online meeting urls in calendar events
+        # one per line. will get | or'd together to form the regex
+        # that's eventually used.
+        online-meeting-url-regex: |-
+          https:\/\/\w+\.zoom\.us\/\d+
+          https:\/\/\w+\.zoom\.us\/my\/\d+
+          https:\/\/\w+\.zoom\.us\/j\/\d+
       datadog-rum:
         application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81"
         client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r"
@@ -20,6 +27,9 @@ development:
       live-events:
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events
+        aws_access_key_id: key
+        aws_secret_access_key_dec: secret
+        # stub_credentials: true # can be used in dev to print creds to stdout
       live-events-subscription-service:
         app-host: "http://les.docker"
         sad-panda: null

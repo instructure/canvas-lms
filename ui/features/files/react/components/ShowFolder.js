@@ -22,7 +22,10 @@ import _ from 'underscore'
 import classnames from 'classnames'
 import I18n from 'i18n!react_files'
 import ShowFolder from '../legacy/components/ShowFolder'
+import File from '@canvas/files/backbone/models/File.coffee'
 import FilePreview from '@canvas/files/react/components/FilePreview'
+import DirectShareCourseTray from '../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
+import DirectShareUserModal from '../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import FolderChild from './FolderChild'
 import UploadDropZone from './UploadDropZone'
 import FileUpload from './FileUpload'
@@ -32,18 +35,18 @@ import LoadingIndicator from './LoadingIndicator'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
 
-ShowFolder.getInitialState = function() {
+ShowFolder.getInitialState = function () {
   return {
     hideToggleAll: true
   }
 }
 
-ShowFolder.closeFilePreview = function(url) {
+ShowFolder.closeFilePreview = function (url) {
   page(url)
   FocusStore.setFocusToItem()
 }
 
-ShowFolder.renderFilePreview = function() {
+ShowFolder.renderFilePreview = function () {
   /* Prepare and render the FilePreview if needed.
        As long as ?preview is present in the url.
     */
@@ -63,7 +66,7 @@ ShowFolder.renderFilePreview = function() {
   }
 }
 
-ShowFolder.renderFolderChildOrEmptyContainer = function() {
+ShowFolder.renderFolderChildOrEmptyContainer = function () {
   if (this.props.currentFolder.isEmpty()) {
     return (
       <div ref="folderEmpty" className="muted">
@@ -89,12 +92,22 @@ ShowFolder.renderFolderChildOrEmptyContainer = function() {
           modalOptions={this.props.modalOptions}
           clearSelectedItems={this.props.clearSelectedItems}
           onMove={this.props.onMove}
+          onCopyToClick={model => {
+            if (model instanceof File) {
+              this.setState({copyFileId: model.id})
+            }
+          }}
+          onSendToClick={model => {
+            if (model instanceof File) {
+              this.setState({sendFileId: model.id})
+            }
+          }}
         />
       ))
   }
 }
 
-ShowFolder.render = function() {
+ShowFolder.render = function () {
   const currentState = this.state || {}
   if (currentState.errorMessages) {
     return (
@@ -193,6 +206,28 @@ ShowFolder.render = function() {
         <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />
         {this.renderFilePreview()}
       </div>
+
+      {this.state.sendFileId && (
+        <DirectShareUserModal
+          contentShare={{content_id: this.state.sendFileId, content_type: 'attachment'}}
+          courseId={ENV.COURSE_ID}
+          onDismiss={() => {
+            this.setState({sendFileId: null})
+          }}
+          open={!!this.state.sendFileId}
+        />
+      )}
+
+      {this.state.copyFileId && (
+        <DirectShareCourseTray
+          contentSelection={{attachments: [this.state.copyFileId]}}
+          onDismiss={() => {
+            this.setState({copyFileId: null})
+          }}
+          open={!!this.state.copyFileId}
+          sourceCourseId={ENV.COURSE_ID}
+        />
+      )}
     </div>
   )
 }

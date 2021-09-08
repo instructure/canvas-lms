@@ -23,6 +23,7 @@ const USE_ES_MODULES =
 
 module.exports = {
   presets: [
+    '@babel/preset-typescript',
     [
       '@instructure/ui-babel-preset',
       {
@@ -39,6 +40,9 @@ module.exports = {
     ['@babel/plugin-proposal-private-methods', {loose: true}]
   ],
   env: {
+    development: {
+      plugins: ['babel-plugin-typescript-to-proptypes']
+    },
     production: {
       plugins: [
         'transform-react-remove-prop-types',

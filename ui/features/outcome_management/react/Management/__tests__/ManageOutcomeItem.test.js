@@ -17,14 +17,27 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
+
 import ManageOutcomeItem from '../ManageOutcomeItem'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {MockedProvider} from '@apollo/react-testing'
+
+const render = (
+  children,
+  {canManage = true, isAdmin = true, contextType = 'Account', renderer = rtlRender} = {}
+) => {
+  return renderer(
+    <OutcomesContext.Provider value={{env: {canManage, isAdmin, contextType}}}>
+      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    </OutcomesContext.Provider>
+  )
+}
 
 describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
   let onCheckboxHandlerMock
   const defaultProps = (props = {}) => ({
-    _id: '1',
     linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
@@ -66,12 +79,7 @@ describe('ManageOutcomeItem', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     const checkbox = getByText('Select outcome')
     fireEvent.click(checkbox)
-    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({
-      _id: '1',
-      linkId: '2',
-      title: 'Outcome Title',
-      canUnlink: true
-    })
+    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({linkId: '2'})
   })
 
   it('displays right pointing caret when description is truncated', () => {
@@ -128,34 +136,34 @@ describe('ManageOutcomeItem', () => {
       expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
     })
 
+    it('hides checkboxes', () => {
+      const {queryByText} = render(
+        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+      )
+      expect(queryByText('Select outcome')).not.toBeInTheDocument()
+    })
+
     describe('with manage_outcomes permission', () => {
-      beforeEach(() => {
-        window.ENV = {
-          ROOT_OUTCOME_GROUP: {
-            context_type: 'Course'
-          },
-          PERMISSIONS: {
-            manage_outcomes: true
-          },
-          current_user_roles: ['admin']
-        }
-      })
-
-      afterEach(() => {
-        window.ENV = null
-      })
-
       it('renders the kebab menu if the user is an admin within the course context', () => {
         const {getByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: true,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(getByText('Outcome Menu')).toBeInTheDocument()
       })
 
       it('does not render the kebab menu if the user is not an admin', () => {
-        window.ENV.current_user_roles = []
         const {queryByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: false,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
       })

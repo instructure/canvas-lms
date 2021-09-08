@@ -1539,9 +1539,23 @@ describe Account do
       account3 = account2.sub_accounts.create!
       account4 = account3.sub_accounts.create!
 
-      expect(account4.account_chain).to eq [account4, account3, account2, account1]
-    end
+      chain = account4.account_chain
+      expect(chain).to eq [account4, account3, account2, account1]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1]
 
+      chain = account4.account_chain(include_site_admin: true)
+      sa = Account.site_admin
+      expect(chain).to eq [account4, account3, account2, account1, sa]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1, sa]
+    end
   end
 
   describe "#can_see_admin_tools_tab?" do
@@ -1766,17 +1780,19 @@ describe Account do
       enable_cache do
         account = account_model
 
-        account.default_storage_quota = 10.megabytes
-        account.save!
+        sub1 = account.sub_accounts.create!
+        sub2 = account.sub_accounts.create!
+        sub2.update(default_storage_quota: 10.megabytes)
 
-        to_be_subaccount = Account.create!
+        to_be_subaccount = sub1.sub_accounts.create!
         expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
 
         # should clear caches
-        to_be_subaccount.parent_account = account
-        to_be_subaccount.root_account = account
-        to_be_subaccount.save!
-        expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        Timecop.travel(1.second.from_now) do
+          to_be_subaccount.update(parent_account: sub2)
+          to_be_subaccount = Account.find(to_be_subaccount.id)
+          expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        end
       end
     end
   end
@@ -2099,6 +2115,7 @@ describe Account do
         au = AccountUser.create!(:account => other_account, :user => @user)
         expect(cached_account_users).to eq []
         @account.update_attribute(:parent_account, other_account)
+        @account.reload
         expect(cached_account_users).to eq [au]
       end
 
@@ -2287,7 +2304,7 @@ describe Account do
       create_role_override('manage_courses_delete', role, account)
       expect(
         account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
-      ).to eq %w[AccountAdmin TeacherAdmin]
+      ).to eq %w[AccountAdmin]
       expect(
         account.roles_with_enabled_permission(:manage_courses_publish).map(&:name).sort
       ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
@@ -2409,6 +2426,85 @@ describe Account do
       expect(act.unless_dummy).to be_nil
       act.id = 1
       expect(act.unless_dummy).to be(act)
+    end
+  end
+
+  describe '#log_changes_to_app_center_access_token' do
+    subject { account.update!(settings: after_settings) }
+
+    let!(:account) { account_model(settings: before_settings).tap(&:save!) }
+    let(:calls) { [] }
+    let(:notifier) { lambda{|*args| calls << args} }
+
+    before do
+      @old_notifier = CanvasErrors.send(:registry)[:sentry_notification]
+      CanvasErrors.register!(:sentry_notification, &notifier)
+    end
+
+    after do
+      CanvasErrors.send(:registry)[:sentry_notification] = @old_notifier
+      CanvasErrors.send(:registry).compact!
+    end
+
+    shared_examples_for 'a change to the token' do |was_present, now_present|
+      it 'triggers a Sentry log' do
+        subject
+        expect(calls).to include([
+          "Account's app_center_access_token changed",
+          {account_id: account.global_id, was_set: was_present, now_set: now_present},
+          :warn
+        ])
+      end
+    end
+
+    shared_examples_for 'no change to the token' do
+      it 'does not trigger a Sentry log' do
+        subject
+        expect(calls.map(&:first)).to_not include("Account's app_center_access_token changed")
+      end
+    end
+
+    context 'when it changes from empty to non-empty' do
+      let(:before_settings) { {} }
+      let(:after_settings) { {app_center_access_token: 'foo'} }
+
+      it_behaves_like 'a change to the token', false, true
+    end
+
+    context 'when it changes from non-empty to empty' do
+      let(:before_settings) { {app_center_access_token: 'foo'} }
+      let(:after_settings) { {app_center_access_token: nil} }
+
+      it_behaves_like 'a change to the token', true, false
+    end
+
+    context 'when it changes from non-empty to something else non-empty' do
+      let(:before_settings) { {app_center_access_token: 'foo'} }
+      let(:after_settings) { {app_center_access_token: 'foo2'} }
+
+      it_behaves_like 'a change to the token', true, true
+    end
+
+    context 'when it is empty and does not change' do
+      let(:before_settings) { {foo: 'bar'} }
+      let(:after_settings) { {foo: 'waz', app_center_access_token: nil} }
+
+      it_behaves_like 'no change to the token'
+    end
+
+    context 'when it is not empty and does not change' do
+      let(:before_settings) { {foo: 'bar', app_center_access_token: 'foo'} }
+      let(:after_settings) { {foo: 'waz', app_center_access_token: 'foo'} }
+
+      it_behaves_like 'no change to the token'
+    end
+
+    context 'when settings does not change' do
+      subject { account.update!(name: 'foobar') }
+
+      let(:before_settings) { {} }
+
+      it_behaves_like 'no change to the token'
     end
   end
 end

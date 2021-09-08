@@ -377,11 +377,15 @@ export default class AssignmentListItemView extends Backbone.View
     ENV.PERMISSIONS.by_assignment_id?
 
   canDelete: ->
-    result = (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
-    if @hasIndividualPermissions() then result && @canEdit() else result
+    modelResult = (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
+    userResult = if @hasIndividualPermissions()
+      !!(ENV.PERMISSIONS.by_assignment_id[@model.id]?.delete)
+    else
+      ENV.PERMISSIONS.manage_assignments_delete
+    modelResult && userResult
 
   canDuplicate: ->
-    (@userIsAdmin || @canManage()) && @model.canDuplicate()
+    (@userIsAdmin || @canAdd()) && @model.canDuplicate()
 
   canMove: ->
     @userIsAdmin or (@canManage() and @model.canMove())
@@ -390,13 +394,16 @@ export default class AssignmentListItemView extends Backbone.View
     if !@hasIndividualPermissions()
       return @userIsAdmin or @canManage()
 
-    @userIsAdmin or (@canManage() && !!(ENV.PERMISSIONS.by_assignment_id[@model.id] && ENV.PERMISSIONS.by_assignment_id[@model.id].update))
+    @userIsAdmin or (@canManage() && !!(ENV.PERMISSIONS.by_assignment_id[@model.id]?.update))
+
+  canAdd: ->
+    ENV.PERMISSIONS.manage_assignments_add
 
   canManage: ->
     ENV.PERMISSIONS.manage
 
   canOpenManageOptions: ->
-    ENV.PERMISSIONS.manage || ENV.DIRECT_SHARE_ENABLED
+    @canManage() || @canAdd() || @canDelete() || ENV.DIRECT_SHARE_ENABLED
 
   isGraded: ->
     submission_types = @model.get('submission_types')

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require 'spec_helper'
 require_dependency "lti/membership_service/course_lis_person_collator"
 
 module Lti::MembershipService
@@ -66,7 +66,7 @@ module Lti::MembershipService
 
         it 'generates a list of IMS::LTI::Models::Membership objects' do
           collator = CourseLisPersonCollator.new(@course, @teacher)
-          memberships = collator.memberships(context: @course)
+          memberships = collator.memberships
           @teacher.reload
           membership = memberships[0]
 
@@ -87,7 +87,7 @@ module Lti::MembershipService
           Lti::Asset.opaque_identifier_for(@teacher)
           collator = CourseLisPersonCollator.new(@course, @teacher)
           UserPastLtiId.create!(user: @teacher, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
-          memberships = collator.memberships(context: @course)
+          memberships = collator.memberships
           expect(memberships[0].member.user_id).to eq('old_lti_id')
         end
       end
@@ -102,17 +102,38 @@ module Lti::MembershipService
     end
   end
 
-  context 'course with user that has many enrollments' do
+  describe '#memberships' do
     before(:each) do
       course_with_teacher
-      @course.enroll_user(@teacher, 'TaEnrollment', enrollment_state: 'active')
-      @course.enroll_user(@teacher, 'DesignerEnrollment', enrollment_state: 'active')
-      @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
-      @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      @course.enroll_user(@teacher, 'ObserverEnrollment', enrollment_state: 'active')
     end
 
-    describe '#membership' do
+    it 'does not show enrollment roles from other courses' do
+      collator = CourseLisPersonCollator.new(@course, @teacher)
+      Lti::Asset.opaque_identifier_for(@teacher, context: @course)
+      course_with_student(user: @teacher)
+      memberships = collator.memberships
+      expect(memberships.map(&:role)).to eq([[IMS::LIS::Roles::Context::URNs::Instructor]])
+    end
+
+    it 'does not show past_lti_ids from other contexts' do
+      collator = CourseLisPersonCollator.new(@course, @teacher)
+      course_with_teacher(user: @teacher)
+      Lti::Asset.opaque_identifier_for(@teacher, context: @course)
+      UserPastLtiId.create!(user_id: @teacher, context: @course, user_uuid: "old_uuid",
+        user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_context_id")
+      memberships = collator.memberships
+      expect(memberships.map(&:member).map(&:user_id)).to eq([@teacher.reload.lti_context_id])
+    end
+
+    context 'course with user that has many enrollments' do
+      before(:each) do
+        @course.enroll_user(@teacher, 'TaEnrollment', enrollment_state: 'active')
+        @course.enroll_user(@teacher, 'DesignerEnrollment', enrollment_state: 'active')
+        @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
+        @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
+        @course.enroll_user(@teacher, 'ObserverEnrollment', enrollment_state: 'active')
+      end
+
       it 'properly outputs multiple membership roles for membership' do
         collator = CourseLisPersonCollator.new(@course, @teacher)
         memberships = collator.memberships
@@ -144,27 +165,24 @@ module Lti::MembershipService
         ])
       end
     end
-  end
 
-  context 'course with multiple users' do
-    let(:user_sis_id) { "user_sis_id_01" }
+    context 'course with multiple users' do
+      let(:user_sis_id) { "user_sis_id_01" }
 
-    before(:each) do
-      course_with_teacher
-      @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      @ta = user_model
-      @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')
-      @designer = user_model
-      @course.enroll_user(@designer, 'DesignerEnrollment', enrollment_state: 'active')
-      @student = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-        :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-        :sis_user_id => user_sis_id, integration_id: 'int1')
-      @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
-      @observer = user_model
-      @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')
-    end
+      before(:each) do
+        @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
+        @ta = user_model
+        @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')
+        @designer = user_model
+        @course.enroll_user(@designer, 'DesignerEnrollment', enrollment_state: 'active')
+        @student = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
+          :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
+          :sis_user_id => user_sis_id, integration_id: 'int1')
+        @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+        @observer = user_model
+        @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')
+      end
 
-    describe '#membership' do
       it 'outputs the users in a course with their respective roles' do
         collator = CourseLisPersonCollator.new(@course, @teacher)
         memberships = collator.memberships

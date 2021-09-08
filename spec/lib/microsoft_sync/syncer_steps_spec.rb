@@ -79,6 +79,7 @@ describe MicrosoftSync::SyncerSteps do
     ra.settings[:microsoft_sync_enabled] = sync_enabled
     ra.settings[:microsoft_sync_tenant] = tenant
     ra.settings[:microsoft_sync_login_attribute] = 'email'
+    ra.settings[:microsoft_sync_remote_attribute] = 'mail'
     ra.save!
 
     allow(MicrosoftSync::GraphServiceHelpers).to \
@@ -173,21 +174,19 @@ describe MicrosoftSync::SyncerSteps do
 
   shared_examples_for 'max of members enrollment reached' do |max_members|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to raise_error do |error|
-        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_members || 25000} members in a team."
-      end
+      klass = MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
+      msg =
+        "Microsoft 365 allows a maximum of #{(max_members || 25000).to_s(:delimited)} " \
+        'members in a team.'
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
   end
 
   shared_examples_for 'max of owners enrollment reached' do |max_owners|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to raise_error do |error|
-        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
-      end
+      klass = MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached
+      msg = "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
   end
 
@@ -211,8 +210,8 @@ describe MicrosoftSync::SyncerSteps do
 
     before do
       n_students_in_course(2, course: course)
-      teacher_in_course(course: course)
-      teacher_in_course(course: course)
+      teacher_in_course(course: course, active_enrollment: true)
+      teacher_in_course(course: course, active_enrollment: true)
     end
 
     context 'when the max enrollments in a course was not reached' do
@@ -285,22 +284,22 @@ describe MicrosoftSync::SyncerSteps do
       context 'when there is more than one remote MS group for the course' do
         let(:education_class_ids) { [group.ms_group_id || 'someid', 'newid3'] }
 
-        it 'raises an InvalidRemoteState error' do
-          expect { subject }.to raise_error(
-            MicrosoftSync::Errors::InvalidRemoteState,
-            'Multiple Microsoft education classes exist for the course.'
-          )
+        it 'raises a descriptive Graceful Cancel Error' do
+          klass = described_class::MultipleEducationClasses
+          msg = 'Multiple Microsoft education classes already exist for the course.'
+          expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
         end
       end
 
       shared_examples_for 'missing the correct account settings' do
-        it 'raises a graceful cleanup error with a end-user-friendly name' do
+        it 'raises a graceful cleanup error with a end-user-friendly message' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
-          expect { subject }.to raise_error do |e|
-            expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-            expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-          end
+          klass = described_class::TenantMissingOrSyncDisabled
+          msg =
+            'Tenant missing or sync disabled. ' \
+            'Check the Microsoft sync integration settings for the course and account.'
+          expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
         end
       end
 
@@ -377,7 +376,10 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     let!(:teachers) do
-      [teacher_in_course(course: course), teacher_in_course(course: course)].map(&:user)
+      [
+        teacher_in_course(course: course, active_enrollment: true),
+        teacher_in_course(course: course, active_enrollment: true)
+      ].map(&:user)
     end
 
     let(:mappings) do
@@ -385,7 +387,7 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     before do
-      stub_const('MicrosoftSync::GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE', batch_size)
+      stub_const('MicrosoftSync::GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE', batch_size)
 
       students.each_with_index do |student, i|
         communication_channel(student, path_type: 'email', username: "student#{i}@example.com", active_cc: true)
@@ -399,29 +401,30 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when Microsoft's API returns success" do
       before do
-        allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-          raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
+        allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
+          raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
-          upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+          # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+          uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
         end
       end
 
       it 'creates a mapping for each of the enrollments' do
         expect_next_step(subject, :step_generate_diff)
         expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
-          students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
-          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
+          students.each_with_index.map{|student, n| [student.id, "student#{n}-mail-aad"]}.sort +
+          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-mail-aad"]}.sort
         )
       end
 
-      it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
+      it 'batches in sizes of GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE' do
+        expect(graph_service_helpers).to receive(:users_uluvs_to_aads).twice.and_return({})
         expect_next_step(subject, :step_generate_diff)
       end
 
-      context "when Microsoft doesn't have AADs for the UPNs" do
+      context "when Microsoft doesn't have AADs for the ULUVs" do
         it "doesn't add any UserMappings" do
-          expect(graph_service_helpers).to receive(:users_upns_to_aads)
+          expect(graph_service_helpers).to receive(:users_uluvs_to_aads)
             .at_least(:once).and_return({})
           expect { subject }.to_not \
             change { MicrosoftSync::UserMapping.count }.from(0)
@@ -440,14 +443,14 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it "doesn't lookup aads for those users" do
-          upns_looked_up = []
-          expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-            upns_looked_up += upns
+          uluvs_looked_up = []
+          expect(graph_service_helpers).to receive(:users_uluvs_to_aads) do |_remote_attr, uluvs|
+            uluvs_looked_up += uluvs
             {}
           end
           expect_next_step(subject, :step_generate_diff)
-          expect(upns_looked_up).to_not include("student0@example.com")
-          expect(upns_looked_up).to include("student1@example.com")
+          expect(uluvs_looked_up).to_not include("student0@example.com")
+          expect(uluvs_looked_up).to include("student1@example.com")
         end
       end
 
@@ -474,9 +477,9 @@ describe MicrosoftSync::SyncerSteps do
 
       context 'when the Account login attribute changes while the job is running' do
         before do
-          orig_root_account_method = MicrosoftSync::UsersUpnsFinder.method(:new)
+          orig_root_account_method = MicrosoftSync::UsersUluvsFinder.method(:new)
 
-          allow(MicrosoftSync::UsersUpnsFinder).to receive(:new) do |user_ids, root_account|
+          allow(MicrosoftSync::UsersUluvsFinder).to receive(:new) do |user_ids, root_account|
             result = orig_root_account_method.call(user_ids, root_account)
             acct = Account.find(root_account.id)
             acct.settings[:microsoft_sync_login_attribute] = 'somethingelse'
@@ -630,13 +633,9 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no local owners (course teacher enrollments)' do
       it 'raises a graceful exit error informing the user' do
         expect(diff).to receive(:local_owners).and_return Set.new
-        expect { subject }.to raise_error do |error|
-          expect(error).to be_a(MicrosoftSync::Errors::PublicError)
-          expect(error.public_message).to match(
-            /no users corresponding to the instructors of the Canvas course could be found/
-          )
-          expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        end
+        klass = MicrosoftSync::Errors::MissingOwners
+        msg = /no users corresponding to the instructors of the Canvas course could be found/
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
       end
     end
 
@@ -750,7 +749,7 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are changes to process' do
       let(:n_students) { 1 }
       let!(:students) { 1.upto(n_students).map{student_in_course(course: course).user} }
-      let!(:teacher) { teacher_in_course(course: course).user }
+      let!(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
 
       before do
         students.each_with_index do |student, index|
@@ -826,8 +825,9 @@ describe MicrosoftSync::SyncerSteps do
             root_account: course.root_account, user: students[0], aad_id: 's0-old'
           )
 
-          allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-            upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+          allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
+            # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+            uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)
@@ -836,8 +836,8 @@ describe MicrosoftSync::SyncerSteps do
         it "gets user mappings that don't exist for all PartialSyncChanges users" do
           subject
           # s0 already has a UserMapping. s1 doesn't have a PartialSyncChange.
-          expect(graph_service_helpers).to have_received(:users_upns_to_aads)
-            .with(contain_exactly('s2@example.com', 't@example.com'))
+          expect(graph_service_helpers).to have_received(:users_uluvs_to_aads)
+            .with(anything, contain_exactly('s2@example.com', 't@example.com'))
         end
 
         it 'builds a partial membership diff' do
@@ -850,15 +850,23 @@ describe MicrosoftSync::SyncerSteps do
           expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
           expect(diff).to have_received(:set_local_member).with(teacher.id, 'TeacherEnrollment')
           expect(diff).to have_received(:set_member_mapping).with(students[0].id, 's0-old')
-          expect(diff).to have_received(:set_member_mapping).with(students[2].id, 's2-aad')
-          expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-aad')
+          expect(diff).to have_received(:set_member_mapping).with(students[2].id, 's2-mail-aad')
+          expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-mail-aad')
         end
 
-        it 'ignores inactive enrollments' do
-          Enrollment.where(course: course, user: students[0]).update_all(workflow_state: 'deleted')
+        %w[completed deleted inactive invited rejected].each do |state|
+          it "ignores #{state} enrollments" do
+            Enrollment.where(course: course, user: students[0]).update_all(workflow_state: state)
+            subject
+            expect(diff).to_not have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
+            expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+          end
+        end
+
+        it 'ignores StudentViewEnrollment (fake) enrollments' do
+          Enrollment.where(course: course, user: students[0]).update_all(type: 'StudentViewEnrollment')
           subject
-          expect(diff).to_not have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
-          expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+          expect(diff).to_not have_received(:set_local_member).with(students[0].id, anything)
         end
 
         it_behaves_like 'a step that executes a diff' do
@@ -915,5 +923,16 @@ describe MicrosoftSync::SyncerSteps do
 
   describe '::MAX_PARTIAL_SYNC_CHANGES' do
     it { expect(described_class::MAX_PARTIAL_SYNC_CHANGES).to eq 500 }
+  end
+
+  describe 'YAML encoding' do
+    it 'only serializes the group so other values are reloaded when the job runs' do
+      syncer_steps.send(:account_settings)
+      syncer_steps.send(:tenant)
+      expect(syncer_steps.instance_variables).to include *%i[@group @account_settings @tenant]
+      serialized = syncer_steps.to_yaml
+      deserialized = YAML.unsafe_load(serialized)
+      expect(deserialized.instance_variables).to eq %i[@group]
+    end
   end
 end

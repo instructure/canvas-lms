@@ -130,6 +130,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $message: String!
     $parentEntryId: ID
     $fileId: ID
+    $includeReplyPreview: Boolean
   ) {
     createDiscussionEntry(
       input: {
@@ -137,17 +138,16 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         message: $message
         parentEntryId: $parentEntryId
         fileId: $fileId
+        includeReplyPreview: $includeReplyPreview
       }
     ) {
       discussionEntry {
         ...DiscussionEntry
         editor {
           ...User
-          courseRoles
         }
         author {
           ...User
-          courseRoles
         }
       }
       errors {
@@ -183,7 +183,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
 `
 
 export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
-  mutation UpdateDiscsussionEntriesReadState($discussionEntryIds: [ID!]!, $read: Boolean!) {
+  mutation UpdateDiscussionEntriesReadState($discussionEntryIds: [ID!]!, $read: Boolean!) {
     updateDiscussionEntriesReadState(
       input: {discussionEntryIds: $discussionEntryIds, read: $read}
     ) {
@@ -202,6 +202,17 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
   ${DiscussionEntry.fragment}
 `
 
+export const UPDATE_DISCUSSION_THREAD_READ_STATE = gql`
+  mutation UpdateDiscussionThreadReadState($discussionEntryId: ID!, $read: Boolean!) {
+    updateDiscussionThreadReadState(input: {discussionEntryId: $discussionEntryId, read: $read}) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+`
+
 export const UPDATE_DISCUSSION_READ_STATE = gql`
   mutation UpdateDiscussionReadState($discussionTopicId: ID!, $read: Boolean!) {
     updateDiscussionReadState(input: {discussionTopicId: $discussionTopicId, read: $read}) {
@@ -211,4 +222,17 @@ export const UPDATE_DISCUSSION_READ_STATE = gql`
     }
   }
   ${Discussion.fragment}
+`
+
+export const UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT = gql`
+  mutation UpdateIsolatedViewDeeplyNestedAlert($isolatedViewDeeplyNestedAlert: Boolean!) {
+    updateIsolatedViewDeeplyNestedAlert(
+      input: {isolatedViewDeeplyNestedAlert: $isolatedViewDeeplyNestedAlert}
+    ) {
+      user {
+        ...User
+      }
+    }
+  }
+  ${User.fragment}
 `

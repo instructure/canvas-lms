@@ -68,14 +68,14 @@ installTranslations()
 
 // The driver that does all the work.
 async function installTranslations() {
-  const canvasTranslations = await getTranslationList('canvas-rce')
-  const canvasLocales = canvasTranslations.map(t => t.replace('.json', ''))
-  const tinyLocales = mapCanvasLocalesToTiny(canvasLocales)
-  await generateCombinedImporters(canvasLocales, tinyLocales)
+  const canvasTranslations = await getTranslationList()
+  const canvasLocaleFileBasenames = canvasTranslations.map(t => t.replace('.json', ''))
+  const tinyLocales = mapCanvasLocalesToTiny(canvasLocaleFileBasenames)
+  generateCombinedImporters(canvasLocaleFileBasenames, tinyLocales)
   // different file systems return the list of files in different orders
   // (e.g. da vs da-x-k12) so sort them to get a uniform order
   // of the case statements out of generateGetTranslations
-  await generateGetTranslations(canvasLocales.sort())
+  generateGetTranslations(canvasLocaleFileBasenames.sort())
 }
 
 // given the array of canvas locales, return
@@ -91,30 +91,24 @@ function mapCanvasLocalesToTiny(canvasLocales) {
 // there's one file in src/translations/locales for each canvas locale
 // that imports adds the canvas strings to formatMessage and
 // imports the corresponding tinymce translations if one exists
-async function generateCombinedImporters(canvasLocales, tinyLocales) {
-  await removeStaleTranslationFiles(canvasLocales)
-  const fileCreatePromises = []
-  for (const locale of canvasLocales) {
+function generateCombinedImporters(canvasLocaleFileBasenames, tinyLocales) {
+  removeStaleTranslationFiles(canvasLocaleFileBasenames)
+
+  for (const basename of canvasLocaleFileBasenames) {
     const filepath = path.resolve(
       __dirname,
-      path.join('../src/translations/locales', `${locale}.js`)
+      path.join('../src/translations/locales', `${basename}.js`)
     )
-    fileCreatePromises.push(
-      localeFileContent(locale, tinyLocales[locale]).then(content => {
-        fileCreatePromises.push(fs.promises.writeFile(filepath, content, {flag: 'w'}))
-      })
-    )
+    const content = localeFileContent(basename, tinyLocales[basename])
+    fs.writeFileSync(filepath, content, {flag: 'w'})
   }
-  await Promise.all(fileCreatePromises)
 }
 
 // if there are any existing src/translations/locales files
 // for locales no longer in the new list, remove them
-async function removeStaleTranslationFiles(locales) {
+function removeStaleTranslationFiles(locales) {
   const newLocalesFiles = locales.map(l => `${l}.js`)
-  const curLocalesFiles = await fs.promises.readdir(
-    path.resolve(__dirname, `../src/translations/locales`)
-  )
+  const curLocalesFiles = fs.readdirSync(path.resolve(__dirname, `../src/translations/locales`))
   const staleFiles = curLocalesFiles.filter(f => !newLocalesFiles.includes(f))
   for (f of staleFiles) {
     fs.rmSync(path.resolve(__dirname, path.join('../src/translations/locales/', f)))
@@ -141,8 +135,11 @@ const copyright = `/*
 `
 
 // the content of the file being generated in generateCombinedImporters
-async function localeFileContent(canvasLocale, tinyLocale) {
-  const localeData = await readTranslationFile('canvas-rce', canvasLocale)
+function localeFileContent(canvasLocaleFileBasename, tinyLocale) {
+  // some translation files have '_', but no canvas locale does,
+  // they all use '-'.
+  let canvasLocale = canvasLocaleFileBasename.replace(/_/g, '-')
+  const localeData = readTranslationFile('canvas-rce', canvasLocaleFileBasename)
 
   const preface = `${copyright}
 import formatMessage from '../../format-message'
@@ -171,7 +168,7 @@ formatMessage.addLocale({${canvasLocale}: locale})
 // that serves to code-split the translations
 // into their own webpack bundle then provide
 // them to the RCE
-async function generateGetTranslations(locales) {
+function generateGetTranslations(localeFileBasenames) {
   const preface = `${copyright}
 /*
  * ********************************************************
@@ -189,8 +186,8 @@ export default function getTranslations(locale) {
 `
 
   const cases = []
-  for (const locale of locales) {
-    cases.push(`          case '${locale}':
+  for (const locale of localeFileBasenames) {
+    cases.push(`          case '${locale.replace(/_/g, '-')}':
             p = import('./translations/locales/${locale}')
             break`)
   }
@@ -211,11 +208,11 @@ export default function getTranslations(locale) {
   const getlocalelist = `
 export function getLocaleList() {
   return [
-    '${locales.join("',\n    '")}'
+    '${localeFileBasenames.map(l => l.replace(/_/g, '-')).join("',\n    '")}'
   ]
 }
 `
   const content = `${preface}${cases.join('\n')}${trailer}${getlocalelist}`
 
-  await fs.promises.writeFile('./src/getTranslations.js', content, {flag: 'w'})
+  fs.writeFileSync('./src/getTranslations.js', content, {flag: 'w'})
 }

@@ -28,8 +28,8 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
     The id of the destination group
   DESC
 
-  field :moved_outcome_link_ids, [ID], <<~DOC, null: false
-    List of Outcome Link ids that were sucessfully moved to the group
+  field :moved_outcome_links, [Types::ContentTagType], <<~DOC, null: false
+    List of Outcome Links that were sucessfully moved to the group
   DOC
 
   def resolve(input:)
@@ -50,7 +50,7 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
 
     {
       errors: errors,
-      moved_outcome_link_ids: outcome_links.pluck(:id)
+      moved_outcome_links: ContentTag.where(id: outcome_links.pluck(:id))
     }
   end
 
@@ -63,17 +63,26 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
   def get_group!(input)
     LearningOutcomeGroup.active.find_by(id: input[:group_id]).tap do |group|
       raise GraphQL::ExecutionError, I18n.t("Group not found") unless group
-      raise GraphQL::ExecutionError, I18n.t("Insufficient permission") unless
-        group.context.grants_right?(current_user, session, :manage_outcomes)
+      if group.context
+        raise GraphQL::ExecutionError, I18n.t("Insufficient permission") unless
+          group.context.grants_right?(current_user, session, :manage_outcomes)
+      else
+        raise GraphQL::ExecutionError, I18n.t("Insufficient permission") unless
+          Account.site_admin.grants_right?(current_user, session, :manage_global_outcomes)
+      end
     end
   end
 
   def get_outcome_links(input, context)
     ids = input[:outcome_link_ids].map(&:to_i).uniq
-    links = ContentTag.active.learning_outcome_links.where(
-      context: context,
-      id: ids
-    )
+    links = if context
+      ContentTag.active.learning_outcome_links.where(
+        context: context,
+        id: ids
+      )
+    else
+      ContentTag.active.learning_outcome_links.where(id: ids, context_type: 'LearningOutcomeGroup')
+    end
     missing_ids = ids - links.pluck(:id)
     [links, missing_ids]
   end

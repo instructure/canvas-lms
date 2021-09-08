@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Dechrau’r Hanes Tasgau i’w Gwneud"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Isod mae enghraifft o sut bydd myfyrwyr yn gweld eu hamserlen."
+  },
   "calendar_a8563bb2": { "message": "Calendr:" },
   "calendar_event_89aadc1c": { "message": "Digwyddiad Calendr" },
   "canvas_planner_98ed106": { "message": "Canvas Planner" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# cyfle}\n    one {# cyfle}\n  other {# cyfle}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Cuddio # eitem ar goll}\n  other {Cuddio # eitemau ar goll}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Dangos # eitem wedi’i chwblhau }\n  other {Dangos # eitem wedi’u cwblhau}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Dangos # eitem ar goll}\n  other {Dangos # eitemau ar goll}\n}"
   },
   "course_8a63b4a3": { "message": "Cwrs" },
   "course_to_do_bcbbab54": { "message": "{ course } – TASGAU I’W GWNEUD" },
@@ -84,6 +93,7 @@
   "edit_c5fbea07": { "message": "Golygu" },
   "edit_title_72e5a21e": { "message": "Golygu { title }" },
   "error_loading_grades_e0b38f4d": { "message": "Gwall wrth lwytho graddau" },
+  "error_loading_items_5218438e": { "message": "Gwall wrth lwytho eitemau" },
   "error_loading_more_items_3f109d9f": {
     "message": "Gwall wrth lwytho mwy o eitemau"
   },
@@ -91,6 +101,16 @@
     "message": "Gwall wrth lwytho eitemau blaenorol"
   },
   "excused_cf8792eb": { "message": "Wedi esgusodi" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Wedi methu cael cipolwg i’ch dyfodol"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Wedi methu cael cipolwg i’ch gorffennol"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Wedi methu cadw newidiadau ar { name }."
+  },
+  "failed_to_delete_name_bdd7b810": { "message": "Wedi methu dileu { name }." },
   "failed_to_delete_to_do_64edff49": {
     "message": "Wedi methu dileu tasg i’w gwneud"
   },
@@ -113,10 +133,11 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } eitem { items, plural,\n     =1 {wedi’i chwblhau}\n  other {eitem}\n} wedi’i chwblhau"
   },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Neidio i’r bar offer llywio"
+  },
+  "jump_to_today_254ccf41": { "message": "Neidio i Heddiw" },
   "late_2be42b88": { "message": "Yn Hwyr" },
-  "list_collapsed_9ac35920": { "message": "Rhestr wedi crebachu." },
-  "list_collapsed_dde87718": { "message": "Rhestr wedi crebachu" },
-  "list_expanded_efec2d0": { "message": "Rhestr wedi ehangu." },
   "load_more_a36f9cf9": { "message": "Llwytho mwy" },
   "load_prior_dates_f2b0f6f0": { "message": "Llwytho dyddiadau blaenorol" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -149,6 +170,9 @@
     "message": "Does dim Dyddiadau Erbyn wedi’u neilltuo"
   },
   "no_grade_3b4d7f3e": { "message": "Dim Gradd" },
+  "nothing_due_this_week_d45c9ef9": {
+    "message": "Dim byd â dyddiad ar gyfer yr wythnos hon"
+  },
   "nothing_for_now_e3e3ce2a": { "message": "Dim byd am nawr" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Does dim byd yma angen sylw."
@@ -171,9 +195,6 @@
     "message": "*Dim ond y cyfnod graddio diweddaraf sy’n ymddangos."
   },
   "opportunities_popup_f6703842": { "message": "neidlen cyfleoedd" },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } wedi dewis. Rhestr wedi crebachu."
-  },
   "optional_add_course_ef0d70fc": { "message": "Dewisol: Ychwanegu Cwrs" },
   "page_50c4823d": { "message": "Tudalen" },
   "peer_review_74f26a13": { "message": "Adolygiad gan Gyd-fyfyrwyr" },
@@ -185,9 +206,11 @@
   "previous_month_bb1e3c84": { "message": "Mis Blaenorol" },
   "pts_699bd9aa": { "message": "pwynt" },
   "quiz_e0dcce8f": { "message": "Cwis" },
+  "redo_363c58b7": { "message": "Ail-wneud" },
   "reminder_date_4564d12d": { "message": "Nodyn atgoffa: { date }" },
   "replies_4a8577c8": { "message": "Ateb" },
   "save_11a80ec3": { "message": "Cadw" },
+  "schedule_preview_3bcda153": { "message": "Trefnu Rhagolwg" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Sgroliwch i fyny i weld eich hanes!"
   },
@@ -215,6 +238,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Does dim pwyntiau’n gysylltiedig â’r eitem hon"
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "Does dim byd wedi’i gynllunio ar gyfer heddiw."
+  },
   "time_2b5aac58": { "message": "Amser" },
   "title_ee03d132": { "message": "Teitl" },
   "title_is_required_6ddcab69": { "message": "mae’n rhaid rhoi teitl" },
@@ -232,6 +258,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Defnyddiwch fysellau saeth i symud drwy''r opsiynau."
+  },
+  "view_next_week_7f61f755": { "message": "Gweld yr wythnos nesaf" },
+  "view_previous_week_6f83849f": { "message": "Gweld yr wythnos flaenorol" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Llywio amserlen wythnosol"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ddoe am { date }" },
   "yesterday_c6bd6abf": { "message": "Ddoe" },

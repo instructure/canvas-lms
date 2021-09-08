@@ -52,6 +52,10 @@ describe('StaffContactInfoLayout', () => {
     ...overrides
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders a row for each of the staff members passed', () => {
     const {getByText} = render(<StaffContactInfoLayout {...getProps()} />)
     expect(getByText('Mrs. Thompson')).toBeInTheDocument()
@@ -69,7 +73,7 @@ describe('StaffContactInfoLayout', () => {
     expect(container.firstChild).toBeEmpty()
   })
 
-  it('renders 2 loading skeletons if isLoading set', () => {
+  it('renders 3 loading skeletons if isLoading set', () => {
     const {getAllByText} = render(<StaffContactInfoLayout {...getProps({isLoading: true})} />)
     const skeletons = getAllByText('Loading staff...')
     expect(skeletons.length).toBe(2)

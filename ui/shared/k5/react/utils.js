@@ -24,6 +24,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
+import natcompare from '@canvas/util/natcompare'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -45,6 +46,7 @@ export const fetchGrades = (userId = 'self') =>
       // Grades are the same across all enrollments, just look at first one
       const hasGradingPeriods = course.has_grading_periods
       const enrollment = course.enrollments[0]
+      const showTotalsForAllGradingPeriods = enrollment.totals_for_all_grading_periods_option
       return {
         courseId: course.id,
         courseName: course.name,
@@ -53,6 +55,7 @@ export const fetchGrades = (userId = 'self') =>
         currentGradingPeriodId: enrollment.current_grading_period_id,
         currentGradingPeriodTitle: enrollment.current_grading_period_title,
         enrollmentType: enrollment.type,
+        finalGradesHidden: course.hide_final_grades,
         gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
         hasGradingPeriods,
         score: hasGradingPeriods
@@ -61,7 +64,14 @@ export const fetchGrades = (userId = 'self') =>
         grade: hasGradingPeriods
           ? enrollment.current_period_computed_current_grade
           : enrollment.computed_current_grade,
-        isHomeroom: course.homeroom_course
+        isHomeroom: course.homeroom_course,
+        showTotalsForAllGradingPeriods,
+        totalScoreForAllGradingPeriods: showTotalsForAllGradingPeriods
+          ? enrollment.computed_current_score
+          : null,
+        totalGradeForAllGradingPeriods: showTotalsForAllGradingPeriods
+          ? enrollment.computed_current_grade
+          : null
       }
     })
   )
@@ -208,7 +218,8 @@ export const getAssignmentGrades = data =>
         unread: a.submission?.read_state === 'unread',
         late: a.submission?.late,
         excused: a.submission?.excused,
-        missing: a.submission?.missing
+        missing: a.submission?.missing,
+        hasComments: !!a.submission?.submission_comments?.length
       }))
     )
     .flat(1)
@@ -222,6 +233,7 @@ export const getAssignmentGrades = data =>
    enrollment. */
 export const getAccountsFromEnrollments = enrollments =>
   enrollments
+    .filter(e => e.account)
     .reduce((acc, e) => {
       if (!acc.find(({id}) => id === e.account.id)) {
         acc.push({
@@ -266,14 +278,24 @@ export const fetchImportantInfos = courses =>
 
 /* Turns raw announcement data from API into usable object */
 export const parseAnnouncementDetails = (announcement, course) => {
-  if (!announcement) {
-    return {
-      courseId: course.id,
-      courseName: course.shortName,
-      courseUrl: course.href,
-      canEdit: course.canManage
-    }
+  const retval = {
+    courseId: course.id,
+    courseName: course.shortName,
+    courseUrl: course.href,
+    canEdit: course.canManage,
+    canReadAnnouncements: course.canReadAnnouncements,
+    published: course.published
   }
+  if (announcement) {
+    retval.announcement = transformAnnouncement(announcement)
+    retval.canEdit = announcement.permissions.update
+  }
+  return retval
+}
+
+export const transformAnnouncement = announcement => {
+  if (!announcement) return undefined
+
   let attachment
   if (announcement.attachments[0]) {
     attachment = {
@@ -282,20 +304,14 @@ export const parseAnnouncementDetails = (announcement, course) => {
       filename: announcement.attachments[0].filename
     }
   }
+
   return {
-    courseId: course.id,
-    courseName: course.shortName,
-    courseUrl: course.href,
-    canEdit: announcement.permissions.update,
-    published: course.published,
-    announcement: {
-      id: announcement.id,
-      title: announcement.title,
-      message: announcement.message,
-      url: announcement.html_url,
-      postedDate: announcement.posted_at,
-      attachment
-    }
+    id: announcement.id,
+    title: announcement.title,
+    message: announcement.message,
+    url: announcement.html_url,
+    postedDate: new Date(announcement.posted_at),
+    attachment
   }
 }
 
@@ -360,6 +376,38 @@ export const saveSelectedContexts = selected_contexts =>
     method: 'POST',
     params: {selected_contexts}
   }).then(data => data.json)
+
+export const parseObserverList = users =>
+  users.map(u => ({
+    id: u.id,
+    name: u.name,
+    avatarUrl: u.avatar_url
+  }))
+
+export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentUser) => {
+  const users = enrollments
+    .filter(e => e.observed_user)
+    .reduce((acc, e) => {
+      if (!acc.some(user => user.id === e.observed_user.id)) {
+        acc.push({
+          id: e.observed_user.id,
+          name: e.observed_user.name,
+          sortableName: e.observed_user.sortable_name,
+          avatarUrl: e.observed_user.avatar_url
+        })
+      }
+      return acc
+    }, [])
+    .sort((a, b) => natcompare.strings(a.sortableName, b.sortableName))
+  if (!isOnlyObserver) {
+    users.unshift({
+      id: currentUser.id,
+      name: currentUser.display_name,
+      avatarUrl: currentUser.avatar_image_url
+    })
+  }
+  return users
+}
 
 export const TAB_IDS = {
   HOME: 'tab-home',

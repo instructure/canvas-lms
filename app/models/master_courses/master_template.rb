@@ -141,7 +141,20 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     ["has_master_courses_templates", Shard.global_id_for(course_id)].cache_key
   end
 
+  def self.preload_is_master_course(courses)
+    return if courses.length == 1 # not worth preloading for 1; let the cache be used
+
+    has_mc_courses = self.where(course: courses).active.distinct.pluck(:course_id).to_set
+    courses.each do |course|
+      course.is_master_course = has_mc_courses.include?(course.id)
+    end
+  end
+
   def self.is_master_course?(course_id)
+    if course_id.is_a?(Course) && !course_id.is_master_course.nil?
+      return course_id.is_master_course
+    end
+
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
       self.where(:course_id => course_id).active.exists?

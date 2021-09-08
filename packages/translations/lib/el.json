@@ -17,6 +17,9 @@
     "announcements_a4b8ed4a": {
         "message": "Ανακοινώσεις"
     },
+    "apply_781a2546": {
+        "message": "Εφαρμογή"
+    },
     "apps_54d24a47": {
         "message": "Εφαρμογές"
     },
@@ -209,6 +212,9 @@
     "invalid_url_cbde79f": {
         "message": "Μη έγκυρο URL"
     },
+    "join_6cafecca": {
+        "message": "Συμμετοχή"
+    },
     "jump_to_today_254ccf41": {
         "message": "Μετάβαση στο Σήμερα"
     },
@@ -260,11 +266,11 @@
     "my_files_2f621040": {
         "message": "Τα αρχεία μου"
     },
+    "name_1aed4a1b": {
+        "message": "Όνομα"
+    },
     "new_13daf639": {
         "message": "Νέο"
-    },
-    "next_40e12421": {
-        "message": "Επόμενο"
     },
     "no_e16d9132": {
         "message": "μη δημοσιευμένο"
@@ -373,6 +379,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Μεταφόρτωση Αρχείου Πολυμέσων"
+    },
+    "uploading_19e8a4e7": {
+        "message": "Γίνεται φόρτωση..."
     },
     "url_22a5f3b8": {
         "message": "URL"

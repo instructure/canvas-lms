@@ -594,6 +594,24 @@ describe AccountsController do
           expect(@root_account.settings[:k5_accounts].length).to be 1
         end
       end
+
+      it "clears the cached k5_user value for all users when the setting is changed" do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
+        user_session(@user)
+        enable_cache(:redis_cache_store) do
+          Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            "cached!"
+          end
+          post 'update', params: toggle_k5_params(@account.id, true)
+          run_jobs
+          other_value = "something else"
+          cached_value = Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            other_value # only takes this value if the cache key is empty - i.e., its been cleared
+          end
+          expect(cached_value).to eq other_value
+        end
+      end
     end
 
     describe "quotas" do
@@ -932,6 +950,20 @@ describe AccountsController do
       expect(assigns[:js_env][:help_link_icon]).to eq 'paperclip'
     end
 
+    it "should order desc announcements" do
+      account_with_admin_logged_in
+      Timecop.freeze do
+        account_notification(account: @account, message: "Announcement 1", created_at: Time.zone.now - 1.minute)
+        @a1 = @announcement
+        account_notification(account: @account, message: "Announcement 2", created_at: Time.zone.now)
+        @a2 = @announcement
+      end
+      get 'settings', params: {account_id: @account.id}
+      expect(response).to be_successful
+      expect(assigns[:announcements].first.id).to eq @a1.id
+      expect(assigns[:announcements].last.id).to eq @a2.id
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -1181,6 +1213,24 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/#{@c1.id}/)
       expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "should not set pagination total_pages/last page link" do
+      admin_logged_in(@account)
+      get 'courses_api', params: {:account_id => @account.id, per_page: 1}
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+    end
+
+    it "should set pagination total_pages/last page link if account setting is set" do
+      @account.settings[:allow_last_page_on_account_courses] = true
+      @account.save!
+      admin_logged_in(@account)
+      get 'courses_api', params: {:account_id => @account.id, per_page: 1}
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
     end
 
     it "should properly remove sections from includes" do

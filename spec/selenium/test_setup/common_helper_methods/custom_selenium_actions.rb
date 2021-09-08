@@ -201,6 +201,15 @@ module CustomSeleniumActions
   end
 
   # Find an element with reference to another element, via xpath
+  def find_from_element_css(element, css)
+    stale_element_protection do
+      element.find_element(:css, css)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "No element with reference to given element was found. Please recheck the css : #{css}"
+  end
+
+  # Find an element with reference to another element, via xpath
   def find_from_element_fxpath(element, xpath)
     stale_element_protection do
       element.find_element(:xpath, xpath)
@@ -259,6 +268,10 @@ module CustomSeleniumActions
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
+  end
+
+  def get_parent_element(element)
+    driver.execute_script("return arguments[0].parentNode;", element)
   end
 
   def first_selected_option(select_element)

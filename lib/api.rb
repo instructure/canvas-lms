@@ -114,10 +114,12 @@ module Api
                       },
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
-                      'lti_context_id' => 'users.lti_context_id',
-                      'lti_user_id' => 'users.lti_context_id',
+                      'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
+                      'lti_1_1_id' => 'users.lti_context_id',
+                      'lti_1_3_id' => 'users.lti_id',
                       'uuid' => 'users.uuid' }.freeze,
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.uuid'].freeze,
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
         :scope => 'pseudonyms.account_id',
         :joins => :pseudonym }.freeze,
     'accounts' =>
@@ -370,7 +372,9 @@ module Api
     begin
       paginated = collection.paginate(pagination_args)
     rescue Folio::InvalidPage
-      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.build_page.ordinal_pages?
+      # Have to .try(:build_page) because we use some collections (like
+      # PaginatedCollection) that do not conform to the full will_paginate API.
+      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.try(:build_page)&.ordinal_pages?
         # for backwards compatibility we currently require returning [] for
         # pages beyond the end of an ordinal collection, rather than a 404.
         paginated = Folio::Ordinal::Page.create
@@ -520,7 +524,6 @@ module Api
     # checking on the context first can improve performance when checking many attachments for admins
     context&.grants_any_right?(
       user,
-      :manage_files,
       :read_as_admin,
       *RoleOverride::GRANULAR_FILE_PERMISSIONS
     ) || attachment&.grants_right?(user, nil, :download)

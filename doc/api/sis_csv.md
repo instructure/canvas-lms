@@ -277,7 +277,7 @@ recommended to omit this field over using fake email addresses for testing.</td>
 <td>status</td>
 <td>enum</td>
 <td>✓</td>
-<td></td>
+<td>✓</td>
 <td>active, deleted</td>
 </tr>
 </table>
@@ -516,7 +516,7 @@ specified the default term for the account will be used</td>
 <td></td>
 <td>✓</td>
 <td>The course start date. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ</td>
+YYYY-MM-DDTHH:MM:SSZ. To remove the start date pass "&lt;delete>"</td>
 </tr>
 <tr>
 <td>end_date</td>
@@ -524,7 +524,7 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td></td>
 <td>✓</td>
 <td>The course end date. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ</td>
+YYYY-MM-DDTHH:MM:SSZ. To remove the end date pass "&lt;delete>"</td>
 </tr>
 <tr>
 <td>course_format</td>

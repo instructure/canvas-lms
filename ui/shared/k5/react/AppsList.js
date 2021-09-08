@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import K5AppLink, {AppShape} from './K5AppLink'
 import LoadingWrapper from './LoadingWrapper'
 
-const AppsList = ({isLoading, apps}) => {
+const AppsList = ({isLoading, apps, courseId}) => {
   return (
     <View as="section">
       {(isLoading || apps.length > 0) && (
@@ -35,10 +35,13 @@ const AppsList = ({isLoading, apps}) => {
         </Heading>
       )}
       <LoadingWrapper
-        id="apps"
+        id={`apps-${courseId || 'dashboard'}`}
         isLoading={isLoading}
         display="inline-block"
-        skeletonsCount={3}
+        skeletonsNum={apps.length}
+        // apps.length is 0 when mounting, setting an initial skeletons number will avoid
+        // showing an empty page when loading
+        defaultSkeletonsNum={3}
         width="16em"
         height="2.875em"
         screenReaderLabel={I18n.t('Loading apps...')}
@@ -53,7 +56,8 @@ const AppsList = ({isLoading, apps}) => {
 
 AppsList.propTypes = {
   isLoading: PropTypes.bool,
-  apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired
+  apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired,
+  courseId: PropTypes.string
 }
 
 export default AppsList

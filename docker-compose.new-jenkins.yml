@@ -25,6 +25,12 @@ services:
       RSPEC_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
+
+      # rspecq
+      RSPECQ_REDIS_URL:
+      RSPECQ_FILE_SPLIT_THRESHOLD:
+      RSPECQ_MAX_REQUEUES:
+
       # rspec-parallel-log build
       RSPEC_LOG:
     # this will stop passenger from booting so the container isn't running anything at all once up

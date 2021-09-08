@@ -27,7 +27,7 @@ export const AssessmentRequest = {
       updatedAt
       user {
         _id
-        name
+        displayName: shortName
       }
       workflowState
     }
@@ -39,7 +39,7 @@ export const AssessmentRequest = {
     updatedAt: string,
     user: shape({
       id: string,
-      name: string
+      displayName: string
     }),
     workflowState: string
   }),
@@ -48,7 +48,7 @@ export const AssessmentRequest = {
     _id = '1',
     createdAt = '2021-06-23T12:37:45-06:00',
     updatedAt = '2021-06-25T09:24:21-06:00',
-    user = {_id: '1', name: 'Morty Smith', __typename: 'User'},
+    user = {_id: '1', displayName: 'Morty Smith', __typename: 'User'},
     workflowState = 'assigned'
   } = {}) => ({
     _id,

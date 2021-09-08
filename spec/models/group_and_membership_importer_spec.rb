@@ -68,6 +68,14 @@ describe GroupAndMembershipImporter do
       expect(progress.class_name).to eq 'Progress'
     end
 
+    it 'should update workflow_state to failed on error' do
+      import = GroupAndMembershipImporter.create!(group_category: gc1)
+      progress = Progress.new(context: gc1, tag: "course_group_import")
+      expect(import).to receive(:progress).exactly(3).and_return(progress)
+      import.fail_import('some error')
+      expect(import.reload.workflow_state).to eq 'failed'
+    end
+
     it 'should work' do
       progress = import_csv_data(%{user_id,group_name
                                    user_0, first group

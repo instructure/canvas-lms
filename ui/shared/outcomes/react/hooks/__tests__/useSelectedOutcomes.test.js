@@ -20,29 +20,26 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useSelectedOutcomes from '../useSelectedOutcomes'
 
 describe('useSelectedOutcomes', () => {
-  const initialState = {
-    1: {
-      _id: '11',
-      linkId: '1',
-      title: 'Outcome 11',
-      canUnlink: true
-    },
-    2: {
-      _id: '12',
-      linkId: '2',
-      title: 'Outcome 12',
-      canUnlink: false
-    }
-  }
+  const generateOutcomes = num =>
+    new Array(num).fill(0).reduce(
+      (acc, _val, ind) => ({
+        ...acc,
+        [`${ind + 1}`]: {
+          linkId: `${ind + 1}`
+        }
+      }),
+      {}
+    )
+  const initialState = new Set([...Object.keys(generateOutcomes(2))])
 
   test('should create custom hook with initial state', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    expect(result.current.selectedOutcomes).toBe(initialState)
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
   })
 
   test('should create custom hook with state equal to an empty object if no initial state provided', () => {
     const {result} = renderHook(() => useSelectedOutcomes())
-    expect(result.current.selectedOutcomes).toEqual({})
+    expect(result.current.selectedOutcomeIds).toEqual(new Set())
   })
 
   test('should calculate number of outcomes stored in the hook', () => {
@@ -53,36 +50,23 @@ describe('useSelectedOutcomes', () => {
   test('should clear state if clearSelectedOutcomes is called', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
     act(() => result.current.clearSelectedOutcomes())
-    expect(result.current.selectedOutcomes).toEqual({})
+    expect(result.current.selectedOutcomeIds).toEqual(new Set())
   })
 
   test('should toggle selected outcome in state if toggleSelectedOutcome is called', () => {
+    const outcome = generateOutcomes(1)[1]
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    act(() =>
-      result.current.toggleSelectedOutcomes({
-        _id: '13',
-        linkId: '3',
-        title: 'Outcome 13',
-        canUnlink: true
-      })
-    )
-    expect(result.current.selectedOutcomesCount).toBe(3)
-    act(() =>
-      result.current.toggleSelectedOutcomes({
-        _id: '13',
-        linkId: '3',
-        title: 'Outcome 13',
-        canUnlink: true
-      })
-    )
+    act(() => result.current.toggleSelectedOutcomes(outcome))
+    expect(result.current.selectedOutcomesCount).toBe(1)
+    act(() => result.current.toggleSelectedOutcomes(outcome))
     expect(result.current.selectedOutcomesCount).toBe(2)
   })
 
   test('should not change state if action type is missing or not defined', () => {
     const {result} = renderHook(() => useSelectedOutcomes(initialState))
-    act(() => result.current.dispatchSelectedOutcomes({}))
-    expect(result.current.selectedOutcomes).toBe(initialState)
-    act(() => result.current.dispatchSelectedOutcomes({type: 'not_defined_action_type'}))
-    expect(result.current.selectedOutcomes).toBe(initialState)
+    act(() => result.current.dispatchSelectedOutcomeIds({}))
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
+    act(() => result.current.dispatchSelectedOutcomeIds({type: 'not_defined_action_type'}))
+    expect(result.current.selectedOutcomeIds).toBe(initialState)
   })
 })

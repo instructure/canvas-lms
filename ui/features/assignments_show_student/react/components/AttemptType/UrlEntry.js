@@ -22,14 +22,15 @@ import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
-import React from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import React, {createRef} from 'react'
+import theme from '@instructure/canvas-theme'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine, IconExternalLinkLine, IconLinkLine} from '@instructure/ui-icons'
+import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -47,6 +48,8 @@ class UrlEntry extends React.Component {
     valid: false
   }
 
+  _urlInputRef = createRef()
+
   componentDidUpdate(prevProps) {
     if (
       this.props.submission?.submissionDraft?.url &&
@@ -62,6 +65,10 @@ class UrlEntry extends React.Component {
       this.updateInputState()
     }
     window.addEventListener('message', this.handleLTIURLs)
+
+    if (!isSubmitted(this.props.submission)) {
+      this._urlInputRef.current.focus()
+    }
   }
 
   updateInputState = () => {
@@ -151,49 +158,59 @@ class UrlEntry extends React.Component {
     }
 
     return (
-      <div style={inputStyle}>
-        <Flex justifyItems="center" alignItems="start">
-          <Flex.Item grow>
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>}
-              type="url"
-              placeholder={I18n.t('http://')}
-              value={this.state.url}
-              onBlur={this.handleBlur}
-              onChange={this.handleChange}
-              messages={this.state.messages}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            {this.state.valid && (
-              <Button
-                icon={IconEyeLine}
-                margin="0 0 0 x-small"
-                onClick={() => window.open(this.state.url)}
-                data-testid="preview-button"
-              >
-                <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
-              </Button>
-            )}
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
-            <MoreOptions
-              assignmentID={this.props.assignment._id}
-              courseID={this.props.assignment.env.courseId}
-              userID={this.props.assignment.env.currentUser.id}
-            />
-          </Flex.Item>
-        </Flex>
-      </div>
+      <Flex direction="column">
+        <Flex.Item overflowY="visible">
+          <div style={inputStyle}>
+            <Flex justifyItems="center" alignItems="start">
+              <Flex.Item grow>
+                <TextInput
+                  renderLabel={
+                    <ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>
+                  }
+                  type="url"
+                  placeholder={I18n.t('http://')}
+                  value={this.state.url}
+                  onBlur={this.handleBlur}
+                  onChange={this.handleChange}
+                  messages={this.state.messages}
+                  ref={this._urlInputRef}
+                  data-testid="url-input"
+                />
+              </Flex.Item>
+              <Flex.Item>
+                {this.state.valid && (
+                  <Button
+                    icon={IconEyeLine}
+                    margin="0 0 0 x-small"
+                    onClick={() => window.open(this.state.url)}
+                    data-testid="preview-button"
+                  >
+                    <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
+                  </Button>
+                )}
+              </Flex.Item>
+            </Flex>
+          </div>
+        </Flex.Item>
+        <Flex.Item margin="small 0" overflowY="visible">
+          <MoreOptions
+            assignmentID={this.props.assignment._id}
+            courseID={this.props.assignment.env.courseId}
+            userID={this.props.assignment.env.currentUser.id}
+          />
+        </Flex.Item>
+      </Flex>
     )
   }
 
   renderAttempt = () => (
     <View as="div" borderWidth="small" data-testid="url-entry" margin="0 0 medium 0">
       <Billboard
-        heading={I18n.t('Website Url')}
-        hero={<IconLinkLine color="brand" />}
+        heading={I18n.t('Enter Web URL')}
+        headingAs="h4"
+        headingLevel="h4"
         message={this.renderURLInput()}
+        theme={{backgroundColor: theme.variables.colors.porcelain}}
       />
     </View>
   )

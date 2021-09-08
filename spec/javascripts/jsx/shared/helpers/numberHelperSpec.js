@@ -45,7 +45,7 @@ QUnit.module('Number Helper Parse and Validate', {
   },
 
   teardown() {
-    I18nStubber.popFrame()
+    I18nStubber.clear()
     if (numberHelper._parseNumber.restore) {
       numberHelper._parseNumber.restore()
     }

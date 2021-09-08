@@ -239,8 +239,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def overdue_and_needs_submission?(strict=false)
-    (strict && self.untaken? && self.overdue?(true)) ||
-    (self.untaken? && self.end_at && self.end_at < Time.now)
+    return true if strict && self.untaken? && self.overdue?(true)
+
+    if self.untaken? && self.end_at && self.end_at < Time.zone.now
+      return true unless self.quiz&.timer_autosubmit_disabled?
+
+      self.end_at_without_time_limit && self.end_at_without_time_limit < Time.zone.now
+    else
+      false
+    end
   end
   alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
 
@@ -541,9 +548,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     @skip_after_save_score_updates = false
   end
 
-  def time_left
+  def time_left(hard: false)
     return unless end_at
-    (end_at - Time.zone.now).round
+    return (end_at - Time.zone.now).round unless hard && self.quiz&.timer_autosubmit_disabled?
+    return (end_at_without_time_limit - Time.zone.now).round if end_at_without_time_limit
   end
 
   def less_than_allotted_time?
@@ -555,8 +563,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def overdue?(strict=false)
-    now = (Time.now - ((strict ? 1 : 5) * 60))
-    !!(end_at && end_at.localtime < now)
+    now = (Time.zone.now - ((strict ? 1 : 5) * 60))
+    return false unless end_at && end_at.localtime < now
+
+    if self.quiz&.timer_autosubmit_disabled?
+      return false unless self.end_at_without_time_limit && self.end_at_without_time_limit.localtime < now
+    end
+
+    true
   end
 
   def extendable?

@@ -73,11 +73,12 @@ describe ApplicationHelper do
   context 'show_user_create_course_button' do
     before(:once) { @domain_root_account = Account.default }
 
-    it "should work (non-granular)" do
-      # deprecated; these settings (and applicable UI) will be removed
-      # with the addition of manage_courses granular permissions
+    it 'should work (non-granular)' do
       @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
-      @domain_root_account.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
+      @domain_root_account.update_attribute(
+        :settings,
+        { teachers_can_create_courses: true, students_can_create_courses: true }
+      )
       expect(show_user_create_course_button(nil)).to be_falsey
       user_factory
       expect(show_user_create_course_button(@user)).to be_falsey
@@ -87,7 +88,7 @@ describe ApplicationHelper do
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
 
-    it "should work for no enrollments setting (granular permissions)" do
+    it 'should work for no enrollments setting (granular permissions)' do
       @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
       @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
       expect(show_user_create_course_button(nil)).to be_falsey
@@ -95,22 +96,6 @@ describe ApplicationHelper do
       expect(show_user_create_course_button(@user)).to be_truthy
       course_with_teacher
       expect(show_user_create_course_button(@teacher)).to be_falsey
-      account_admin_user
-      expect(show_user_create_course_button(@admin)).to be_truthy
-    end
-
-    it "should grant right for manually created courses account (granular permissions)" do
-      @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
-      @domain_root_account.role_overrides.create!(
-        role: teacher_role,
-        permission: 'manage_courses_add',
-        enabled: true
-      )
-      expect(show_user_create_course_button(nil)).to be_falsey
-      user_factory
-      expect(show_user_create_course_button(@user)).to be_falsey
-      course_with_teacher
-      expect(show_user_create_course_button(@teacher)).to be_truthy
       account_admin_user
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
@@ -851,31 +836,19 @@ describe ApplicationHelper do
   end
 
   describe "file_access_user" do
-    context "not on the files domain" do
-      before :each do
-        @files_domain = false
-      end
-
-      it "should return @current_user" do
-        @current_user = user_model
-        expect(file_access_user).to be @current_user
-      end
+    it "returns access user from session" do
+      access_user = user_model
+      session['file_access_user_id'] = access_user.id
+      expect(file_access_user).to eql access_user
     end
 
-    context "on the files domain" do
-      before :each do
-        @files_domain = true
-      end
+    it "returns the current user" do
+      @current_user = user_model
+      expect(file_access_user).to eql @current_user
+    end
 
-      it "should return access user from session" do
-        access_user = user_model
-        session['file_access_user_id'] = access_user.id
-        expect(file_access_user).to eql access_user
-      end
-
-      it "should return nil if not set" do
-        expect(file_access_user).to be nil
-      end
+    it "returns nil if not set" do
+      expect(file_access_user).to be nil
     end
   end
 

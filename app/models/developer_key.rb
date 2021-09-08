@@ -61,6 +61,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_redirect_uris
   validate :validate_public_jwk
   validate :validate_lti_fields
+  validate :validate_flag_combinations
 
   attr_reader :private_jwk
 
@@ -290,7 +291,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)
@@ -345,6 +346,12 @@ class DeveloperKey < ActiveRecord::Base
     return unless self.is_lti_key?
     return if self.public_jwk.present? || self.public_jwk_url.present?
     errors.add(:lti_key, "developer key must have public jwk or public jwk url")
+  end
+
+  def validate_flag_combinations
+    return unless auto_expire_tokens && force_token_reuse
+
+    errors.add(:auto_expire_tokens, "auto_expire_tokens cannot be set if force_token_reuse is set")
   end
 
   def normalize_public_jwk_url

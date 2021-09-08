@@ -73,7 +73,9 @@ export const theme = {
     h3FontSize: '1.25rem',
     h3FontWeight: typography.fontWeightBold,
     h4FontSize: '1.25rem',
-    h4FontWeight: typography.fontWeightBold
+    h4FontWeight: typography.fontWeightBold,
+    h5FontSize: '1rem',
+    h5FontWeight: typography.fontWeightNormal
   },
   [Tabs.Tab.theme]: {
     fontSize: '1.25rem'
@@ -94,10 +96,6 @@ export const theme = {
   },
   [IconButton.theme]: {
     iconSizeMedium: '1.5rem'
-  },
-  [ToggleDetails.theme]: {
-    iconColor: colors.brand,
-    textColor: colors.textBrand
   }
 }
 
@@ -106,6 +104,14 @@ export const resourcesTheme = {
   [Heading.theme]: {
     h2FontSize: '1.375rem',
     h3FontSize: '1.125rem'
+  }
+}
+
+// A few overrides for the planner
+export const plannerTheme = {
+  [ToggleDetails.theme]: {
+    iconColor: colors.brand,
+    textColor: colors.textBrand
   }
 }
 

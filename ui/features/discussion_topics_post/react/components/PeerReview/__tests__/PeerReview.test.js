@@ -19,38 +19,100 @@
 import {PeerReview} from '../PeerReview'
 import React from 'react'
 import {render} from '@testing-library/react'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
 
 describe('PeerReview', () => {
-  it('displays the correct message when the review is assigned', () => {
-    const props = {
-      dueAtDisplayText: 'Jan 26 11:49pm',
-      revieweeName: 'Morty Smith',
-      reviewLinkUrl: '#',
-      workflowState: 'assigned'
-    }
-    const {getByText} = render(<PeerReview {...props} />)
+  describe('desktop', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        desktop: {maxWidth: '1000px'}
+      }))
+    })
+    it('displays the correct message when the review is assigned', () => {
+      const props = {
+        dueAtDisplayText: 'Jan 26 11:49pm',
+        revieweeName: 'Morty Smith',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
 
-    expect(getByText('Peer review for Morty Smith Due: Jan 26 11:49pm')).toBeTruthy()
+      expect(getByText('Peer review for Morty Smith Due: Jan 26 11:49pm')).toBeTruthy()
+    })
+
+    it('omits the due date when there is not one', () => {
+      const props = {
+        revieweeName: 'Morty Smith',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
+
+      expect(getByText('Peer review for Morty Smith')).toBeTruthy()
+    })
+
+    it('displays the correct message when the review is completed', () => {
+      const props = {
+        revieweeName: 'Rick Sanchez',
+        workflowState: 'completed'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
+
+      expect(getByText('You have completed a peer review for Rick Sanchez')).toBeTruthy()
+    })
   })
 
-  it('omits the due date when there is not one', () => {
-    const props = {
-      revieweeName: 'Morty Smith',
-      reviewLinkUrl: '#',
-      workflowState: 'assigned'
-    }
-    const {getByText} = render(<PeerReview {...props} />)
+  describe('mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1000px'}
+      }))
+    })
+    it('displays the correct message when the review is assigned', () => {
+      const props = {
+        dueAtDisplayText: '2021-07-03T23:59:59-06:00',
+        revieweeName: 'Morty Smith',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
 
-    expect(getByText('Peer review for Morty Smith')).toBeTruthy()
-  })
+      expect(getByText('Peer review due Jul 4')).toBeTruthy()
+    })
 
-  it('displays the correct message when the review is completed', () => {
-    const props = {
-      revieweeName: 'Rick Sanchez',
-      workflowState: 'completed'
-    }
-    const {getByText} = render(<PeerReview {...props} />)
+    it('omits the due date when there is not one', () => {
+      const props = {
+        revieweeName: 'Morty Smith',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
 
-    expect(getByText('You have completed a peer review for Rick Sanchez')).toBeTruthy()
+      expect(getByText('Peer review due')).toBeTruthy()
+    })
+
+    it('displays the correct message when the review is completed', () => {
+      const props = {
+        revieweeName: 'Rick Sanchez',
+        workflowState: 'completed'
+      }
+      const {getByText} = render(<PeerReview {...props} />)
+
+      expect(getByText('Completed')).toBeTruthy()
+    })
   })
 })

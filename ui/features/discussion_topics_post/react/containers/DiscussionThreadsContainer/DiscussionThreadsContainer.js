@@ -21,23 +21,31 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
+import {updateDiscussionTopicEntryCounts} from '../../utils/index'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 
 export const DiscussionThreadsContainer = props => {
-  const discussionTopic = props.discussionTopic
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {setPageNumber} = useContext(SearchContext)
+  const {searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
   const AUTO_MARK_AS_READ_DELAY = 3000
 
+  const updateCache = (cache, result) => {
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length
+    })
+  }
+
   const [updateDiscussionEntriesReadState] = useMutation(UPDATE_DISCUSSION_ENTRIES_READ_STATE, {
+    update: updateCache,
     onCompleted: () => {
       setOnSuccess(I18n.t('The replies were successfully updated'))
     },
@@ -49,10 +57,11 @@ export const DiscussionThreadsContainer = props => {
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
-        const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = discussionTopic.discussionEntriesConnection.nodes.filter(entry =>
-          entryIds.includes(entry._id)
+        let entryIds = Array.from(discussionEntriesToUpdate)
+        const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
+          entry => entryIds.includes(entry._id) && entry.read === false
         )
+        entryIds = entries.map(entry => entry._id)
         entries.forEach(entry => (entry.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({
@@ -73,7 +82,7 @@ export const DiscussionThreadsContainer = props => {
     }
   }, [
     discussionEntriesToUpdate,
-    discussionTopic.discussionEntriesConnection.nodes,
+    props.discussionTopic.discussionEntriesConnection.nodes,
     updateDiscussionEntriesReadState
   ])
 
@@ -89,26 +98,28 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <View as="div" margin="medium none none none">
-      {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
+    <View as="div">
+      {searchTerm && <SearchResultsCount resultsFound={props.discussionTopic.searchEntryCount} />}
+      {props.discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer
             key={`discussion-thread-${thread.id}`}
             discussionEntry={thread}
-            discussionTopic={discussionTopic}
+            discussionTopic={props.discussionTopic}
             markAsRead={markAsRead}
             onOpenIsolatedView={props.onOpenIsolatedView}
             goToTopic={props.goToTopic}
+            highlightEntryId={props.highlightEntryId}
           />
         )
       })}
-      {discussionTopic.entriesTotalPages > 1 && (
+      {props.discussionTopic.entriesTotalPages > 1 && (
         <ThreadPagination
           setPage={setPage}
           selectedPage={Math.ceil(
-            atob(discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
+            atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
           )}
-          totalPages={discussionTopic.entriesTotalPages}
+          totalPages={props.discussionTopic.entriesTotalPages}
         />
       )}
     </View>
@@ -118,7 +129,8 @@ export const DiscussionThreadsContainer = props => {
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
   onOpenIsolatedView: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string
 }
 
 export default DiscussionThreadsContainer

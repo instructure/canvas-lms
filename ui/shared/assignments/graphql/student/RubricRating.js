@@ -22,7 +22,7 @@ import {number, shape, string} from 'prop-types'
 export const RubricRating = {
   fragment: gql`
     fragment RubricRating on RubricRating {
-      id: _id
+      _id
       description
       long_description: longDescription
       points
@@ -39,6 +39,6 @@ export const RubricRating = {
 
 export const DefaultMocks = {
   RubricRating: () => ({
-    id: '1'
+    _id: '1'
   })
 }

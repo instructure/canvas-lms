@@ -32,6 +32,8 @@
   left_side_custom = nil
   right_side = (yield :right_side).presence
 
+  sticky_enabled = Account.site_admin.feature_enabled?(:sticky_left_nav)
+
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
     subnav_menu_text = t('Show Courses Navigation Menu') if active_path?('/courses')
@@ -107,24 +109,36 @@
           <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>">
             <i class="icon-hamburger" aria-hidden="true"></i>
           </button>
-          <div class="ic-app-crumbs">
         <% end %>
-        <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
-        <%= link_to course_path(id: @context.id), :class => "btn", :id => "back_to_subject" do %>
-          <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
-        <% end %>
-        <% else %>
-          <%= render_crumbs %>
-        <% end %>
-        <% if @show_left_side %></div><% end %>
-        <% if tutorials_enabled? %>
-          <div class="TutorialToggleHolder"></div>
-        <% end %>
-        <% if show_student_view_button? %>
-          <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
-            <i class="icon-student-view"></i> <%= t('Student View') %>
+
+        <div class="ic-app-crumbs">
+          <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
+            <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
+              <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
+            <% end %>
+          <% else %>
+            <%= render_crumbs %>
           <% end %>
+        </div>
+
+        <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
+          <span class="k5-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
         <% end %>
+
+        <div class="right-of-crumbs">
+          <% if tutorials_enabled? %>
+            <div class="TutorialToggleHolder"></div>
+          <% end %>
+          <% if show_immersive_reader? %>
+            <div id="immersive_reader_mount_point"></div>
+          <% end %>
+          <% if show_student_view_button? %>
+            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :role => 'complementary', :method => :post do %>
+              <i class="icon-student-view"></i> <%= t('Student View') %>
+            <% end %>
+          <% end %>
+        </div>
+
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
@@ -139,30 +153,36 @@
           end
         %>
         <div id="left-side"
-          class="ic-app-course-menu <%= list_view_class %>"
+          class="ic-app-course-menu <%= 'ic-sticky-on ' if sticky_enabled %><%= list_view_class %>"
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
-          <% if left_side %>
-            <%= left_side %>
-          <% else %>
-            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-              <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
-                <%= t("Switch Group")%>
-                <i class="icon-mini-arrow-down"></i>
-              </a>
-              <ul class="al-options">
-                <% @context.group_category.groups.active.by_name.each do |group| %>
-                  <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
-                <% end %>
-              </ul>
+          <% if sticky_enabled %>
+            <div class="ic-sticky-frame">
+          <% end %>
+            <% if left_side %>
+              <%= left_side %>
+            <% else %>
+              <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
+                <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
+                  <%= t("Switch Group")%>
+                  <i class="icon-mini-arrow-down"></i>
+                </a>
+                <ul class="al-options">
+                  <% @context.group_category.groups.active.by_name.each do |group| %>
+                    <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
+                  <% end %>
+                </ul>
 
-              <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
-              <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
+                <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
+                <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
+              <% end %>
+              <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
+                <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
+              <% end %>
+              <%= section_tabs %>
             <% end %>
-            <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
-              <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
-            <% end %>
-            <%= section_tabs %>
+          <% if sticky_enabled %>
+            </div>
           <% end %>
         </div>
       <% end %>

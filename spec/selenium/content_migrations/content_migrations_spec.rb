@@ -282,7 +282,7 @@ describe "content migrations", :non_parallel do
       Account.clear_special_account_cache!(true)
       @copy_from = course_factory
       @copy_from.update_attribute(:name, 'copy from me')
-      data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
+      data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test_smaller.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
       cm.migration_settings = {:import_immediately => true,
@@ -290,8 +290,8 @@ describe "content migrations", :non_parallel do
       cm.skip_job_progress = true
       cm.save!
 
-      att = attachment_model(:context => cm, :filename => "cc_full_test.zip",
-                             :uploaded_data => stub_file_data("cc_full_test.zip", data, "application/zip"))
+      att = attachment_model(:context => cm, :filename => "cc_full_test_smaller.zip",
+                             :uploaded_data => stub_file_data("cc_full_test_smaller.zip", data, "application/zip"))
       cm.attachment = att
       cm.save!
 
@@ -419,39 +419,59 @@ describe "content migrations", :non_parallel do
       expect(divs[0].text).to eq enrolled_course.name
     end
 
-    it "should copy all content from a course", priority: "1", test_id: 126677 do
-      skip unless Qti.qti_enabled?
-      visit_page
+    context "Qti Enabled" do
+      before do
+        data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
 
-      select_migration_type
-      wait_for_ajaximations
+        cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
+        cm.migration_settings = {:import_immediately => true,
+                                 :migration_ids_to_import => {:copy => {:everything => true}}}
+        cm.skip_job_progress = true
+        cm.save!
 
-      click_option('#courseSelect', @copy_from.id.to_s, :value)
-      ff('[name=selective_import]')[0].click
-      submit
+        att = attachment_model(:context => cm, :filename => "cc_full_test.zip",
+                               :uploaded_data => stub_file_data("cc_full_test.zip", data, "application/zip"))
+        cm.attachment = att
+        cm.save!
 
-      run_migration
+        worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(cm.migration_type).settings['worker'])
+        worker_class.new(cm.id).perform
+      end
 
-      expect(@course.attachments.count).to eq 10
-      expect(@course.discussion_topics.count).to eq 2
-      expect(@course.context_modules.count).to eq 3
-      expect(@course.context_external_tools.count).to eq 2
-      expect(@course.quizzes.count).to eq 1
-      expect(@course.quizzes.first.quiz_questions.count).to eq 11
-    end
+      it "should copy all content from a course", priority: "1", test_id: 126677 do
+        skip unless Qti.qti_enabled?
+        visit_page
 
-    it "should selectively copy content", priority: "1", test_id: 126682 do
-      skip unless Qti.qti_enabled?
-      visit_page
+        select_migration_type
+        wait_for_ajaximations
 
-      select_migration_type
-      wait_for_ajaximations
+        click_option('#courseSelect', @copy_from.id.to_s, :value)
+        ff('[name=selective_import]')[0].click
+        submit
 
-      click_option('#courseSelect', @copy_from.id.to_s, :value)
-      ff('[name=selective_import]')[1].click
-      submit
+        run_migration
 
-      test_selective_content(@copy_from)
+        expect(@course.attachments.count).to eq 10
+        expect(@course.discussion_topics.count).to eq 2
+        expect(@course.context_modules.count).to eq 3
+        expect(@course.context_external_tools.count).to eq 2
+        expect(@course.quizzes.count).to eq 1
+        expect(@course.quizzes.first.quiz_questions.count).to eq 11
+      end
+
+      it "should selectively copy content", priority: "1", test_id: 126682 do
+        skip unless Qti.qti_enabled?
+        visit_page
+
+        select_migration_type
+        wait_for_ajaximations
+
+        click_option('#courseSelect', @copy_from.id.to_s, :value)
+        ff('[name=selective_import]')[1].click
+        submit
+
+        test_selective_content(@copy_from)
+      end
     end
 
     context "with selectable_outcomes_in_course_copy enabled" do

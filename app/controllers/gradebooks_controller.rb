@@ -413,6 +413,7 @@ class GradebooksController < ApplicationController
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
+      enhanced_gradebook_filters: Account.site_admin.feature_enabled?(:enhanced_gradebook_filters),
       enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
       enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
       export_gradebook_csv_url: course_gradebook_csv_url,
@@ -425,6 +426,7 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      gradebook_assignment_search_and_redesign: Account.site_admin.feature_enabled?(:gradebook_assignment_search_and_redesign),
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,
@@ -447,6 +449,7 @@ class GradebooksController < ApplicationController
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
+      remove_gradebook_student_search_delay_enabled: Account.site_admin.feature_enabled?(:remove_gradebook_student_search_delay),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       setting_update_url: api_v1_course_settings_url(@context),
@@ -465,7 +468,7 @@ class GradebooksController < ApplicationController
     }
 
     js_env({
-      GRADEBOOK_OPTIONS: gradebook_options,
+      GRADEBOOK_OPTIONS: gradebook_options
     })
   end
 
@@ -877,10 +880,11 @@ class GradebooksController < ApplicationController
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: true,
-          help_url: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader",
+          help_url: I18n.t(:'community.instructor_guide_speedgrader'),
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
-          media_comment_asset_string: @current_user.asset_string
+          media_comment_asset_string: @current_user.asset_string,
+          late_policy: @context.late_policy&.as_json(include_root: false)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

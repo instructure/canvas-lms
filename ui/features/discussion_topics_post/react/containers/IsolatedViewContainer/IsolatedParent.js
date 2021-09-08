@@ -16,20 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import {BackButton} from '../../components/BackButton/BackButton'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import I18n from 'i18n!discussion_topics_post'
-import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
+import I18n from 'i18n!discussion_posts'
+import {isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {PostContainer} from '../PostContainer/PostContainer'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
-import theme from '@instructure/canvas-theme'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
+import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import {
+  UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
+  UPDATE_DISCUSSION_THREAD_READ_STATE
+} from '../../../graphql/Mutations'
+import {useMutation, useApolloClient} from 'react-apollo'
+import {View} from '@instructure/ui-view'
 
 export const IsolatedParent = props => {
+  const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
+    UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
+  )
+
+  const client = useApolloClient()
+  const resetDiscussionCache = () => {
+    client.resetStore()
+  }
+
+  const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
+    update: resetDiscussionCache
+  })
+
   const [isEditing, setIsEditing] = useState(false)
   const threadActions = []
 
@@ -37,8 +61,8 @@ export const IsolatedParent = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
-        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        authorName={props.discussionEntry.author.displayName}
+        delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
       />
@@ -58,7 +82,7 @@ export const IsolatedParent = props => {
             props.onToggleRating()
           }
         }}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -71,13 +95,12 @@ export const IsolatedParent = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
-        )}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         isReadOnly={!props.RCEOpen}
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}
@@ -86,75 +109,138 @@ export const IsolatedParent = props => {
   }
 
   return (
-    <>
-      {props.discussionEntry.parent && (
-        <div
-          style={{
-            paddingLeft: '0.50rem',
-            paddingRight: '0.50rem',
-            paddingBottom: '0.50rem'
-          }}
-        >
-          <BackButton
-            onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
-          />
-        </div>
-      )}
-      <div
-        style={{
-          marginLeft: theme.variables.spacing.medium,
-          paddingLeft: '0.75rem',
-          paddingRight: '0.75rem',
-          paddingBottom: '0.375rem'
-        }}
-      >
-        <Highlight isHighlighted={props.isHighlighted}>
-          <Flex>
-            <Flex.Item shouldShrink shouldGrow>
-              <PostMessageContainer
-                discussionEntry={props.discussionEntry}
-                isIsolatedView
-                threadActions={threadActions}
-                isEditing={isEditing}
-                onCancel={() => {
-                  setIsEditing(false)
-                }}
-                onSave={message => {
-                  if (props.onSave) {
-                    props.onSave(props.discussionEntry, message)
-                    setIsEditing(false)
-                  }
-                }}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'small',
+          padding: 'x-small'
+        },
+        desktop: {
+          textSize: 'medium',
+          padding: 'x-small medium'
+        }
+      }}
+      render={responsiveProps => (
+        <>
+          {props.discussionEntry.parentId && (
+            <View as="div" padding="small none none small">
+              <BackButton
+                onClick={() =>
+                  props.onOpenIsolatedView(
+                    props.discussionEntry.parentId,
+                    props.discussionEntry.rootEntryId,
+                    false
+                  )
+                }
               />
-            </Flex.Item>
-            {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
-                <ThreadActions
-                  id={props.discussionEntry.id}
-                  isUnread={!props.discussionEntry.read}
-                  onToggleUnread={props.onToggleUnread}
-                  onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
-                  onEdit={
-                    props.discussionEntry.permissions?.update
-                      ? () => {
-                          setIsEditing(true)
+            </View>
+          )}
+          {props.discussionEntry.parentId && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+            <Alert
+              variant="warning"
+              renderCloseButtonLabel="Close"
+              margin="small"
+              onDismiss={() => {
+                updateIsolatedViewDeeplyNestedAlert({
+                  variables: {
+                    isolatedViewDeeplyNestedAlert: false
+                  }
+                })
+
+                ENV.should_show_deeply_nested_alert = false
+              }}
+            >
+              <Text size={responsiveProps.textSize}>
+                {I18n.t(
+                  'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+                )}
+              </Text>
+            </Alert>
+          )}
+          <View as="div" padding={responsiveProps.padding}>
+            <Highlight isHighlighted={props.isHighlighted}>
+              <Flex padding="small">
+                <Flex.Item shouldShrink shouldGrow>
+                  <PostContainer
+                    isTopic={false}
+                    postUtilities={
+                      <ThreadActions
+                        id={props.discussionEntry.id}
+                        isUnread={!props.discussionEntry.read}
+                        onToggleUnread={props.onToggleUnread}
+                        onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
+                        onEdit={
+                          props.discussionEntry.permissions?.update
+                            ? () => {
+                                setIsEditing(true)
+                              }
+                            : null
                         }
-                      : null
-                  }
-                  goToTopic={props.goToTopic}
-                  onOpenInSpeedGrader={
-                    props.discussionTopic.permissions?.speedGrader
-                      ? props.onOpenInSpeedGrader
-                      : null
-                  }
-                />
-              </Flex.Item>
-            )}
-          </Flex>
-          {props.children}
-        </Highlight>
-      </div>
-    </>
+                        goToTopic={props.goToTopic}
+                        onOpenInSpeedGrader={
+                          props.discussionTopic.permissions?.speedGrader
+                            ? props.onOpenInSpeedGrader
+                            : null
+                        }
+                        onMarkThreadAsRead={readState =>
+                          updateDiscussionThreadReadState({
+                            variables: {
+                              discussionEntryId: props.discussionEntry.rootEntryId
+                                ? props.discussionEntry.rootEntryId
+                                : props.discussionEntry.id,
+                              read: readState
+                            }
+                          })
+                        }
+                      />
+                    }
+                    author={props.discussionEntry.author}
+                    message={props.discussionEntry.message}
+                    isEditing={isEditing}
+                    onSave={message => {
+                      if (props.onSave) {
+                        props.onSave(props.discussionEntry, message)
+                        setIsEditing(false)
+                      }
+                    }}
+                    onCancel={() => setIsEditing(false)}
+                    isIsolatedView
+                    editor={props.discussionEntry.editor}
+                    isUnread={!props.discussionEntry.read}
+                    isForcedRead={props.discussionEntry.forcedReadState}
+                    timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.createdAt
+                    )}
+                    editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.updatedAt
+                    )}
+                    lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.lastReply?.createdAt
+                    )}
+                    deleted={props.discussionEntry.deleted}
+                    isTopicAuthor={isTopicAuthor(
+                      props.discussionTopic.author,
+                      props.discussionEntry.author
+                    )}
+                  >
+                    {threadActions.length > 0 && (
+                      <View as="div" padding="x-small none none">
+                        <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>
+                          {threadActions}
+                        </ThreadingToolbar>
+                      </View>
+                    )}
+                  </PostContainer>
+                </Flex.Item>
+              </Flex>
+              {props.children}
+            </Highlight>
+          </View>
+        </>
+      )}
+    />
   )
 }
 

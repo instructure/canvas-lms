@@ -1,5 +1,6 @@
 ---
 canvas_k6_theme:
+  type: setting
   state: allowed
   display_name: Canvas Elementary Theming
   description: |-

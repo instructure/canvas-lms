@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "You have been mentioned in %{discussion_topic}: %{course}", discussion_topic: asset.discussion_topic.title, course: asset.context.name %>
+  <%= t :subject, "%{user} mentioned you in %{discussion_topic}, %{course}", discussion_topic: asset.discussion_topic.title, course: asset.context.name, :user => asset.discussion_entry.user.short_name %>
 <% end %>
 
-<%= t :body, "%{user} mentioned you in a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.discussion_entry.user.short_name, :discussion_topic => asset.discussion_topic.title, :course => asset.context.name %>
+<%= t :body, "%{user} mentioned you in %{discussion_topic}, %{course}:", :user => asset.discussion_entry.user.short_name, :discussion_topic => asset.discussion_topic.title, :course => asset.context.name %>
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 

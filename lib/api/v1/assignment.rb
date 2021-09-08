@@ -227,7 +227,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
-      tool_attributes.merge!('custom' => assignment.primary_resource_link&.custom)
+      tool_attributes.merge!('custom_params' => assignment.primary_resource_link&.custom)
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -934,8 +934,15 @@ module Api::V1::Assignment
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
-    custom_params = assignment_params.dig(:external_tool_tag_attributes, :custom_params)
-    assignment.lti_resource_link_custom_params = custom_params if custom_params.present?
+    external_tool_tag_attributes = assignment_params.dig(:external_tool_tag_attributes)
+    if external_tool_tag_attributes&.include?(:custom_params)
+      custom_params = external_tool_tag_attributes[:custom_params]
+      unless custom_params_valid?(custom_params)
+        assignment.errors.add(:custom_params, :invalid, message: I18n.t("Invalid custom parameters. Please ensure they match the LTI 1.3 specification."))
+        return invalid
+      end
+      assignment.lti_resource_link_custom_params = custom_params.presence&.to_unsafe_h || {}
+    end
 
     {
       assignment: assignment,
@@ -992,6 +999,11 @@ module Api::V1::Assignment
     overrides = [] if !overrides && assignment_params.key?(:assignment_overrides)
     assignment_params.delete(:assignment_overrides)
     overrides
+  end
+
+  def custom_params_valid?(custom_params)
+    custom_params.blank? ||
+      (custom_params.respond_to?(:to_unsafe_h) && Lti::DeepLinkingUtil.valid_custom_params?(custom_params.to_unsafe_h))
   end
 
   def update_parameters_valid?(assignment, assignment_params, user, overrides)

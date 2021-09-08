@@ -20,13 +20,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {fireEvent, waitFor} from '@testing-library/react'
 
-import GradebookSettingsModal from 'ui/features/gradebook/react/default_gradebook/components/GradebookSettingsModal.js'
-import * as GradebookSettingsModalApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
+import GradebookSettingsModal from 'ui/features/gradebook/react/default_gradebook/components/GradebookSettingsModal'
+import * as GradebookSettingsModalApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import CourseSettings from 'ui/features/gradebook/react/default_gradebook/CourseSettings/index.js'
-import PostPolicies from 'ui/features/gradebook/react/default_gradebook/PostPolicies/index.js'
-import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi.js'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import CourseSettings from 'ui/features/gradebook/react/default_gradebook/CourseSettings/index'
+import PostPolicies from 'ui/features/gradebook/react/default_gradebook/PostPolicies/index'
+import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import {defaultColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors'
 
 QUnit.module('GradebookSettingsModal', suiteHooks => {
   let $container
@@ -85,19 +86,30 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     postPolicy = {postManually: true}
 
     props = {
+      allowSortingByModules: true,
+      allowViewUngradedAsZero: true,
       anonymousAssignmentsPresent: false,
       courseFeatures: {
         finalGradeOverrideEnabled: true
       },
       courseId: '1201',
       courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
+      gradebookIsEditable: true,
       gradedLateSubmissionsExist: true,
       locale: 'en',
       onClose: sinon.spy(),
       onCourseSettingsUpdated: sinon.spy(),
       onEntered: sinon.spy(),
       onLatePolicyUpdate() {},
-      postPolicies: new PostPolicies(gradebook)
+      onViewOptionsUpdated: sinon.stub().resolves(),
+      postPolicies: new PostPolicies(gradebook),
+      viewOptions: {
+        columnSortSettings: {criterion: 'points', direction: 'ascending'},
+        showNotes: true,
+        showUnpublishedAssignments: true,
+        statusColors: {...defaultColors},
+        viewUngradedAsZero: true
+      }
     }
 
     fetchLatePolicyPromise = {}
@@ -252,6 +264,10 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     return findTab('Advanced')
   }
 
+  function getViewOptionsTab() {
+    return findTab('View Options')
+  }
+
   function findCheckbox(label) {
     const $modal = getModalElement()
     const $label = [...$modal.querySelectorAll('label')].find($el =>
@@ -274,6 +290,10 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
   function getAllowFinalGradeOverrideCheckbox() {
     return findCheckbox('Allow final grade override')
+  }
+
+  function getShowNotesCheckbox() {
+    return findCheckbox('Notes')
   }
 
   function getUpdateButton() {
@@ -347,6 +367,19 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   })
 
+  QUnit.module('"View Options" tab', () => {
+    test('is present when the viewOptions prop is present', async () => {
+      await mountOpenAndLoad()
+      ok(getViewOptionsTab())
+    })
+
+    test('is not present when the viewOptions prop is not present', async () => {
+      delete props.viewOptions
+      await mountOpenAndLoad()
+      notOk(getViewOptionsTab())
+    })
+  })
+
   QUnit.module('"Update" button', () => {
     test('is disabled when no settings have been changed', async () => {
       await mountOpenAndLoad()
@@ -401,6 +434,19 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       const $input = getModalElement().querySelector('#missing-submission-grade')
       fireEvent.change($input, {target: {value: 'abc'}})
       fireEvent.blur($input)
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    test('is enabled when a view option setting has been changed', async () => {
+      await mountOpenLoadAndSelectTab('View Options')
+      getShowNotesCheckbox().click()
+      strictEqual(getUpdateButton().disabled, false)
+    })
+
+    test('is disabled when a view option setting change was reverted', async () => {
+      await mountOpenLoadAndSelectTab('View Options')
+      getShowNotesCheckbox().click()
+      getShowNotesCheckbox().click()
       strictEqual(getUpdateButton().disabled, true)
     })
 
@@ -488,6 +534,14 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           getUpdateButton().click()
           strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 1)
         })
+      })
+
+      test('calls the .onViewOptionsUpdated prop when changed', async () => {
+        props.onViewOptionsUpdated.resolves()
+        await mountOpenLoadAndSelectTab('View Options')
+        getShowNotesCheckbox().click()
+        getUpdateButton().click()
+        strictEqual(props.onViewOptionsUpdated.callCount, 1)
       })
     })
   })
@@ -796,6 +850,80 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   })
 
+  QUnit.module('when updating View Options', hooks => {
+    hooks.beforeEach(() => {
+      sandbox.spy(FlashAlert, 'showFlashAlert')
+
+      return mountOpenLoadAndSelectTab('View Options').then(() => {
+        getShowNotesCheckbox().click()
+      })
+    })
+
+    hooks.afterEach(() => {
+      FlashAlert.destroyContainer()
+    })
+
+    test('disables the "Update" button while the request is pending', () => {
+      getUpdateButton().click()
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    QUnit.module('when the request succeeds', contextHooks => {
+      contextHooks.beforeEach(() => {
+        getUpdateButton().click()
+        return waitForModalClosed()
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "success" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'success')
+      })
+
+      test('calls the onViewOptionsUpdated callback prop', () => {
+        strictEqual(props.onViewOptionsUpdated.callCount, 1)
+      })
+
+      test('includes the updated settings when calling onCourseSettingsUpdated', () => {
+        const [viewOptions] = props.onViewOptionsUpdated.lastCall.args
+        deepEqual(viewOptions, {...props.viewOptions, showNotes: false})
+      })
+
+      test('closes the modal', () => {
+        notOk(getModalElement())
+      })
+
+      test('retains the view options in their saved state when the modal opens again', async () => {
+        await mountOpenLoadAndSelectTab('View Options')
+        strictEqual(getShowNotesCheckbox().checked, false)
+      })
+    })
+
+    QUnit.module('when the request fails', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.onViewOptionsUpdated.rejects(new Error('request failed'))
+        getUpdateButton().click()
+        return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "error" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
+
+      test('does not close the modal', () => {
+        ok(getModalElement())
+      })
+    })
+  })
+
   QUnit.module('"Cancel" button', () => {
     function getCancelButton() {
       return getModalElement().querySelector('#gradebook-settings-cancel-button')
@@ -807,6 +935,17 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         getCancelButton().click()
         await waitForModalClosed()
         notOk(getModalElement())
+      })
+
+      test('restores the View Options settings to a pristine state', async () => {
+        props.viewOptions.showNotes = false
+        await mountOpenLoadAndSelectTab('View Options')
+        getShowNotesCheckbox().click()
+        getCancelButton().click()
+        await waitForModalClosed()
+
+        await mountOpenLoadAndSelectTab('View Options')
+        strictEqual(getShowNotesCheckbox().checked, false)
       })
     })
   })

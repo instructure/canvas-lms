@@ -19,14 +19,24 @@
 import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import moment from 'moment'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const moonwalk = tz.parse('1969-07-21T02:56:00Z')
+const switchToDetroit = () => tzInTest.configureAndRestoreLater({
+  tz: timezone(detroit, 'America/Detroit'),
+  tzData: {
+    'America/Detroit': detroit
+  },
+  formats: getI18nFormats()
+})
 
 QUnit.module('processTimeOptions', {
   setup() {
@@ -253,25 +263,24 @@ test('should set suggest text', function() {
 
 QUnit.module('parseValue', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.$field = $('<input type="text" name="due_at">')
     this.field = new DatetimeField(this.$field, {})
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
 test('sets @fudged according to browser (fudged) timezone', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+  switchToDetroit()
   this.$field.val(tz.format(moonwalk, '%b %-e, %Y at %-l:%M%P'))
   this.field.parseValue()
   equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(moonwalk))
 })
 
 test('sets @datetime according to profile timezone', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+  switchToDetroit()
   this.$field.val(tz.format(moonwalk, '%b %-e, %Y at %-l:%M%P'))
   this.field.parseValue()
   equal(+this.field.datetime, +moonwalk)
@@ -355,8 +364,7 @@ test('interprets time-only fields as occurring on implicit date if set', functio
 
 QUnit.module('updateData', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
+    switchToDetroit()
     this.$field = $('<input type="text" name="due_at">')
     this.$field.val('Jan 1, 1970 at 12:01am')
     this.field = new DatetimeField(this.$field, {})
@@ -365,7 +373,7 @@ QUnit.module('updateData', {
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -403,7 +411,13 @@ test('sets time-* to fudged, 12-hour values', function() {
 })
 
 test('sets time-* to fudged, 24-hour values', function() {
-  tz.changeLocale(portuguese, 'pt_PT', 'pt')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit', portuguese, 'pt_PT'),
+    tzData: {
+      'America/Detroit': detroit,
+    },
+    momentLocale: 'pt'
+  })
   this.field.updateData()
   equal(this.$field.data('time-hour'), '21')
   equal(this.$field.data('time-minute'), '56')
@@ -536,15 +550,17 @@ test('does not reflash same suggest text when key presses do not change anything
 
 QUnit.module('formatSuggest', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
+    I18nStubber.pushFrame()
+    I18nStubber.useInitialTranslations()
+    switchToDetroit()
     this.$field = $('<input type="text" name="due_at">')
     this.$field.val('Jul 20, 1969 at 9:56pm')
     this.field = new DatetimeField(this.$field, {})
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
+    I18nStubber.clear()
   }
 })
 
@@ -573,19 +589,31 @@ test('returns time only if @showDate false', function() {
 })
 
 test('localizes formatting of dates and times', function() {
-  tz.changeLocale(portuguese, 'pt_PT', 'pt')
-  I18nStubber.pushFrame()
+  const formats = {'date.formats.full_with_weekday': '%a, %-d %b %Y %k:%M'}
+
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit', portuguese, 'pt_PT'),
+    tzData: {
+      'America/Detroit': detroit,
+    },
+    momentLocale: 'pt',
+    formats
+  })
   I18nStubber.setLocale('pt_PT')
-  I18nStubber.stub('pt_PT', {'date.formats.full_with_weekday': '%a, %-d %b %Y %k:%M'})
+  I18nStubber.stub('pt_PT', formats)
   equal(this.field.formatSuggest(), 'Dom, 20 Jul 1969 21:56')
-  I18nStubber.popFrame()
 })
 
 QUnit.module('formatSuggestCourse', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
-    tz.preload('America/Juneau', juneau)
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Detroit': detroit,
+        'America/Juneau': juneau,
+      },
+      formats: getI18nFormats(),
+    })
     fakeENV.setup({TIMEZONE: 'America/Detroit', CONTEXT_TIMEZONE: 'America/Juneau'})
     this.$field = $('<input type="text" name="due_at">')
     this.$field.val('Jul 20, 1969 at 9:56pm')
@@ -594,7 +622,7 @@ QUnit.module('formatSuggestCourse', {
 
   teardown() {
     fakeENV.teardown()
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -682,14 +710,20 @@ test('passes through 24 and greater', function() {
 
 QUnit.module('setFormattedDatetime', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Detroit': detroit
+      },
+      formats: getI18nFormats(),
+    })
+
     this.$field = $('<input type="text" name="due_at">')
     this.field = new DatetimeField(this.$field, {})
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
@@ -719,25 +753,33 @@ test('formats value into val() according to format parameter', function() {
 })
 
 test('localizes value', function() {
-  tz.changeLocale(portuguese, 'pt_PT', 'pt')
-  I18nStubber.pushFrame()
-  I18nStubber.setLocale('pt_PT')
-  I18nStubber.stub('pt_PT', {'date.formats.full': '%-d %b %Y %-k:%M'})
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit', portuguese, 'pt_PT'),
+    tzData: {
+      'America/Detroit': detroit,
+    },
+    momentLocale: 'pt',
+    formats: {'date.formats.full': '%-d %b %Y %-k:%M'}
+  })
   this.field.setFormattedDatetime(moonwalk, 'date.formats.full')
   equal(this.$field.val(), '20 Jul 1969 21:56')
-  I18nStubber.popFrame()
 })
 
 QUnit.module('setDate/setTime/setDatetime', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Detroit': detroit
+      },
+      formats: getI18nFormats()
+    })
     this.$field = $('<input type="text" name="due_at">')
     this.field = new DatetimeField(this.$field, {})
   },
 
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 

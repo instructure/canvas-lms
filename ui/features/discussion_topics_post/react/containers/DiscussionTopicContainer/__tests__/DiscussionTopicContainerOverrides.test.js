@@ -18,12 +18,35 @@
 
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
+import {ApolloProvider} from 'react-apollo'
 import React from 'react'
+import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {Discussion} from '../../../../graphql/Discussion'
+
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
 
 describe('DiscussionTopicContainer', () => {
   const setup = props => {
-    return render(<DiscussionTopicContainer {...props} />)
+    return render(
+      <ApolloProvider client={mswClient}>
+        <DiscussionTopicContainer {...props} />
+      </ApolloProvider>
+    )
   }
 
   it('Renders the correct number of assignment overrides', async () => {

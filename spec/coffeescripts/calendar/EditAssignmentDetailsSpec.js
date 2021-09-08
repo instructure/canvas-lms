@@ -20,22 +20,41 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails.js'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
-import tz from '@canvas/timezone'
+import timezone from 'timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const fixtures = $('#fixtures')
 
 QUnit.module('EditAssignmentDetails', {
   setup() {
-    this.snapshot = tz.snapshot()
     this.$holder = $('<table />').appendTo(document.getElementById('fixtures'))
     this.event = {
       possibleContexts() {
-        return []
+        return [
+          {
+            name: 'k5 Course',
+            asset_string: 'course_1',
+            id: '1',
+            concluded: false,
+            k5_subject: true,
+            can_create_assignments: true,
+            assignment_groups: [{id: '9', name: 'Assignments'}]
+          },
+          {
+            name: 'Normal Course',
+            asset_string: 'course_2',
+            id: '2',
+            concluded: false,
+            k5_subject: false,
+            can_create_assignments: true,
+            assignment_groups: [{id: '9', name: 'Assignments'}]
+          }
+        ]
       },
       isNewEvent() {
         return true
@@ -51,7 +70,7 @@ QUnit.module('EditAssignmentDetails', {
     this.$holder.detach()
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 const createView = function(model, event) {
@@ -99,24 +118,30 @@ test('should include start date only if all day', function() {
 })
 
 test('should treat start date as fudged', function() {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    },
+    formats: getI18nFormats()
+  })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 1:00pm')
 })
 
 test('should localize start date', function() {
-  I18nStubber.pushFrame()
-  tz.changeLocale(french, 'fr_FR', 'fr')
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
-    'date.formats.medium': '%a %-d %b %Y %-k:%M',
-    'date.month_names': ['août'],
-    'date.abbr_month_names': ['août']
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr',
+    formats: {
+      'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
+      'date.formats.medium': '%a %-d %b %Y %-k:%M',
+      'date.month_names': ['août'],
+      'date.abbr_month_names': ['août']
+    }
   })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')
-  I18nStubber.popFrame()
 })
 
 test('requires name to save assignment event', function() {
@@ -204,4 +229,44 @@ test('allows assignment event to save if there is no date and post_to_sis is fal
   }
   const errors = view.validateBeforeSave(data, [])
   equal(errors.length, 0)
+})
+
+test('Should not show the important date checkbox if the important_dates feature is disabled', function () {
+  window.ENV.FEATURES = {
+    important_dates: false
+  }
+  const view = createView(commonEvent(), this.event)
+  view.setContext('course_1')
+  view.contextChange({target: '#assignment_context'}, false)
+  equal(view.$('#important_dates').css('display'), 'none')
+})
+
+test('Should not show the important date checkbox if the context is not a k5 subject', function () {
+  window.ENV.FEATURES = {
+    important_dates: true
+  }
+  const view = createView(commonEvent(), this.event)
+  view.setContext('course_2')
+  view.contextChange({target: '#assignment_context'}, false)
+  equal(view.$('#important_dates').css('display'), 'none')
+})
+
+test('Should show the important date checkbox if the context is a k5 subject and the important_dates feature is enabled', function () {
+  window.ENV.FEATURES = {
+    important_dates: true
+  }
+  const view = createView(commonEvent(), this.event)
+  view.setContext('course_1')
+  view.contextChange({target: '#assignment_context'}, false)
+  equal(view.$('#important_dates').css('display'), 'block')
+})
+
+test('Should include the important date value when submitting', function () {
+  window.ENV.FEATURES = {
+    important_dates: true
+  }
+  const view = createView(commonEvent(), this.event)
+  view.$('#calendar_event_important_dates').click()
+  const dataToSubmit = view.getFormData()
+  equal(dataToSubmit.assignment.important_dates, true)
 })

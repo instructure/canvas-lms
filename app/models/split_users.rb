@@ -149,6 +149,9 @@ class SplitUsers
   end
 
   def check_and_update_local_ids(records)
+    # if both users have the same local id, this isn't a safe guess to make
+    return records if source_user.local_id == restored_user.local_id
+
     if records.where("previous_user_id<?", Shard::IDS_PER_SHARD).where(previous_user_id: restored_user.local_id).exists?
       records.where(previous_user_id: restored_user.local_id).update_all(previous_user_id: restored_user.global_id)
     end
@@ -159,6 +162,7 @@ class SplitUsers
     fix_communication_channels(records.where(context_type: 'CommunicationChannel'))
     move_user_observers(records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: restored_user))
     move_attachments(records.where(context_type: 'Attachment'))
+    handle_submissions(records)
     enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: restored_user).pluck(:context_id)
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
@@ -166,7 +170,6 @@ class SplitUsers
     Shard.partition_by_shard(pseudonyms) do |pseudonyms|
       move_new_enrollments(enrollment_ids, pseudonyms)
     end
-    handle_submissions(records)
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
 
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
@@ -280,17 +283,21 @@ class SplitUsers
     restore_source_user
     pseudonyms_ids = merge_data.records.where(context_type: 'Pseudonym').pluck(:context_id)
     pseudonyms = Pseudonym.where(id: pseudonyms_ids)
-    # the where.not needs to be used incase that user is actually deleted.
-    name = merge_data.items.where.not(user_id: source_user).where(item_type: 'user_name').take&.item || pseudonyms.first.unique_id
-    prefs = merge_data.items.where.not(user_id: source_user).where(item_type: 'user_preferences').take&.item
+    # the where.not needs to be used incase that user is actually deleted
+    name =
+      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_name').take&.item
+    prefs =
+      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_preferences').take&.item
     @restored_user ||= User.new
-    @restored_user.name = name
-    @restored_user.preferences = prefs
+    @restored_user.name = name || pseudonyms.first&.unique_id || 'restored user'
+    @restored_user.preferences = prefs if prefs
     @restored_user.workflow_state = 'registered'
     shard = Shard.shard_for(merge_data.from_user_id)
     shard ||= source_user.shard
     @restored_user.shard = shard if @restored_user.new_record?
     @restored_user.save!
+    return [] unless pseudonyms.exists?
+
     move_pseudonyms_to_user(pseudonyms)
     pseudonyms
   end

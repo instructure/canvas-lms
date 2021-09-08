@@ -14,6 +14,9 @@
     "announcements_a4b8ed4a": {
         "message": "공지"
     },
+    "apply_781a2546": {
+        "message": "적용"
+    },
     "apps_54d24a47": {
         "message": "앱"
     },
@@ -173,6 +176,9 @@
     "invalid_url_cbde79f": {
         "message": "잘못된 URL"
     },
+    "join_6cafecca": {
+        "message": "참여"
+    },
     "jump_to_today_254ccf41": {
         "message": "오늘로 가기"
     },
@@ -215,11 +221,11 @@
     "my_files_2f621040": {
         "message": "내 파일"
     },
+    "name_1aed4a1b": {
+        "message": "이름"
+    },
     "new_13daf639": {
         "message": "새 항목"
-    },
-    "next_40e12421": {
-        "message": "다음"
     },
     "no_e16d9132": {
         "message": "아니요"
@@ -307,6 +313,9 @@
     },
     "upload_file_fd2361b8": {
         "message": "파일 업로드"
+    },
+    "uploading_19e8a4e7": {
+        "message": "업로드 중"
     },
     "url_22a5f3b8": {
         "message": "URL"

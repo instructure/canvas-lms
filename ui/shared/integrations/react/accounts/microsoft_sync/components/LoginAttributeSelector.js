@@ -19,39 +19,12 @@
 import React from 'react'
 import I18n from 'i18n!account_settings_jsx_bundle'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {IconButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
 import PropTypes from 'prop-types'
-import {IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function LoginAttributeSelector(props) {
   return (
-    <View as="div" margin="small 0 small 0" maxWidth="20rem">
-      <Flex>
-        <Flex.Item>
-          <Heading level="h3">{I18n.t('Login Attribute')}</Heading>
-        </Flex.Item>
-        <Flex.Item>
-          <Tooltip
-            tip={I18n.t(
-              'The attribute to use when associating a Canvas User with a Microsoft User'
-            )}
-            placement="start"
-            on={['hover', 'focus']}
-          >
-            <IconButton
-              renderIcon={IconInfoLine}
-              withBackground={false}
-              withBorder={false}
-            />
-          </Tooltip>
-        </Flex.Item>
-      </Flex>
-
+    <>
       <SimpleSelect
         renderLabel={
           <ScreenReaderContent>{I18n.t('Login Attribute Selector')}</ScreenReaderContent>
@@ -69,8 +42,11 @@ export default function LoginAttributeSelector(props) {
         <SimpleSelect.Option id="sis_user_id" value="sis_user_id">
           {I18n.t('SIS User ID')}
         </SimpleSelect.Option>
+        <SimpleSelect.Option id="integration_id" value="integration_id">
+          {I18n.t('Integration ID')}
+        </SimpleSelect.Option>
       </SimpleSelect>
-    </View>
+    </>
   )
 }
 

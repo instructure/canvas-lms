@@ -20,6 +20,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ButtonsTray} from '../ButtonsTray'
+import {StoreProvider} from '../../../shared/StoreContext'
 
 describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   const defaults = {
@@ -28,19 +29,22 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     type: 'create'
   }
 
-  it('renders the create view', () => {
-    render(<ButtonsTray {...defaults} />)
-    screen.getByRole('heading', {name: /buttons and icons/i})
-  })
+  const renderComponent = componentProps => {
+    return render(
+      <StoreProvider>
+        {storeProps => <ButtonsTray {...storeProps} {...componentProps} />}
+      </StoreProvider>
+    )
+  }
 
-  it('renders the list view', () => {
-    render(<ButtonsTray {...defaults} type="list" />)
-    screen.getByRole('heading', {name: /saved buttons and icons/i})
+  it('renders the create view', () => {
+    renderComponent(defaults)
+    screen.getByRole('heading', {name: /buttons and icons/i})
   })
 
   it('closes the tray', async () => {
     const onUnmount = jest.fn()
-    render(<ButtonsTray {...defaults} onUnmount={onUnmount} />)
+    renderComponent({...defaults, onUnmount})
     userEvent.click(screen.getByText(/close/i))
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })

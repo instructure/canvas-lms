@@ -1,14 +1,16 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+exit 0 if ENV['DISABLE_RUBOCOP'] == '1'
+
 require_relative './linter'
 require 'optparse'
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: /\.rb$/,
+  file_regex: %r{(?:\.e?rb|\.rake|\.gemspec|/[^./]+)$},
   format: "rubocop",
-  command: "bundle exec rubocop",
+  command: "bin/rubocop",
   campsite_mode: false,
   append_files_to_command: true,
   severe_levels: [],
@@ -22,12 +24,14 @@ linter_options = {
     RuboCop::CLI.new.run(args)
   end
 }
+no_fail = false
 
 OptionParser.new do |opts|
   opts.on("--heavy") { linter_options[:heavy_mode] = true }
   opts.on("--boy-scout") { linter_options[:boyscout_mode] = true }
   opts.on("--plugin PLUGIN") { |v| linter_options[:plugin] = v }
+  opts.on("--no-fail-on-offense") { |v| no_fail = true }
 end.parse!
 
 rlint = Linter.new(linter_options)
-rlint.run
+exit 1 if !rlint.run && !no_fail

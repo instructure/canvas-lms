@@ -214,6 +214,7 @@ class FilesController < ApplicationController
       session['file_access_root_acocunt_id'] = access_verifier[:root_account]&.global_id
       session['file_access_oauth_host'] = access_verifier[:oauth_host]
       session['file_access_expiration'] = 1.hour.from_now.to_i
+      session.file_access_user = access_verifier[:user]
 
       session[:permissions_key] = SecureRandom.uuid
 
@@ -350,12 +351,7 @@ class FilesController < ApplicationController
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_any_right?(
-          @current_user,
-          session,
-          :manage_files,
-          *RoleOverride::GRANULAR_FILE_PERMISSIONS
-        )
+        if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
           @images = @context.active_images.paginate page: params[:page]
         else
           @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
@@ -372,11 +368,8 @@ class FilesController < ApplicationController
     if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
-    if authorized_action(
-      @context,
-      @current_user,
-      [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
-    ) && tab_enabled?(@context.class::TAB_FILES)
+    if authorized_action(@context, @current_user, [:read, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
+        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -400,24 +393,9 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files_add: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_add
-            ),
-            manage_files_edit: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_edit
-            ),
-            manage_files_delete: context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_delete
-            ),
+            manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
+            manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
+            manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
           file_menu_tools: file_menu_tools,
           file_index_menu_tools: file_index_menu_tools
@@ -522,7 +500,6 @@ class FilesController < ApplicationController
       original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
-      set_k5_mode
       # note that the /files/XXX URL implicitly uses the current user as the
       # context, even though it doesn't search for the file using
       # @current_user.attachments.find , since it might not actually be a user
@@ -534,7 +511,7 @@ class FilesController < ApplicationController
         @skip_crumb = true unless @context
       else
         # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-        @attachment = @context.attachments.find(params[:id])
+        @attachment ||= @context.attachments.find(params[:id])
       end
 
       params[:download] ||= params[:preview]
@@ -583,9 +560,12 @@ class FilesController < ApplicationController
           # it, since this should also count as an access.
         elsif params[:inline]
           @attachment.context_module_action(@current_user, :read) if @current_user
-          log_asset_access(@attachment, 'files', 'files')
+          log_attachment_access(@attachment)
           render :json => {:ok => true}
         else
+          # Module items count as an asset access
+          log_attachment_access(@attachment) if params[:module_item_id]
+
           render_attachment(@attachment)
         end
       end
@@ -738,8 +718,7 @@ class FilesController < ApplicationController
   protected :send_attachment
 
   def send_stored_file(attachment, inline=true)
-    user = @current_user
-    user ||= api_find(User, session['file_access_user_id']) if session['file_access_user_id'].present?
+    user = file_access_user
     attachment.context_module_action(user, :read) if user && !params[:preview]
 
     if params[:preview].blank?
@@ -1175,7 +1154,7 @@ class FilesController < ApplicationController
 
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
-    if authorized_action(@context, @current_user, [:manage_files, :manage_files_edit])
+    if authorized_action(@context, @current_user, :manage_files_edit)
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
@@ -1276,7 +1255,6 @@ class FilesController < ApplicationController
       permission_context.grants_any_right?(
         @current_user,
         nil,
-        :manage_files,
         :manage_files_edit,
         :manage_files_delete
       ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
@@ -1324,6 +1302,10 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def log_attachment_access(attachment)
+    log_asset_access(attachment, 'files', 'files')
+  end
 
   def open_cors
     headers['Access-Control-Allow-Origin'] = '*'

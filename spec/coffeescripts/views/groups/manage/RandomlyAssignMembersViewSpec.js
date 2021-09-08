@@ -26,7 +26,6 @@ import 'helpers/fakeENV'
 let server = null
 let view = null
 let model = null
-const globalObj = this
 let clock = null
 
 const queueResponse = (method, url, json) =>
@@ -175,6 +174,7 @@ QUnit.module('RandomlyAssignMembersView', {
     this._ENV = window.ENV
     window.ENV = {
       group_user_type: 'student',
+      permissions: {can_manage_groups: true},
       IS_LARGE_ROSTER: false
     }
 

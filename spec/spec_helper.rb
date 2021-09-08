@@ -27,14 +27,13 @@ require 'securerandom'
 require 'tmpdir'
 
 ENV["RAILS_ENV"] = 'test'
+require File.expand_path('../../config/environment', __FILE__)
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require_relative 'coverage_tool'
-  CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
+  CoverageTool.start("RSpec:#{Process.pid}")
 end
-
-require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 
 require 'rspec/rails'
 
@@ -58,7 +57,7 @@ require_relative 'sharding_spec_helper'
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-TestDatabaseUtils.reset_database! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
+TestDatabaseUtils.reset_database!
 BlankSlateProtection.install!
 GreatExpectations.install!
 
@@ -145,8 +144,10 @@ if ENV['ENABLE_AXE_SELENIUM'] == '1'
     config.driver = lambda { SeleniumDriverSetup.driver }
     config.skip = [:'color-contrast', :'duplicate-id']
     config.rules = [:wcag2a, :wcag2aa, :section508]
-    config.serialize_output = true
-    config.serialize_prefix = 'log/results/stormbreaker_results'
+    if ENV['RSPEC_PROCESSES']
+      config.serialize_output = true
+      config.serialize_prefix = 'log/results/stormbreaker_results'
+    end
   end
 end
 
@@ -247,56 +248,8 @@ end
 
 RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
 
-RSpec::Matchers.define_negated_matcher :not_eq, :eq
-RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
-
-RSpec::Matchers.define :encompass do |expected|
-  match do |actual|
-    if expected.is_a?(Array) && actual.is_a?(Array)
-      expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
-    elsif expected.is_a?(Hash) && actual.is_a?(Hash)
-      actual.slice(*expected.keys) == expected
-    else
-      false
-    end
-  end
-end
-
-RSpec::Matchers.define :match_ignoring_whitespace do |expected|
-  def whitespaceless(str)
-    str.gsub(/\s+/, '')
-  end
-
-  match do |actual|
-    whitespaceless(actual) == whitespaceless(expected)
-  end
-end
-
-RSpec::Matchers.define :match_path do |expected|
-  match do |actual|
-    path = URI(actual).path
-    values_match?(expected, path)
-  end
-end
-
-RSpec::Matchers.define :and_query do |expected|
-  match do |actual|
-    query = Rack::Utils.parse_query(URI(actual).query)
-
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
-    values_match?(expected_as_strings, query)
-  end
-end
-
-RSpec::Matchers.define :and_fragment do |expected|
-  match do |actual|
-    fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
-    values_match?(expected_as_strings, fragment)
-  end
-end
-
-RSpec::Matchers.define_negated_matcher :not_change, :change
+# Require all custom matchers
+Dir[Rails.root.join('spec', 'support', 'custom_matchers', '*.rb')].each {|f| require f }
 
 module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
@@ -363,7 +316,7 @@ RSpec.configure do |config|
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV['RSPEC_PROCESSES']
+  if ENV['RSPEC_PROCESSES'] && !ENV['RSPECQ_REDIS_URL']
     file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
     config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
@@ -442,14 +395,8 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    if ENV['TEST_ENV_NUMBER'].present?
-      Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
-    end
-
     if ENV['COVERAGE'] == "1"
-      # do this in a hook so that results aren't clobbered under test-queue
-      # (it forks and changes the TEST_ENV_NUMBER)
-      simple_cov_cmd = "rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}"
+      simple_cov_cmd = "rspec:#{Process.pid}"
       puts "Starting SimpleCov command: #{simple_cov_cmd}"
       SimpleCov.command_name(simple_cov_cmd)
       SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377
@@ -856,7 +803,11 @@ RSpec.configure do |config|
   end
 
   def consider_all_requests_local(value)
+    old_value = Rails.application.config.consider_all_requests_local
     Rails.application.config.consider_all_requests_local = value
+    yield
+  ensure
+    Rails.application.config.consider_all_requests_local = old_value
   end
 
   def skip_if_prepended_class_method_stubs_broken
@@ -870,36 +821,40 @@ RSpec.configure do |config|
   end
 end
 
-require 'lazy_presumptuous_i18n_backend'
+require_dependency 'lazy_presumptuous_i18n_backend'
 
-class LazyPresumptuousI18nBackend
+module I18nStubs
   def stub(translations)
+    new_locales = translations.keys - I18n.config.available_locales
     @stubs = translations.with_indifferent_access
-    singleton_class.instance_eval do
-      alias_method :lookup, :lookup_with_stubs
-      alias_method :available_locales, :available_locales_with_stubs
+    unless new_locales.empty?
+      I18n.config.available_locales = I18n.config.available_locales + new_locales
     end
+    old_locale = I18n.locale
     yield
   ensure
-    singleton_class.instance_eval do
-      alias_method :lookup, :lookup_without_stubs
-      alias_method :available_locales, :available_locales_without_stubs
-    end
     @stubs = nil
+    unless new_locales.empty?
+      I18n.config.available_locales = I18n.config.available_locales - new_locales
+    end
+    I18n.locale = old_locale
   end
 
-  def lookup_with_stubs(locale, key, scope = [], options = {})
+  def lookup(locale, key, scope = [], options = {})
+    return super unless @stubs
+
     ensure_initialized
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
-    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
+    keys.inject(@stubs) { |h,k| h[k] if h.respond_to?(:key) } || super
   end
-  alias_method :lookup_without_stubs, :lookup
 
-  def available_locales_with_stubs
-    available_locales_without_stubs | @stubs.keys.map(&:to_sym)
+  def available_locales
+    return super unless @stubs
+
+    super | @stubs.keys.map(&:to_sym)
   end
-  alias_method :available_locales_without_stubs, :available_locales
 end
+LazyPresumptuousI18nBackend.prepend(I18nStubs)
 
 Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each { |file| require file }
 

@@ -285,7 +285,6 @@ describe ProfileController do
     end
 
     it "should 404 if user has only student enrollments" do
-      skip("LS-1997 failing on not found exception that it should be looking for")
       user_session(@student)
       get 'content_shares', params: {user_id: @student.id}
       expect(response).to be_not_found
@@ -329,6 +328,18 @@ describe ProfileController do
         user_session(@user)
         get "qr_mobile_login"
         expect(response).to be_not_found
+      end
+    end
+  end
+
+  describe "communication" do
+    context "when rendering the full view" do
+      render_views
+
+      it "sets the appropriate page title" do
+        user_session(@user)
+        get "communication"
+        expect(response.body).to include "<title>Account Notification Settings</title>"
       end
     end
   end

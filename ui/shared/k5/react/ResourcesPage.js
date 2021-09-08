@@ -72,26 +72,22 @@ const fetchApps = cards => {
   )
 }
 
-export default function ResourcesPage({
-  cards,
-  cardsSettled,
-  visible,
-  showStaff,
-  filterToHomerooms
-}) {
+export default function ResourcesPage({cards, cardsSettled, visible, showStaff, isSingleCourse}) {
   const [infos, setInfos] = useState([])
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
   const [staffAuthorized, setStaffAuthorized] = useState(true)
-  const [isInfoLoading, setInfoLoading] = useState(false)
-  const [isAppsLoading, setAppsLoading] = useState(false)
-  const [isStaffLoading, setStaffLoading] = useState(false)
+  const [isInfoLoading, setInfoLoading] = useState(true)
+  const [isAppsLoading, setAppsLoading] = useState(true)
+  const [isStaffLoading, setStaffLoading] = useState(true)
+  const [alreadyLoaded, setAlreadyLoaded] = useState(false)
+  const homerooms = cards.filter(c => c.isHomeroom)
 
   useImmediate(
     () => {
-      if (cards && cardsSettled) {
+      if (cards && cardsSettled && visible && !alreadyLoaded) {
         setInfoLoading(true)
-        fetchImportantInfos(filterToHomerooms ? cards.filter(c => c.isHomeroom) : cards)
+        fetchImportantInfos(!isSingleCourse ? cards.filter(c => c.isHomeroom) : cards)
           .then(setInfos)
           .catch(showFlashError(I18n.t('Failed to load important info.')))
           .finally(() => setInfoLoading(false))
@@ -112,18 +108,29 @@ export default function ResourcesPage({
             })
             .finally(() => setStaffLoading(false))
         }
+        setAlreadyLoaded(true)
       }
     },
-    [cards, cardsSettled],
+    [cards, cardsSettled, visible],
     {deep: true}
   )
 
   return (
     <ApplyTheme theme={resourcesTheme}>
       <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
-        <ImportantInfoLayout isLoading={isInfoLoading} importantInfos={infos} />
-        <AppsList isLoading={isAppsLoading} apps={apps} />
-        {showStaff && staffAuthorized && (
+        {(isSingleCourse || homerooms?.length > 0) && (
+          <ImportantInfoLayout
+            isLoading={isInfoLoading}
+            importantInfos={infos}
+            courseId={isSingleCourse ? cards[0]?.id : null}
+          />
+        )}
+        <AppsList
+          isLoading={isAppsLoading}
+          apps={apps}
+          courseId={isSingleCourse ? cards[0]?.id : null}
+        />
+        {(isSingleCourse || homerooms?.length > 0) && showStaff && staffAuthorized && (
           <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
         )}
       </section>
@@ -136,5 +143,5 @@ ResourcesPage.propTypes = {
   cardsSettled: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   showStaff: PropTypes.bool.isRequired,
-  filterToHomerooms: PropTypes.bool.isRequired
+  isSingleCourse: PropTypes.bool.isRequired
 }

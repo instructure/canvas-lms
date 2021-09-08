@@ -24,13 +24,19 @@ export const ExternalTool = {
       _id
       description
       name
+      settings {
+        iconUrl
+      }
     }
   `,
 
   shape: shape({
     _id: string,
     description: string,
-    name: string
+    name: string,
+    settings: shape({
+      iconUrl: string
+    })
   })
 }
 

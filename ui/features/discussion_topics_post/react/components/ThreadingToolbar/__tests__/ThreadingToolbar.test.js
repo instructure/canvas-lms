@@ -16,9 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import React from 'react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import {responsiveQuerySizes} from '../../../utils'
 import {ThreadingToolbar} from '../ThreadingToolbar'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 describe('PostToolbar', () => {
   it('renders provided children', () => {
@@ -67,5 +89,93 @@ describe('PostToolbar', () => {
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
+  })
+
+  describe('when rootEntryId is present', () => {
+    it('calls the onOpenIsolatedView callback with the parent entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: '2',
+            parentId: '3'
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('3', '2', false, '1', '1')
+      )
+    })
+  })
+
+  describe('when rootEntryId is not present', () => {
+    it('calls the onOpenIsolatedView callback with the entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: null,
+            parentId: null
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
+      )
+    })
+  })
+
+  it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
+    window.ENV.isolated_view = true
+    const onOpenIsolatedView = jest.fn()
+    const container = render(
+      <ThreadingToolbar
+        discussionEntry={DiscussionEntry.mock({
+          id: '1',
+          _id: '1',
+          rootEntryId: null
+        })}
+        searchTerm="neato"
+        onOpenIsolatedView={onOpenIsolatedView}
+      />
+    )
+
+    fireEvent.click(container.getByText('Go to Reply'))
+    await waitFor(() =>
+      expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
+    )
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('should render mobile children', () => {
+      const {queryAllByTestId} = render(
+        <ThreadingToolbar>
+          <>First</>
+          <>Second</>
+        </ThreadingToolbar>
+      )
+
+      expect(queryAllByTestId('mobile-thread-tool')).toBeTruthy()
+    })
   })
 })

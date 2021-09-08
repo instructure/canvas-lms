@@ -542,7 +542,9 @@ export default class SubmissionManager extends Component {
         key: button.key
       }))
 
-    return buttons.length > 0 ? <StudentFooter buttons={buttons} /> : null
+    return (
+      <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+    )
   }
 
   renderSubmitButton() {
@@ -598,7 +600,7 @@ export default class SubmissionManager extends Component {
                 !activeTypeMeetsCriteria
               }
               color="primary"
-              margin="auto auto auto small"
+              margin="auto 0 auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}
             >
               {I18n.t('Submit Assignment')}

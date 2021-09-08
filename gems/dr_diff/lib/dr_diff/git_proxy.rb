@@ -84,7 +84,7 @@ module DrDiff
     end
 
     def outstanding_change_files
-      shell("git diff --name-only")
+      shell("git diff --name-only && git diff --cached --name-only")
     end
 
     def change_files
@@ -92,7 +92,7 @@ module DrDiff
     end
 
     def outstanding_change_diff
-      shell("git diff")
+      shell("git diff && git diff --cached")
     end
 
     def change_diff

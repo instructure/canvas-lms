@@ -31,19 +31,25 @@ describe('HomeroomPage', () => {
     window.ENV.INITIAL_NUM_K5_CARDS = 3
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   afterAll(() => {
     window.ENV = {}
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {
-    const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} loadingAnnouncements />)
+    const {getAllByText, getByText} = render(
+      <HomeroomPage {...getProps()} loadingAnnouncements loadingCards />
+    )
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
-    expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()
+    expect(getByText('Loading Announcement Content')).toBeInTheDocument()
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {
-    const {getAllByText} = render(<HomeroomPage {...getProps()} />)
+    const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards />)
     const cards = getAllByText('Loading Card')
     expect(cards.length).toBe(3)
     expect(cards[0]).toBeInTheDocument()
@@ -56,15 +62,15 @@ describe('HomeroomPage', () => {
           id: '56',
           assetString: 'course_56',
           href: '/courses/56',
-          shortName: 'CS 101',
-          originalName: 'Computer Science 101',
+          shortName: 'Computer Science 101',
+          originalName: 'UGLY-SIS-COMP-SCI-101',
           courseCode: 'CS-001',
           isHomeroom: false,
           canManage: false,
           published: true
         }
       ],
-      cardsLoading: false
+      loadingCards: false
     }
     const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
     expect(queryAllByText('Loading Card').length).toBe(0)

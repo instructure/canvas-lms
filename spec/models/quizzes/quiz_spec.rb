@@ -1147,7 +1147,7 @@ describe Quizzes::Quiz do
     end
 
     it "returns false when feature flag is off" do
-      @course.root_account.set_feature_flag! 'timer_without_autosubmission', 'off'
+      @quiz.context.root_account.set_feature_flag! 'timer_without_autosubmission', 'off'
       expect(@quiz.timer_autosubmit_disabled?).to be(false)
       @quiz.update({
         disable_timer_autosubmission: true
@@ -1156,12 +1156,12 @@ describe Quizzes::Quiz do
     end
 
     it "returns false when feature flag is on and disable_timer_autosubmission is false" do
-      @course.root_account.set_feature_flag! 'timer_without_autosubmission', 'on'
+      @quiz.context.root_account.set_feature_flag! 'timer_without_autosubmission', 'on'
       expect(@quiz.timer_autosubmit_disabled?).to be(false)
     end
 
     it "returns true when feature flag is on and disable_timer_autosubmission is true" do
-      @course.root_account.set_feature_flag! 'timer_without_autosubmission', 'on'
+      @quiz.context.root_account.set_feature_flag! 'timer_without_autosubmission', 'on'
       @quiz.update({
         disable_timer_autosubmission: true
       })
@@ -1658,9 +1658,16 @@ describe Quizzes::Quiz do
       quiz.destroy
       expect(assignment.deleted?).to be_truthy
     end
+
     it 'should raise an error on validation error' do
       quiz = Quizzes::Quiz.new
       expect {quiz.destroy}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not create a new assignment if one doesn't exist" do
+      quiz = @course.quizzes.create!(title: 'test quiz')
+      quiz.destroy
+      expect(quiz.assignment).to be_nil
     end
   end
 

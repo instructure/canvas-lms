@@ -57,9 +57,9 @@ export default class CreateAssignmentView extends DialogFormView
   onSaveSuccess: =>
     @shouldPublish = false
     super
-    # Person who creates the assignment should always have permission to update it
+    # Usually manage_assignments means a user can update, except in moderated_grading
     ENV.PERMISSIONS.by_assignment_id && ENV.PERMISSIONS.by_assignment_id[@model.id] = {
-      update: true
+      update: ENV.PERMISSIONS.manage_assignments
     }
     if @assignmentGroup
       @assignmentGroup.get('assignments').add(@model)

@@ -19,16 +19,19 @@
 
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false)
+  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
     raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
     raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
-    self.new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region).pseudonym
+
+    sis_pseudonym =
+      self.new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region, include_all_pseudonyms: include_all_pseudonyms)
+    include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
   end
 
-  attr_reader :user, :context, :type, :require_sis, :include_deleted
+  attr_reader :user, :context, :type, :require_sis, :include_deleted, :include_all_pseudonyms
 
-  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false)
+  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false, include_all_pseudonyms: false)
     @user = user
     @context = context
     @type = type
@@ -36,6 +39,7 @@ class SisPseudonym
     @include_deleted = include_deleted
     @root_account = root_account
     @in_region = in_region
+    @include_all_pseudonyms = include_all_pseudonyms
   end
 
   def pseudonym
@@ -48,6 +52,23 @@ class SisPseudonym
       result.account = root_account if result.account_id == root_account.id
     end
     result
+  end
+
+  def all_pseudonyms
+    results = []
+    results << @context.sis_pseudonym if @context.class <= Enrollment
+    results << find_on_enrollment_for_context
+    results << find_in_home_account
+    results << find_in_other_accounts
+    results = results.flatten.compact.uniq
+    results.reject! {|result| exclude_deleted?(result)}
+    if results.present?
+      results.each do |result|
+        result.account = root_account if result.account_id == root_account.id
+      end
+      return results
+    end
+    nil
   end
 
   private
@@ -66,22 +87,21 @@ class SisPseudonym
       # it will grab that one instead.
       return nil if pseudonym&.sis_user_id.nil?
       return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
+
       pseudonym
     end
   end
 
   def find_in_other_accounts
     return nil if type == :exact
+
     if include_deleted
       if user.all_pseudonyms_loaded?
         return pick_user_pseudonym(user.all_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
       end
-    else
-      if user.all_active_pseudonyms_loaded?
-        return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
-      end
+    elsif user.all_active_pseudonyms_loaded?
+      return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
     end
-
 
     trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
 
@@ -105,6 +125,7 @@ class SisPseudonym
 
     Shard.with_each_shard(shards.sort) do
       next if Shard.current == user.shard && user_shard_is_in_region
+
       account_ids = trusted_account_ids[Shard.current] if type == :trusted
       result = find_in_trusted_accounts(account_ids)
       return result if result
@@ -145,6 +166,7 @@ class SisPseudonym
     @root_account ||= begin
       account = context.root_account
       raise "could not resolve root account" unless account.is_a?(Account)
+
       account
      end
   end
@@ -152,16 +174,22 @@ class SisPseudonym
   def pick_pseudonym(account_ids)
     relation = Pseudonym.active.where(user_id: user)
     relation = relation.where(account_id: account_ids) if account_ids
-    relation = if require_sis
-                 relation.where.not(sis_user_id: nil)
-               else
-                 # false sorts before true
-                 relation.order(Arel.sql("sis_user_id IS NULL"))
-               end
+    relation =
+      if require_sis
+        relation.where.not(sis_user_id: nil)
+      else
+        # false sorts before true
+        relation.order(Arel.sql("sis_user_id IS NULL"))
+      end
     relation.primary_shard.activate do
       relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id))
     end
+
     if type == :implicit
+      if include_all_pseudonyms
+        return relation.select { |p| p.works_for_account?(root_account, true) }
+      end
+
       relation.detect { |p| p.works_for_account?(root_account, true) }
     else
       relation.first
@@ -169,11 +197,22 @@ class SisPseudonym
   end
 
   def pick_user_pseudonym(collection, account_ids)
-    collection.sort_by {|p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
-      next if account_ids && !account_ids.include?(p.account_id)
-      next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
-      next if require_sis && !p.sis_user_id
-      include_deleted || p.workflow_state != 'deleted'
+    if include_all_pseudonyms
+      collection.select do |p|
+        next if account_ids && !account_ids.include?(p.account_id)
+        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if require_sis && !p.sis_user_id
+
+        true
+      end
+    else
+      collection.sort_by {|p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
+        next if account_ids && !account_ids.include?(p.account_id)
+        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if require_sis && !p.sis_user_id
+
+        include_deleted || p.workflow_state != 'deleted'
+      end
     end
   end
 end

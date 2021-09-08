@@ -53,6 +53,7 @@ module Factories
     account = (opts[:account] ? opts[:account].root_account : Account.default)
     @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
     @pseudonym.sis_user_id = opts[:sis_user_id]
+    @pseudonym.integration_id = opts[:integration_id]
     @pseudonym.save_without_session_maintenance
     opts[:username] = opts[:username] + user.id.to_s + '@example.com' unless opts[:username].include? '@'
     @pseudonym.communication_channel = communication_channel(user, opts)

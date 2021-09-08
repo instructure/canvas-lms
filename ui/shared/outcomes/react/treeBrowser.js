@@ -26,44 +26,34 @@ import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
+import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-export const ROOT_ID = '0'
-export const ACCOUNT_FOLDER_ID = '-1'
-
-const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
-  return I18n.t('%{groups} Groups | %{outcomes} Outcomes', {
-    groups: childGroupsCount,
-    outcomes: outcomesCount
-  })
-}
-
-const structFromGroup = (g, parentGroupId) => ({
+const structFromGroup = g => ({
   id: g._id,
   name: g.title,
-  descriptor: groupDescriptor(g),
   collections: [],
-  outcomesCount: g.outcomesCount,
-  canEdit: g.canEdit,
-  parentGroupId
+  isRootGroup: g.isRootGroup,
+  parentGroupId: g.parentOutcomeGroup?._id
 })
 
-const getCounts = rootGroups => {
-  return rootGroups.reduce(
-    (acc, group) => {
-      return [acc[0] + group.outcomesCount, acc[1] + group.childGroupsCount]
-    },
-    [0, 0]
-  )
-}
+const formatNewGroup = g => ({
+  _id: g.id,
+  title: g.title,
+  description: g.description,
+  isRootGroup: false,
+  parentOutcomeGroup: {
+    _id: g.parent_outcome_group.id,
+    __typename: 'LearningOutcomeGroup'
+  },
+  __typename: 'LearningOutcomeGroup'
+})
 
 const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
-  canEdit: false,
-  childGroupsCount: null,
   description: null,
-  outcomesCount: null,
   title: null,
-  parentGroupId: null,
+  parentOutcomeGroup: null,
+  isRootGroup: false,
   ...group
 })
 
@@ -71,16 +61,19 @@ const extractGroups = parentGroup =>
   (parentGroup?.childGroups?.nodes || [])
     .map(g => ({
       ...g,
-      parentGroupId: parentGroup._id
+      parentOutcomeGroup: {
+        _id: parentGroup._id,
+        __typename: 'LearningOutcomeGroup'
+      }
     }))
     .concat(parentGroup)
     .map(ensureAllGroupFields)
 
 const getCollectionsByParentId = groups =>
   (groups || []).reduce((memo, g) => {
-    if (g.parentGroupId) {
-      memo[g.parentGroupId] = memo[g.parentGroupId] || []
-      memo[g.parentGroupId].push(g._id)
+    if (g.parentOutcomeGroup) {
+      memo[g.parentOutcomeGroup._id] = memo[g.parentOutcomeGroup._id] || []
+      memo[g.parentOutcomeGroup._id].push(g._id)
     }
 
     return memo
@@ -90,48 +83,64 @@ const GROUPS_QUERY = gql`
   query GroupsQuery($collection: String!){
     groups(collection: $collection) {
       ${groupFields}
-      parentGroupId
+      isRootGroup
+      parentOutcomeGroup {
+        _id
+      }
     }
+  }
+`
+const LOADED_GROUPS_QUERY = gql`
+  query LoadedGroupsQuery($collection: String!) {
+    loadedGroups(collection: $collection)
+  }
+`
+const CONTEXT_GROUPS_QUERY = gql`
+  query ContextGroupsLoadedQuery($contextType: String!, $contextId: ID!) {
+    rootGroupId(contextType: $contextType, contextId: $contextId)
   }
 `
 
 const useTreeBrowser = queryVariables => {
-  const {contextType} = useCanvasContext()
+  const {isCourse, treeBrowserRootGroupId: ROOT_GROUP_ID} = useCanvasContext()
   const client = useApolloClient()
-  const [rootId, setRootId] = useState(ROOT_ID)
-  const [isLoading, setIsLoading] = useState(true)
+  const [rootId, setRootId] = useState(ROOT_GROUP_ID)
+  const [isLoadingRootGroup, setIsLoadingRootGroup] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
-  const [loadedGroups, setLoadedGroups] = useState([])
   const {data: cacheData} = useQuery(GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
     variables: queryVariables
   })
+  const {data: loadedGroupsData} = useQuery(LOADED_GROUPS_QUERY, {
+    fetchPolicy: 'cache-only',
+    variables: queryVariables
+  })
   const groups = cacheData.groups || []
+  const loadedGroups = loadedGroupsData.loadedGroups || []
 
   const addLoadedGroups = ids => {
-    setLoadedGroups([...loadedGroups, ...ids])
-  }
-
-  const clearCache = () => {
     client.writeQuery({
-      query: GROUPS_QUERY,
+      query: LOADED_GROUPS_QUERY,
       variables: queryVariables,
       data: {
-        groups: []
+        loadedGroups: [...loadedGroups, ...ids]
       }
     })
   }
 
+  const clearCache = () => {
+    updateCache([])
+  }
+
   const collections = useMemo(() => {
     const collectionsByParentId = getCollectionsByParentId(groups)
-
     return groups.reduce(
       (memo, g) => ({
         ...memo,
         [g._id]: {
-          ...structFromGroup(g, g.parentGroupId),
+          ...structFromGroup(g),
           collections: collectionsByParentId[g._id] || []
         }
       }),
@@ -141,7 +150,19 @@ const useTreeBrowser = queryVariables => {
 
   const addGroups = groupsToAdd => {
     const newGroups = uniqBy([...groups, ...groupsToAdd], '_id')
+    updateCache(newGroups)
+  }
 
+  const addNewGroup = group => {
+    addGroups([formatNewGroup(group)])
+  }
+
+  const removeGroup = groupId => {
+    const newGroups = groups.filter(group => group._id !== groupId)
+    updateCache(newGroups)
+  }
+
+  const updateCache = newGroups => {
     client.writeQuery({
       query: GROUPS_QUERY,
       variables: queryVariables,
@@ -151,14 +172,22 @@ const useTreeBrowser = queryVariables => {
     })
   }
 
-  const queryCollections = ({id}) => {
+  const queryCollections = ({
+    id,
+    parentGroupId = collections[id].parentGroupId,
+    shouldLoad = true
+  }) => {
     setSelectedGroupId(id)
-    setSelectedParentGroupId(collections[id].parentGroupId)
+    setSelectedParentGroupId(parentGroupId)
 
     if (loadedGroups.includes(id)) {
       return
     }
-    addLoadedGroups([id])
+
+    if (!shouldLoad) {
+      addLoadedGroups([id])
+      return
+    }
 
     client
       .query({
@@ -170,6 +199,7 @@ const useTreeBrowser = queryVariables => {
       })
       .then(({data}) => {
         addGroups(extractGroups(data.context))
+        addLoadedGroups([id])
       })
       .catch(err => {
         setError(err.message)
@@ -179,7 +209,7 @@ const useTreeBrowser = queryVariables => {
   useEffect(() => {
     if (error) {
       const srOnlyAlert = Object.keys(collections).length === 0
-      contextType === 'Course'
+      isCourse
         ? showFlashAlert({
             message: I18n.t('An error occurred while loading course learning outcome groups.'),
             type: 'error',
@@ -201,62 +231,157 @@ const useTreeBrowser = queryVariables => {
     setSelectedGroupId,
     error,
     setError,
-    isLoading,
-    setIsLoading,
+    isLoading: isLoadingRootGroup,
+    setIsLoading: setIsLoadingRootGroup,
     setRootId,
     rootId,
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
-    clearCache
+    clearCache,
+    loadedGroups,
+    addNewGroup,
+    removeGroup
   }
 }
 
-export const useManageOutcomes = collection => {
+export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
   const {
     collections,
-    queryCollections,
+    queryCollections: queryCollectionsTreeBrowser,
     error,
     setError,
     isLoading,
     setIsLoading,
     setRootId,
     rootId,
+    setSelectedGroupId,
     selectedGroupId,
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
-    clearCache
+    clearCache: clearTreeBrowserCache,
+    addNewGroup,
+    removeGroup,
+    loadedGroups
   } = useTreeBrowser({
     collection
   })
 
+  const {data: contextGroupLoadedData} = useQuery(CONTEXT_GROUPS_QUERY, {
+    fetchPolicy: 'cache-only',
+    variables: {
+      contextId,
+      contextType
+    }
+  })
+
+  const clearCache = () => {
+    client.writeQuery({
+      query: CONTEXT_GROUPS_QUERY,
+      variables: {
+        contextType,
+        contextId
+      },
+      data: {
+        rootGroupId: null
+      }
+    })
+    clearTreeBrowserCache()
+  }
+
+  const rootGroupId = contextGroupLoadedData.rootGroupId
+
+  const {
+    search: searchString,
+    debouncedSearch: debouncedSearchString,
+    onChangeHandler: updateSearch,
+    onClearHandler: clearSearch
+  } = useSearch()
+
+  const queryCollections = props => {
+    if (props?.id !== selectedGroupId) clearSearch()
+    queryCollectionsTreeBrowser(props)
+  }
+
   useEffect(() => {
+    if (
+      isLoading &&
+      ((Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) || error)
+    ) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
+
+  const saveRootGroupId = id => {
+    addLoadedGroups([id])
+    setRootId(id)
+  }
+
+  const fetchContextGroups = () => {
     client
       .query({
         query: CHILD_GROUPS_QUERY,
         variables: {
           id: contextId,
           type: contextType
-        }
+        },
+        fetchPolicy: 'network-only'
       })
       .then(({data}) => {
-        const rootGroup = data?.context?.rootOutcomeGroup
-        addGroups(extractGroups(rootGroup))
-        addLoadedGroups([rootGroup._id])
-        setRootId(rootGroup._id)
+        const rootGroup = data.context.rootOutcomeGroup
+        client.writeQuery({
+          query: CONTEXT_GROUPS_QUERY,
+          variables: {
+            contextId,
+            contextType
+          },
+          data: {
+            rootGroupId: rootGroup._id
+          }
+        })
+        saveRootGroupId(rootGroup._id)
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
+  }
+
+  useEffect(() => {
+    if (importNumber === 0 && rootGroupId) {
+      saveRootGroupId(rootGroupId)
+    } else {
+      fetchContextGroups()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [importNumber])
+
+  const createGroup = async (groupName, parentGroupId = rootId) => {
+    try {
+      const newGroup = await addOutcomeGroup(contextType, contextId, parentGroupId, groupName)
+      addNewGroup(newGroup.data)
+      showFlashAlert({
+        message: I18n.t('"%{groupName}" has been created.', {groupName}),
+        type: 'success'
+      })
+      return structFromGroup(formatNewGroup(newGroup.data))
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
+              groupName,
+              message: err.message
+            })
+          : I18n.t('An error occurred adding group "%{groupName}".', {
+              groupName
+            }),
+        type: 'error'
+      })
+    }
+  }
 
   return {
     error,
@@ -264,14 +389,30 @@ export const useManageOutcomes = collection => {
     collections,
     queryCollections,
     rootId,
+    setSelectedGroupId,
     selectedGroupId,
     selectedParentGroupId,
-    clearCache
+    clearCache,
+    addNewGroup,
+    removeGroup,
+    loadedGroups,
+    createGroup,
+    searchString,
+    debouncedSearchString,
+    updateSearch,
+    clearSearch
   }
 }
 
 export const useFindOutcomeModal = open => {
-  const {contextType, contextId} = useCanvasContext()
+  const {
+    contextType,
+    contextId,
+    isCourse,
+    globalRootId,
+    treeBrowserRootGroupId: ROOT_GROUP_ID,
+    treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
+  } = useCanvasContext()
   const client = useApolloClient()
   const {
     collections,
@@ -285,10 +426,19 @@ export const useFindOutcomeModal = open => {
     setSelectedGroupId,
     setRootId,
     rootId,
-    addLoadedGroups
+    addLoadedGroups,
+    loadedGroups
   } = useTreeBrowser({
     collection: 'findOutcomesView'
   })
+
+  useEffect(() => {
+    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
+      setIsLoading(false)
+    } else if (isLoading && error) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
 
   const {
     search: searchString,
@@ -303,7 +453,11 @@ export const useFindOutcomeModal = open => {
   }
 
   useEffect(() => {
-    if (!open && selectedGroupId !== null) setSelectedGroupId(null)
+    if (!open && selectedGroupId !== null) {
+      setTimeout(() => {
+        setSelectedGroupId(null)
+      }, 500)
+    }
   }, [open, selectedGroupId, setSelectedGroupId])
 
   useEffect(() => {
@@ -316,31 +470,34 @@ export const useFindOutcomeModal = open => {
         variables: {
           id: contextId,
           type: contextType,
-          rootGroupId: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID || '0',
-          includeGlobalRootGroup: !!ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID
+          rootGroupId: globalRootId || '0',
+          includeGlobalRootGroup: !!globalRootId
         }
       })
       .then(({data}) => {
         const {context, globalRootGroup} = data
-        let accounts = []
-        if (contextType === 'Course') {
-          accounts = [...context.account.parentAccountsConnection?.nodes, context.account]
+        let accounts
+        if (isCourse) {
+          accounts = [...context.account.parentAccountsConnection.nodes, context.account]
         } else {
-          accounts = context.parentAccountsConnection?.nodes
+          accounts = context.parentAccountsConnection.nodes
         }
+
         const rootGroups = accounts.map(account => account.rootOutcomeGroup)
-        const [outcomesCount, childGroupsCount] = getCounts(rootGroups)
-        const childGroups = [
-          {
-            _id: ACCOUNT_FOLDER_ID,
+        const childGroups = []
+
+        if (rootGroups.length > 0) {
+          childGroups.push({
+            _id: ACCOUNT_GROUP_ID,
             title: I18n.t('Account Standards'),
-            outcomesCount,
-            childGroupsCount
-          }
-        ]
+            isRootGroup: true
+          })
+        }
+
         if (globalRootGroup) {
           childGroups.push({
             ...globalRootGroup,
+            isRootGroup: true,
             title: I18n.t('State Standards'),
             // add a different typename than LearningOutcomeGroup
             // because useDetail will load this group with a title
@@ -354,28 +511,30 @@ export const useFindOutcomeModal = open => {
           ...rootGroups.flatMap(g =>
             extractGroups({
               ...g,
-              parentGroupId: ACCOUNT_FOLDER_ID
+              isRootGroup: true,
+              parentOutcomeGroup: {
+                _id: ACCOUNT_GROUP_ID,
+                __typename: 'LearningOutcomeGroup'
+              }
             })
           ),
           ...extractGroups({
-            _id: ROOT_ID,
+            _id: ROOT_GROUP_ID,
+            isRootGroup: true,
+            title: I18n.t('Root Learning Outcome Groups'),
             childGroups: {
               nodes: childGroups
             }
           })
         ]
 
+        addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
+        setRootId(ROOT_GROUP_ID)
         addGroups(groups)
-        addLoadedGroups([ACCOUNT_FOLDER_ID])
-        setRootId(ROOT_ID)
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -390,45 +549,42 @@ export const useFindOutcomeModal = open => {
     searchString,
     debouncedSearchString,
     updateSearch,
-    clearSearch
+    clearSearch,
+    loadedGroups
   }
 }
 
-export const useGroupMoveModal = groupId => {
+export const useTargetGroupSelector = groupId => {
   const {
     error,
     isLoading,
     collections,
     rootId,
-    clearCache,
-    queryCollections: treeBrowserQueryCollection
-  } = useManageOutcomes('groupMoveModal')
+    queryCollections: treeBrowserQueryCollection,
+    addNewGroup,
+    selectedGroupId,
+    selectedParentGroupId,
+    loadedGroups,
+    createGroup
+  } = useManageOutcomes('OutcomeManagementPanel')
 
-  const queryCollections = ({id}) => {
+  const queryCollections = ({id, parentGroupId, shouldLoad}) => {
     // Do not query for more collections if the groupId is the same as the id passed
     if (id !== groupId) {
-      treeBrowserQueryCollection({id})
+      treeBrowserQueryCollection({id, parentGroupId, shouldLoad})
     }
   }
-
-  // This will prevent to show child groups if the group id is the same as the
-  // id passed
-  // This will happen when user wants to move group A, load group B children,
-  // closes the move modal and opens group B to be moved.
-  // We won't query group b children, but this will be on cache, so to prevent
-  // of showing, we clear the cache
-  useEffect(() => {
-    return () => {
-      clearCache()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return {
     error,
     isLoading,
     collections,
     queryCollections,
-    rootId
+    rootId,
+    addNewGroup,
+    selectedGroupId,
+    selectedParentGroupId,
+    loadedGroups,
+    createGroup
   }
 }

@@ -385,4 +385,123 @@ describe('ContentTabs', () => {
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
   })
+
+  describe('group assignments', () => {
+    const groupMatcher = /this submission will count for everyone in your sample-group-set group/
+
+    it('shows a reminder for a group assignment that does not grade students individually and is not yet submitted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: false,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+
+      const {getByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+          <AttemptTab {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(getByText(groupMatcher)).toBeInTheDocument()
+    })
+
+    it('does not show a reminder for a non-group assignment', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+          <AttemptTab {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+
+    it('does not show a reminder for a group assignment that grades students individually', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: true,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+          <AttemptTab {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+
+    it('does not show a reminder for a group assignment if the selected attempt is submitted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: true,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.submitted
+        }
+      })
+
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+          <AttemptTab {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+
+    it('does not show a reminder if changes to the submission are not allowed', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: false,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+          <AttemptTab {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+  })
 })

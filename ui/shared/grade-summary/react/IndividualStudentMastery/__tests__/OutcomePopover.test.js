@@ -65,7 +65,8 @@ const defaultProps = (props = {}) => ({
         submitted_or_assessed_at: time2
       }
     ],
-    title: 'My outcome'
+    title: 'My outcome',
+    friendly_description: ''
   },
   outcomeProficiency: {
     ratings: [
@@ -154,5 +155,20 @@ describe('selected rating', () => {
     const button = getByRole('button')
     fireEvent.click(button)
     expect(within(baseElement).getByText('Meets Mastery')).not.toBeNull()
+  })
+})
+
+describe('friendly description', () => {
+  it('renders the friendly description if the outcome has one', () => {
+    const friendlyDescription = {
+      ...defaultProps().outcome,
+      ...{friendly_description: 'A friendly description'}
+    }
+    const {baseElement, getByRole} = render(
+      <OutcomePopover {...defaultProps({outcome: friendlyDescription})} />
+    )
+    const button = getByRole('button')
+    fireEvent.click(button)
+    expect(within(baseElement).getByText('A friendly description')).not.toBeNull()
   })
 })

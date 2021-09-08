@@ -331,6 +331,15 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:disable_keyboard_shortcuts]).to be_truthy
     end
 
+    it "logs an asset_user_access on show" do
+      allow(@course).to receive(:feature_enabled?).with('react_discussions_post').and_return(true)
+      user_session @student
+      @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello')
+      get 'show', params: { course_id: @course.id, id: @discussion.id }
+      accessed_asset = assigns[:accessed_asset]
+      expect(accessed_asset[:category]).to eq 'topics'
+    end
+
     it "js_bundles includes discussion_topics_post when ff is on" do
       commons_hash = {
         base_url: '/testing-url',
@@ -670,6 +679,16 @@ describe DiscussionTopicsController do
         @group1.add_user(@student)
       end
 
+      it "should provide sequence in js_env when Discussions Redesign is ON" do
+        Account.default.enable_feature! :react_discussions_post
+        module1 = @course.context_modules.create!(:name => "module1")
+        module1.add_item(:id => @topic.id, :type => 'discussion_topic')
+        user_session(@teacher)
+
+        get 'show', params: {:course_id => @course.id, :id => @topic.id}
+        expect(assigns[:js_env][:SEQUENCE]).to be_truthy
+      end
+
       it "should assign groups from the topic's category" do
         user_session(@teacher)
 
@@ -860,8 +879,7 @@ describe DiscussionTopicsController do
 
     context "in a homeroom course" do
       before(:each) do
-        @course.account.settings[:enable_as_k5_account] = {value: true}
-        @course.account.save!
+        @course.account.enable_as_k5_account!
       end
 
       it "does not permit replies to assignments" do

@@ -28,6 +28,14 @@ const useCanvasContext = () => {
   const rootOutcomeGroup = context?.env?.rootOutcomeGroup
   const friendlyDescriptionFF = context?.env?.friendlyDescriptionFF
   const isMobileView = context?.env?.isMobileView
+  const canManage = context?.env?.canManage
+  const canImport = context?.env?.canImport
+  const isAdmin = context?.env?.isAdmin
+  const isStudent = context?.env?.isStudent
+  const globalRootId = context?.env?.globalRootId
+  const treeBrowserRootGroupId = context?.env?.treeBrowserRootGroupId
+  const treeBrowserAccountGroupId = context?.env?.treeBrowserAccountGroupId
+  const rootIds = context?.env?.rootIds
 
   return {
     contextType,
@@ -36,7 +44,15 @@ const useCanvasContext = () => {
     useRceEnhancements,
     rootOutcomeGroup,
     friendlyDescriptionFF,
-    isMobileView
+    isMobileView,
+    canManage,
+    canImport,
+    isAdmin,
+    isStudent,
+    globalRootId,
+    treeBrowserRootGroupId,
+    treeBrowserAccountGroupId,
+    rootIds
   }
 }
 

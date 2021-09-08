@@ -35,6 +35,13 @@ module Lti
       nil
     end
 
+    def valid_custom_params?(custom)
+      custom = JSON.parse(custom) if custom.is_a?(String)
+      custom.is_a?(Hash) && custom.all? {|_, value| valid_custom_params_value?(value) }
+    rescue JSON::ParserError
+      false
+    end
+
     def valid_custom_params_value?(val)
       case val
       when String, Numeric, true, false, nil

@@ -1202,4 +1202,19 @@ describe SIS::CSV::EnrollmentImporter do
     expect(u1.associated_accounts).not_to be_include(a2)
     expect(v1.associated_accounts).not_to be_include(a1)
   end
+
+  it "does not enroll students in blueprint courses" do
+    course_factory(:account => @account, :sis_source_id => 'blue')
+    @teacher = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'daba')
+    @student = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'dee')
+    MasterCourses::MasterTemplate.set_as_master_course(@course)
+    importer = process_csv_data(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "blue,daba,teacher,,active,",
+        "blue,dee,student,,active,"
+    )
+    expect(@teacher.enrollments.size).to eq 1
+    expect(@student.enrollments.size).to eq 0
+    expect(importer.errors.map(&:last)).to eq ["Student enrollment for \"dee\" not allowed in blueprint course \"blue\""]
+  end
 end

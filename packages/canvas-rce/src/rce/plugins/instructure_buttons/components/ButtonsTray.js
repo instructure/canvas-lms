@@ -25,15 +25,11 @@ import {Tray} from '@instructure/ui-tray'
 import formatMessage from '../../../../format-message'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {CreateButtonForm} from './CreateButtonForm'
-import {SavedButtonList} from './SavedButtonList'
 
-export function ButtonsTray({onUnmount, type}) {
+export function ButtonsTray({editor, onUnmount}) {
   const [isOpen, setIsOpen] = useState(true)
 
-  const title =
-    type === 'create'
-      ? formatMessage('Buttons and Icons')
-      : formatMessage('Saved Buttons and Icons')
+  const title = formatMessage('Buttons and Icons')
 
   return (
     <Tray
@@ -43,7 +39,6 @@ export function ButtonsTray({onUnmount, type}) {
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldCloseOnDocumentClick
       shouldContainFocus
       shouldReturnFocus
       size="regular"
@@ -63,8 +58,8 @@ export function ButtonsTray({onUnmount, type}) {
           </Flex>
         </Flex.Item>
 
-        <Flex.Item as="content" padding="small">
-          {type === 'create' ? <CreateButtonForm /> : <SavedButtonList />}
+        <Flex.Item as="slot" padding="small">
+          <CreateButtonForm editor={editor} onClose={() => setIsOpen(false)} />
         </Flex.Item>
       </Flex>
     </Tray>

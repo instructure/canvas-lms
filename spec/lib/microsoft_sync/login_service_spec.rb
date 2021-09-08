@@ -114,10 +114,9 @@ describe MicrosoftSync::LoginService do
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do
-            expect { subject }.to raise_error do |e|
-              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
-              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-            end
+            klass = MicrosoftSync::LoginService::TenantDoesNotExist
+            msg = /tenant does not exist/
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
           end
         end
 
@@ -128,10 +127,9 @@ describe MicrosoftSync::LoginService do
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do
-            expect { subject }.to raise_error do |e|
-              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
-              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-            end
+            klass = MicrosoftSync::LoginService::TenantDoesNotExist
+            msg = /tenant does not exist/
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
           end
         end
 

@@ -24,11 +24,11 @@ describe DatadogRumHelper do
   include ApplicationHelper
 
   let(:datadog_rum_config) do
-    {
+    DynamicSettings::FallbackProxy.new(
       application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81",
       client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r",
       sample_rate_percentage: 100.0
-    }
+    )
   end
 
   describe "#include_datadog_rum_js?" do
@@ -50,33 +50,33 @@ describe DatadogRumHelper do
       end
 
       it "returns true when the random value is below the sample rate" do
-        datadog_rum_config[:sample_rate_percentage] = 50.0001
+        datadog_rum_config.data[:sample_rate_percentage] = 50.0001
         expect(include_datadog_rum_js?).to be(true)
       end
 
       it "returns true when the random value matches the sample rate" do
-        datadog_rum_config[:sample_rate_percentage] = 50.0
+        datadog_rum_config.data[:sample_rate_percentage] = 50.0
         expect(include_datadog_rum_js?).to be(true)
       end
 
       it "returns false when the random value is above the sample rate" do
-        datadog_rum_config[:sample_rate_percentage] = 49.9999
+        datadog_rum_config.data[:sample_rate_percentage] = 49.9999
         expect(include_datadog_rum_js?).to be(false)
       end
 
       it "returns true when the sample rate percentage is 100%" do
-        datadog_rum_config[:sample_rate_percentage] = 100.0
+        datadog_rum_config.data[:sample_rate_percentage] = 100.0
         expect(include_datadog_rum_js?).to be(true)
       end
 
       it "returns false when the sample rate percentage is 0%" do
         allow(self).to receive(:random).and_return(0.0)
-        datadog_rum_config[:sample_rate_percentage] = 0.0
+        datadog_rum_config.data[:sample_rate_percentage] = 0.0
         expect(include_datadog_rum_js?).to be(false)
       end
 
       it "returns false consistently when called multiple times" do
-        datadog_rum_config[:sample_rate_percentage] = 50.0
+        datadog_rum_config.data[:sample_rate_percentage] = 50.0
         allow(self).to receive(:random).and_return(0.6)
         expect(include_datadog_rum_js?).to be(false)
         allow(self).to receive(:random).and_return(0.4)
@@ -84,7 +84,7 @@ describe DatadogRumHelper do
       end
 
       it "returns true consistently when called multiple times" do
-        datadog_rum_config[:sample_rate_percentage] = 50.0
+        datadog_rum_config.data[:sample_rate_percentage] = 50.0
         allow(self).to receive(:random).and_return(0.4)
         expect(include_datadog_rum_js?).to be(true)
         allow(self).to receive(:random).and_return(0.6)
@@ -105,7 +105,7 @@ describe DatadogRumHelper do
 
       it "returns false when the sample rate percentage is 0.0" do
         request_datadog_rum_js
-        datadog_rum_config[:sample_rate_percentage] = 0.0
+        datadog_rum_config.data[:sample_rate_percentage] = 0.0
         expect(include_datadog_rum_js?).to be(false)
       end
 
@@ -122,19 +122,19 @@ describe DatadogRumHelper do
 
     it "returns false when the configuration is missing :application_id" do
       opt_in_datadog_rum_js
-      datadog_rum_config.delete(:application_id)
+      datadog_rum_config.data.delete(:application_id)
       expect(include_datadog_rum_js?).to be(false)
     end
 
     it "returns false when the configuration is missing :client_token" do
       opt_in_datadog_rum_js
-      datadog_rum_config.delete(:client_token)
+      datadog_rum_config.data.delete(:client_token)
       expect(include_datadog_rum_js?).to be(false)
     end
 
     it "returns false when the configuration is missing :sample_rate_percentage" do
       opt_in_datadog_rum_js
-      datadog_rum_config.delete(:sample_rate_percentage)
+      datadog_rum_config.data.delete(:sample_rate_percentage)
       expect(include_datadog_rum_js?).to be(false)
     end
   end

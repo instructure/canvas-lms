@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import moment from 'moment-timezone'
 
 import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 
 import tz from '@canvas/timezone'
 import ImportantDateItem, {ImportantDateItemShape} from './ImportantDateItem'
@@ -30,12 +30,12 @@ const ImportantDateSection = ({date, items, timeZone}) => {
   const isSameYear = moment(date).isSame(moment().tz(timeZone), 'year')
   return (
     <View as="div" margin="medium 0 x-small">
-      <Text as="div" size="small">
+      <Heading as="h3" level="h5">
         {tz.format(
           date,
           `date.formats.${isSameYear ? 'long_with_weekday' : 'medium_with_weekday'}`
         )}
-      </Text>
+      </Heading>
       {items.map(item => (
         <ImportantDateItem key={item.id} {...item} />
       ))}

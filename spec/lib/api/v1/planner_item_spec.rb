@@ -92,14 +92,32 @@ describe Api::V1::PlannerItem do
       @course.name = "test course name"
       expect(api.planner_item_json(@assignment, @student, session)[:context_name]).to eq "test course name"
 
-      # still no image if feature flag is off
       @course.image_url = "path/to/course/image.png"
-      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to be_nil
-
-      # ok, now that course has an image and the feature flag is on there should be an image
-      @course.enable_feature!(:course_card_images)
       expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
     end
+
+    describe "calendar events with an online meeting url" do
+      before(:once) do
+        @meeting_urls = ['https://myschool.zoom.us/123456', 'https://myschool.zoom.us/j/123456', 'https://myschool.zoom.us/my/123456']
+      end
+      it 'should include it in the result if found in the event description' do
+        event_start_date = 2.days.from_now
+        @meeting_urls.each do |zurl|
+          event = calendar_event_model(start_at: event_start_date, description: "zoom at #{zurl} for this thing")
+          event_hash = api.planner_item_json(event, @student, session)
+          expect(event_hash[:plannable][:online_meeting_url]).to eq zurl
+        end
+      end
+  
+      it 'should include it in the event if found in the event location' do
+        event_start_date = 2.days.from_now
+        @meeting_urls.each do |zurl|
+          event = calendar_event_model(start_at: event_start_date, location_name: "zoom at #{zurl} for this thing")
+          event_hash = api.planner_item_json(event, @student, session)
+          expect(event_hash[:plannable][:online_meeting_url]).to eq zurl
+        end
+      end
+    end  
 
     context 'planner overrides' do
       it 'should return the planner override id' do

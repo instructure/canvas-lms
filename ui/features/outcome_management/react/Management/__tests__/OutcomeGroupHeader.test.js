@@ -19,28 +19,37 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {merge} from 'lodash'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import OutcomeGroupHeader from '../OutcomeGroupHeader'
 
 describe('OutcomeGroupHeader', () => {
-  let onMenuHandlerMock
+  let onMenuHandlerMock, isMobileView, hideOutcomesViewMock
   const defaultProps = (props = {}) =>
     merge(
       {
         title: 'Group 3',
         description: 'Description',
         onMenuHandler: onMenuHandlerMock,
-        canManage: true
+        canManage: true,
+        hideOutcomesView: hideOutcomesViewMock
       },
       props
     )
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
+    hideOutcomesViewMock = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  const renderWithContext = children => {
+    return render(
+      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>
+    )
+  }
 
   it('renders Outcome Group custom title when title prop provided', () => {
     const {getByText} = render(<OutcomeGroupHeader {...defaultProps()} />)
@@ -66,6 +75,33 @@ describe('OutcomeGroupHeader', () => {
     it('does not render OutcomeKebabMenu when canManage is false', () => {
       const {queryByText} = render(<OutcomeGroupHeader {...defaultProps({canManage: false})} />)
       expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('mobile view', () => {
+    beforeAll(() => {
+      isMobileView = true
+    })
+
+    it('renders the group title', () => {
+      const {getByText} = renderWithContext(<OutcomeGroupHeader {...defaultProps()} />)
+      expect(getByText('Group 3')).toBeInTheDocument()
+    })
+
+    it('renders a caret', () => {
+      const {getByText} = renderWithContext(<OutcomeGroupHeader {...defaultProps({})} />)
+      expect(getByText('Select another group')).toBeInTheDocument()
+    })
+
+    it('hideOutcomeView is called when the caret is clicked', () => {
+      const {getByText} = renderWithContext(<OutcomeGroupHeader {...defaultProps({})} />)
+      fireEvent.click(getByText('Select another group'))
+      expect(hideOutcomesViewMock).toHaveBeenCalled()
+    })
+
+    it('focuses on the caret on mount', () => {
+      const {getByText} = renderWithContext(<OutcomeGroupHeader {...defaultProps({})} />)
+      expect(getByText('Select another group').closest('button')).toHaveFocus()
     })
   })
 })

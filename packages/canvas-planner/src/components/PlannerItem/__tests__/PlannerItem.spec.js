@@ -18,9 +18,11 @@
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 import moment from 'moment-timezone'
+import MockDate from 'mockdate'
 import {PlannerItem} from '../index'
 
-const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', 'America/Los_Angeles')
+const MY_TIMEZONE = 'America/Los_Angeles'
+const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', MY_TIMEZONE)
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#00AC18'}
 
 function defaultProps(option = {}) {
@@ -652,6 +654,23 @@ it('renders media feedback if available', () => {
   expect(wrapper).toMatchSnapshot()
 })
 
+it('does not show "Join" button for zoom calendar events in standard planner', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        simplifiedControls: false, // not k5Mode
+        associated_item: 'Calendar Event',
+        completed: false,
+        title: 'I am a Calendar Event',
+        date: DEFAULT_DATE,
+        dateStyle: 'due',
+        onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+      })}
+    />
+  )
+  expect(wrapper.find('[data-testid="join-button"]').exists()).toBeFalsy()
+})
+
 describe('with simplifiedControls', () => {
   const props = defaultProps({simplifiedControls: true})
 
@@ -669,6 +688,135 @@ describe('with simplifiedControls', () => {
   it('does not render the item type icon in course color', () => {
     const wrapper = shallow(<PlannerItem {...props} />)
     expect(wrapper.find('.PlannerItem-styles__icon').prop('style').color).toBe(undefined)
+  })
+
+  describe('the "Join" button', () => {
+    describe('as inactive', () => {
+      it('for all day events on another day', () => {
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: moment().add(1, 'days'),
+              allDay: true,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
+      })
+
+      it("for events with no end time that haven't started", () => {
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: moment().add(1, 'hours'),
+              allDay: false,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
+      })
+
+      it("for events with an end time that aren't active", () => {
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: moment().add(1, 'hours'),
+              end_time: moment().add(2, 'hours'),
+              allDay: false,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
+      })
+    })
+
+    describe('as active', () => {
+      beforeAll(() => {
+        moment.tz.setDefault(MY_TIMEZONE)
+        const tzoffset = moment.tz(MY_TIMEZONE).format('Z')
+        MockDate.set(`2021-09-01T13:00:00${tzoffset}`)
+      })
+
+      afterAll(() => {
+        MockDate.reset()
+        moment.tz.setDefault()
+      })
+
+      it('for all day events today', () => {
+        const today = moment()
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: today,
+              allDay: true,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
+      })
+
+      it('for started events today with no end time', () => {
+        const today = moment()
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: today.add(-1, 'hour'),
+              allDay: false,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
+      })
+
+      it('for started events currently taking place', () => {
+        const wrapper = shallow(
+          <PlannerItem
+            {...defaultProps({
+              simplifiedControls: true,
+              associated_item: 'Calendar Event',
+              completed: false,
+              title: 'I am a Calendar Event',
+              date: moment().add(-1, 'hour'),
+              end_time: moment().add(1, 'hour'),
+              allDay: false,
+              dateStyle: 'due',
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+            })}
+          />
+        )
+        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
+      })
+    })
   })
 })
 

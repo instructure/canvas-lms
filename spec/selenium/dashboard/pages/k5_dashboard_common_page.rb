@@ -139,8 +139,8 @@ module K5DashboardCommonPageObject
     toggle_k5_setting(@account)
   end
 
-  def hex_value_for_color(element)
-    '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
+  def hex_value_for_color(element, style_type)
+    '#' + ColorCommon.rgba_to_hex(element.style(style_type))
   end
 
   def new_announcement(course, title, message)
@@ -161,20 +161,26 @@ module K5DashboardCommonPageObject
     @homeroom_teacher = @teacher
     course_with_student(
       active_all: true,
-      new_user: true,
-      user_name: 'KTStudent',
+      name: 'K5Student',
       course: @course
     )
+    @original_student = @student
     @course.update!(homeroom_course: true)
     @homeroom_course = @course
-
     @subject_course_title = "Science"
-    course_with_student(
-      active_all: true,
+    @student_enrollment = course_with_student(
+      active_course: true,
       user: @student,
       course_name: @subject_course_title
     )
     @subject_course = @course
+    @student_enrollment.update!(workflow_state: 'active')
+    @subject_course.enroll_teacher(@homeroom_teacher, :enrollment_state => 'active')
+  end
+
+  def observer_setup
+    @observer = user_with_pseudonym(name: "Mom", email: "bestmom@example.com", workflow_state: "available")
+    add_linked_observer(@student, @observer, root_account: @account)
   end
 
   def teacher_setup

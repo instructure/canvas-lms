@@ -32,25 +32,95 @@ describe ContentSharesController do
   end
 
   describe "POST #create" do
+    let(:sender) { @teacher_1 }
+    let(:receiver) { @teacher_2 }
+
     before :each do
-      user_session(@teacher_1)
+      user_session(sender)
     end
 
-    it "returns http success" do
-      post :create, params: {user_id: @teacher_1.id, content_type: 'assignment', content_id: @assignment.id, receiver_ids: [@teacher_2.id]}
-      expect(response).to have_http_status(:created)
-      expect(SentContentShare.where(user_id: @teacher_1.id)).to exist
-      expect(ReceivedContentShare.where(user_id: @teacher_2.id, sender_id: @teacher_1.id)).to exist
-      expect(ContentExport.where(context: @assignment.context)).to exist
-      json = JSON.parse(response.body)
-      expect(json).to include({
-        "name" => @assignment.title,
-        "user_id" => @teacher_1.id,
-        "read_state" => 'read',
-        "sender" => nil,
-      })
-      expect(json['receivers'].first).to include({'id' => @teacher_2.id})
-      expect(json['content_export']).to be_present
+    shared_examples_for "a successful create" do
+      let(:json_response) { JSON.parse(subject.body) }
+      let(:content_export) { ContentExport.find(json_response["content_export"]["id"]) }
+
+      it "has the http status 'created'" do
+        expect(subject).to have_http_status(:created)
+      end
+
+      it "includes the content export id in the response" do
+        expect(json_response["content_export"]["id"]).to eq content_export.id
+      end
+
+      it "includes the sender id in the response" do
+        expect(json_response["user_id"]).to eq sender.id
+      end
+
+      it "includes the receiver id in the response" do
+        expect(json_response["receivers"].select { |receiver_json| receiver_json["id"] == receiver.id }).to be_present
+      end
+
+      it "creates a ContentExport" do
+        expect(content_export).to be_present
+      end
+
+      it "creates a SentContentShare with the sender id" do
+        sent_content_share = SentContentShare.find_by(
+          content_export_id: content_export.id,
+          user_id: sender.id
+        )
+        expect(sent_content_share).to be_present
+      end
+
+      it "creates a ReceivedContentShare with the receiver and sender ids" do
+        received_content_share = ReceivedContentShare.find_by(
+          content_export_id: content_export.id,
+          sender_id: sender.id,
+          user_id: receiver.id
+        )
+        expect(received_content_share).to be_present
+      end
+    end
+
+    context "when sharing an assignment" do
+      subject do
+        post(
+          :create,
+          params: {
+            user_id: sender.id,
+            content_type: "assignment",
+            content_id: @assignment.id,
+            receiver_ids: [receiver.id]
+          }
+        )
+      end
+
+      it_behaves_like "a successful create"
+
+      it "includes the name of the assignment in the response" do
+        expect(JSON.parse(subject.body)["name"]).to eq @assignment.title
+      end
+    end
+
+    context "when sharing an attachment" do
+      let_once(:attachment) { attachment_model(context: sender) }
+
+      subject do
+        post(
+          :create,
+          params: {
+            user_id: sender.id,
+            content_type: "attachment",
+            content_id: attachment.id,
+            receiver_ids: [receiver.id]
+          }
+        )
+      end
+
+      it_behaves_like "a successful create"
+
+      it "includes the name of the assignment in the response" do
+        expect(JSON.parse(subject.body)["name"]).to eq attachment.filename
+      end
     end
 
     it "returns 400 if required parameters aren't included" do

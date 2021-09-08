@@ -29,7 +29,7 @@ shared_context 'advantage services context' do
   end
   let_once(:developer_key) do
     dk = DeveloperKey.create!(account: root_account)
-    dk.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE
+    dk.developer_key_account_bindings.first.update! workflow_state: 'on'
     dk
   end
   let(:access_token_scopes) do

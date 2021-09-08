@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {CreateCourseModal} from '../k5_dashboard/react/CreateCourseModal'
 import $ from 'jquery'
 import I18n from 'i18n!course_list'
 import ready from '@instructure/ready'
@@ -54,7 +57,7 @@ function success(target) {
 }
 
 ready(() => {
-  $('[data-favorite-url]').on('click keyclick', function(event) {
+  $('[data-favorite-url]').on('click keyclick', function (event) {
     event.preventDefault()
     const url = $(this).data('favoriteUrl')
     const target = $(event.currentTarget)
@@ -64,4 +67,32 @@ ready(() => {
       $.ajaxJSON(url, 'POST', {}, success(target), null)
     }
   })
+
+  const startButton = document.getElementById('start_new_course')
+  if (startButton && ENV.K5_USER) {
+    const container = document.getElementById('create_subject_modal_container')
+    if (container) {
+      startButton.addEventListener('click', () => {
+        let role
+        if (ENV.current_user_roles.includes('admin')) {
+          role = 'admin'
+        } else if (ENV.current_user_roles.includes('teacher')) {
+          role = 'teacher'
+        } else {
+          // should never get here
+          return
+        }
+        ReactDOM.render(
+          <CreateCourseModal
+            isModalOpen
+            setModalOpen={isOpen => {
+              if (!isOpen) ReactDOM.unmountComponentAtNode(container)
+            }}
+            permissions={role}
+          />,
+          container
+        )
+      })
+    }
+  }
 })

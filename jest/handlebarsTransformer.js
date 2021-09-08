@@ -24,6 +24,6 @@ exports.process = (source, path) => {
     // brandable_css assets are not available in test
     injectBrandableStylesheet: false
   })
-  const cjs = transformSync(amd).code
+  const cjs = transformSync(amd, {filename: path}).code
   return cjs
 }

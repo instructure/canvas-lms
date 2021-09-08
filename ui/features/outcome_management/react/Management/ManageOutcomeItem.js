@@ -29,22 +29,13 @@ import I18n from 'i18n!OutcomeManagement'
 import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
-
-// This allows account admins to edit global outcomes
-// within a course. See OUT-1415, OUT-1511
-const allowAdminEdit = () => {
-  return (
-    ENV.ROOT_OUTCOME_GROUP?.context_type === 'Course' &&
-    ENV.PERMISSIONS?.manage_outcomes &&
-    ENV.current_user_roles?.includes('admin')
-  )
-}
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const ManageOutcomeItem = ({
-  _id,
   linkId,
   title,
   description,
+  friendlyDescription,
   canManageOutcome,
   isChecked,
   onMenuHandler,
@@ -53,8 +44,13 @@ const ManageOutcomeItem = ({
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
-  const onChangeHandler = () => onCheckboxHandler({_id, linkId, title, canUnlink})
+  const onChangeHandler = () => onCheckboxHandler({linkId})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
+
+  // This allows account admins to edit global outcomes
+  // within a course. See OUT-1415, OUT-1511
+  const {canManage, isAdmin, isCourse} = useCanvasContext()
+  const allowAdminEdit = isCourse && canManage && isAdmin
 
   if (!title) return null
 
@@ -69,14 +65,16 @@ const ManageOutcomeItem = ({
         <Flex.Item as="div" size="4.125rem">
           <div style={{padding: '0.3125rem 0'}}>
             <Flex alignItems="center">
-              <Flex.Item>
-                <Checkbox
-                  label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
-                  value="medium"
-                  checked={isChecked}
-                  onChange={onChangeHandler}
-                />
-              </Flex.Item>
+              {canManageOutcome && (
+                <Flex.Item>
+                  <Checkbox
+                    label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
+                    value="medium"
+                    checked={isChecked}
+                    onChange={onChangeHandler}
+                  />
+                </Flex.Item>
+              )}
               <Flex.Item as="div" padding="0 x-small 0 0">
                 <IconButton
                   size="small"
@@ -87,7 +85,7 @@ const ManageOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={description ? 'enabled' : 'disabled'}
+                  interaction={description || friendlyDescription ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
@@ -104,12 +102,12 @@ const ManageOutcomeItem = ({
         </Flex.Item>
         <Flex.Item align="start" size="50%" shouldGrow>
           <div style={{padding: '0.625rem 0'}}>
-            <Heading level="h4">
+            <Heading level="h4" data-testid="outcome-management-item-title">
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
             </Heading>
           </div>
         </Flex.Item>
-        {(canManageOutcome || allowAdminEdit()) && (
+        {(canManageOutcome || allowAdminEdit) && (
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}
@@ -122,13 +120,14 @@ const ManageOutcomeItem = ({
       <Flex as="div" alignItems="start">
         <Flex.Item size="4.125rem" />
         <Flex.Item size="50%" shouldGrow>
-          {description && (
+          {(description || friendlyDescription) && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
                 withExternalControl
                 description={description}
                 truncate={truncate}
                 onClickHandler={onClickHandler}
+                friendlyDescription={friendlyDescription}
               />
             </View>
           )}
@@ -139,10 +138,10 @@ const ManageOutcomeItem = ({
 }
 
 ManageOutcomeItem.propTypes = {
-  _id: PropTypes.string.isRequired,
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
+  friendlyDescription: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,

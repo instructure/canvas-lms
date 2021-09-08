@@ -122,7 +122,9 @@ class FavoritesController < ApplicationController
   end
   # @API Add course to favorites
   # Add a course to the current user's favorites.  If the course is already
-  # in the user's favorites, nothing happens.
+  # in the user's favorites, nothing happens. Canvas for Elementary subject
+  # and homeroom courses can be added to favorites, but this has no effect in
+  # the UI.
   #
   # @argument id [Required, String]
   #   The ID or SIS ID of the course to add.  The current user must be
@@ -272,10 +274,18 @@ class FavoritesController < ApplicationController
   # When we have other favorites, this needs to be modified to handle the other
   # types, rather than just courses.
   def check_defaults
-    return unless @current_user.favorites.count == 0
-    @current_user.menu_courses.each do |course|
-      @current_user.favorites.create :context => course
+    return if @current_user.favorites.exists?
+
+    @current_user.shard.activate do
+      Favorite.transaction do
+        @current_user.menu_courses.each do |course|
+          @current_user.favorites.create :context => course
+        end
+      end
     end
+  rescue ActiveRecord::RecordNotUnique
+    # another process got to it first
+    nil
   end
 
   def touch_user

@@ -37,6 +37,7 @@ import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
+import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
 import {isGraded, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import studentViewedAtTemplate from '../jst/student_viewed_at.handlebars'
 import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
@@ -48,6 +49,12 @@ import {
   IconCheckMarkIndeterminateLine
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
+import {
+  styleSubmissionStatusPills,
+  determineSubmissionSelection,
+  makeSubmissionUpdateRequest
+} from '../SpeedGraderStatusMenuHelpers'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
@@ -103,6 +110,7 @@ const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
+const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -1135,6 +1143,41 @@ function allowsReassignment(submission) {
   )
 }
 
+function renderStatusMenu(component) {
+  ReactDOM.render(component, document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT))
+}
+
+function statusMenuComponent(submission) {
+  return (
+    <SpeedGraderStatusMenu
+      key={submission.id}
+      lateSubmissionInterval={ENV.late_policy?.late_submission_interval || 'day'}
+      locale={ENV.LOCALE}
+      secondsLate={submission.seconds_late || 0}
+      selection={determineSubmissionSelection(submission)}
+      updateSubmission={updateSubmissionAndPageEffects}
+    />
+  )
+}
+
+function getLateAndMissingPills() {
+  return document.querySelectorAll('.submission-missing-pill, .submission-late-pill')
+}
+
+function updateSubmissionAndPageEffects(data) {
+  const submission = EG.currentStudent.submission
+
+  makeSubmissionUpdateRequest(submission, ENV.course_id, data)
+    .then(() => {
+      refreshGrades(() => {
+        EG.refreshSubmissionsToView()
+        styleSubmissionStatusPills(getLateAndMissingPills())
+        renderStatusMenu(statusMenuComponent(submission))
+      })
+    })
+    .catch(showFlashError())
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -1992,6 +2035,13 @@ EG = {
       submission =
         submissionHistory[currentSelectedIndex].submission ||
         submissionHistory[currentSelectedIndex]
+    }
+
+    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
+    if (mountPoint) {
+      styleSubmissionStatusPills(getLateAndMissingPills())
+      const component = isMostRecent ? statusMenuComponent(this.currentStudent.submission) : null
+      renderStatusMenu(component)
     }
 
     const turnitinEnabled =
@@ -2980,7 +3030,8 @@ EG = {
       method,
       formData,
       () => formSuccess(EG.currentStudent.id),
-      data => formError(data, EG.currentStudent.id)
+      data => formError(data, EG.currentStudent.id),
+      {skipDefaultError: true}
     )
   },
 
@@ -3082,18 +3133,24 @@ EG = {
 
     // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
     // depends on it being there. so mimic it.
+    let historyIndex =
+      student.submission?.submission_history?.findIndex(history => {
+        const historySubmission = history.submission || history
+        if (historySubmission.attempt == null) {
+          return false
+        }
+        return historySubmission.attempt === submission.attempt
+      }) || 0
+    historyIndex = historyIndex === -1 ? 0 : historyIndex
+
     if (typeof submission.submission_history === 'undefined') {
-      let historyIndex =
-        student.submission?.submission_history?.findIndex(history => {
-          const historySubmission = history.submission || history
-          if (historySubmission.attempt == null) {
-            return false
-          }
-          return historySubmission.attempt === submission.attempt
-        }) || 0
-      historyIndex = historyIndex === -1 ? 0 : historyIndex
       submission.submission_history = Array.from({length: historyIndex + 1})
       submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
+    }
+
+    // update the nested submission in submission_history if needed
+    if (student.submission?.submission_history?.[historyIndex]?.submission) {
+      submission.submission_history[historyIndex].submission = $.extend(true, {}, submission)
     }
 
     $.extend(true, student.submission, submission)
@@ -3479,6 +3536,8 @@ EG = {
       errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.')
     } else if (errorCode === 'PROVISIONAL_GRADE_MODIFY_SELECTED') {
       errorMessage = I18n.t('The grade you entered has been selected and can no longer be changed.')
+    } else if (errorCode === 'ASSIGNMENT_LOCKED') {
+      errorMessage = I18n.t('This assignment is locked and cannot be reassigned.')
     } else {
       errorMessage = I18n.t('An error occurred updating this assignment.')
     }

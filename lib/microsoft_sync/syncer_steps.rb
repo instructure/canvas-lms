@@ -34,8 +34,8 @@
 module MicrosoftSync
   class SyncerSteps
     # Database batch size for users without AAD ids. Should be an even multiple of
-    # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
-    ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+    # GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE:
+    ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE = 750
 
     MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
     MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
@@ -60,18 +60,39 @@ module MicrosoftSync
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
 
-    # SyncCanceled errors are semi-expected errors -- so we raise them they will
-    # cleanup_after_failure but not produce a failed job.
-    class SyncCanceled < Errors::PublicError
-      include Errors::GracefulCancelErrorMixin
+    # Can happen when User disables sync on account-level when jobs are running:
+    class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Tenant missing or sync disabled. ' \
+          'Check the Microsoft sync integration settings for the course and account.'
+      end
     end
 
-    class MissingOwners < SyncCanceled; end
-    # Can happen when User disables sync on account-level when jobs are running:
-    class TenantMissingOrSyncDisabled < SyncCanceled; end
-    # Can happen when the Course has more then 25k members's enrolled or 100
-    # owner's enrolled
-    class MaxEnrollmentsReached < SyncCanceled; end
+    class MultipleEducationClasses < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Multiple Microsoft education classes already exist for the course.'
+      end
+    end
+
+    class MaxMemberEnrollmentsReached < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Microsoft 365 allows a maximum of %{max} members in a team.'
+      end
+
+      def public_interpolated_values
+        {max: MAX_ENROLLMENT_MEMBERS}
+      end
+    end
+
+    class MaxOwnerEnrollmentsReached < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t 'Microsoft 365 allows a maximum of %{max} owners in a team.'
+      end
+
+      def public_interpolated_values
+        {max: MAX_ENROLLMENT_OWNERS}
+      end
+    end
 
     attr_reader :group
     delegate :course, to: :group
@@ -116,8 +137,8 @@ module MicrosoftSync
     # don't want to delete PartialSyncChanges corresponding to enrollments not
     # yet replicated.)
     def step_full_sync_prerequisites(_mem_data, _job_state_data)
-      raise_max_enrollment_members_reached if max_enrollment_members_reached?
-      raise_max_enrollment_owners_reached if max_enrollment_owners_reached?
+      raise MaxMemberEnrollmentsReached if max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if max_enrollment_owners_reached?
 
       PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
 
@@ -133,10 +154,7 @@ module MicrosoftSync
         return StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
       end
 
-      if remote_ids.length > 1
-        raise MicrosoftSync::Errors::InvalidRemoteState, \
-              "Multiple Microsoft education classes exist for the course."
-      end
+      raise MultipleEducationClasses if remote_ids.length > 1
 
       # Create a group if needed. If there is already a group but we do not
       # have it in the Group record, use it but first update it with course
@@ -162,15 +180,16 @@ module MicrosoftSync
       retry_object_for_error(e, job_state_data: group_id)
     end
 
-    # Gets users enrolled in course, get UPNs ("userPrincipalName"s, e.g. email
+    # Gets users enrolled in course, get ULUVs (user lookup values, e.g.
     # addresses, username) for them, looks up the AADs (Azure Active Directory
     # object IDs -- Microsoft's internal ID for the user) from Microsoft, and
     # writes the User->AAD mapping into the UserMapping table.  If a user
-    # doesn't have a UPN or Microsoft doesn't have an AAD for them, skips that
-    # user.
+    # doesn't have whatever we use to bulid the ULUV (e.g. email or SIS id, as
+    # specified by the microsoft_sync_login_attribute Account setting), or
+    # Microsoft doesn't have a user for the calculated ULUV, skips that user.
     def step_ensure_enrollments_user_mappings_filled(_mem_data, _job_state_data)
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
-        course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
+        course: course, batch_size: ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE
       ) do |user_ids|
         ensure_user_mappings(user_ids)
       end
@@ -181,16 +200,17 @@ module MicrosoftSync
     end
 
     def ensure_user_mappings(user_ids)
-      users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
-      users_and_upns = users_upns_finder.call
+      users_uluvs_finder = MicrosoftSync::UsersUluvsFinder.new(user_ids, group.root_account)
+      users_and_uluvs = users_uluvs_finder.call
+      remote_attr = account_settings[:microsoft_sync_remote_attribute]
 
-      # If some users in different slices have the same UPNs, this could end up
-      # looking up the same UPN multiple times; but this should be very rare
-      users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
-        upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
-        user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
+      # If some users in different slices have the same ULUVs, this could end up
+      # looking up the same ULUV multiple times; but this should be very rare
+      users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
+        uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(remote_attr, slice.map(&:last))
+        user_id_to_aad = slice.map{|user_id, uluv| [user_id, uluv_to_aad[uluv]]}.to_h.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
-        # as passed into UsersUpnsFinder AND as used in #tenant, for the "have settings changed?"
+        # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.
         UserMapping.bulk_insert_for_root_account(group.root_account, user_id_to_aad)
       end
@@ -229,14 +249,10 @@ module MicrosoftSync
     def step_execute_diff(diff, _job_state_data)
       # TODO: If there are no instructor enrollments, we actually want to
       # remove the group on the Microsoft side (INTEROP-6672)
-      if diff.local_owners.empty?
-        raise MissingOwners, 'A Microsoft 365 Group must have owners, and no users ' \
-          'corresponding to the instructors of the Canvas course could be found on the ' \
-          'Microsoft side.'
-      end
+      raise Errors::MissingOwners if diff.local_owners.empty?
 
-      raise_max_enrollment_members_reached if diff.max_enrollment_members_reached?
-      raise_max_enrollment_owners_reached if diff.max_enrollment_owners_reached?
+      raise MaxMemberEnrollmentsReached if diff.max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if diff.max_enrollment_owners_reached?
 
       execute_diff(diff)
 
@@ -339,7 +355,7 @@ module MicrosoftSync
       mappings.each { |user_id, aad_id| diff.set_member_mapping(user_id, aad_id) }
 
       users_with_mappings = mappings.map(&:first)
-      enrollments = Enrollment.active
+      enrollments = Enrollment.microsoft_sync_relevant
         .where(course: course, user_id: users_with_mappings)
         .pluck(:user_id, :type)
       enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
@@ -370,6 +386,13 @@ module MicrosoftSync
       retry_object_for_error(e)
     end
 
+    # Only serialize Group (AR model, so really just Group id) when enqueueing
+    # a job. The rest of the instance variables should be reloaded when the job
+    # starts again.
+    def encode_with(coder)
+      coder['group'] = @group
+    end
+
     private
 
     attr_writer :sync_type
@@ -380,13 +403,16 @@ module MicrosoftSync
     def tenant
       @tenant ||=
         begin
-          settings = group.root_account.settings
-          enabled = settings[:microsoft_sync_enabled]
-          tenant = settings[:microsoft_sync_tenant]
+          enabled = account_settings[:microsoft_sync_enabled]
+          tenant = account_settings[:microsoft_sync_tenant]
           raise TenantMissingOrSyncDisabled unless enabled && tenant
 
           tenant
         end
+    end
+
+    def account_settings
+      @account_settings ||= group.root_account.settings
     end
 
     def graph_service_helpers
@@ -414,16 +440,6 @@ module MicrosoftSync
         .limit(MAX_ENROLLMENT_OWNERS + 1)
         .distinct
         .count > MAX_ENROLLMENT_OWNERS
-    end
-
-    def raise_max_enrollment_members_reached
-      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
-          "#{MAX_ENROLLMENT_MEMBERS} members in a team."
-    end
-
-    def raise_max_enrollment_owners_reached
-      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
-          "#{MAX_ENROLLMENT_OWNERS} owners in a team."
     end
   end
 end

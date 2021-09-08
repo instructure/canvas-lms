@@ -1245,40 +1245,8 @@ class Attachment < ActiveRecord::Base
       (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
   end
 
-  def context_root_account(user = nil)
-    # Granular Permissions
-    #
-    # The primary use case for this method is for accurately checking
-    # feature flag enablement, given a user and the calling context.
-    # We want to prefer finding the root_account through the context
-    # of the authorizing resource or fallback to the user's active
-    # pseudonym's residing account.
-    return self.context.account if self.context.is_a?(User)
-
-    self.context.try(:root_account) || user&.account
-  end
-
   set_policy do
-    #################### Begin legacy permission block #########################
-
     given do |user, session|
-      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
-      self.context&.grants_right?(user, session, :manage_files) &&
-      !self.associated_with_submission? &&
-      (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
-    end
-    can :delete and can :update
-
-    given do |user, session|
-      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
-      self.context&.grants_right?(user, session, :manage_files)
-    end
-    can :read and can :create and can :download and can :read_as_admin
-
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_edit) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1286,7 +1254,6 @@ class Attachment < ActiveRecord::Base
     can :read and can :update
 
     given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_delete) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1294,7 +1261,6 @@ class Attachment < ActiveRecord::Base
     can :read and can :delete
 
     given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_add)
     end
     can :read and can :create and can :download and can :read_as_admin
@@ -1313,22 +1279,20 @@ class Attachment < ActiveRecord::Base
     }
     can :read and can :download
 
-    given { |user, session|
-        session && session['file_access_user_id'].present? &&
-        (u = User.where(id: session['file_access_user_id']).first) &&
+    given { |_user, session|
+        (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
-        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
+        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
     }
     can :read
 
-    given { |user, session|
-        session && session['file_access_user_id'].present? &&
-        (u = User.where(id: session['file_access_user_id']).first) &&
+    given { |_user, session|
+        (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         !self.locked_for?(u, :check_policies => true) &&
-        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
+        session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
     }
     can :download
 

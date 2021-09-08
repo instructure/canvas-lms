@@ -44,7 +44,8 @@
 #   job_state_record.job_state is information about the step that failed,
 #       and data it may need to continue where it left off. There may be other
 #       temporary data in the DB with retry info (e.g. saved with a stash block
-#       and cleaned up in after_failure())
+#       and cleaned up in after_failure()). If a record has been deleted and then
+#       restored, job_state should be set to {restored: true}
 # After a job has hit a final error (error raised, or max `Retry`s surpassed):
 #   job_state_record.workflow_state is "errored"
 #   job_state_record.last_error will have a user-friendly/safe error message
@@ -160,7 +161,7 @@ module MicrosoftSync
     # of time we may clear the state and restart the job. See `job_is_stale?`
     STALE_JOB_TIME = 1.day
 
-    # SEE ALSO Errors::GracefulCancelErrorMixin
+    # SEE ALSO Errors::GracefulCancelError
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
@@ -170,6 +171,9 @@ module MicrosoftSync
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state=nil)
       run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
+    rescue IRB::Abort => e
+      update_state_record_to_errored_and_cleanup(e)
+      raise
     end
 
     def run_later(initial_mem_state=nil)
@@ -198,6 +202,15 @@ module MicrosoftSync
         # state/jobs and reset state below). This can happen if jobs were
         # paused for longer than STALE_JOB_TIME and a new job in the queue
         # comes and wipes out the state
+        #
+        # It can also happen if the job_state_record was deleted and then restored
+        # while the job was waiting to be retried. Check that case here and ignore.
+        # job_state will get reset the next time the job completes/retries/errors.
+        if job_state&.dig(:restored)
+          log { "In-progress job starting again but job state record was deleted & restored since" }
+          return
+        end
+
         err = InternalError.new(
           "Job step doesn't match state: #{step.inspect} != #{step_from_job_state.inspect}. " \
           "workflow_state: #{job_state_record.workflow_state}, job_state: #{job_state.inspect}"
@@ -247,7 +260,7 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          if e.is_a?(Errors::GracefulCancelErrorMixin)
+          if e.is_a?(Errors::GracefulCancelError)
             statsd_increment(:cancel, current_step, e)
             update_state_record_to_errored_and_cleanup(e)
             return
@@ -311,7 +324,7 @@ module MicrosoftSync
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.user_facing_message(error)
+      error_msg = MicrosoftSync::Errors.serialize(error)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id
@@ -394,14 +407,14 @@ module MicrosoftSync
 
     # Find a delayed job on the strand with arguments that match the selector
     # IMPORTANT: To avoid unnecessary database loads of the state_record
-    # object, this uses SafeYAML to avoid instantiating objects in the YAML;
+    # object, this uses YAML to avoid instantiating objects in the YAML;
     # this also means that the args passed into the selector will be only Ruby
     # primitives. So if you use non-primitives in initial_mem_state, duplicate
     # job detection won't work.
     def find_delayed_job(strand, &args_selector)
       Delayed::Job.where(strand: strand).find_each.find do |job|
         job != Delayed::Worker.current_job && args_selector[
-          SafeYAML.load(job.handler, nil, raise_on_unknown_tag: false)['args']
+          YAML.unsafe_load(job.handler)['args']
         ]
       end
     end

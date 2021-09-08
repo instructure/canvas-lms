@@ -41,6 +41,7 @@ class PseudonymsController < ApplicationController
   #                 provider that this login is associated with
   # @response_field authentication_provider_type The type of the authentication
   #                 provider that this login is associated with
+  # @response_field workflow_state The current status of the login
   #
   # @example_response
   #   [
@@ -51,7 +52,8 @@ class PseudonymsController < ApplicationController
   #       "unique_id": "belieber@example.com",
   #       "user_id": 2,
   #       "authentication_provider_id": 1,
-  #       "authentication_provider_type": "facebook"
+  #       "authentication_provider_type": "facebook",
+  #       "workflow_state": "active"
   #     }
   #   ]
   def index
@@ -85,7 +87,7 @@ class PseudonymsController < ApplicationController
       end
       @ccs = CommunicationChannel.email.by_path(email).shard(shards.to_a).active.to_a
       if @domain_root_account
-        @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
+        @domain_root_account.pseudonyms.active_only.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
           cc ||= p.user.communication_channel rescue nil
           @ccs << cc
@@ -139,7 +141,7 @@ class PseudonymsController < ApplicationController
         flash[:error] = t 'The link you used has expired. Click "Forgot Password?" to get a new reset-password link.'
         redirect_to canvas_login_url
       end
-      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.canvas_authentication? }
+      @password_pseudonyms = @cc.user.pseudonyms.active_only.select{|p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
              :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
     end
@@ -301,6 +303,9 @@ class PseudonymsController < ApplicationController
   #   provider, or the type of the provider (in which case, it will find the
   #   first matching provider).
   #
+  # @argument login[workflow_state] [String, "active"|"suspended"]
+  #   Used to suspend or re-activate a login.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/logins/:login_id \
   #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
@@ -315,7 +320,8 @@ class PseudonymsController < ApplicationController
   #     "created_at": "2020-01-29T19:33:35Z",
   #     "sis_user_id": null,
   #     "integration_id": null,
-  #     "authentication_provider_id": null
+  #     "authentication_provider_id": null,
+  #     "workflow_state": "active",
   #   }
   def update
     if api_request?
@@ -323,7 +329,7 @@ class PseudonymsController < ApplicationController
       return unless @user = @pseudonym.user
       params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]
-      params[:pseudonym]  = params[:login]
+      params[:pseudonym] = params[:login]
     else
       return unless get_user
       @pseudonym = Pseudonym.active.find(params[:id])
@@ -406,7 +412,8 @@ class PseudonymsController < ApplicationController
       :password,
       :sis_user_id,
       :authentication_provider_id,
-      :integration_id
+      :integration_id,
+      :workflow_state,
     ).blank?
       render json: nil, status: :bad_request
       return false
@@ -448,6 +455,20 @@ class PseudonymsController < ApplicationController
     has_right_if_requests_change(:password, :change_password) do
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
+    end or return false
+
+    # give a 400 instead of a 401 if the workflow_state doesn't make sense
+    if params[:pseudonym].key?(:workflow_state) && !%w[active suspended].include?(params[:pseudonym][:workflow_state])
+      @pseudonym.errors.add(:workflow_state, 'invalid workflow_state')
+      respond_to do |format|
+        format.html { render(params[:action] == 'edit' ? :edit : :new) }
+        format.json { render json: @pseudonym.errors, status: :bad_request }
+      end
+      return false
+    end
+
+    has_right_if_requests_change(:workflow_state, :delete) do
+      @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
     end or return false
   end
 

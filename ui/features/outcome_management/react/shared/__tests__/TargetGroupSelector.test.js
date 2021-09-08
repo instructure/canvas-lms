@@ -39,9 +39,9 @@ describe('TargetGroupSelector', () => {
   let showFlashAlertSpy
 
   const defaultProps = (props = {}) => ({
-    groupId: '100',
     parentGroupId: '1',
     setTargetGroup: setTargetGroupMock,
+    targetGroupId: '1',
     ...props
   })
 
@@ -57,15 +57,10 @@ describe('TargetGroupSelector', () => {
 
   const render = (
     children,
-    {
-      contextType = 'Account',
-      contextId = '1',
-      rootOutcomeGroup = {id: '100'},
-      mocks = accountMocks({childGroupsCount: 0})
-    } = {}
+    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
   ) => {
     return realRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -83,7 +78,7 @@ describe('TargetGroupSelector', () => {
     expect(getByText('Account folder 0')).toBeInTheDocument()
   })
 
-  it('calls setTargetGroup with the selected group object', async () => {
+  it('calls setTargetGroup with the selected group object and ancestors ids', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
@@ -92,13 +87,14 @@ describe('TargetGroupSelector', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(setTargetGroupMock).toHaveBeenCalledWith({
-      canEdit: true,
-      collections: [],
-      descriptor: '2 Groups | 2 Outcomes',
-      id: '100',
-      name: 'Account folder 0',
-      outcomesCount: 2,
-      parentGroupId: '1'
+      targetAncestorsIds: ['100', '1'],
+      targetGroup: {
+        collections: [],
+        id: '100',
+        name: 'Account folder 0',
+        parentGroupId: '1',
+        isRootGroup: false
+      }
     })
   })
 
@@ -131,7 +127,7 @@ describe('TargetGroupSelector', () => {
   it('displays a flash alert when a child group fails to load', async () => {
     const mocks = [
       ...accountMocks({childGroupsCount: 2}),
-      ...groupMocks({groupId: 100, childGroupOffset: 400})
+      ...groupMocks({groupId: '100', childGroupOffset: 400})
     ]
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {mocks})
     await act(async () => jest.runAllTimers())
@@ -152,17 +148,32 @@ describe('TargetGroupSelector', () => {
     expect(getByText('Create New Group')).toBeInTheDocument()
   })
 
-  describe('when the create new group link is expanded', () => {
-    it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
-      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+  describe('create new group button', () => {
+    it('focuses on the link after the AddContentItem unexpands', async () => {
+      const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Cancel'))
+      expect(getByText('Create New Group')).toHaveFocus()
+    })
+
+    it('calls the addOutcomeGroup api when the item is created', async () => {
+      const newGroup = {
+        id: '101',
+        title: 'Group 101',
+        description: '',
+        isRootGroup: false,
+        parent_outcome_group: {id: '1'}
+      }
+      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200, data: newGroup}))
       const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
@@ -176,14 +187,14 @@ describe('TargetGroupSelector', () => {
       addOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred adding group "new group name": Server is busy'
+        message: 'An error occurred adding group "new group name": Server is busy.'
       })
     })
 
@@ -193,14 +204,14 @@ describe('TargetGroupSelector', () => {
       addOutcomeGroup.mockReturnValue(Promise.reject(new Error()))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
-      fireEvent.click(getByText('Create New Group'))
+      fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
-      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '1', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred adding group "new group name"'
+        message: 'An error occurred adding group "new group name".'
       })
     })
   })

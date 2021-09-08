@@ -35,6 +35,9 @@
     "announcements_a4b8ed4a": {
         "message": "הכרזות"
     },
+    "apply_781a2546": {
+        "message": "החל"
+    },
     "apps_54d24a47": {
         "message": "אפליקציות"
     },
@@ -344,6 +347,9 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
+    "join_6cafecca": {
+        "message": "הצטרפות"
+    },
     "jump_to_today_254ccf41": {
         "message": "עבור להיום"
     },
@@ -419,6 +425,9 @@
     "my_grades_98834476": {
         "message": "הציונים שלי"
     },
+    "name_1aed4a1b": {
+        "message": "שם"
+    },
     "new_13daf639": {
         "message": "חדש"
     },
@@ -430,9 +439,6 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "הזדמנויות חדשות"
-    },
-    "next_40e12421": {
-        "message": "הבא"
     },
     "next_month_749b1778": {
         "message": "החודש הבא"
@@ -649,6 +655,9 @@
     },
     "upload_media_ce31135a": {
         "message": "העלאת מדיה"
+    },
+    "uploading_19e8a4e7": {
+        "message": "מעלה"
     },
     "url_22a5f3b8": {
         "message": "כתובת דף אינטרנט"

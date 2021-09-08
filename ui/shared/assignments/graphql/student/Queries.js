@@ -88,12 +88,13 @@ export const STUDENT_VIEW_QUERY = gql`
       ...Assignment
       ...AssignmentSubmissionsConnection
       rubric {
-        id
+        ...Rubric
       }
     }
   }
   ${Assignment.fragment}
   ${AssignmentSubmissionsConnection.fragment}
+  ${Rubric.fragment}
 `
 
 export const LOGGED_OUT_STUDENT_VIEW_QUERY = gql`

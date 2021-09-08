@@ -21,49 +21,13 @@ import formatMessage from '../format-message'
 import {CodeEditor} from '@instructure/ui-code-editor'
 import beautify from 'js-beautify'
 
-// html inline elements allowed by canvas
-// (less 'a', 'img', 'span', and 'br', which I want rendered on a new line the editor)
-const inline_elems = [
-  'abbr',
-  'area',
-  'b',
-  'bdi',
-  'bdo',
-  'cite',
-  'code',
-  'del',
-  'dfn',
-  'em',
-  'embed',
-  'i',
-  'ins',
-  'kbd',
-  'label',
-  'map',
-  'mark',
-  'math',
-  'object',
-  'q',
-  'samp',
-  'small',
-  'strong',
-  'sub',
-  'sup',
-  'time',
-  'u',
-  'var',
-  'acronym',
-  'big',
-  'tt'
-]
-
 const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   const [code, setCode] = useState(props.code)
   const label = formatMessage('html code editor')
   const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
 
   useEffect(() => {
-    setCode(beautify.html(props.code, {inline: inline_elems}))
+    setCode(beautify.html(props.code))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

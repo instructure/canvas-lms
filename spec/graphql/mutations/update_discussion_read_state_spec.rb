@@ -67,7 +67,9 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
     result = run_mutation({id: @topic.id, read: false})
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'updateDiscussionReadState', 'discussionTopic', 'title')).to eq @topic.title
-    expect(@topic.discussion_entry_participants.where(user: @teacher).pluck(:workflow_state)).not_to include('read')
+    scope = @topic.discussion_entry_participants.where(user: @teacher)
+      .where.not(discussion_entries: { workflow_state: 'deleted' })
+    expect(scope.pluck(:workflow_state)).not_to include('read')
   end
 
 end

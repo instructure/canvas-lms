@@ -121,8 +121,12 @@ class AssetUserAccessLog
   end
 
   def self.publish_message_to_bus(log_values, root_account)
-    producer = MessageBus.producer_for(PULSAR_NAMESPACE, message_bus_topic_name(root_account))
-    producer.send(log_values.to_json)
+    topic_name = message_bus_topic_name(root_account)
+    msg = log_values.to_json
+    MessageBus.send_one_message(PULSAR_NAMESPACE, topic_name, msg)
+  rescue ::MessageBus::MemoryQueueFullError => e
+    Rails.logger.warn("[AUA LOG] Write failed due to throughput: #{topic_name} , #{msg}")
+    CanvasErrors.capture_exception(:asset_user_access_logs, e, :warn)
   end
 
   def self.message_bus_topic_name(root_account)
@@ -277,6 +281,7 @@ class AssetUserAccessLog
   # write throughput for keeping AUA counts up to date
   # at the tradeoff of some eventual consistency.
   def self.message_bus_compact
+    Bundler.require(:pulsar) # makes sure we can capture Pulsar errors
     # Step 0) load iterator state and settings
     compaction_state = self.metadatum_payload
     compaction_start = Time.now.utc
@@ -327,7 +332,35 @@ class AssetUserAccessLog
       topic = self.message_bus_topic_name(root_account)
       # we explicitly close this consumer at the end of processing, so we don't want
       # a cached consumer.
-      consumer = MessageBus.consumer_for(PULSAR_NAMESPACE, topic, PULSAR_SUBSCRIPTION, force_fresh: true)
+      consumer = nil
+      connect_attempts = 0
+      begin
+        consumer = MessageBus.consumer_for(PULSAR_NAMESPACE, topic, PULSAR_SUBSCRIPTION, force_fresh: true)
+      rescue ::Pulsar::Error::ConsumerBusy => e
+        # this means that another consumer is already running, or is being
+        # held open improperly.  If it's the former, we don't want
+        # to run at the same time.  If it's the later, we can't really tell
+        # that from here, so we should just stop and let that other consumer eventually
+        # time out.  No need to fail the job, it will get rescheduled, just like if
+        # we'd run out of runtime budget.
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :info)
+        early_exit = true
+        break
+      rescue *::MessageBus.rescuable_pulsar_errors => e
+        connect_attempts += 1
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :warn)
+        if connect_attempts >= 2
+          # treat it like a runtime timeout, reschedule the job
+          # and let it try again.
+          early_exit = true
+          break
+        end
+        # It's possible the brokers are being restarted; we'll try
+        # one more time to see if pulling new connections allows us to
+        # find the brokers again.
+        MessageBus.reset!
+        retry
+      end
 
       # 3) establish in-memory datastructure for compacting a set of events FOR THIS ROOT ACCOUNT.
       # the hash will have IDs for asset_user_access records as it's key, and
@@ -505,7 +538,13 @@ class AssetUserAccessLog
       # job can start a new one later on a different box safely.
       # we want to stay in "exclusive" mode so that only one job
       # can be updating the iterator state.
-      consumer.close()
+      begin
+        consumer.close()
+      rescue ::Pulsar::Error::ConnectError => e
+        # if we fail to close the connection, but we're already here
+        # the job didn't really fail; we already got past all the state updating.
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :warn)
+      end
     end
 
     # 14) return value indicating whether we should immediately re-schedule or not
@@ -661,7 +700,9 @@ class AssetUserAccessLog
         intra_batch_pause = Setting.get("aua_log_compaction_batch_pause", "0.0").to_f
         batch_upper_boundary = log_id_bookmark + log_batch_size
         agg_sql = aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
-        if use_pulsar_ripcord_iterators
+        # if there ARE no root accounts that are active, aggregating according to
+        # them is pointless.  This can happen in scenarios where a system is being decomissioned.
+        if use_pulsar_ripcord_iterators && Account.root_accounts.active.exists?
           # we cannot use the standard aggregation query because of the root-account
           # partition strategy while we were using the message bus transpor layer.
           # We need to replace it with a recovery

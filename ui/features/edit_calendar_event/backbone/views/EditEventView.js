@@ -158,9 +158,6 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   renderConferenceWidget() {
-    if (!ENV.CALENDAR?.CONFERENCES_ENABLED) {
-      return
-    }
     const conferenceNode = document.getElementById('calendar_event_conference_selection')
     const activeConferenceTypes = this.getActiveConferenceTypes()
     if (!this.model.get('web_conference') && activeConferenceTypes.length === 0) {
@@ -283,21 +280,18 @@ export default class EditCalendarEventView extends Backbone.View {
       if (dialog.render()) return
     }
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
-      const conference = this.model.get('web_conference')
-      if (conference) {
-        eventData.web_conference = {
-          ...conference,
-          title:
-            conference.conference_type === 'LtiConference' ? eventData.title : conference.title,
-          user_settings: {
-            ...conference.user_settings,
-            scheduled_date: eventData.start_at ? eventData.start_at.toISOString() : null
-          }
+    const conference = this.model.get('web_conference')
+    if (conference) {
+      eventData.web_conference = {
+        ...conference,
+        title: conference.conference_type === 'LtiConference' ? eventData.title : conference.title,
+        user_settings: {
+          ...conference.user_settings,
+          scheduled_date: eventData.start_at ? eventData.start_at.toISOString() : null
         }
-      } else {
-        eventData.web_conference = ''
       }
+    } else {
+      eventData.web_conference = ''
     }
 
     return this.saveEvent(eventData)

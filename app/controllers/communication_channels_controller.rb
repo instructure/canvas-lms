@@ -337,7 +337,7 @@ class CommunicationChannelsController < ApplicationController
         return unless @merge_opportunities.empty?
         failed = true
       elsif cc.active?
-        pseudonym = @root_account.pseudonyms.active.where(:user_id => @user).exists?
+        pseudonym = @root_account.pseudonyms.active_only.where(:user_id => @user).exists?
         if @user.pre_registered? && pseudonym
           @user.register
           return redirect_with_success_flash
@@ -347,12 +347,12 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.active_only.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(:user => @user, :unique_id => cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
         # up with something new
-        @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.by_unique_id(@pseudonym.unique_id).exists?
+        @pseudonym.unique_id = '' if @pseudonym&.new_record? && @root_account.pseudonyms.active_only.by_unique_id(@pseudonym.unique_id).exists?
 
         # Have to either have a pseudonym to register with, or be looking at merge opportunities
         return render :confirm_failed, status: :bad_request if !@pseudonym && @merge_opportunities.empty?

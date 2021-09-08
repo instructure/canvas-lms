@@ -17,11 +17,18 @@
  */
 
 export const DEFAULT_SETTINGS = {
+  name: '',
+  alt: '',
   shape: 'square',
   size: 'small',
   color: null,
   outlineColor: null,
-  outlineSize: 'none'
+  outlineSize: 'none',
+  text: '',
+  textSize: 'small',
+  textColor: null,
+  textBackgroundColor: null,
+  textPosition: 'middle'
 }
 
 export const DEFAULT_OPTIONS = {
@@ -41,3 +48,21 @@ export const STROKE_WIDTH = {
   medium: 4,
   large: 8
 }
+
+export const TEXT_SIZE = {
+  small: 14,
+  medium: 16,
+  large: 22,
+  'x-large': 28
+}
+
+export const MAX_CHAR_COUNT = {
+  small: 21,
+  medium: 18,
+  large: 13,
+  'x-large': 10
+}
+
+export const MAX_TOTAL_TEXT_CHARS = 32
+
+export const TEXT_BACKGROUND_PADDING = 4

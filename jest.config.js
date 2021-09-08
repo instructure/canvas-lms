@@ -33,7 +33,7 @@ module.exports = {
     // mock the tinymce-react Editor react component
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },
-  roots: ['ui', 'gems/plugins', 'public/javascripts'],
+  roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
   reporters: [
     'default',
@@ -52,7 +52,7 @@ module.exports = {
     '@testing-library/jest-dom/extend-expect',
     './packages/validated-apollo/src/ValidatedApolloCleanup.js'
   ],
-  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
@@ -65,7 +65,7 @@ module.exports = {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
     '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.[jt]sx?$': 'babel-jest',
     '\\.graphql$': 'jest-raw-loader'
   }
 }

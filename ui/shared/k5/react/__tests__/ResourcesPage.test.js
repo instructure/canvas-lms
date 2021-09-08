@@ -81,7 +81,7 @@ describe('ResourcesPage', () => {
     ],
     cardsSettled: true,
     showStaff: true,
-    filterToHomerooms: true,
+    isSingleCourse: false,
     ...overrides
   })
 

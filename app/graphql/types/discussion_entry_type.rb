@@ -25,7 +25,11 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    global_id_field :id
 
+    field :discussion_topic_id, ID, null: false
+    field :parent_id, ID, null: true
+    field :root_entry_id, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :rating, Boolean, null: true
@@ -38,7 +42,27 @@ module Types
 
     field :message, String, null: true
     def message
-      object.deleted? ? nil : object.message
+      if object.deleted?
+        nil
+      else
+        object.message
+      end
+    end
+
+    field :preview_message, String, null: true
+    def preview_message
+      object.deleted? ? nil : object.summary
+    end
+
+    field :quoted_entry, Types::DiscussionEntryType, null: true
+    def quoted_entry
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry)
+      else
+        nil
+      end
     end
 
     field :read, Boolean, null: false
@@ -72,6 +96,8 @@ module Types
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
     def root_entry_participant_counts
+      return nil unless object.root_entry_id.nil?
+
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
@@ -82,17 +108,34 @@ module Types
 
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :relative_entry_id, ID, required: false
+      argument :before_relative_entry, Boolean, required: false
+      argument :include_relative_entry, Boolean, required: false
     end
-    def discussion_subentries_connection(sort_order: :asc)
+    def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
+      # don't try to load subentries UNLESS
+      # we are a legacy discussion entry, or we are a root_entry.
+      return nil unless object.legacy? || object.root_entry_id.nil?
+
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
-        sort_order: sort_order
+        sort_order: sort_order,
+        relative_entry_id: relative_entry_id,
+        before_relative_entry: before_relative_entry,
+        include_relative_entry: include_relative_entry
+      ).load(object)
+    end
+
+    field :entry_participant, Types::EntryParticipantType, null: true
+    def entry_participant
+      Loaders::EntryParticipantLoader.for(
+        current_user: current_user
       ).load(object)
     end
 
     field :parent, Types::DiscussionEntryType, null: true
     def parent
-      Loaders::IDLoader.for(DiscussionEntry).load(object.parent_id)
+      load_association(:parent_entry)
     end
 
     field :attachment, Types::FileType, null: true
@@ -102,11 +145,17 @@ module Types
 
     field :last_reply, Types::DiscussionEntryType, null: true
     def last_reply
+      return nil unless object.root_entry_id.nil?
+
       load_association(:last_discussion_subentry)
     end
 
     field :subentries_count, Integer, null: true
     def subentries_count
+      # don't try to count subentries UNLESS
+      # we are a legacy discussion entry, or we are a root_entry
+      return nil unless object.legacy? || object.root_entry_id.nil?
+
       Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end
 

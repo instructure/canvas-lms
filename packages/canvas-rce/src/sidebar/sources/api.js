@@ -150,6 +150,19 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
+  fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, bookmark) {
+    return fetchFunction(properties, bookmark)
+      .then(result => {
+        onSuccess(result)
+        if (result.bookmark) {
+          this.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError, result.bookmark)
+        }
+      })
+      .catch(error => {
+        onError(error)
+      })
+  }
+
   fetchDocs(props) {
     const documents = props.documents[props.contextType]
     const uri = documents.bookmark || this.uriFor('documents', props)
@@ -242,6 +255,65 @@ class RceApiSource {
     const headers = headerFor(this.jwt)
     const uri = bookmark || this.uriFor('folders/all', props)
     return this.apiFetch(uri, headers)
+  }
+
+  // Fetches all files for a given folder
+  fetchFilesForFolder(props, bookmark) {
+    let uri
+
+    if (!bookmark) {
+      const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
+      uri = `${props.filesUrl}?${perPageQuery}${getSearchParam(props.searchString)}`
+
+      if (props.sortBy) {
+        uri += `${getSortParams(props.sortBy.sort, props.sortBy.order)}`
+      }
+    }
+
+    return this.fetchPage(uri || bookmark, this.jwt)
+  }
+
+  fetchSubFolders(props, bookmark) {
+    const uri = bookmark || `${this.baseUri('folders', props.host)}/${props.folderId}`
+    return this.apiFetch(uri, headerFor(this.jwt))
+  }
+
+  fetchButtonsAndIconsFolder({contextId, contextType}) {
+    const uri = this.uriFor('folders/buttons_and_icons', {
+      contextId,
+      contextType,
+      host: this.host,
+      jwt: this.jwt
+    })
+    return this.fetchPage(uri)
+  }
+
+  fetchButtonsAndIcons(
+    {contextId, contextType},
+    bookmark = null,
+    searchString = null,
+    sortBy,
+    onSuccess
+  ) {
+    const onSuccessWithFixedFileData = data => {
+      onSuccess({
+        ...data,
+        files: data.files.map(file => fixupFileUrl(contextType, contextId, file))
+      })
+    }
+
+    if (bookmark) {
+      this.fetchFilesForFolder(null, bookmark).then(onSuccessWithFixedFileData)
+    } else {
+      this.fetchButtonsAndIconsFolder({contextId, contextType}).then(({folders}) => {
+        this.fetchFilesForFolder({
+          filesUrl: folders[0].filesUrl,
+          perPage: 25,
+          searchString,
+          sortBy
+        }).then(onSuccessWithFixedFileData)
+      })
+    }
   }
 
   fetchMediaFolder(props) {
@@ -485,8 +557,10 @@ class RceApiSource {
   //   //rce.docker/api/wikiPages?context_type=course&context_id=42
   //
   uriFor(endpoint, props) {
-    const {host, contextType, contextId, sortBy, searchString} = props
+    const {host, contextType, contextId, sortBy, searchString, perPage} = props
     let extra = ''
+    const pageSizeParam = perPage ? `&per_page=${perPage}` : ''
+
     switch (endpoint) {
       case 'images':
         extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
@@ -514,10 +588,11 @@ class RceApiSource {
       default:
         extra = getSearchParam(searchString)
     }
+
     return `${this.baseUri(
       endpoint,
       host
-    )}?contextType=${contextType}&contextId=${contextId}${extra}`
+    )}?contextType=${contextType}&contextId=${contextId}${pageSizeParam}${extra}`
   }
 }
 

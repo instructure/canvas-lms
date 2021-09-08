@@ -72,6 +72,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
       {formatMessage('Links')}
     </SimpleSelect.Option>
   ]
+
   if (userContextType === 'course' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
       <SimpleSelect.Option
@@ -84,6 +85,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
       </SimpleSelect.Option>
     )
   }
+
   if (userContextType === 'group' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
       <SimpleSelect.Option
@@ -96,16 +98,23 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
       </SimpleSelect.Option>
     )
   }
-  options.push(
-    <SimpleSelect.Option
-      key="user_files"
-      id="user_files"
-      value="user_files"
-      renderBeforeLabel={IconFolderLine}
-    >
-      {fileLabelFromContext(contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user')}
-    </SimpleSelect.Option>
-  )
+
+  // Buttons and Icons are only stored in course folders.
+  if (contentSubtype !== 'buttons_and_icons') {
+    options.push(
+      <SimpleSelect.Option
+        key="user_files"
+        id="user_files"
+        value="user_files"
+        renderBeforeLabel={IconFolderLine}
+      >
+        {fileLabelFromContext(
+          contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user'
+        )}
+      </SimpleSelect.Option>
+    )
+  }
+
   return options
 }
 
@@ -222,6 +231,9 @@ export default function Filter(props) {
                   // when flipped to All, the context needs to be user
                   // so we can get media_objects, which are all returned in the user context
                   changed.contentType = 'user_files'
+                } else if (changed.contentSubtype === 'buttons_and_icons') {
+                  // Buttons and Icons only belong to Courses.
+                  changed.contentType = 'course_files'
                 }
                 onChange(changed)
               }}
@@ -241,6 +253,14 @@ export default function Filter(props) {
 
               <SimpleSelect.Option id="media" value="media" renderBeforeLabel={IconAttachMediaLine}>
                 {formatMessage('Media')}
+              </SimpleSelect.Option>
+
+              <SimpleSelect.Option
+                id="buttons_and_icons"
+                value="buttons_and_icons"
+                renderBeforeLabel={IconImageLine}
+              >
+                {formatMessage('Buttons and Icons')}
               </SimpleSelect.Option>
 
               <SimpleSelect.Option id="all" value="all">

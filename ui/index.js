@@ -129,7 +129,7 @@ import('intl-polyfills')
     )
     console.error(e.message)
   })
-  .then(() => advanceReadiness('localePolyfills'))
+  .finally(() => advanceReadiness('localePolyfills'))
 /* eslint-enable no-console */
 
 ready(() => {

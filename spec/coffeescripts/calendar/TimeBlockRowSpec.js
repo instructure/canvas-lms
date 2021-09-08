@@ -21,7 +21,10 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList.js'
 import TimeBlockRow from 'ui/features/calendar/jquery/TimeBlockRow.js'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const nextYear = new Date().getFullYear() + 1
 const unfudged_start = tz.parse(`${nextYear}-02-03T12:32:00Z`)
@@ -29,8 +32,14 @@ const unfudged_end = tz.parse(`${nextYear}-02-03T17:32:00Z`)
 
 QUnit.module('TimeBlockRow', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(detroit, 'America/Detroit')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Detroit': detroit
+      },
+      formats: getI18nFormats()
+    })
+
     this.start = fcUtil.wrap(unfudged_start)
     this.end = fcUtil.wrap(unfudged_end)
     this.$holder = $('<table />').appendTo(document.getElementById('fixtures'))
@@ -50,7 +59,7 @@ QUnit.module('TimeBlockRow', {
     $('#fixtures').empty()
     $('.ui-tooltip').remove()
     $('.error_box').remove()
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 

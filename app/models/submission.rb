@@ -599,7 +599,11 @@ class Submission < ActiveRecord::Base
           )
         end
       end
-      self.assignment&.delay_if_production&.multiple_module_actions([self.user_id], :scored, self.score)
+
+      unless ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
+        # trigger assignments have to wait for ConditionalRelease::OverrideHandler#handle_grade_change
+        self.assignment&.delay_if_production&.multiple_module_actions([self.user_id], :scored, self.score)
+      end
     end
     true
   end
@@ -1958,8 +1962,10 @@ class Submission < ActiveRecord::Base
         self.course.feature_enabled?(:conditional_release)
       end
       if ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
-        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand: "conditional_release_grade_change:#{self.global_assignment_id}").
+        strand = "conditional_release_grade_change:#{self.global_assignment_id}"
+        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand: strand).
           handle_grade_change(self)
+        self.assignment&.delay_if_production(strand: strand)&.multiple_module_actions([self.user_id], :scored, self.score)
       end
     end
   end
@@ -2248,6 +2254,15 @@ class Submission < ActiveRecord::Base
 
     displayable_comments.preload(submission: :assignment).select do |submission_comment|
       submission_comment.grants_right?(current_user, :read)
+    end
+  end
+
+  # true if there is a comment by user other than submitter on the current attempt
+  # comments prior to first attempt will count as current until a second attempt is started
+  def feedback_for_current_attempt?
+    visible_submission_comments.any? do |comment|
+      comment.author_id != self.user_id &&
+        ((comment.attempt&.nonzero? ? comment.attempt : 1) == (self.attempt || 1))
     end
   end
 
@@ -2713,11 +2728,11 @@ class Submission < ActiveRecord::Base
           comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
           if comment.present?
             comment = {
-                :comment => comment[:text_comment],
-                :author => grader,
-                :hidden => assignment.muted?,
+              comment: comment[:text_comment],
+              author: grader,
+              hidden: assignment.post_manually? && !submission.posted?
             }.merge(
-                comment
+              comment
             ).with_indifferent_access
 
             if file_ids = user_data[:file_ids]

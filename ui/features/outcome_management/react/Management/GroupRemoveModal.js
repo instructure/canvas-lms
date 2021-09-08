@@ -28,7 +28,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
+const GroupRemoveModal = ({groupId, isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId} = useCanvasContext()
   const isAccount = contextType === 'Account'
   const onRemoveGroupHandler = async () => {
@@ -36,6 +36,7 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
     try {
       const result = await removeOutcomeGroup(contextType, contextId, groupId)
       if (result?.status === 200) {
+        onSuccess()
         showFlashAlert({
           message: isAccount
             ? I18n.t('This group was successfully removed from this account.')
@@ -50,12 +51,12 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
         err?.response?.data &&
         err?.response?.data.match(/cannot be deleted because it is aligned to content/)
           ? I18n.t(
-              'Outcome Group contains one or more Outcomes that are currently aligned to content.'
+              'Outcome Group contains one or more Outcomes that are currently aligned to content'
             )
           : err.message
       showFlashAlert({
         message: err.message
-          ? I18n.t('An error occurred while removing this group: %{message}', {
+          ? I18n.t('An error occurred while removing this group: %{message}.', {
               message: err.message
             })
           : I18n.t('An error occurred while removing this group.'),
@@ -100,7 +101,8 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
 GroupRemoveModal.propTypes = {
   groupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired
 }
 
 export default GroupRemoveModal

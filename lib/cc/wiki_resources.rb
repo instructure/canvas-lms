@@ -35,7 +35,16 @@ module CC
           add_exported_asset(page)
 
           migration_id = create_key(page)
-          file_name = "#{page.url}.html"
+          name_max = path_max = nil
+          File.open(wiki_folder) do |f|
+            name_max = f.pathconf(Etc::PC_NAME_MAX)
+            path_max = f.pathconf(Etc::PC_PATH_MAX)
+          end
+          name_max -= 5 if name_max
+          path_max -= 5 + wiki_folder.length + 1 if path_max
+          max = [name_max, path_max].compact.min
+          file_name = "#{page.url[0...max]}.html"
+
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
           meta_fields = {:identifier => migration_id}

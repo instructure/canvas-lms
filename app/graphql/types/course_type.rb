@@ -81,6 +81,8 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
+    key_field_id
+
     field :name, String, null: false
     field :course_code, String, "course short name", null: true
     field :state, CourseWorkflowState, method: :workflow_state, null: false
@@ -239,7 +241,7 @@ module Types
       Project group sets for this course.
     DOC
     def group_sets_connection
-      if course.grants_right? current_user, :manage_groups
+      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
         course.group_categories.where(role: nil)
       end
     end
@@ -288,8 +290,6 @@ module Types
       course cards)
     DOC
     def image_url
-      return nil unless course.feature_enabled?('course_card_images')
-
       if course.image_url.present?
         course.image_url
       elsif course.image_id.present?

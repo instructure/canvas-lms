@@ -25,7 +25,7 @@ module EnableRackChunking
   def chunkable_version?(*)
     if defined?(PactConfig)
       false
-    elsif ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking"]
+    elsif ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking", failsafe: true]
       super
     else
       false

@@ -20,8 +20,9 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import AssignmentGroupColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeaderRenderer.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import AssignmentGroupColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeaderRenderer'
+import {getAssignmentGroupColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => {
@@ -75,7 +76,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
       assignments
     }
     gradebook.gotAllAssignmentGroups([assignmentGroup])
-    column = {id: gradebook.getAssignmentGroupColumnId('2201'), assignmentGroupId: '2201'}
+    column = {id: getAssignmentGroupColumnId('2201'), assignmentGroupId: '2201'}
     renderer = new AssignmentGroupColumnHeaderRenderer(gradebook)
   })
 

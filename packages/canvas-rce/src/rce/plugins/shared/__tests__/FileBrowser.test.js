@@ -36,7 +36,7 @@ describe('RceFileBrowser', () => {
     selectFile({
       name: 'a file',
       src: '/file/download',
-      api: {url: '/file/download?download_frd=1', 'content-type': 'application/pdf'}
+      api: {url: '/file/download?download_frd=1', type: 'application/pdf'}
     })
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
@@ -59,8 +59,8 @@ describe('RceFileBrowser', () => {
       src: '/file/download',
       api: {
         url: '/file/download?download_frd=1',
-        'content-type': 'video/mp4',
-        media_entry_id: 'm-deadbeef'
+        type: 'video/mp4',
+        embed: { id: 'm-deadbeef' }
       }
     })
     expect(onFileSelect).toHaveBeenCalledWith({

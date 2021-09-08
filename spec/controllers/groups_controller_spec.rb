@@ -369,6 +369,27 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("some group")
     end
 
+    it "should create new group (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      expect(response).to be_redirect
+      expect(assigns[:group]).not_to be_nil
+      expect(assigns[:group].name).to eql("some group")
+    end
+
+    it "should not create new group if :manage_groups_add is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_add',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      assert_unauthorized
+    end
+
     it "should honor group[group_category_id] when permitted" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
@@ -438,6 +459,29 @@ describe GroupsController do
       expect(response).to be_redirect
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group].name).to eql("new name")
+    end
+
+    it "should update group (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      expect(response).to be_redirect
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group].name).to eql("new name")
+    end
+
+    it "should not update group if :manage_groups_manage is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_manage',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      assert_unauthorized
     end
 
     it "should honor group[group_category_id]" do
@@ -519,6 +563,31 @@ describe GroupsController do
       expect(assigns[:group]).to be_deleted
       expect(@course.groups).to be_include(@group)
       expect(@course.groups.active).not_to be_include(@group)
+    end
+
+    it "should delete group (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group]).not_to be_frozen
+      expect(assigns[:group]).to be_deleted
+      expect(@course.groups).to be_include(@group)
+      expect(@course.groups.active).not_to be_include(@group)
+    end
+
+    it "should not delete group if :manage_groups_delete is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_delete',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      assert_unauthorized
     end
   end
 

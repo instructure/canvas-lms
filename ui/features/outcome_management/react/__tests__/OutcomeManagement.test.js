@@ -77,6 +77,8 @@ describe('OutcomeManagement', () => {
 
     it('calls showImportOutcomesModal after a file is uploaded', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      window.ENV.PERMISSIONS.manage_outcomes = true
+      window.ENV.PERMISSIONS.import_outcomes = true
       const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
       const {getByText, getByLabelText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
@@ -97,10 +99,10 @@ describe('OutcomeManagement', () => {
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
-    it('checks for existing outcome imports when the user switches to the manage tab', async () => {
+    it('checks for existing outcome imports when the user switches to the manage tab and renders the OutcomeManagementPanel', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const {getByText} = render(
-        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+      const {getByText, getByTestId} = render(
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks, ...outcomeGroupsMocks]}>
           <OutcomeManagement />
         </MockedProvider>
       )
@@ -119,25 +121,14 @@ describe('OutcomeManagement', () => {
       fireEvent.click(getByText('Calculation'))
       fireEvent.click(getByText('Manage'))
       expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(2)
+      await act(async () => jest.runAllTimers())
+      expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
     it('does not render OutcomeManagementPanel', () => {
       const {queryByTestId} = render(<OutcomeManagement />)
       expect(queryByTestId('outcomeManagementPanel')).not.toBeInTheDocument()
-    })
-
-    it('renders OutcomeManagementPanel when improved outcomes enabled', async () => {
-      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const {getByText, getByTestId} = render(
-        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
-          <OutcomeManagement />
-        </MockedProvider>
-      )
-      expect(getByText(/Loading/)).toBeInTheDocument()
-      await act(async () => jest.runAllTimers())
-      expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
-      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
     describe('Changes confirmation', () => {

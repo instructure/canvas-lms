@@ -41,13 +41,13 @@ module DynamicSettings
       end
 
       it 'must return the value for the specified key' do
-        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
-        allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return('qux')
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return('qux')
         expect(proxy.fetch('baz')).to eq 'qux'
       end
 
       it 'must fetch the value from consul using the prefix and supplied key' do
-        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
+        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return(nil)
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).ordered.and_return(nil)
         proxy.fetch('baz')
@@ -55,8 +55,8 @@ module DynamicSettings
 
       it "logs the query when enabled" do
         proxy.query_logging = true
-        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
-        allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).ordered.and_return('qux')
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).and_return('qux')
         expect(DynamicSettings.logger).to receive(:debug) do |log_message|
           expect(log_message).to match("CONSUL")
           expect(log_message).to match("status:OK")
@@ -96,11 +96,64 @@ module DynamicSettings
         expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
       end
 
+      it "returns the failsafe value when consul can't be reached and no previous value is found" do
+        expect(Diplomat::Kv).to receive(:get_all).twice.and_raise(Diplomat::KeyNotFound)
+        expect(proxy.fetch('baz', failsafe: nil)).to be_nil
+        expect(proxy.fetch('baz', failsafe: 'a')).to eq 'a'
+      end
+
       it "falls back to global settings" do
         expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).and_return(42).ordered
         expect(proxy.fetch('baz')).to eq 42
+      end
+
+      context "with retries" do
+        before do
+          allow(proxy).to receive(:retry_limit).and_return(2)
+          allow(proxy).to receive(:retry_base).and_return(1.4)
+        end
+
+        it "retries if there is an initial error" do
+          expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound).ordered
+          expect(proxy).to receive(:sleep).with(1.4)
+          expect(Diplomat::Kv).to receive(:get_all).and_return([]).ordered
+          allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return('qux')
+
+          expect(proxy.fetch('baz')).to eq 'qux'
+        end
+
+        it "still raises errors if retries fail" do
+          expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound).twice
+          expect(proxy).to receive(:sleep).with(1.4)
+
+          expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
+        end
+
+        context "with circuit breaker" do
+          let(:circuit_breaker) { CircuitBreaker.new }
+
+          before do
+            allow(proxy).to receive(:circuit_breaker).and_return(circuit_breaker)
+          end
+
+          it "fails immediately if the circuit breaker is tripped" do
+            allow(circuit_breaker).to receive(:tripped?).and_return(true)
+            expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
+            expect(proxy).not_to receive(:sleep)
+
+            expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
+          end
+
+          it "trips the circuit breaker" do
+            expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound).twice
+            expect(proxy).to receive(:sleep).with(1.4)
+
+            expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
+            expect(circuit_breaker).to be_tripped
+          end
+        end
       end
     end
 
@@ -132,24 +185,24 @@ module DynamicSettings
       it 'sets multiple key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo1',
-              Value: Base64.strict_encode64('bar1')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo1',
+              'Value' => 'bar1'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo2',
-              Value: Base64.strict_encode64('bar2')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo2',
+              'Value' => 'bar2'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo3',
-              Value: Base64.strict_encode64('bar3')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo3',
+              'Value' => 'bar3'
             }
           }
         ])
@@ -159,24 +212,24 @@ module DynamicSettings
       it 'sets multiple global key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo1',
-              Value: Base64.strict_encode64('bar1')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo1',
+              'Value' => 'bar1'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo2',
-              Value: Base64.strict_encode64('bar2')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo2',
+              'Value' => 'bar2'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo3',
-              Value: Base64.strict_encode64('bar3')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo3',
+              'Value' => 'bar3'
             }
           }
         ])

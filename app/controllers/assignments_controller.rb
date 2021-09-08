@@ -96,7 +96,7 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view?
-    @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
       !@context_enrollment&.observer?
   end
@@ -107,7 +107,7 @@ class AssignmentsController < ApplicationController
     if submission
       graphql_submisison_id = CanvasSchema.id_from_object(
         submission,
-        CanvasSchema.resolve_type(submission, nil),
+        CanvasSchema.resolve_type(nil, submission, nil),
         nil
       )
     end
@@ -220,6 +220,8 @@ class AssignmentsController < ApplicationController
           js_env({ SUBMISSION_ID: submission.id })
         end
 
+        @first_annotation_submission = !submission&.has_submission? && @assignment.annotated_document?
+        js_env({ FIRST_ANNOTATION_SUBMISSION: @first_annotation_submission })
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
@@ -297,7 +299,7 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
-          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         }
 
         @similarity_pledge = pledge_text
@@ -507,6 +509,14 @@ class AssignmentsController < ApplicationController
     rce_js_env
     add_crumb @context.elementary_enabled? ? t("Important Info") : t('#crumbs.syllabus', "Syllabus")
     active_tab = "Syllabus"
+
+    @course_home_sub_navigation_tools =
+      ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
+                                        root_account: @domain_root_account, current_user: @current_user).to_a
+    unless @context.grants_right?(@current_user, session, :manage_content)
+      @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
+    end
+
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
       @groups = @context.assignment_groups.active.order(
@@ -663,7 +673,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PERMISSIONS: {
-          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,

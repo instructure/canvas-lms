@@ -17,6 +17,9 @@
     "announcements_a4b8ed4a": {
         "message": "Հայտարարություններ"
     },
+    "apply_781a2546": {
+        "message": "Կիրառել"
+    },
     "apps_54d24a47": {
         "message": "Հավելվածներ"
     },
@@ -209,6 +212,9 @@
     "invalid_url_cbde79f": {
         "message": "Սխալ URL"
     },
+    "join_6cafecca": {
+        "message": "Միանալ"
+    },
     "jump_to_today_254ccf41": {
         "message": "Անցնել այսօրվան"
     },
@@ -251,11 +257,11 @@
     "my_files_2f621040": {
         "message": "Իմ ֆայլերը"
     },
+    "name_1aed4a1b": {
+        "message": "Անուն"
+    },
     "new_13daf639": {
         "message": "Նոր"
-    },
-    "next_40e12421": {
-        "message": "Հաջորդը"
     },
     "no_e16d9132": {
         "message": "Ոչ"
@@ -355,6 +361,9 @@
     },
     "upload_file_fd2361b8": {
         "message": "Բեռնել ֆայլը "
+    },
+    "uploading_19e8a4e7": {
+        "message": "Բեռնում"
     },
     "url_22a5f3b8": {
         "message": "URL"

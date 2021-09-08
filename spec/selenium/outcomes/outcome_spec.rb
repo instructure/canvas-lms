@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/outcome_common'
+require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
 
 describe "outcomes" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
+  include ImprovedOutcomeManagementPage
 
   let(:who_to_login) { 'teacher' }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
@@ -209,6 +211,122 @@ describe "outcomes" do
         wait_for_ajaximations
 
         expect(f('#alignments').text).to match(/#{@rubric.title}/)
+      end
+    end
+
+    describe 'with improved_outcome_management enabled' do
+      before(:each) do
+        enable_improved_outcomes_management(Account.default)
+      end
+
+      it 'creates an initial outcome in the course level as a teacher' do
+        get outcome_url
+        create_outcome('Test Outcome')
+        run_jobs
+        get outcome_url
+        # Initial Group is created as well as a Create New Group button
+        expect(tree_browser_outcome_groups.count).to eq(2)
+        group_text = tree_browser_outcome_groups[0].text.split("\n")[0]
+        expect(group_text).to eq(@course.name)
+        add_new_group_text = tree_browser_outcome_groups[1].text
+        # Verify through AR to save time
+        expect(add_new_group_text).to eq('Create New Group')
+        expect(LearningOutcome.where(context_id: @course.id).count).to eq(1)
+        expect(LearningOutcome.find_by(context_id: @course.id).short_description).to eq('Test Outcome')
+      end
+
+      it 'edits an existing outcome in the course level as a teacher' do
+        create_bulk_outcomes_groups(@course, 1, 1)
+        get outcome_url
+        select_outcome_group_with_text(@course.name).click
+        expect(nth_individual_outcome_title(0)).to eq('outcome 0')
+        individual_outcome_kabob_menu(0).click
+        edit_outcome_button.click
+        edit_outcome_title('Edited Title')
+        click_save_edit_modal
+        expect(nth_individual_outcome_title(0)).to eq('Edited Title')
+      end
+
+      it 'removes a single outcome in the course level as a teacher' do
+        create_bulk_outcomes_groups(@course, 1, 1)
+        get outcome_url
+        select_outcome_group_with_text(@course.name).click
+        expect(nth_individual_outcome_title(0)).to eq('outcome 0')
+        individual_outcome_kabob_menu(0).click
+        click_remove_outcome_button
+        click_confirm_remove_button
+        expect(no_outcomes_billboard.present?).to eq(true)
+      end
+
+      it 'moves an outcome into a newly created outcome group as a teacher' do
+        create_bulk_outcomes_groups(@course, 1, 1)
+        get outcome_url
+        select_outcome_group_with_text(@course.name).click
+        individual_outcome_kabob_menu(0).click
+        click_move_outcome_button
+        click_create_new_group_in_move_modal_button
+        insert_new_group_name_in_move_modal('New group')
+        click_confirm_new_group_in_move_modal_button
+        tree_browser_root_group.click
+        select_drilldown_outcome_group_with_text('New group').click
+        force_click(confirm_move_button)
+        # Verify through AR to save time
+        new_group_children = LearningOutcomeGroup.find_by(title: 'New group').child_outcome_links
+        expect(new_group_children.count).to eq(1)
+        expect(new_group_children.first.title).to eq('outcome 0')
+      end
+
+      it 'bulk removes outcomes at the course level as a teacher' do
+        create_bulk_outcomes_groups(@course, 1, 5)
+        get outcome_url
+        select_outcome_group_with_text(@course.name).click
+        force_click(select_nth_outcome_for_bulk_action(0))
+        force_click(select_nth_outcome_for_bulk_action(1))
+        force_click(select_nth_outcome_for_bulk_action(2))
+        force_click(select_nth_outcome_for_bulk_action(3))
+        click_remove_button
+        click_confirm_remove_button
+        expect(nth_individual_outcome_title(0)).to eq('outcome 4')
+      end
+
+      # Can't reproduce the js error locally
+      it 'bulk moves outcomes at the course level as a teacher', ignore_js_errors: true do
+        create_bulk_outcomes_groups(@course, 1, 3)
+        get outcome_url
+        select_outcome_group_with_text(@course.name).click
+        force_click(select_nth_outcome_for_bulk_action(0))
+        force_click(select_nth_outcome_for_bulk_action(1))
+        click_move_button
+        click_create_new_group_in_move_modal_button
+        insert_new_group_name_in_move_modal('New group')
+        click_confirm_new_group_in_move_modal_button
+        select_drilldown_outcome_group_with_text('New group').click
+        force_click(confirm_move_button)
+        # Verify through AR to save time
+        new_group_children = LearningOutcomeGroup.find_by(title: 'New group').child_outcome_links
+        expect(new_group_children.count).to eq(2)
+        expect(new_group_children.pluck(:title).sort).to eq(['outcome 0', 'outcome 1'])
+      end
+
+      it 'imports account outcomes into a course via Find modal' do
+        create_bulk_outcomes_groups(Account.default, 1, 10)
+        get outcome_url
+        open_find_modal
+        select_outcome_group_with_text('Account Standards').click
+        select_outcome_group_with_text('Default Account').click
+        job_count = Delayed::Job.count
+        outcome0_title = nth_find_outcome_modal_item_title(0)
+        add_button_nth_find_outcome_modal_item(0).click
+        click_done_find_modal
+
+        # ImportOutcomes operations enqueue jobs that will need to be manually processed
+        expect(Delayed::Job.count).to eq(job_count + 1)
+        run_jobs
+
+        # Verify by titles that the outcomes are imported into current root account
+        course_outcomes = LearningOutcomeGroup.find_by(context_id: @course.id, context_type: 'Course', title: 'group 0').child_outcome_links
+        # Since the outcomes existed already and are just imported into a new group, we're checking the new content tags
+        expect(course_outcomes[0].title).to eq(outcome0_title)
       end
     end
   end

@@ -82,6 +82,53 @@ describe "Importing Learning Outcomes" do
     expect(@context.learning_outcomes.count).to eq 2
   end
 
+  it "should create an OutcomeFriendlyDescription if the outcome has a friendly description" do
+    Account.site_admin.enable_feature! :outcomes_friendly_description
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    friendly_description = "a friendly description"
+    lo_data[:friendly_description] = friendly_description
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(OutcomeFriendlyDescription.find_by(context_id: @context.id).description).to eq friendly_description
+  end
+
+  it "should create a new OutcomeFriendlyDescription if the outcome is being imported to a new context" do
+    context2 = course_model
+    outcome = context2.created_learning_outcomes.create!({:title => 'new outcome'})
+    friendly_description = "a friendly description"
+    OutcomeFriendlyDescription.create!({
+      learning_outcome: outcome,
+      context: context2,
+      description: friendly_description
+    })
+    outcome.write_attribute('migration_id', "bdf6dc13-5d8f-43a8-b426-03380c9b6781")
+    identifier = outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    Account.site_admin.enable_feature! :outcomes_friendly_description
+    lo_data[:friendly_description] = friendly_description
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, outcome)
+    expect(OutcomeFriendlyDescription.count).to eq 2
+    expect(OutcomeFriendlyDescription.find_by(context_id: @context.id).description).to eq friendly_description
+  end
+
+  it "should update an OutcomeFriendlyDescription if there is a friendly description in the database" do
+    Account.site_admin.enable_feature! :outcomes_friendly_description
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    OutcomeFriendlyDescription.create!({
+      learning_outcome: existing_outcome,
+      context: existing_outcome.context,
+      description: "I will be updated to a new friendly description"
+    })
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    friendly_description = "I was updated to a new friendly description"
+    lo_data[:friendly_description] = friendly_description
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(OutcomeFriendlyDescription.where(learning_outcome_id: existing_outcome.id).count).to eq 1
+    expect(OutcomeFriendlyDescription.find_by(learning_outcome_id: existing_outcome.id).description).to eq friendly_description
+  end
+
   it "change calculation method, calculation int and rubric criterion" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     expect(existing_outcome.calculation_method).to eq "decaying_average"

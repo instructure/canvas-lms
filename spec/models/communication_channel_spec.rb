@@ -738,7 +738,6 @@ describe CommunicationChannel do
     it "sends directly via SMS if configured" do
       expect(cc.e164_path).to eq '+18015555555'
       account = double()
-      expect(Account.site_admin).to_not receive(:feature_enabled?).with(:deprecate_sms)
       allow(account).to receive(:feature_enabled?).and_return(true)
       allow(account).to receive(:global_id).and_return('totes_an_ID')
       expect(Services::NotificationService).to receive(:process).with(
@@ -811,6 +810,15 @@ describe CommunicationChannel do
           expect(subject).to be_truthy
         end
       end
+    end
+  end
+
+  describe ".supported" do
+    let(:user) { User.create! }
+    let!(:sms_channel) { communication_channel(user, {username: 'sms', path_type: CommunicationChannel::TYPE_SMS}) }
+
+    it "filters sms channels" do
+      expect(CommunicationChannel.supported).to match_array []
     end
   end
 end

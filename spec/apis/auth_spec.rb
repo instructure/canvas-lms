@@ -31,12 +31,11 @@ describe "API Authentication", type: :request do
   before :each do
     @client_id = @key.id
     @client_secret = @key.api_key
-    consider_all_requests_local(false)
     enable_forgery_protection
   end
 
-  after do
-    consider_all_requests_local(true)
+  around do |example|
+    consider_all_requests_local(false, &example)
   end
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
@@ -456,7 +455,7 @@ describe "API Authentication", type: :request do
       end
 
       context "trusted developer key" do
-        def trusted_exchange(create_token=false)
+        def trusted_exchange(create_token=false, userinfo: false)
           @key.trusted = true
           @key.save!
 
@@ -466,10 +465,13 @@ describe "API Authentication", type: :request do
               course_with_teacher_logged_in(:user => @user)
               @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
               if create_token
-                @user.access_tokens.create!(developer_key: @key)
+                token = @user.access_tokens.create!(developer_key: @key, scopes: userinfo ? ['/auth/userinfo'] : [])
+                yield token if block_given?
               end
 
-              get "/login/oauth2/auth", params: {:response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"}
+              params = {:response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"}
+              params[:scope] = '/auth/userinfo' if userinfo
+              get "/login/oauth2/auth", params: params
               expect(response).to be_redirect
               expect(response['Location']).to match(%r{http://www.example.com/my_uri?})
               code = response['Location'].match(/code=([^\?&]+)/)[1]
@@ -493,16 +495,91 @@ describe "API Authentication", type: :request do
         it "should give second token if not force_token_reuse" do
           json = trusted_exchange(true)
           expect(json['access_token']).to_not be_nil
+          expect(@user.access_tokens.count).to eq 2
         end
 
         it "should not give second token if force_token_reuse" do
           @key.force_token_reuse = true
+          @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true)
-          expect(json['access_token']).to be_nil
+          json = trusted_exchange(true) do |token|
+            expect_any_instantiation_of(token).to receive(:save).at_least(:once).and_call_original
+          end
+          expect(json['access_token']).not_to be_nil
+          expect(@user.access_tokens.count).to eq 1
+        end
+
+        it "should not regenerate if force_token_reuse with userinfo" do
+          @key.force_token_reuse = true
+          @key.auto_expire_tokens = false
+          @key.save!
+
+          json = trusted_exchange(true, userinfo: true) do |token|
+            expect_any_instantiation_of(token).not_to receive(:save)
+          end
+          expect(json['user']).not_to be_nil
+          expect(@user.access_tokens.count).to eq 1
         end
       end
+    end
+  end
+
+  describe "InstAccess tokens" do
+    include_context "InstAccess setup"
+
+    before :once do
+      user_obj = user_with_pseudonym
+      course_with_teacher(user: user_obj)
+    end
+
+    it "allows API access with a valid InstAccess token" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "allows API access for a masquerading user" do
+      user = @user
+      real_user = user_with_pseudonym
+      token = InstAccess::Token.for_user(
+        user_uuid: user.uuid,
+        account_uuid: user.account.uuid,
+        real_user_uuid: real_user.uuid,
+        real_user_shard_id: real_user.shard.id
+      ).to_unencrypted_token_string
+
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+      expect(assigns['current_user']).to eq user
+      expect(assigns['real_current_user']).to eq real_user
+    end
+
+    it "errors if the InstAccess token is expired" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      Timecop.travel(3601) do
+        get "/api/v1/courses", headers: {
+          'HTTP_AUTHORIZATION' => "Bearer #{token}"
+        }
+        assert_status(401)
+        expect(response.body).to match(/Invalid access token/)
+      end
+    end
+
+    it "requires an active pseudonym" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      @user.pseudonym.destroy
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(401)
+      expect(response.body).to match(/Invalid access token/)
     end
   end
 
@@ -608,15 +685,16 @@ describe "API Authentication", type: :request do
       expect(JSON.parse(response.body).size).to eq 1
     end
 
+    it "doesn't allow usage of a suspended pseudonym" do
+      @pseudonym.update!(workflow_state: 'suspended')
+
+      get "/api/v1/courses?access_token=#{@token.full_token}"
+      expect(response.status).to eq 401
+    end
+
     it "should allow passing the access token in the authorization header" do
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       expect(JSON.parse(response.body).size).to eq 1
-    end
-
-    it "recovers gracefully if consul is missing encryption data" do
-      allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
-      check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
-      assert_status(200)
     end
 
     it "should allow passing the access token in the post body" do

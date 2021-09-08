@@ -26,6 +26,7 @@ import {ApolloLink} from 'apollo-link'
 import {ApolloProvider, Query} from 'react-apollo'
 import introspectionQueryResultData from './fragmentTypes.json'
 import {withClientState} from 'apollo-link-state'
+import InstAccess from './InstAccess'
 
 function createConsoleErrorReportLink() {
   return onError(({graphQLErrors, networkError}) => {
@@ -50,27 +51,22 @@ function setHeadersLink() {
   })
 }
 
-function createHttpLink() {
-  return new HttpLink({
+function createHttpLink(httpLinkOptions = {}) {
+  const defaultOptions = {
     uri: '/api/graphql',
     credentials: 'same-origin'
-  })
+  }
+  const linkOpts = {
+    ...defaultOptions,
+    ...httpLinkOptions
+  }
+  return new HttpLink(linkOpts)
 }
 
 function createCache() {
   return new InMemoryCache({
     addTypename: true,
     dataIdFromObject: object => {
-      const problematicTypes = ['Rubric', 'RubricRating', 'RubricCriterion', 'LearningOutcome']
-      if (object.id && problematicTypes.includes(object.__typename)) {
-        // The problematic types have GraphQL queries written that include "id: _id"
-        // (assigning the database ID, `_id`, to `id`). Because of this, `id` is not
-        // guaranteed to be globally unique for these types, and so we'll always
-        // include the typename in the cache key to ensure uniqueness.
-        const id = object._id || object.id
-        return object.__typename + id
-      }
-
       if (object.id) {
         return object.id
       } else if (object._id && object.__typename) {
@@ -95,9 +91,43 @@ function createClient(opts = {}) {
     defaults
   })
 
+  // if this option exists, we want this client
+  // to talk through the API gateway instead of
+  // directly to canvas, so we'll need to update the http
+  // link to have both our target URL, and also
+  // an enhanced "fetch" implementation that uses
+  // InstAccess tokens
+  const gatewayUri = opts.apiGatewayUri || false
+  const defaultHttpLinkOptions = {}
+  if (gatewayUri) {
+    defaultHttpLinkOptions.uri = gatewayUri
+    const instAccess = new InstAccess()
+    defaultHttpLinkOptions.fetch = (uri, fetchOpts) => {
+      return instAccess.gatewayAuthenticatedFetch(uri, fetchOpts)
+    }
+  }
+
+  // there are some cases where we need to override these options.
+  //  If we're using an API gateway instead of talking to canvas directly,
+  // we need to be able to inject that config.
+  // also if we need to test what the client is sending over the wire,
+  // being able to override the "fetch" method is useful.
+  // A design goal here is not to do anything "special", but just
+  // use the options that are already built into ApolloLink:
+  // https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts
+  const httpLinkOptions = {
+    ...defaultHttpLinkOptions,
+    ...(opts.httpLinkOptions || {})
+  }
+
   const links =
     createClient.mockLink == null
-      ? [createConsoleErrorReportLink(), setHeadersLink(), stateLink, createHttpLink()]
+      ? [
+          createConsoleErrorReportLink(),
+          setHeadersLink(),
+          stateLink,
+          createHttpLink(httpLinkOptions)
+        ]
       : [createConsoleErrorReportLink(), stateLink, createClient.mockLink]
 
   const client = new ApolloClient({

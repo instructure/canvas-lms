@@ -18,8 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  # @API Webhooks Subscriptions
+  # @API Webhooks Subscriptions for Plagiarism Platform
   # **LTI API for Webhook Subscriptions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # This is intended for use with Canvas'
+  # <a href="plagiarism_platform.html">Plagiarism Detection Platform</a>. For
+  # general-purpose event subscriptions see
+  # <a href="data_service_introduction.html">Live Events</a>.
   #
   # The tool proxy must also have the appropriate enabled capabilities (See appendix).
   #

@@ -27,6 +27,7 @@ import {
   initialOptions,
   getPlannerItems,
   getWeeklyPlannerItems,
+  preloadSurroundingWeeks,
   scrollIntoPast,
   loadFutureItems,
   loadThisWeekItems,
@@ -52,10 +53,10 @@ export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 
-export function createPlannerPreview(timeZone) {
+export function createPlannerPreview(timeZone, singleCourse) {
   return (
     <Suspense fallback={loading()}>
-      <PlannerPreview timeZone={timeZone} />
+      <PlannerPreview timeZone={timeZone} singleCourse={singleCourse} />
     </Suspense>
   )
 }
@@ -350,5 +351,16 @@ export function loadPlannerDashboard() {
 
   if (headerElement) {
     renderHeader(headerElement, headerAuxElement)
+  }
+}
+
+// Allows you to defer preloading surrounding weeks' items until the user is more
+// likely to use them (in weekly-planner mode)
+export function preloadInitialItems() {
+  if (!initializedOptions)
+    throw new Error('initializePlanner must be called before preloadInitialItems')
+
+  if (store.getState().weeklyDashboard) {
+    store.dispatch(preloadSurroundingWeeks())
   }
 }

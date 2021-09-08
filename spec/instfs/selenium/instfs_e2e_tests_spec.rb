@@ -257,13 +257,12 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "should upload course image cards to instfs", priority: "1", test_id: 3455114 do
-      Account.default.enable_feature!(:course_card_images)
+    it "should upload course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1", test_id: 3455114 do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/courses/#{@course.id}/settings"
       wait_for_ajaximations
       f(".CourseImageSelector").click
-      f(".UploadArea__Content input").send_keys(file_path)
+      f("[aria-label=\"Choose Image\"] input").send_keys(file_path)
       wait_for_new_page_load
       image_link = f(".CourseImageSelector")["style"]
       file_link = get_file_link_from_bg_image(image_link)

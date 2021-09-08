@@ -27,7 +27,9 @@ import {
   IconDiscussionLine,
   IconEditLine,
   IconTrashLine,
-  IconSpeedGraderLine
+  IconSpeedGraderLine,
+  IconMarkAsReadSolid,
+  IconMarkAsReadLine
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -38,28 +40,43 @@ import {Flex} from '@instructure/ui-flex'
 // are produced by the menu causing the page to scroll all over the place
 export const ThreadActions = props => {
   const menuItems = useMemo(() => {
-    return getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))
+    return getMenuConfigs({
+      onMarkAllAsRead: props.onMarkAllAsRead,
+      onMarkAllAsUnread: props.onMarkAllAsUnread,
+      isUnread: props.isUnread,
+      onToggleUnread: props.onToggleUnread,
+      goToTopic: props.goToTopic,
+      goToParent: props.goToParent,
+      onEdit: props.onEdit,
+      onDelete: props.onDelete,
+      onOpenInSpeedGrader: props.onOpenInSpeedGrader,
+      onMarkThreadAsRead: props.onMarkThreadAsRead
+    }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
   return (
-    <>
-      <Menu
-        placement="bottom"
-        key={`threadActionMenu-${props.id}`}
-        trigger={
-          <IconButton
-            size="small"
-            screenReaderLabel={I18n.t('Manage Discussion')}
-            renderIcon={IconMoreLine}
-            withBackground={false}
-            withBorder={false}
-            data-testid="thread-actions-menu"
-          />
-        }
-      >
-        {menuItems}
-      </Menu>
-    </>
+    <Flex justifyItems="end">
+      <Flex.Item>
+        {!props.isSearch && (
+          <Menu
+            placement="bottom"
+            key={`threadActionMenu-${props.id}`}
+            trigger={
+              <IconButton
+                size="small"
+                screenReaderLabel={I18n.t('Manage Discussion')}
+                renderIcon={IconMoreLine}
+                withBackground={false}
+                withBorder={false}
+                data-testid="thread-actions-menu"
+              />
+            }
+          >
+            {menuItems}
+          </Menu>
+        )}
+      </Flex.Item>
+    </Flex>
   )
 }
 
@@ -69,15 +86,15 @@ const getMenuConfigs = props => {
     options.push({
       key: 'markAllAsRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Thread as Read'),
-      selectionCallback: props.onMarkAllAsUnread
+      label: I18n.t('Mark All as Read'),
+      selectionCallback: props.onMarkAllAsRead
     })
   }
   if (props.onMarkAllAsUnread) {
     options.push({
       key: 'markAllAsUnRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Thread as Unread'),
+      label: I18n.t('Mark All as Unread'),
       selectionCallback: props.onMarkAllAsUnread
     })
   }
@@ -85,15 +102,35 @@ const getMenuConfigs = props => {
     options.push({
       key: 'markAsRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Post as Read'),
+      label: I18n.t('Mark as Read'),
       selectionCallback: props.onToggleUnread
     })
   } else {
     options.push({
       key: 'markAsUnread',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark Post as Unread'),
+      label: I18n.t('Mark as Unread'),
       selectionCallback: props.onToggleUnread
+    })
+  }
+  if (props.onMarkThreadAsRead) {
+    options.push({
+      key: 'markThreadAsRead',
+      icon: <IconMarkAsReadLine />,
+      label: I18n.t('Mark Thread as Read'),
+      selectionCallback: () => {
+        props.onMarkThreadAsRead(true)
+      }
+    })
+  }
+  if (props.onMarkThreadAsRead) {
+    options.push({
+      key: 'markThreadAsUnRead',
+      icon: <IconMarkAsReadSolid />,
+      label: I18n.t('Mark Thread as Unread'),
+      selectionCallback: () => {
+        props.onMarkThreadAsRead(false)
+      }
     })
   }
   if (props.goToTopic) {
@@ -160,17 +197,20 @@ ThreadActions.propTypes = {
   id: PropTypes.string.isRequired,
   onMarkAllAsUnread: PropTypes.func,
   onMarkAllAsRead: PropTypes.func,
+  onMarkThreadAsRead: PropTypes.func,
   onToggleUnread: PropTypes.func.isRequired,
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,
   goToParent: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  onOpenInSpeedGrader: PropTypes.func
+  onOpenInSpeedGrader: PropTypes.func,
+  isSearch: PropTypes.bool
 }
 
 ThreadActions.defaultProps = {
-  isUnread: false
+  isUnread: false,
+  isSearch: false
 }
 
 export default ThreadActions

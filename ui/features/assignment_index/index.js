@@ -70,13 +70,15 @@ if (ENV.PERMISSIONS.manage_assignments) {
     model: course,
     sisName: ENV.SIS_NAME
   })
-
+}
+if (ENV.PERMISSIONS.manage_assignments_add) {
   createGroupView = new CreateGroupView({
     assignmentGroups,
     course,
     userIsAdmin
   })
-} else {
+}
+if (!ENV.PERMISSIONS.manage_assignments && !ENV.PERMISSIONS.manage_assignments_add) {
   showByView = new ToggleShowByView({
     course,
     assignmentGroups

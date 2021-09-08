@@ -28,28 +28,24 @@ const AssignmentsTray = () => (
     imageWidth="11rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I create an assignment?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740'
+        href: I18n.t('#community.instructor_create_assignment')
       },
       {
         label: I18n.t('How do I publish or unpublish an assignment as an instructor?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585'
+        href: I18n.t('#community.instructor_publish_assignment')
       },
       {
         label: I18n.t('What assignment types can I create in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627'
+        href: I18n.t('#community.instructor_assignment_types')
       },
       {
         label: I18n.t('How do I add or edit details in an assignment?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971'
+        href: I18n.t('#community.instructor_assignment_details')
       }
     ]}
   >

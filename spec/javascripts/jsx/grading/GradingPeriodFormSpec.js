@@ -22,7 +22,10 @@ import {mount} from 'enzyme'
 import GradingPeriodForm from 'ui/features/account_grading_standards/react/GradingPeriodForm.js'
 import chicago from 'timezone/America/Chicago'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import fakeENV from 'helpers/fakeENV'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 QUnit.module('GradingPeriodForm', suiteHooks => {
   let gradingPeriod
@@ -123,9 +126,17 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
     QUnit.module('when local and server time are different', hooks => {
       hooks.beforeEach(() => {
         Object.assign(ENV, {CONTEXT_TIMEZONE: 'America/Chicago'})
-        tz.preload('America/Chicago', chicago)
+        tzInTest.configureAndRestoreLater({
+          tz: timezone('UTC'),
+          tzData: {
+            'America/Chicago': chicago
+          },
+          formats: getI18nFormats(),
+        })
         mountComponent()
       })
+
+      hooks.afterEach(tzInTest.restore)
 
       test('shows both local and context time suggestions for start date', () => {
         strictEqual(getDateTimeSuggestions('Start Date').length, 2)
@@ -168,9 +179,17 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
     QUnit.module('when local and server time are different', hooks => {
       hooks.beforeEach(() => {
         Object.assign(ENV, {CONTEXT_TIMEZONE: 'America/Chicago'})
-        tz.preload('America/Chicago', chicago)
+        tzInTest.configureAndRestoreLater({
+          tz: timezone('UTC'),
+          tzData: {
+            'America/Chicago': chicago
+          },
+          formats: getI18nFormats(),
+        })
         mountComponent()
       })
+
+      hooks.afterEach(tzInTest.restore)
 
       test('shows both local and context time suggestions for end date', () => {
         strictEqual(getDateTimeSuggestions('End Date').length, 2)
@@ -213,9 +232,17 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
     QUnit.module('when local and server time are different', hooks => {
       hooks.beforeEach(() => {
         Object.assign(ENV, {CONTEXT_TIMEZONE: 'America/Chicago'})
-        tz.preload('America/Chicago', chicago)
+        tzInTest.configureAndRestoreLater({
+          tz: timezone('UTC'),
+          tzData: {
+            'America/Chicago': chicago
+          },
+          formats: getI18nFormats(),
+        })
         mountComponent()
       })
+
+      hooks.afterEach(tzInTest.restore)
 
       test('shows both local and context time suggestions for close date', () => {
         strictEqual(getDateTimeSuggestions('Close Date').length, 2)

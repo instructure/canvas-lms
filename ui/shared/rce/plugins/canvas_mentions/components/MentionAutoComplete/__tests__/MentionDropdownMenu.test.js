@@ -18,6 +18,7 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import MentionDropdownMenu from '../MentionDropdownMenu'
+import {ARIA_ID_TEMPLATES} from '../../../constants'
 
 const MentionMockUsers = [
   {
@@ -30,48 +31,40 @@ const MentionMockUsers = [
   }
 ]
 
+const tinyMCE = {
+  activeEditor: {
+    getParam: () => 'LTR'
+  }
+}
+
 const setup = props => {
   return render(<MentionDropdownMenu mentionOptions={MentionMockUsers} {...props} />)
 }
 
 describe('MentionDropdownMenu tests', () => {
+  beforeEach(() => {
+    global.tinyMCE = tinyMCE
+  })
+
+  afterEach(() => {
+    global.tinyMCE = null
+  })
+
   it('should render', () => {
     const component = setup()
     expect(component).toBeTruthy()
   })
 
   it('should render correct number of menu items', () => {
-    const component = setup({
-      show: true
-    })
+    const component = setup()
     const items = component.container.querySelectorAll('li')
     expect(items.length).toBe(2)
   })
 
-  it('should not show when prop is false', () => {
-    const {container} = setup({
-      show: false
-    })
-    const menuComponent = container.querySelector('.mention-dropdown-menu')
-    expect(menuComponent).toBeFalsy()
-  })
-
-  it('should show when prop is true', () => {
-    const {container} = setup({
-      show: true
-    })
-    const menuComponent = container.querySelector('.mention-dropdown-menu')
-    expect(menuComponent).toBeTruthy()
-  })
-
-  it('should load x and y props respectively', () => {
-    const {container} = setup({
-      show: true,
-      x: '42',
-      y: '24'
-    })
-    const menuContainer = container.querySelector('.mention-dropdown-menu')
-    expect(menuContainer.style.left).toBe('42px')
-    expect(menuContainer.style.top).toBe('24px')
+  it('should call ARIA template for the Popup menu', () => {
+    const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
+    setup()
+    expect(spy).toHaveBeenCalled()
+    expect(spy.mock.calls.length).toBe(2)
   })
 })

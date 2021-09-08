@@ -1378,9 +1378,10 @@ const ipFilterValidation = {
     if (resp && resp.invalid_ip_filter) {
       const event = 'invalid:ip_filter'
       $('#quiz_ip_filter').triggerHandler(event)
+
+      // Prevent $.fn.formErrors from giving error box with cryptic message.
+      delete resp.invalid_ip_filter
     }
-    // Prevent $.fn.formErrors from giving error box with cryptic message.
-    delete resp.invalid_ip_filter
   }
 }
 
@@ -1519,7 +1520,7 @@ correctAnswerVisibility = {
       const $field = $('#quiz_' + key)
       let date
 
-      if ($field.val().length) {
+      if ($field.val().length && $field.data().date) {
         date = $field.data().date
         data['quiz[' + key + ']'] = $.unfudgeDateForProfileTimezone(date).toISOString()
       } else {

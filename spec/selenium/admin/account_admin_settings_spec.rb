@@ -64,9 +64,20 @@ describe "root account basic settings" do
   context 'Integrations' do
     context 'Microsoft Teams Sync' do
       context('microsoft_group_enrollments FF enabled') do
-
+        let(:enabled) { true }
         let(:tenant) { 'canvastest2.onmicrosoft.com' }
-        let(:login_attribute) { 'email' }
+        let(:login_attribute) { 'sis_user_id' }
+        let(:suffix) { '@example.com' }
+        let(:remote_attribute) { "mailNickname" }
+        let(:expected_settings) do
+          {
+            microsoft_sync_enabled: enabled,
+            microsoft_sync_tenant: tenant,
+            microsoft_sync_login_attribute: login_attribute,
+            microsoft_sync_login_attribute_suffix: suffix,
+            microsoft_sync_remote_attribute: remote_attribute
+          }
+        end
 
         before :once do
           account.enable_feature!(:microsoft_group_enrollments_syncing)
@@ -77,42 +88,50 @@ describe "root account basic settings" do
           user_session(@admin)
         end
 
-        it "lets a user update what tenant and login attribute they want to use" do
+        it "lets a user update what settings they want to use" do
           get account_settings_url
-
           f("#tab-integrations-link").click
+
           tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
           set_value(tenant_input_area, tenant)
+
           f("#microsoft_teams_sync_attribute_selector").click
-          f("#email").click
-          fxpath("//*[@id=\"tab-integrations\"]/span/button").click
+          f("#sis_user_id").click
+
+          suffix_input_area = fxpath('//input[@placeholder="@example.edu"]')
+          set_value(suffix_input_area, suffix)
+
+          f("#microsoft_teams_sync_remote_attribute_lookup_attribute_selector").click
+          f("#remote_lookup_attribute_mail_nickname_option").click
+
+          f("#microsoft_teams_sync_toggle_button").click
           wait_for_ajaximations
 
           account.reload
-          expect(account.settings[:microsoft_sync_tenant]).to eq tenant
-          expect(account.settings[:microsoft_sync_login_attribute]).to eq login_attribute
+          expect(account.settings).to eq expected_settings
         end
 
         it "lets a user toggle Microsoft Teams sync" do
-          account.settings[:microsoft_sync_enabled] = false
-          account.settings[:microsoft_sync_tenant] = tenant
-          account.settings[:microsoft_sync_login_attribute] = login_attribute
+          account.settings = {
+            microsoft_sync_enabled: !enabled,
+            microsoft_sync_tenant: tenant,
+            microsoft_sync_login_attribute: login_attribute,
+            microsoft_sync_login_attribute_suffix: suffix,
+            microsoft_sync_remote_attribute: remote_attribute
+          }
           account.save!
 
           get account_settings_url
-
           f("#tab-integrations-link").click
-          f("#microsoft_sync_toggle_button").click
+          f("#microsoft_teams_sync_toggle_button").click
           wait_for_ajaximations
+
           account.reload
-          expect(account.settings[:microsoft_sync_enabled]).to be true
-          expect(account.settings[:microsoft_sync_tenant]).to eq tenant
-          expect(account.settings[:microsoft_sync_login_attribute]).to eq login_attribute
+          expect(account.settings).to eq expected_settings
         end
       end
     end
   end
-
 
   it "downloads reports" do
     course_with_admin_logged_in

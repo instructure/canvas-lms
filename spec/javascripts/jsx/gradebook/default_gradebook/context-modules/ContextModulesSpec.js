@@ -19,7 +19,7 @@
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Context Modules', suiteHooks => {
   let $container
@@ -49,7 +49,7 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
 
     test('stores the given context modules', () => {
       gradebook.updateContextModules(contextModules)
-      const storedModules = gradebook.listContextModules()
+      const storedModules = gradebook.courseContent.contextModules
       deepEqual(
         storedModules.map(contextModule => contextModule.id),
         ['2601', '2602']
@@ -69,7 +69,7 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
 
     test('renders the view options menu after storing the context modules', () => {
       sinon.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
-        const storedModules = gradebook.listContextModules()
+        const storedModules = gradebook.courseContent.contextModules
         strictEqual(storedModules.length, 2)
       })
       gradebook.updateContextModules(contextModules)
@@ -90,7 +90,7 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
 
     test('renders filters after storing the context modules', () => {
       sinon.stub(gradebook, 'renderFilters').callsFake(() => {
-        const storedModules = gradebook.listContextModules()
+        const storedModules = gradebook.courseContent.contextModules
         strictEqual(storedModules.length, 2)
       })
       gradebook.updateContextModules(contextModules)

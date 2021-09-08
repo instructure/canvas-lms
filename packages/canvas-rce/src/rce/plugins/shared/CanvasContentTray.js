@@ -46,6 +46,8 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
   }
 
   switch (contentSubtype) {
+    case 'buttons_and_icons':
+      return formatMessage('Buttons and Icons')
     case 'images':
       if (contentType === 'course_files') return formatMessage('Course Images')
       if (contentType === 'group_files') return formatMessage('Group Images')
@@ -64,6 +66,7 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
 }
 
 const thePanels = {
+  buttons_and_icons: React.lazy(() => import('../instructure_buttons/components/SavedButtonList')),
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
@@ -178,6 +181,14 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contextType: 'group',
     contentType: 'links',
     contentSubtype: 'all',
+    sortValue: 'date_added',
+    sortDir: 'desc',
+    searchString: ''
+  },
+  list_buttons_and_icons: {
+    contextType: 'course',
+    contentType: 'course_files',
+    contentSubtype: 'buttons_and_icons',
     sortValue: 'date_added',
     sortDir: 'desc',
     searchString: ''
@@ -428,6 +439,11 @@ export default function CanvasContentTray(props) {
                     contentSubtype={filterSettings.contentSubtype}
                     sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
                     searchString={filterSettings.searchString}
+                    source={props.source}
+                    jwt={props.jwt}
+                    host={props.host}
+                    refreshToken={props.refreshToken}
+                    context={{type: props.contextType, id: props.contextId}}
                     {...contentProps}
                   />
                 </ErrorBoundary>

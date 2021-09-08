@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {bool, shape, string, number, arrayOf, func} from 'prop-types'
-import {userShape, itemShape} from '../plannerPropTypes'
+import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
 import {getFriendlyDate, getDynamicFullDate, isToday} from '../../utilities/dateUtils'
@@ -46,14 +46,16 @@ export class Day extends Component {
     currentUser: shape(userShape),
     simplifiedControls: bool,
     singleCourseView: bool,
-    showMissingAssignments: bool
+    showMissingAssignments: bool,
+    responsiveSize: sizeShape
   }
 
   static defaultProps = {
     animatableIndex: 0,
     simplifiedControls: false,
     singleCourseView: false,
-    showMissingAssignments: false
+    showMissingAssignments: false,
+    responsiveSize: 'large'
   }
 
   constructor(props) {
@@ -112,6 +114,7 @@ export class Day extends Component {
         currentUser={this.props.currentUser}
         simplifiedControls={this.props.simplifiedControls}
         singleCourseView={this.props.singleCourseView}
+        responsiveSize={this.props.responsiveSize}
       />
     )
   }
@@ -173,7 +176,10 @@ export class Day extends Component {
           )}
         </div>
         {thisIsToday && this.props.showMissingAssignments && (
-          <MissingAssignments timeZone={this.props.timeZone} />
+          <MissingAssignments
+            timeZone={this.props.timeZone}
+            responsiveSize={this.props.responsiveSize}
+          />
         )}
       </div>
     )

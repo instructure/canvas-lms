@@ -523,11 +523,6 @@ $(document).ready(function () {
       }
     )
   })
-  $('#enrollment_type').change(function () {
-    $('.teacherless_invite_message').showIf(
-      $(this).find(':selected').hasClass('teacherless_invite')
-    )
-  })
 
   $('.self_enrollment_checkbox')
     .change(function () {
@@ -598,4 +593,10 @@ $(document).ready(function () {
   $('#course_show_announcements_on_home_page').change(function (event) {
     $('#course_home_page_announcement_limit').prop('disabled', !$(this).prop('checked'))
   })
+
+  $('#course_enable_pace_plans')
+    .change(function () {
+      $('#pace_plans_caution_text').toggleClass('shown', this.checked)
+    })
+    .trigger('change')
 })

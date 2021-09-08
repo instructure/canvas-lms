@@ -25,17 +25,39 @@ import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TargetGroupSelector from '../shared/TargetGroupSelector'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
+import {useMutation} from 'react-apollo'
 
-const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHandler}) => {
-  const [targetGroup, setTargetGroup] = useState(null)
-  const {contextType, contextId} = useCanvasContext()
+const GroupMoveModal = ({
+  groupId,
+  groupTitle,
+  parentGroupId,
+  isOpen,
+  onCloseHandler,
+  onSuccess,
+  rootGroup
+}) => {
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
+  const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
+  const disableGroupMove =
+    !targetGroup || targetGroup?.id === parentGroupId || targetGroup?.id === groupId
 
   const onMoveGroupHandler = () => {
     ;(async () => {
       try {
-        await moveOutcomeGroup(contextType, contextId, groupId, targetGroup.id)
+        const result = await moveOutcomeGroup({
+          variables: {
+            input: {
+              id: groupId,
+              parentOutcomeGroupId: targetGroup.id
+            }
+          }
+        })
+
+        const movedOutcomeGroup = result.data?.updateLearningOutcomeGroup?.learningOutcomeGroup
+        const errorMessage = result.data?.updateLearningOutcomeGroup?.errors?.[0]?.message
+        if (!movedOutcomeGroup) throw new Error(errorMessage)
+
         showFlashAlert({
           message: I18n.t('"%{groupTitle}" has been moved to "%{newGroupTitle}".', {
             groupTitle,
@@ -43,14 +65,15 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
           }),
           type: 'success'
         })
+        onSuccess()
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}', {
+            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}.', {
                 groupTitle,
                 message: err.message
               })
-            : I18n.t('An error occurred moving group "%{groupTitle}"', {
+            : I18n.t('An error occurred moving group "%{groupTitle}".', {
                 groupTitle
               }),
           type: 'error'
@@ -77,8 +100,8 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
           </Text>
           <TargetGroupSelector
             groupId={groupId}
-            parentGroupId={parentGroupId}
-            setTargetGroup={setTargetGroup}
+            // eslint-disable-next-line no-shadow
+            setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
           />
         </View>
       </Modal.Body>
@@ -90,7 +113,7 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
           type="button"
           color="primary"
           margin="0 x-small 0 0"
-          disabled={!targetGroup}
+          disabled={disableGroupMove}
           onClick={onMoveGroupHandler}
         >
           {I18n.t('Move')}
@@ -105,7 +128,13 @@ GroupMoveModal.propTypes = {
   groupTitle: PropTypes.string.isRequired,
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
+  rootGroup: PropTypes.object.isRequired
+}
+
+GroupMoveModal.defaultProps = {
+  onSuccess: () => {}
 }
 
 export default GroupMoveModal

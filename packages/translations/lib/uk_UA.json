@@ -56,6 +56,9 @@
     "announcements_a4b8ed4a": {
         "message": "Оголошення"
     },
+    "apply_781a2546": {
+        "message": "Застосувати"
+    },
     "apps_54d24a47": {
         "message": "Застосунки"
     },
@@ -398,6 +401,9 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
+    "join_6cafecca": {
+        "message": "Приєднатися"
+    },
     "jump_to_today_254ccf41": {
         "message": "Перейти на Сьогодні"
     },
@@ -473,6 +479,9 @@
     "my_grades_98834476": {
         "message": "Мої оцінки"
     },
+    "name_1aed4a1b": {
+        "message": "Ім''я"
+    },
     "new_13daf639": {
         "message": "Новий"
     },
@@ -484,9 +493,6 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Нові можливості"
-    },
-    "next_40e12421": {
-        "message": "Далі"
     },
     "next_month_749b1778": {
         "message": "Наступний місяць"
@@ -709,6 +715,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Завантажити медіа контент"
+    },
+    "uploading_19e8a4e7": {
+        "message": "Завантаження"
     },
     "url_22a5f3b8": {
         "message": "URL"

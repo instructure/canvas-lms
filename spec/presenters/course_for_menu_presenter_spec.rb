@@ -97,6 +97,16 @@ describe CourseForMenuPresenter do
       expect(cs_presenter.to_h.key?(:published)).to eq true
     end
 
+    it 'sets additional keys' do
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      h = cs_presenter.to_h
+      expect(h.key?(:published)).to eq true
+      expect(h.key?(:canChangeCoursePublishState)).to eq true
+      expect(h.key?(:defaultView)).to eq true
+      expect(h.key?(:pagesUrl)).to eq true
+      expect(h.key?(:frontPageTitle)).to eq true
+    end
+
     context 'isK5Subject' do
       it 'is set for k5 subjects' do
         toggle_k5_setting(course.account)
@@ -119,22 +129,6 @@ describe CourseForMenuPresenter do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h[:isHomeroom]).to eq true
-      end
-    end
-
-    context 'with the `unpublished_courses` FF enabled' do
-      before(:each) do
-        course.root_account.enable_feature!(:unpublished_courses)
-      end
-
-      it 'sets additional keys' do
-        cs_presenter = CourseForMenuPresenter.new(course, user, account)
-        h = cs_presenter.to_h
-        expect(h.key?(:published)).to eq true
-        expect(h.key?(:canChangeCoursePublishState)).to eq true
-        expect(h.key?(:defaultView)).to eq true
-        expect(h.key?(:pagesUrl)).to eq true
-        expect(h.key?(:frontPageTitle)).to eq true
       end
     end
 
@@ -172,8 +166,7 @@ describe CourseForMenuPresenter do
     end
 
     context 'Using courses from a trusted account' do
-      it 'returns correct published value if the current account has FF enabled' do
-        account.enable_feature!(:unpublished_courses)
+      it 'returns correct published value' do
         a2 = account_model(name: "second account")
         a2.trust_links.create!(managing_account: account)
         account.trust_links.create!(managing_account: a2)

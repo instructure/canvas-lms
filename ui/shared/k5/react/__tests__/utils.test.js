@@ -34,7 +34,8 @@ import {
   fetchImportantInfos,
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom,
-  groupImportantDates
+  groupImportantDates,
+  parseObserverList
 } from '../utils'
 
 import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
@@ -133,6 +134,7 @@ describe('fetchGrades', () => {
       {
         current_grading_period_id: '1',
         current_grading_period_title: 'The first one',
+        totals_for_all_grading_periods_option: false,
         current_period_computed_current_score: 80,
         current_period_computed_current_grade: 'B-',
         computed_current_score: 89,
@@ -175,7 +177,10 @@ describe('fetchGrades', () => {
         hasGradingPeriods: true,
         score: 80,
         grade: 'B-',
-        isHomeroom: false
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: false,
+        totalGradeForAllGradingPeriods: null,
+        totalScoreForAllGradingPeriods: null
       }
     ])
   })
@@ -195,7 +200,61 @@ describe('fetchGrades', () => {
         hasGradingPeriods: false,
         score: 89,
         grade: 'B+',
-        isHomeroom: false
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: false,
+        totalGradeForAllGradingPeriods: null,
+        totalScoreForAllGradingPeriods: null
+      }
+    ])
+  })
+
+  it('populates totalGradeForAllGradingPeriods and totalScoreForAllGradingPeriods if totals option is true', async () => {
+    fetchMock.get(
+      GRADES_URL,
+      JSON.stringify([
+        {
+          ...defaultCourse,
+          enrollments: [
+            {
+              current_grading_period_id: '1',
+              current_grading_period_title: 'The first one',
+              totals_for_all_grading_periods_option: true,
+              current_period_computed_current_score: 80,
+              current_period_computed_current_grade: 'B-',
+              computed_current_score: 89,
+              computed_current_grade: 'B+'
+            }
+          ]
+        }
+      ])
+    )
+
+    const courseGrades = await fetchGrades()
+    expect(courseGrades).toEqual([
+      {
+        courseId: '1',
+        courseName: 'Intro to Everything',
+        courseImage: 'https://course.img',
+        courseColor: '#ace',
+        currentGradingPeriodId: '1',
+        currentGradingPeriodTitle: 'The first one',
+        gradingPeriods: [
+          {
+            id: '1',
+            title: 'The first one'
+          },
+          {
+            id: '2',
+            title: 'The second one'
+          }
+        ],
+        hasGradingPeriods: true,
+        score: 80,
+        grade: 'B-',
+        isHomeroom: false,
+        showTotalsForAllGradingPeriods: true,
+        totalGradeForAllGradingPeriods: 'B+',
+        totalScoreForAllGradingPeriods: 89
       }
     ])
   })
@@ -438,6 +497,39 @@ describe('getAssignmentGrades', () => {
     const totals = getAssignmentGrades(data)
     expect(totals[0].unread).toBeTruthy()
   })
+
+  it('sets hasComments appropriately', () => {
+    const data = [
+      {
+        id: '49',
+        assignments: [
+          {
+            id: 149,
+            submission: {
+              submission_comments: [
+                {
+                  id: 1
+                }
+              ]
+            }
+          },
+          {
+            id: 150,
+            submission: {
+              submission_comments: []
+            }
+          },
+          {
+            id: 151
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals.find(({id}) => id === 149).hasComments).toBe(true)
+    expect(totals.find(({id}) => id === 150).hasComments).toBe(false)
+    expect(totals.find(({id}) => id === 151).hasComments).toBe(false)
+  })
 })
 
 describe('getAccountsFromEnrollments', () => {
@@ -476,6 +568,25 @@ describe('getAccountsFromEnrollments', () => {
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)
+  })
+
+  it('ignores enrollments without an account property', () => {
+    const enrollments = [
+      {
+        id: 10,
+        account: {
+          id: 1,
+          name: 'School'
+        }
+      },
+      {
+        id: 11,
+        access_restricted_by_date: true
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
+    expect(accounts[0].id).toBe(1)
   })
 })
 
@@ -631,7 +742,9 @@ describe('parseAnnouncementDetails', () => {
       'http://localhost:3000/files/longpath'
     )
     expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
-    expect(announcementDetails.announcement.postedDate).toBe('2021-05-14T17:06:21-06:00')
+    expect(new Date(announcementDetails.announcement.postedDate)).toEqual(
+      new Date('2021-05-14T17:06:21-06:00')
+    )
   })
 
   it('handles a missing attachment', () => {
@@ -774,5 +887,25 @@ describe('groupImportantDates', () => {
     expect(event.type).toBe('event')
     expect(event.url).toBe('http://localhost:3000/calendar?event_id=99&include_contexts=course_30')
     expect(event.start).toBe('2021-06-30T07:00:00Z')
+  })
+})
+
+describe('parseObserverList', () => {
+  it('transforms attribute names', () => {
+    const users = parseObserverList([
+      {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
+      {id: '6', name: 'Student 6'}
+    ])
+    expect(users.length).toBe(2)
+    expect(users[0].id).toBe('4')
+    expect(users[0].name).toBe('Student 4')
+    expect(users[0].avatarUrl).toBe('https://url_here')
+    expect(users[1].id).toBe('6')
+    expect(users[1].name).toBe('Student 6')
+  })
+
+  it('returns empty list if no observers passed', () => {
+    const users = parseObserverList([])
+    expect(users.length).toBe(0)
   })
 })

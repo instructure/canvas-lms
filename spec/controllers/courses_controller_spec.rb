@@ -89,8 +89,7 @@ describe CoursesController do
     describe "homeroom courses" do
       before :once do
         @account = Account.default
-        @account.settings[:enable_as_k5_account] = {value: true}
-        @account.save!
+        @account.enable_as_k5_account!
 
         @teacher1 = user_factory(active_all: true, account: @account)
         @student1 = user_factory(active_all: true, account: @account)
@@ -403,8 +402,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           @student = user_factory
 
           # past unpublished course
@@ -420,10 +419,6 @@ describe CoursesController do
           course_with_student course: course2, user: @student, active_all: true
 
           user_session(@student)
-          get_index
-          expect(assigns[:past_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:past_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
         end
@@ -505,8 +500,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           # unpublished course
           course1 = Account.default.courses.create! name: 'A'
           enrollment1 = course_with_student user: @student, course: course1
@@ -519,10 +514,6 @@ describe CoursesController do
           course_with_student course: course2, user: @student, active_all: true
 
           user_session(@student)
-          get_index
-          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
         end
@@ -637,8 +628,8 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq [enrollment1] # show it because it's accessible now
       end
 
-      describe "unpublished_courses FF" do
-        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+      describe "unpublished_courses" do
+        it "should list unpublished courses after published" do
           # unpublished course
           course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
           expect(course1).to be_unpublished
@@ -650,10 +641,6 @@ describe CoursesController do
           course_with_student user: @student, course: course2
 
           user_session(@student)
-          get_index
-          expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
-
-          Account.default.enable_feature!(:unpublished_courses)
           get_index
           expect(assigns[:future_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
         end
@@ -831,8 +818,7 @@ describe CoursesController do
     end
 
     it "should only set course color js_env vars for elementary courses" do
-      @course.account.settings[:enable_as_k5_account] = {value: true}
-      @course.account.save!
+      @course.account.enable_as_k5_account!
       @course.course_color = "#BAD"
       @course.save!
 
@@ -1036,7 +1022,6 @@ describe CoursesController do
     end
 
     it "should not find deleted courses" do
-      skip('flaky spec: LS-2269')
       user_session(@teacher)
       @course.destroy
       assert_page_not_found do
@@ -1673,7 +1658,7 @@ describe CoursesController do
         user_session(@teacher)
 
         get 'show', params: {:id => @course.id}
-        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_announcements: true, read_as_admin: true})
       end
 
       it "sets COURSE.color appropriately in js_env" do
@@ -1696,6 +1681,17 @@ describe CoursesController do
         expect(bundle.size).to eq 1
       end
 
+      it "sets the course_home_view to 'Important Info' if the teacher has no announcement reading permission for the homeroom" do
+        @course.homeroom_course = true
+        @course.save!
+
+        @course.account.role_overrides.create!(permission: :read_announcements, role: teacher_role, enabled: false)
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq 'syllabus'
+      end
+
       it "sets COURSE.has_syllabus_body to true when syllabus exists" do
         @course.syllabus_body = "Welcome"
         @course.save!
@@ -1713,15 +1709,62 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_falsey
       end
-    end
 
+      it "sets ENV.OBSERVER_LIST with self and observed users" do
+        user_session(@student)
 
-    it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
-      @course.enable_feature!(:student_outcome_gradebook)
-      user_session(@student)
+        get 'show', params: {:id => @course.id}
+        observers = assigns[:js_env][:OBSERVER_LIST]
+        expect(observers.length).to be(1)
+        expect(observers[0][:name]).to eq(@student.name)
+        expect(observers[0][:id]).to eq(@student.id)
+      end
 
-      get 'show', params: {:id => @course.id}
-      expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+      it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
+        @course.enable_feature!(:student_outcome_gradebook)
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+      end
+
+      describe "update" do
+
+        it "syncs enrollments if setting is set" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).to receive(:process_job)
+
+          user_session(@teacher)
+
+          get 'update', params: {
+            :id => @course.id,
+            :course => {
+              homeroom_course_id: '17',
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+
+        it "does not sync if course is a sis import" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).not_to receive(:process_job)
+
+          user_session(@teacher)
+          sis = @course.account.sis_batches.create
+          @course.sis_batch_id = sis.id
+          @course.save!
+
+          get 'update', params: {
+            :id => @course.id,
+            :course => {
+              homeroom_course_id: '17',
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+      end
     end
 
     context 'COURSE.latest_announcement' do
@@ -2184,7 +2227,6 @@ describe CoursesController do
     end
 
     it 'should not allow unpublishing of the course if submissions present' do
-      skip('flaky spec: LS-2269')
       course_with_student_submissions({active_all: true, submission_points: true})
       put 'update', params: {:id => @course.id, :course => {:event => 'claim'}}
       @course.reload
@@ -2504,7 +2546,7 @@ describe CoursesController do
     it "should render the show page with a flash on error" do
       user_session(@teacher)
       # cause the course to be invalid
-      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      Course.where(id: @course).update_all(restrict_enrollments_to_course_dates: true, start_at: Time.now.utc, conclude_at: 1.day.ago)
       put 'update', params: {:id => @course.id, :course => { :name => "name change" }}
       expect(flash[:error]).to match(/There was an error saving the changes to the course/)
     end
@@ -3489,6 +3531,51 @@ describe CoursesController do
       group.users << student2
       group.group_memberships.first.update!(workflow_state: 'deleted')
       group.reload
+    end
+
+    it "should not set pagination total_pages/last page link" do
+      user_session(teacher)
+      # need two pages or the first page will also be the last_page
+      student1
+      student2
+
+      get 'users', params: {
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        per_page: 1
+      }
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+    end
+
+    it "should set pagination total_pages/last page link if account setting enabled" do
+      user_session(teacher)
+      # need two pages or the first page will also be the last_page
+      student1
+      student2
+      account = course.root_account
+      account.settings[:allow_last_page_on_course_users] = true
+      account.save!
+
+      get 'users', params: {
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        per_page: 1
+      }
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
+
+      get 'users', params: {
+        search_term: 'us',
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        per_page: 1
+      }
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
     it 'only returns group_ids for active group memberships when requested' do

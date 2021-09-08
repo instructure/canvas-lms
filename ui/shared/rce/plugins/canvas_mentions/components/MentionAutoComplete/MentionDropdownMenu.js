@@ -16,11 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import PropTypes from 'prop-types'
-import React, {useMemo} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import MentionDropdownOption from './MentionDropdownOption'
 import {View} from '@instructure/ui-view'
+import {usePopper} from 'react-popper'
+import {ARIA_ID_TEMPLATES} from '../../constants'
 
-const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser, popupId}) => {
+const MentionDropdownMenu = ({
+  onSelect,
+  onMouseEnter,
+  mentionOptions,
+  coordiantes,
+  selectedUser,
+  instanceId,
+  highlightMouse,
+  onOptionMouseEnter,
+  isInteractive
+}) => {
+  // Hooks & Variables
+  const directionality = tinyMCE?.activeEditor?.getParam('directionality')
+  const menuRef = useRef(null)
+
+  // Setup Popper
+  const virtualReference = useMemo(() => {
+    return {
+      getBoundingClientRect: () => {
+        return coordiantes
+      }
+    }
+  }, [coordiantes])
+  const [popperElement, setPopperElement] = useState(null)
+  const {styles, attributes} = usePopper(virtualReference, popperElement, {
+    placement: directionality === 'rtl' ? 'bottom-end' : 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          flipVariations: false,
+          fallbackPlacements: ['bottom', 'bottom-end', 'bottom-start']
+        }
+      }
+    ]
+  })
+
   // Memoize map of Mention Options
   const menuItems = useMemo(() => {
     return mentionOptions.map(user => {
@@ -28,33 +66,45 @@ const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser
         <MentionDropdownOption
           {...user}
           onSelect={() => {
-            onSelect(user)
+            onSelect({
+              ...user,
+              elementId: ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)
+            })
           }}
           isSelected={selectedUser === user.id}
-          key={`${popupId}-mention-popup-${user.id}`}
-          id={`${popupId}-mention-popup-${user.id}`}
+          key={user.id}
+          id={ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)}
+          highlightMouse={highlightMouse}
+          onOptionMouseEnter={() => {
+            onOptionMouseEnter(user)
+          }}
+          menuRef={menuRef}
+          isInteractive={isInteractive}
         />
       )
     })
-  }, [mentionOptions, onSelect, popupId, selectedUser])
+  }, [
+    mentionOptions,
+    selectedUser,
+    instanceId,
+    highlightMouse,
+    isInteractive,
+    onSelect,
+    onOptionMouseEnter
+  ])
 
   // Don't show if menu is empty
-  if (!show || mentionOptions?.length === 0) {
+  if (mentionOptions?.length === 0) {
     return null
   }
-
-  // Convert cords to px
-  const xOffset = Math.round(x).toString() + 'px'
-  const yOffset = Math.round(y).toString() + 'px'
 
   return (
     <div
       className="mention-dropdown-menu"
-      style={{
-        position: 'absolute',
-        top: yOffset,
-        left: xOffset
-      }}
+      ref={isInteractive ? setPopperElement : null}
+      style={isInteractive ? {...styles.popper, zIndex: 10000} : null}
+      onMouseEnter={isInteractive ? onMouseEnter : null}
+      {...attributes.popper}
     >
       <View
         as="div"
@@ -68,15 +118,19 @@ const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser
         padding="none"
         shadow="above"
         width="auto"
+        elementRef={el => {
+          menuRef.current = el
+        }}
       >
         <ul
           aria-label="Mentionable Users"
-          id={`${popupId}-mention-popup`}
+          id={ARIA_ID_TEMPLATES.ariaControlTemplate(instanceId)}
           role="listbox"
           style={{
             paddingInlineStart: '0px',
             marginBlockStart: '0px',
-            marginBlockEnd: '0px'
+            marginBlockEnd: '0px',
+            margin: '0'
           }}
         >
           {menuItems}
@@ -94,23 +148,41 @@ MentionDropdownMenu.proptypes = {
    */
   mentionOptions: PropTypes.array,
   /**
-   * Unique popup ID supplied for ARIA support
+   * Unique ID supplied for ARIA support
    */
-  popupId: PropTypes.string,
+  instanceId: PropTypes.string,
   /**
-   * Bool that controls visibility of menu
+   * cordinates for menu on screen
    */
-  show: PropTypes.bool,
-  /**
-   * X cordinate for menu on screen (in px)
-   */
-  x: PropTypes.number,
-  /**
-   * y cordinate for menu on screen (in px)
-   */
-  y: PropTypes.number,
+  coordiantes: PropTypes.object,
   /**
    * Callback for selecting an item
    */
-  onSelect: PropTypes.func
+  onSelect: PropTypes.func,
+  /**
+   * ID of selected user
+   */
+  selectedUser: PropTypes.string,
+  /**
+   * Event for triggering onMosueOver
+   */
+  onMouseEnter: PropTypes.func,
+  /**
+   * Bool to control mouse highlighting
+   */
+  highlightMouse: PropTypes.bool,
+  /**
+   * Callback to set user on hover
+   */
+  onOptionMouseEnter: PropTypes.func,
+  /**
+   * isInteractive determines if menu will recieve events
+   * This is used for the hidden menu offscreen in the RCE
+   */
+  isInteractive: PropTypes.bool
+}
+
+MentionDropdownMenu.defaultProps = {
+  isInteractive: true,
+  onSelect: () => {}
 }

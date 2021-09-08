@@ -18,7 +18,21 @@
 
 import renderCanvasDiscussionPosts from './react/index'
 import ready from '@instructure/ready'
+import $ from 'jquery'
 
 ready(() => {
-  renderCanvasDiscussionPosts(ENV, document.getElementById('content'))
+  renderCanvasDiscussionPosts(ENV, $('<div/>').appendTo('#content')[0])
 })
+if (ENV.SEQUENCE != null) {
+  import('@canvas/module-sequence-footer').then(() => {
+    $(() => {
+      $('<div id="module_sequence_footer" style="margin-top: 30px" />')
+        .appendTo('#content')
+        .moduleSequenceFooter({
+          assetType: 'Discussion',
+          assetID: ENV.SEQUENCE.ASSET_ID,
+          courseID: ENV.SEQUENCE.COURSE_ID
+        })
+    })
+  })
+}

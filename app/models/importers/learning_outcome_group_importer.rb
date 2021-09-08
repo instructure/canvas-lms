@@ -66,6 +66,16 @@ module Importers
       item.low_grade = hash[:low_grade]
       item.high_grade = hash[:high_grade]
 
+      if hash[:source_outcome_group_id]
+        source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
+
+        if source_group && \
+            item.title == source_group.title && \
+            context&.associated_accounts&.include?(source_group.context)
+          item.source_outcome_group = source_group
+        end
+      end
+
       # For some reason the top level authority for the United Kingdom
       # gets returned back from Academic Benchmarks with a GUID of
       # "ENG", with no title and no description.  Because of this, our

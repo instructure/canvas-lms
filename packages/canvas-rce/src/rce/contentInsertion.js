@@ -175,6 +175,16 @@ export function insertLink(editor, link) {
   return insertUndecoratedLink(editor, linkAttrs)
 }
 
+function textForLink(linkProps, editor, anchorElm) {
+  // Some actions (like editing the link text in the link tray)
+  // require an explicit update to the link text
+  if (linkProps.forceRename) return linkProps.text
+
+  // Other actions (link highlighting an existing link and changing
+  // the linked file) should use the anchor text if present
+  return getAnchorText(editor.selection, anchorElm) || linkProps.text
+}
+
 // link edit/create logic based on tinymce/plugins/link/plugin.js
 function insertUndecoratedLink(editor, linkProps) {
   const selectedElm = editor.selection.getNode()
@@ -183,7 +193,7 @@ function insertUndecoratedLink(editor, linkProps) {
   const selectedPlainText = editor.selection.getContent({format: 'text'})
   const onlyText = isOnlyTextSelected(selectedContent)
 
-  const linkText = onlyText && (linkProps.text || getAnchorText(editor.selection, anchorElm))
+  const linkText = onlyText && textForLink(linkProps, editor, anchorElm)
 
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {

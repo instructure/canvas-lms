@@ -71,19 +71,25 @@ export default function wrapInitCb(mirroredAttrs, editorOptions, MutationObserve
 
     $(window).triggerHandler('resize')
 
-    // this is a hack so that when you drag an image from the sidebar to the editor that it doesn't
-    // try to embed the thumbnail but rather the full size version of the image.
-    // so basically, to document why and how this works: in wiki_sidebar.js we add the
-    // _mce_src="http://path/to/the/fullsize/image" to the images whose src="path/to/thumbnail/of/image/"
-    // what this does is check to see if some DOM node that got inserted into the editor has the attribute _mce_src
-    // and if it does, use that instead.
-    $(ed.contentDocument).bind('DOMNodeInserted', e => {
-      const target = e.target
-      let mceSrc
-      if (target.nodeType === 1 && target.nodeName === 'IMG' && (mceSrc = $(target).data('url'))) {
-        $(target).attr('src', tinymce.activeEditor.documentBaseURI.toAbsolute(mceSrc))
-      }
-    })
+    if (!window.ENV?.use_rce_enhancements) {
+      // this is a hack so that when you drag an image from the sidebar to the editor that it doesn't
+      // try to embed the thumbnail but rather the full size version of the image.
+      // so basically, to document why and how this works: in wiki_sidebar.js we add the
+      // _mce_src="http://path/to/the/fullsize/image" to the images whose src="path/to/thumbnail/of/image/"
+      // what this does is check to see if some DOM node that got inserted into the editor has the attribute _mce_src
+      // and if it does, use that instead.
+      $(ed.contentDocument).bind('DOMNodeInserted', e => {
+        const target = e.target
+        let mceSrc
+        if (
+          target.nodeType === 1 &&
+          target.nodeName === 'IMG' &&
+          (mceSrc = $(target).data('url'))
+        ) {
+          $(target).attr('src', tinymce.activeEditor.documentBaseURI.toAbsolute(mceSrc))
+        }
+      })
+    }
 
     // tiny sets a focusout event handler, which only IE supports
     // (Chrome/Safari/Opera support DOMFocusOut, FF supports neither)

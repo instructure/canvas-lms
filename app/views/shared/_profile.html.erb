@@ -57,8 +57,9 @@
         <% end %>
         <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
+          <%# Do not convert these to inferred-key translations, "title" is most often used in canvas for things like document titles, but personal titles can be translated differently in some languages. %>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
-            <input aria-label="<%= t 'Title' %>" class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+            <input aria-label="<%= t('title', 'Title') %>" class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
           </label>
         </p>
       <% else %>

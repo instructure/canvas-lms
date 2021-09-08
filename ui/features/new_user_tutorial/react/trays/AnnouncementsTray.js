@@ -27,28 +27,24 @@ const AnnouncementsTray = () => (
     image="/images/tutorial-tray-images/Panda_Announcements.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('What are announcements?'),
-        href:
-          'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39'
+        href: I18n.t('#community.basics_announcements')
       },
       {
         label: I18n.t('How do I add an announcement in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194'
+        href: I18n.t('#community.instructor_add_announcement')
       },
       {
         label: I18n.t('How do I edit an announcement in a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190'
+        href: I18n.t('#community.instructor_edit_announcement')
       },
       {
         label: I18n.t('How do I use the Announcements Index Page?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113'
+        href: I18n.t('#community.instructor_use_announcements_index')
       }
     ]}
   >

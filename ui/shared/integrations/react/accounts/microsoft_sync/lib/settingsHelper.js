@@ -18,47 +18,67 @@
 
 import I18n from 'i18n!account_settings_jsx_bundle'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {pick} from 'lodash'
+
+export const SYNC_SETTINGS = [
+  'microsoft_sync_enabled',
+  'microsoft_sync_tenant',
+  'microsoft_sync_login_attribute',
+  'microsoft_sync_login_attribute_suffix',
+  'microsoft_sync_remote_attribute'
+]
 
 /**
  * Using the provided parameters, updates the Microsoft Teams Sync settings for the current
  * account.
  *
- * @param {boolean} syncEnabled Whether MSFT Teams Sync should be enabled or not.
- * @param {string} syncTenant The tenant to use
- * @param {string} syncLoginAttr The login attribute to use
+ * @param {import('./settingsReducer').State} state The state whose values to use to update settings.
  */
-export async function doUpdateSettings(syncEnabled, syncTenant, syncLoginAttr) {
+export async function doUpdateSettings(state) {
   await doFetchApi({
     path: `/api/v1/${ENV.CONTEXT_BASE_URL}`,
     method: 'PUT',
     body: {
       account: {
-        settings: {
-          microsoft_sync_enabled: syncEnabled,
-          microsoft_sync_tenant: syncTenant,
-          microsoft_sync_login_attribute: syncLoginAttr
-        }
+        settings: sliceSyncSettings(state)
       }
     }
   })
 }
+
 /**
- * Using the provided state from the reducer function, checks if the tenant is valid and adds error messages
- * as appropriate.
- * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
- * @returns {import('./settingsReducer').State} The modified state, with an error message if the tenant is invalid
+ *
+ * @param {Object} obj
+ * @returns Returns the properties from obj that match actual Microsoft
+ * Sync settings used by the API.
  */
-export function validateTenant(state) {
+export function sliceSyncSettings(obj) {
+  const syncSettings = pick(obj, SYNC_SETTINGS)
+  if (syncSettings.microsoft_sync_login_attribute_suffix) {
+    syncSettings.microsoft_sync_login_attribute_suffix =
+      syncSettings.microsoft_sync_login_attribute_suffix.trim()
+  }
+  return syncSettings
+}
+
+/**
+ * Using the provided state from the reducer function, checks if the tenant is valid and
+ * returns an array of appropriate error messages.
+ * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
+ * @returns {[{text: string, type: string}]} An array of error messages. Returns an empty array
+ * if no errors were found.
+ */
+export function getTenantErrorMessages(state) {
   const regex = /^(?:[\w-]+\.[\w-]+)+$/
   if (!state.microsoft_sync_tenant) {
-    state.tenantErrorMessages = [
+    return [
       {
         text: I18n.t('To toggle Microsoft Teams Sync you need to input a tenant domain.'),
         type: 'error'
       }
     ]
   } else if (!regex.test(state.microsoft_sync_tenant)) {
-    state.tenantErrorMessages = [
+    return [
       {
         text: I18n.t(
           'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
@@ -67,18 +87,36 @@ export function validateTenant(state) {
       }
     ]
   }
-  return state
+  return []
 }
 
 /**
- * Removes all error and success messages from the state.
+ * Returns an array of error messages related to the suffix of the specified state.
  * @param {import('./settingsReducer').State} state
- * @returns The state with all error and success messages cleared.
+ * @returns {[{text: string, type: string}]} An array of error messages related to the suffix
+ * on the specified state. If no errors are found, returns an empty array.
  */
-export function clearMessages(state) {
-  state.errorMessage = ''
-  state.successMessage = ''
-  return state
+export function getSuffixErrorMessages(state) {
+  const regex = /\s/
+  if (state.microsoft_sync_login_attribute_suffix.length > 255) {
+    return [
+      {
+        text: I18n.t(
+          'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.'
+        ),
+        type: 'error'
+      }
+    ]
+  } else if (regex.test(state.microsoft_sync_login_attribute_suffix.trim())) {
+    return [
+      {
+        text: I18n.t('A suffix cannot have any tabs or spaces. Please remove them and try again.'),
+        type: 'error'
+      }
+    ]
+  } else {
+    return []
+  }
 }
 
 /**
@@ -87,7 +125,7 @@ export function clearMessages(state) {
  *
  * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
  * @param payload The data given to the reducer, which contains the new tenant input text
- * @returns {import('./settingsReducer').State} The modified state, with an error message if the tenant is invalid
+ * @returns {{text: string, type: string}[]} The array of tenantInfoMessages
  */
 export function setTenantInfoMessages(state, payload) {
   let tenantInfoMessages = []

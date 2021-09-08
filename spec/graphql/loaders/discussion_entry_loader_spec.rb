@@ -26,7 +26,7 @@ describe Loaders::DiscussionEntryLoader do
     student_in_course(active_all: true)
     @student.update(name: 'Student')
     @de1 = @discussion.discussion_entries.create!(message: 'peekaboo', user: @teacher, created_at: Time.zone.now)
-    @de2 = @discussion.discussion_entries.create!(message: 'hello', user: @student, created_at: Time.zone.now - 1.day)
+    @de2 = @discussion.discussion_entries.create!(message: "can't touch this.", user: @student, created_at: Time.zone.now - 1.day)
     @de3 = @discussion.discussion_entries.create!(message: 'goodbye', user: @teacher, created_at: Time.zone.now - 2.days)
     @de4 = @discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: @de2.id)
     @de3.destroy
@@ -40,6 +40,65 @@ describe Loaders::DiscussionEntryLoader do
       discussion_entry_loader.load(@discussion).then { |discussion_entries|
         expect(discussion_entries).to match @discussion.discussion_entries.reorder(created_at: "desc")
       }
+    end
+  end
+
+  describe 'relative entry' do
+    before(:once) do
+      @de5 = @discussion.discussion_entries.create!(message: 'from the future?', user: @student, created_at: 1.day.from_now)
+      @de6 = @discussion.discussion_entries.create!(message: 'that is just crazy', user: @student, created_at: 2.days.from_now)
+      # @de1 is root, and we are loading 5 replies ordered by created_at, but force them all to be children.
+      DiscussionEntry.where(id: [@de2, @de3, @de4, @de5, @de6]).update_all(parent_id: @de1.id, root_entry_id: @de1.id)
+    end
+
+    it 'get entries before relative entry including relative by default' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de3.id, @de2.id, @de4.id]
+        end
+      end
+    end
+
+    it 'sort works wih relative_entry_id' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :desc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de2.id, @de3.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: false,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de5.id, @de6.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry including relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: true,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de5.id, @de6.id]
+        end
+      end
     end
   end
 
@@ -71,6 +130,17 @@ describe Loaders::DiscussionEntryLoader do
   end
 
   context 'allows search discussion entries' do
+    it "finds [can't touch this] with search_term of [']" do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(
+          current_user: @teacher,
+          search_term: "'"
+        ).load(@discussion).then { |discussion_entries|
+          expect(discussion_entries).to match [@de2]
+        }
+      end
+    end
+
     it 'by message body' do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
@@ -105,7 +175,7 @@ describe Loaders::DiscussionEntryLoader do
     end
   end
 
-  context 'allow fitering discussion entries' do
+  context 'allow filtering discussion entries' do
 
     it 'by any workflow state' do
       GraphQL::Batch.batch do
@@ -119,14 +189,21 @@ describe Loaders::DiscussionEntryLoader do
     end
 
     it 'by unread workflow state' do
-      @de1.change_read_state('unread', @teacher)
+      # explicit and implicit read states
+      @de1.change_read_state('read', @teacher)
+      @de2.change_read_state('unread', @teacher)
+      @de4.discussion_entry_participants.where(user_id: @teacher).delete_all
 
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           filter: 'unread'
         ).load(@discussion).then { |discussion_entries|
-          expect(discussion_entries).to match [@de1]
+          # @de1 has a read entry_participant and will be excluded.
+          # @de2 has a unread entry_participant and will be included.
+          # @de3 is deleted and will be excluded.
+          # @de4 has no entry_participant and is considered unread and will be included.
+          expect(discussion_entries).to match_array([@de2, @de4])
         }
       end
     end

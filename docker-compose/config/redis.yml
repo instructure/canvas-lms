@@ -14,3 +14,7 @@ test:
   # use this server for anything else, make sure to set aside a database id for
   # these tests to use.
   db: <%= ENV.fetch('PARALLEL_INDEX', '1') %>
+
+  # when using RspecQ under test, ignore redis guards to allow execution of
+  # unsafe redis commands against redis test queue.
+  ignore_redis_guards: true

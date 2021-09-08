@@ -38,7 +38,7 @@ QUnit.module('SelectContentDialog', {
       jQuery17209791898143012077: true,
       preventDefault() {}
     }
-    $l.data('tool', {placements: {resource_selection: {}}})
+    $l.data('tool', {name: 'mytool', placements: {resource_selection: {}}})
     sandbox.stub(window, 'confirm').returns(true)
   },
   teardown() {
@@ -72,6 +72,7 @@ test('sets the iframe "data-lti-launch" attribute', function() {
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
   equal($dialog.find('#resource_selection_iframe').attr('data-lti-launch'), 'true')
+  equal($dialog.find('#resource_selection_iframe').attr('title'), 'mytool')
 })
 
 test('it removes the confirm alert if a selection is passed back', () => {

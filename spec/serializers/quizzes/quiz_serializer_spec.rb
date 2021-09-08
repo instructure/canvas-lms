@@ -53,6 +53,7 @@ describe Quizzes::QuizSerializer do
     allow(controller).to receive(:context).and_return context
     allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
     allow(@context).to receive(:grants_right?).at_least(:once).and_return true
+    allow(@context).to receive(:grants_any_right?).at_least(:once).and_return true
     @serializer = quiz_serializer
     @json = @serializer.as_json[:quiz]
   end
@@ -180,7 +181,7 @@ describe Quizzes::QuizSerializer do
     end
 
     it "is included if the user can manage" do
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
         at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
@@ -188,7 +189,7 @@ describe Quizzes::QuizSerializer do
     it "is not included if the user can't grade or manage" do
       expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
         at_least(:once).and_return false
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
         at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :access_code
     end
@@ -245,7 +246,7 @@ describe Quizzes::QuizSerializer do
 
     it "is not present unless the user can manage the quiz's assignments" do
       manage_result = true
-      allow(context).to receive(:grants_right?).with(@user, :manage_assignments) { manage_result }
+      allow(context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS) { manage_result }
       expect(serializer.filter(serializer.class._attributes)).to include :unpublishable
 
       manage_result = false

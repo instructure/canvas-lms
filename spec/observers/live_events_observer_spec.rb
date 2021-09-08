@@ -551,4 +551,24 @@ describe LiveEventsObserver do
       calculation_method.destroy
     end
   end
+
+  describe "friendly_description" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_friendly_description_created).once
+      outcome_friendly_description_model(account_model)
+    end
+
+    it "posts updated events when friendly description is changed" do
+      friendly_description = outcome_friendly_description_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_friendly_description_updated).once
+      friendly_description.description = 'A new friendly description'
+      friendly_description.save!
+    end
+
+    it "posts updated events when proficiencies are destroyed" do
+      friendly_description = outcome_friendly_description_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_friendly_description_updated).once
+      friendly_description.destroy
+    end
+  end
 end

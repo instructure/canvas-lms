@@ -28,7 +28,7 @@ ready(() => {
   const roles = []
 
   // Decide which tour to show based on the role
-  if (current_types.includes('Account Admin')) {
+  if (current_types.includes('AccountAdmin')) {
     roles.push('admin')
   }
   if (current_roles.includes('teacher') || window.ENV.COURSE?.is_instructor) {

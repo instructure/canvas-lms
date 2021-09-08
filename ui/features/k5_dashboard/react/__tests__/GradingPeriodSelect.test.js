@@ -50,6 +50,7 @@ describe('GradingPeriodSelect', () => {
     expect(getByText('Current Grading Period')).toBeInTheDocument()
     expect(getByText('Spring 2020')).toBeInTheDocument()
     expect(getByText('Fall 2020')).toBeInTheDocument()
+    expect(getByText('All Grading Periods')).toBeInTheDocument()
     expect(queryByText('Spring 2019')).not.toBeInTheDocument()
   })
 

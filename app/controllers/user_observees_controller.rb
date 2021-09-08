@@ -58,12 +58,12 @@ class UserObserveesController < ApplicationController
   end
 
   # @API List observers
-  # A paginated list of the users that the given user is observing.
+  # A paginated list of the observers of a given user.
   #
-  # *Note:* all users are allowed to list their own observees. Administrators can list
-  # other users' observees.
+  # *Note:* all users are allowed to list their own observers. Administrators can list
+  # other users' observers.
   #
-  # The returned observees will include an attribute "observation_link_root_account_ids", a list
+  # The returned observers will include an attribute "observation_link_root_account_ids", a list
   # of ids for the root accounts the observer and observee are linked on. The observer will only be able to
   # observe in courses associated with these root accounts.
   #
@@ -71,7 +71,7 @@ class UserObserveesController < ApplicationController
   #   - "avatar_url": Optionally include avatar_url.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/<user_id>/observees \
+  #     curl https://<canvas>/api/v1/users/<user_id>/observers \
   #          -X GET \
   #          -H 'Authorization: Bearer <token>'
   #
@@ -141,7 +141,7 @@ class UserObserveesController < ApplicationController
       common_root_accounts = common_root_accounts_for(observer, student)
       code.destroy
     else
-      observee_pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(params[:observee][:unique_id]).first
+      observee_pseudonym = @domain_root_account.pseudonyms.active_only.by_unique_id(params[:observee][:unique_id]).first
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?
@@ -204,7 +204,7 @@ class UserObserveesController < ApplicationController
 
   # @API Show an observer
   #
-  # Gets information about an observed user.
+  # Gets information about an observer.
   #
   # *Note:* all users are allowed to view their own observers.
   #

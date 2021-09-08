@@ -124,6 +124,8 @@ describe Canvadocs do
       describe 'user filter' do
         let(:peer_reviewer) { User.create!(name: 'Percy the Peer Reviewer') }
         let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer'} }
+        let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
+        let(:peer_reviewer2_real_data) { {type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer'} }
         let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
         let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
@@ -188,6 +190,12 @@ describe Canvadocs do
                 asset: submission,
                 assessor: peer_reviewer,
                 assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer2,
+                assessor_asset: assignment.submission_for_student(peer_reviewer2)
               )
             end
 
@@ -262,6 +270,12 @@ describe Canvadocs do
                 asset: submission,
                 assessor: peer_reviewer,
                 assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer2,
+                assessor_asset: assignment.submission_for_student(peer_reviewer2)
               )
             end
 
@@ -552,6 +566,9 @@ describe Canvadocs do
         let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
         let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
+        let(:ta) { User.create!(name: 'Tory the TA', short_name: 'Tory') }
+        let(:ta_real_data) { { type: 'real', role: 'ta', id: ta.global_id.to_s, name: 'Tory the TA' } }
+        let(:ta_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'tttt') }
 
         context 'for an unmoderated anonymized assignment' do
           before(:each) do
@@ -584,6 +601,20 @@ describe Canvadocs do
 
             it 'does not request that all returned annotations belong to users in the user_filter' do
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+          end
+
+          context 'when a ta is viewing' do
+            before(:each) do
+              @current_user = ta
+            end
+
+            it 'includes anonymous information for the student' do
+              expect(user_filter).to include(student_anonymous_data)
+            end
+
+            it 'requests that all returned annotations belong to users in the user_filter' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
         end
@@ -806,6 +837,8 @@ describe Canvadocs do
           context 'when a peer reviewer is viewing' do
             let(:peer_reviewer) { course.enroll_student(User.create!(name: "Percy the Peer Reviewer")).user }
             let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer"} }
+            let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
+            let(:peer_reviewer2_real_data) { {type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer'} }
             let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student"} }
 
             before(:each) do
@@ -815,6 +848,12 @@ describe Canvadocs do
                 asset: submission,
                 assessor: peer_reviewer,
                 assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer2,
+                assessor_asset: assignment.submission_for_student(peer_reviewer2)
               )
 
               @current_user = peer_reviewer

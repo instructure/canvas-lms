@@ -24,8 +24,6 @@ const parentAccountsFragment = gql`
       nodes {
         rootOutcomeGroup {
           _id
-          outcomesCount
-          childGroupsCount
           title
         }
       }
@@ -50,8 +48,6 @@ export const FIND_GROUPS_QUERY = gql`
         account {
           rootOutcomeGroup {
             _id
-            outcomesCount
-            childGroupsCount
             title
           }
           ...ParentAccountsFragment
@@ -60,8 +56,6 @@ export const FIND_GROUPS_QUERY = gql`
     }
     globalRootGroup: learningOutcomeGroup(id: $rootGroupId) @include(if: $includeGlobalRootGroup) {
       _id
-      outcomesCount
-      childGroupsCount
     }
   }
   ${parentAccountsFragment}

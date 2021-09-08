@@ -209,37 +209,6 @@ test('validates presence of attachment use justification when assignment has typ
   strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
 })
 
-test('validates presence of attachment legal copyright when assignment has type annotatable_attachment', function () {
-  const view = this.editView()
-  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
-  view.renderAnnotatedDocumentUsageRightsSelectBox()
-  view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['student_annotation']}
-  const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
-  strictEqual(
-    annotatedDocumentLegalCopyrightError.message,
-    'You must set document copyright holder'
-  )
-})
-
-test('validates presence of attachment use justification and legal copyright when assignment has type annotatable_attachment', function () {
-  const view = this.editView()
-  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
-  view.renderAnnotatedDocumentUsageRightsSelectBox()
-  view.$('#usageRightSelector').val('choose')
-  view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['student_annotation']}
-  const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
-  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
-  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
-  strictEqual(
-    annotatedDocumentLegalCopyrightError.message,
-    'You must set document copyright holder'
-  )
-})
-
 test('does not allow group assignment for large rosters', function () {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
@@ -598,6 +567,19 @@ test('sets seconds of due_at to 00 if the new minute value is not 59', function 
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
+})
+
+test('getFormData returns custom_params as a JSON object, not a string', function () {
+  const custom_params = {
+    hello: 'world'
+  }
+  const view = this.editView()
+  // You have to stringify this, as the custom_params are not stored in memory as an object. Oh no,
+  // that would make too much sense. Instead, they're stored inside a hidden input on the page with
+  // id '#assignment_external_tool_tag_attributes_custom_params', because Backbone and Coffeescript
+  // are the worst thing ever.
+  view.$externalToolsCustomParams.val(JSON.stringify(custom_params))
+  deepEqual(view.getFormData().external_tool_tag_attributes.custom_params, custom_params)
 })
 
 // The UI doesn't allow editing the seconds value and always returns 00. If

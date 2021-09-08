@@ -70,7 +70,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+            href={I18n.t('#community.admin_add_course')}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -80,7 +80,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+            href={I18n.t('#community.admin_add_users')}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -90,7 +90,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+            href={I18n.t('#community.admin_import_sis')}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -113,7 +113,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+            href={I18n.t('#community.resource_course_content_distribution_comparison')}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -134,7 +134,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+            href={I18n.t('#community.contingency_web_conferencing')}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -157,7 +157,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+            href={I18n.t('#community.admin_training_services_portal')}
             target="_blank"
             rel="noopener noreferrer"
           >

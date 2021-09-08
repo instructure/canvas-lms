@@ -21,19 +21,8 @@
 module Lti
   module MembershipService
     class CourseLisPersonCollator < LisPersonCollatorBase
-      attr_reader :context, :user
-
-      def initialize(context, user, opts={})
-        super(opts)
-        @context = context
-        @user = user
-      end
 
       private
-
-      def users
-        @users ||= bookmarked_collection.paginate(page: @page,per_page: @per_page)
-      end
 
       def scope
         options = {
@@ -41,11 +30,15 @@ module Lti
           include_inactive_enrollments: false
         }
 
-        @user_scope ||= @user.nil? ? @context.current_users : UserSearch.scope_for(@context, @user, options)
+        @user_scope ||= @user.nil? ? context.current_users : UserSearch.scope_for(context, @user, options)
       end
 
       def generate_roles(user)
-        enrollments = user.not_ended_enrollments.select { |e| e.course_id == @context.id }
+        enrollments = if user.association(:not_ended_enrollments).loaded?
+          user.not_ended_enrollments.select{|enr| enr.course_id == context.id}
+        else
+          user.not_ended_enrollments.where(course: context)
+        end
         enrollments.map do |enrollment|
           case enrollment.type
           when 'TeacherEnrollment'

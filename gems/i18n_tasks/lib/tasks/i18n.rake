@@ -103,7 +103,9 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
-
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
+    
+    I18n::Backend::Simple.send(:include, I18nTasks::CsvBackend)
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
     require 'i18nliner/extractors/translation_hash'
@@ -118,7 +120,7 @@ namespace :i18n do
   task :generate_js => :i18n_environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
-    locales = I18n.available_locales - [:en]
+    locales = I18n.available_locales
     all_translations = I18n.backend.send(:translations)
 
     flat_translations = all_translations.flatten_keys

@@ -31,22 +31,14 @@ class DiscussionTopicPresenter
     end
   end
 
-  # Public: Determine if the given user has permissions to manage this discussion.
-  #
-  # Returns a boolean.
-  def has_manage_actions?(user)
-    can_grade?(user) || show_peer_reviews?(user) || should_show_rubric?(user)
-  end
-
   # Public: Determine if the given user can grade the discussion's assignment.
   #
   # user - The user whose permissions we're testing.
   #
   # Returns a boolean.
-  def can_grade?(user=@user)
+  def show_all_dates?
     topic.for_assignment? &&
-    (assignment.grants_right?(user, :grade) ||
-      assignment.context.grants_right?(user, :manage_assignments))
+      (assignment.grants_right?(user, :grade) || assignment.context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
   end
 
   def can_direct_share?

@@ -17,6 +17,7 @@
  */
 
 import {useCallback, useReducer} from 'react'
+import {sliceSyncSettings} from './settingsHelper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {reducerActions, defaultState, settingsReducer} from './settingsReducer'
 
@@ -29,14 +30,9 @@ export default function useSettings() {
   const [state, dispatch] = useReducer(settingsReducer, defaultState)
   useFetchApi({
     success: useCallback(data => {
-      const {microsoft_sync_enabled, microsoft_sync_login_attribute, microsoft_sync_tenant} = data
       dispatch({
         type: reducerActions.fetchSuccess,
-        payload: {
-          microsoft_sync_enabled,
-          microsoft_sync_tenant,
-          microsoft_sync_login_attribute
-        }
+        payload: sliceSyncSettings(data)
       })
     }, []),
     path: `/api/v1/${ENV.CONTEXT_BASE_URL}/settings`,

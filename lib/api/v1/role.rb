@@ -22,7 +22,7 @@ module Api::V1::Role
   include Api::V1::Json
   include Api::V1::Account
 
-  def role_json(account, role, current_user, session, opts={})
+  def role_json(account, role, current_user, session, skip_permissions: false, preloaded_overrides: nil)
     json = {
       :id => role.id,
       :role => role.name,
@@ -37,17 +37,21 @@ module Api::V1::Role
 
     json[:account] = account_json(role.account, current_user, session, []) if role.account_id
 
+    return json if skip_permissions
+
+    preloaded_overrides ||= RoleOverride.preload_overrides(account, [role])
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      perm = RoleOverride.permission_for(account, permission, role, account, true)
+      perm = RoleOverride.permission_for(account, permission, role, account, true, preloaded_overrides: preloaded_overrides)
       next if permission == :manage_developer_keys && !account.root_account?
+
       json[:permissions][permission] = permission_json(perm, current_user, session) if perm[:account_allows]
-    end unless opts[:skip_permissions]
+    end
 
     json
   end
 
   def permission_json(permission, _current_user, _session)
-    permission = permission.dup
+    permission = permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default, :group)
 
     if permission[:enabled]
       permission[:applies_to_self] = permission[:enabled].include?(:self)
@@ -56,7 +60,6 @@ module Api::V1::Role
     permission[:enabled] = !!permission[:enabled]
     permission[:prior_default] = !!permission[:prior_default]
     permission.delete(:prior_default) unless permission[:explicit]
-    permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default,
-                     :applies_to_descendants, :applies_to_self, :group)
+    permission
   end
 end

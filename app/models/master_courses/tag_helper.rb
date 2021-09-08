@@ -35,7 +35,7 @@ module MasterCourses::TagHelper
     if objects
       return unless objects.any?
       objects_to_load = objects.map{|o| (o.is_a?(Assignment) && o.submittable_object) || o}
-      tag_scope = tag_scope.polymorphic_where(:content => objects_to_load)
+      tag_scope = tag_scope.where(content: objects_to_load)
     end
     tag_scope.to_a.group_by(&:content_type).each do |content_type, typed_tags|
       @content_tag_index[content_type] = typed_tags.index_by(&:content_id).merge(@content_tag_index[content_type] || {})
@@ -59,7 +59,7 @@ module MasterCourses::TagHelper
       end
       tag
     else
-      self.content_tags.polymorphic_where(:content => content).first || create_content_tag_for!(content, defaults)
+      self.content_tags.where(content: content).first || create_content_tag_for!(content, defaults)
     end
   end
 
@@ -67,7 +67,7 @@ module MasterCourses::TagHelper
     return if content.is_a?(Assignment) && Assignment::SUBMITTABLE_TYPES.include?(content.submission_types)
     self.class.unique_constraint_retry do |retry_count|
       tag = nil
-      tag = self.content_tags.polymorphic_where(:content => content).first if retry_count > 0
+      tag = self.content_tags.where(content: content).first if retry_count > 0
       tag ||= self.content_tags.create!(defaults.merge(:content => content))
       tag
     end

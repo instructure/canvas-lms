@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {func, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
+import RceApiSource from '../../../sidebar/sources/api'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -34,15 +35,27 @@ RceFileBrowser.propTypes = {
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect, searchString, onAllFilesLoading} = props
+  const {onFileSelect, searchString, onAllFilesLoading, jwt, refreshToken, host, source} = props
+  const apiSource = useMemo(() => {
+    return (
+      source ||
+      new RceApiSource({
+        jwt,
+        refreshToken,
+        host
+      })
+    )
+  }, [source])
 
   function handleFileSelect(fileInfo) {
-    const content_type = fileInfo.api['content-type']
+    const content_type = fileInfo.api.type
     const canPreview = isPreviewable(content_type)
+
     const clazz = classnames('instructure_file_link', {
       instructure_scribd_file: canPreview,
       inline_disabled: true
     })
+
     const url = downloadToWrap(fileInfo.src)
     const embedded_iframe_url = mediaPlayerURLFromFile(fileInfo.api)
 
@@ -51,7 +64,7 @@ export default function RceFileBrowser(props) {
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
-      media_id: fileInfo.api.media_entry_id,
+      media_id: fileInfo.api.embed?.id,
       target: '_blank',
       class: clazz,
       content_type
@@ -61,11 +74,12 @@ export default function RceFileBrowser(props) {
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
       <FileBrowser
-        allowUpload={false}
         selectFile={handleFileSelect}
         contentTypes={['**']}
         searchString={searchString}
         onLoading={onAllFilesLoading}
+        source={apiSource}
+        context={props.context}
       />
     </View>
   )

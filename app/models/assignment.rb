@@ -40,6 +40,8 @@ class Assignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
 
+  self.ignored_columns = %i[context_code]
+
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
@@ -69,6 +71,9 @@ class Assignment < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   attribute :lti_resource_link_custom_params, :string, default: nil
+  # Serializing this as JSON vs a Hash allows us to distinguish between nil (no changes need to be made)
+  # and an actual Hash to set custom params to, which could be an empty hash.
+  serialize :lti_resource_link_custom_params, JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
@@ -195,9 +200,14 @@ class Assignment < ActiveRecord::Base
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
 
+  def context_code
+    "#{context_type.downcase}_#{context_id}"
+  end
+
   def positive_points_possible?
     return if self.points_possible.to_i >= 0
     return unless self.points_possible_changed?
+
     errors.add(
       :points_possible,
       I18n.t(
@@ -919,7 +929,6 @@ class Assignment < ActiveRecord::Base
 
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
 
     self.infer_all_day
@@ -1107,7 +1116,7 @@ class Assignment < ActiveRecord::Base
       if lti_1_3_external_tool_tag? && line_items.empty?
         rl = Lti::ResourceLink.create!(
           context: self,
-          custom: lti_resource_link_custom_params_as_hash,
+          custom: validate_resource_link_custom_params,
           resource_link_uuid: lti_context_id,
           context_external_tool: ContextExternalTool.from_content_tag(
             external_tool_tag,
@@ -1124,9 +1133,12 @@ class Assignment < ActiveRecord::Base
 
       if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
         options = {}
-
-        unless primary_resource_link.custom == lti_resource_link_custom_params_as_hash
-          options[:custom] = lti_resource_link_custom_params_as_hash
+        validated_params = validate_resource_link_custom_params
+        # Check if they actually passed something that isn't just our default value of nil, such as an
+        # empty string to signify they really want to set the custom params to nil, then format
+        # it for storage.
+        if !lti_resource_link_custom_params.nil? && validated_params != primary_resource_link.custom
+          options[:custom] = validated_params
         end
 
         options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
@@ -1139,10 +1151,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :update_line_items
 
-  def lti_resource_link_custom_params_as_hash
+  def validate_resource_link_custom_params
     Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link_custom_params)
   end
-  private :lti_resource_link_custom_params_as_hash
+  private :validate_resource_link_custom_params
 
   def primary_resource_link
     @primary_resource_link ||= begin
@@ -1466,8 +1478,8 @@ class Assignment < ActiveRecord::Base
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at = CanvasTime.fancy_midnight(self.due_at)
-    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
+    self.due_at = CanvasTime.fancy_midnight(self.due_at) if will_save_change_to_due_at?
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at) if will_save_change_to_lock_at?
   end
 
   def infer_all_day(tz = nil)
@@ -1720,21 +1732,38 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and
     can :attach_submission_comment_files and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :create and can :read and can :attach_submission_comment_files
+    given do |user, session|
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments)
+    end
+    can :create and can :read
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_add)
+    end
+    can :create and can :read
 
     given { |user, session| self.user_can_update?(user, session) }
     can :update
 
     given do |user, session|
-      self.context.grants_right?(user, session, :manage_assignments) &&
-        (self.context.account_membership_allows(user) ||
-         !in_closed_grading_period?)
+      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments) &&
+          (self.context.account_membership_allows(user) ||
+           !in_closed_grading_period?)
+    end
+    can :delete
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_delete) &&
+          (self.context.account_membership_allows(user) ||
+           !in_closed_grading_period?)
     end
     can :delete
   end
@@ -2752,7 +2781,18 @@ class Assignment < ActiveRecord::Base
     where('assignment_group_id = ?', group_id.to_s)
   }
 
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
+  scope :for_context_codes, ->(codes) do
+     ids = codes.map do |code|
+      type, id = parse_asset_string(code)
+      next unless type == 'Course'
+
+      id
+     end.compact
+     next none if ids.empty?
+
+     for_course(ids)
+  end
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
   scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
 
@@ -2792,14 +2832,22 @@ class Assignment < ActiveRecord::Base
 
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
-  scope :due_between_with_overrides, lambda { |start, ending|
-    where('assignments.due_at BETWEEN ? AND ? OR (EXISTS (?))',
-        start, ending,
-        AssignmentOverride.where('assignment_overrides.assignment_id = assignments.id AND
-          assignment_overrides.due_at_overridden AND
-          assignment_overrides.due_at BETWEEN ? AND ?', start, ending)
-    )
-  }
+  scope :due_between_with_overrides, ->(start, ending) do
+    overrides_subquery = AssignmentOverride.where("assignment_id=assignments.id")
+      .where(due_at_overridden: true, due_at: start..ending)
+
+    scope1 = where(due_at: start..ending)
+    scope2 = where("EXISTS (?)", overrides_subquery)
+    if group_values.present?
+      # subquery strategy doesn't work with GROUP BY
+      scope1.or(scope2)
+    else
+      scope1.union(
+        scope2.merge(unscoped.where.not(due_at: start..ending).or(unscoped.where(due_at: nil))),
+        from: true
+      )
+    end
+  end
 
   scope :due_between_for_user, -> (start, ending, user) do
     with_user_due_date(user).where(user_due_date: start..ending)
@@ -2865,7 +2913,7 @@ class Assignment < ActiveRecord::Base
 
   scope :gradeable, -> { where.not(submission_types: %w(not_graded wiki_page)) }
 
-  scope :active, -> { where("assignments.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
 
   scope :not_locked, -> {
@@ -3116,7 +3164,7 @@ class Assignment < ActiveRecord::Base
     self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
-      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
+      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
       DueDateCacher.recompute(self, update_grades: true)
     end
@@ -3128,7 +3176,8 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
-      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
+      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading? ||
+      will_save_change_to_anonymous_grading? || saved_change_to_anonymous_grading?
   end
 
   def update_due_date_smart_alerts
@@ -3635,8 +3684,8 @@ class Assignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
-    return false if external_tool? || quiz? || discussion_topic? || wiki_page? ||
-      group_category? || peer_reviews?
+    return false if external_tool? || quiz? || discussion_topic? || wiki_page? || peer_reviews?
+
     true
   end
 
@@ -3673,6 +3722,14 @@ class Assignment < ActiveRecord::Base
 
   def can_reassign?(grader)
     (final_grader_id.nil? || final_grader_id == grader.id) && context.grants_right?(grader, :manage_grades)
+  end
+
+  def accepts_submission_type?(submission_type)
+    if submission_type == "basic_lti_launch"
+      submission_types =~ /online|external_tool/
+    else
+      submission_types_array.include?(submission_type)
+    end
   end
 
   private

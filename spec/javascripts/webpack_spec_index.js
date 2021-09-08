@@ -22,12 +22,19 @@ import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
 import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRavenConsoleLoggingPlugin.js'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
-import BrandableCSS from '@canvas/brandable-css'
+import './jsx/spec-support/timezoneBackwardsCompatLayer'
+import {
+  up as configureDateTime
+} from 'ui/boot/initializers/configureDateTime'
 
-BrandableCSS.loadStylesheetForJST = () => {}
-BrandableCSS.loadStylesheet = () => {}
+import {
+  up as configureDateTimeMomentParser
+} from 'ui/boot/initializers/configureDateTimeMomentParser'
+
 
 filterUselessConsoleMessages(console)
+configureDateTime()
+configureDateTimeMomentParser()
 
 Enzyme.configure({adapter: new Adapter()})
 

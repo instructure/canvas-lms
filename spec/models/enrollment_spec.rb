@@ -1128,6 +1128,16 @@ describe Enrollment do
     expect(@enrollment).to_not be_valid
   end
 
+  it "does not allow an enrollment to be created in a template course" do
+    course = course_factory
+    course.template = true
+    course.save!
+    enrollment = course.teacher_enrollments.new
+    enrollment.user = user_with_pseudonym
+    expect(enrollment).not_to be_valid
+    expect(enrollment.errors.to_a).to eq(["Course is a template course"])
+  end
+
   context "permissions" do
     before(:once) do
       course_with_student(:active_all => true)
@@ -2977,6 +2987,7 @@ describe Enrollment do
       before :each do
         course_with_student
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is true for a user who has been granted :manage_students' do
@@ -3041,6 +3052,7 @@ describe Enrollment do
       before :each do
         course_with_observer
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is true with :manage_students' do
@@ -3074,6 +3086,7 @@ describe Enrollment do
       before :each do
         course_with_teacher
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @enrollment.reload
       end
 
       it 'is false with :manage_students' do
@@ -3478,6 +3491,7 @@ describe Enrollment do
 
   describe '#sync_microsoft_group' do
     let(:course) { course_factory }
+    let(:enrollment_type) { 'StudentEnrollment' }
 
     before :each do
       MicrosoftSync::Group.create!(course: course)
@@ -3486,7 +3500,7 @@ describe Enrollment do
     # enroll user without running callbacks like update_user_account_associations,
     # so that the only jobs getting enqueued are the MSFT sync group type
     def enroll_user
-      course.enroll_user(user_factory, 'StudentViewEnrollment', skip_touch_user: true)
+      course.enroll_user(user_factory, enrollment_type, skip_touch_user: true)
     end
 
     context 'when feature flag is off' do
@@ -3495,7 +3509,7 @@ describe Enrollment do
       end
 
       it 'does not enqueue a job' do
-        expect { enroll_user }.not_to change { Delayed::Job.count }
+        expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
       end
     end
 
@@ -3511,7 +3525,7 @@ describe Enrollment do
         end
 
         it 'does not enqueue a job' do
-          expect { enroll_user }.not_to change { Delayed::Job.count }
+          expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
         end
       end
 
@@ -3522,12 +3536,20 @@ describe Enrollment do
         end
 
         it 'should enqueue a job' do
-          expect { enroll_user }.to change { Delayed::Job.count }.by 1
+          expect { enroll_user }.to change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }.by 1
         end
 
         it 'calls MicrosoftSync::Group#enqueue_future_partial_sync' do
           expect_any_instance_of(MicrosoftSync::Group).to receive(:enqueue_future_partial_sync)
           enroll_user
+        end
+
+        context 'when the enrollment is a StudentViewEnrollment' do
+          let(:enrollment_type) { 'StudentViewEnrollment' }
+
+          it 'should not enqueue a job' do
+            expect { enroll_user }.to not_change { Delayed::Job.where(tag: 'MicrosoftSync::StateMachineJob#run_later').count }
+          end
         end
       end
     end

@@ -19,6 +19,7 @@
 import {bool, func} from 'prop-types'
 import React, {createRef} from 'react'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
+import TinyMCEContentItem from '@canvas/tinymce-external-tools/TinyMCEContentItem'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 
 // This is how long we wait to see that changes have stopped before actually
@@ -43,6 +44,19 @@ export default class TextEntry extends React.Component {
 
   _rceRef = createRef()
 
+  handleMessage = e => {
+    const editor = this._rceRef.current
+    if (editor == null || e.data.messageType !== 'A2ExternalContentReady') {
+      return
+    }
+
+    e.data.content_items
+      .map(contentItem => TinyMCEContentItem.fromJSON(contentItem).codePayload)
+      .forEach(code => {
+        editor.insertCode(code)
+      })
+  }
+
   getDraftBody = () => {
     const {submission} = this.props
     if (['graded', 'submitted'].includes(submission.state)) {
@@ -64,6 +78,8 @@ export default class TextEntry extends React.Component {
 
   componentDidMount() {
     this._isMounted = true
+
+    window.addEventListener('message', this.handleMessage)
   }
 
   componentDidUpdate(prevProps) {
@@ -89,6 +105,7 @@ export default class TextEntry extends React.Component {
   componentWillUnmount() {
     this._isMounted = false
     clearTimeout(this._saveDraftTimer)
+    window.removeEventListener('message', this.handleMessage)
   }
 
   checkForChanges = newContent => {

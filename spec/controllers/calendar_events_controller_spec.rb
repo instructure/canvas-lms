@@ -46,10 +46,6 @@ describe CalendarEventsController do
   let(:other_teacher_conference) { other_teacher_enrollment.course.web_conferences.create!(**conference_params, user: other_teacher_enrollment.user) }
 
   shared_examples "accepts web_conference" do
-    before(:once) do
-      Account.site_admin.enable_feature! 'calendar_conferences'
-    end
-
     it "accepts a new conference" do
       user_session(@teacher)
       make_request.call(conference_params)
@@ -130,10 +126,6 @@ describe CalendarEventsController do
     end
 
     context "with web conferences" do
-      before(:once) do
-        Account.site_admin.enable_feature! 'calendar_conferences'
-      end
-
       it "includes conference environment" do
         user_session(@teacher)
         get 'new', params: {course_id: @course.id}
@@ -212,10 +204,6 @@ describe CalendarEventsController do
     end
 
     # context "with web conferences" do
-    #   before(:once) do
-    #     Account.site_admin.enable_feature! 'calendar_conferences'
-    #   end
-
     #   it "can update with a new conference" do
     #     user_session(@teacher)
     #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: conference_params}

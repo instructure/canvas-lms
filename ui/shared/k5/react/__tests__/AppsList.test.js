@@ -54,6 +54,10 @@ describe('AppsList', () => {
     ...overrides
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders all provided apps', () => {
     const {getByText} = render(<AppsList {...getProps()} />)
     expect(getByText('YouTube')).toBeInTheDocument()
@@ -70,7 +74,7 @@ describe('AppsList', () => {
     expect(queryByText('Student Applications')).not.toBeInTheDocument()
   })
 
-  it('renders 3 loading skeletons if isLoading set', () => {
+  it('renders 2 loading skeletons if isLoading set', () => {
     const {getAllByText} = render(<AppsList {...getProps({isLoading: true})} />)
     const skeletons = getAllByText('Loading apps...')
     expect(skeletons.length).toBe(3)

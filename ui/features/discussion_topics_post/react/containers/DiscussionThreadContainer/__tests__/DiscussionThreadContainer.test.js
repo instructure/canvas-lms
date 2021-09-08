@@ -31,6 +31,12 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {graphql} from 'msw'
+import {User} from '../../../../graphql/User'
+
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
 
 describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
@@ -43,6 +49,16 @@ describe('DiscussionThreadContainer', () => {
     window.ENV = {
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
 
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -103,37 +119,6 @@ describe('DiscussionThreadContainer', () => {
     expect(queryByTestId('threading-toolbar-reply')).toBeTruthy()
   })
 
-  it('should render expand when nested replies are present', () => {
-    const {getByTestId} = setup(defaultProps())
-    expect(getByTestId('expand-button')).toBeTruthy()
-  })
-
-  it('should expand replies when expand button is clicked', () => {
-    const {getByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-  })
-
-  it('should collapse replies when expand button is clicked', async () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('expand-button'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
-  })
-
-  it('should collapse replies when collapse button is clicked', () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('collapse-replies'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
-  })
-
   describe('delete permission', () => {
     it('removed when false', async () => {
       const new_prop = defaultProps()
@@ -150,6 +135,23 @@ describe('DiscussionThreadContainer', () => {
 
       const deletes = queryAllByText('Delete')
       expect(deletes.length).toBe(1)
+    })
+  })
+
+  describe('Roles', () => {
+    it('does not display author role if not the author', async () => {
+      const {queryByTestId} = setup(defaultProps())
+      expect(queryByTestId('pill-Author')).toBeFalsy()
+    })
+
+    it('displays author role if the post is from the author', async () => {
+      const new_prop = defaultProps({
+        discussionOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})},
+        discussionEntryOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})}
+      })
+      const {queryByTestId} = setup(new_prop)
+
+      expect(queryByTestId('pill-Author')).toBeTruthy()
     })
   })
 
@@ -273,19 +275,106 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
-  describe('Pluralization', () => {
+  describe('Unread Badge', () => {
+    describe('should find unread badge', () => {
+      it('root is read and child reply is unread', () => {
+        const container = setup(defaultProps())
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+
+      it('root is unread and child reply is unread', () => {
+        const container = setup(defaultProps({discussionEntryOverrides: {read: false}}))
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+      it('root is unread and child is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              read: false,
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.getByTestId('is-unread')).toBeTruthy()
+      })
+    })
+
+    describe('should not find unread badge', () => {
+      it('root is read and child reply is read', () => {
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              rootEntryParticipantCounts: {
+                unreadCount: 0,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
+        expect(container.queryByTestId('is-unread')).toBeNull()
+      })
+    })
+  })
+
+  describe('Expand-Button', () => {
+    it('should render expand when nested replies are present', () => {
+      const {getByTestId} = setup(defaultProps())
+      expect(getByTestId('expand-button')).toBeTruthy()
+    })
+
+    it('should expand replies when expand button is clicked', () => {
+      const {getByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+    })
+
+    it('should collapse replies when expand button is clicked', async () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('expand-button'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
+    it('should collapse replies when collapse button is clicked', () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('collapse-replies'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
     it('pluralizes reply message correctly when there is only a single reply', async () => {
-      const {getByText} = setup(defaultProps())
-      expect(getByText('1 reply, 1 unread')).toBeTruthy()
+      const {getAllByText} = setup(defaultProps())
+      expect(getAllByText('1 reply, 1 unread').length).toBe(2)
     })
 
     it('pluralizes replies message correctly when there are multiple replies', async () => {
-      const {getByText} = setup(
+      const {getAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
         })
       )
-      expect(getByText('2 replies, 1 unread')).toBeTruthy()
+      expect(getAllByText('2 replies, 1 unread')).toBeTruthy()
+    })
+
+    it('does not display unread count if it is 0', async () => {
+      const {queryAllByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+        })
+      )
+      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 })

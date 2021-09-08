@@ -21,32 +21,36 @@
 module Lti
   module MembershipService
     class LisPersonCollatorBase < CollatorBase
-      attr_reader :role, :per_page, :page
+      attr_reader :user
 
-      def initialize(opts={})
-        super()
-        @role = opts[:role]
-        @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
-        @page = [opts[:page].to_i, 1].max
+      def initialize(context, user, opts={})
+        super(context, opts)
+        @user = user
       end
 
-      def memberships(context: nil)
-        @memberships ||= users.to_a.slice(0, @per_page).map do |user|
-          generate_membership(user, context: context)
+      def memberships
+        @memberships ||= begin
+          ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym)
+          ActiveRecord::Associations::Preloader.new.preload(users, :communication_channels, CommunicationChannel.email.unretired)
+          ActiveRecord::Associations::Preloader.new.preload(users, :not_ended_enrollments, Enrollment.where(course_id: context))
+          ActiveRecord::Associations::Preloader.new.preload(users, :past_lti_ids, UserPastLtiId.where(context: context))
+          users.map do |user|
+            generate_membership(user)
+          end
         end
       end
 
       private
 
       def membership_type
-        User.preload(:communication_channels, :not_ended_enrollments, :pseudonym)
+        User
       end
 
       def users
         @users ||= bookmarked_collection.paginate(per_page: @per_page)
       end
 
-      def generate_member(user, context: nil)
+      def generate_member(user)
         user_id = Lti::Asset.opaque_identifier_for(user, context: context)
         IMS::LTI::Models::MembershipService::LISPerson.new(
           name: user.name,
@@ -60,10 +64,10 @@ module Lti
         )
       end
 
-      def generate_membership(user, context: nil)
+      def generate_membership(user)
         IMS::LTI::Models::MembershipService::Membership.new(
           status: IMS::LIS::Statuses::SimpleNames::Active,
-          member: generate_member(user, context: context),
+          member: generate_member(user),
           role: generate_roles(user)
         )
       end

@@ -264,6 +264,257 @@ describe('sources/api', () => {
     })
   })
 
+  describe('fetchSubFolders()', () => {
+    let bookmark, props
+
+    const subject = () => apiSource.fetchSubFolders(props, bookmark)
+
+    beforeEach(() => {
+      props = {host: 'canvas.rce', folderId: 2}
+      bookmark = undefined
+      sinon.stub(apiSource, 'apiFetch').returns(Promise.resolve({}))
+    })
+
+    afterEach(() => apiSource.apiFetch.reset())
+
+    it('makes a request to the folders api with the given host and ID', () => {
+      subject()
+      sinon.assert.calledWith(apiSource.apiFetch, 'about://canvas.rce/api/folders/2', {
+        Authorization: 'Bearer theJWT'
+      })
+    })
+
+    describe('fetchFilesForFolder()', () => {
+      let bookmark, props
+
+      const subject = () => apiSource.fetchFilesForFolder(props, bookmark)
+
+      beforeEach(() => {
+        props = {host: 'canvas.rce', filesUrl: 'https://canvas.rce/api/files/2'}
+        bookmark = undefined
+      })
+
+      afterEach(() => apiSource.apiFetch.reset())
+
+      it('makes a request to the files api with given host and folder ID', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2?', {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+
+      describe('with perPage set', () => {
+        beforeEach(() => {
+          props.perPage = 50
+        })
+
+        it('includes the "per_page" query param', () => {
+          subject()
+          sinon.assert.calledWith(
+            apiSource.apiFetch,
+            'https://canvas.rce/api/files/2?per_page=50',
+            {
+              Authorization: 'Bearer theJWT'
+            }
+          )
+        })
+      })
+    })
+
+    describe('with a provided bookmark', () => {
+      beforeEach(() => (bookmark = 'https://canvas.rce/api/folders/2?page=2'))
+
+      it('makes a request to the bookmark', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, bookmark, {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+    })
+  })
+
+  describe('fetchBookmarkedData', () => {
+    let fetchFunction, properties, onSuccess, onError
+
+    beforeEach(() => {
+      fetchFunction = sinon
+        .stub()
+        .onFirstCall()
+        .returns(Promise.resolve({bookmark: 'https://canvas.rce/api/thing/1?page=2'}))
+        .onSecondCall()
+        .returns(Promise.resolve({data: 'foo'}))
+      properties = {foo: 'bar'}
+      onSuccess = sinon.stub()
+      onError = sinon.stub()
+    })
+
+    afterEach(() => {
+      fetchFunction.reset()
+      onSuccess.reset()
+      onError.reset()
+    })
+
+    const subject = () =>
+      apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
+
+    it('calls the "fetchFunction", passing "properties"', () => {
+      subject().then(() => {
+        sinon.assert.alwaysCalledWith(fetchFunction, properties)
+        sinon.assert.calledTwice(fetchFunction)
+      })
+    })
+
+    it('calls "onSuccess" for each page', () => {
+      return subject().then(() => {
+        sinon.assert.calledTwice(onSuccess)
+      })
+    })
+
+    describe('when "fetchFunction" throws an exception', () => {
+      beforeEach(() => {
+        fetchFunction.onFirstCall().returns(Promise.reject('error'))
+      })
+
+      it('calls "onError"', () => {
+        return subject().then(() => {
+          sinon.assert.calledOnce(onError)
+        })
+      })
+    })
+  })
+
+  describe('fetchButtonsAndIconsFolder', () => {
+    let folders
+
+    beforeEach(() => {
+      folders = [{id: 24}]
+      const body = {folders}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+
+    it('calls fetchPage with the proper params', () => {
+      return apiSource
+        .fetchButtonsAndIconsFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/buttons_and_icons?contextType=course&contextId=22'
+          )
+        })
+    })
+  })
+
+  describe('fetchButtonsAndIcons', () => {
+    const props = {contextId: '1', contextType: 'course'}
+
+    beforeEach(() => {
+      const fetchPageResponseBody = {
+        bookmark: 'http://example.com/?p=3',
+        files: [
+          {
+            id: '101',
+            name: 'button.svg',
+            thumbnailUrl: '/files/1/download',
+            type: 'image/svg+xml',
+            url: '/files/1/download/'
+          }
+        ]
+      }
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(fetchPageResponseBody))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+
+    describe('when a bookmark is present', () => {
+      it('fetches with the bookmark', () => {
+        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', () => {})
+        sinon.assert.calledWith(apiSource.fetchPage, 'http://example.com/?p=2')
+      })
+
+      it('calls the onSuccess arg with the returned bookmark', () => {
+        const onSuccess = ({bookmark}) => {
+          assert.strictEqual(bookmark, fetchPageResponseBody.bookmark)
+        }
+
+        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', onSuccess)
+      })
+
+      it('calls the onSuccess arg with the returned files', () => {
+        const onSuccess = ({files}) => {
+          assert.deepEqual(files, [
+            {
+              id: '101',
+              name: 'button.svg',
+              thumbnailUrl: '/files/1/download',
+              type: 'image/svg+xml',
+              url: '/courses/1/files/1?wrap=1' // url is normalized to include the context
+            }
+          ])
+        }
+
+        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', onSuccess)
+      })
+    })
+
+    describe('when a bookmark is not present', () => {
+      const filesUrl = 'http://example.com'
+      const folderResponseBody = {
+        bookmark: 'http://example.com/?p=2',
+        folders: [{filesUrl, id: 24}]
+      }
+
+      let fetchButtonsAndIconsFolderPromise
+
+      beforeEach(() => {
+        fetchButtonsAndIconsFolderPromise = Promise.resolve(folderResponseBody)
+        sinon.stub(apiSource, 'fetchButtonsAndIconsFolder').returns(promise)
+      })
+
+      afterEach(() => {
+        apiSource.fetchButtonsAndIconsFolder.restore()
+      })
+
+      it('fetches the buttons and icons folder, then fetches the files within that folder', async () => {
+        apiSource.fetchButtonsAndIcons(props, null, () => {})
+        await fetchButtonsAndIconsFolderPromise
+        sinon.assert.calledWith(apiSource.fetchPage, `${filesUrl}?per_page=25`)
+      })
+
+      it('calls the onSuccess arg with the returned bookmark', () => {
+        const onSuccess = ({bookmark}) => {
+          assert.strictEqual(bookmark, folderResponseBody.bookmark)
+        }
+
+        apiSource.fetchButtonsAndIcons(props, null, onSuccess)
+      })
+
+      it('calls the onSuccess arg with the returned files', () => {
+        const onSuccess = ({files}) => {
+          assert.deepEqual(files, [
+            {
+              id: '101',
+              name: 'button.svg',
+              thumbnailUrl: '/files/1/download',
+              type: 'image/svg+xml',
+              url: '/courses/1/files/1?wrap=1' // url is normalized to include the context
+            }
+          ])
+        }
+
+        apiSource.fetchButtonsAndIcons(props, null, onSuccess)
+      })
+    })
+  })
+
   describe('fetchMediaFolder', () => {
     let files
     beforeEach(() => {

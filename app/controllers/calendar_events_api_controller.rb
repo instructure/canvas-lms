@@ -494,12 +494,8 @@ class CalendarEventsApiController < ApplicationController
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
-    if Account.site_admin.feature_enabled?(:calendar_conferences)
-      if params_for_create.key?(:web_conference)
-        web_conference = find_or_initialize_conference(@context, params_for_create[:web_conference])
-        return unless authorize_user_for_conference(@current_user, web_conference)
-        params_for_create[:web_conference] = web_conference
-      end
+    if params_for_create.key?(:web_conference)
+      params_for_create[:web_conference] = find_or_initialize_conference(@context, params_for_create[:web_conference])
     end
 
     @event = @context.calendar_events.build(params_for_create)
@@ -516,6 +512,8 @@ class CalendarEventsApiController < ApplicationController
       else
         events = [@event]
       end
+
+      return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render :json => {
@@ -683,12 +681,11 @@ class CalendarEventsApiController < ApplicationController
       if params_for_update[:description].present?
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
-      if Account.site_admin.feature_enabled?(:calendar_conferences)
-        if params_for_update.key?(:web_conference)
-          web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
-          return unless authorize_user_for_conference(@current_user, web_conference)
-          params_for_update[:web_conference] = web_conference
-        end
+      if params_for_update.key?(:web_conference)
+        web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
+        return unless authorize_user_for_conference(@current_user, web_conference)
+
+        params_for_update[:web_conference] = web_conference
       end
 
       if @event.update(params_for_update)
@@ -1159,7 +1156,8 @@ class CalendarEventsApiController < ApplicationController
       scope = assignment_context_scope(user)
       next unless scope
 
-      scope = scope.active.order(:due_at, :id)
+      scope = scope.order(:due_at, :id)
+      scope = scope.active
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
@@ -1184,20 +1182,15 @@ class CalendarEventsApiController < ApplicationController
     # contexts have to be partitioned into two groups so they can be queried effectively
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    sql = []
-    conditions = []
     unless view_unpublished.empty?
-      sql << '(assignments.context_code IN (?))'
-      conditions << view_unpublished.map(&:asset_string)
+      scope = Assignment.for_course(view_unpublished)
     end
 
     unless other.empty?
-      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
-      conditions << other.map(&:asset_string)
-      conditions << 'published'
+      scope2 = Assignment.published.for_course(other)
+      scope = scope ? scope.or(scope2) : scope2
     end
 
-    scope = Assignment.where([sql.join(' OR ')] + conditions)
     return scope if @public_to_auth || !user
 
     student_ids = Set.new
@@ -1239,6 +1232,7 @@ class CalendarEventsApiController < ApplicationController
         relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
+        relation = relation.with_important_dates if @important_dates
         if includes.include?('web_conference')
           relation = relation.preload(:web_conference)
         end
@@ -1247,8 +1241,8 @@ class CalendarEventsApiController < ApplicationController
     else
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
+      scope = scope.with_important_dates if @important_dates
     end
-    scope = scope.with_important_dates if @important_dates
     scope
   end
 
@@ -1274,11 +1268,10 @@ class CalendarEventsApiController < ApplicationController
 
     courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
     events = events.inject([]) do |assignments, assignment|
-
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day(Time.zone)
-        assignments << assignment
+        assignments << assignment unless @important_dates && assignment.important_dates && assignment.due_at.nil?
       else
         dates_list = assignment.all_dates_visible_to(user,
           courses_user_has_been_enrolled_in: courses_user_has_been_enrolled_in)
@@ -1396,6 +1389,11 @@ class CalendarEventsApiController < ApplicationController
         new_child_event[:end_at] = Time.zone.parse(child_event[:end_at]) + offset unless child_event[:end_at].blank?
         new_child_event
       end
+    end
+
+    if event_attributes.key?(:web_conference)
+      override_params = { :user_settings => { :scheduled_date => event_attributes[:start_at] } }
+      event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
     end
 
     event_attributes

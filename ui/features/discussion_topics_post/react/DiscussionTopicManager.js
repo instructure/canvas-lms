@@ -16,79 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
+import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {getOptimisticResponse} from './utils'
+import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
-
-const getOptimisticResponse = text => {
-  return {
-    createDiscussionEntry: {
-      discussionEntry: {
-        id: 'PLACEHOLDER',
-        _id: 'PLACEHOLDER',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deleted: false,
-        message: text,
-        ratingCount: null,
-        ratingSum: null,
-        rating: false,
-        read: true,
-        forcedReadState: false,
-        subentriesCount: null,
-        rootEntryParticipantCounts: {
-          unreadCount: 0,
-          repliesCount: 0,
-          __typename: 'DiscussionEntryCounts'
-        },
-        author: {
-          id: 'PLACEHOLDER',
-          _id: ENV.current_user.id,
-          avatarUrl: ENV.current_user.avatar_image_url,
-          name: ENV.current_user.display_name,
-          courseRoles: [],
-          __typename: 'User'
-        },
-        editor: null,
-        lastReply: null,
-        permissions: {
-          attach: false,
-          create: false,
-          delete: false,
-          rate: false,
-          read: false,
-          reply: false,
-          update: false,
-          viewRating: false,
-          __typename: 'DiscussionEntryPermissions'
-        },
-        rootEntry: null,
-        discussionTopic: null,
-        parent: null,
-        __typename: 'DiscussionEntry'
-      },
-      errors: null,
-      __typename: 'CreateDiscussionEntryPayload'
-    }
-  }
-}
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
@@ -104,20 +51,44 @@ const DiscussionTopicManager = props => {
   }
 
   const goToTopic = () => {
+    setSearchTerm('')
     closeIsolatedView()
     setIsTopicHighlighted(true)
   }
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
+  const [replyId, setReplyId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
-  const [highlightEntryId, setHighlightEntryId] = useState(null)
 
-  const openIsolatedView = (discussionEntryId, withRCE) => {
-    setIsolatedEntryId(discussionEntryId)
+  // Highlight State
+  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
+  const [highlightEntryId, setHighlightEntryId] = useState(null)
+  const [relativeEntryId, setRelativeEntryId] = useState(null)
+
+  useEffect(() => {
+    if (isTopicHighlighted) {
+      setTimeout(() => {
+        setIsTopicHighlighted(false)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [isTopicHighlighted])
+
+  useEffect(() => {
+    if (highlightEntryId) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [highlightEntryId])
+
+  const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
+    setIsolatedEntryId(discussionEntryId || rootEntryId)
+    setReplyId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
+    setRelativeEntryId(relativeId)
   }
 
   const closeIsolatedView = () => {
@@ -136,7 +107,10 @@ const DiscussionTopicManager = props => {
     courseID: window.ENV?.course_id
   }
 
-  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
+  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
+    variables,
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
+  })
 
   const updateCache = (cache, result) => {
     try {
@@ -150,7 +124,11 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
-        currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+        if (variables.sort === 'desc') {
+          currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
+        } else {
+          currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+        }
 
         cache.writeQuery({...options, data: currentDiscussion})
       }
@@ -161,8 +139,12 @@ const DiscussionTopicManager = props => {
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => {
+    onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (sort === 'asc') {
+        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+      }
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -205,17 +187,26 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          onOpenIsolatedView={(discussionEntryId, withRCE, highlightId) => {
+          onOpenIsolatedView={(
+            discussionEntryId,
+            rootEntryId,
+            withRCE,
+            relativeId,
+            highlightId
+          ) => {
             setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, withRCE)
+            openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
+          relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
+          replyId={replyId}
           open={isolatedViewOpen}
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}

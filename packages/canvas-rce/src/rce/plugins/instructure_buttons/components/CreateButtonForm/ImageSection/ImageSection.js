@@ -18,30 +18,14 @@
 
 import React from 'react'
 
-import {ToggleGroup} from '@instructure/ui-toggle-details'
-
 import formatMessage from '../../../../../../format-message'
 import {MyImages} from './MyImages'
+import {Group} from '../Group'
 
-export const ImageSection = () => (
+export const ImageSection = ({editor}) => (
   <Group as="section" defaultExpanded summary={formatMessage('Image')}>
     <Group as="div" padding="none" size="small" summary={formatMessage('My Images')}>
-      <MyImages />
+      <MyImages editor={editor} />
     </Group>
   </Group>
 )
-
-function Group({children, summary, ...props}) {
-  return (
-    <ToggleGroup
-      background="default"
-      border={false}
-      padding="small"
-      summary={summary}
-      toggleLabel={formatMessage('Toggle {summary} group', {summary})}
-      {...props}
-    >
-      {children}
-    </ToggleGroup>
-  )
-}

@@ -262,8 +262,8 @@ describe 'as a student' do
       end
 
       it "shows the module sequence footer" do
-        expect(f('.module-sequence-footer-button--previous a')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
-        expect(f('.module-sequence-footer-button--next a')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_after.id}")
+        expect(f("[data-testid='previous-assignment-btn']")).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
+        expect(f("[data-testid='next-assignment-btn']")).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_after.id}")
       end
     end
 

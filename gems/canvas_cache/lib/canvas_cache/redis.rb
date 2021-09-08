@@ -106,6 +106,12 @@ module CanvasCache
       settings_store.get('ignore_redis_failures', 'true') == 'true'
     end
 
+    def self.ignore_redis_guards?
+      return false unless CanvasCache::Redis.enabled?
+
+      @config['ignore_redis_guards'] && Rails.env.test?
+    end
+
     COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]"
     def self.log_style
       # supported: 'off', 'compact', 'json'
@@ -307,11 +313,13 @@ module CanvasCache
       end
 
       def write(command)
-        if UNSUPPORTED_METHODS.include?(command.first.to_s)
-          raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is not supported by Twemproxy, and so shouldn't be used in Canvas")
-        end
-        if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && GuardRail.environment != :deploy
-          raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running GuardRail.activate!(:deploy)")
+        unless CanvasCache::Redis.ignore_redis_guards?
+          if UNSUPPORTED_METHODS.include?(command.first.to_s)
+            raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is not supported by Twemproxy, and so shouldn't be used in Canvas")
+          end
+          if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && GuardRail.environment != :deploy
+            raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running GuardRail.activate!(:deploy)")
+          end
         end
 
         super

@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPreferencesContextType < Types::BaseEnum
-  graphql_name 'NotificationPreferencesContextType'
-  description 'Context types that can be associated with notification preferences'
-  value 'Course'
-  value 'Account'
-end
-
 module Types
   class UserType < ApplicationObjectType
     #
@@ -123,14 +116,6 @@ module Types
       end
     end
 
-    field :trophies, [TrophyType], null: true
-    def trophies
-      Loaders::AssociationLoader.for(User, :trophies).load(object).then do |trophies|
-        locked_trophies = Trophy.trophy_names - trophies.map(&:name)
-        trophies.to_a.concat(locked_trophies.map { |name| Trophy.blank_trophy(name) })
-      end
-    end
-
     field :notification_preferences_enabled, Boolean, null: false do
       argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
       argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
@@ -155,7 +140,7 @@ module Types
     def notification_preferences
       Loaders::AssociationLoader.for(User, :communication_channels).load(object).then do |comm_channels|
         {
-          channels: comm_channels.unretired,
+          channels: comm_channels.supported.unretired,
           user: object
         }
       end
@@ -337,17 +322,9 @@ module Types
       # currently does not support type inheritance. If graphql starts supporting type inheritance
       # this field can be replaced by a discussionAuthor type that inherits from User type and
       # contains a discussionRoles field
+      return if course_id.nil?
 
-      return [] if course_id.nil?
-
-      course_roles = []
-
-      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object).then do |roles|
-        roles.each do |role|
-          course_roles.push(role[:type])
-        end
-        course_roles
-      end
+      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object)
     end
   end
 end

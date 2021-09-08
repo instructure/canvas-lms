@@ -18,3 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Canvas::Reloader.on_reload { MessageBus.reset! }
+
+Rails.configuration.to_prepare do
+  MessageBus.logger = Rails.logger
+  MessageBus.max_mem_queue_size = -> { Setting.get('pulsar_max_mem_queue_size', 200).to_i }
+  MessageBus.worker_process_interval = -> { Setting.get('pulsar_process_interval_seconds', 1.0).to_f }
+  # sometimes this async worker thread grabs a connection on a Setting read or similar.
+  # We need it to be released or the main thread can have a real problem.
+  MessageBus.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
+end

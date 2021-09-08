@@ -34,17 +34,13 @@ responsive_student_grades_page:
   display_name: Responsive Student Grades Page
   description: Makes the student grades page responsive.
 view_ungraded_as_zero:
+  type: setting
   state: hidden
   applies_to: Account
   display_name: View Ungraded as Zero View in Gradebook
   description:
     The Gradebook will factor in ungraded submissions as if they were given a score of zero for
     calculations. This is just a view for the teacher, and does not affect actual scoring.
-fix_missing_policy_grade_change_records:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Fix Missing Policy Grade Change Records
-  description: Insert a grade change record when the periodic MissingPolicyApplicator job runs on a submission.
 import_override_scores_in_gradebook:
   state: hidden
   applies_to: SiteAdmin
@@ -90,3 +86,25 @@ gradebook_csv_export_order_matches_gradebook_grid:
   environments:
     ci:
       state: on # enable for automated testings builds and local testing
+edit_submission_status_from_speedgrader:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Edit Submission Status from Speedgrader
+  description: If set, allows submission status to be changed from inside of
+    Speedgrader
+enhanced_gradebook_filters:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enhanced Gradebook Filters
+  description: Improved filtering of students and assignments in Gradebook.
+remove_gradebook_student_search_delay:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Remove Delay for Gradebook Student Search
+  description: If set, removes the delay that normally occurs when searching for students.
+gradebook_assignment_search_and_redesign:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Gradebook Assignment Search And Redesign
+  description: Search assignments in Gradebook and new design for assignment
+    and student search

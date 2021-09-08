@@ -289,7 +289,7 @@ module ActiveRecord
       end
     end
 
-    describe "parse_asset_string" do
+    describe ".parse_asset_string" do
       it "parses simple asset strings" do
         expect(ActiveRecord::Base.parse_asset_string("course_123")).to eql(["Course", 123])
       end
@@ -308,6 +308,38 @@ module ActiveRecord
 
       it "behaves predictably on an invalid asset string" do
         expect(ActiveRecord::Base.parse_asset_string("what")).to eql(["", 0])
+      end
+    end
+
+    describe ".parse_asset_string_list" do
+      it "parses to a hash" do
+        expect(ActiveRecord::Base.parse_asset_string_list("course_1,course_2,user_3"))
+          .to eq({ 'Course' => [1, 2], 'User' => [3] })
+      end
+
+      it "accepts an array" do
+        expect(ActiveRecord::Base.parse_asset_string_list(%w{course_1 course_2 user_3}))
+          .to eq({ 'Course' => [1, 2], 'User' => [3] })
+      end
+    end
+
+    describe ".find_all_by_asset_string" do
+      let_once(:course) { course_factory }
+      let_once(:user) { user_factory }
+
+      it "works" do
+        expect(ActiveRecord::Base.find_all_by_asset_string([course.asset_string, user.asset_string]))
+          .to eq [course, user]
+      end
+
+      it "accepts a pre-parsed hash" do
+        expect(ActiveRecord::Base.find_all_by_asset_string('Course' => [course.id], 'User' => [user.id]))
+          .to eq [course, user]
+      end
+
+      it "ignores unnamed asset types" do
+        expect(ActiveRecord::Base.find_all_by_asset_string([course.asset_string, user.asset_string], ['User', 'Group']))
+          .to eq [user]
       end
     end
   end
@@ -334,12 +366,12 @@ module ActiveRecord
     describe "union" do
       shared_examples_for "query creation" do
         it "should include conditions after the union inside of the subquery" do
-          scope = base.active.where(id:99).union(User.where(id:1))
+          scope = base.active.where(id:99).union(User.where(id: 1))
           wheres = scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 1
           sql_before_union, sql_after_union = wheres.first.split("UNION ALL")
-          expect(sql_before_union.include?('"id" = 99')).to be_falsey
-          expect(sql_after_union.include?('"id" = 99')).to be_truthy
+          expect(sql_before_union).to include('"id" = 99')
+          expect(sql_after_union).not_to include('"id" = 99')
         end
 
         it "should include conditions prior to the union outside of the subquery" do
@@ -347,7 +379,25 @@ module ActiveRecord
           wheres = scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 2
           union_where = wheres.detect{|w| w.is_a?(String) && w.include?("UNION ALL")}
-          expect(union_where.include?('"id" = 99')).to be_falsey
+          expect(union_where).not_to include('"id" = 99')
+        end
+
+        it "ignores null scopes" do
+          s1 = Assignment.all
+          s2 = Assignment.all.none
+          expect(s1.union(s2)).to be s1
+        end
+
+        it "just returns self if everything is null scope" do
+          s1 = Assignment.all.none
+          s2 = Assignment.all.none
+          expect(s1).not_to be s2
+          expect(s1.union(s2)).to be s1
+        end
+
+        it "serializes to valid SQL with selects, limits, and orders" do
+          s = Assignment.select(:updated_at).order(updated_at: :desc).limit(1)
+          s.union(s)
         end
       end
 

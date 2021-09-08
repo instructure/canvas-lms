@@ -30,7 +30,8 @@ export default {
     open: true,
     onCloseHandler: () => {},
     isCourse: false,
-    includeGlobalRootGroup: false
+    includeGlobalRootGroup: false,
+    isMobileView: false
   },
   // Adding a story decorator will cause the component to re-render when a control change
   //  is presented. This is necessary becuase useEffect is only called once upon initial render
@@ -53,7 +54,13 @@ const Template = args => {
   }
   return (
     <OutcomesContext.Provider
-      value={{env: {contextType: args.isCourse ? 'Course' : 'Account', contextId: '1'}}}
+      value={{
+        env: {
+          contextType: args.isCourse ? 'Course' : 'Account',
+          contextId: '1',
+          isMobileView: args.isMobileView
+        }
+      }}
     >
       <MockedProvider mocks={response} cache={createCache()}>
         <FindOutcomesModal {...args} />

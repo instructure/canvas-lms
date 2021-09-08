@@ -20,6 +20,7 @@ import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import RubricTab from '../RubricTab'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {transformRubricData, transformRubricAssessmentData} from '../../helpers/RubricHelpers'
 
 function gradedOverrides() {
   return {
@@ -90,11 +91,12 @@ async function makeProps(opts = {}) {
   ]
 
   const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+  const assessments = result.data.submission.rubricAssessmentsConnection?.nodes
   return {
-    assessments: result.data.submission.rubricAssessmentsConnection?.nodes,
+    assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)),
     proficiencyRatings:
       result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
-    rubric: result.data.assignment.rubric
+    rubric: transformRubricData(result.data.assignment.rubric)
   }
 }
 

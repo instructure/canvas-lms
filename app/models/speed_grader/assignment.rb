@@ -171,7 +171,7 @@ module SpeedGrader
       res[:submissions] = submissions.map do |sub|
         json = sub.as_json(
           include_root: false,
-          methods: %i(submission_history late external_tool_url entered_score entered_grade),
+          methods: %i(submission_history late external_tool_url entered_score entered_grade seconds_late missing),
           only: submission_json_fields
         ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 

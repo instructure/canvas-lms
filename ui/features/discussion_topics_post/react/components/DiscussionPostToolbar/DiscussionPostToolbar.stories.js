@@ -17,6 +17,7 @@
  */
 import React from 'react'
 
+import {ChildTopic} from '../../../graphql/ChildTopic'
 import {DiscussionPostToolbar, getMenuConfig} from './DiscussionPostToolbar'
 
 export default {
@@ -51,4 +52,13 @@ SortedDesc.args = {
 export const ShowDeleted = Template.bind({})
 ShowDeleted.args = {
   enableDeleteFilter: true
+}
+
+export const WithChildTopics = Template.bind({})
+WithChildTopics.args = {
+  childTopics: [
+    ChildTopic.mock(),
+    ChildTopic.mock({_id: '2', contextName: 'Group 2', contextId: '2'}),
+    ChildTopic.mock({_id: '3', contextName: 'Group 3', contextId: '3'})
+  ]
 }

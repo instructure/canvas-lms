@@ -23,7 +23,7 @@ require_relative '../../sharding_spec_helper'
 
 describe CalendarEventsApiController, type: :request do
   before :once do
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @me = @user
   end
@@ -206,7 +206,8 @@ describe CalendarEventsApiController, type: :request do
     it 'should return events from up to 10 contexts by default' do
       contexts = [@course.asset_string]
       course_ids = create_courses(15, enroll_user: @me)
-      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
+      now = Time.now.utc
+      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now}})
       contexts.concat course_ids.map{ |id| "course_#{id}" }
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
@@ -219,7 +220,8 @@ describe CalendarEventsApiController, type: :request do
       Account.default.settings[:calendar_contexts_limit] = 15
       Account.default.save!
       course_ids = create_courses(20, enroll_user: @me)
-      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
+      now = Time.now.utc
+      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now}})
       contexts.concat course_ids.map{ |id| "course_#{id}" }
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
@@ -1313,7 +1315,6 @@ describe CalendarEventsApiController, type: :request do
 
     context "web_conferences" do
       before(:once) do
-        Account.site_admin.enable_feature! :calendar_conferences
         plugin = PluginSetting.create!(name: 'big_blue_button')
         plugin.update_attribute(:settings, { key: 'value' })
       end
@@ -2452,15 +2453,34 @@ describe CalendarEventsApiController, type: :request do
         links = Api.parse_pagination_links(response.headers['Link'])
         expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
       end
+
+      it "returns important dates over multiple shards" do
+        Account.site_admin.enable_feature! :important_dates
+        @e0.update important_dates: true
+        @e1.update important_dates: true
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&important_dates=1",
+                        controller: 'calendar_events_api', action: 'index', format: 'json',
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, important_dates: 1)
+        expect(json.size).to eq 2
+        expect(json.map { |e| e['id'] }).to match_array([@e0.id, @e1.id])
+      end
     end
 
     context 'important dates' do
       before :once do
-        @course.assignments.create(title: 'important date', due_at: DateTime.current, important_dates: true)
-        @course.assignments.create(title: 'important date without due', important_dates: true)
-        overrides_course = @course.assignments.create(title: 'important date with override dates', important_dates: true)
-        overrides_course.assignment_overrides.create(due_at_overridden: true, due_at: DateTime.current)
-        @course.assignments.create(title: 'not important date', due_at: DateTime.current)
+        @student = user_factory(active_all: true, active_state: 'active')
+        @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+        @other_student = user_factory(active_all: true, active_state: 'active')
+        @course.enroll_user(@other_student, 'StudentEnrollment', enrollment_state: 'active')
+
+        @course.assignments.create!(title: 'important date', due_at: DateTime.current, important_dates: true)
+        @course.assignments.create!(title: 'important date without due', important_dates: true)
+        overrides_assignment = @course.assignments.create!(title: 'important date with override dates', important_dates: true)
+        overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set: @course.default_section)
+        specific_overrides_assignment = @course.assignments.create!(title: 'important date with override for others', important_dates: true)
+        override = specific_overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set_type: 'ADHOC')
+        override.assignment_override_students.create!(user: @other_student)
+        @course.assignments.create!(title: 'not important date', due_at: DateTime.current)
       end
 
       context 'with feature enabled' do
@@ -2468,23 +2488,32 @@ describe CalendarEventsApiController, type: :request do
           Account.site_admin.enable_feature!(:important_dates)
         end
 
+        it 'should return all assignments with important dates if the user is a teacher' do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :important_dates => true
+            })
+          expect(json.size).to be 4
+          expect(json[0]['important_dates']).to be true
+        end
+
+        it 'should return assignments with dates for the user with important dates if the param is sent' do
+          json = api_call_as_user(@other_student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :important_dates => true
+            })
+          expect(json.size).to be 3
+          expect(json[0]['important_dates']).to be true
+        end
+
         it 'should return assignments with important dates if the param is sent' do
-          json = api_call(:get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+          json = api_call_as_user(@student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
             :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
             :context_codes => ["course_#{@course.id}"], :important_dates => true
             })
           expect(json.size).to be 2
           expect(json[0]['important_dates']).to be true
         end
-      end
-
-      it 'should return all assignments if the param is sent and the site admin feature is off' do
-        Account.site_admin.disable_feature!(:important_dates)
-        json = api_call(:get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
-          :context_codes => ["course_#{@course.id}"], :important_dates => true
-          })
-        expect(json.size).to be 3
       end
     end
   end
@@ -2571,7 +2600,6 @@ describe CalendarEventsApiController, type: :request do
 
     context "web_conferences" do
       before(:once) do
-        Account.site_admin.enable_feature! :calendar_conferences
         plugin = PluginSetting.create!(name: 'big_blue_button')
         plugin.update_attribute(:settings, { key: 'value' })
         3.times do |idx|

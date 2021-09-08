@@ -17,32 +17,29 @@
  */
 
 import I18n from 'i18n!discussion_posts'
-import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
-import React from 'react'
-import {View} from '@instructure/ui-view'
+import React, {useContext} from 'react'
+import {Img} from '@instructure/ui-img'
+import {Billboard} from '@instructure/ui-billboard'
+
+import {SearchContext} from '../../utils/constants'
+
+import pageNotFound from '@canvas/images/PageNotFoundPanda.svg'
 
 export const NoResultsFound = () => {
+  const {searchTerm} = useContext(SearchContext)
   return (
-    <View as="div" margin="medium none none none">
-      <Text lineHeight="double">{I18n.t('Your search did not match any entries.')}</Text>
-      <br />
-      <Text lineHeight="double">{I18n.t('Suggestions:')}</Text>
-      <List>
-        <List.Item>
-          <Text lineHeight="double">
-            {I18n.t('Make sure all search terms are spelled correctly.')}
-          </Text>
-        </List.Item>
-        <List.Item>
-          <Text lineHeight="double">
-            {I18n.t('Try different, more general, or fewer keywords.')}
-          </Text>
-        </List.Item>
-        <List.Item>
-          <Text lineHeight="double">{I18n.t('Try disabling the "Unread" filter.')}</Text>
-        </List.Item>
-      </List>
-    </View>
+    <Billboard
+      size="medium"
+      heading="No Results Found"
+      message={I18n.t('No results match "%{searchTerm}"', {searchTerm})}
+      hero={
+        <Img
+          data-testid="page-not-found-panda"
+          display="block"
+          src={pageNotFound}
+          alt="No results found"
+        />
+      }
+    />
   )
 }

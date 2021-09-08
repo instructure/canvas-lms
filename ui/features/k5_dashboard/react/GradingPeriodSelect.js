@@ -26,6 +26,8 @@ import {View} from '@instructure/ui-view'
 
 import {GradingPeriodShape} from '@canvas/k5/react/utils'
 
+export const ALL_PERIODS_OPTION = 'all'
+
 const GradingPeriodSelect = ({
   gradingPeriods,
   handleSelectGradingPeriod,
@@ -51,6 +53,9 @@ const GradingPeriodSelect = ({
             {title}
           </SimpleSelect.Option>
         ))}
+      <SimpleSelect.Option id="grading-period-all" value={ALL_PERIODS_OPTION}>
+        {I18n.t('All Grading Periods')}
+      </SimpleSelect.Option>
     </SimpleSelect>
   </View>
 )

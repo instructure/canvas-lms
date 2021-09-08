@@ -19,27 +19,13 @@
 #
 
 class Loaders::OutcomeFriendlyDescriptionLoader < GraphQL::Batch::Loader
+  include Outcomes::OutcomeFriendlyDescriptionResolver
+
   VALID_CONTEXT_TYPES = ['Course', 'Account'].freeze
 
   def initialize(context_id, context_type)
     @context_id = context_id
     @context_type = context_type
-  end
-
-  def context_queries
-    queries = []
-
-    if @course
-      queries << OutcomeFriendlyDescription.sanitize_sql([
-        "context_type = 'Course' AND context_id = ?", @course.id
-      ])
-    end
-
-    queries << OutcomeFriendlyDescription.sanitize_sql([
-      "context_type = 'Account' AND context_id IN (?)", @account.account_chain_ids
-    ])
-
-    '(' + queries.join(') OR (') + ')'
   end
 
   def valid_context?
@@ -69,20 +55,13 @@ class Loaders::OutcomeFriendlyDescriptionLoader < GraphQL::Batch::Loader
       return
     end
 
-    account_order = @account.account_chain_ids
-
     # get all friendly description for the course and all parent accounts once
     # sort by course, then the account parent order in account_chain_ids
     # and fulfill every friendly description
-    friendly_descriptions = OutcomeFriendlyDescription.active.where(
-      learning_outcome_id: outcome_ids
-    ).where(context_queries).to_a.sort_by do |friendly_description|
-      friendly_description.context_type == 'Course' ? 0 : account_order.index(friendly_description.context_id) + 1
-    end
-
+    friendly_descriptions = resolve_friendly_descriptions(@account, @course, outcome_ids)
     friendly_descriptions.each do |friendly_description|
       outcome_id = friendly_description.learning_outcome_id
-      fulfill(outcome_id, friendly_description) unless fulfilled?(outcome_id)
+      fulfill(outcome_id, friendly_description)
     end
 
     nullify_resting(outcome_ids)

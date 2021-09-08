@@ -17,35 +17,73 @@
  */
 
 import {BASE_SIZE, DEFAULT_OPTIONS, DEFAULT_SETTINGS, STROKE_WIDTH} from './constants'
-import {createSvgElement} from './utils'
+import {createSvgElement, convertFileToBase64} from './utils'
+import {buildMetadata} from './metadata'
 import {buildShape} from './shape'
+import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from './text'
 
 export function buildSvg(settings, options = DEFAULT_OPTIONS) {
   settings = {...DEFAULT_SETTINGS, ...settings}
-
-  const wrapper = buildSvgWrapper(settings)
+  const mainContainer = buildSvgContainer(settings)
+  const shapeWrapper = buildSvgWrapper(settings)
 
   if (options.isPreview) {
     const checkerboard = buildCheckerboard()
-    wrapper.appendChild(checkerboard)
+    shapeWrapper.appendChild(checkerboard)
+  } else {
+    const metadata = buildMetadata(settings)
+    mainContainer.appendChild(metadata)
   }
 
   const g = buildGroup(settings, options)
   const shape = buildShape(settings)
   g.appendChild(shape)
+  shapeWrapper.appendChild(g)
+  mainContainer.appendChild(shapeWrapper)
 
-  wrapper.appendChild(g)
+  const textBackground = buildTextBackground(settings)
+  if (textBackground) mainContainer.appendChild(textBackground)
 
-  return wrapper
+  const text = buildText(settings)
+  if (text) mainContainer.appendChild(text)
+
+  return mainContainer
 }
 
-export function buildSvgWrapper({size}) {
-  const base = BASE_SIZE[size]
+export function buildStylesheet() {
+  const url = '/fonts/lato/extended/Lato-Bold.woff2'
+  return new Promise(resolve => resolve(fetch(url)))
+    .then(data => data.blob())
+    .then(blob => convertFileToBase64(blob))
+    .then(base64String => {
+      const stylesheet = document.createElement('style')
+      const css = `@font-face {font-family: "Lato Extended";font-weight: bold;src: url(${base64String});}`
+      stylesheet.setAttribute('type', 'text/css')
+      stylesheet.appendChild(document.createTextNode(css))
+      return stylesheet
+    })
+}
+
+export function buildSvgWrapper(settings) {
+  const base = BASE_SIZE[settings.size]
   return createSvgElement('svg', {
     fill: 'none',
     height: `${base}px`,
     viewBox: `0 0 ${base} ${base}`,
-    width: `${base}px`
+    width: `${base}px`,
+    x: Math.floor((getContainerWidth(settings) - base) * 0.5)
+  })
+}
+
+export function buildSvgContainer(settings) {
+  const containerWidth = getContainerWidth(settings)
+  const containerHeight = getContainerHeight(settings)
+  return createSvgElement('svg', {
+    fill: 'none',
+    width: `${containerWidth}px`,
+    height: `${containerHeight}px`,
+    viewBox: `0 0 ${containerWidth} ${containerHeight}`,
+    xmlns: 'http://www.w3.org/2000/svg'
   })
 }
 

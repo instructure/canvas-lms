@@ -30,11 +30,6 @@ describe "Files API", type: :request do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
-  before :each do
-    # granular permissions disabled by default
-    @course.root_account.disable_feature!(:granular_permissions_course_files)
-  end
-
   context 'locked api item' do
     let(:item_type) { 'file' }
 
@@ -93,86 +88,80 @@ describe "Files API", type: :request do
       expect(payload['capture_params']['include']).to include('avatar')
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher having manage_files_add permission" do
+      it "should create a course file" do
+        api_call(
+          :post, "/api/v1/courses/#{@course.id}/files",
+          {
+            controller: 'courses',
+            action: 'create_file',
+            course_id: @course.id,
+            format: 'json',
+            name: 'test_file.png',
+            size: '12345',
+            content_type: 'image/png',
+            success_include: ['avatar'],
+            no_redirect: 'true'
+          },
+          {},
+          :expected_status => 200
+        )
+      end
+    end
+
+    context "as teacher without manage_files_add permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_add',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_add permission" do
-        it "should create a course file" do
-          api_call(
-            :post, "/api/v1/courses/#{@course.id}/files",
-            {
-              controller: 'courses',
-              action: 'create_file',
-              course_id: @course.id,
-              format: 'json',
-              name: 'test_file.png',
-              size: '12345',
-              content_type: 'image/png',
-              success_include: ['avatar'],
-              no_redirect: 'true'
-            },
-            {},
-            :expected_status => 200
-          )
-        end
+      it "should disallow creating a course file" do
+        api_call(
+          :post, "/api/v1/courses/#{@course.id}/files",
+          {
+            controller: 'courses',
+            action: 'create_file',
+            course_id: @course.id,
+            format: 'json',
+            name: 'test_file.png',
+            size: '12345',
+            content_type: 'image/png',
+            success_include: ['avatar'],
+            no_redirect: 'true'
+          },
+          {},
+          :expected_status => 401
+        )
+      end
+    end
+
+    context "as student" do
+      before do
+        course_with_student_logged_in(:course => @course)
       end
 
-      context "as teacher without manage_files_add permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_add',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow creating a course file" do
-          api_call(
-            :post, "/api/v1/courses/#{@course.id}/files",
-            {
-              controller: 'courses',
-              action: 'create_file',
-              course_id: @course.id,
-              format: 'json',
-              name: 'test_file.png',
-              size: '12345',
-              content_type: 'image/png',
-              success_include: ['avatar'],
-              no_redirect: 'true'
-            },
-            {},
-            :expected_status => 401
-          )
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should return unauthorized error" do
-          api_call(
-            :post, "/api/v1/courses/#{@course.id}/files",
-            {
-              controller: 'courses',
-              action: 'create_file',
-              course_id: @course.id,
-              format: 'json',
-              name: 'test_file.png',
-              size: '12345',
-              content_type: 'image/png',
-              success_include: ['avatar'],
-              no_redirect: 'true'
-            },
-            {},
-            :expected_status => 401
-          )
-        end
+      it "should return unauthorized error" do
+        api_call(
+          :post, "/api/v1/courses/#{@course.id}/files",
+          {
+            controller: 'courses',
+            action: 'create_file',
+            course_id: @course.id,
+            format: 'json',
+            name: 'test_file.png',
+            size: '12345',
+            content_type: 'image/png',
+            success_include: ['avatar'],
+            no_redirect: 'true'
+          },
+          {},
+          :expected_status => 401
+        )
       end
     end
   end
@@ -595,7 +584,7 @@ describe "Files API", type: :request do
     it "should list hidden files with :read_as_admin rights" do
       course_with_ta(:course => @course, :active_all => true)
       user_session(@user)
-      @course.account.role_overrides.create!(:permission => :manage_files, :enabled => false, :role => ta_role)
+      @course.account.role_overrides.create!(:permission => :manage_files_add, :enabled => false, :role => ta_role)
       json = api_call(:get, @files_path, @files_path_options, {})
 
       expect(json.any?{|f| f['id'] == @a3.id}).to be_truthy
@@ -1223,86 +1212,22 @@ describe "Files API", type: :request do
       api_call(:delete, @file_path, @file_path_options, {}, {}, :expected_status => 401)
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_delete permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_delete',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "having manage_files_edit permission" do
-        it "should delete a file" do
-          api_call(:delete, @file_path, @file_path_options)
-          @att.reload
-          expect(@att.file_state).to eq 'deleted'
-        end
-
-        it 'should delete/replace a file' do
-          u = user_with_pseudonym(account: @account)
-          account_admin_user(account: @account)
-          @att.context = u
-          @att.save!
-          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
-          @file_path_options[:replace] = true
-          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
-        end
-
-        it 'should delete/replace a file tied to an assignment' do
-          assignment = @course.assignments.create!(title: 'one')
-          account_admin_user(account: @account)
-          @att.context = assignment
-          @att.save!
-          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
-          @file_path_options[:replace] = true
-          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
-        end
-
-        it 'should delete/replace a file tied to a quiz submission' do
-          course_with_student(:active_all => true)
-          quiz_model(:course => @course)
-          @quiz.update_attribute :one_question_at_a_time, true
-          @qs = @quiz.generate_submission(@student, false)
-
-          account_admin_user(account: @account)
-          @att.context = @qs
-          @att.save!
-          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
-          @file_path_options[:replace] = true
-          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
-        end
-
-        it "should not be authorized to delete/replace a file" do
-          course_with_teacher(active_all: true, user: user_with_pseudonym)
-          @file_path_options[:replace] = true
-          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 401)
-        end
-      end
-
-      context "as teacher without manage_files_delete permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_delete',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow deleting a file" do
-          course_with_teacher(active_all: true, user: user_with_pseudonym, course: @course)
-          @file_path_options[:replace] = false
-          api_call(:delete, @file_path, @file_path_options,
-                   {}, {}, expected_status: 401)
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(course: @course)
-        end
-
-        it "should return unauthorized error if not authorized to delete" do
-          api_call(:delete, @file_path, @file_path_options, {}, {}, :expected_status => 401)
-        end
+      it "should disallow deleting a file" do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, course: @course)
+        @file_path_options[:replace] = false
+        api_call(:delete, @file_path, @file_path_options,
+                 {}, {}, expected_status: 401)
       end
     end
   end
@@ -1327,38 +1252,18 @@ describe "Files API", type: :request do
       api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as an admin without manage_files_edit or manage_files_delete permission" do
+      before do
+        @course.account.account_users.create(user: User.create!(name: 'billy bob'))
+        admin = admin_role(root_account_id: @course.account.resolved_root_account_id)
+        @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_edit)
+        @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_delete)
       end
 
-      context "as an admin having manage_files_edit or manage_files_delete permission" do
-        it "should let admin users reset verifiers" do
-          old_uuid = @att.uuid
-          account_admin_user(account: @course.root_account)
-          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
-          expect(@att.reload.uuid).to_not eq old_uuid
-        end
-
-        it "should not let non-admin users reset verifiers" do
-          course_with_teacher(course: @course, active_all: true, user: user_with_pseudonym)
-          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
-        end
-      end
-
-      context "as an admin without manage_files_edit or manage_files_delete permission" do
-        before do
-          @course.account.account_users.create(user: User.create!(name: 'billy bob'))
-          admin = admin_role(root_account_id: @course.account.resolved_root_account_id)
-          @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_edit)
-          @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_delete)
-        end
-
-        it "should disallow letting admin users reset verifiers" do
-          old_uuid = @att.uuid
-          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
-          expect(@att.reload.uuid).to eq old_uuid
-        end
+      it "should disallow letting admin users reset verifiers" do
+        old_uuid = @att.uuid
+        api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+        expect(@att.reload.uuid).to eq old_uuid
       end
     end
   end
@@ -1535,62 +1440,22 @@ describe "Files API", type: :request do
       end
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_edit permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_edit',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_edit permission" do
-        it "should update" do
-          unlock = 1.day.from_now
-          lock = 3.days.from_now
-          new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
-          json = api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
-          expect(json['url']).to include 'verifier='
-          @att.reload
-          expect(@att.display_name).to eq "newname.txt"
-          expect(@att.locked).to be_truthy
-          expect(@att.hidden).to be_truthy
-          expect(@att.unlock_at.to_i).to eq unlock.to_i
-          expect(@att.lock_at.to_i).to eq lock.to_i
-        end
-
-        it "should move to another folder" do
-          @sub = @root.sub_folders.create!(:name => "sub", :context => @course)
-          api_call(:put, @file_path, @file_path_options, {:parent_folder_id => @sub.id.to_param}, {}, :expected_status => 200)
-          @att.reload
-          expect(@att.folder_id).to eq @sub.id
-        end
-      end
-
-      context "as teacher without manage_files_edit permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_edit',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow an update" do
-          unlock = 1.day.from_now
-          lock = 3.days.from_now
-          new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
-          api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 401)
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(course: @course)
-        end
-
-        it "should return unauthorized error" do
-          api_call(:put, @file_path, @file_path_options, {:name => "new name"},
-                   {}, :expected_status => 401)
-        end
+      it "should disallow an update" do
+        unlock = 1.day.from_now
+        lock = 3.days.from_now
+        new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
+        api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 401)
       end
     end
   end

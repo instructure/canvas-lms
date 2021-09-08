@@ -139,10 +139,8 @@ class CalendarEventsController < ApplicationController
 
   def permit_params(params, attrs)
     params.permit(attrs).tap do |p|
-      if Account.site_admin.feature_enabled?(:calendar_conferences)
-        if p.key?(:web_conference)
-          p[:web_conference] = find_or_initialize_conference(@context, p[:web_conference])
-        end
+      if p.key?(:web_conference)
+        p[:web_conference] = find_or_initialize_conference(@context, p[:web_conference])
       end
     end
   end

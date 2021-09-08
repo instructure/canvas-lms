@@ -45,6 +45,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begin van je To-do-historie"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Hieronder is een voorbeeld van hoe cursisten hun planning zullen zien"
+  },
   "calendar_a8563bb2": { "message": "Kalender:" },
   "calendar_event_89aadc1c": { "message": "Gebeurtenis op kalender" },
   "canvas_planner_98ed106": { "message": "Canvas planner" },
@@ -55,8 +58,14 @@
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
   },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Ontbrekend item # verbergen}\n  other {Ontbrekende items # verbergen}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Toon # voltooid item}\n  other {Toon # voltooide items}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Ontbrekend item # tonen}\n  other {Ontbrekende items # tonen}\n}"
   },
   "course_8a63b4a3": { "message": "Cursus" },
   "course_to_do_bcbbab54": { "message": "{ course } TO-DO" },
@@ -84,6 +93,7 @@
   "edit_c5fbea07": { "message": "Bewerken" },
   "edit_title_72e5a21e": { "message": "Bewerk { title }" },
   "error_loading_grades_e0b38f4d": { "message": "Fout bij laden van cijfers" },
+  "error_loading_items_5218438e": { "message": "Fout bij het laden van items" },
   "error_loading_more_items_3f109d9f": {
     "message": "Fout bij het laden van meer items"
   },
@@ -91,6 +101,18 @@
     "message": "Fout bij het laden van eerdere items"
   },
   "excused_cf8792eb": { "message": "Vrijgesteld" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Gluren in de toekomst is mislukt"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Gluren in het verleden is mislukt"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Opslaan van wijzigingen op { name } is mislukt."
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "Verwijderen van { name } is mislukt."
+  },
   "failed_to_delete_to_do_64edff49": {
     "message": "Kan To Do-lijst niet sluiten"
   },
@@ -113,10 +135,11 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } voltooid(e) { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Naar navigatiewerkbalk springen"
+  },
+  "jump_to_today_254ccf41": { "message": "Naar vandaag springen" },
   "late_2be42b88": { "message": "Te laat" },
-  "list_collapsed_9ac35920": { "message": "Lijst samengevouwen." },
-  "list_collapsed_dde87718": { "message": "Lijst samengevouwen" },
-  "list_expanded_efec2d0": { "message": "Lijst uitgevouwen." },
   "load_more_a36f9cf9": { "message": "Meer laden" },
   "load_prior_dates_f2b0f6f0": { "message": "Eerdere datums laden" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -147,6 +170,9 @@
     "message": "Geen inleverdatums toegewezen"
   },
   "no_grade_3b4d7f3e": { "message": "Geen cijfer" },
+  "nothing_due_this_week_d45c9ef9": {
+    "message": "Niets in te leveren deze week"
+  },
   "nothing_for_now_e3e3ce2a": { "message": "Momenteel niets" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Er is niets hier waarnaar gekeken moet worden."
@@ -167,9 +193,6 @@
     "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
   },
   "opportunities_popup_f6703842": { "message": "mogelijkheden popup" },
-  "option_selected_list_collapsed_e00180ff": {
-    "message": "{ option } geselecteerd. Lijst samengevouwen."
-  },
   "optional_add_course_ef0d70fc": { "message": "Optioneel: Cursus toevoegen" },
   "page_50c4823d": { "message": "Pagina" },
   "peer_review_74f26a13": { "message": "Peerbeoordeling" },
@@ -181,9 +204,11 @@
   "previous_month_bb1e3c84": { "message": "Vorige maand" },
   "pts_699bd9aa": { "message": "ptn" },
   "quiz_e0dcce8f": { "message": "Toets" },
+  "redo_363c58b7": { "message": "Opnieuw" },
   "reminder_date_4564d12d": { "message": "Herinnering: { date }" },
   "replies_4a8577c8": { "message": "Antwoorden" },
   "save_11a80ec3": { "message": "Opslaan" },
+  "schedule_preview_3bcda153": { "message": "Planningsvoorbeeld" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Scroll omhoog om je geschiedenis weer te geven!"
   },
@@ -213,6 +238,9 @@
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Er zijn geen punten gekoppeld aan dit item."
   },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "Er is niets gepland voor vandaag."
+  },
   "time_2b5aac58": { "message": "Tijd" },
   "title_ee03d132": { "message": "Titel" },
   "title_is_required_6ddcab69": { "message": "titel is verplicht" },
@@ -228,6 +256,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Gebruik de pijltoetsen om door opties te navigeren."
+  },
+  "view_next_week_7f61f755": { "message": "Volgende week bekijken" },
+  "view_previous_week_6f83849f": { "message": "Vorige week bekijken" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Navigatie van wekelijkse planning"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Gisteren om { date }" },
   "yesterday_c6bd6abf": { "message": "Gisteren" },

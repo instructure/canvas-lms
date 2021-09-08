@@ -21,12 +21,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "site-wide" do
-  before do
-    consider_all_requests_local(false)
-  end
-
-  after do
-    consider_all_requests_local(true)
+  around do |example|
+    consider_all_requests_local(false, &example)
   end
 
   let(:x_frame_options) { 'X-Frame-Options' }

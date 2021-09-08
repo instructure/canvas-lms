@@ -68,6 +68,9 @@
     "announcements_a4b8ed4a": {
         "message": "Duyurular"
     },
+    "apply_781a2546": {
+        "message": "Uygula"
+    },
     "apps_54d24a47": {
         "message": "Uygulamalar"
     },
@@ -413,6 +416,9 @@
     "invalid_url_cbde79f": {
         "message": "Geçersiz bağlantı"
     },
+    "join_6cafecca": {
+        "message": "Katıl"
+    },
     "jump_to_today_254ccf41": {
         "message": "Bugüne Git"
     },
@@ -476,14 +482,14 @@
     "my_files_2f621040": {
         "message": "Dosyalarım"
     },
+    "name_1aed4a1b": {
+        "message": "İsim"
+    },
     "new_13daf639": {
         "message": "Yeni"
     },
     "new_activity_8b84847d": {
         "message": "Yeni Etkinlik"
-    },
-    "next_40e12421": {
-        "message": "Sonraki"
     },
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
@@ -649,6 +655,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Medya Dosyası Yükle"
+    },
+    "uploading_19e8a4e7": {
+        "message": "Yükleniyor"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "Büyük harf alfabetik sıralı liste"

@@ -302,7 +302,6 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
-  include MicrosoftSync::Concerns::Settings
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -372,7 +371,7 @@ class AccountsController < ApplicationController
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
-      course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids))
+      course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids), always_use_bookmarks: true)
       @accounts = Api.paginate(course_accounts, self, api_v1_course_accounts_url)
     else
       @accounts = []
@@ -740,7 +739,10 @@ class AccountsController < ApplicationController
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
     page_opts = {}
-    page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
+    # don't calculate a total count for this endpoint.
+    if params[:search_term] || !@account.allow_last_page_on_account_courses?
+      page_opts[:total_entries] = nil
+    end
 
     all_precalculated_permissions = nil
     GuardRail.activate(:secondary) do
@@ -760,7 +762,8 @@ class AccountsController < ApplicationController
     end
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
-      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id)) }
+      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
+      prefer_friendly_name: false) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)
@@ -814,11 +817,9 @@ class AccountsController < ApplicationController
         end
       end
 
-      # All the Microsoft Teams Sync things!
-      sync_enabled = params.dig(:account, :settings)&.delete(:microsoft_sync_enabled)
-      tenant = params.dig(:account, :settings)&.delete(:microsoft_sync_tenant)
-      login_attribute = params.dig(:account, :settings)&.delete(:microsoft_sync_login_attribute)
-      set_microsoft_sync_settings(sync_enabled, tenant, login_attribute)
+      param_settings = params.dig(:account, :settings)
+      microsoft_sync_settings = param_settings&.permit(*MicrosoftSync::SettingsValidator::SYNC_SETTINGS)
+      MicrosoftSync::SettingsValidator.new(microsoft_sync_settings, @account).validate_and_save
 
 
       # quotas (:manage_account_quotas)
@@ -906,7 +907,8 @@ class AccountsController < ApplicationController
   #
   #   Note that if you are altering Microsoft Teams sync settings you must enable
   #   the Microsoft Group enrollment syncing feature flag. In addition, if you are enabling
-  #   Microsoft Teams sync, you must also specify a tenant and login attribute.
+  #   Microsoft Teams sync, you must also specify a tenant, login attribute, and a remote attribute.
+  #   Specifying a suffix to use is optional.
   #
   # @argument account[settings][microsoft_sync_tenant]
   #   The tenant this account should use when using Microsoft Teams Sync.
@@ -914,7 +916,16 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][microsoft_sync_login_attribute]
   #   The attribute this account should use to lookup users when using Microsoft Teams Sync.
-  #   Must be one of sub, email, oid, or preferred_username.
+  #   Must be one of "sub", "email", "oid", "preferred_username", or "integration_id".
+  #
+  # @argument account[settings][microsoft_sync_login_attribute_suffix]
+  #   A suffix that will be appended to the result of the login attribute when associating
+  #   Canvas users with Microsoft users. Must be under 255 characters and contain no whitespace.
+  #   This field is optional.
+  #
+  # @argument account[settings][microsoft_sync_remote_attribute]
+  #   The Active Directory attribute to use when associating Canvas users with Microsoft users.
+  #   Must be one of "mail", "mailNickname", or "userPrincipalName".
   #
   # @argument account[settings][restrict_student_future_view][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
@@ -1106,9 +1117,7 @@ class AccountsController < ApplicationController
             @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
             @account.root_account.save!
             # Invalidate the cached k5 settings for all users in the account
-            User.of_account(@account.root_account).find_in_batches do |users|
-              User.clear_cache_keys(users.pluck(:id), :k5_user)
-            end
+            @account.root_account.clear_k5_cache
           end
         end
 
@@ -1169,7 +1178,7 @@ class AccountsController < ApplicationController
       @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
       @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
 
-      @announcements = @account.announcements.order(:created_at).paginate(page: params[:page], per_page: 50)
+      @announcements = @account.announcements.order(created_at: 'desc').paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
       js_env({
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
@@ -1466,7 +1475,13 @@ class AccountsController < ApplicationController
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
-      can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups), # access to view user groups?
+      can_manage_groups: # access to view account-level user groups, People --> hamburger menu
+        @account.grants_any_right?(
+          @current_user,
+          session,
+          :manage_groups,
+          *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
+        ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
@@ -1683,6 +1698,7 @@ class AccountsController < ApplicationController
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
                                    :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
+                                   :microsoft_sync_login_attribute_suffix, :microsoft_sync_remote_attribute,
                                    :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
                                    {:restrict_student_future_listing => [:value, :locked]}.freeze,

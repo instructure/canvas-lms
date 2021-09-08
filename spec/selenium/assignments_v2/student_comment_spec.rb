@@ -50,7 +50,6 @@ describe 'assignments' do
     end
 
     it 'allows a student to submit a comment when there is no submission' do
-      StudentAssignmentPageV2.view_feedback_button.click
       StudentAssignmentPageV2.leave_a_comment('test comment')
 
       expect(StudentAssignmentPageV2.comment_container).to include_text('test comment')
@@ -61,29 +60,22 @@ describe 'assignments' do
     end
 
     it 'allows student to read submission comments by in view feedback tray' do
-      StudentAssignmentPageV2.view_feedback_button.click
-
       expect(StudentAssignmentPageV2.comment_container).to include_text('Nice Work!')
       expect(StudentAssignmentPageV2.tray_close_button).to be_displayed
       StudentAssignmentPageV2.tray_close_button.click
     end
 
     it 'displays submission comment attachments in feedback tray' do
-      StudentAssignmentPageV2.view_feedback_button.click
-
       expect(StudentAssignmentPageV2.comment_container).to include_text('doc.doc')
     end
 
     it 'allows students to post media submission comments with media modal' do
-      StudentAssignmentPageV2.view_feedback_button.click
       StudentAssignmentPageV2.media_comment_button.click
 
       expect(StudentAssignmentPageV2.media_modal).to be_displayed
     end
 
     it 'paginates the comments starting with most recent into batches of 20 with a button to load more comments' do
-      StudentAssignmentPageV2.view_feedback_button.click
-
       expect(StudentAssignmentPageV2.comment_container).to include_text('20')
       expect(StudentAssignmentPageV2.comment_container).to_not include_text('First')
       StudentAssignmentPageV2.load_more_comments_button.click

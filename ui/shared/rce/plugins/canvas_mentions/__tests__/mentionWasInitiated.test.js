@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mentionWasInitiated from '../mentionWasInitiated'
+import mentionWasInitiated, {spaceCharacters} from '../mentionWasInitiated'
 
-let anchorNode, anchorOffset, selection, triggerChar
+let anchorNode, anchorOffset, selection, triggerChar, selectedNode
 
-const subject = () => mentionWasInitiated(selection, triggerChar)
+const subject = () => mentionWasInitiated(selection, selectedNode, triggerChar)
 
 describe('mentionWasInitiated', () => {
   beforeEach(() => {
+    selectedNode = {id: 'foo'}
     triggerChar = '@'
     anchorNode = {wholeText: ''}
     anchorOffset = 2
@@ -44,6 +45,16 @@ describe('mentionWasInitiated', () => {
   describe('when anchorNode is falsey', () => {
     beforeEach(() => {
       anchorNode = undefined
+    })
+
+    it('returns false', () => {
+      expect(subject()).toBe(false)
+    })
+  })
+
+  describe('when the selected node is the marker', () => {
+    beforeEach(() => {
+      selectedNode.id = 'mentions-marker'
     })
 
     it('returns false', () => {
@@ -81,6 +92,12 @@ describe('mentionWasInitiated', () => {
   })
 
   describe('when the proceeding char is a space character', () => {
+    describe('space character list', () => {
+      it('has a complete list', () => {
+        expect(spaceCharacters).toEqual(expect.arrayContaining([' ', '\u00A0', '\uFEFF']))
+      })
+    })
+
     describe('and the typed char is the trigger char', () => {
       beforeEach(() => {
         anchorOffset = 2

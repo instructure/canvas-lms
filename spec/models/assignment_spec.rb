@@ -170,6 +170,14 @@ describe Assignment do
     end
 
     describe 'update_cached_due_dates' do
+      it 'invokes DueDateCacher if anonymous_grading is changed' do
+        attrs = assignment_valid_attributes.merge(anonymous_grading: true)
+        assignment = @course.assignments.create!(attrs)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(anonymous_grading: false)
+      end
+
       it 'invokes DueDateCacher if due_at is changed' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
@@ -3641,13 +3649,16 @@ describe Assignment do
                       :unlock_at => "Sep 3 2008 12:00am",
                       :course => @course)
       expect(@assignment.all_day).to eql(false)
+
+      @assignment.due_at = Time.zone.parse("Sep 4 2008 12:00am")
+      @assignment.lock_at = Time.zone.parse("Sep 4 2008 12:00am")
       @assignment.infer_times
       @assignment.save!
       expect(@assignment.all_day).to eql(true)
       expect(@assignment.due_at.strftime("%H:%M")).to eql("23:59")
       expect(@assignment.lock_at.strftime("%H:%M")).to eql("23:59")
       expect(@assignment.unlock_at.strftime("%H:%M")).to eql("00:00")
-      expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
+      expect(@assignment.all_day_date).to eql(Date.parse("Sep 4 2008"))
     end
 
     it "should not set to all_day without infer_times call" do
@@ -3656,6 +3667,62 @@ describe Assignment do
       expect(@assignment.all_day).to eql(false)
       expect(@assignment.due_at.strftime("%H:%M")).to eql("00:00")
       expect(@assignment.all_day_date).to eql(Date.parse("Sep 3 2008"))
+    end
+
+    it "adjusts due_at when it has been modified on the object" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.due_at = "Sep 4 2008 12:00am"
+      assignment.infer_times
+
+      expect(assignment.due_at.to_s(:time)).to eq "23:59"
+    end
+
+    it "does not adjust due_at when it has not been modified" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.due_at
+      }
+    end
+
+    it "does not adjust due_at when it is not set to midnight" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.due_at = "Sep 3 2008 10:30pm"
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.due_at
+      }
+    end
+
+    it "adjusts lock_at when it has been modified on the object" do
+      assignment = @course.assignments.create!(
+        lock_at: "Sep 3 2008 12:00am"
+      )
+      assignment.lock_at = "Sep 4 2008 12:00am"
+      assignment.infer_times
+
+      expect(assignment.lock_at.to_s(:time)).to eq "23:59"
+    end
+
+    it "does not adjust lock_at when it has not been modified" do
+      assignment = @course.assignments.create!(lock_at: "Sep 3 2008 12:00am")
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.lock_at
+      }
+    end
+
+    it "does not adjust lock_at when it is not set to midnight" do
+      assignment = @course.assignments.create!(due_at: "Sep 3 2008 12:00am")
+      assignment.lock_at = "Sep 3 2008 10:30pm"
+      expect {
+        assignment.infer_times
+      }.not_to change {
+        assignment.lock_at
+      }
     end
   end
 
@@ -6132,7 +6199,7 @@ describe Assignment do
       @attachment.content_type = "foo/bar"
       @attachment.size = 10
       @attachment.save!
-      
+
       @submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [@attachment]
     end
 
@@ -9375,7 +9442,7 @@ describe Assignment do
         it_behaves_like 'assignment to line item attribute sync check'
 
         it 'change the `custom` attribute at resource link when it is given' do
-          assignment.lti_resource_link_custom_params = nil
+          assignment.lti_resource_link_custom_params = ""
           assignment.save!
           assignment.reload
 
@@ -9397,7 +9464,7 @@ describe Assignment do
             referer_name: 'Custom params changed'
           }
 
-          assignment.lti_resource_link_custom_params = new_custom_params.to_json
+          assignment.lti_resource_link_custom_params = new_custom_params
           assignment.save!
           assignment.reload
 
@@ -9887,6 +9954,39 @@ describe Assignment do
 
     it "returns true if the rubric association exists and is active" do
       expect(@assignment).to be_active_rubric_association
+    end
+  end
+
+  describe "#accepts_submission_type?" do
+    let(:assignment) { @course.assignments.create! }
+
+    context "when the submission_type is 'basic_lti_launch'" do
+      it "returns true if the assignment accepts external_tool submissions" do
+        assignment.update!(submission_types: "external_tool")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns true if the assignment accepts online uploads" do
+        assignment.update!(submission_types: "online_text_entry")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns false if the assignment accepts neither external_tool nor online-type submissions" do
+        assignment.update!(submission_types: "on_paper")
+        expect(assignment).not_to be_accepts_submission_type("basic_lti_launch")
+      end
+    end
+
+    context "when the submission_type is a non-LTI type" do
+      it "returns true if the specified type is contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).to be_accepts_submission_type("online_upload")
+      end
+
+      it "returns false if the specified type is not contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).not_to be_accepts_submission_type("online_text_entry")
+      end
     end
   end
 

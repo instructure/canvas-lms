@@ -2,57 +2,60 @@
 
 require 'set'
 
+#DumpHelper.find_dump_error(viewer)
 module DumpHelper
   class << self
-    def find_dump_error(val, key = "<toplevel>", prefix = "", __visited_dump_vars = Set.new)
-      return if __visited_dump_vars.include?(val)
-      __visited_dump_vars << val
+    def find_dump_error(val, key = "val", __visited_dump_vars = Set.new)
+      return if __visited_dump_vars.include?(val.object_id)
+
+      __visited_dump_vars << val.object_id
 
       Marshal.dump(val)
     rescue TypeError
-
+      if val.is_a?(Proc)
+        raise TypeError, "#{key}: #{$!}"
+      end
       if $!.message == "singleton can't be dumped" && !val.singleton_methods.empty?
-        raise TypeError, "Unable to dump #{prefix}#{key} (#<#{val.class}>): #{$!}"
+        raise TypeError, "#{key}: singleton can't be dumped (#<#{val.class}>): #{val.singleton_methods.inspect}"
+      end
+      if val.is_a?(Hash) && val.default_proc
+        raise TypeError, "#{key}: can't dump hash with default proc: #{val.default_proc.inspect}"
       end
 
       # see if anything inside val can't be dumped...
-      sub_prefix = "  #{prefix}#{key} (#<#{val.class}>) => "
-
       if val.respond_to?(:marshal_dump, true)
-        return find_dump_error(val.marshal_dump, "marshal_dump", sub_prefix, __visited_dump_vars)
+        find_dump_error(val.marshal_dump, "#{key}.marshal_dump", __visited_dump_vars)
       elsif val.respond_to?(:_dump, true)
         stringval = val._dump(-1)
-        unless stringvals.instance_variables.empty?
-          dump_ivars(stringval, "#{sub_prefix}_dump => ", __visited_dump_vars)
+        if stringval.instance_variables.empty?
+          dump_ivars(val, "#{key}._dump", __visited_dump_vars)
         else
-          dump_ivars(val, sub_prefix, __visited_dump_vars)
+          dump_ivars(stringval, "#{key}._dump", __visited_dump_vars)
         end
-        return
       else
-        dump_ivars(val, sub_prefix, __visited_dump_vars)
+        dump_ivars(val, key, __visited_dump_vars)
 
-        if val.is_a?(Hash) || val.is_a?(Struct)
+        if val.is_a?(Hash)
+          find_dump_error(val.keys, "#{key}.keys", __visited_dump_vars)
+        end
+        if val.is_a?(Hash)|| val.is_a?(Struct)
           val.each_pair do |k, v|
-            find_dump_error(k, "hash key #{k}", sub_prefix, __visited_dump_vars)
-            find_dump_error(v, "[#{k.inspect}]", sub_prefix, __visited_dump_vars)
+            find_dump_error(v, "#{key}[#{k.inspect}]", __visited_dump_vars)
           end
         elsif val.is_a?(Array)
           val.each_with_index do |v, i|
-            find_dump_error(v, "[#{i}]", sub_prefix, __visited_dump_vars)
-          end if val.is_a?(Array)
-        else
-          # guess it's val proper
-          raise TypeError.new("Unable to dump #{prefix}#{key} (#<#{val.class}>): #{$!}")
+            find_dump_error(v, "#{key}[#{i}]", __visited_dump_vars)
+          end
         end
       end
     end
 
     private
 
-    def dump_ivars(val, sub_prefix, __visited_dump_vars)
-      val.instance_variables.map do |k|
+    def dump_ivars(val, key, __visited_dump_vars)
+      val.instance_variables.each do |k|
         v = val.instance_variable_get(k)
-        find_dump_error(v, k, sub_prefix, __visited_dump_vars)
+        find_dump_error(v, "#{key}.instance_variable_get(#{k.inspect})", __visited_dump_vars)
       end
     end
   end

@@ -53,7 +53,6 @@ class ApplicationController < ActionController::Base
   around_action :set_locale
   around_action :enable_request_cache
   around_action :batch_statsd
-  around_action :report_to_datadog
   around_action :compute_http_cost
 
   before_action :clear_idle_connections
@@ -160,7 +159,7 @@ class ApplicationController < ActionController::Base
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
           current_user_roles: @current_user&.roles(@domain_root_account),
-          current_user_types: @current_user.try{|u| u.account_users.active.map(&:readable_type)},
+          current_user_types: @current_user.try{|u| u.account_users.active.map { |au| au.role.name }},
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
@@ -168,6 +167,7 @@ class ApplicationController < ActionController::Base
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.blank? || @context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
+          use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user&.prefers_high_contrast?,
@@ -184,6 +184,11 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
         }
+
+        dynamic_settings_tree = Canvas::DynamicSettings.find(tree: :private)
+        if dynamic_settings_tree['api_gateway_enabled'] == 'true'
+          @js_env[:API_GATEWAY_URI] = dynamic_settings_tree['api_gateway_uri']
+        end
 
         @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user&.prefers_no_toast_timeout?
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
@@ -232,11 +237,12 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing,
-    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates
+    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
+    :k5_homeroom_many_announcements
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
-    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users
+    :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
+    :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -263,7 +269,7 @@ class ApplicationController < ActionController::Base
 
   def add_to_js_env(hash, jsenv, overwrite)
     hash.each do |k,v|
-      if jsenv[k] && !overwrite
+      if jsenv[k] && jsenv[k] != v && !overwrite
         raise "js_env key #{k} is already taken"
       else
         jsenv[k] = v
@@ -279,7 +285,7 @@ class ApplicationController < ActionController::Base
   helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
-  def rce_js_env(domain: request.env['HTTP_HOST'])
+  def rce_js_env(domain: request.host_with_port)
     rce_env_hash = Services::RichContent.env_for(
         user: @current_user,
         domain: domain,
@@ -404,6 +410,7 @@ class ApplicationController < ActionController::Base
   helper_method :set_master_course_js_env_data
 
   def load_blueprint_courses_ui
+    return if js_env[:BLUEPRINT_COURSES_DATA]
     return unless @context && @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
 
     is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
@@ -610,19 +617,6 @@ class ApplicationController < ActionController::Base
     if CanvasHttp.cost > 0
       cost_weight = Setting.get('canvas_http_cost_weight', '1.0').to_f
       increment_request_cost(CanvasHttp.cost * cost_weight)
-    end
-  end
-
-  def report_to_datadog(&block)
-    if (metric = params[:datadog_metric]) && metric.present?
-      tags = {
-        domain: request.host_with_port.sub(':', '_'),
-        action: "#{controller_name}.#{action_name}",
-      }
-      InstStatsd::Statsd.increment("graphql.rest_comparison.#{metric}.count", tags: tags)
-      InstStatsd::Statsd.time("graphql.rest_comparison.#{metric}.time", tags: tags, &block)
-    else
-      yield
     end
   end
 
@@ -1024,23 +1018,23 @@ class ApplicationController < ActionController::Base
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
-        course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        unless course_ids.empty?
-          courses = Course.
-            shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-            joins(enrollments: :enrollment_state).
-            merge(enrollment_scope.except(:joins)).
-            where(id: course_ids)
+        course_ids = only_contexts['Course']
+        if course_ids.present?
+          courses = Course
+            .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+            .joins(enrollments: :enrollment_state)
+            .merge(enrollment_scope.except(:joins))
+            .where(id: course_ids)
         end
         if include_groups
-          group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          include_groups = !group_ids.empty?
+          group_ids = only_contexts['Group']
+          include_groups = group_ids.present?
         end
       else
-        courses = Course.
-          shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-          joins(enrollments: :enrollment_state).
-          merge(enrollment_scope.except(:joins))
+        courses = Course
+          .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+          .joins(enrollments: :enrollment_state)
+          .merge(enrollment_scope.except(:joins))
       end
 
       groups = []
@@ -1381,11 +1375,7 @@ class ApplicationController < ActionController::Base
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true, context: nil)
-    # ideally this could just be `user = file_access_user` now, but that causes
-    # problems with some integration specs where getting @files_domain set
-    # reliably is... difficult
-    user = @current_user
-    user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
+    user = file_access_user
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
 
@@ -1523,6 +1513,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
+  rescue_from ActiveRecord::StaleObjectError, with: :rescue_expected_error_type
   # Canvas exceptions
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
@@ -1759,7 +1750,10 @@ class ApplicationController < ActionController::Base
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = tag.tag_type == 'context_module' ? { :module_item_id => tag.id } : {}
     if tag.content_type == 'Assignment'
-      use_edit_url = Account.site_admin.feature_enabled?(:new_quizzes_modules_support) && @context.grants_right?(@current_user, :manage) && tag.quiz_lti
+      use_edit_url = params[:build].nil? &&
+        Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
+        @context.grants_right?(@current_user, :manage) &&
+        tag.quiz_lti
       redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
       redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
@@ -1849,7 +1843,6 @@ class ApplicationController < ActionController::Base
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
             domain: HostUrl.context_host(@domain_root_account, request.host),
-            include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1957,7 +1950,7 @@ class ApplicationController < ActionController::Base
   def external_tool_redirect_display_type
     if params['display'].present?
       params['display']
-    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
+    elsif @assignment&.quiz_lti? && @module_tag
       'in_nav_context'
     else
       @tool&.extension_setting(:assignment_selection)&.dig('display_type')
@@ -2453,7 +2446,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:'community_link.basics_browser_requirements')))
   end
 
   def browser_supported?
@@ -2580,12 +2573,19 @@ class ApplicationController < ActionController::Base
 
   ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
-    rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
+    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
+    unless @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
+      permissions[:manage_assignments_add] = permissions[:manage_assignments]
+      permissions[:manage_assignments_delete] = permissions[:manage_assignments]
+    end
     permissions[:manage] = permissions[:manage_assignments]
     permissions[:by_assignment_id] = @context.assignments.map do |assignment|
-      [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+      [assignment.id, {
+        update: assignment.user_can_update?(@current_user, session),
+        delete: assignment.grants_right?(@current_user, :delete)
+      }]
     end.to_h
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
@@ -2783,7 +2783,7 @@ class ApplicationController < ActionController::Base
       false
     else
       return value_to_boolean(params[:force_stream]) if params.key?(:force_stream)
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming"] &&
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming", failsafe: false] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end
@@ -2822,6 +2822,21 @@ class ApplicationController < ActionController::Base
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
   end
   helper_method :show_student_view_button?
+
+
+  def show_immersive_reader?
+    controller_action = "#{params[:controller]}##{params[:action]}"
+    immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
+      ["assignments#show", "assignments#syllabus", "wiki_pages#show"].freeze
+    else
+      ["wiki_pages#show"].freeze
+    end
+
+    return false unless immersive_reader_pages.include?(controller_action)
+
+    @context&.account&.feature_enabled?(:immersive_reader_wiki_pages)
+  end
+  helper_method :show_immersive_reader?
 
   def uncached_k5_user?
     if @current_user && @domain_root_account

@@ -144,6 +144,28 @@ describe Lti::LtiAdvantageAdapter do
       expect(login_message['canvas_region']).to eq 'not_configured'
     end
 
+    context 'when no i18n locale is set in the request' do
+      before do
+        allow(I18n).to receive(:locale).and_return nil
+        allow(I18n).to receive(:default_locale).and_return :en
+      end
+
+      it 'sets the canvas_locale in the message hint to the default i18n locale' do
+        expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_locale']).to eq 'en'
+      end
+    end
+
+    context 'when the i18n locale is set in the request' do
+      before do
+        allow(I18n).to receive(:locale).and_return :de
+        allow(I18n).to receive(:default_locale).and_return :en
+      end
+
+      it 'sets the canvas_locale in the message hint to the locale from the request' do
+        expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_locale']).to eq 'de'
+      end
+    end
+
     it 'sets the domain in the message hint' do
       expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
     end

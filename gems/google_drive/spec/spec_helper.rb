@@ -28,13 +28,19 @@ def load_fixture(filename)
   File.read(DRIVE_FIXTURES_PATH + filename)
 end
 
-WebMock.disable_net_connect!(allow_localhost: true)
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.color = true
 
   config.order = 'random'
+
+  config.before do
+    WebMock.disable_net_connect!(allow_localhost: true)
+  end
+  config.after do
+    WebMock.allow_net_connect!
+  end
 end
 
 

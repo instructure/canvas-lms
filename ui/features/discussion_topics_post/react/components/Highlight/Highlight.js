@@ -18,21 +18,26 @@
 
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef} from 'react'
+import React, {useLayoutEffect, useRef} from 'react'
 import theme from '@instructure/canvas-theme'
 
 export function Highlight({...props}) {
   const highlightRef = useRef()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.isHighlighted && highlightRef.current) {
-      highlightRef.current.scrollIntoView({behavior: 'smooth'})
+      setTimeout(() => {
+        highlightRef.current?.scrollIntoView({behavior: 'smooth', block: 'center'})
+        highlightRef.current?.querySelector('button').focus({preventScroll: true})
+      }, 0)
     }
   }, [props.isHighlighted, highlightRef])
 
   return (
     <div
-      style={{paddingBottom: theme.variables.spacing.xxxSmall}}
+      style={{
+        borderRadius: theme.variables.borders.radiusLarge
+      }}
       className={classNames({'highlight-fadeout': props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
       ref={highlightRef}

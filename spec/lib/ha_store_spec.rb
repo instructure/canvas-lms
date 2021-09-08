@@ -26,67 +26,6 @@ describe ActiveSupport::Cache::HaStore do
 
   let(:store) { ActiveSupport::Cache::HaStore.new(url: Canvas.redis.id, expires_in: 5.minutes.to_i, race_condition_ttl: 7.days.to_i, consul_event: 'invalidate') }
 
-  describe "#fetch" do
-    it "locks for a new key" do
-      expect(store).to receive(:read_entry).and_return(nil)
-      expect(store).to receive(:lock).and_return("nonce")
-      expect(store).to receive(:write_entry)
-      expect(store).to receive(:unlock)
-      expect(store.fetch('bob') { 42 }).to eq 42
-    end
-
-    it "doesn't lock for an existing key" do
-      store.write("bob", 42)
-      expect(store).to receive(:lock).never
-      expect(store).to receive(:unlock).never
-      expect(store.fetch('bob') { raise "not reached" }).to eq 42
-    end
-
-    it "doesn't populate for a stale key that someone else is populating" do
-      store.write("bob", 42, expires_in: -1)
-      expect(store).to receive(:lock).and_return(false)
-      expect(store).to receive(:unlock).never
-
-      expect(store.fetch('bob') { raise "not reached" }).to eq 42
-    end
-
-    it "waits to get a lock for a non-existent key" do
-      expect(store).to receive(:read_entry).and_return(nil).ordered
-      expect(store).to receive(:lock).and_return(false).ordered
-      expect(store).to receive(:read_entry).and_return(nil).ordered
-      expect(store).to receive(:lock).and_return('nonce').ordered
-      expect(store).to receive(:write_entry)
-      expect(store).to receive(:unlock)
-      expect(store.fetch('bob') { 42 }).to eq 42
-    end
-
-    it "waits and then reads fresh data for a non-existent key" do
-      store.write("bob", 42)
-      expect(store).to receive(:read_entry).and_return(nil).ordered
-      expect(store).to receive(:lock).and_return(false).ordered
-      expect(store).to receive(:read_entry).and_call_original.ordered
-      expect(store).to receive(:unlock).never
-      expect(store.fetch('bob') { raise "not reached" }).to eq 42
-    end
-
-    it "returns stale data if there is an exception calculating new data" do
-      store.write("bob", 42, expires_in: 1)
-      Timecop.travel(5) do
-        exception = RuntimeError.new("die")
-        expect(Canvas::Errors).to receive(:capture).with(exception)
-        expect(store.fetch('bob') { raise exception }).to eq 42
-      end
-    end
-
-    it "calculates anyway if we couldn't contact the cache" do
-      expect(store).to receive(:read_entry).and_return(nil)
-      expect(store).to receive(:lock).and_return(true)
-      expect(store).to receive(:write_entry)
-      expect(store).to receive(:unlock).never
-      expect(store.fetch('bob') { 42 }).to eq 42
-    end
-  end
-
   describe "#delete" do
     it "triggers a consul event when configured" do
       # will get called twice; once with rails52: prefix, once without

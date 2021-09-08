@@ -172,6 +172,7 @@ class UsersController < ApplicationController
   include CustomColorHelper
   include DashboardHelper
   include Api::V1::Submission
+  include ObserverEnrollmentsHelper
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
@@ -390,6 +391,7 @@ class UsersController < ApplicationController
   def api_index
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
+
     search_term = params[:search_term].presence
     page_opts = {}
     if search_term
@@ -405,6 +407,7 @@ class UsersController < ApplicationController
           enrollment_type: params[:enrollment_type]})
       users = users.with_last_login if params[:sort] == 'last_login'
     end
+    page_opts[:total_entries] = nil unless @context.root_account.allow_last_page_on_users?
 
     includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
     includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
@@ -488,31 +491,51 @@ class UsersController < ApplicationController
     k5_user = k5_user?(false)
     js_env({K5_USER: k5_user && !k5_disabled}, true)
 
+    # things needed on both k5 and classic dashboards
+    js_env({
+      PREFERENCES: {
+        dashboard_view: @current_user.dashboard_view(@domain_root_account),
+        hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+        custom_colors: @current_user.custom_colors
+      },
+      STUDENT_PLANNER_ENABLED: planner_enabled?,
+      STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
+      STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
+      CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user
+    })
+
     if k5_user?
+      # things needed only for k5 dashboard
       # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
       active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
-      js_env({HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) }})
-    end
 
-    js_env({
-      :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :PREFERENCES => {
-        :dashboard_view => @current_user.dashboard_view(@domain_root_account),
-        :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
-        :custom_colors => @current_user.custom_colors
-      },
-      :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
-      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups),
-      :INITIAL_NUM_K5_CARDS => Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
-      :PERMISSIONS => {
-        :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
-        :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
-      },
-      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user,
-      :SELECTED_CONTEXT_CODES => @current_user.get_preference(:selected_calendar_contexts),
-      :SELECTED_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10
-    })
+      js_env({
+        HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) },
+        OBSERVER_LIST: observed_users(@current_user, session),
+        SELECTED_CONTEXT_CODES: @current_user.get_preference(:selected_calendar_contexts),
+        SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
+        INITIAL_NUM_K5_CARDS: Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
+        PERMISSIONS: {
+          create_courses_as_admin: @current_user.roles(@domain_root_account).include?('admin'),
+          create_courses_as_teacher: @domain_root_account.grants_right?(@current_user, session, :create_courses)
+        },
+        CAN_ADD_OBSERVEE: @current_user
+                          .profile
+                          .tabs_available(@current_user, :root_account => @domain_root_account)
+                          .any?{|t| t[:id] == UserProfile::TAB_OBSERVEES }
+      })
+
+      css_bundle :k5_common, :k5_dashboard, :dashboard_card
+      js_bundle :k5_dashboard
+    else
+      # things needed only for classic dashboard
+      js_env({
+        DASHBOARD_SIDEBAR_URL: dashboard_sidebar_url
+      })
+
+      css_bundle :dashboard
+      js_bundle :dashboard
+    end
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
@@ -521,13 +544,6 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
-    if k5_user?
-      css_bundle :k5_common, :k5_dashboard, :dashboard_card
-      js_bundle :k5_dashboard
-    else
-      css_bundle :dashboard
-      js_bundle :dashboard
-    end
     add_body_class "dashboard-is-planner" if show_planner?
   end
 
@@ -546,14 +562,12 @@ class UsersController < ApplicationController
   ].freeze
 
   def dashboard_cards
-    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
-    if @domain_root_account.feature_enabled?(:unpublished_courses)
-      published, unpublished = dashboard_courses.partition { |course| course[:published]}
-      Rails.cache.write(['last_known_dashboard_cards_published_count', @current_user.global_id].cache_key, published.count)
-      Rails.cache.write(['last_known_dashboard_cards_unpublished_count', @current_user.global_id].cache_key, unpublished.count)
-    else
-      Rails.cache.write(['last_known_dashboard_cards_count', @current_user.global_id].cache_key, dashboard_courses.count)
-    end
+    opts = {}
+    opts[:observee_user] = params[:observed_user].to_i if params.key?(:observed_user)
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses(nil, opts), tabs: DASHBOARD_CARD_TABS)
+    published, unpublished = dashboard_courses.partition { |course| course[:published]}
+    Rails.cache.write(['last_known_dashboard_cards_published_count', @current_user.global_id].cache_key, published.count)
+    Rails.cache.write(['last_known_dashboard_cards_unpublished_count', @current_user.global_id].cache_key, unpublished.count)
     Rails.cache.write(['last_known_k5_cards_count', @current_user.global_id].cache_key, dashboard_courses.reject{|c| c[:isHomeroom]}.count)
     render json: dashboard_courses
   end
@@ -797,7 +811,13 @@ class UsersController < ApplicationController
       ]
     end[0, limit]
 
-    @courses = @courses.select { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
+    # Since concluded courses aren't manageable, we check the read_as_admin grant in those cases
+    # Otherwise we check manageability along with the read grant (so admins won't get cluttered w/ courses)
+    if include_concluded
+      @courses.select! {|c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read)}
+    else
+      @courses.select! {|c| c.grants_right?(@current_user, :manage_content) && c.grants_right?(@current_user, :read) }
+    end
 
     render :json => @courses.map { |c|
       { :label => c.nickname_for(@current_user),
@@ -1290,12 +1310,19 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
       includes = api_show_includes
-
       # would've preferred to pass User.with_last_login as the collection to
       # api_find but the implementation of that scope appears to be incompatible
       # with what api_find does
       if includes.include?('last_login')
-        @user.last_login = User.with_last_login.find(@user.id).read_attribute(:last_login)
+        pseudonyms =
+          SisPseudonym.for(
+            @user,
+            @domain_root_account,
+            type: :implicit,
+            require_sis: false,
+            include_all_pseudonyms: true
+          )
+        @user.last_login = pseudonyms.max_by(&:current_login_at).current_login_at
       end
 
       render json: user_json(@user, @current_user, session, includes, @domain_root_account),
@@ -1888,6 +1915,10 @@ class UsersController < ApplicationController
   #   Only Available Pronouns set on the root account are allowed
   #   Adding and changing pronouns must be enabled on the root account.
   #
+  # @argument user[event] [String, "suspend"|"unsuspend"]
+  #   suspends or unsuspends all logins for this user that the calling user
+  #   has permission to
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
@@ -1925,7 +1956,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.concat([:time_zone, :locale])
+      managed_attributes.concat([:time_zone, :locale, :event])
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
@@ -1986,6 +2017,17 @@ class UsersController < ApplicationController
     end
 
     @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
+
+    if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
+      @user != @current_user
+      @user.pseudonyms.active.shard(@user).each do |p|
+        next unless p.grants_right?(@current_user, :delete)
+        next if p.active? && event == 'unsuspend'
+        next if p.suspended? && event == 'suspend'
+
+        p.update!(workflow_state: event == 'suspend' ? 'suspended' : 'active')
+      end
+    end
 
     respond_to do |format|
       if @user.update(user_params)
@@ -2423,7 +2465,7 @@ class UsersController < ApplicationController
     invited_users = []
     errored_users = []
     Array(params[:users]).each do |user_hash|
-      unless user_hash[:email].present?
+      if user_hash[:email].blank?
         errored_users << user_hash.merge(:error => "email required")
         next
       end
@@ -2436,15 +2478,35 @@ class UsersController < ApplicationController
       user.workflow_state = 'creation_pending'
 
       # check just in case
-      existing_rows = Pseudonym.active.where(:account_id => @context.root_account).joins(:user => :communication_channels).joins(:account).
-        where("communication_channels.workflow_state<>'retired' AND path_type='email' AND LOWER(path) = ?", email.downcase).
-        pluck('communication_channels.path', :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
+      user_scope =
+        Pseudonym
+          .active
+          .where(account_id: @context.root_account)
+          .joins(user: :communication_channels)
+          .joins(:account)
+          .where("communication_channels.path_type='email' AND LOWER(path) = ?", email.downcase)
+      existing_rows =
+        user_scope
+          .where("communication_channels.workflow_state<>'retired'")
+          .pluck('communication_channels.path', :user_id, 'users.uuid', :account_id, 'users.name', 'accounts.name')
 
       if existing_rows.any?
         existing_users = existing_rows.map do |address, user_id, user_uuid, account_id, user_name, account_name|
          {:address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid), :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
-        errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
+        unconfirmed_email = user_scope.where(communication_channels: { workflow_state: 'unconfirmed' })
+        errored_users <<
+          if unconfirmed_email.exists?
+            user_hash.merge(
+              errors: [{message: "The email address provided conflicts with an existing user's email that is awaiting verification. Please add the user by either SIS ID or Login ID."}],
+              existing_users: existing_users
+            )
+          else
+            user_hash.merge(
+              errors: [{message: "Matching user(s) already exist"}],
+              existing_users: existing_users
+            )
+          end
       elsif user.save
         invited_users << user_hash.merge(:id => user.id, :user_token => user.token)
       else
@@ -2790,7 +2852,7 @@ class UsersController < ApplicationController
     end
 
     if @pseudonym.nil?
-      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      @pseudonym = @context.pseudonyms.active_only.by_unique_id(params[:pseudonym][:unique_id]).first
       # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
       @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
     end

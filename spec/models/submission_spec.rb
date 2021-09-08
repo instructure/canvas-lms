@@ -4557,6 +4557,72 @@ describe Submission do
       expect(@a1.submission_for_student(@u1).grade).to be_nil
       expect(@a1.submission_for_student(@u2).grade).to be_nil
     end
+
+    describe "submitting comments via bulk update" do
+      let(:auto_assignment) { @a1 }
+      let(:manual_assignment) do
+        @a2.post_policy.update!(post_manually: true)
+        @a2
+      end
+
+      it "sets the comment to visible if the assignment is automatically posted" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if the relevant submission has already been posted" do
+        auto_assignment.grade_student(@u1, grade: 0, grader: @teacher)
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      it "sets the comment to visible if a grade is also included in the update" do
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          auto_assignment.id.to_s => {
+            @u1.id => {posted_grade: 0, text_comment: "hello there"}
+          }
+        })
+
+        comment = auto_assignment.submission_for_student(@u1).submission_comments.last
+        expect(comment).not_to be_hidden
+      end
+
+      context "for a manually-posted assignment" do
+        let(:submission) { manual_assignment.submission_for_student(@u1) }
+
+        it "shows the comment if the associated submission is already posted" do
+          manual_assignment.post_submissions(submission_ids: [submission.id])
+
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "hello there"}
+            }
+          })
+          expect(submission.submission_comments.last).not_to be_hidden
+        end
+
+        it "leaves the comment hidden if the associated submission is not posted" do
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+            manual_assignment.id.to_s => {
+              @u1.id => {text_comment: "clandestine comment"}
+            }
+          })
+          expect(submission.submission_comments.last).to be_hidden
+        end
+      end
+    end
   end
 
   describe 'find_or_create_provisional_grade!' do
@@ -5868,6 +5934,78 @@ describe Submission do
         expect(comments).to include @student_comment, @ta_comment
         expect(comments).not_to include @teacher_comment
       end
+    end
+  end
+
+  describe "#feedback_for_current_attempt?" do
+    before(:once) do
+      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+      @student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+      @peer = course_with_user("StudentEnrollment", course: @course, name: "Peer", active_all: true).user
+      @assignment = @course.assignments.create!(name: "HasFeedback Assignment")
+      @submission = @assignment.submissions.find_by(user: @student)
+    end
+
+    it "is true when a teacher leaves a comment" do
+      @submission.attempt = 1
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: 1)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is true when a peer leaves a comment" do
+      @submission.attempt = 1
+      @submission.add_comment(author: @peer, comment: "Peer comment", attempt: 1)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is true when a teacher leaves a comment on the latest attempt" do
+      @submission.attempt = 3
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: 3)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is true when a teacher has left a comment prior to the first attempt (nil)" do
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: nil)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is true when a teacher has left a comment prior to the first attempt (zero)" do
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: 0)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is true when a teacher leaves a comment prior to the first attempt and it has been submitted" do
+      @submission.attempt = 1
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: nil)
+      expect(@submission).to be_feedback_for_current_attempt
+    end
+
+    it "is false when no comments exist" do
+      expect(@submission).not_to be_feedback_for_current_attempt
+    end
+
+    it "is false when a teacher leaves comment on prior attempt" do
+      @submission.attempt = 2
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: 1)
+      expect(@submission).not_to be_feedback_for_current_attempt
+    end
+
+    it "is false when a teacher leaves a comment prior to first attempt and a second is started" do
+      @submission.attempt = 2
+      @submission.add_comment(author: @teacher, comment: "Teacher comment", attempt: nil)
+      expect(@submission).not_to be_feedback_for_current_attempt
+    end
+
+    it "is false when a peer leaves comment on prior attempt" do
+      @submission.attempt = 2
+      @submission.add_comment(author: @peer, comment: "Peer comment", attempt: 1)
+      expect(@submission).not_to be_feedback_for_current_attempt
+    end
+
+    it "is false when only submitter has commented on the current attempt" do
+      @submission.attempt = 1
+      @submission.add_comment(author: @student, comment: "Student comment", attempt: 1)
+      expect(@submission).not_to be_feedback_for_current_attempt
     end
   end
 

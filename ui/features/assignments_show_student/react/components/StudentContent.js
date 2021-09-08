@@ -36,6 +36,7 @@ import {Text} from '@instructure/ui-text'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
+import VisualOnFocusMessage from './VisualOnFocusMessage'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
@@ -58,12 +59,10 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
   // component will handle rendering the footer.  If not, we still need to show
   // the "Mark as Done" button for assignments that belong to modules.
   const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
-  if (moduleItem == null) {
-    return null
-  }
 
-  const buttons = [
-    {
+  const buttons = []
+  if (moduleItem != null) {
+    buttons.push({
       element: (
         <MarkAsDoneButton
           done={moduleItem.done}
@@ -73,10 +72,12 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
         />
       ),
       key: 'mark-as-done'
-    }
-  ]
+    })
+  }
 
-  return <StudentFooter buttons={buttons} />
+  return (
+    <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+  )
 }
 
 function renderAttemptsAndAvailability({assignment, submission}) {
@@ -128,6 +129,13 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return (
       <>
         {renderAttemptsAndAvailability({assignment, submission})}
+        {assignment.submissionTypes.includes('student_annotation') && (
+          <VisualOnFocusMessage
+            message={I18n.t(
+              'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+            )}
+          />
+        )}
         <AssignmentToggleDetails description={assignment.description} />
         {assignment.rubric && (
           <Suspense fallback={<LoadingIndicator />}>

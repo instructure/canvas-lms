@@ -207,7 +207,7 @@ class ProfileController < ApplicationController
     @other_channels = @channels.select{|c| c.path_type != "email"}
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
-    @pseudonyms = @user.pseudonyms.active
+    @pseudonyms = @user.pseudonyms.active_only
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = @user.profile
     set_active_tab "profile_settings"
@@ -234,12 +234,12 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
+    @page_title = t('account_notification_settings_title', 'Account Notification Settings')
     set_active_tab 'notifications'
 
     add_crumb(@current_user.short_name, profile_path)
     add_crumb(t("Account Notification Settings"))
     js_env NOTIFICATION_PREFERENCES_OPTIONS: {
-      allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
       allowed_push_categories: Notification.categories_to_send_in_push,
       send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
       read_privacy_info: @user.preferences[:read_notification_privacy_info],

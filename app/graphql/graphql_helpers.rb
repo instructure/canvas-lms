@@ -50,12 +50,16 @@ module GraphQLHelpers
     if relay_or_legacy_id.nil? || relay_or_legacy_id =~ /\A\d+\Z/
       relay_or_legacy_id
     else
-      type, id = GraphQL::Schema::UniqueWithinType.decode(relay_or_legacy_id)
-      if (type != expected_type || id.nil?)
-        raise InvalidIDError.new("expected an id for #{expected_type}")
-      else
-        id
-      end
+      parse_relay_id(relay_or_legacy_id, expected_type)
+    end
+  end
+
+  def self.parse_relay_id(relay_id, expected_type)
+    type, id = GraphQL::Schema::UniqueWithinType.decode(relay_id)
+    if (type != expected_type || id.nil?)
+      raise InvalidIDError.new("expected an id for #{expected_type}")
+    else
+      id
     end
   end
 

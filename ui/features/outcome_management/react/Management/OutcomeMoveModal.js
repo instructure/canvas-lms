@@ -29,8 +29,16 @@ import {MOVE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 import {outcomeShape} from './shapes'
 
-const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) => {
-  const [targetGroup, setTargetGroup] = useState(null)
+const OutcomeMoveModal = ({
+  outcomes,
+  isOpen,
+  onCloseHandler,
+  onCleanupHandler,
+  onSuccess,
+  rootGroup
+}) => {
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
+  const [targetAncestorsIds, setTargetAncestorsIds] = useState([])
   const count = Object.keys(outcomes).length
   const outcomeTitle = Object.values(outcomes)[0]?.title
   const [moveOutcomeLinks] = useMutation(MOVE_OUTCOME_LINKS)
@@ -46,11 +54,16 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) 
             }
           }
         })
-
-        const movedOutcomeLinkIds = result.data?.moveOutcomeLinks?.movedOutcomeLinkIds
+        const movedLinks = result.data?.moveOutcomeLinks?.movedOutcomeLinks
         const errorMessage = result.data?.moveOutcomeLinks?.errors?.[0]?.message
-        if (movedOutcomeLinkIds.length === 0) throw new Error(errorMessage)
-        if (movedOutcomeLinkIds.length !== count) throw new Error()
+        if (movedLinks.length === 0) throw new Error(errorMessage)
+        if (movedLinks.length !== count) throw new Error()
+
+        onSuccess({
+          movedOutcomeLinkIds: movedLinks.map(ct => ct._id),
+          groupId: targetGroup.id,
+          targetAncestorsIds
+        })
 
         showFlashAlert({
           message: I18n.t(
@@ -131,7 +144,14 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) 
               }
             )}
           </Text>
-          <TargetGroupSelector setTargetGroup={setTargetGroup} />
+          <TargetGroupSelector
+            modalName="outcomeMoveModal"
+            // eslint-disable-next-line no-shadow
+            setTargetGroup={({targetGroup, targetAncestorsIds}) => {
+              setTargetGroup(targetGroup)
+              setTargetAncestorsIds(targetAncestorsIds)
+            }}
+          />
         </View>
       </Modal.Body>
       <Modal.Footer>
@@ -156,7 +176,13 @@ OutcomeMoveModal.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onCleanupHandler: PropTypes.func.isRequired
+  onCleanupHandler: PropTypes.func.isRequired,
+  rootGroup: PropTypes.object.isRequired,
+  onSuccess: PropTypes.func
+}
+
+OutcomeMoveModal.defaultProps = {
+  onSuccess: () => {}
 }
 
 export default OutcomeMoveModal

@@ -88,7 +88,6 @@ class AnnouncementsApiController < ApplicationController
   # @returns [DiscussionTopic]
   def index
     courses = api_find_all(Course, @course_ids)
-    return unless courses.all? { |course| authorized_action(course, @current_user, :read_announcements) }
 
     scope = Announcement.where(:context_type => 'Course', :context_id => courses)
 
@@ -111,7 +110,7 @@ class AnnouncementsApiController < ApplicationController
 
     # only filter by section visibility if user has no course manage rights
     skip_section_filtering = courses.all? do |course|
-      course.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+      course.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
     end
     scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
 

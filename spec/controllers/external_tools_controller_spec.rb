@@ -30,7 +30,9 @@ describe ExternalToolsController do
     student_in_course(:active_all => true)
   end
 
-  before { consider_all_requests_local(false) }
+  around do |example|
+    consider_all_requests_local(false, &example)
+  end
 
   describe "GET 'jwt_token'" do
 
@@ -684,6 +686,90 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params['first']).to be_nil
       end
     end
+
+    context 'when tool is hidden from course nav' do
+      let(:context) { @course }
+      let(:tool) do
+        t = new_valid_tool(context)
+        t.course_navigation = { url: 'http://test.host/course_navigation' }
+        t.global_navigation = { url: 'http://test.host/global_navigation' }
+        t.save!
+        t
+      end
+      let(:placement) { raise 'override' }
+
+      before :each do
+        @course.tab_configuration = [{ id: tool.asset_string, hidden: true }]
+        @course.save!
+      end
+
+      def show_request
+        get :show, params: {"#{context.class.base_class.to_s.downcase}_id": context.id, id: tool.id, placement: placement}
+      end
+
+      shared_examples_for 'can launch tool' do
+        let(:user) { raise 'override in examples' }
+
+        it 'returns 200' do
+          user_session(user)
+          show_request
+          expect(response.code.to_i).to be 200
+        end
+      end
+
+      shared_examples_for 'blocked from launching tool' do
+        let(:user) { raise 'override in examples' }
+
+        it 'returns 401' do
+          user_session(user)
+          show_request
+          expect(response.code.to_i).to be 401
+        end
+      end
+
+      context 'for course_navigation placement' do
+        let(:placement) { :course_navigation }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'blocked from launching tool' do
+          let(:user) { @student }
+        end
+      end
+
+      context 'for other placement' do
+        let(:placement) { :global_navigation }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @student }
+        end
+      end
+
+      context 'for tool launched from Account' do
+        let(:placement) { :course_navigation }
+        let(:context) { Account.default }
+
+        it_behaves_like 'can launch tool' do
+          let(:user) { site_admin_user }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @teacher }
+        end
+        it_behaves_like 'can launch tool' do
+          let(:user) { @student }
+        end
+      end
+    end
   end
 
   describe "GET 'retrieve'" do
@@ -866,6 +952,23 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
+    context 'when tool is hidden from course nav' do
+      let(:tool) do
+        @course.context_external_tools.create!(name: "bob", consumer_key: "bob", shared_secret: "bob", url: "http://www.example.com/basic_lti")
+      end
+
+      before :each do
+        user_session(@student)
+        @course.tab_configuration = [{id: tool.asset_string, hidden: true }]
+        @course.save!
+      end
+
+      it 'should restrict students from launching' do
+        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/basic_lti", placement: 'course_navigation'}
+        assert_unauthorized
+      end
+    end
+
     it "should find tools matching by exact url" do
       user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
@@ -952,29 +1055,32 @@ describe ExternalToolsController do
     end
 
     context 'for Quizzes Next launch' do
-      let(:assignment) { assignment_model(course: @course) }
-
-      before do
-        params = {
-          :name => "Quizzes.Next",
-          :url => 'http://example.com/launch',
-          :domain => "example.com",
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :privacy_level => 'public',
-          :tool_id => 'Quizzes 2'
-        }
-        account.context_external_tools.create!(params)
-        assignment.submission_types = 'external_tool'
-        assignment.external_tool_tag_attributes = {url: "http://example.com/launch"}
-        assignment.save!
+      let(:assignment) do
+        a = assignment_model(course: @course)
+        a.submission_types = 'external_tool'
+        a.external_tool_tag_attributes = {url: tool.url}
+        a.save!
+        a
+      end
+      let(:tool) do
+        account.context_external_tools.create!({
+          name: "Quizzes.Next",
+          url: 'http://example.com/launch',
+          domain: "example.com",
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          privacy_level: 'public',
+          tool_id: 'Quizzes 2'
+        })
       end
 
-      it 'sets consistent resource_link_id with that in regular lti launch' do
+      before do
         u = user_factory(active_all: true)
         account.account_users.create!(user: u)
         user_session(@user)
+      end
 
+      it 'sets consistent resource_link_id with that in regular lti launch' do
         get :retrieve, params: {
           course_id: @course.id,
           assignment_id:assignment.id,
@@ -983,6 +1089,21 @@ describe ExternalToolsController do
 
         expect(assigns[:lti_launch].params['resource_link_id']).to eq assignment.lti_resource_link_id
         expect(assigns[:lti_launch].params['context_id']).to eq opaque_id(@course)
+      end
+
+      it 'includes extra assignment info during relaunch' do
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: 'http://example.com/launch',
+          placement: :assignment_selection
+        }
+
+        # this is a sampling of that extra assignment info, which is fully tested in
+        # `lti_integration_spec.rb`. This is just enough to know that it exists.
+        expect(assigns[:lti_launch].params['custom_canvas_assignment_title']).to eq assignment.title
+        expect(assigns[:lti_launch].params['ext_outcome_result_total_score_accepted']).to eq "true"
+        expect(assigns[:lti_launch].params['lis_outcome_service_url']).to eq lti_grade_passback_api_url(tool)
       end
     end
 
@@ -1073,6 +1194,80 @@ describe ExternalToolsController do
         data = assigns[:lti_launch].params['data']
         json_data = Canvas::Security.decode_jwt(data)
         expect(json_data[:default_launch_url]).to eq tool.url
+      end
+    end
+
+    context 'for assignment launches with overrides' do
+      let(:assignment) do
+        a = assignment_model(course: @course, due_at: due_at)
+        a.submission_types = 'external_tool'
+        a.external_tool_tag_attributes = {url: tool.url}
+        a.due_at = due_at
+        a.save!
+        a
+      end
+
+      let(:tool) do
+        account.context_external_tools.create!({
+          name: "Quizzes.Next",
+          url: 'http://example.com/launch',
+          domain: "example.com",
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          privacy_level: 'public',
+          tool_id: 'Quizzes 2',
+          settings: {
+            custom_fields: { 'canvas_assignment_due_at' => '$Canvas.assignment.dueAt.iso8601' } 
+          }
+        })
+      end
+
+      let(:due_at) { '2021-07-29 08:26:56.000000000 +0000'.to_datetime }
+
+      let(:due_at_diff) { '2021-07-30 08:26:56.000000000 +0000'.to_datetime }
+
+      before do
+        student_in_course
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        adhoc_override = assignment_override_model(:assignment => assignment)
+        override_student = adhoc_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+        adhoc_override.override_due_at(due_at_diff)
+        adhoc_override.save!
+      end
+
+      it "generates a student launch with overriden params" do
+        expect(assignment.due_at).to eq due_at
+
+        user_session(@student)
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: 'http://example.com/launch',
+          placement: :assignment_selection
+        }
+
+        expect(
+          assigns[:lti_launch].params['custom_canvas_assignment_due_at'].to_datetime
+        ).to eq due_at_diff
+      end
+
+      it "generates an admin/teacher launch with overriden params" do
+        expect(assignment.due_at).to eq due_at
+
+        user_session(@user)
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: 'http://example.com/launch',
+          placement: :assignment_selection
+        }
+
+        expect(
+          assigns[:lti_launch].params['custom_canvas_assignment_due_at'].to_datetime
+        ).to eq due_at_diff
       end
     end
   end

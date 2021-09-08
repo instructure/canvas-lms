@@ -19,6 +19,8 @@
 import React from 'react'
 
 import {DeletedPostMessage} from './DeletedPostMessage'
+import {ThreadingToolbar} from '../ThreadingToolbar/ThreadingToolbar'
+import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
 
 export default {
   title: 'Examples/Discussion Posts/Components/DeletedPostMessage',
@@ -26,9 +28,20 @@ export default {
   argTypes: {}
 }
 
-const Template = args => (
-  <DeletedPostMessage deleterName="Matt Hardy" timingDisplay="Jan 25 1:00pm" {...args} />
-)
+const Template = args => <DeletedPostMessage {...args} />
 
 export const Default = Template.bind({})
-Default.args = {}
+Default.args = {
+  children: (
+    <ThreadingToolbar>
+      <ThreadingToolbar.Expansion
+        onExpand={() => {}}
+        expandText={<ReplyInfo replyCount={23} unreadCount={5} />}
+        delimiterKey="expansion"
+      />
+    </ThreadingToolbar>
+  ),
+  deleterName: 'Rick Sanchez',
+  timingDisplay: 'Jan 1 1:00pm',
+  deletedTimingDisplay: 'Feb 2 2:00pm'
+}

@@ -149,6 +149,11 @@ module Lti
     end
 
     def generate_lti_params
+      if resource_type&.to_sym == :course_assignments_menu &&
+        !Account.site_admin.feature_enabled?(:lti_multiple_assignment_deep_linking)
+        return resource_link_request.generate_post_payload
+      end
+
       message_type = @tool.extension_setting(resource_type, :message_type)
       if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
         deep_linking_request.generate_post_payload
@@ -178,7 +183,8 @@ module Lti
           verifier: verifier,
           canvas_domain: @opts[:domain],
           context_type: @context.class,
-          context_id: @context.global_id
+          context_id: @context.global_id,
+          canvas_locale: I18n.locale || I18n.default_locale.to_s
         },
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
       )

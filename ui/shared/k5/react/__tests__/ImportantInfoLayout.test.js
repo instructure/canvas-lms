@@ -40,6 +40,10 @@ describe('ImportantInfoLayout', () => {
     ...overrides
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders each passed important info', () => {
     const {getByText} = render(<ImportantInfoLayout {...getProps()} />)
     expect(getByText('Homeroom 1')).toBeInTheDocument()

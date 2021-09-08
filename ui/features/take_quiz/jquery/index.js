@@ -192,9 +192,9 @@ const quizSubmission = (function() {
               }
             }
             // if timer autosubmission is disabled, we need to know when the fallback autosubmission time is
-            if (data && data.end_at_without_time_limit) {
+            if (data && data.hard_end_at) {
               quizSubmission.endAtWithoutTimeLimitParsed = Date.parse(
-                data.end_at_without_time_limit
+                data.hard_end_at
               )
             }
           },
@@ -937,7 +937,11 @@ $(function() {
   setTimeout(function() {
     $('.question_holder textarea.question_input').each(function() {
       $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++)
-      RichContentEditor.loadNewEditor($(this), {manageParent: true})
+      RichContentEditor.loadNewEditor($(this), {
+        manageParent: true,
+        autosave: {enabled: false},
+        maxInitRenderedRCEs: 5
+      })
     })
   }, 2000)
 

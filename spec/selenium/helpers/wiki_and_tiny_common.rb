@@ -283,13 +283,15 @@ module WikiAndTinyCommon
     visit_front_page_edit(course)
     wait_for_tiny(edit_wiki_css)
     if html
-      button_title = new_rce ? 'Click or shift-click for the html editor.' : 'Switch to the html editor'
-      f("button[title='#{button_title}']").click
+      # Switch to HTML
+      f("button[data-btn-id='rce-edit-btn']").click
       in_frame tiny_rce_ifr_id do
         tinyrce_element = f('body')
         tinyrce_element.send_keys(text)
       end
-      f('button[title="Switch to the rich text editor"]').click
+
+      # Switch back to WYSIWYG
+      f("button[data-btn-id='rce-edit-btn']").click
     else
       in_frame tiny_rce_ifr_id do
         tinyrce_element = f('body')

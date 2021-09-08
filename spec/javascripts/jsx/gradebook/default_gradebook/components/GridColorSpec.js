@@ -18,8 +18,12 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import GridColor from 'ui/features/gradebook/react/default_gradebook/components/GridColor.js'
-import {darken, defaultColors, statusColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
+import GridColor from 'ui/features/gradebook/react/default_gradebook/components/GridColor'
+import {
+  darken,
+  defaultColors,
+  statusColors
+} from 'ui/features/gradebook/react/default_gradebook/constants/colors'
 
 function defaultProps(props = {}) {
   return {
@@ -37,7 +41,7 @@ QUnit.module('GridColor', {
   }
 })
 
-test('it renders style', function() {
+test('it renders style', function () {
   strictEqual(this.wrapper.find('style[type="text/css"]').length, 1)
 })
 
@@ -50,47 +54,47 @@ QUnit.module('GridColor rendered html', {
   }
 })
 
-test('it has blue as a default color', function() {
+test('it has blue as a default color', function () {
   ok(this.wrapper.html().includes(defaultColors.blue))
 })
 
-test('it has salmon as a default color', function() {
+test('it has salmon as a default color', function () {
   ok(this.wrapper.html().includes(defaultColors.salmon))
 })
 
-test('it has green as a default color', function() {
+test('it has green as a default color', function () {
   ok(this.wrapper.html().includes(defaultColors.green))
 })
 
-test('it has orange as a default color', function() {
+test('it has orange as a default color', function () {
   ok(this.wrapper.html().includes(defaultColors.orange))
 })
 
-test('it has yellow as a default color', function() {
+test('it has yellow as a default color', function () {
   ok(this.wrapper.html().includes(defaultColors.yellow))
 })
 
-test('it has darker blue as a default color', function() {
+test('it has darker blue as a default color', function () {
   const color = darken(defaultColors.blue, 5)
   ok(this.wrapper.html().includes(color))
 })
 
-test('it has dark salmon as a default color', function() {
+test('it has dark salmon as a default color', function () {
   const color = darken(defaultColors.salmon, 5)
   ok(this.wrapper.html().includes(color))
 })
 
-test('it has dark green as a default color', function() {
+test('it has dark green as a default color', function () {
   const color = darken(defaultColors.green, 5)
   ok(this.wrapper.html().includes(color))
 })
 
-test('it has dark orange as a default color', function() {
+test('it has dark orange as a default color', function () {
   const color = darken(defaultColors.orange, 5)
   ok(this.wrapper.html().includes(color))
 })
 
-test('it has dark yellow as a default color', function() {
+test('it has dark yellow as a default color', function () {
   const color = darken(defaultColors.yellow, 5)
   ok(this.wrapper.html().includes(color))
 })
@@ -102,7 +106,7 @@ test('rules are for .gradebook-cell and .`statuses`', () => {
   const wrapper = mount(<GridColor {...props} />)
   equal(
     wrapper.html(),
-    '<style type="text/css">' +
+    '<style type="text/css" data-testid="grid-color">' +
       `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
       `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
       '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
@@ -115,7 +119,7 @@ test('multiple state rules are concatenated', () => {
   const props = defaultProps({statuses: ['late', 'missing']})
   const wrapper = shallow(<GridColor {...props} />)
   const expected = (
-    <style type="text/css">
+    <style type="text/css" data-testid="grid-color">
       {`.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
         `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
         '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +

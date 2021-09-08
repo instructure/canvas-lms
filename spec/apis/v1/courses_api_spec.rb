@@ -150,6 +150,22 @@ describe Api::V1::Course do
       expect(json['original_name']).to eq @course1.name
     end
 
+    it "prefers the course's friendly_name to the user's nickname" do
+      @me.set_preference(:course_nicknames, @course1.id, 'nickname')
+
+      @course1.account.enable_as_k5_account!
+      @course1.friendly_name = 'friendly name'
+      @course1.save!
+
+      json = @test_api.course_json(@course1, @me, {}, [], [])
+      expect(json['name']).to eq 'friendly name'
+      expect(json['original_name']).to eq @course1.name
+
+      json = @test_api.course_json(@course1, @me, {}, [], [], prefer_friendly_name: false)
+      expect(json['name']).to eq 'nickname'
+      expect(json['original_name']).to eq @course1.name
+    end
+
     describe "total_scores" do
       before(:each) do
         @enrollment.scores.create!(
@@ -631,9 +647,8 @@ describe CoursesController, type: :request do
     ])
   end
 
-  it "should include files tab if requested (granular)" do
+  it "should include files tab if requested" do
     course_with_teacher(active_all: true)
-    @course.root_account.enable_feature!(:granular_permissions_course_files)
 
     json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
     expect(json.first['tabs']).to include(a_hash_including({"id" => "files"}))
@@ -795,6 +810,107 @@ describe CoursesController, type: :request do
 
   end
 
+  describe "bulk_user_progress" do
+    let(:course) { Course.create!(:workflow_state => 'available') }
+
+    let(:item1) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: 'published') }
+
+    let(:item2) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: 'published') }
+
+    let(:designer) { designer_in_course(course: course, active_all: true).user }
+
+    let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+
+    it 'denies access to a caller without rights to view course grades' do
+      api_call_as_user(designer, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                       { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                         :format => 'json'}, {}, {}, { expected_status: 401})
+    end
+
+    it 'returns an exception when the specified course has no modules' do
+      api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                       { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                         :format => 'json'}, {}, {}, { expected_status: 400})
+    end
+
+    describe 'when the course has a context module' do
+      let(:context_module) { course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}") }
+
+      let(:content_tag1) { context_module.add_item(:id => item1.id, :type => 'assignment') }
+
+      let(:content_tag2) { context_module.add_item(:id => item2.id, :type => 'assignment') }
+
+      it 'returns an exception when the module has no requirements' do
+        api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                         { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                           :format => 'json'}, {}, {}, { expected_status: 400})
+      end
+
+      describe 'and the context module has completion requirements' do
+        before do
+          context_module.completion_requirements = { "none" => "none", content_tag1.id => { :type => "must_view" }, content_tag2.id => { :type => "must_view" } }
+          context_module.save!
+        end
+
+        it 'returns an empty response when no users are enrolled as students' do
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json' }, {}, {}, { expected_status: 200 })
+          expect(json).to be_empty
+        end
+
+        it 'returns a json representation of enrolled users and their progress to a user with rights to view course grades' do
+          # Enroll two students
+          student1 = student_in_course(course: course, active_all: true)
+          student2 = student_in_course(course: course, active_all: true)
+
+          # Have one of the students complete the course
+          student1_progress = CourseProgress.new(course, student1.user)
+          student1_progress.current_position # results in progression being written
+
+          student1_progression = student1_progress.module_progressions.first
+          student1_progression.requirements_met = student1_progress.requirements
+          student1_progression.save!
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json' }, {}, {}, { expected_status: 200 })
+
+          expect(json.map { |s| s.slice('id', 'progress') }).to match_array [
+            { 'id' => student1.user_id, 'progress' =>
+              { 'requirement_count' => 2,
+                'requirement_completed_count' => 2,
+                'next_requirement_url' => nil,
+                'completed_at' => student1_progression.completed_at } },
+            { 'id' => student2.user_id, 'progress' =>
+              { 'requirement_count' => 2,
+                'requirement_completed_count' => 0,
+                'next_requirement_url' => nil,
+                'completed_at' => nil } }
+          ]
+        end
+
+        it 'should paginate the list of user progress' do
+          student_in_course(course: course, active_all: true)
+          student_in_course(course: course, active_all: true)
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json', :per_page => 1 }, {}, {}, { expected_status: 200 })
+
+          expect(json.length).to equal 1
+
+
+          json = api_call_as_user(teacher, :get, "/api/v1/courses/#{course.id}/bulk_user_progress",
+                                  { :course_id => course.to_param, :controller => 'courses', :action => 'bulk_user_progress',
+                                    :format => 'json', :per_page => 1, :page => 2 }, {}, {}, { expected_status: 200 })
+
+          expect(json.length).to equal 1
+        end
+      end
+    end
+  end
+
   it 'should paginate the course list' do
     json = api_call(:get, "/api/v1/courses.json?per_page=1",
             { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
@@ -872,7 +988,8 @@ describe CoursesController, type: :request do
           'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb,
           'homeroom_course' => false,
-          'course_color' => nil
+          'course_color' => nil,
+          'friendly_name' => nil
         })
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
@@ -954,7 +1071,8 @@ describe CoursesController, type: :request do
           'uuid' => new_course.uuid,
           'blueprint' => false,
           'homeroom_course' => false,
-          'course_color' => nil
+          'course_color' => nil,
+          'friendly_name' => nil
         )
         expect(json).to eql course_response
       end
@@ -1151,6 +1269,44 @@ describe CoursesController, type: :request do
         expect(new_course.assignments.length).to eq 1
         expect(new_course.assignments.first.title).to eq 'my assignment'
       end
+
+      it "removes start and end dates when restrict_enrollments_to_course_dates is false and an enrollment_term is present" do
+        term = @account.enrollment_terms.create!
+
+        post_params = {
+          'account_id' => @account.id,
+          'course'     => {
+            'name'        => 'Test Course 📝',
+            'term_id'     => term.id,
+            'start_at'    => Time.now,
+            'conclude_at' => 16.weeks.from_now,
+          }
+        }
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        expect(new_course.start_at).to be_nil
+        expect(new_course.conclude_at).to be_nil
+      end
+
+      it "does not remove start and end dates when restrict_enrollments_to_course_dates is true" do
+        term = @account.enrollment_terms.create
+
+        post_params = {
+          'account_id' => @account.id,
+          'course'     => {
+            'name'                                 => 'Test Course 📝',
+            'term_id'                              => term.id,
+            'restrict_enrollments_to_course_dates' => true,
+            'start_at'                             => Time.now,
+            'conclude_at'                          => 16.weeks.from_now,
+
+          }
+        }
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        expect(new_course.start_at).not_to be_nil
+        expect(new_course.conclude_at).not_to be_nil
+      end
     end
 
     context "a user without permissions" do
@@ -1282,6 +1438,13 @@ describe CoursesController, type: :request do
       it "should allow a date to be deleted" do
         @course.update_attribute(:conclude_at, Time.now)
         @new_values['course']['end_at'] = nil
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        expect(@course.end_at).to be_nil
+      end
+
+      it "should remove end date when restrict_enrollments_to_course_dates is set to false" do
+        @new_values['course']['restrict_enrollments_to_course_dates'] = false
         api_call(:put, @path, @params, @new_values)
         @course.reload
         expect(@course.end_at).to be_nil
@@ -3460,7 +3623,6 @@ describe CoursesController, type: :request do
         expect(link_header[0]).to match /page=1&per_page=5/ # current page
         expect(link_header[1]).to match /page=2&per_page=5/ # next page
         expect(link_header[2]).to match /page=1&per_page=5/ # first page
-        expect(link_header[3]).to match /page=2&per_page=5/ # last page
       end
 
       it "should allow jumping to a user's page based on id" do
@@ -3628,6 +3790,7 @@ describe CoursesController, type: :request do
         'time_zone' => 'America/Los_Angeles',
         'homeroom_course' => false,
         'course_color' => nil,
+        'friendly_name' => nil,
         'uuid' => @course1.uuid,
         'blueprint' => false,
         'license' => nil
@@ -3900,7 +4063,11 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'banner_image' => nil,
+          'banner_image_id' => nil,
+          'banner_image_url' => nil,
           'course_color' => nil,
+          'friendly_name' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3926,6 +4093,7 @@ describe CoursesController, type: :request do
       it "should update settings" do
         @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
         @course.enable_feature!(:final_grades_override)
+        @course.account.enable_as_k5_account!
         expect(Auditors::Course).to receive(:record_updated).
           with(anything, anything, anything, source: :api)
 
@@ -3941,6 +4109,7 @@ describe CoursesController, type: :request do
           :allow_student_discussion_editing => false,
           :allow_student_organized_groups => false,
           :course_color => '#AABBCC',
+          :friendly_name => 'drama',
           :filter_speed_grader_by_student_group => true,
           :hide_distribution_graphs => true,
           :hide_sections_on_course_users_page => true,
@@ -3959,7 +4128,11 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => false,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => false,
+          'banner_image' => nil,
+          'banner_image_id' => nil,
+          'banner_image_url' => nil,
           'course_color' => '#AABBCC',
+          'friendly_name' => 'drama',
           'filter_speed_grader_by_student_group' => true,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3987,6 +4160,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
         expect(@course.course_color).to eq '#AABBCC'
+        expect(@course.friendly_name).to eq 'drama'
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_sections_on_course_users_page).to be true
         expect(@course.hide_final_grades).to eq true
@@ -4016,7 +4190,11 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'banner_image' => nil,
+          'banner_image_id' => nil,
+          'banner_image_url' => nil,
           'course_color' => nil,
+          'friendly_name' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,

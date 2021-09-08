@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {MARKER_SELECTOR} from './constants'
+
 /**
  * Simple wrapper function that inserts an html string
  * into an editor
@@ -49,4 +51,20 @@ export function replace(selector, newHtml, editor = tinymce.activeEditor) {
 
   // Insert the new element
   return insert(newHtml, editor)
+}
+
+export function insertMentionFor(user, editor = tinymce.activeEditor) {
+  if (!user || !user.shortName || !user.id) {
+    console.error('Error inserting mention for user:', user)
+    return
+  }
+
+  // TODO: Any issue using generic document to make the element versus TinyMCE getDoc()?
+  const newElem = document.createElement('span')
+
+  newElem.classList.add('mceNonEditable', 'mention')
+  newElem.setAttribute('data-mention', user?.id)
+  newElem.textContent = user?.shortName
+
+  replace(MARKER_SELECTOR, newElem.outerHTML, editor)
 }

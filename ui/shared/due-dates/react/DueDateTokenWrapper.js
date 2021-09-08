@@ -288,7 +288,8 @@ class DueDateTokenWrapper extends React.Component {
   }
 
   selectableOption = (set, index) => {
-    const displayName = set.name || this.props.defaultSectionNamer(set.course_section_id)
+    const displayName =
+      set.displayName || set.name || this.props.defaultSectionNamer(set.course_section_id)
     return (
       <ComboboxOption key={set.key || `${displayName}-${index}`} value={set.name} set_props={set}>
         {displayName}{set.pronouns && ` (${set.pronouns})`}

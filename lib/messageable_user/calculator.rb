@@ -173,6 +173,13 @@ class MessageableUser
       end
     end
 
+    def search_in_context_scope(options, global_exclude_ids: [])
+      scope = messageable_users_in_context_scope(options.delete(:context), options)
+      scope = search_scope(scope, options[:search], global_exclude_ids) if scope
+      scope ||= MessageableUser.where('?', false)
+      scope
+    end
+
     # construct a bookmark-paginated collection of messageable users from
     # the various sources (across applicable shards)
     def search_messageable_users(options={})
@@ -185,9 +192,7 @@ class MessageableUser
         # non-visible context, so the result will be empty. but we still need
         # to return a bookmark-paginated collection, so we craft an empty scope
         # by default
-        scope = messageable_users_in_context_scope(options.delete(:context), options)
-        scope = search_scope(scope, options[:search], global_exclude_ids) if scope
-        scope ||= MessageableUser.where('?', false)
+        scope = search_in_context_scope(options, global_exclude_ids: global_exclude_ids)
         bookmark(scope)
       else
         scope = self_scope(options)
@@ -1039,6 +1044,15 @@ class MessageableUser
 
     def section_visible_group_ids
       section_visible_group_ids_by_shard[Shard.current] || []
+    end
+
+    def marshal_dump
+      ivars = (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
+      ivars
+    end
+
+    def marshal_load(ivars)
+      ivars.each { |name, val| instance_variable_set(name, val) }
     end
   end
 end

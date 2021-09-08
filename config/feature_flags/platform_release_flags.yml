@@ -29,6 +29,7 @@ site_admin_keys_only:
     already behaved in this way.
   applies_to: SiteAdmin
 use_oembed_token:
+  type: setting
   state: hidden
   display_name: Require signed token for oEmbed
   description: |-
@@ -50,3 +51,9 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+lti_multiple_assignment_deep_linking:
+  state: hidden
+  display_name: LTI Multiple Assignment Deep Linking
+  description: |-
+    If enabled, allows multiple deep link support for assignments and modules.
+  applies_to: SiteAdmin

@@ -101,18 +101,42 @@ describe DiscussionEntry do
 
   context "mentions" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @mentioned_student = @student
-      student_in_course(:active_all => true)
-      @topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      course_with_teacher(active_all: true)
     end
 
+    let(:student) { student_in_course(active_all: true).user }
+    let(:mentioned_student) { student_in_course(active_all: true).user }
+
     it 'should create on entry save' do
-      entry = @topic.discussion_entries.new(user: @student)
-      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{@mentioned_student.id} class=mention>@#{@mentioned_student.short_name}</span> what's up dude</p>")
+      entry = topic.discussion_entries.new(user: student)
+      allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
-      expect(entry.mentions.take.user_id).to eq @mentioned_student.id
+      expect(entry.mentions.take.user_id).to eq mentioned_student.id
+    end
+
+    describe "edits to an entry" do
+      let!(:entry) {
+        topic.discussion_entries.create(
+          user: student,
+          message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>"
+        )
+      }
+
+      context "a new user is mentioned" do
+        it "should create a mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
+          }.to change {entry.mentions.count}.by 1
+        end
+      end
+
+      context "the same user is mentioned" do
+        it "should not create a new mention on save" do
+          expect {
+            entry.update(message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude?!</p>")
+          }.to not_change {entry.mentions.count}
+        end
+      end
     end
   end
 
@@ -454,11 +478,6 @@ describe DiscussionEntry do
       student_in_course(:active_all => true); @s5 = @student
       @topic.change_all_read_state("read", @s5)
       expect(@topic.unread_count(@s5)).to eq 0
-    end
-
-    it "should use unique_constaint_retry when updating read state" do
-      expect(DiscussionEntry).to receive(:unique_constraint_retry).once
-      @entry.change_read_state("read", @student)
     end
 
     it "should not increment unread count for students in group topics when posting to the root" do

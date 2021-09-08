@@ -84,14 +84,14 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = @aac.provision_user(unique_ids.first, provider_attributes)
     end
 
-    if pseudonym
+    if pseudonym && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user
       @domain_root_account.pseudonyms.scoping do
         PseudonymSession.create!(pseudonym, false)
       end
       session[:login_aac] = @aac.global_id
 
-      successful_login(pseudonym.user, pseudonym)
+      successful_login(user, pseudonym)
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}, redirecting to: #{unknown_user_url}."

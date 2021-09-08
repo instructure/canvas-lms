@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useEffect, useState} from 'react'
+import React, {forwardRef, useCallback, useEffect, useState} from 'react'
 import {bool, func, number, object, objectOf, oneOfType, string} from 'prop-types'
 import {createChainedFunction} from '@instructure/ui-utils'
 import RCE from '@instructure/canvas-rce/es/rce/RCE'
 import getRCSProps from '../getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
+import loadEventListeners from '../loadEventListeners'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -79,17 +80,36 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     enabled: ENV.rce_auto_save && autosave,
     interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
   })
+  const [refCreated, setRefCreated] = useState(null)
+
+  // you have to use a callback function ref because a ref as a useEffect dependency
+  // will never trigger it to be rerun. This way any time the ref changes,
+  // the function is called. rceRef as a dependency is to quiet eslint.
+  const magicRef = useCallback(
+    node => {
+      rceRef.current = node
+      if (node) {
+        node.getTextarea().remoteEditor = node
+      }
+      setRefCreated(node)
+    },
+    [rceRef]
+  )
 
   useEffect(() => {
-    const rce_wrapper = rceRef.current
+    const rce_wrapper = refCreated && rceRef.current
     return () => {
       rce_wrapper?.destroy()
     }
-  }, [rceRef])
+  }, [rceRef, refCreated])
+
+  useEffect(() => {
+    loadEventListeners()
+  }, [])
 
   return (
     <RCE
-      ref={rceRef}
+      ref={magicRef}
       autosave={autosave_}
       defaultContent={defaultContent}
       editorOptions={tinymceConfig}
@@ -99,6 +119,9 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       ltiTools={window.INST?.editorButtons}
+      maxInitRenderedRCEs={
+        window.ENV?.FEATURES?.rce_limit_init_render_on_page ? props.maxInitRenderedRCEs : -1
+      }
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
@@ -111,6 +134,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onInit={onInit}
       use_rce_pretty_html_editor={!!window.ENV?.FEATURES?.rce_pretty_html_editor}
       use_rce_buttons_and_icons={!!window.ENV?.FEATURES?.rce_buttons_and_icons}
+      use_rce_a11y_checker_notifications={!!window.ENV?.use_rce_a11y_checker_notifications}
       {...rest}
     />
   )
@@ -128,6 +152,12 @@ CanvasRce.propTypes = {
   editorOptions: object,
   // height of the RCE. If a number, in px
   height: oneOfType([number, string]),
+  // if the rce_limit_init_render_on_page flag is on, this
+  // is the maximum number of RCEs that will render on page load.
+  // Any more than this will be deferred until it is nearly
+  // scrolled into view.
+  // if isNaN or <=0, render them all
+  maxInitRenderedRCEs: number,
   // name:value pairs of attributes to add to the textarea
   // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
@@ -147,6 +177,7 @@ CanvasRce.propTypes = {
 CanvasRce.defaultProps = {
   autosave: true,
   editorOptions: {},
+  maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
   textareaClassName: 'input-block-level',

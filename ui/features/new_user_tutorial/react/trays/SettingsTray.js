@@ -27,28 +27,24 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/Panda_Map.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use course settings?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267'
+        href: I18n.t('#community.instructor_use_course_settings')
       },
       {
         label: I18n.t('How do I set details for a course?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037'
+        href: I18n.t('#community.instructor_set_course_details')
       },
       {
         label: I18n.t('How do I change a course name and course code?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234'
+        href: I18n.t('#community.instructor_change_name_code')
       },
       {
         label: I18n.t('How do I add an image to a course card in the Dashboard?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624'
+        href: I18n.t('#community.instructor_add_dashboard_image')
       }
     ]}
   >

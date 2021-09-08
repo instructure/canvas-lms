@@ -53,11 +53,13 @@ export default {
    *   complete with title, cmd, image, and classes
    */
   buttonConfig(button, editor) {
+    const useRceEnhancements = ENV.use_rce_enhancements
+
     const config = {
       title: button.name,
       classes: 'widget btn instructure_external_tool_button'
     }
-    if (ENV.use_rce_enhancements) {
+    if (useRceEnhancements) {
       config.id = button.id
       config.onAction = () => {
         editor.execCommand(`instructureExternalButton${button.id}`)
@@ -70,7 +72,11 @@ export default {
       config.cmd = `instructureExternalButton${button.id}`
     }
 
-    if (button.canvas_icon_class && typeof button.canvas_icon_class === 'string') {
+    if (
+      !useRceEnhancements && // New RCE does not support custom icon classes
+      button.canvas_icon_class &&
+      typeof button.canvas_icon_class === 'string'
+    ) {
       config.icon = `hack-to-avoid-mce-prefix ${button.canvas_icon_class}`
     } else {
       // default to image
@@ -111,7 +117,7 @@ export default {
         key = `<img src='${htmlEscape(button.icon_url)}' data-tool-id='${button.id}'/>`
       }
       key += `&nbsp;${htmlEscape(button.name)}`
-      items[key] = function() {
+      items[key] = function () {
         onClickHandler(button, ed)
       }
       return items

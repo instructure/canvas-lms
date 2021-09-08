@@ -36,11 +36,16 @@ module Canvas::Vault
     end
 
     class << self
-      Canvas::Reloader.on_reload { @_client = nil }
       def get_client
         @_client ||= FileClient.new
       end
+
+      def reset!
+        @_client = nil
+      end
     end
+
+    Canvas::Reloader.on_reload { reset! }
 
     def initialize
       @config = ConfigFile.load("vault_contents") || {}

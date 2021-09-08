@@ -777,6 +777,11 @@ export default class EditView extends ValidatedFormView
     data.points_possible = round(numberHelper.parse(data.points_possible), 2)
     data.peer_review_count = numberHelper.parse(data.peer_review_count) if data.peer_review_count
     $grader_count = $('#grader_count')
+    # The custom_params are stored as a JSONified string in a hidden input, but the API uses an
+    # actual JSON object, so we have to convert.
+    if data.external_tool_tag_attributes.custom_params.trim()
+      data.external_tool_tag_attributes.custom_params = JSON.parse(data.external_tool_tag_attributes.custom_params)
+
     if $grader_count.length > 0
       data.grader_count = numberHelper.parse($grader_count[0].value)
     return data
@@ -975,8 +980,6 @@ export default class EditView extends ValidatedFormView
       annotatedDocumentUsageRights = @getAnnotatedDocumentUsageRights()
       if annotatedDocumentUsageRights.use_justification == 'choose'
         errors['usage_rights_use_justification'] = [{message: I18n.t('You must set document usage rights')}]
-      if annotatedDocumentUsageRights.legal_copyright == ''
-        errors['usage_rights_legal_copyright'] = [{message: I18n.t('You must set document copyright holder')}]
 
     errors
 

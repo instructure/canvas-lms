@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import tz from 'timezone'
 import timezone from '@canvas/timezone'
+import tzInTest from 'datetime/specHelpers'
 import newYork from 'timezone/America/New_York'
 
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../AuditTrailHelpers'
@@ -32,7 +34,6 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
   let auditEvents
   let auditTrail
   let quizzes
-  let timezoneSnapshot
   let externalTools
   let users
 
@@ -42,8 +43,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
   const quiz = {id: '123', name: 'Unicorns', role: 'grader'}
 
   beforeEach(() => {
-    timezoneSnapshot = timezone.snapshot()
-    timezone.changeZone(newYork, 'America/New_York')
+    tzInTest.configureAndRestoreLater({
+      tz: tz(newYork, 'America/New_York'),
+      tzData: {
+        'America/New_York': newYork
+      }
+    })
 
     auditEvents = []
     users = [firstUser, secondUser]
@@ -53,7 +58,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
   })
 
   afterEach(() => {
-    timezone.restore(timezoneSnapshot)
+    tzInTest.restore()
   })
 
   function buildCreateEvent(payloadValues) {

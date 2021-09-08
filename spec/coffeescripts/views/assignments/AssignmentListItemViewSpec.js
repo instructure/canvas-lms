@@ -23,7 +23,8 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import Submission from '@canvas/assignments/backbone/models/Submission'
 import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView.coffee'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
@@ -115,6 +116,8 @@ const createView = function (model, options) {
   }
   ENV.PERMISSIONS = {
     manage: options.canManage,
+    manage_assignments_add: options.canAdd || options.canManage,
+    manage_assignments_delete: options.canDelete || options.canManage,
     read_grades: options.canReadGrades
   }
 
@@ -124,7 +127,6 @@ const createView = function (model, options) {
   }
 
   ENV.POST_TO_SIS = options.post_to_sis
-  ENV.DUPLICATE_ENABLED = options.duplicateEnabled
   ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
   ENV.COURSE_ID = options.courseId
 
@@ -169,14 +171,13 @@ QUnit.module('AssignmentListItemViewSpec', {
       URLS: {assignment_sort_base_url: 'test'}
     })
     genSetup.call(this)
-    this.snapshot = tz.snapshot()
     return I18nStubber.pushFrame()
   },
   teardown() {
     fakeENV.teardown()
     genTeardown.call(this)
-    tz.restore(this.snapshot)
-    return I18nStubber.popFrame()
+    tzInTest.restore()
+    return I18nStubber.clear()
   }
 })
 
@@ -542,7 +543,10 @@ test('does not render score template without permission', function () {
 })
 
 test('renders lockAt/unlockAt with locale-appropriate format string', function () {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -570,7 +574,12 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function (
 })
 
 test('renders lockAt/unlockAt in appropriate time zone', function () {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.formats.date_at_time': '%b %-d at %l:%M%P',
@@ -646,7 +655,10 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
 })
 
 test('renders due date column with locale-appropriate format string', function () {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -660,7 +672,12 @@ test('renders due date column with locale-appropriate format string', function (
 })
 
 test('renders due date column in appropriate time zone', function () {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.abbr_month_names.8': 'Aug'
@@ -680,8 +697,7 @@ test('can duplicate when assignment can be duplicated', () => {
   })
   const view = createView(model, {
     userIsAdmin: true,
-    canManage: true,
-    duplicateEnabled: true
+    canManage: true
   })
   const json = view.toJSON()
   ok(json.canDuplicate)
@@ -722,8 +738,7 @@ test('cannot duplicate when user is not admin', () => {
   })
   const view = createView(model, {
     userIsAdmin: false,
-    canManage: false,
-    duplicateEnabled: true
+    canManage: false
   })
   const json = view.toJSON()
   notOk(json.canDuplicate)
@@ -924,28 +939,27 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('canDelete is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
-      userIsAdmin: true,
-      canManage: false
+      userIsAdmin: true
     })
 
     const json = view.toJSON()
     strictEqual(json.canDelete, true)
   })
 
-  test('canDelete is false if canManage is true and the individual assignment cannot be updated', function () {
+  test('canDelete is false if canManage is true and the individual assignment cannot be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {delete: false}
     })
 
     const json = view.toJSON()
     strictEqual(json.canDelete, false)
   })
 
-  test('canDelete is true if canManage is true and the individual assignment can be updated', function () {
+  test('canDelete is true if canManage is true and the individual assignment can be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {delete: true}
     })
 
     const json = view.toJSON()
@@ -954,7 +968,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is enabled when canDelete returns true', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {delete: true}
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), false)
@@ -962,7 +976,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is disabled when canDelete returns false', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {delete: false}
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), true)

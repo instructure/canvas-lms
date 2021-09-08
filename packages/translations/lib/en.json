@@ -1,4 +1,10 @@
 {
+  "a_great_discussion_6526a6d9": {
+    "message": "A great discussion"
+  },
+  "a_wonderful_assignment_d3139d9b": {
+    "message": "A wonderful assignment"
+  },
   "access_the_pretty_html_editor_37168efe": {
     "message": "Access the pretty HTML editor"
   },
@@ -59,6 +65,9 @@
   "alt_text_611fb322": {
     "message": "Alt Text"
   },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "An amazing discussion assignment"
+  },
   "an_error_occured_reading_the_file_ff48558b": {
     "message": "An error occured reading the file"
   },
@@ -79,6 +88,9 @@
   },
   "announcements_a4b8ed4a": {
     "message": "Announcements"
+  },
+  "apply_781a2546": {
+    "message": "Apply"
   },
   "apps_54d24a47": {
     "message": "Apps"
@@ -146,8 +158,14 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginning of Your To-Do History"
   },
+  "below_81d4dceb": {
+    "message": "Below"
+  },
   "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
     "message": "Below is an example of how students will see their schedule"
+  },
+  "bottom_third_5f5fec1d": {
+    "message": "Bottom Third"
   },
   "button_color_608a0242": {
     "message": "Button Color"
@@ -428,6 +446,9 @@
   "edit_equation_f5279959": {
     "message": "Edit Equation"
   },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edit Existing Button / Icon"
+  },
   "edit_link_7f53bebb": {
     "message": "Edit Link"
   },
@@ -475,6 +496,9 @@
   },
   "error_loading_past_items_2881dbb1": {
     "message": "Error loading past items"
+  },
+  "exciting_discussion_9f67bd0a": {
+    "message": "Exciting discussion"
   },
   "excused_cf8792eb": {
     "message": "Excused"
@@ -524,12 +548,6 @@
   "feedback_6dcc1991": {
     "message": "Feedback"
   },
-  "file_upload_failed_af22dd91": {
-    "message": "File upload failed"
-  },
-  "file_uploading_56c9c0c8": {
-    "message": "File uploading"
-  },
   "file_url_c12b64be": {
     "message": "File URL"
   },
@@ -568,6 +586,9 @@
   },
   "fullscreen_873bf53f": {
     "message": "Fullscreen"
+  },
+  "fun_quiz_47ab0b0": {
+    "message": "Fun quiz"
   },
   "generating_preview_45b53be0": {
     "message": "Generating preview..."
@@ -694,6 +715,15 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "join_6cafecca": {
+    "message": "Join"
+  },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "join active online meeting"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "join online meeting"
+  },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Jump to navigation toolbar"
   },
@@ -702,6 +732,9 @@
   },
   "keyboard_shortcuts_ed1844bd": {
     "message": "Keyboard Shortcuts"
+  },
+  "language_arts_35b79a8b": {
+    "message": "Language Arts"
   },
   "large_9c5e80e7": {
     "message": "Large"
@@ -775,11 +808,17 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Looks like there isn''t anything here"
   },
+  "math_ede93050": {
+    "message": "Math"
+  },
   "media_af190855": {
     "message": "Media"
   },
   "medium_5a8e9ead": {
     "message": "Medium"
+  },
+  "middle_27dc1d5": {
+    "message": "Middle"
   },
   "miscellaneous_e9818229": {
     "message": "Miscellaneous"
@@ -805,6 +844,9 @@
   "my_images_427f9b0c": {
     "message": "My Images"
   },
+  "name_1aed4a1b": {
+    "message": "Name"
+  },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -819,9 +861,6 @@
   },
   "new_opportunities_7d349c4d": {
     "message": "New Opportunities"
-  },
-  "next_40e12421": {
-    "message": "Next"
   },
   "next_month_749b1778": {
     "message": "Next Month"
@@ -1024,6 +1063,9 @@
   "schedule_preview_3bcda153": {
     "message": "Schedule Preview"
   },
+  "science_8d92214a": {
+    "message": "Science"
+  },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Scroll up to see your history!"
   },
@@ -1071,6 +1113,9 @@
   },
   "small_b070434a": {
     "message": "Small"
+  },
+  "social_studies_13fa30c7": {
+    "message": "Social Studies"
   },
   "something_went_wrong_89195131": {
     "message": "Something went wrong."
@@ -1126,9 +1171,6 @@
   "subscript_59744f96": {
     "message": "Subscript"
   },
-  "success_file_uploaded_8174e93f": {
-    "message": "Success: File uploaded"
-  },
   "success_to_do_created_e34ed395": {
     "message": "Success: To Do created"
   },
@@ -1155,6 +1197,21 @@
   },
   "text_7f4593da": {
     "message": "Text"
+  },
+  "text_background_color_16e61c3f": {
+    "message": "Text Background Color"
+  },
+  "text_color_acf75eb6": {
+    "message": "Text Color"
+  },
+  "text_position_8df8c162": {
+    "message": "Text Position"
+  },
+  "text_size_887c2f6": {
+    "message": "Text Size"
+  },
+  "the_best_assignment_15e98be1": {
+    "message": "The best assignment"
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "The date and time this to do is due"
@@ -1246,6 +1303,9 @@
   "unpublished_dfd8801": {
     "message": "unpublished"
   },
+  "untitled_efdc2d7d": {
+    "message": "untitled"
+  },
   "upload_document_253f0478": {
     "message": "Upload Document"
   },
@@ -1257,9 +1317,6 @@
   },
   "upload_media_ce31135a": {
     "message": "Upload Media"
-  },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Upload not available for this folder"
   },
   "upload_record_media_e4207d72": {
     "message": "Upload/Record Media"
@@ -1293,6 +1350,12 @@
   },
   "use_arrow_keys_to_select_a_size_699a19f4": {
     "message": "Use arrow keys to select a size."
+  },
+  "use_arrow_keys_to_select_a_text_position_72f9137c": {
+    "message": "Use arrow keys to select a text position."
+  },
+  "use_arrow_keys_to_select_a_text_size_65e89336": {
+    "message": "Use arrow keys to select a text size."
   },
   "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
     "message": "Use arrow keys to select an outline size."

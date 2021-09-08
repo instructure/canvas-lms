@@ -22,9 +22,11 @@ require 'spec_helper'
 require 'nokogiri'
 require 'webmock/rspec'
 
-WebMock.disable_net_connect!(allow_localhost: true)
-
 describe BasicLTI::BasicOutcomes do
+  before do
+    WebMock.disable_net_connect!(allow_localhost: true)
+  end
+
   before(:each) do
     course_model.offer
     @root_account = @course.root_account
@@ -32,6 +34,10 @@ describe BasicLTI::BasicOutcomes do
     @course.update_attribute(:account, @account)
     @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
     @course.enroll_student(@user)
+  end
+
+  after do
+    WebMock.allow_net_connect!
   end
 
   let(:tool) do

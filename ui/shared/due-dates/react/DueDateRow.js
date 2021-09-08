@@ -139,7 +139,8 @@ class DueDateRow extends React.Component {
   nameOrLoading = (collection, id) => {
     const item = collection[id]
     if (item) {
-      return item.pronouns ? `${item.name} (${item.pronouns})` : item.name
+      const name = item.displayName || item.name
+      return item.pronouns ? `${name} (${item.pronouns})` : name
     } else {
       return I18n.t('Loading...')
     }

@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy, inverse_of: :user
   has_many :notification_policies, through: :communication_channels
   has_many :notification_policy_overrides, through: :communication_channels
-  has_one :communication_channel, -> { where("workflow_state<>'retired'").ordered }
+  has_one :communication_channel, -> { unretired.ordered }
   has_many :ignores
   has_many :planner_notes, :dependent => :destroy
   has_many :viewed_submission_comments, :dependent => :destroy
@@ -117,14 +117,14 @@ class User < ActiveRecord::Base
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
-  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
-  has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order('submissions.updated_at DESC') }
+  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order(updated_at: :desc) }, class_name: 'Submission', dependent: :destroy
+  has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order(updated_at: :desc) }
   has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").ordered }
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order(:display_name).preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
   has_many :mentions, inverse_of: :user
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
@@ -132,14 +132,14 @@ class User < ActiveRecord::Base
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context
   has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: :context, inverse_of: :context, class_name: 'Folder'
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order(:name) }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: 'dashboard').order('created_at DESC') }, class_name: 'Message', dependent: :destroy
   has_many :collaborations, -> { order('created_at DESC') }
   has_many :user_services, -> { order('created_at') }, dependent: :destroy
-  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context, inverse_of: :context
+  has_many :rubric_associations, -> { preload(:rubric).order(created_at: :desc) }, as: :context, inverse_of: :context
   has_many :rubrics
   has_many :context_rubrics, :as => :context, :inverse_of => :context, :class_name => 'Rubric'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }
@@ -147,7 +147,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
-  has_many :trophies, inverse_of: :user, dependent: :destroy
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
   has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'
@@ -420,16 +419,23 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope)
-    Course.active.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).distinct
+  def courses_for_enrollments(enrollment_scope, associated_user = nil)
+    if associated_user && associated_user != self.id
+      Course.active.joins(:observer_enrollments)
+        .merge(enrollment_scope.except(:joins))
+        .where(enrollments: { associated_user_id: associated_user })
+    else
+      enrollments_to_include = associated_user == self.id ? :non_observer_enrollments : :all_enrollments
+      Course.active.joins(enrollments_to_include).merge(enrollment_scope.except(:joins)).distinct
+    end
   end
 
   def courses
     courses_for_enrollments(enrollments.current)
   end
 
-  def current_and_invited_courses
-    courses_for_enrollments(enrollments.current_and_invited)
+  def current_and_invited_courses(associated_user = nil)
+    courses_for_enrollments(enrollments.current_and_invited, associated_user)
   end
 
   def concluded_courses
@@ -606,10 +612,10 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.where("workflow_state NOT IN ('deleted','inactive','rejected') AND type<>'StudentViewEnrollment'").
-                where(:user_id => shard_user_ids).
-                select([:user_id, :course_id, :course_section_id]).
-                distinct.to_a
+          Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
+            .where(:user_id => shard_user_ids)
+            .select([:user_id, :course_id, :course_section_id])
+            .distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
@@ -1093,7 +1099,7 @@ class User < ActiveRecord::Base
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always
       # be on the user's shard
-      self.communication_channels.unretired.find_each(&:destroy) unless has_other_root_accounts
+      self.communication_channels.unretired.each(&:destroy) unless has_other_root_accounts
 
       self.update_account_associations
     end
@@ -1205,7 +1211,6 @@ class User < ActiveRecord::Base
     can :read_as_admin and
     can :manage and
     can :manage_content and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete and
@@ -1842,8 +1847,7 @@ class User < ActiveRecord::Base
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          scope = send(actual_association)
-
+          scope = send(actual_association, options[:observee_user])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -2080,8 +2084,8 @@ class User < ActiveRecord::Base
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch_with_batched_keys([self, 'participating_enrollments', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
-        self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
+      Rails.cache.fetch_with_batched_keys([self, 'participating_enrollments2', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+        self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a.each(&:clear_association_cache)
       end
     end
   end
@@ -2144,9 +2148,9 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      instances = instances.polymorphic_where('stream_item_instances.context' => opts[:contexts])
+      instances = instances.where(context: opts[:contexts])
     elsif opts[:context]
-      instances = instances.where(:context_type => opts[:context].class.base_class.name, :context_id => opts[:context])
+      instances = instances.where(context: opts[:context])
     elsif opts[:only_active_courses]
       instances = instances.where(:context_type => "Course", :context_id => self.participating_course_ids)
     end
@@ -2281,7 +2285,7 @@ class User < ActiveRecord::Base
   def select_upcoming_assignments(assignments,opts)
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
-      if a.context.grants_right?(self, :manage_assignments)
+      if a.context.grants_any_right?(self, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
         a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
@@ -2666,18 +2670,22 @@ class User < ActiveRecord::Base
     }
   end
 
-  def menu_courses(enrollment_uuid = nil)
+  def menu_courses(enrollment_uuid = nil, opts = {})
     return @menu_courses if @menu_courses
 
-    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
+    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) }
+    # this terribleness is so we try to make sure that the newest courses show up in the menu
+    courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
+      .sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }
+      .first(Setting.get('menu_course_limit', '20').to_i)
+      .sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
+      .select { |c| can_favorite.call(c) }
+    # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
     if favorites.length > 0
-      @menu_courses = favorites
+      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
     else
-      # this terribleness is so we try to make sure that the newest courses show up in the menu
-      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).
-        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.
-        first(Setting.get('menu_course_limit', '20').to_i).
-        sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+      @menu_courses = courses
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
@@ -2705,7 +2713,7 @@ class User < ActiveRecord::Base
     # so short-circuit if it's enabled, else we might return false prematurely
     # depending on the state of :granular_permissions_manage_users feature flag
     if course.grants_right?(self, session, :manage_students)
-      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type)
         return true
       end
     end
@@ -2999,6 +3007,10 @@ class User < ActiveRecord::Base
 
   def preferred_gradebook_version
     get_preference(:gradebook_version) || 'default'
+  end
+
+  def should_show_deeply_nested_alert?
+    ActiveModel::Type::Boolean.new.cast(get_preference(:isolated_view_deeply_nested_alert) || true)
   end
 
   def stamp_logout_time!

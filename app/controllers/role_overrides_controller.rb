@@ -144,7 +144,8 @@ class RoleOverridesController < ApplicationController
 
       roles = Api.paginate(roles, self, route)
       ActiveRecord::Associations::Preloader.new.preload(roles, :account)
-      render :json => roles.collect{|role| role_json(@context, role, @current_user, session)}
+      preloaded_overrides = RoleOverride.preload_overrides(@context, roles)
+      render :json => roles.map { |role| role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides) }
     end
   end
 
@@ -152,13 +153,15 @@ class RoleOverridesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_role_overrides)
 
       account_role_data = []
+      preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_account_roles)
       @context.available_account_roles.each do |role|
-        account_role_data << role_json(@context, role, @current_user, session)
+        account_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
       end
 
       course_role_data = []
+      preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_course_roles)
       @context.available_course_roles.each do |role|
-        course_role_data << role_json(@context, role, @current_user, session)
+        course_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
       end
 
       js_env({
@@ -236,8 +239,8 @@ class RoleOverridesController < ApplicationController
   #         add_course_template          -- Course Templates - add
   #         delete_course_template       -- Course Templates - delete
   #         edit_course_template         -- Course Templates - edit
-  #     Manage Courses granular permissions
-  #         manage_courses_admin         -- Manage Courses - manage / update
+  #     manage_courses_add               -- Courses - add
+  #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
   #     manage_feature_flags             -- Feature Previews - enable / disable
   #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
@@ -270,12 +273,15 @@ class RoleOverridesController < ApplicationController
   #     generate_observer_pairing_code   -- [ tado] Users - Generate observer pairing codes for students
   #     import_outcomes                  -- [ TaDo] Learning Outcomes - import
   #     lti_add_edit                     -- [ TAD ] LTI - add / edit / delete
-  #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete
+  #     manage_account_banks             -- [ td  ] Item Banks - manage account
+  #     manage_assignments               -- [ TADo] Assignments and Quizzes - manage / edit
+  #     Manage Assignments and Quizzes granular permissions
+  #         manage_assignments_add       -- [ TADo] Assignments and Quizzes - add
+  #         manage_assignments_delete    -- [ TADo] Assignments and Quizzes - delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete
   #     manage_course_visibility         -- [ TAD ] Course - change visibility
   #     Manage Courses granular permissions
-  #         manage_courses_add           -- [sTADo] Courses - add
   #         manage_courses_conclude      -- [ TaD ] Courses - conclude
   #         manage_courses_delete        -- [ TaD ] Courses - delete
   #         manage_courses_publish       -- [ TaD ] Courses - publish
@@ -285,7 +291,10 @@ class RoleOverridesController < ApplicationController
   #         manage_files_edit            -- [ TADo] Course Files - edit
   #         manage_files_delete          -- [ TADo] Course Files - delete
   #     manage_grades                    -- [ TA  ] Grades - edit
-  #     manage_groups                    -- [ TAD ] Groups - add / edit / delete
+  #     Manage Groups granular permissions
+  #         manage_groups_add            -- [ TAD ] Groups - add
+  #         manage_groups_delete         -- [ TAD ] Groups - delete
+  #         manage_groups_manage         -- [ TAD ] Groups - manage
   #     manage_interaction_alerts        -- [ Ta  ] Alerts - add / edit / delete
   #     manage_outcomes                  -- [sTaDo] Learning Outcomes - add / edit / delete
   #     manage_proficiency_calculations  -- [ t d ] Outcome Proficiency Calculations - add / edit / delete

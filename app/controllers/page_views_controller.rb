@@ -191,6 +191,13 @@ class PageViewsController < ApplicationController
       date_options[:newest] = end_time
       url_options[:end_time] = params[:end_time]
     end
+    if start_time && end_time && end_time < start_time
+      return respond_to do |format|
+        format.json { render json: { error: t('end_time must be after start_time') }, status: 400 }
+        format.any { render plain: t('end_time must be after start_time'), status: 400 }
+      end
+    end
+
     date_options[:viewer] = @current_user
 
     respond_to do |format|

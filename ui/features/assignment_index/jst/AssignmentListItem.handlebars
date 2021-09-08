@@ -119,7 +119,7 @@
     </div>
     {{#if canOpenManageOptions}}
       <div class="ig-admin">
-      {{#if canManage}}
+        {{#if canManage}}
           {{#if cyoe.isTrigger}}
             <a href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           {{/if}}
@@ -209,26 +209,26 @@
                   >{{#t}}Mastery Paths{{/t}}</a>
                 </li>
                 {{/if}}
-                {{#unless is_locked}}
-                  <li>
-                    {{#if canDelete}}
-                      <a
-                        class="delete_assignment icon-trash"
-                        id="assignment_{{id}}_settings_delete_item"
-                        aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                        data-focus-returns-to="assign_{{id}}_manage_link"
-                      >{{#t "delete"}}Delete{{/t}}</a>
-                    {{else}}
-                      <a
-                        class="delete_assignment icon-trash disabled"
-                        id="assignment_{{id}}_settings_delete_item"
-                        aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                        aria-disabled=true
-                      >{{#t "delete"}}Delete{{/t}}</a>
-                    {{/if}}
-                  </li>
-                {{/unless}}
             {{/if}}
+            {{#unless is_locked}}
+              <li>
+                {{#if canDelete}}
+                  <a
+                    class="delete_assignment icon-trash"
+                    id="assignment_{{id}}_settings_delete_item"
+                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                    data-focus-returns-to="assign_{{id}}_manage_link"
+                  >{{#t "delete"}}Delete{{/t}}</a>
+                {{else}}
+                  <a
+                    class="delete_assignment icon-trash disabled"
+                    id="assignment_{{id}}_settings_delete_item"
+                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                    aria-disabled=true
+                  >{{#t "delete"}}Delete{{/t}}</a>
+                {{/if}}
+              </li>
+            {{/unless}}
             {{#if DIRECT_SHARE_ENABLED}}
               <li>
                 <a

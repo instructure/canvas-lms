@@ -23,6 +23,7 @@ module CC::Importer::Canvas
     include LearningOutcomesConverter
     include RubricsConverter
     include ModuleConverter
+    include PacePlansConverter
 
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
@@ -46,6 +47,7 @@ module CC::Importer::Canvas
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
+      @course[:pace_plans] = convert_pace_plans(settings_doc(PACE_PLANS))
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
     end
@@ -59,7 +61,7 @@ module CC::Importer::Canvas
        'turnitin_comments', 'default_view', 'license', 'locale',
        'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref',
        'overridden_course_visibility', 'root_account_uuid',
-       'image_url', 'image_identifier_ref', 'course_color'].each do |string_type|
+       'image_url', 'image_identifier_ref', 'course_color', 'alt_name'].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end

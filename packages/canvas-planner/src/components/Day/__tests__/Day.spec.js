@@ -50,7 +50,7 @@ it('renders missing assignments if showMissingAssignments is true and it is toda
   const wrapper = shallow(
     <Day timeZone="America/Denver" day={today.format('YYYY-MM-DD')} showMissingAssignments />
   )
-  expect(wrapper.find('Connect(ResponsiveMissingAssignments)').exists()).toBeTruthy()
+  expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeTruthy()
 })
 
 it('does not render missing assignments if it is not today', () => {
@@ -58,7 +58,7 @@ it('does not render missing assignments if it is not today', () => {
   const wrapper = shallow(
     <Day timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} showMissingAssignments />
   )
-  expect(wrapper.find('Connect(ResponsiveMissingAssignments)').exists()).toBeFalsy()
+  expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeFalsy()
 })
 
 it('only renders the year when the date is not in the current year', () => {

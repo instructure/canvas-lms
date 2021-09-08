@@ -84,6 +84,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_entries_read_state, mutation: Mutations::UpdateDiscussionEntriesReadState
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
+  field :update_discussion_thread_read_state, mutation: Mutations::UpdateDiscussionThreadReadState
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
   field :import_outcomes, mutation: Mutations::ImportOutcomes
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
@@ -93,6 +94,8 @@ class Types::MutationType < Types::ApplicationObjectType
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :delete_outcome_links, mutation: Mutations::DeleteOutcomeLinks
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup
+  field :create_learning_outcome_group, mutation: Mutations::CreateLearningOutcomeGroup
+  field :update_isolated_view_deeply_nested_alert, mutation: Mutations::UpdateIsolatedViewDeeplyNestedAlert
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

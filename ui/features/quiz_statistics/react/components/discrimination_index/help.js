@@ -39,7 +39,7 @@ const Help = ({ style }) => (
     </p>
 
     <p>
-      <a href={K.DISCRIMINATION_INDEX_HELP_ARTICLE_URL} target="_blank" rel="noopener noreferrer">
+      <a href={I18n.t('#community.instructor_quiz_statistics')} target="_blank" rel="noopener noreferrer">
         {I18n.t('Learn more about quiz statistics.')}
       </a>
     </p>

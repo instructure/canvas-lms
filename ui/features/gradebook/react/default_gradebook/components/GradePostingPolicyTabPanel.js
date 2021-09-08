@@ -33,6 +33,7 @@ const AUTOMATIC_POST = 'auto'
 export default class GradePostingPolicyTabPanel extends Component {
   static propTypes = {
     anonymousAssignmentsPresent: bool.isRequired,
+    gradebookIsEditable: bool.isRequired,
     onChange: func.isRequired,
     settings: shape({
       postManually: bool.isRequired
@@ -126,6 +127,7 @@ export default class GradePostingPolicyTabPanel extends Component {
             id="GradePostingPolicyTabPanel__PostAutomatically"
             label={automaticallyPostLabel}
             value={AUTOMATIC_POST}
+            disabled={!this.props.gradebookIsEditable}
           />
 
           <RadioInput
@@ -133,6 +135,7 @@ export default class GradePostingPolicyTabPanel extends Component {
             id="GradePostingPolicyTabPanel__PostManually"
             label={manuallyPostLabel}
             value={MANUAL_POST}
+            disabled={!this.props.gradebookIsEditable}
           />
         </RadioInputGroup>
       </div>

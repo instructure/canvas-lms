@@ -75,6 +75,9 @@ module Canvas
         "SERVER_NAME",
         "SERVER_PORT",
         "SERVER_PROTOCOL",
+        "HTTP_X_FORWARDED_HOST",
+        "HTTP_X_FORWARDED_PROTO",
+        "HTTP_X_FORWARDED_FOR",
       ].freeze
 
       def self.useful_http_env_stuff_from_request(req)

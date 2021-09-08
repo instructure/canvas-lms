@@ -94,8 +94,8 @@ export const MOCK_CARDS = [
     id: '1',
     assetString: 'course_1',
     href: '/courses/1',
-    shortName: 'Econ 101',
-    originalName: 'Economics 101',
+    shortName: 'Economics 101',
+    originalName: 'UGLY-SIS-ECON-101',
     color: 'yellow',
     courseCode: 'ECON-001',
     enrollmentState: 'active',
@@ -108,8 +108,8 @@ export const MOCK_CARDS = [
     id: '2',
     assetString: 'course_2',
     href: '/courses/2',
-    shortName: 'Homeroom1',
-    originalName: 'Home Room',
+    shortName: 'Home Room',
+    originalName: 'UGLY-SIS-HOMEROOM-007',
     color: 'blue',
     courseCode: 'HOME-001',
     enrollmentState: 'active',
@@ -122,7 +122,8 @@ export const MOCK_CARDS = [
     id: '3',
     assetString: 'course_3',
     href: '/courses/3',
-    originalName: 'The Maths',
+    shortName: 'The Maths',
+    originalName: 'UGLY-SIS-BEG-ALG-101',
     color: 'red',
     courseCode: 'DA-MATHS',
     enrollmentState: 'invited',
@@ -143,5 +144,24 @@ export const MOCK_EVENTS = [
     start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'Morning Yoga',
     type: 'event'
+  }
+]
+
+export const MOCK_OBSERVER_LIST = [
+  {
+    id: '13',
+    name: 'Zelda',
+    avatar_url: 'http://avatar'
+  },
+  {
+    id: '4',
+    name: 'Student 4',
+    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
+  },
+  {
+    id: '2',
+    name: 'Student 2',
+    avatar_url:
+      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
   }
 ]

@@ -1467,7 +1467,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       </div>
       <div id='submission_attachment_viewed_at_container'>
       </div>
-    `)
+      <div id="speed_grader_edit_status_mount_point"></div>`)
       sinon.stub($, 'ajaxJSON')
 
       // Defer the rest of the setup until the tests themselves so we can edit
@@ -1624,6 +1624,22 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.currentStudent.submission.grading_period_id = null
       SpeedGrader.EG.handleSubmissionSelectionChange()
       notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+    })
+
+    test('hides the status menu component when the current submission is not the newest', () => {
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 0)
+    })
+
+    test('shows the status menu component when the current submission is the newest', () => {
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 1
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+      const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
+      strictEqual(mountPoint.children.length, 1)
     })
 
     test('includes last-viewed date for attachments if not anonymizing students', () => {
@@ -5167,6 +5183,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           errorMessage,
           'The maximum number of graders has been reached for this assignment.'
         )
+      })
+
+      test('shows a specific error message if given an ASSIGNMENT_LOCKED error code', () => {
+        SpeedGrader.EG.handleGradingError({errors: {error_code: 'ASSIGNMENT_LOCKED'}})
+
+        const [errorMessage] = $.flashError.firstCall.args
+        strictEqual(errorMessage, 'This assignment is locked and cannot be reassigned.')
       })
 
       test('forbears from showing an error message if given a PROVISIONAL_GRADE_INVALID_SCORE error code', () => {

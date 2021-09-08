@@ -22,6 +22,7 @@ require_relative '../helpers/assignments_common'
 require_relative '../helpers/public_courses_context'
 require_relative '../helpers/files_common'
 require_relative '../helpers/admin_settings_common'
+require_relative '../../helpers/k5_common'
 
 describe "assignments" do
   include_context "in-process server selenium tests"
@@ -30,6 +31,7 @@ describe "assignments" do
   include AdminSettingsCommon
   include CustomScreenActions
   include CustomSeleniumActions
+  include K5Common
 
   # note: due date testing can be found in assignments_overrides_spec
 
@@ -353,6 +355,26 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css(".edit_assignment_link")
     end
 
+    it "should show course name in the canvas for elementary header" do
+      toggle_k5_setting(@course.account)
+      get "/courses/#{@course.id}/assignments"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq @course.name
+    end
+
+    it "should show course friendly name in the canvas for elementary header if defined" do
+      toggle_k5_setting(@course.account)
+      @course.friendly_name = "Well hello there"
+      @course.save!
+      get "/courses/#{@course.id}/assignments"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq "Well hello there"
+    end
+
+
+
     context "group assignments" do
       before(:once) do
         ag = @course.assignment_groups.first
@@ -455,11 +477,9 @@ describe "assignments" do
         expect(f('#assignment_show fieldset')).to include_text('a text entry box or a student annotation')
       end
 
-      it 'displays annotatbale document to student and submits assignment for grading' do
+      it 'displays annotatable document to student and submits assignment for grading' do
         course_with_student_logged_in(active_all: true, course: @course)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-        f('.submit_assignment_link').click
 
         expect(f('.submit_annotated_document_option')).to be_displayed
         f('.submit_annotated_document_option').click
@@ -587,6 +607,56 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@a2.id}"
         wait_for_ajaximations
         expect(f("#sequence_footer .module-sequence-footer")).to be_present
+      end
+    end
+
+    context 'with an LTI 1.3 Tool with custom params' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          name: 'LTI Test Tool',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          use_1_3: true,
+          developer_key: DeveloperKey.create!,
+          tool_id: 'LTI Test Tool',
+          url: 'http://lti13testtool.docker/launch'
+        )
+      end
+      let(:custom_params) do
+        {
+          "lti_assignment_id" => "$com.instructure.Assignment.lti.id"
+        }
+      end
+      let(:content_tag) { ContentTag.new(url: tool.url, content: tool) }
+      let(:assignment) do
+        @course.assignment_groups.first.assignments.create!(title: "custom params",
+                                                            lti_resource_link_custom_params: custom_params,
+                                                            submission_types: "external_tool", context: @course,
+                                                            points_possible: 10, external_tool_tag: content_tag,
+                                                            workflow_state: "unpublished")
+      end
+
+      it "doesn't delete the custom params when publishing from the index page" do
+        assignment
+        get "/courses/#{@course.id}/assignments"
+        f("#assignment_#{assignment.id} .publish-icon").click
+        wait_for_ajaximations
+
+        expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
+      end
+
+      it "doesn't delete the custom params when editing from the index page" do
+        assignment
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        f("#assign_#{assignment.id}_manage_link").click
+        wait_for_ajaximations
+        f("#assignment_#{assignment.id} .edit_assignment").click
+        f("#assign_#{assignment.id}_assignment_points").send_keys("5")
+
+        submit_form(fj('.form-dialog:visible'))
+
+        expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
       end
     end
 

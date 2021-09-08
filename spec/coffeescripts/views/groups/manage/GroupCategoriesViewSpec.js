@@ -26,12 +26,12 @@ let clock = null
 let view = null
 let categories = null
 let wrapper = null
-const sanbox = null
 
 QUnit.module('GroupCategoriesView', {
   setup() {
     fakeENV.setup()
     ENV.group_categories_url = '/api/v1/courses/1/group_categories'
+    ENV.permissions = {can_add_groups: true}
     clock = sinon.useFakeTimers()
     categories = new GroupCategoryCollection([
       {

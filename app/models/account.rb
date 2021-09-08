@@ -142,6 +142,7 @@ class Account < ActiveRecord::Base
   has_many :external_integration_keys, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :shared_brand_configs
   belongs_to :brand_config, foreign_key: "brand_config_md5"
+  has_many :blackout_dates, as: :context, inverse_of: :context
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -156,6 +157,8 @@ class Account < ActiveRecord::Base
   after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   after_create :create_default_objects
+
+  after_save :log_changes_to_app_center_access_token
 
   serialize :settings, Hash
   include TimeZoneHelper
@@ -254,6 +257,8 @@ class Account < ActiveRecord::Base
   add_setting :microsoft_sync_enabled, :root_only => true, :boolean => true, :default => false
   add_setting :microsoft_sync_tenant, :root_only => true
   add_setting :microsoft_sync_login_attribute, :root_only => true
+  add_setting :microsoft_sync_login_attribute_suffix, :root_only => true
+  add_setting :microsoft_sync_remote_attribute, :root_only => true
 
   # Help link settings
   add_setting :custom_help_links, :root_only => true
@@ -272,8 +277,6 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
-  # legacy account settings for allowing course creation
-  # will be handled through :manage_courses_add granular permission role override
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -351,6 +354,9 @@ class Account < ActiveRecord::Base
   # Allow accounts with strict data residency requirements to turn off mobile
   # push notifications which may be routed through US datacenters by Google/Apple
   add_setting :enable_push_notifications, boolean: true, root_only: true, default: true
+  add_setting :allow_last_page_on_course_users, boolean: true, root_only: true, default: false
+  add_setting :allow_last_page_on_account_courses, boolean: true, root_only: true, default: false
+  add_setting :allow_last_page_on_users, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -446,6 +452,11 @@ class Account < ActiveRecord::Base
 
   def enable_as_k5_account?
     enable_as_k5_account[:value]
+  end
+
+  def enable_as_k5_account!
+    self.settings[:enable_as_k5_account] = {value: true}
+    self.save!
   end
 
   def open_registration?
@@ -567,13 +578,26 @@ class Account < ActiveRecord::Base
     keys_to_clear << :default_locale if self.saved_change_to_default_locale?
     if keys_to_clear.any?
       self.shard.activate do
-        delay_if_production.clear_downstream_caches(*keys_to_clear)
+        self.class.connection.after_transaction_commit do
+          delay_if_production(singleton: "Account#clear_downstream_caches/#{global_id}")
+            .clear_downstream_caches(*keys_to_clear, xlog_location: self.class.current_xlog_location)
+        end
       end
     end
   end
 
-  def clear_downstream_caches(*key_types)
+  def clear_downstream_caches(*key_types, xlog_location: nil, is_retry: false)
     self.shard.activate do
+      if xlog_location
+        timeout = Setting.get("account_cache_clear_replication_timeout", "60").to_i.seconds
+        unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+          delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}")
+            .clear_downstream_caches(*keys_to_clear, xlog_location: xlog_location, is_retry: true)
+          # we still clear, but only the first time; after that we just keep waiting
+          return if is_retry
+        end
+      end
+
       Account.clear_cache_keys([self.id] + Account.sub_account_ids_recursive(self.id), *key_types)
     end
   end
@@ -615,6 +639,14 @@ class Account < ActiveRecord::Base
 
   def root_account
     return self if root_account?
+
+    super
+  end
+
+  def root_account=(value)
+    return if value == self && root_account?
+    raise ArgumentError, "cannot change the root account of a root account" if root_account? && persisted?
+
     super
   end
 
@@ -984,10 +1016,18 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+    @account_chain ||= Account.account_chain(self).tap do |chain|
+      # preload the root account and parent accounts that we also found here
+      ra = chain.find(&:root_account?)
+      chain.each { |a| a.root_account = ra if a.root_account_id == ra.id }
+      chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
+    end.freeze
+
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+
+    @account_chain
   end
 
   def account_chain_ids
@@ -1195,6 +1235,10 @@ class Account < ActiveRecord::Base
           au.account = Account.site_admin
           au.user = user
           au.role_id = role_id
+          # Marking this record as not new means `persisted?` will be true,
+          # which means that `clear_association_cache` will work correctly on
+          # these objects.
+          au.instance_variable_set(:@new_record, false)
           au.readonly!
           au
         end
@@ -1220,9 +1264,7 @@ class Account < ActiveRecord::Base
       else
         Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
             batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
-          aus = account_users_for(user)
-          aus.each{|au| au.instance_variable_set(:@association_cache, {})}
-          aus
+          account_users_for(user).each(&:clear_association_cache)
         end
       end
     end
@@ -1253,8 +1295,6 @@ class Account < ActiveRecord::Base
       given { |user| self.cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses_add
-      # deprecated
-      can :create_courses if permission == :manage_courses
     end
 
     given { |user| !self.cached_account_users_for(user).empty? }
@@ -1265,10 +1305,19 @@ class Account < ActiveRecord::Base
 
     #################### Begin legacy permission block #########################
     given do |user|
+      user && !root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.cached_account_users_for(user).any? do |au|
+          au.has_permission_to?(self, :manage_courses)
+        end
+    end
+    can :create_courses
+    ##################### End legacy permission block ##########################
+
+    given do |user|
       result = false
       next false if user&.fake_student?
 
-      if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
+      if user && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
@@ -1279,44 +1328,6 @@ class Account < ActiveRecord::Base
       end
 
       result
-    end
-    can :create_courses
-    ##################### End legacy permission block ##########################
-
-    # any logged in user with no active enrollments (i.e. FFT)
-    # combined with root account setting that is enabled for Users with no enrollments
-    given do |user|
-      next false if user&.fake_student?
-
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? &&
-        !root_account.enrollments.active.where(user_id: user).exists? &&
-        root_account.no_enrollments_can_create_courses?
-    end
-    can :create_courses
-
-    # grants right to manually created courses account for show user create course button
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self == manually_created_courses_account &&
-        root_account
-          .enrollments
-          .active
-          .where(user_id: user)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-    end
-    can :create_courses
-
-    # any logged in user with an active enrollment granting :manage_courses_add
-    # scope is checked against user's associated courses on the account's residing shard
-    given do |user|
-      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !root_account.site_admin? && self.shard.activate do
-        Enrollment
-          .active
-          .where(user_id: user, course_id: self.associated_courses)
-          .any? { |e| e.has_permission_to?(:manage_courses_add) }
-      end
     end
     can :create_courses
 
@@ -1350,7 +1361,7 @@ class Account < ActiveRecord::Base
   end
 
   def reload(*)
-    @account_chain = nil
+    @account_chain = @account_chain_with_site_admin = nil
     super
   end
 
@@ -1540,6 +1551,7 @@ class Account < ActiveRecord::Base
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
+    feature_flags.load
   end
 
   class ::Canvas::AccountCacheError < StandardError; end
@@ -1764,7 +1776,7 @@ class Account < ActiveRecord::Base
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
       tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_assignments)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
@@ -2118,6 +2130,13 @@ class Account < ActiveRecord::Base
   end
   handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
+  def clear_k5_cache
+    User.of_account(self).find_in_batches do |users|
+      User.clear_cache_keys(users.pluck(:id), :k5_user)
+    end
+  end
+  handle_asynchronously :clear_k5_cache, priority: Delayed::LOW_PRIORITY, :max_attempts => 1
+
   def process_external_integration_keys(params_keys, current_user, keys = ExternalIntegrationKey.indexed_keys_for(self))
     return unless params_keys
 
@@ -2208,5 +2227,19 @@ class Account < ActiveRecord::Base
     return nil if owning_account.course_template_id == 0
 
     owning_account.course_template
+  end
+
+  def log_changes_to_app_center_access_token
+    # Hopefully temporary change to debug how/why token is getting reset
+    was_settings, now_settings = saved_change_to_attribute(:settings)
+    was_token = was_settings.respond_to?(:[]) && was_settings[:app_center_access_token]
+    now_token = now_settings.respond_to?(:[]) && now_settings[:app_center_access_token]
+    if was_token != now_token
+      sentry_notifier = CanvasErrors.send(:registry)[:sentry_notification]
+      if sentry_notifier
+        data = {account_id: global_id, was_set: !!was_token.presence, now_set: !!now_token.presence}
+        sentry_notifier.call("Account's app_center_access_token changed", data, :warn)
+      end
+    end
   end
 end

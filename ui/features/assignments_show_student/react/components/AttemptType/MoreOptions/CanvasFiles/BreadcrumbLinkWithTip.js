@@ -50,7 +50,7 @@ class BreadcrumbLinkWithTip extends Breadcrumb.Link {
 
     return (
       <Tooltip variant="inverse" as="div" tip={props.tip}>
-        {onClick ? this.renderLink() : <Text tabIndex="0">{this.renderLink()}</Text>}
+        {onClick ? this.renderLink() : <Text>{this.renderLink()}</Text>}
       </Tooltip>
     )
   }

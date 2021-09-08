@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-large-snapshots */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -16,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildGroup, buildSvg, buildSvgWrapper} from '../index'
+import {buildGroup, buildSvg, buildSvgWrapper, buildStylesheet} from '../index'
 import {DEFAULT_OPTIONS, DEFAULT_SETTINGS} from '../constants'
 
 let settings, options
@@ -41,18 +42,30 @@ describe('buildSvg()', () => {
         height="218px"
         viewBox="0 0 218 218"
         width="218px"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <g
-          fill="#000"
-          stroke="#fff"
-          stroke-width="8"
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
+        <svg
+          fill="none"
+          height="218px"
+          viewBox="0 0 218 218"
+          width="218px"
+          x="0"
         >
-          <circle
-            cx="109"
-            cy="109"
-            r="105"
-          />
-        </g>
+          <g
+            fill="#000"
+            stroke="#fff"
+            stroke-width="8"
+          >
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+        </svg>
       </svg>
     `)
   })
@@ -66,41 +79,105 @@ describe('buildSvg()', () => {
         height="218px"
         viewBox="0 0 218 218"
         width="218px"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <pattern
-          height="16"
-          id="checkerboard"
-          patternUnits="userSpaceOnUse"
-          width="16"
+        <svg
+          fill="none"
+          height="218px"
+          viewBox="0 0 218 218"
+          width="218px"
           x="0"
-          y="0"
         >
-          <rect
-            fill="#d9d9d9"
-            height="8"
-            width="8"
+          <pattern
+            height="16"
+            id="checkerboard"
+            patternUnits="userSpaceOnUse"
+            width="16"
             x="0"
             y="0"
-          />
-          <rect
-            fill="#d9d9d9"
-            height="8"
-            width="8"
-            x="8"
-            y="8"
-          />
-        </pattern>
-        <g
-          fill="url(#checkerboard)"
-          stroke="#fff"
-          stroke-width="8"
+          >
+            <rect
+              fill="#d9d9d9"
+              height="8"
+              width="8"
+              x="0"
+              y="0"
+            />
+            <rect
+              fill="#d9d9d9"
+              height="8"
+              width="8"
+              x="8"
+              y="8"
+            />
+          </pattern>
+          <g
+            fill="url(#checkerboard)"
+            stroke="#fff"
+            stroke-width="8"
+          >
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+        </svg>
+      </svg>
+    `)
+  })
+
+  it('builds the button svg with text', () => {
+    settings = {...settings, text: 'Hello World!'}
+    expect(buildSvg(settings)).toMatchInlineSnapshot(`
+      <svg
+        fill="none"
+        height="218px"
+        viewBox="0 0 218 218"
+        width="218px"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <metadata>
+          {"name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+        </metadata>
+        <svg
+          fill="none"
+          height="218px"
+          viewBox="0 0 218 218"
+          width="218px"
+          x="0"
         >
-          <circle
-            cx="109"
-            cy="109"
-            r="105"
-          />
-        </g>
+          <g
+            fill="#000"
+            stroke="#fff"
+            stroke-width="8"
+          >
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+        </svg>
+        <path
+          d="M103,100 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
+          fill=""
+        />
+        <text
+          fill=""
+          font-family="Lato Extended"
+          font-size="14"
+          font-weight="bold"
+          x="103"
+          y="116"
+        >
+          <tspan
+            dy="0"
+            x="103"
+          >
+            Hello World!
+          </tspan>
+        </text>
       </svg>
     `)
   })
@@ -118,6 +195,7 @@ describe('buildSvgWrapper()', () => {
         height="74px"
         viewBox="0 0 74 74"
         width="74px"
+        x="0"
       />
     `)
   })
@@ -129,6 +207,7 @@ describe('buildSvgWrapper()', () => {
         height="122px"
         viewBox="0 0 122 122"
         width="122px"
+        x="0"
       />
     `)
   })
@@ -140,6 +219,7 @@ describe('buildSvgWrapper()', () => {
         height="158px"
         viewBox="0 0 158 158"
         width="158px"
+        x="0"
       />
     `)
   })
@@ -151,6 +231,7 @@ describe('buildSvgWrapper()', () => {
         height="218px"
         viewBox="0 0 218 218"
         width="218px"
+        x="0"
       />
     `)
   })
@@ -247,5 +328,23 @@ describe('buildGroup()', () => {
         />
       `)
     })
+  })
+})
+
+describe('buildStylesheet()', () => {
+  it('builds the <style /> element', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        blob: () => Promise.resolve(new Blob())
+      })
+    )
+
+    expect(await buildStylesheet()).toMatchInlineSnapshot(`
+      <style
+        type="text/css"
+      >
+        @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+      </style>
+    `)
   })
 })

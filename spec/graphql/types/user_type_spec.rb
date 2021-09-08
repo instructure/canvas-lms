@@ -77,6 +77,21 @@ describe Types::UserType do
     end
   end
 
+  context "shortName" do
+    before(:once) do
+      @student.update! short_name: 'new display name'
+    end
+
+    it "is displayed if set" do
+      expect(user_type.resolve("shortName")).to eq 'new display name'
+    end
+
+    it "returns full name if shortname is not set" do
+      @student.update! short_name: nil
+      expect(user_type.resolve("shortName")).to eq @student.name
+    end
+  end
+
   context "avatarUrl" do
     before(:once) do
       @student.update! avatar_image_url: 'not-a-fallback-avatar.png'
@@ -314,19 +329,6 @@ describe Types::UserType do
       expect(
         user_type.resolve('groups { _id }', current_user: @teacher)
       ).to be_nil
-    end
-  end
-
-  context 'trophies' do
-    it 'returns empty values for the trophies the user has not unlocked' do
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response[0]).to be_nil
-    end
-
-    it 'returns values for the trophies the user has unlocked' do
-      @student.trophies.create!(name: 'balloon')
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response.include?('Balloon')).to be true
     end
   end
 
@@ -678,25 +680,25 @@ describe Types::UserType do
     it "does not return student role" do
       expect(
         user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when no course id is given" do
+    it "returns nil when no course id is given" do
       expect(
         user_type.resolve(%|courseRoles(roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when course id is null" do
+    it "returns nil when course id is null" do
       expect(
         user_type.resolve(%|courseRoles(courseId: null, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "does not return custom roles based on teacher" do
       expect(
         custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "Returns multiple roles when mutiple enrollments exist" do

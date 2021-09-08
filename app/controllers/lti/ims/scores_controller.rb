@@ -74,6 +74,8 @@ module Lti::Ims
       :verify_valid_timestamp,
       :verify_valid_score_maximum,
       :verify_valid_submitted_at,
+      :verify_valid_content_item_submission_type,
+      :verify_attempts_for_online_upload,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
@@ -277,6 +279,27 @@ module Lti::Ims
       else
         render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
       end
+    end
+
+    def verify_valid_content_item_submission_type
+      if !has_content_items? && submission_type == 'online_upload'
+        render_error("Content items must be provided with submission type 'online_upload'", :unprocessable_entity)
+      end
+    end
+
+    # a similar check is done by assignment.submit_homework for online_* submission types,
+    # but the AGS should perform this check for all requests that are going to create new
+    # submissions and increment the attempt number, including those with the external_tool
+    # submission type, and those with file content items that are processed in a job.
+    def verify_attempts_for_online_upload
+      return unless new_submission?
+
+      submission = line_item.assignment.find_or_create_submission(user)
+      # if attempts_left is 0, trying to submit will fail
+      # attempts_left will be nil for non-limited assignments
+      return if submission.attempts_left.nil? || submission.attempts_left > 0
+
+      render_error('The maximum number of allowed attempts has been reached for this submission', :unprocessable_entity)
     end
 
     def score_submission

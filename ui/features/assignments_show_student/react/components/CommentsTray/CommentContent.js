@@ -24,7 +24,10 @@ import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/
 import noComments from '../../../images/NoComments.svg'
 import React, {useContext, useEffect} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {SUBMISSION_COMMENT_QUERY, SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {
+  SUBMISSION_COMMENT_QUERY,
+  SUBMISSION_HISTORIES_QUERY
+} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
@@ -137,7 +140,9 @@ export default function CommentContent(props) {
     <>
       {!props.submission.gradeHidden && !props.comments.length && (
         <SVGWithTextPlaceholder
-          text={I18n.t('Send a comment to your instructor about this assignment.')}
+          text={I18n.t(
+            "This is where you can leave a comment and view your instructor's feedback."
+          )}
           url={noComments}
         />
       )}

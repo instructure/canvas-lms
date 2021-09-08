@@ -17,57 +17,96 @@
  */
 
 import React from 'react'
-import {render, fireEvent, within} from '@testing-library/react'
 import FindOutcomesView from '../FindOutcomesView'
-import {isRTL} from '@canvas/i18n/rtlHelper'
+import {createCache} from '@canvas/apollo'
+import {MockedProvider} from '@apollo/react-testing'
+import {render as realRender, fireEvent, within} from '@testing-library/react'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {findOutcomesMocks} from '@canvas/outcomes/mocks/Management'
+import {
+  IMPORT_NOT_STARTED,
+  IMPORT_FAILED,
+  IMPORT_PENDING
+} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-jest.mock('@canvas/i18n/rtlHelper')
+jest.useFakeTimers()
 
 describe('FindOutcomesView', () => {
   let onChangeHandlerMock
   let onClearHandlerMock
-  let onAddAllHandlerMock
+  let importOutcomeHandlerMock
   let onLoadMoreHandlerMock
+  let onAddAllHandlerMock
+  let cache
   const defaultProps = (props = {}) => ({
     collection: {
       id: '1',
-      name: 'State Standards'
+      name: 'State Standards',
+      isRootGroup: false
     },
-    outcomesCount: 3,
-    outcomes: {
-      edges: [
-        {
-          node: {
-            _id: '11',
-            title: 'Outcome 1',
-            description: 'Outcome 1 description'
+    outcomesGroup: {
+      title: 'State Standards',
+      _id: '1',
+      contextId: 1,
+      contextType: 'Account',
+      outcomesCount: 3,
+      outcomes: {
+        edges: [
+          {
+            _id: 10,
+            node: {
+              _id: '11',
+              title: 'Outcome 1',
+              description: 'Outcome 1 description',
+              isImported: false
+            }
           }
+        ],
+        pageInfo: {
+          endCursor: 'abc',
+          hasNextPage: true
         }
-      ],
-      pageInfo: {
-        endCursor: 'abc',
-        hasNextPage: true
       }
     },
     loading: false,
     searchString: '',
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
+    disableAddAllButton: false,
+    importGroupStatus: IMPORT_NOT_STARTED,
+    importOutcomesStatus: {},
+    importOutcomeHandler: importOutcomeHandlerMock,
+    shouldFocusAddAllBtn: false,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
     ...props
   })
 
   beforeEach(() => {
+    cache = createCache()
     onChangeHandlerMock = jest.fn()
     onClearHandlerMock = jest.fn()
-    onAddAllHandlerMock = jest.fn()
+    importOutcomeHandlerMock = jest.fn()
     onLoadMoreHandlerMock = jest.fn()
+    onAddAllHandlerMock = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '1', mocks = findOutcomesMocks()} = {}
+  ) => {
+    return realRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        <MockedProvider cache={cache} mocks={mocks}>
+          {children}
+        </MockedProvider>
+      </OutcomesContext.Provider>
+    )
+  }
 
   it('renders component with the correct group name and search bar placeholder', () => {
     const {getByText, getByPlaceholderText} = render(<FindOutcomesView {...defaultProps()} />)
@@ -99,7 +138,10 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          outcomesCount: 0
+          outcomesGroup: {
+            ...defaultProps.outcomesGroup,
+            outcomesCount: 0
+          }
         })}
       />
     )
@@ -120,26 +162,32 @@ describe('FindOutcomesView', () => {
       <FindOutcomesView
         {...defaultProps({
           searchString: 'abc',
-          outcomes: {
-            edges: []
+          outcomesGroup: {
+            ...defaultProps().outcomesGroup,
+            outcomes: {
+              edges: []
+            }
           }
         })}
       />
     )
-    expect(queryByText('The search returned no results')).toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
     const {queryByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          outcomes: {
-            edges: []
+          outcomesGroup: {
+            ...defaultProps().outcomesGroup,
+            outcomes: {
+              edges: []
+            }
           }
         })}
       />
     )
-    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 
   it('calls onClearHandler on click on clear search button', () => {
@@ -156,70 +204,86 @@ describe('FindOutcomesView', () => {
     expect(onAddAllHandlerMock).toHaveBeenCalled()
   })
 
-  it('shows outcome as not added when outcome has not been imnported', () => {
-    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    expect(toggle).not.toBeChecked()
-  })
-
-  it('shows outcome as added when outcome is already imported', () => {
-    const importedOutcome = {
-      outcomes: {
-        edges: [
-          {
-            node: {
-              _id: '11',
-              title: 'Outcome 1',
-              description: 'Outcome 1 description',
-              isImported: true
-            }
-          }
-        ],
-        pageInfo: {
-          endCursor: 'abc',
-          hasNextPage: true
-        }
-      }
-    }
-    const {getAllByText} = render(<FindOutcomesView {...defaultProps(importedOutcome)} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    expect(toggle).toBeChecked()
-  })
-
-  it('shows outcome as added when toggle is turned on', () => {
-    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    fireEvent.click(toggle)
-    expect(toggle).toBeChecked()
-  })
-
-  it('shows outcome as removed when toggle is turned off', () => {
-    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    fireEvent.click(toggle)
-    fireEvent.click(toggle)
-    expect(toggle).not.toBeChecked()
-  })
-
-  it('disables "Add All Outcomes" button if number of outcomes eq 0', () => {
+  it('enables "Add All Outcomes" button if group import failed', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          outcomesCount: 0
+          importGroupStatus: IMPORT_FAILED
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
+  })
+
+  it('enables "Add All Outcomes" button if group import not started', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_NOT_STARTED
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
+  })
+
+  it('disables "Add All Outcomes" button if group import is pending', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_PENDING
         })}
       />
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
 
-  it('disables "Add All Outcomes" button if the search is present', () => {
-    const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
+  it('displays outcome as not added when outcome has not been imported', () => {
+    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
+    const addButton = getAllByText('Add')[0].closest('button')
+    expect(addButton).not.toBeDisabled()
+  })
+
+  it('disables "Add All Outcomes" button if number of outcomes eq 0', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          outcomesGroup: {
+            ...defaultProps().outcomesGroup,
+            outcomesCount: 0
+          }
+        })}
+      />
+    )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  })
+
+  it('hides the "Add All Outcomes" button if the collection is a root group', () => {
+    const {queryByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          collection: {
+            ...defaultProps().collection,
+            isRootGroup: true
+          }
+        })}
+      />
+    )
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
+  })
+
+  it('hides "Add All Outcomes" button if search string is present', () => {
+    const {queryByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
   it('shows large loader if data is loading and outcomes are missing/undefined', () => {
     const {getByTestId} = render(
-      <FindOutcomesView {...defaultProps({loading: true, outcomes: null})} />
+      <FindOutcomesView
+        {...defaultProps({
+          loading: true,
+          outcomesGroup: {...defaultProps().outcomesGroup, outcomes: null}
+        })}
+      />
     )
     expect(getByTestId('loading')).toBeInTheDocument()
   })
@@ -234,30 +298,17 @@ describe('FindOutcomesView', () => {
     expect(getByTestId('load-more-loading')).toBeInTheDocument()
   })
 
-  it('shows small loader when searching for outcomes', () => {
-    const {getByTestId} = render(
-      <FindOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
-    )
-    expect(getByTestId('search-loading')).toBeInTheDocument()
-  })
+  describe('mobile view', () => {
+    const mobileRender = children =>
+      render(
+        <OutcomesContext.Provider value={{env: {isMobileView: true}}}>
+          {children}
+        </OutcomesContext.Provider>
+      )
 
-  it('shows in search breadcrumb right arrow icon with screen reader accessible title', () => {
-    const {getByTitle} = render(
-      <FindOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
-    )
-    expect(getByTitle('search results for')).toBeInTheDocument()
-  })
-
-  it('flips order of search term and outcome title if RTL is enabled', () => {
-    isRTL.mockReturnValue(false)
-    const {getByTestId, rerender} = render(
-      <FindOutcomesView {...defaultProps({loading: true, searchString: 'ltrtest'})} />
-    )
-    expect(within(getByTestId('group-name-ltr')).getByText('State Standards')).toBeTruthy()
-    expect(within(getByTestId('search-string-ltr')).getByText('ltrtest')).toBeTruthy()
-    isRTL.mockReturnValue(true)
-    rerender(<FindOutcomesView {...defaultProps({loading: true, searchString: 'rtltest'})} />)
-    expect(within(getByTestId('group-name-ltr')).getByText('rtltest')).toBeTruthy()
-    expect(within(getByTestId('search-string-ltr')).getByText('State Standards')).toBeTruthy()
+    it('does not render the group name', () => {
+      const {queryByText} = mobileRender(<FindOutcomesView {...defaultProps()} />)
+      expect(queryByText('State Standards')).not.toBeInTheDocument()
+    })
   })
 })

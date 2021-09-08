@@ -90,18 +90,11 @@ class ContextModulesController < ApplicationController
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
-        :DUPLICATE_ENABLED => @domain_root_account.feature_enabled?(:duplicate_modules),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.usage_rights_required?,
-           manage_files_edit:
-            @context.grants_any_right?(
-              @current_user,
-              session,
-              :manage_files,
-              :manage_files_edit
-            )
+           manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
         },
         :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},
         :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),

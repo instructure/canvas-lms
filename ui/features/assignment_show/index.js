@@ -106,6 +106,33 @@ function renderStudentGroupFilter() {
   }
 }
 
+// Attach the immersive reader button if enabled
+const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+const immersive_reader_mobile_mount_point = document.getElementById(
+  'immersive_reader_mobile_mount_point'
+)
+if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
+  import('../../shared/immersive-reader/ImmersiveReader')
+    .then(ImmersiveReader => {
+      const content = document.querySelector('.description')?.innerHTML
+      const title = document.querySelector('.title')?.textContent
+
+      if (immersive_reader_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+      }
+
+      if (immersive_reader_mobile_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+          content,
+          title
+        })
+      }
+    })
+    .catch(e => {
+      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+    })
+}
+
 const promiseToGetModuleSequenceFooter = import('@canvas/module-sequence-footer')
 $(() => {
   const $el = $('#assignment_publish_button')
@@ -140,7 +167,7 @@ $(() => {
 })
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function() {
+  $('#content').on('click', '#mark-as-done-checkbox', function () {
     return MarkAsDone.toggle(this)
   })
 )
@@ -199,7 +226,7 @@ $(() => {
     $('#re_upload_submissions_form').slideToggle()
   })
 
-  $('.download_submissions_link').click(function(event) {
+  $('.download_submissions_link').click(function (event) {
     event.preventDefault()
     INST.downloadSubmissions($(this).attr('href'))
     $('.upload_submissions_link').slideDown()
@@ -228,4 +255,12 @@ $(() => {
       parseInt(ENV.ASSIGNMENT_ID, 10)
     )
   }
+})
+
+$('#accessibility_warning').on('focus', function () {
+  $('#accessibility_warning').removeClass('screenreader-only')
+})
+
+$('#accessibility_warning').on('blur', function () {
+  $('#accessibility_warning').addClass('screenreader-only')
 })

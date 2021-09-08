@@ -31,7 +31,8 @@ export default function StudentAnnotationAttempt(props) {
   useEffect(() => {
     axios
       .post('/api/v1/canvadoc_session', {
-        submission_attempt: isSubmitted ? props.submission.attempt : 'draft',
+        submission_attempt:
+          isSubmitted && props.submission.attempt !== 0 ? props.submission.attempt : 'draft',
         submission_id: props.submission._id
       })
       .then(result => {
@@ -53,7 +54,7 @@ export default function StudentAnnotationAttempt(props) {
         setFetchingCanvadocSession(false)
         setValidResponse(false)
       })
-  }, [isSubmitted, props.submission.attempt])
+  }, [isSubmitted, props, props.submission.attempt])
 
   return (
     <div data-testid="canvadocs-pane">
