@@ -287,6 +287,7 @@ describe "security" do
       end
 
       it "should be limited for the same ip" do
+        skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
         bad_login("5.5.5.5")
         expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.5")
@@ -300,6 +301,7 @@ describe "security" do
       end
 
       it "should have a higher limit for other ips" do
+        skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
         bad_login("5.5.5.5")
         expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.6") # different IP, so allowed
@@ -329,6 +331,7 @@ describe "security" do
       end
 
       it "should apply limitations correctly for cross-account logins" do
+        skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
         account = Account.create!
         allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
         @pseudonym.account = account

@@ -55,7 +55,7 @@ def createDistribution(nestedStages) {
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
     'RSPEC_PROCESSES=6',
     'RSPECQ_FILE_SPLIT_THRESHOLD=120',
-    'RSPECQ_MAX_REQUEUES=1',
+    'RSPECQ_MAX_REQUEUES=2',
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
   ]
 

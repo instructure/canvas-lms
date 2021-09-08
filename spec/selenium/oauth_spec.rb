@@ -115,6 +115,7 @@ describe "oauth2 flow" do
     end
 
     it "should not let developer keys expire if remember me was checked" do
+      skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
       expiring_key = DeveloperKey.create!(
         name: 'IExpire',
         redirect_uri: 'http://www.example.com',
