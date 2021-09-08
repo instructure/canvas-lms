@@ -14887,7 +14887,7 @@ nn:
   only_csv_files_are_supported_e1ad5270: "Kun CSV-filer er støtta."
   only_needed_if_enrollments_selected_ee620ce3: "Gjeld kun dersom påmeldingar er valt"
   only_once_after_each_attempt_cc842738: "Berre ein gong etter kvart forsøk"
-  only_show_announcement_on_current_account_domain_fc341eea: "Vis berre kunngjeringar for gjeldande konto."
+  only_show_announcement_on_current_account_domain_fc341eea: "Vis kunngjeringar berre for ditt lokale kontodomene og ikkje Trust account."
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
   oops_something_went_wrong_importing_name_d382cac1: "Ops! Noke gjekk gale under importering av \"%{name}\""
   oops_something_went_wrong_with_making_a_copy_of_or_22787360: "Noko gjekk gale under kopiering av \"%{original_assignment_name}\"."
@@ -14934,6 +14934,7 @@ nn:
   options_for_title_label_17f821ff: "Innstillingar for %{title_label}"
   or_9b70ccaa: Eller
   or_a01eec62: ELLER
+  or_choose_files_b795006d: "eller vel filer"
   or_ef4e808: eller
   orange_81386a62: Oransje
   orbis_report_header_assignment_id: oppgåve-ID
