@@ -3218,7 +3218,7 @@ describe Course, 'grade_publishing' do
     before(:each) do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = double()
-      allow(Canvas::Plugin).to receive("find!".to_sym).with('grade_export').and_return(@plugin)
+      allow(Canvas::Plugin).to receive(:find!).with('grade_export').and_return(@plugin)
       allow(@plugin).to receive(:settings).and_return(@plugin_settings)
     end
 
@@ -3886,7 +3886,7 @@ describe Course, 'grade_publishing' do
         @course.assignment_groups.create(:name => "Assignments")
         a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
         a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
+        @course.enroll_teacher(@user).tap { |e| e.update!(workflow_state: 'active') }
         @ase = @course.student_enrollments.active
 
         add_pseudonym(@ase[2], Account.default, "student2", nil)
@@ -4026,6 +4026,41 @@ describe Course, 'grade_publishing' do
                 "#{@user.id},U1,#{@course.id},,#{@ase[7].course_section_id},,#{@ase[7].user.id},student7b,#{@ase[7].id},active,85.0,B\n"),
            "text/csv"]
         ]
+      end
+
+      context 'sharding' do
+        specs_require_sharding
+
+        it 'should generate valid csv with a sis_user_id from out-of-shard' do
+          u = @shard1.activate { User.create! }
+          @course.root_account.pseudonyms.create!(user: u, unique_id: 'user', sis_user_id: 'sis_id')
+          enrollment = @course.enroll_student(u, enrollment_state: 'active')
+          ase = @ase.to_a << enrollment
+          @course.assignments.first.grade_student(u, { grade: '10', grader: @user })
+          @course.recompute_student_scores_without_send_later
+
+          expect(@course.generate_grade_publishing_csv_output(ase, @user, @pseudonym)).to eq [
+               [
+                 ase.map(&:id),
+                 (
+                   'publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,' +
+                     'student_id,student_sis_id,enrollment_id,enrollment_status,' + "score\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[0].course_section_id},,#{ase[0].user.id},,#{ase[0].id},active,95.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[1].course_section_id},,#{ase[1].user.id},,#{ase[1].id},active,65.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[2].course_section_id},,#{ase[2].user.id},,#{ase[2].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[3].course_section_id},,#{ase[3].user.id},student3,#{ase[3].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[4].course_section_id},,#{ase[4].user.id},student4a,#{ase[4].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[4].course_section_id},,#{ase[4].user.id},student4b,#{ase[4].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[5].course_section_id},,#{ase[5].user.id},,#{ase[5].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[6].course_section_id},,#{ase[6].user.id},,#{ase[6].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[7].course_section_id},,#{ase[7].user.id},student7a,#{ase[7].id},active,85.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[7].course_section_id},,#{ase[7].user.id},student7b,#{ase[7].id},active,85.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[8].course_section_id},,#{ase[8].user.id},sis_id,#{ase[8].id},active,50.0\n"
+                 ),
+                 'text/csv'
+               ]
+             ]
+        end
       end
 
       context "when including final grade overrides" do

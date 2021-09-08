@@ -2073,6 +2073,8 @@ class Course < ActiveRecord::Base
   end
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, { user: :pseudonyms })
+
     enrollment_ids = []
 
     res = CSV.generate do |csv|
@@ -2106,8 +2108,9 @@ class Course < ActiveRecord::Base
           score = enrollment.computed_final_score
         end
 
-        pseudonym_sis_ids = enrollment.user.pseudonyms.active.where(account_id: self.root_account_id).pluck(:sis_user_id)
-        pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
+        sis_pseudonyms =
+          SisPseudonym.for(enrollment.user, self.root_account, include_all_pseudonyms: true)
+        pseudonym_sis_ids = sis_pseudonyms ? sis_pseudonyms.map(&:sis_user_id) : [nil]
 
         pseudonym_sis_ids.each do |pseudonym_sis_id|
           row = [
