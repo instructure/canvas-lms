@@ -251,4 +251,50 @@ describe "observer k5 dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
   end
+
+  context 'observee pairing modal' do
+    it 'brings up modal when button selected' do
+      get "/"
+
+      click_observed_student_option('Add Student')
+
+      expect(pairing_modal).to be_displayed
+    end
+
+    it 'closes when Close button is selected' do
+      get "/"
+
+      click_observed_student_option('Add Student')
+      click_close_pairing_button
+
+      expect(wait_for_no_such_element { pairing_modal }).to be_truthy
+    end
+
+    it 'pairs observer and observee when pairing code added' do
+      course_with_student(
+        active_all: true,
+        name: "Transfer Student",
+        course: @homeroom_course
+      )
+      pairing_code = @student.generate_observer_pairing_code
+
+      get "/"
+
+      click_observed_student_option('Add Student')
+      pairing_code_input.send_keys(pairing_code.code)
+      click_pairing_button
+
+      expect(wait_for_no_such_element { pairing_modal }).to be_truthy
+    end
+
+    it 'retains modal when invalid pairing code added' do
+      get "/"
+
+      click_observed_student_option('Add Student')
+      pairing_code_input.send_keys('xxxXXX')
+      click_pairing_button
+      expect_instui_flash_message("Failed pairing student.")
+      expect(pairing_modal).to be_displayed
+    end
+  end
 end
