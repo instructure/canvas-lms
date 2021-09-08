@@ -157,7 +157,7 @@ describe('IsolatedViewContainer', () => {
     expect(onOpenIsolatedView).toHaveBeenCalledWith('70', '70', false)
   })
 
-  it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -165,13 +165,13 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(threadActionsMenus[0])
 
     const goToTopicButton = await findByText('Go To Topic')
-
     expect(goToTopicButton).toBeInTheDocument()
     fireEvent.click(goToTopicButton)
-    expect(goToTopic).toHaveBeenCalled()
+
+    expect(onClose).toHaveBeenCalled()
   })
 
-  it('calls the goToTopic callback when clicking Go To Topic (from child)', async () => {
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from child)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -182,7 +182,7 @@ describe('IsolatedViewContainer', () => {
     expect(goToTopicButton).toBeInTheDocument()
     fireEvent.click(goToTopicButton)
 
-    expect(goToTopic).toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('should not render a back button', async () => {
