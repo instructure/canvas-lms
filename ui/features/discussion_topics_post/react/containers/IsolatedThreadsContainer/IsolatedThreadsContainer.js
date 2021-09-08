@@ -239,7 +239,7 @@ const IsolatedThreadContainer = props => {
         onClick={() =>
           props.onOpenIsolatedView(
             props.discussionEntry._id,
-            props.discussionEntry.rootEntryId,
+            props.discussionEntry.isolatedEntryId,
             true
           )
         }

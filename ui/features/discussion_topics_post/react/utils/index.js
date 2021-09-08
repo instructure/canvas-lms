@@ -157,7 +157,12 @@ export const isTopicAuthor = (topicAuthor, entryAuthor) => {
   return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
 }
 
-export const getOptimisticResponse = (message, parentId = 'PLACEHOLDER', rootEntryId = null) => {
+export const getOptimisticResponse = (
+  message,
+  parentId = 'PLACEHOLDER',
+  rootEntryId = null,
+  isolatedEntryId = null
+) => {
   return {
     createDiscussionEntry: {
       discussionEntry: {
@@ -202,6 +207,7 @@ export const getOptimisticResponse = (message, parentId = 'PLACEHOLDER', rootEnt
         },
         parentId,
         rootEntryId,
+        isolatedEntryId,
         quotedEntry: null,
         __typename: 'DiscussionEntry'
       },

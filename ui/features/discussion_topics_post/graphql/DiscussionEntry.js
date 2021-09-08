@@ -50,6 +50,7 @@ export const DiscussionEntry = {
         ...DiscussionEntryPermissions
       }
       rootEntryId
+      isolatedEntryId
       parentId
       quotedEntry {
         createdAt
@@ -92,6 +93,7 @@ export const DiscussionEntry = {
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
+    isolatedEntryId: string,
     parentId: string,
     quotedEntry: shape({
       createdAt: string,
@@ -140,6 +142,7 @@ export const DiscussionEntry = {
       __typename: 'DiscussionSubentriesConnection'
     },
     rootEntryId = '77',
+    isolatedEntryId = '77',
     parentId = '77',
     quotedEntry = null
   } = {}) => ({
@@ -160,6 +163,7 @@ export const DiscussionEntry = {
     permissions,
     discussionSubentriesConnection,
     rootEntryId,
+    isolatedEntryId,
     parentId,
     quotedEntry,
     __typename: 'DiscussionEntry'

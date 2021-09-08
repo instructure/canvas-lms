@@ -130,7 +130,7 @@ export const IsolatedParent = props => {
                 onClick={() =>
                   props.onOpenIsolatedView(
                     props.discussionEntry.parentId,
-                    props.discussionEntry.rootEntryId,
+                    props.discussionEntry.isolatedEntryId,
                     false
                   )
                 }

@@ -83,9 +83,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
+  const openIsolatedView = (discussionEntryId, isolatedEntryId, withRCE, relativeId = null) => {
     setReplyFromId(discussionEntryId)
-    setIsolatedEntryId(discussionEntryId || rootEntryId)
+    setIsolatedEntryId(isolatedEntryId || discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -189,13 +189,13 @@ const DiscussionTopicManager = props => {
           discussionTopic={discussionTopicQuery.data.legacyNode}
           onOpenIsolatedView={(
             discussionEntryId,
-            rootEntryId,
+            isolatedEntryId,
             withRCE,
             relativeId,
             highlightId
           ) => {
             setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
+            openIsolatedView(discussionEntryId, isolatedEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
