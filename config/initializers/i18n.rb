@@ -22,6 +22,80 @@ require_dependency 'lazy_presumptuous_i18n_backend'
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
 
+module CanvasI18nFallbacks
+  # see BCP-47 "Tags for Identifying Languages" for the grammar
+  # definition that led to this pattern match. It is not 100%
+  # strictly implemented but this will be more than sufficient
+  # for Canvas
+  LANG_PAT = %r{
+    ^
+    ([a-z]{2,3})                               # language
+    (-[a-z]{4})?                               # optional script
+    (-(?:[a-z]{2}|[0-9]{3}))?                  # optional region
+    ((?:-(?:[a-z0-9]{5,8}|[0-9][a-z0-9]{3}))*) # optional variants
+    ((?:-[a-wy-z](?:-[a-z0-9]{2,8})*)*)        # optional extensions
+    (-x(?:-[a-z0-9]{1,8})+)*                   # optional private use
+    $
+  }ix.freeze
+
+  # This fallback order is more intelligent than simply lopping off
+  # elements from the end. For instance, in Canvas we use the private
+  # tag x-k12 in several locales, and we would want to keep that as long
+  # as possible, for instance we would like sv-FI-x-k12 to fall back to
+  # sv-x-k12 first, and then sv.
+  FALLBACK_ORDER = [
+    [0, 1, 2, 3, 4, 5].freeze,   # everything
+    [0, 1, 2, 3, 5].freeze,      # remove extensions
+    [0, 1, 2, 5].freeze,         # remove variants
+    [0, 1, 5].freeze,            # remove region
+    [0, 1, 2].freeze,            # remove private tags
+    [0, 2, 5].freeze,            # remove script
+    [0, 2].freeze,               # only language and region
+    [0, 5].freeze,               # only language and private tags
+    [0, 1].freeze,               # only language and script
+    [0].freeze                   # only language code
+  ].freeze
+
+  def self.fallbacks(locale)
+    result = locale.match LANG_PAT
+
+    return [] unless result
+
+    existing_elements = result.captures.map { |e| !!e && e.length > 0 }
+
+    order = []
+    FALLBACK_ORDER.each do |a|
+      order.push(a.dup.select { |e| existing_elements[e] })
+    end
+
+    order.uniq.map do |ordering|
+      ordering.map { |idx| result.captures[idx] }.join.to_sym
+    end
+  end
+end
+
+# Now monkey-patch the i18n gem's Fallbacks::compute method to call our
+# fallback generator rather than its own.
+# rubocop:disable Style/OptionalBooleanParameter
+module I18n
+  module Locale
+    class Fallbacks < Hash
+      def compute(tags, include_defaults = true, exclude = [])
+        result = Array(tags).flat_map do |tag|
+          tags = CanvasI18nFallbacks.fallbacks(tag).map(&:to_sym) - exclude
+          tags.each { |t| tags += compute(@map[t], false, exclude + tags) if @map[t] }
+          tags
+        end
+        result.push(*defaults) if include_defaults
+        result.uniq!
+        result.compact!
+        result
+      end
+    end
+  end
+end
+# rubocop:enable Style/OptionalBooleanParameter
+
 I18n.backend = LazyPresumptuousI18nBackend.new(
   meta_keys: %w[aliases crowdsourced custom locales],
   logger: Rails.logger.method(:debug)
