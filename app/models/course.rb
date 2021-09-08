@@ -2877,7 +2877,7 @@ class Course < ActiveRecord::Base
   TAB_PACE_PLANS = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
-  COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES].freeze
+  COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
 
   def self.default_tabs
     [{
@@ -2987,12 +2987,17 @@ class Course < ActiveRecord::Base
 
   def self.course_subject_tabs
     course_tabs = Course.default_tabs.select { |tab| COURSE_SUBJECT_TAB_IDS.include?(tab[:id]) }
-    # Add the unique TAB_SCHEDULE
+    # Add the unique TAB_SCHEDULE and TAB_GROUPS
     course_tabs.insert(1, {
       :id => TAB_SCHEDULE,
       :label => t('#tabs.schedule', "Schedule"),
       :css_class => 'schedule',
       :href => :course_path
+    }, {
+      :id => TAB_GROUPS,
+      :label => t('#tabs.groups', "Groups"),
+      :css_class => 'groups',
+      :href => :course_groups_path,
     })
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
   end
@@ -3095,10 +3100,13 @@ class Course < ActiveRecord::Base
 
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings, ensure that all external tools are at the bottom
+        # Don't show Settings, ensure that all external tools are at the bottom (with the exception of Groups, which
+        # should stick to the end unless it has been re-ordered)
         lti_tabs = tabs.filter { |t| t[:external] }
         tabs -= lti_tabs
+        groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
         tabs += lti_tabs
+        tabs << groups_tab if groups_tab
       else
         # Ensure that Settings is always at the bottom
         tabs << settings_tab if settings_tab
@@ -3138,9 +3146,14 @@ class Course < ActiveRecord::Base
         {id: TAB_DISCUSSIONS, relation: :discussions, additional_check: -> { allow_student_discussion_topics }}
       ].select{ |hidable_tab| tabs.any?{ |t| t[:id] == hidable_tab[:id] } }
 
-      # Show modules tab in k5 even if there's no modules (but not if its hidden)
       if course_subject_tabs
+        # Show modules tab in k5 even if there's no modules (but not if its hidden)
         tabs_that_can_be_marked_hidden_unused.reject!{ |t| t[:id] == TAB_MODULES }
+
+        # Hide Groups tab for students if there are no groups
+        unless self.grants_right?(user, :read_as_admin) || self.active_groups.exists?
+          tabs.delete_if { |t| t[:id] == TAB_GROUPS }
+        end
       end
 
       if tabs_that_can_be_marked_hidden_unused.present?

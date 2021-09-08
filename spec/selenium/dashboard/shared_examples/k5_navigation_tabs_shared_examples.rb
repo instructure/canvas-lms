@@ -31,7 +31,7 @@ shared_examples_for 'k5 subject navigation tabs' do
 
   let(:lti_a) { 'LTI Resource A' }
   let(:lti_b) { 'LTI Resource B' }
-  let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', lti_a, lti_b] }
+  let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', 'Groups', lti_a, lti_b] }
 
   before :once do
     Account.site_admin.enable_feature!(:k5_parent_support)
@@ -51,7 +51,13 @@ shared_examples_for 'k5 subject navigation tabs' do
 
     get "/courses/#{@subject_course.id}"
 
-    expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
+    get "/courses/#{@subject_course.id}"
+
+    tab_list_text = "Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\n"\
+                    "Math Resources\nResources"
+    tab_list_text += "\nMath Groups\nGroups" if @subject_course.user_is_instructor?(@current_user)
+
+    expect(k5_tablist).to include_text(tab_list_text)
   end
 
   it 'has tabs that are hidden from the subject page' do
@@ -66,7 +72,10 @@ shared_examples_for 'k5 subject navigation tabs' do
 
     get "/courses/#{@subject_course.id}"
 
-    expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
+    tab_list_text = "Math Schedule\nSchedule\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources"
+    tab_list_text += "\nMath Groups\nGroups" if @subject_course.user_is_instructor?(@current_user)
+
+    expect(k5_tablist).to include_text(tab_list_text)
   end
 
   it 'has ltis that are rearranged in new order on the resources page' do

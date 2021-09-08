@@ -26,6 +26,7 @@ import {
   IconBankLine,
   IconCalendarMonthLine,
   IconEditSolid,
+  IconGroupLine,
   IconHomeLine,
   IconModuleLine,
   IconStarLightLine,
@@ -59,6 +60,7 @@ import ObserverOptions, {
   ObserverListShape,
   shouldShowObserverOptions
 } from '@canvas/k5/react/ObserverOptions'
+import GroupsPage from '@canvas/k5/react/GroupsPage'
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 100
@@ -89,6 +91,11 @@ const COURSE_TABS = [
     id: TAB_IDS.RESOURCES,
     icon: IconBankLine,
     label: I18n.t('Resources')
+  },
+  {
+    id: TAB_IDS.GROUPS,
+    icon: IconGroupLine,
+    label: I18n.t('Groups')
   }
 ]
 
@@ -96,6 +103,7 @@ const COURSE_TABS = [
 const translateTabId = id => {
   if (id === '19') return TAB_IDS.SCHEDULE
   if (id === '10') return TAB_IDS.MODULES
+  if (id === '7') return TAB_IDS.GROUPS
   if (id === '5') return TAB_IDS.GRADES
   if (String(id).startsWith('context_external_tool_')) return TAB_IDS.RESOURCES
   return TAB_IDS.HOME
@@ -114,6 +122,7 @@ const toRenderTabs = (tabs, hasSyllabusBody) => {
   if (hasSyllabusBody && !activeTabs.some(tab => tab.id === TAB_IDS.RESOURCES)) {
     activeTabs.push(COURSE_TABS.find(tab => tab.id === TAB_IDS.RESOURCES))
   }
+
   return activeTabs
 }
 
@@ -280,19 +289,20 @@ export function K5Course({
   name,
   timeZone,
   canManage = false,
+  canManageGroups,
   canReadAsAdmin,
   canReadAnnouncements,
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
   userIsStudent,
-  userIsInstructor,
   showStudentView,
   studentViewPath,
   showLearningMasteryGradebook,
   outcomeProficiency,
   tabs,
   settingsPath,
+  groupsPath,
   latestAnnouncement,
   pagesPath,
   hasWikiPages,
@@ -473,7 +483,7 @@ export function K5Course({
             hideFinalGrades={hideFinalGrades}
             currentUser={currentUser}
             userIsStudent={userIsStudent}
-            userIsInstructor={userIsInstructor}
+            userIsCourseAdmin={canReadAsAdmin}
             showLearningMasteryGradebook={showLearningMasteryGradebook}
             outcomeProficiency={outcomeProficiency}
           />
@@ -486,6 +496,14 @@ export function K5Course({
           isSingleCourse
         />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
+        {currentTab === TAB_IDS.GROUPS && (
+          <GroupsPage
+            courseId={id}
+            groupsPath={groupsPath}
+            showTeacherPage={canReadAsAdmin}
+            canManageGroups={canManageGroups}
+          />
+        )}
       </View>
     </K5DashboardContext.Provider>
   )
@@ -502,6 +520,7 @@ K5Course.propTypes = {
   bannerImageUrl: PropTypes.string,
   cardImageUrl: PropTypes.string,
   canManage: PropTypes.bool,
+  canManageGroups: PropTypes.bool,
   canReadAsAdmin: PropTypes.bool.isRequired,
   canReadAnnouncements: PropTypes.bool.isRequired,
   color: PropTypes.string,
@@ -511,12 +530,12 @@ K5Course.propTypes = {
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   userIsStudent: PropTypes.bool.isRequired,
-  userIsInstructor: PropTypes.bool.isRequired,
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape,
   tabs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  groupsPath: PropTypes.string.isRequired,
   settingsPath: PropTypes.string.isRequired,
   latestAnnouncement: PropTypes.object,
   pagesPath: PropTypes.string.isRequired,

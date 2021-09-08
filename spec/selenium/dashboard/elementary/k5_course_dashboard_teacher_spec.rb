@@ -204,7 +204,7 @@ describe "teacher k5 course dashboard" do
   context 'course tab navigation' do
     let(:lti_a) { 'LTI Resource A' }
     let(:lti_b) { 'LTI Resource B' }
-    let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', lti_a, lti_b] }
+    let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', 'Groups', lti_a, lti_b] }
 
     before :once do
       @resource_a = "context_external_tool_#{create_lti_resource(lti_a).id}"
@@ -216,7 +216,7 @@ describe "teacher k5 course dashboard" do
 
       navigation_list = navigation_items
 
-      expect(navigation_list.count).to eq(6)
+      expect(navigation_list.count).to eq(7)
 
       navigation_names.count.times do |x|
         expect(navigation_list[x]).to include_text(navigation_names[x])

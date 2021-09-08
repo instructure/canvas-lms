@@ -2235,6 +2235,12 @@ class CoursesController < ApplicationController
             CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
             PERMISSIONS: {
               manage: @context.grants_right?(@current_user, session, :manage),
+              manage_groups: @context.grants_any_right?(@current_user,
+                                                        session,
+                                                        :manage_groups,
+                                                        :manage_groups_add,
+                                                        :manage_groups_manage,
+                                                        :manage_groups_delete),
               read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
               read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },
@@ -2255,6 +2261,7 @@ class CoursesController < ApplicationController
             show_student_view: can_do(@context, @current_user, :use_student_view),
             student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
             settings_path: course_settings_path(@context.id),
+            groups_path: course_groups_path(@context.id),
             latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
             has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
             has_syllabus_body: @context.syllabus_body.present?,

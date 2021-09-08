@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
-import StudentView from './react/index'
-import ready from '@instructure/ready'
 import React from 'react'
+import StudentView from '../../../features/groups/react'
+import {bool, string} from 'prop-types'
+import TeacherGroupsPage from '../../../features/k5_course/react/TeacherGroupsPage'
 
-ready(() => {
-  ReactDOM.render(
-    <StudentView enableGroupCreation enableEveryoneTab />,
-    document.getElementById('content')
+const GroupsPage = ({canManageGroups, groupsPath, showTeacherPage}) => {
+  if (showTeacherPage) {
+    return <TeacherGroupsPage groupsPath={groupsPath} canManageGroups={canManageGroups} />
+  }
+
+  return (
+    <div>
+      <StudentView />
+    </div>
   )
-})
+}
+
+GroupsPage.propTypes = {
+  groupsPath: string.isRequired,
+  canManageGroups: bool,
+  showTeacherPage: bool
+}
+
+export default GroupsPage

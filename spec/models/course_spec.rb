@@ -2867,10 +2867,17 @@ describe Course, "tabs_available" do
                 { id: Course::TAB_ANNOUNCEMENTS },
                 { id: Course::TAB_MODULES },
                 { id: Course::TAB_GRADES },
-                { id: Course::TAB_SETTINGS }
+                { id: Course::TAB_SETTINGS },
+                { id: Course::TAB_GROUPS },
             ]
             available_tabs = @course.tabs_available(@user, course_subject_tabs: true).map { |tab| tab[:id] }
-            expected_tabs = [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+            expected_tabs = [
+              Course::TAB_HOME,
+              Course::TAB_SCHEDULE,
+              Course::TAB_MODULES,
+              Course::TAB_GRADES,
+              Course::TAB_GROUPS
+            ]
 
             expect(available_tabs).to eq expected_tabs
           end
@@ -2906,6 +2913,45 @@ describe Course, "tabs_available" do
             course_with_student_logged_in(:active_all => true)
             tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map{ |t| t[:id] }
             expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+          end
+
+          it "includes groups if the user is a student and there are active groups" do
+            course_with_student_logged_in(:active_all => true)
+            @course.groups.create!
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).to include Course::TAB_GROUPS
+          end
+
+          it "doesn't include groups if the user is a student and there are no active groups" do
+            course_with_student_logged_in(:active_all => true)
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).not_to include Course::TAB_GROUPS
+          end
+
+          it "includes groups if the user is a teacher, even if there are no active groups" do
+            tab_ids = @course.tabs_available(@teacher, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).to include Course::TAB_GROUPS
+          end
+
+          it "places groups after external items when it is not re-ordered" do
+            @course.context_external_tools.create!(name: "bob",
+                                                   consumer_key: "🔑",
+                                                   shared_secret: "🤫",
+                                                   domain: "example.com",
+                                                   course_navigation: { text: "Blah", url: "https://google.com" })
+            last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+            expect(last_tab_id).to equal Course::TAB_GROUPS
+          end
+
+          it "does not place groups after external items when it has been re-ordered" do
+            @course.context_external_tools.create!(name: "bob",
+                                                   consumer_key: "🔑",
+                                                   shared_secret: "🤫",
+                                                   domain: "example.com",
+                                                   course_navigation: { text: "Blah", url: "https://google.com" })
+            @course.tab_configuration = [{id: Course::TAB_GROUPS}]
+            last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+            expect(last_tab_id).to start_with 'context_external_tool_'
           end
         end
       end

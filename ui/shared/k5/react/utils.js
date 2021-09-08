@@ -440,6 +440,7 @@ export const TAB_IDS = {
   SCHEDULE: 'tab-schedule',
   GRADES: 'tab-grades',
   RESOURCES: 'tab-resources',
+  GROUPS: 'tab-groups',
   MODULES: 'tab-modules',
   TODO: 'tab-todo'
 }

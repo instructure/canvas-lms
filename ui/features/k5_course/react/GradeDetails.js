@@ -48,7 +48,7 @@ const GradeDetails = ({
   showTotals,
   currentUser,
   loadingGradingPeriods,
-  userIsInstructor
+  userIsCourseAdmin
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -147,7 +147,7 @@ const GradeDetails = ({
 
   return !loadingAssignmentGroups && grades?.length === 0 ? (
     <GradesEmptyPage
-      userIsInstructor={userIsInstructor}
+      userIsCourseAdmin={userIsCourseAdmin}
       courseId={courseId}
       courseName={courseName}
     />
@@ -240,7 +240,7 @@ GradeDetails.propTypes = {
   showTotals: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   loadingGradingPeriods: PropTypes.bool.isRequired,
-  userIsInstructor: PropTypes.bool.isRequired
+  userIsCourseAdmin: PropTypes.bool.isRequired
 }
 
 export default GradeDetails

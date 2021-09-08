@@ -29,6 +29,7 @@ ready(() => {
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
+        canManageGroups={ENV.PERMISSIONS.manage_groups}
         canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
         canReadAnnouncements={ENV.PERMISSIONS.read_announcements}
         currentUser={ENV.current_user}
@@ -41,7 +42,6 @@ ready(() => {
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
         userIsStudent={ENV.COURSE.is_student_or_fake_student}
-        userIsInstructor={ENV.COURSE.is_instructor}
         hideFinalGrades={ENV.COURSE.hide_final_grades}
         showLearningMasteryGradebook={
           ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student_or_fake_student
@@ -51,6 +51,7 @@ ready(() => {
         studentViewPath={ENV.COURSE.student_view_path}
         tabs={ENV.TABS}
         settingsPath={ENV.COURSE.settings_path}
+        groupsPath={ENV.COURSE.groups_path}
         latestAnnouncement={ENV.COURSE.latest_announcement}
         pagesPath={ENV.COURSE.pages_url}
         hasWikiPages={ENV.COURSE.has_wiki_pages}
