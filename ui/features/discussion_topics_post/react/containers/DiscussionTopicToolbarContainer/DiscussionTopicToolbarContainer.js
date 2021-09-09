@@ -22,7 +22,7 @@ import React, {useContext, useEffect, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 
-export const DiscussionPostToolbarContainer = props => {
+export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
   const [currentSearchValue, setCurrentSearchValue] = useState('')
 
@@ -78,8 +78,8 @@ export const DiscussionPostToolbarContainer = props => {
   )
 }
 
-DiscussionPostToolbarContainer.propTypes = {
+DiscussionTopicToolbarContainer.propTypes = {
   discussionTopic: Discussion.shape
 }
 
-export default DiscussionPostToolbarContainer
+export default DiscussionTopicToolbarContainer
