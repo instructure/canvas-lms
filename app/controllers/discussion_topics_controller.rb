@@ -651,6 +651,10 @@ class DiscussionTopicsController < ApplicationController
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
     end
 
+    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+      set_student_context_cards_js_env
+    end
+
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post)
       topics = groups_and_group_topics if @topic.for_group_discussion?
@@ -807,9 +811,6 @@ class DiscussionTopicsController < ApplicationController
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-            if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
-              set_student_context_cards_js_env
-            end
 
             append_sis_data(js_hash)
             js_env(js_hash)
