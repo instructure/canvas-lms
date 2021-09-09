@@ -56,9 +56,10 @@ def createDistribution(nestedStages) {
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
     'RSPEC_PROCESSES=6',
-    'RSPECQ_FILE_SPLIT_THRESHOLD=120',
+    "RSPECQ_FILE_SPLIT_THRESHOLD=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '999' : '150'}",
     'RSPECQ_MAX_REQUEUES=2',
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
+    "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
   def rspecNodeRequirements = [label: 'canvas-docker']
@@ -102,6 +103,7 @@ def createDistribution(nestedStages) {
 
 def setupNode() {
   distribution.unstashBuildScripts()
+  libraryScript.execute 'bash/print-env-excluding-secrets.sh'
   def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD}", 'UTF-8')
   env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
 
@@ -176,6 +178,7 @@ def runRspecqSuite() {
                                         -e RSPECQ_ENABLED \
                                         -e SENTRY_DSN \
                                         -e RAILS_DB_NAME_TEST=canvas_test_${index} \
+                                        -e RSPECQ_UPDATE_TIMINGS \
                                         -T canvas bundle exec rspecq \
                                           --build ${env.JOB_NAME}_build${BUILD_NUMBER} \
                                           --worker ${workerName} \
