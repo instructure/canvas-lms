@@ -40,7 +40,7 @@ import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
-import {PostContainer} from '../PostContainer/PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
@@ -344,7 +344,7 @@ export const DiscussionThreadContainer = props => {
             <div style={{marginLeft: marginDepth}} ref={onThreadRefCurrentSet}>
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
-                  <PostContainer
+                  <DiscussionEntryContainer
                     isTopic={false}
                     postUtilities={
                       !props.discussionEntry.deleted ? (
@@ -417,7 +417,7 @@ export const DiscussionThreadContainer = props => {
                         </ThreadingToolbar>
                       </View>
                     )}
-                  </PostContainer>
+                  </DiscussionEntryContainer>
                 </Flex.Item>
               </Flex>
             </div>

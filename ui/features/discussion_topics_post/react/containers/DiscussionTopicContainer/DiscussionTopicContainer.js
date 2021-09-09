@@ -33,7 +33,7 @@ import {
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
-import {PostContainer} from '../PostContainer/PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
@@ -323,7 +323,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         </Flex.Item>
                       )}
                       <Flex.Item shouldShrink shouldGrow>
-                        <PostContainer
+                        <DiscussionEntryContainer
                           isTopic
                           postUtilities={
                             <PostToolbar
@@ -448,7 +448,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               </Button>
                             </View>
                           )}
-                        </PostContainer>
+                        </DiscussionEntryContainer>
                       </Flex.Item>
                       <Flex.Item
                         shouldShrink
