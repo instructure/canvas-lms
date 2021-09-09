@@ -32,5 +32,11 @@ describe DiscussionEntryParticipant do
     it 'sets the root account id from the discussion_topic_entry' do
       expect(@participant.root_account_id).to eq(@entry.root_account_id)
     end
+
+    it 'throws error on regular create' do
+      user = user_model
+      expect { @entry.discussion_entry_participants.create!(user: user, workflow_state: 'read') }
+        .to raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 end

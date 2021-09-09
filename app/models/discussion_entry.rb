@@ -420,7 +420,7 @@ class DiscussionEntry < ActiveRecord::Base
       scope.update_all("unread_entry_count = unread_entry_count + 1")
 
       if self.user
-        self.discussion_entry_participants.create!(:user => self.user, :workflow_state => "read")
+        update_or_create_participant(current_user: self.user, new_state: 'read')
 
         existing_topic_participant = nil
         DiscussionTopicParticipant.unique_constraint_retry do
