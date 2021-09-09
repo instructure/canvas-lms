@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import {isTopicAuthor, updateDiscussionTopicEntryCounts, responsiveQuerySizes} from '../../utils'
-import {PostContainer} from '../PostContainer/PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect, useRef} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
@@ -293,7 +293,7 @@ const IsolatedThreadContainer = props => {
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
-                  <PostContainer
+                  <DiscussionEntryContainer
                     isTopic={false}
                     postUtilities={
                       <ThreadActions
@@ -358,7 +358,7 @@ const IsolatedThreadContainer = props => {
                         {threadActions}
                       </ThreadingToolbar>
                     </View>
-                  </PostContainer>
+                  </DiscussionEntryContainer>
                 </Flex.Item>
               </Flex>
             </Highlight>
