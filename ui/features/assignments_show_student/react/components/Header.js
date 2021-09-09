@@ -54,10 +54,7 @@ class Header extends React.Component {
   }
 
   state = {
-    commentsTrayOpen:
-      this.props.submission &&
-      this.props.submission.unreadCommentCount &&
-      this.props.submission.unreadCommentCount !== 0
+    commentsTrayOpen: !!this.props.submission?.unreadCommentCount
   }
 
   isSubmissionLate = () => {
