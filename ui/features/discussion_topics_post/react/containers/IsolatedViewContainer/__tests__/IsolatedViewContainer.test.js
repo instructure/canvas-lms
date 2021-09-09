@@ -350,7 +350,7 @@ describe('IsolatedViewContainer', () => {
     describe('RCE is closed', () => {
       const props = defaultProps({RCEOpen: false})
 
-      it('should display children', async () => {
+      it.skip('should display children', async () => {
         const {findByTestId} = setup(props)
         expect(await findByTestId('isolated-view-children')).toBeTruthy()
       })
