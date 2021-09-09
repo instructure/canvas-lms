@@ -21,21 +21,48 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import formatMessage from '../../../../../format-message'
 
-export const Footer = ({disabled, onCancel, onSubmit}) => (
+export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => (
   <View as="footer" padding="0 small">
-    <Flex justifyItems="end">
-      <Flex.Item margin="0 small 0 0">
+    <Flex>
+      <Flex.Item shouldGrow shouldShrink>
         <Button disabled={disabled} onClick={onCancel}>
           {formatMessage('Cancel')}
         </Button>
       </Flex.Item>
       <Flex.Item>
-        <Button disabled={disabled} color="primary" onClick={onSubmit}>
-          {formatMessage('Apply')}
-        </Button>
+        {editing ? (
+          <>
+            <Tooltip
+              renderTip={formatMessage(
+                'Apply changes to all instances of this image in the course'
+              )}
+              on={['hover', 'focus']}
+            >
+              <Button disabled={disabled} color="primary" onClick={onReplace}>
+                {formatMessage('Save and Replace All')}
+              </Button>
+            </Tooltip>
+
+            <Tooltip
+              renderTip={formatMessage(
+                'Save as a new image'
+              )}
+              on={['hover', 'focus']}
+            >
+              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small">
+                {formatMessage('Save')}
+              </Button>
+            </Tooltip>
+          </>
+        ) : (
+          <Button disabled={disabled} color="primary" onClick={onSubmit}>
+            {formatMessage('Apply')}
+          </Button>
+        )}
       </Flex.Item>
     </Flex>
   </View>

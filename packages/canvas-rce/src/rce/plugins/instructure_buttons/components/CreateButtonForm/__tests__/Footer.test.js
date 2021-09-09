@@ -22,10 +22,18 @@ import userEvent from '@testing-library/user-event'
 import {Footer} from '../Footer'
 
 describe('<Footer />', () => {
-  const defaults = {
-    onCancel: jest.fn(),
-    onSubmit: jest.fn()
-  }
+  let defaults
+
+  beforeEach(() => {
+    defaults = {
+      onCancel: jest.fn(),
+      onSubmit: jest.fn(),
+      onReplace: jest.fn(),
+      editing: false
+    }
+  })
+
+  afterEach(() => jest.clearAllMocks())
 
   it('submits the buttons tray', () => {
     const onSubmit = jest.fn()
@@ -47,5 +55,33 @@ describe('<Footer />', () => {
     const applyButton = screen.getByRole('button', {name: /apply/i})
     expect(cancelButton).toBeDisabled()
     expect(applyButton).toBeDisabled()
+  })
+
+  describe('when editing', () => {
+    beforeEach(() => { defaults.editing = true })
+
+    const subject = (overrides = {}) => render(<Footer {...defaults} {...overrides} />)
+
+    it('renders the "Save & Replace All" button', async () => {
+      const {findByText} = subject()
+      expect(await findByText('Save and Replace All')).toBeInTheDocument()
+    })
+
+    it('renders the "Save" button', async () => {
+      const {findByText} = subject()
+      expect(await findByText('Save')).toBeInTheDocument()
+    })
+
+    it('calls "onReplace" when "Save & Replace All" is pressed', async () => {
+      const {findByText} = subject()
+      userEvent.click(await findByText('Save and Replace All'))
+      expect(defaults.onReplace).toHaveBeenCalled()
+    })
+
+    it('calls "onSubmit" when "Save" is pressed"', async () => {
+      const {findByText} = subject()
+      userEvent.click(await findByText('Save'))
+      expect(defaults.onSubmit).toHaveBeenCalled()
+    })
   })
 })

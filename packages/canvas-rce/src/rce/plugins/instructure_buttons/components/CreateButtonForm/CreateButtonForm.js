@@ -77,7 +77,13 @@ export const CreateButtonForm = ({editor, onClose, editing}) => {
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
       <ImageSection editor={editor} settings={settings} onChange={dispatch} />
-      <Footer disabled={status === statuses.LOADING} onCancel={onClose} onSubmit={handleSubmit} />
+      <Footer
+        disabled={status === statuses.LOADING}
+        onCancel={onClose}
+        onSubmit={handleSubmit}
+        onReplace={() => {}}
+        editing={editing}
+      />
     </View>
   )
 }
