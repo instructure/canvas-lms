@@ -504,32 +504,6 @@ describe('FileUpload', () => {
     expect(emptyRender).toContainElement(await findByRole('button', {name: /Files/}))
   })
 
-  it('displays buttons for uploading using external tools in the upload box', async () => {
-    const mocks = await createGraphqlMocks({
-      ExternalToolConnection: {
-        nodes: [
-          {
-            _id: '1',
-            description: 'just an external tool',
-            name: 'my external tool',
-            settings: {
-              iconUrl: 'http://localhost:3000/icon'
-            }
-          }
-        ]
-      }
-    })
-    const props = await makeProps()
-    const {getByTestId, findByRole} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
-    const emptyRender = getByTestId('upload-box')
-
-    expect(emptyRender).toContainElement(await findByRole('button', {name: /my external tool/}))
-  })
-
   it('displays allowed extensions in the upload box', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({

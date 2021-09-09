@@ -40,6 +40,7 @@ RSpec.describe Mutations::CreateSubmission do
     body: nil,
     file_ids: [],
     media_id: nil,
+    resource_link_lookup_uuid: nil,
     url: nil
   )
     <<~GQL
@@ -51,6 +52,7 @@ RSpec.describe Mutations::CreateSubmission do
           #{"body: \"#{body}\"" if body}
           fileIds: #{file_ids}
           #{"mediaId: \"#{media_id}\"" if media_id}
+          #{"resourceLinkLookupUuid: \"#{resource_link_lookup_uuid}\"" if resource_link_lookup_uuid}
           #{"url: \"#{url}\"" if url}
         }) {
           submission {
@@ -65,6 +67,7 @@ RSpec.describe Mutations::CreateSubmission do
               _id
               title
             }
+            resourceLinkLookupUuid
             url
           }
           errors {
@@ -238,9 +241,39 @@ RSpec.describe Mutations::CreateSubmission do
   end
 
   context "when the submission_type is basic_lti_launch" do
-    it "returns an error" do
-      result = run_mutation(submission_type: "basic_lti_launch", url: "/some-url")
-      expect(result.dig(:errors, 0, :message)).to include("invalid value (basic_lti_launch)")
+    it "saves the submission type as basic_lti_launch" do
+      result = run_mutation(submission_type: "basic_lti_launch", url: "http://localhost/some-url")
+      submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
+
+      expect(submission.submission_type).to eq "basic_lti_launch"
+    end
+
+    it "saves the url to the submission" do
+      result = run_mutation(submission_type: "basic_lti_launch", url: "http://localhost/some-url")
+      submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
+
+      expect(submission.url).to eq "http://localhost/some-url"
+    end
+
+    it "saves the resource_link_lookup_uuid to the submission" do
+      uuid = SecureRandom.uuid
+      result = run_mutation(
+        resource_link_lookup_uuid: uuid,
+        submission_type: "basic_lti_launch",
+        url: "http://localhost/some-url"
+      )
+      submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
+      expect(submission.resource_link_lookup_uuid).to eq uuid
+    end
+
+    it "returns an error if no URL is provided" do
+      result = run_mutation(submission_type: "basic_lti_launch")
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "LTI submissions require a URL to submit"
+    end
+
+    it "returns an error if an invalid URL is provided" do
+      result = run_mutation(submission_type: "basic_lti_launch", url: "bad url")
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "is not a valid URL"
     end
   end
 

@@ -319,5 +319,7 @@ module Interfaces::SubmissionInterface
 
   field :url, Types::UrlType, null: true
 
+  field :resource_link_lookup_uuid, String, null: true
+
   field :extra_attempts, Integer, null: true
 end

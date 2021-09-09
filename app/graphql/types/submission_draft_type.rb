@@ -66,8 +66,6 @@ module Types
       )
     end
 
-    field :lti_launch_content_type, String, null: true
-    field :lti_launch_filename, String, null: true
     field :lti_launch_url, Types::UrlType, null: true
 
     field :meets_media_recording_criteria, Boolean, null: false
