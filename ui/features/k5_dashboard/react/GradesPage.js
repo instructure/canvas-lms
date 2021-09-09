@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard_grades_page'
 
@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
-import {fetchGrades, fetchGradesForGradingPeriod, getCourseGrades} from '@canvas/k5/react/utils'
+import {fetchGrades, fetchGradesForGradingPeriod} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
 import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
@@ -73,53 +73,19 @@ export const overrideCourseGradingPeriods = (
     // Filter out nulls
     .filter(c => c)
 
-export const getCoursesByObservee = (courses, observedUserId, currentUser) => {
-  // All courses will be shown by default
-  let coursesByObservee = courses
-  const currentUserId = currentUser?.id
-  if (observedUserId && observedUserId === currentUserId) {
-    // If the observed user is the current user, only non-observer enrollments
-    // will be considered
-    coursesByObservee = courses.filter(c =>
-      c.enrollments?.find(e => e.type !== 'observer' && e.user_id === currentUserId)
-    )
-  } else if (observedUserId) {
-    // Filtering courses by the observed User
-    coursesByObservee = courses
-      .filter(c =>
-        c.enrollments?.find(
-          e =>
-            e.type === 'observer' &&
-            e.user_id === currentUserId &&
-            e.associated_user_id === observedUserId
-        )
-      )
-      .map(course => {
-        // observer enrollments don't include observee grades information,
-        // so we need to regenerate the course information based on the student enrollment
-        // to present the observee grades
-        return getCourseGrades(course, observedUserId)
-      })
-  }
-  return coursesByObservee
-}
-
-export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUser}) => {
+export const GradesPage = ({visible, currentUserRoles}) => {
   const [courses, setCourses] = useState(null)
-  const [coursesByUser, setCoursesByUser] = useState(null)
   const [gradingPeriods, setGradingPeriods] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedGradingPeriodId, selectGradingPeriodId] = useState('')
   const [specificPeriodGrades, setSpecificPeriodGrades] = useState([])
-  const userRef = useRef(null)
 
-  const loadCourses = includeObservedUsers => {
+  const loadCourses = () => {
     setLoading(true)
-    fetchGrades(includeObservedUsers)
+    fetchGrades()
       .then(results => results.filter(c => !c.isHomeroom))
       .then(results => {
         setCourses(results)
-        setCoursesByUser(getCoursesByObservee(results, observedUserId, currentUser))
         setGradingPeriods(getGradingPeriodsFromCourses(results))
         setLoading(false)
       })
@@ -130,20 +96,14 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
   }
 
   useEffect(() => {
-    if (visible) {
-      if (!courses && currentUserRoles?.length > 0) {
-        const includeObservedUser = currentUserRoles.includes('observer')
-        loadCourses(includeObservedUser)
-      } else if (courses && userRef.current !== observedUserId) {
-        setCoursesByUser(getCoursesByObservee(courses, observedUserId, currentUser))
-        userRef.current = observedUserId
-      }
+    if (!courses && visible) {
+      loadCourses()
     }
-  }, [courses, visible, observedUserId, currentUser, currentUserRoles]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [courses, visible])
 
   const loadSpecificPeriodGrades = gradingPeriodId => {
     if (gradingPeriodId === ALL_PERIODS_OPTION) {
-      const allGrades = coursesByUser.map(course => ({
+      const allGrades = courses.map(course => ({
         courseId: course.courseId,
         score: course.totalScoreForAllGradingPeriods,
         grade: course.totalGradeForAllGradingPeriods
@@ -172,7 +132,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
 
   // Override current grading period grades with selected period if they exist
   const selectedCourses = overrideCourseGradingPeriods(
-    coursesByUser,
+    courses,
     selectedGradingPeriodId,
     specificPeriodGrades
   )
@@ -237,13 +197,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
 GradesPage.displayName = 'GradesPage'
 GradesPage.propTypes = {
   visible: PropTypes.bool.isRequired,
-  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
-  observedUserId: PropTypes.string,
-  currentUser: PropTypes.shape({
-    id: PropTypes.string,
-    display_name: PropTypes.string,
-    avatar_image_url: PropTypes.string
-  }).isRequired
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default GradesPage
