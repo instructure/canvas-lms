@@ -63,6 +63,18 @@ describe Loaders::DiscussionEntryLoader do
       end
     end
 
+    it "raises error not found" do
+      expect do
+        GraphQL::Batch.batch do
+          Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                             relative_entry_id: @de3,
+                                             before_relative_entry: false,
+                                             include_relative_entry: true,
+                                             sort_order: :asc).load(@de3)
+        end
+      end.to raise_error(GraphQL::ExecutionError)
+    end
+
     it 'sort works wih relative_entry_id' do
       GraphQL::Batch.batch do
         # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
