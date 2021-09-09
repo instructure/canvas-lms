@@ -146,7 +146,11 @@ const GradeDetails = ({
   )
 
   return !loadingAssignmentGroups && grades?.length === 0 ? (
-    <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
+    <GradesEmptyPage
+      userIsInstructor={userIsInstructor}
+      courseId={courseId}
+      courseName={courseName}
+    />
   ) : (
     <>
       {showTotals && (
@@ -219,7 +223,6 @@ const GradeDetails = ({
       >
         {grades.map(assignment =>
           GradeRow({
-            key: assignment.id,
             isStacked,
             currentUserId: currentUser.id,
             ...assignment

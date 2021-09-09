@@ -190,7 +190,7 @@ export function CourseHeaderOptions({
   const sideItemsWidth = '200px'
 
   const manageButton = (
-    <Flex.Item size={collapseManageButton ? undefined : sideItemsWidth}>
+    <Flex.Item size={collapseManageButton ? undefined : sideItemsWidth} key="course-header-manage">
       {collapseManageButton ? (
         <IconButton {...buttonProps} screenReaderLabel={altText} margin="0 small 0 0" />
       ) : (
@@ -202,19 +202,20 @@ export function CourseHeaderOptions({
   )
 
   const observerOptions = (
-    <Flex.Item shouldGrow textAlign="center">
+    <Flex.Item shouldGrow textAlign="center" key="course-header-observer-options">
       <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
         <ObserverOptions
           observerList={observerList}
           currentUser={currentUser}
           handleChangeObservedUser={handleChangeObservedUser}
+          canAddObservee={false}
         />
       </View>
     </Flex.Item>
   )
 
   const studentViewButton = (
-    <Flex.Item textAlign="end" size={sideItemsWidth}>
+    <Flex.Item textAlign="end" size={sideItemsWidth} key="course-header-student-view">
       <Button
         id="student-view-btn"
         href={studentViewPath}

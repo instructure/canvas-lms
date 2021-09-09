@@ -40,11 +40,11 @@ ready(() => {
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
-        userIsStudent={ENV.COURSE.is_student}
+        userIsStudent={ENV.COURSE.is_student_or_fake_student}
         userIsInstructor={ENV.COURSE.is_instructor}
         hideFinalGrades={ENV.COURSE.hide_final_grades}
         showLearningMasteryGradebook={
-          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student
+          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student_or_fake_student
         }
         outcomeProficiency={ENV.COURSE.outcome_proficiency}
         showStudentView={ENV.COURSE.show_student_view}

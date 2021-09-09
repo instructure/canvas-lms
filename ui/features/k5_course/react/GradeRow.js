@@ -35,6 +35,7 @@ import k5Theme from '@canvas/k5/react/k5-theme'
 // For this reason GradeRow is plain old js function and not a React function component.
 // Except for having no PropTypes, the code is exactly the same.
 export const GradeRow = ({
+  id,
   assignmentName,
   url,
   dueDate,
@@ -152,7 +153,7 @@ export const GradeRow = ({
   )
 
   return (
-    <Table.Row data-testid="grades-table-row">
+    <Table.Row data-testid="grades-table-row" key={id}>
       <Table.Cell theme={cellTheme}>
         {unread ? (
           <Badge

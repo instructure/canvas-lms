@@ -272,6 +272,15 @@ describe "teacher k5 course dashboard" do
       expect(empty_grades_image).to be_displayed
       expect(view_grades_button(@subject_course.id)).to be_displayed
     end
+
+    it 'shows fake student grades in student view' do
+      create_assignment(@subject_course, "a cool assignment", "woohoo", 100)
+      get "/courses/#{@subject_course.id}#grades"
+
+      click_student_view_button
+      expect(grades_assignments_list[0].text).to include("a cool assignment")
+      expect(grades_total.text).to include("Total: n/a")
+    end
   end
 
   context 'course resources tab' do
