@@ -105,6 +105,7 @@ export default class AttemptTab extends Component {
     activeSubmissionType: string,
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
+    focusAttemptOnInit: bool.isRequired,
     onContentsChanged: func,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
@@ -119,6 +120,7 @@ export default class AttemptTab extends Component {
         <FileUpload
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
+          focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
           updateUploadingFiles={this.props.updateUploadingFiles}
           uploadingFiles={this.props.uploadingFiles}
@@ -146,6 +148,7 @@ export default class AttemptTab extends Component {
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
           createSubmissionDraft={this.props.createSubmissionDraft}
+          focusOnInit={this.props.focusAttemptOnInit}
           onContentsChanged={this.props.onContentsChanged}
           readOnly={readOnly}
           submission={this.props.submission}
@@ -161,6 +164,7 @@ export default class AttemptTab extends Component {
         <UrlEntry
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
+          focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
@@ -175,6 +179,7 @@ export default class AttemptTab extends Component {
           key={this.props.submission.attempt}
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
+          focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
           updateUploadingFiles={this.props.updateUploadingFiles}
           uploadingFiles={this.props.uploadingFiles}

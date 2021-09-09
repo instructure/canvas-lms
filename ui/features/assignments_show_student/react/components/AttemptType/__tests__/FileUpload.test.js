@@ -66,7 +66,8 @@ async function makeProps(overrides) {
     // Make these return a promise that will resolve
     createSubmissionDraft: jest.fn().mockResolvedValue({}),
     updateUploadingFiles: jest.fn().mockResolvedValue({}),
-    uploadingFiles: false
+    uploadingFiles: false,
+    focusOnInit: false
   }
   return props
 }
@@ -102,9 +103,23 @@ describe('FileUpload', () => {
     expect(emptyRender).toHaveTextContent('Drag a file here')
   })
 
-  it('moves focus to file drop box after render', async () => {
+  it('does not move focus to file drop box after render if focusOnInit is false', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const inputFileDrop = getByTestId('input-file-drop')
+
+    expect(inputFileDrop).not.toHaveFocus()
+  })
+
+  it('moves focus to file drop box after render if focusOnInit is true', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
+    props.focusOnInit = true
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />

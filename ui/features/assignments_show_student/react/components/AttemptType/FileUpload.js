@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
 import elideString from '../../helpers/elideString'
-import {func} from 'prop-types'
+import {bool, func} from 'prop-types'
 import {getFileThumbnail} from '@canvas/util/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import MoreOptions from './MoreOptions/index'
@@ -48,6 +48,7 @@ export default class FileUpload extends Component {
   static propTypes = {
     assignment: Assignment.shape,
     createSubmissionDraft: func,
+    focusOnInit: bool.isRequired,
     submission: Submission.shape,
     updateUploadingFiles: func
   }
@@ -62,8 +63,9 @@ export default class FileUpload extends Component {
   componentDidMount() {
     this._isMounted = true
     window.addEventListener('message', this.handleLTIFiles)
-    if (document.getElementById('inputFileDrop')) {
-      document.getElementById('inputFileDrop').focus()
+    const fileDrop = document.getElementById('inputFileDrop')
+    if (fileDrop && this.props.focusOnInit) {
+      fileDrop.focus()
     }
   }
 
