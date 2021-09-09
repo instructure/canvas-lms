@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
 import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
-import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
+import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -185,7 +185,7 @@ const DiscussionTopicManager = props => {
       (searchTerm || filter === 'unread') ? (
         <NoResultsFound />
       ) : (
-        <DiscussionThreadsContainer
+        <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
           onOpenIsolatedView={(
             discussionEntryId,

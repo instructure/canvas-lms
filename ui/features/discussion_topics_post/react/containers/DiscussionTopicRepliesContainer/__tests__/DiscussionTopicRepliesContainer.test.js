@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {DiscussionThreadsContainer} from '../DiscussionThreadsContainer'
+import {DiscussionTopicRepliesContainer} from '../DiscussionTopicRepliesContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
@@ -33,7 +33,7 @@ jest.mock('../../../utils', () => ({
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
 }))
 
-describe('DiscussionThreadContainer', () => {
+describe('DiscussionTopicRepliesContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -83,7 +83,7 @@ describe('DiscussionThreadContainer', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <DiscussionThreadsContainer {...props} />
+          <DiscussionTopicRepliesContainer {...props} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )

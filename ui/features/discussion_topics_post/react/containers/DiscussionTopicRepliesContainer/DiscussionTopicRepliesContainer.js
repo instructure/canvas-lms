@@ -30,7 +30,7 @@ import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 
-export const DiscussionThreadsContainer = props => {
+export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {searchTerm, setPageNumber} = useContext(SearchContext)
 
@@ -126,11 +126,11 @@ export const DiscussionThreadsContainer = props => {
   )
 }
 
-DiscussionThreadsContainer.propTypes = {
+DiscussionTopicRepliesContainer.propTypes = {
   discussionTopic: Discussion.shape,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string
 }
 
-export default DiscussionThreadsContainer
+export default DiscussionTopicRepliesContainer
