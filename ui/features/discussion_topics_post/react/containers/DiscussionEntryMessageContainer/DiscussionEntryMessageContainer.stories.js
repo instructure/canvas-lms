@@ -18,16 +18,16 @@
 
 import React from 'react'
 
-import {PostMessageContainer} from './PostMessageContainer'
+import {DiscussionEntryMessageContainer} from './DiscussionEntryMessageContainer'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 
 export default {
   title: 'Examples/Discussion Posts/Containers/Post Message Container',
-  component: PostMessageContainer,
+  component: DiscussionEntryMessageContainer,
   argTypes: {}
 }
 
-const Template = args => <PostMessageContainer {...args} />
+const Template = args => <DiscussionEntryMessageContainer {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
