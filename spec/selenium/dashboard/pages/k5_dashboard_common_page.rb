@@ -167,7 +167,7 @@ module K5DashboardCommonPageObject
     @original_student = @student
     @course.update!(homeroom_course: true)
     @homeroom_course = @course
-    @subject_course_title = "Science"
+    @subject_course_title = "Math"
     @student_enrollment = course_with_student(
       active_course: true,
       user: @student,

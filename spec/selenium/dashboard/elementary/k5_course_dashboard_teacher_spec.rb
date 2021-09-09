@@ -26,6 +26,7 @@ require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../courses/pages/course_settings_page'
 require_relative '../shared_examples/k5_announcements_shared_examples'
+require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
 
 describe "teacher k5 course dashboard" do
   include_context "in-process server selenium tests"
@@ -206,8 +207,8 @@ describe "teacher k5 course dashboard" do
     let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', lti_a, lti_b] }
 
     before :once do
-      @resource_a = "context_external_tool_" + create_lti_resource(lti_a).id.to_s
-      @resource_b = "context_external_tool_" + create_lti_resource(lti_b).id.to_s
+      @resource_a = "context_external_tool_#{create_lti_resource(lti_a).id}"
+      @resource_b = "context_external_tool_#{create_lti_resource(lti_b).id}"
     end
 
     it 'shows the k5 navigation tabs and LTIs on the settings page' do
@@ -221,48 +222,10 @@ describe "teacher k5 course dashboard" do
         expect(navigation_list[x]).to include_text(navigation_names[x])
       end
     end
+  end
 
-    it 'has tabs rearranged in new configuration on the subject page' do
-      @subject_course.update!(
-        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
-      )
-
-      get "/courses/#{@subject_course.id}"
-
-      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
-    end
-
-    it 'has tabs that are hidden from the subject page' do
-      @subject_course.update!(
-        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME, hidden: true}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
-      )
-
-      get "/courses/#{@subject_course.id}"
-
-      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
-    end
-
-    it 'has ltis that are rearranged in new order on the resources page' do
-      @subject_course.update!(
-        tab_configuration: [{id: Course::TAB_HOME}, {id: Course::TAB_SCHEDULE}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES}, {id: @resource_b}, {id: @resource_a}]
-      )
-
-      get "/courses/#{@subject_course.id}#resources"
-
-      expect(k5_app_buttons[0].text).to eq lti_b
-      expect(k5_app_buttons[1].text).to eq lti_a
-    end
-
-    it 'has ltis that are hidden on the resources page' do
-      @subject_course.update!(
-        tab_configuration: [ {id: @resource_a, hidden: true}, {id: @resource_b}]
-      )
-
-      get "/courses/#{@subject_course.id}#resources"
-
-      expect(k5_app_buttons.count).to eq 1
-      expect(k5_app_buttons[0].text).to eq lti_b
-    end
+  context 'course tab navigation shared examples' do
+    it_behaves_like 'k5 subject navigation tabs'
   end
 
   context 'course grades tab' do

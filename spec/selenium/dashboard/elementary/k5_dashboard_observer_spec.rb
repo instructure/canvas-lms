@@ -25,6 +25,7 @@ require_relative '../../grades/setup/gradebook_setup'
 require_relative '../pages/k5_schedule_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
+require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -61,7 +62,7 @@ describe "observer k5 dashboard" do
 
       get "/"
 
-      expect(dashboard_card_specific_subject('Science')).to be_displayed
+      expect(dashboard_card_specific_subject('Math')).to be_displayed
       expect(announcement_title(announcement_heading1)).to be_displayed
     end
 
@@ -157,7 +158,7 @@ describe "observer k5 dashboard" do
       click_observed_student_option('My2 Student')
 
       expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
-      expect(dashboard_card_specific_subject('Science')).to be_displayed
+      expect(dashboard_card_specific_subject('Math')).to be_displayed
     end
 
     it 'shows the observers name first if observer is also a student' do
@@ -296,5 +297,9 @@ describe "observer k5 dashboard" do
       expect_instui_flash_message("Failed pairing student.")
       expect(pairing_modal).to be_displayed
     end
+  end
+
+  context 'course tab navigation shared examples' do
+    it_behaves_like 'k5 subject navigation tabs'
   end
 end
