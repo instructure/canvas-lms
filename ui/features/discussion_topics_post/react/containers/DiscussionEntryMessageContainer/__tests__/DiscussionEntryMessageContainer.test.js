@@ -19,15 +19,15 @@
 import React from 'react'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {render} from '@testing-library/react'
-import {PostMessageContainer} from '../PostMessageContainer'
+import {DiscussionEntryMessageContainer} from '../DiscussionEntryMessageContainer'
 
-describe('PostMessageContainer', () => {
+describe('DiscussionEntryMessageContainer', () => {
   const defaultProps = (discussionEntry = {}) => ({
     discussionEntry: {...DiscussionEntry.mock(), ...discussionEntry}
   })
 
   const setup = props => {
-    return render(<PostMessageContainer {...props} />)
+    return render(<DiscussionEntryMessageContainer {...props} />)
   }
 
   it('should render', () => {

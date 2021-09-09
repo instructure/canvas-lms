@@ -26,7 +26,7 @@ import React, {useContext} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {Flex} from '@instructure/ui-flex'
 
-export const PostMessageContainer = props => {
+export const DiscussionEntryMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
   const editedAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.updatedAt)
   const {searchTerm, filter} = useContext(SearchContext)
@@ -88,7 +88,7 @@ export const PostMessageContainer = props => {
   }
 }
 
-PostMessageContainer.propTypes = {
+DiscussionEntryMessageContainer.propTypes = {
   discussionEntry: DiscussionEntry.shape,
   threadActions: PropTypes.arrayOf(PropTypes.object),
   isEditing: PropTypes.bool,
@@ -99,7 +99,7 @@ PostMessageContainer.propTypes = {
   padding: PropTypes.string
 }
 
-PostMessageContainer.defaultProps = {
+DiscussionEntryMessageContainer.defaultProps = {
   threadActions: [],
   isEditing: false,
   onCancel: () => {},
@@ -107,4 +107,4 @@ PostMessageContainer.defaultProps = {
   padding: '0 0 0 0'
 }
 
-export default PostMessageContainer
+export default DiscussionEntryMessageContainer
