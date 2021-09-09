@@ -33,7 +33,9 @@ import {
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
+import GenericErrorPage from '@canvas/generic-error-page'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!discussion_topics_post'
 import {ISOLATED_VIEW_INITIAL_PAGE_SIZE, PER_PAGE} from '../../utils/constants'
@@ -41,7 +43,7 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useCallback, useContext, useMemo, useState} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -229,12 +231,6 @@ export const IsolatedViewContainer = props => {
     }
   })
 
-  if (isolatedEntryOlderDirection.error) {
-    setOnFailure(I18n.t('There was an unexpected error loading the discussion entry.'))
-    props.onClose()
-    return null
-  }
-
   const fetchOlderEntries = () => {
     isolatedEntryOlderDirection.fetchMore({
       variables: {
@@ -263,12 +259,6 @@ export const IsolatedViewContainer = props => {
         }
       }
     })
-  }
-
-  if (isolatedEntryNewerDirection.error) {
-    setOnFailure(I18n.t('There was an unexpected error loading the discussion entry.'))
-    props.onClose()
-    return null
   }
 
   const fetchNewerEntries = () => {
@@ -324,6 +314,114 @@ export const IsolatedViewContainer = props => {
     return preview
   }
 
+  const entriesAreLoading = useCallback(() => {
+    return isolatedEntryOlderDirection.loading || isolatedEntryNewerDirection.loading
+  }, [isolatedEntryNewerDirection.loading, isolatedEntryOlderDirection.loading])
+
+  const entriesLoadingError = useCallback(() => {
+    return isolatedEntryOlderDirection?.error || isolatedEntryNewerDirection?.error
+  }, [isolatedEntryNewerDirection.error, isolatedEntryOlderDirection.error])
+
+  const contentIsReady = useMemo(() => {
+    return !(entriesAreLoading() || entriesLoadingError())
+  }, [entriesAreLoading, entriesLoadingError])
+
+  const renderErrorOrLoading = useMemo(() => {
+    if (entriesAreLoading()) {
+      return <LoadingIndicator />
+    } else {
+      return (
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorSubject={I18n.t('Isolated Entry query error')}
+          errorCategory={I18n.t('Isolated Entry Post Error Page')}
+        />
+      )
+    }
+  }, [entriesAreLoading])
+
+  const renderIsolatedView = () => {
+    return (
+      <>
+        <IsolatedParent
+          discussionTopic={props.discussionTopic}
+          discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
+          onToggleUnread={() => toggleUnread(isolatedEntryOlderDirection.data.legacyNode)}
+          onDelete={() => onDelete(isolatedEntryOlderDirection.data.legacyNode)}
+          onOpenInSpeedGrader={() =>
+            onOpenInSpeedGrader(isolatedEntryOlderDirection.data.legacyNode)
+          }
+          onToggleRating={() => toggleRating(isolatedEntryOlderDirection.data.legacyNode)}
+          onSave={onUpdate}
+          onOpenIsolatedView={props.onOpenIsolatedView}
+          setRCEOpen={props.setRCEOpen}
+          RCEOpen={props.RCEOpen}
+          goToTopic={props.goToTopic}
+          isHighlighted={props.highlightEntryId === props.discussionEntryId}
+        >
+          {props.RCEOpen && (
+            <View
+              display="block"
+              background="primary"
+              borderWidth="none none none none"
+              padding="none small small"
+              margin="none none x-small"
+            >
+              <DiscussionEdit
+                onSubmit={(text, includeReplyPreview) => {
+                  onReplySubmit(text, props.replyFromId, includeReplyPreview)
+                  props.setRCEOpen(false)
+                }}
+                onCancel={() => props.setRCEOpen(false)}
+                quotedEntry={buildQuotedReply(
+                  isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                    .nodes,
+                  props.replyFromId
+                )}
+              />
+            </View>
+          )}
+        </IsolatedParent>
+        {!props.RCEOpen && (
+          <View as="div" borderWidth="medium none none none" padding="medium none none">
+            <IsolatedThreadsContainer
+              discussionTopic={props.discussionTopic}
+              discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
+              onToggleRating={toggleRating}
+              onToggleUnread={toggleUnread}
+              onDelete={onDelete}
+              onOpenInSpeedGrader={onOpenInSpeedGrader}
+              showOlderReplies={() => {
+                setFetchingMoreOlderReplies(true)
+                fetchOlderEntries()
+              }}
+              showNewerReplies={() => {
+                setFetchingMoreNewerReplies(true)
+                fetchNewerEntries()
+              }}
+              onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, highlightEntryId) => {
+                props.setHighlightEntryId(highlightEntryId)
+                props.onOpenIsolatedView(discussionEntryId, rootEntryId, withRCE)
+              }}
+              goToTopic={props.goToTopic}
+              highlightEntryId={props.highlightEntryId}
+              hasMoreOlderReplies={
+                isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
+                  ?.pageInfo?.hasPreviousPage
+              }
+              hasMoreNewerReplies={
+                isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
+                  ?.pageInfo?.hasNextPage && !!props.relativeEntryId
+              }
+              fetchingMoreOlderReplies={fetchingMoreOlderReplies}
+              fetchingMoreNewerReplies={fetchingMoreNewerReplies}
+            />
+          </View>
+        )}
+      </>
+    )
+  }
+
   return (
     <Tray
       data-testid="isolated-view-container"
@@ -369,87 +467,7 @@ export const IsolatedViewContainer = props => {
           />
         </Flex.Item>
       </Flex>
-      {isolatedEntryOlderDirection.loading ? (
-        <LoadingIndicator />
-      ) : (
-        <>
-          <IsolatedParent
-            discussionTopic={props.discussionTopic}
-            discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
-            onToggleUnread={() => toggleUnread(isolatedEntryOlderDirection.data.legacyNode)}
-            onDelete={() => onDelete(isolatedEntryOlderDirection.data.legacyNode)}
-            onOpenInSpeedGrader={() =>
-              onOpenInSpeedGrader(isolatedEntryOlderDirection.data.legacyNode)
-            }
-            onToggleRating={() => toggleRating(isolatedEntryOlderDirection.data.legacyNode)}
-            onSave={onUpdate}
-            onOpenIsolatedView={props.onOpenIsolatedView}
-            setRCEOpen={props.setRCEOpen}
-            RCEOpen={props.RCEOpen}
-            goToTopic={props.goToTopic}
-            isHighlighted={props.highlightEntryId === props.discussionEntryId}
-          >
-            {props.RCEOpen && (
-              <View
-                display="block"
-                background="primary"
-                borderWidth="none none none none"
-                padding="none small small"
-                margin="none none x-small"
-              >
-                <DiscussionEdit
-                  onSubmit={(text, includeReplyPreview) => {
-                    onReplySubmit(text, props.replyFromId, includeReplyPreview)
-                    props.setRCEOpen(false)
-                  }}
-                  onCancel={() => props.setRCEOpen(false)}
-                  quotedEntry={buildQuotedReply(
-                    isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                      .nodes,
-                    props.replyFromId
-                  )}
-                />
-              </View>
-            )}
-          </IsolatedParent>
-          {!props.RCEOpen && (
-            <View as="div" borderWidth="medium none none none" padding="medium none none">
-              <IsolatedThreadsContainer
-                discussionTopic={props.discussionTopic}
-                discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
-                onToggleRating={toggleRating}
-                onToggleUnread={toggleUnread}
-                onDelete={onDelete}
-                onOpenInSpeedGrader={onOpenInSpeedGrader}
-                showOlderReplies={() => {
-                  setFetchingMoreOlderReplies(true)
-                  fetchOlderEntries()
-                }}
-                showNewerReplies={() => {
-                  setFetchingMoreNewerReplies(true)
-                  fetchNewerEntries()
-                }}
-                onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, highlightEntryId) => {
-                  props.setHighlightEntryId(highlightEntryId)
-                  props.onOpenIsolatedView(discussionEntryId, rootEntryId, withRCE)
-                }}
-                goToTopic={props.goToTopic}
-                highlightEntryId={props.highlightEntryId}
-                hasMoreOlderReplies={
-                  isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                    ?.pageInfo?.hasPreviousPage
-                }
-                hasMoreNewerReplies={
-                  isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
-                    ?.pageInfo?.hasNextPage && !!props.relativeEntryId
-                }
-                fetchingMoreOlderReplies={fetchingMoreOlderReplies}
-                fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-              />
-            </View>
-          )}
-        </>
-      )}
+      {contentIsReady ? renderIsolatedView() : renderErrorOrLoading}
     </Tray>
   )
 }

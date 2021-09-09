@@ -155,7 +155,7 @@ describe('IsolatedViewContainer', () => {
     expect(onOpenIsolatedView).toHaveBeenCalledWith('70', '70', false)
   })
 
-  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
+  it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -166,10 +166,10 @@ describe('IsolatedViewContainer', () => {
     expect(goToTopicButton).toBeInTheDocument()
     fireEvent.click(goToTopicButton, {clientY: 100})
 
-    expect(onClose).toHaveBeenCalled()
+    expect(goToTopic).toHaveBeenCalled()
   })
 
-  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from child)', async () => {
+  it('calls the goToTopic callback when clicking Go To Topic (from child)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -180,7 +180,7 @@ describe('IsolatedViewContainer', () => {
     expect(goToTopicButton).toBeInTheDocument()
     fireEvent.click(goToTopicButton, {clientY: 100})
 
-    expect(onClose).toHaveBeenCalled()
+    expect(goToTopic).toHaveBeenCalled()
   })
 
   describe('when a ui-dialog is clicked', () => {
@@ -421,5 +421,24 @@ describe('IsolatedViewContainer', () => {
     const {findByTestId} = setup(defaultProps({highlightEntryId: '50'}))
 
     expect(await findByTestId('isHighlighted')).toBeInTheDocument()
+  })
+
+  describe('graphql error', () => {
+    it('should render generic error page when DISCUSSION_SUBENTRIES_QUERY returns errors', async () => {
+      server.use(
+        graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+          return res.once(
+            ctx.errors([
+              {
+                message: 'generic error'
+              }
+            ])
+          )
+        })
+      )
+
+      const container = setup(defaultProps())
+      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
+    })
   })
 })
