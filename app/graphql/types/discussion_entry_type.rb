@@ -117,11 +117,6 @@ module Types
       ).load(object)
     end
 
-    field :parent, Types::DiscussionEntryType, null: true
-    def parent
-      load_association(:parent_entry)
-    end
-
     field :attachment, Types::FileType, null: true
     def attachment
       load_association(:attachment)
