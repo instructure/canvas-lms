@@ -223,13 +223,9 @@ namespace :db do
   end # Task: load_initial_data
 
   desc "Useful initial setup task"
-  task :initial_setup => [:generate_security_key] do
-    Rake::Task['db:migrate:predeploy'].invoke
-    ActiveRecord::Base.connection.schema_cache.clear!
-    ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
-    Account.clear_special_account_cache!(true)
+  task :initial_setup => [:environment, :generate_security_key] do
+    Switchman::Shard.default(reload: true)
     Rake::Task['db:migrate'].invoke
-    load 'app/models/pseudonym.rb'
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
     Account.clear_special_account_cache!(true)

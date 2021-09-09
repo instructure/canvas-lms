@@ -4,7 +4,7 @@ PATH
     rubocop-canvas (1.0.0)
       activesupport (~> 6.0)
       jira_ref_parser (= 1.0.1)
-      outrigger (~> 2.1)
+      outrigger (~> 3.0)
       rubocop (~> 1.19)
 
 GEM
@@ -36,8 +36,8 @@ GEM
     mime-types-data (3.2021.0901)
     minitest (5.14.4)
     multi_xml (0.6.0)
-    outrigger (2.1.1)
-      activerecord (>= 5.0, < 6.2)
+    outrigger (3.0.0)
+      activerecord (>= 6.0, < 6.2)
     parallel (1.20.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
