@@ -280,7 +280,7 @@ body:not(.course-menu-expanded) {
   }
   &.ic-sticky-on {
     bottom: 0;
-    padding-top: 0;
+    padding: 0;
   }
   // account for the course term showing in the left-hand sub-nav
   #section-tabs-header-subtitle {
@@ -292,7 +292,7 @@ body:not(.course-menu-expanded) {
   position: sticky;
   top: 0;
   max-height: 100vh;
-  padding: $ic-sp*2 0 $ic-breadcrumbs-height;
+  padding: direction-sides($ic-sp*2 $ic-sp $ic-breadcrumbs-height $ic-sp*2);
   box-sizing: border-box;
   overflow-y: auto;
   overscroll-behavior-y: contain;
