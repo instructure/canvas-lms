@@ -240,6 +240,18 @@ describe "Api::V1::Assignment" do
         json = api.assignment_json(assignment, user, session)
         expect(json['rubric_settings']['hide_points']).to eq true
       end
+
+      it "excludes rubric when exclude_response_fields contains 'rubric'" do
+        opts = {exclude_response_fields: ['rubric']}
+        json = api.assignment_json(assignment, user, session, opts)
+        expect(json).not_to have_key 'rubric'
+      end
+
+      it "excludes rubric when no active rubric" do
+        @rubric.update!(workflow_state: 'deleted')
+        json = api.assignment_json(assignment, user, session)
+        expect(json).not_to have_key 'rubric'
+      end
     end
 
     describe 'N.Q respondus setting' do
