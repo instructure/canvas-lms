@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+import I18n from 'i18n!pace_plans_start_date_selector'
 import moment from 'moment-timezone'
 
 import {autoSavingActions as actions} from '../../../actions/pace_plans'
@@ -69,8 +70,8 @@ export class StartDateSelector extends React.Component<ComponentProps> {
         onDateChange={this.onDateChange}
         disabledDaysOfWeek={this.props.disabledDaysOfWeek}
         disabledDays={this.isDayDisabled}
-        label="Start Date"
-        width="149px"
+        label={I18n.t('Projected Start Date')}
+        width="14rem"
       />
     )
   }

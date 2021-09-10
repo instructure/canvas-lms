@@ -107,6 +107,7 @@ export interface UIState {
   readonly selectedContextId: string
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
+  readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
   readonly adjustingHardEndDatesAfter?: number
 }

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+import I18n from 'i18n!pace_plans_end_date_selector'
 import moment from 'moment-timezone'
 
 import {autoSavingActions as actions} from '../../../actions/pace_plans'
@@ -72,8 +73,8 @@ export class EndDateSelector extends React.Component<ComponentProps> {
         onDateChange={this.onDateChange}
         disabledDaysOfWeek={this.props.disabledDaysOfWeek}
         disabledDays={this.isDayDisabled}
-        label="End Date"
-        width="149px"
+        label={I18n.t('Projected End Date')}
+        width="14rem"
       />
     )
   }

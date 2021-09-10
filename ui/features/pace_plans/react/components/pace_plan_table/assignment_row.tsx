@@ -18,7 +18,10 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+import I18n from 'i18n!pace_plans_assignment_row'
 import {debounce} from 'lodash'
+import moment from 'moment-timezone'
+
 import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
@@ -32,7 +35,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import moment from 'moment-timezone'
 
 import {PacePlanItem, PacePlan, StoreState} from '../../types'
 import {BlackoutDate} from '../../shared/types'
@@ -40,17 +42,16 @@ import {
   getPacePlan,
   getDueDate,
   getExcludeWeekends,
-  getPacePlanItems,
   getPacePlanItemPosition,
   isPlanCompleted,
   getDisabledDaysOfWeek
 } from '../../reducers/pace_plans'
 import {autoSavingActions as actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
-import PacePlanDateInput from '../../shared/components/pace_plan_date_input'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getAutoSaving, getAdjustingHardEndDatesAfter} from '../../reducers/ui'
+import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
+import SlideTransition from '../../utils/slide_transition'
 
 interface PassedProps {
   readonly pacePlanItem: PacePlanItem
@@ -60,7 +61,6 @@ interface StoreProps {
   readonly pacePlan: PacePlan
   readonly dueDate: string
   readonly excludeWeekends: boolean
-  readonly pacePlanItems: PacePlanItem[]
   readonly pacePlanItemPosition: number
   readonly blackoutDates: BlackoutDate[]
   readonly planCompleted: boolean
@@ -68,6 +68,7 @@ interface StoreProps {
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
   readonly disabledDaysOfWeek: number[]
+  readonly showProjections: boolean
 }
 
 interface DispatchProps {
@@ -93,7 +94,7 @@ export const ColumnWrapper = ({children, center = false, ...props}) => {
 
 export const COLUMN_WIDTHS = {
   DURATION: 90,
-  DATE: 150,
+  DATE: 90,
   STATUS: 45
 }
 
@@ -124,7 +125,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextProps.pacePlan.exclude_weekends !== this.props.pacePlan.exclude_weekends ||
       nextProps.pacePlan.context_type !== this.props.pacePlan.context_type ||
       (nextProps.pacePlan.context_type === this.props.pacePlan.context_type &&
-        nextProps.pacePlan.context_id !== this.props.pacePlan.context_id)
+        nextProps.pacePlan.context_id !== this.props.pacePlan.context_id) ||
+      nextProps.showProjections !== this.props.showProjections
     )
   }
 
@@ -291,30 +293,23 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     }
   }
 
-  renderDateInput = () => {
-    if (
+  renderDate = () => {
+    const dateText =
       this.props.adjustingHardEndDatesAfter !== undefined &&
       this.props.pacePlanItemPosition > this.props.adjustingHardEndDatesAfter
-    ) {
-      return <View width={`${COLUMN_WIDTHS.DATE}px`}>Adjusting due date...</View>
-    } else {
-      return (
-        <PacePlanDateInput
-          id={String(this.props.pacePlanItem.id)}
-          disabled={this.dateInputIsDisabled()}
-          dateValue={this.props.dueDate}
-          onDateChange={this.onDateChange}
-          disabledDaysOfWeek={this.props.disabledDaysOfWeek}
-          disabledDays={this.isDayDisabled}
-          width={`${COLUMN_WIDTHS.DATE}px`}
-          label={
-            <ScreenReaderContent>
-              Due Date for module {this.props.pacePlanItem.assignment_title}
-            </ScreenReaderContent>
-          }
-        />
-      )
-    }
+        ? I18n.t('Adjusting due dates...')
+        : moment(this.props.dueDate).format('l')
+    return (
+      <SlideTransition
+        direction="horizontal"
+        expanded={this.props.showProjections}
+        size={COLUMN_WIDTHS.DATE}
+      >
+        <ColumnWrapper width={COLUMN_WIDTHS.DATE}>
+          <Text>{dateText}</Text>
+        </ColumnWrapper>
+      </SlideTransition>
+    )
   }
 
   renderBody() {
@@ -329,7 +324,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
         <Flex alignItems="center" justifyItems="space-between">
           {this.renderDurationInput()}
-          <ColumnWrapper center>{this.renderDateInput()}</ColumnWrapper>
+          {this.renderDate()}
           <ColumnWrapper center width={`${COLUMN_WIDTHS.STATUS}px`}>
             {this.renderPublishStatusBadge()}
           </ColumnWrapper>
@@ -377,7 +372,6 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     pacePlan,
     dueDate: getDueDate(state, props),
     excludeWeekends: getExcludeWeekends(state),
-    pacePlanItems: getPacePlanItems(state),
     pacePlanItemPosition: getPacePlanItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
     planCompleted: isPlanCompleted(state),
@@ -386,7 +380,8 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
     ),
     adjustingHardEndDatesAfter: getAdjustingHardEndDatesAfter(state),
-    disabledDaysOfWeek: getDisabledDaysOfWeek(state)
+    disabledDaysOfWeek: getDisabledDaysOfWeek(state),
+    showProjections: getShowProjections(state)
   }
 }
 

@@ -29,6 +29,7 @@ export const initialState: UIState = {
   loadingMessage: '',
   showLoadingOverlay: false,
   editingBlackoutDates: false,
+  showProjections: false,
   adjustingHardEndDatesAfter: undefined
 }
 
@@ -42,6 +43,7 @@ export const getSelectedContextType = (state: StoreState) => state.ui.selectedCo
 export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
+export const getShowProjections = (state: StoreState) => state.ui.showProjections
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getAdjustingHardEndDatesAfter = (state: StoreState) =>
   state.ui.adjustingHardEndDatesAfter
@@ -58,6 +60,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, errorMessage: action.payload}
     case UIConstants.TOGGLE_DIVIDE_INTO_WEEKS:
       return {...state, divideIntoWeeks: !state.divideIntoWeeks}
+    case UIConstants.TOGGLE_SHOW_PROJECTIONS:
+      return {...state, showProjections: !state.showProjections}
     case UIConstants.PUBLISH_PLAN_STARTED:
       return {...state, planPublishing: true}
     case UIConstants.PUBLISH_PLAN_FINISHED:

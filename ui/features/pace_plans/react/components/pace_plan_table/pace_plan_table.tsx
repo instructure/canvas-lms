@@ -22,22 +22,31 @@ import Module from './module'
 import {StoreState, PacePlan} from '../../types'
 import {connect} from 'react-redux'
 import {getPacePlan} from '../../reducers/pace_plans'
+import {getShowProjections} from '../../reducers/ui'
 
 interface StoreProps {
   readonly pacePlan: PacePlan
+  readonly showProjections: boolean
 }
 
-export const PacePlanTable: React.FC<StoreProps> = ({pacePlan}) => (
+export const PacePlanTable: React.FC<StoreProps> = ({pacePlan, showProjections}) => (
   <>
     {pacePlan.modules.map((module, index) => (
-      <Module key={`module-${module.id}`} index={index + 1} module={module} pacePlan={pacePlan} />
+      <Module
+        key={`module-${module.id}`}
+        index={index + 1}
+        module={module}
+        pacePlan={pacePlan}
+        showProjections={showProjections}
+      />
     ))}
   </>
 )
 
 const mapStateToProps = (state: StoreState) => {
   return {
-    pacePlan: getPacePlan(state)
+    pacePlan: getPacePlan(state),
+    showProjections: getShowProjections(state)
   }
 }
 

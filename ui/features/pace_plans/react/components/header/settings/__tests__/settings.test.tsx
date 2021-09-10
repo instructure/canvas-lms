@@ -41,6 +41,10 @@ const defaultProps = {
   toggleHardEndDates
 }
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('Settings', () => {
   it('renders a settings menu with toggles and a button to open the blackout dates modal', () => {
     const {getByRole} = render(<Settings {...defaultProps} />)

@@ -20,21 +20,25 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-import PlanLengthPicker from './plan_length_picker/plan_length_picker'
 import PlanPicker from './plan_picker'
+import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
+import ShowProjectionsButton from './show_projections_button'
 
 const Header: React.FC = () => (
-  <View as="div" borderWidth="0 0 small 0">
-    <Flex wrap="wrap" alignItems="start" justifyItems="space-between">
-      <Flex alignItems="end" margin="0 small medium 0">
+  <View as="div">
+    <View as="div" borderWidth="0 0 small 0" margin="0 0 medium">
+      <Flex as="section" alignItems="end" margin="0 0 medium">
         <PlanPicker />
         <View margin="0 0 0 small">
           <Settings />
         </View>
+        <View margin="0 0 0 small">
+          <ShowProjectionsButton />
+        </View>
       </Flex>
-      <PlanLengthPicker />
-    </Flex>
+    </View>
+    <ProjectedDates />
   </View>
 )
 

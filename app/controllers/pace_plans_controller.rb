@@ -87,7 +87,7 @@ class PacePlansController < ApplicationController
   end
 
   def sections_json(course)
-    json = course.course_sections.map do |section|
+    json = course.active_course_sections.map do |section|
       {
         id: section.id,
         course_id: section.course_id,
