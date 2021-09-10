@@ -171,6 +171,7 @@ module Api::V1::PlannerItem
         submitted: submission&.has_submission?,
         excused: submission&.excused?,
         graded: submission&.graded?,
+        posted_at: submission&.posted_at,
         late: submission&.late?,
         missing: submission&.missing?,
         needs_grading: submission&.needs_grading?,
