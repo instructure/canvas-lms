@@ -65,7 +65,7 @@ describe Mutations::CreateOutcomeCalculationMethod do
     result = result.dig('data', 'createOutcomeCalculationMethod', 'outcomeCalculationMethod')
     record = OutcomeCalculationMethod.find(result.dig('_id'))
     expect(result.dig('contextType')).to eq 'Course'
-    expect(result.dig('contextId')).to eq @course.id
+    expect(result.dig('contextId')).to eq @course.id.to_s
     expect(result.dig('calculationMethod')).to eq 'highest'
     expect(result.dig('calculationInt')).to be_nil
     expect(record.calculation_method).to eq 'highest'

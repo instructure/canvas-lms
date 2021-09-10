@@ -83,7 +83,7 @@ describe Mutations::CreateOutcomeProficiency do
     record = OutcomeProficiency.find(result.dig('_id'))
     expect(record.context).to eq @account
     expect(result.dig('contextType')).to eq 'Account'
-    expect(result.dig('contextId')).to eq @account.id
+    expect(result.dig('contextId')).to eq @account.id.to_s
     ratings = result.dig('proficiencyRatingsConnection', 'nodes')
     expect(ratings.length).to eq 1
     expect(ratings[0]['color']).to eq 'FFFFFF'

@@ -34,7 +34,7 @@ export default {
     parentGroupId: '100',
     parentGroupTitle: 'Outcome Group',
     outcomeContextType: 'Account',
-    outcomeContextId: 1,
+    outcomeContextId: '1',
     onMenuHandler: () => {},
     onCheckboxHandler: () => {}
   }

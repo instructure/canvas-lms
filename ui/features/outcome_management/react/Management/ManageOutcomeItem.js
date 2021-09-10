@@ -55,8 +55,7 @@ const ManageOutcomeItem = ({
   const {canManage, isAdmin, isCourse} = useCanvasContext()
   const allowAdminEdit = isCourse && canManage && isAdmin
   const canEdit =
-    friendlyDescriptionFF ||
-    (outcomeContextType === contextType && String(outcomeContextId) === contextId)
+    friendlyDescriptionFF || (outcomeContextType === contextType && outcomeContextId === contextId)
 
   if (!title) return null
 
@@ -150,7 +149,7 @@ ManageOutcomeItem.propTypes = {
   description: PropTypes.string,
   friendlyDescription: PropTypes.string,
   outcomeContextType: PropTypes.string,
-  outcomeContextId: PropTypes.number,
+  outcomeContextId: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,

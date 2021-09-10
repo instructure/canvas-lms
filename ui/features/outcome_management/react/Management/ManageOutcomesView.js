@@ -190,7 +190,7 @@ ManageOutcomesView.propTypes = {
             description: PropTypes.string,
             canEdit: PropTypes.bool.isRequired,
             contextType: PropTypes.string,
-            contextId: PropTypes.number
+            contextId: PropTypes.string
           })
         })
       ),

@@ -31,7 +31,7 @@ export default {
       id: '1'
     },
     outcomeGroup: {
-      contextId: 1,
+      contextId: '1',
       contextType: 'Account',
       outcomes: {
         edges: [
