@@ -182,6 +182,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Määräpäivä: { when }" },
   "edit_c5fbea07": { "message": "Muokkaa" },
   "edit_equation_f5279959": { "message": "Muokkaa kaavaa" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Muokkaa olemassa olevaa painiketta/kuvaketta"
+  },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
   "editor_statusbar_26ac81fc": { "message": "Editorin tilapalkki" },
   "embed_828fac4a": { "message": "Upota" },

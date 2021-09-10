@@ -179,6 +179,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Inleverdatum: { when }" },
   "edit_c5fbea07": { "message": "Bewerken" },
   "edit_equation_f5279959": { "message": "Vergelijking bewerken" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Bestaande knop/pictogram bewerken"
+  },
   "edit_link_7f53bebb": { "message": "Link bewerken" },
   "editor_statusbar_26ac81fc": { "message": "Statusbalk van editor" },
   "embed_828fac4a": { "message": "Insluiten" },

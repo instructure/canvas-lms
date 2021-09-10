@@ -169,6 +169,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Due: { when }" },
   "edit_c5fbea07": { "message": "Edit" },
   "edit_equation_f5279959": { "message": "Edit Equation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edit Existing Button / Icon"
+  },
   "edit_link_7f53bebb": { "message": "Edit Link" },
   "editor_statusbar_26ac81fc": { "message": "Editor Status bar" },
   "embed_828fac4a": { "message": "Embed" },

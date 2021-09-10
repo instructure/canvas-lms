@@ -185,6 +185,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Fecha límite: { when }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar ecuación" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Editar botón / ícono existente"
+  },
   "edit_link_7f53bebb": { "message": "Editar enlace" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado del editor" },
   "embed_828fac4a": { "message": "Incrustar" },

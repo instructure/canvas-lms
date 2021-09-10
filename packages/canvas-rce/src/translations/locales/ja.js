@@ -179,6 +179,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "期限：{ when }" },
   "edit_c5fbea07": { "message": "編集" },
   "edit_equation_f5279959": { "message": "方程式を編集する" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "既存のボタン/アイコンの編集"
+  },
   "edit_link_7f53bebb": { "message": "リンクの編集" },
   "editor_statusbar_26ac81fc": { "message": "エディタ ステータスバー" },
   "embed_828fac4a": { "message": "埋め込み" },

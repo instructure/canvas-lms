@@ -185,6 +185,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "À rendre le : { when }" },
   "edit_c5fbea07": { "message": "Modifier" },
   "edit_equation_f5279959": { "message": "Modifier l''équation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Modifier une icône ou un bouton existant"
+  },
   "edit_link_7f53bebb": { "message": "Modifier lien" },
   "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "embed_828fac4a": { "message": "Intégrer" },

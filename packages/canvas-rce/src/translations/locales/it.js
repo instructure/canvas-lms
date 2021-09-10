@@ -185,6 +185,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Scadenza: { when }" },
   "edit_c5fbea07": { "message": "Modifica" },
   "edit_equation_f5279959": { "message": "Modifica equazione" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Modifica pulsante/icona esistente"
+  },
   "edit_link_7f53bebb": { "message": "Modifica collegamento" },
   "editor_statusbar_26ac81fc": { "message": "Barra di stato dell’editor" },
   "embed_828fac4a": { "message": "Incorpora" },

@@ -157,6 +157,7 @@ const locale = {
   "due_when_7eed10c6": { "message": "截止日期：{ when }" },
   "edit_c5fbea07": { "message": "編輯" },
   "edit_equation_f5279959": { "message": "編輯方程式" },
+  "edit_existing_button_icon_3d0277bd": { "message": "編輯現有的按鈕/圖示" },
   "edit_link_7f53bebb": { "message": "編輯連結" },
   "editor_statusbar_26ac81fc": { "message": "編輯器狀態欄" },
   "embed_828fac4a": { "message": "嵌入" },

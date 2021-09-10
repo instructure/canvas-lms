@@ -179,6 +179,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Erbyn: { when }" },
   "edit_c5fbea07": { "message": "Golygu" },
   "edit_equation_f5279959": { "message": "Golygu Hafaliad" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Golygu Botwm / Eicon Cyfredol"
+  },
   "edit_link_7f53bebb": { "message": "Golygu Dolen" },
   "editor_statusbar_26ac81fc": { "message": "Bar Statws Golygydd" },
   "embed_828fac4a": { "message": "Plannu" },

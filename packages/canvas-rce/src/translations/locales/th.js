@@ -172,6 +172,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "ครบกำหนด: { when }" },
   "edit_c5fbea07": { "message": "แก้ไข" },
   "edit_equation_f5279959": { "message": "แก้ไขสมการ" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "แก้ไขปุ่ม/ไอคอนในปัจจุบัน"
+  },
   "edit_link_7f53bebb": { "message": "แก้ไขลิงค์" },
   "editor_statusbar_26ac81fc": { "message": "แถบสถานะโปรแกรมแก้ไข" },
   "embed_828fac4a": { "message": "ผนวก" },

@@ -177,6 +177,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Inlämningsdatum: { when }" },
   "edit_c5fbea07": { "message": "Redigera" },
   "edit_equation_f5279959": { "message": "Redigera ekvation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Redigera befintlig knapp/ikon"
+  },
   "edit_link_7f53bebb": { "message": "Redigera länk" },
   "editor_statusbar_26ac81fc": { "message": "Statusfält för redigeraren" },
   "embed_828fac4a": { "message": "Bädda in" },

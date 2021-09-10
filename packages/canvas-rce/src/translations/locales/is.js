@@ -174,6 +174,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Skil: { when }" },
   "edit_c5fbea07": { "message": "Breyta" },
   "edit_equation_f5279959": { "message": "Breyta jöfnu" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Breyta núverandi hnapp / tákni"
+  },
   "edit_link_7f53bebb": { "message": "Breyta tengli" },
   "editor_statusbar_26ac81fc": { "message": "Stöðuslá ritils" },
   "embed_828fac4a": { "message": "Fella inn" },

@@ -175,6 +175,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Forfalder: { when }" },
   "edit_c5fbea07": { "message": "Redigér" },
   "edit_equation_f5279959": { "message": "Rediger ligning" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Rediger eksisterende knap/ikon"
+  },
   "edit_link_7f53bebb": { "message": "Rediger link" },
   "editor_statusbar_26ac81fc": { "message": "Editor-statusbar" },
   "embed_828fac4a": { "message": "Indlejre" },
