@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Frábær umræða"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Mjög góð verkefni"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Fáðu aðgang að Pretty HTML ritlinum"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Annar texti"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Mjög góðar verkefnisumræður"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Villa kom upp þegar skráin var lesin"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Breyta jöfnu"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Breyta núverandi hnapp / tákni"
+    },
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Villa kom upp við að hlaða eldri atriðum"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Spennandi umræður"
     },
     "excused_cf8792eb": {
         "message": "Undanþegið"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Allur skjárinn"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Skemmtilegar spurningar"
     },
     "generating_preview_45b53be0": {
         "message": "Býr til forskoðun..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
     },
+    "join_6cafecca": {
+        "message": "Taka þátt"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "taka þátt í virkum netfundi"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "taka þátt í netfundi"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Hoppa í verkfæraslá leiðarstýringar"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Flýtilyklar"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Tungumál"
     },
     "large_9c5e80e7": {
         "message": "Stór"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Lítur út fyrir að vera autt"
+    },
+    "math_ede93050": {
+        "message": "Stærðfræði"
     },
     "media_af190855": {
         "message": "Miðill"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Forskoðun stundaskrár"
     },
+    "science_8d92214a": {
+        "message": "Vísindi"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Skruna upp til að sjá sögu þína!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Lítil"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Félagslegar rannsóknir"
     },
     "something_went_wrong_89195131": {
         "message": "Eitthvað fór úrskeiðis."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Textastærð"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Bestu verkefnin"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Dagsetning og tími skilafrests þessa verkefnis"

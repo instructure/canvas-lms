@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "نقاش رائع"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "مهمة رائعة"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "الوصول إلى محرر HTML الأنيق"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "النص البديل"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "مهمة نقاش مذهلة"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "حدث خطأ أثناء قراءة الملف"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "تحرير المعادلة"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "تحرير الزر الحالي / الأيقونة الحالية"
+    },
     "edit_link_7f53bebb": {
         "message": "تحرير الارتباط"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "حدث خطأ في تحميل العناصر السابقة"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "نقاش مثير"
     },
     "excused_cf8792eb": {
         "message": "معفى"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "ملء الشاشة"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "اختبار موجز مرح"
     },
     "generating_preview_45b53be0": {
         "message": "جارٍ إنشاء المعاينة..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
     },
+    "join_6cafecca": {
+        "message": "انضمام"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "الانضمام إلى اجتماع نشط عبر الإنترنت"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "الانضمام إلى اجتماع عبر الإنترنت"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "الانتقال إلى شريط أدوات التنقل"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "اختصارات لوحة المفاتيح"
+    },
+    "language_arts_35b79a8b": {
+        "message": "آداب اللغة"
     },
     "large_9c5e80e7": {
         "message": "كبير"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "يبدو أنه لا يوجد أي شيء هنا"
+    },
+    "math_ede93050": {
+        "message": "الرياضيات"
     },
     "media_af190855": {
         "message": "الوسائط"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "جدولة معاينة"
     },
+    "science_8d92214a": {
+        "message": "العلوم"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "قم بالتمرير للأعلى للاطلاع على السجل!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "صغير"
+    },
+    "social_studies_13fa30c7": {
+        "message": "الدراسات الاجتماعية"
     },
     "something_went_wrong_89195131": {
         "message": "حدث خطأ ما."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "حجم النص"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "أفضل مهمة"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "تاريخ ووقت استحقاق قائمة المهام تلك"

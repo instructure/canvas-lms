@@ -152,6 +152,9 @@
   "due_when_7eed10c6": { "message": "Frist: { when }" },
   "edit_c5fbea07": { "message": "Rediger" },
   "edit_equation_f5279959": { "message": "Rediger likning" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Rediger eksisterende knapp/ikon"
+  },
   "edit_link_7f53bebb": { "message": "Rediger lenke" },
   "editor_statusbar_26ac81fc": { "message": "Redigering Statusbar" },
   "embed_828fac4a": { "message": "Legg ved" },

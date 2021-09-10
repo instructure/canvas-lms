@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "En fantastisk diskussion"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "En fantastisk opgave"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Få adgang til det pæne HTML-redigeringsværktøj"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alt-tekst"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "En fantastisk diskussionsopgave"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Der opstod en fejl, da filen skulle læses"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Rediger ligning"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Rediger eksisterende knap/ikon"
+    },
     "edit_link_7f53bebb": {
         "message": "Rediger link"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Fejl ved indlæsning af forrige elementer"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Spændende diskussion"
     },
     "excused_cf8792eb": {
         "message": "Undskyldt"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Fuld skærm"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Sjov test"
     },
     "generating_preview_45b53be0": {
         "message": "Genererer forhåndsvisning ..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } afsluttet { items, plural,\n     =1 {element}\n  other {elementer}\n}"
     },
+    "join_6cafecca": {
+        "message": "Deltag"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "deltage i et aktivt onlinemøde"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "deltage i onlinemøde"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Gå til navigationsværktøjslinjen"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Genvejstaster"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Sprog"
     },
     "large_9c5e80e7": {
         "message": "Stor"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Det ser ud som om, der ikke er noget her"
+    },
+    "math_ede93050": {
+        "message": "Matematik"
     },
     "media_af190855": {
         "message": "Medier"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Forhåndsvisning af tidsplan"
     },
+    "science_8d92214a": {
+        "message": "Videnskab"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Rul op for at se din historik!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Lille"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Sociale studier"
     },
     "something_went_wrong_89195131": {
         "message": "Noget gik galt."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Tekststørrelse"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Den bedste opgave"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Dato og klokkeslæt, hvor denne opgave forfalder"

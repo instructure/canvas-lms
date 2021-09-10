@@ -1,9 +1,12 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "精彩的讨论" },
+  "a_wonderful_assignment_d3139d9b": { "message": "精彩的作业" },
   "add_to_do_7537af64": { "message": "添加待办事项" },
   "add_to_do_7def3c37": { "message": "添加到待办事项" },
   "address_3159962f": { "message": "地址：" },
   "all_day_fb42c4fc": { "message": "全天" },
   "all_items_loaded_aa256183": { "message": "已加载所有项目" },
+  "an_amazing_discussion_assignment_e5c8bd6b": { "message": "精彩的讨论作业" },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "尝试拒绝该机会时出现错误。"
   },
@@ -92,6 +95,7 @@
   "error_loading_items_5218438e": { "message": "加载项目时出错" },
   "error_loading_more_items_3f109d9f": { "message": "加载更多项目时出错" },
   "error_loading_past_items_2881dbb1": { "message": "加载过去的项目时出错" },
+  "exciting_discussion_9f67bd0a": { "message": "精彩的讨论" },
   "excused_cf8792eb": { "message": "已请假" },
   "failed_peeking_into_your_future_e95b9306": { "message": "无法查看未来" },
   "failed_peeking_into_your_past_5bec2323": { "message": "无法查看过去" },
@@ -104,6 +108,7 @@
   "failed_to_load_opportunities_52ab6404": { "message": "加载机遇失败" },
   "failed_to_save_to_do_ddc7503b": { "message": "保存待办事项出错" },
   "feedback_6dcc1991": { "message": "反馈" },
+  "fun_quiz_47ab0b0": { "message": "趣味测验" },
   "go_to_card_view_dashboard_9d03970e": { "message": "前往卡片视图仪表板" },
   "graded_25cd3fcd": { "message": "已评分" },
   "grades_are_loading_c899652d": { "message": "正在加载评分" },
@@ -111,8 +116,12 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items }已完成{ items, plural,\n     =1 {个项目}\n  other {个项目}\n}"
   },
+  "join_6cafecca": { "message": "加入" },
+  "join_active_online_meeting_d9d892b2": { "message": "加入活跃的在线会议" },
+  "join_online_meeting_b1725843": { "message": "加入在线会议" },
   "jump_to_navigation_toolbar_2952cd8b": { "message": "跳转到导航工具栏" },
   "jump_to_today_254ccf41": { "message": "跳至今天" },
+  "language_arts_35b79a8b": { "message": "语言艺术" },
   "late_2be42b88": { "message": "延迟" },
   "load_more_a36f9cf9": { "message": "加载更多" },
   "load_prior_dates_f2b0f6f0": { "message": "加载以前的日期" },
@@ -128,6 +137,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "此处似乎没有任何内容"
   },
+  "math_ede93050": { "message": "数学" },
   "missing_1a256b3b": { "message": "缺失" },
   "missing_items_for_title_516511f8": { "message": "{ title } 的缺失项目" },
   "my_grades_98834476": { "message": "我的评分" },
@@ -173,6 +183,7 @@
   "replies_4a8577c8": { "message": "回复" },
   "save_11a80ec3": { "message": "保存" },
   "schedule_preview_3bcda153": { "message": "日程规划预览" },
+  "science_8d92214a": { "message": "科学" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "向上滚动以查看您的历史记录！"
   },
@@ -181,6 +192,7 @@
   },
   "show_all_ae37d610": { "message": "显示全部" },
   "show_my_grades_ebd08684": { "message": "显示我的评分" },
+  "social_studies_13fa30c7": { "message": "社会研究" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } 至 { endDate }"
   },
@@ -196,6 +208,7 @@
   "submitted_318fad53": { "message": "已提交" },
   "success_to_do_created_e34ed395": { "message": "成功：创建的待办列表" },
   "task_16b0ef38": { "message": "任务" },
+  "the_best_assignment_15e98be1": { "message": "最佳作业" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "完成该事项的日期和时间已截止"
   },

@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Yon gran deba" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Yon devwa eksepsyonèl" },
   "add_to_do_7537af64": { "message": "Ajoute Lis Tach" },
   "add_to_do_7def3c37": { "message": "Ajoute Lis Tach" },
   "address_3159962f": { "message": "Adrès:" },
   "all_day_fb42c4fc": { "message": "Tout Jounen" },
   "all_items_loaded_aa256183": { "message": "Tout eleman yo chaje" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Yon devwa diskisyon san parèy"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Gen yon erè ki fèt pandan tantativ pou rejte opòtinite a."
   },
@@ -96,6 +101,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Erè chajman eleman pase yo"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Yon deba pasyonan" },
   "excused_cf8792eb": { "message": "Egzante" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Koudèy echwe sou avni w"
@@ -118,6 +124,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Echèk anrejistreman tach" },
   "feedback_6dcc1991": { "message": "Kòmantè" },
+  "fun_quiz_47ab0b0": { "message": "Quiz amizan" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Ale nan Tablo Afichaj Kat"
   },
@@ -127,10 +134,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } eleman { items, plural,\n     =1 {eleman}\n  other {konplete}\n}"
   },
+  "join_6cafecca": { "message": "Antre" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "Patisipe nan rankont aktif anliy"
+  },
+  "join_online_meeting_b1725843": { "message": "patisipe nan rankont anliy" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Ale sou ba zouti navigasyon an"
   },
   "jump_to_today_254ccf41": { "message": "Ale nan Jodi a" },
+  "language_arts_35b79a8b": { "message": "La Langaj" },
   "late_2be42b88": { "message": "An reta" },
   "load_more_a36f9cf9": { "message": "Chaje plis" },
   "load_prior_dates_f2b0f6f0": { "message": "Chaje dat avan" },
@@ -146,6 +159,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Ta sanble pa gen anyen la a"
   },
+  "math_ede93050": { "message": "Matematik" },
   "missing_1a256b3b": { "message": "Manke" },
   "missing_items_for_title_516511f8": {
     "message": "Eleman ki manke pou { title }"
@@ -199,6 +213,7 @@
   "replies_4a8577c8": { "message": "Repons" },
   "save_11a80ec3": { "message": "Anrejistre" },
   "schedule_preview_3bcda153": { "message": "Apèsi Pwogram" },
+  "science_8d92214a": { "message": "Syans" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Navige monte pou wè istoryal ou!"
   },
@@ -207,6 +222,7 @@
   },
   "show_all_ae37d610": { "message": "Afiche Tout" },
   "show_my_grades_ebd08684": { "message": "Afiche Nòt Mwen" },
+  "social_studies_13fa30c7": { "message": "Syans Sosyal" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } a { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -218,6 +234,7 @@
   "submitted_318fad53": { "message": "Soumèt" },
   "success_to_do_created_e34ed395": { "message": "Reyisi: Lis Tach Kreye" },
   "task_16b0ef38": { "message": "Tach" },
+  "the_best_assignment_15e98be1": { "message": "Meyè devwa a" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dat ak lè pou sa fèt la se"
   },

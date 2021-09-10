@@ -148,6 +148,9 @@
   "due_when_7eed10c6": { "message": "تاريخ الاستحقاق: { when }" },
   "edit_c5fbea07": { "message": "تحرير" },
   "edit_equation_f5279959": { "message": "تحرير المعادلة" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "تحرير الزر الحالي / الأيقونة الحالية"
+  },
   "edit_link_7f53bebb": { "message": "تحرير الارتباط" },
   "editor_statusbar_26ac81fc": { "message": "شريط حالة المحرر" },
   "embed_828fac4a": { "message": "تضمين" },

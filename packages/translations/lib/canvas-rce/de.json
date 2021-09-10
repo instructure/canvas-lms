@@ -154,6 +154,9 @@
   "due_when_7eed10c6": { "message": "Fällig: { when }" },
   "edit_c5fbea07": { "message": "Ändern" },
   "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Vorhandene/s Schaltfläche/Symbol bearbeiten"
+  },
   "edit_link_7f53bebb": { "message": "Link bearbeiten" },
   "editor_statusbar_26ac81fc": { "message": "Editor-Statusleiste" },
   "embed_828fac4a": { "message": "Einbetten" },

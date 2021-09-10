@@ -138,6 +138,7 @@
   "due_when_7eed10c6": { "message": "到期：{ when }" },
   "edit_c5fbea07": { "message": "编辑" },
   "edit_equation_f5279959": { "message": "编辑等式" },
+  "edit_existing_button_icon_3d0277bd": { "message": "编辑现有按钮/图标" },
   "edit_link_7f53bebb": { "message": "编辑链接" },
   "editor_statusbar_26ac81fc": { "message": "编辑器状态栏" },
   "embed_828fac4a": { "message": "嵌入" },

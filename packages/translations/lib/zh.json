@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "精彩的讨论"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "精彩的作业"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "访问精美 HTML 编辑器"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alt 文本"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "精彩的讨论作业"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "读取文件时发生错误"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "编辑等式"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "编辑现有按钮/图标"
+    },
     "edit_link_7f53bebb": {
         "message": "编辑链接"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "加载过去的项目时出错"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "精彩的讨论"
     },
     "excused_cf8792eb": {
         "message": "已请假"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "全屏"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "趣味测验"
     },
     "generating_preview_45b53be0": {
         "message": "生成预览..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items }已完成{ items, plural,\n     =1 {个项目}\n  other {个项目}\n}"
     },
+    "join_6cafecca": {
+        "message": "加入"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "加入活跃的在线会议"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "加入在线会议"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "跳转到导航工具栏"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "键盘捷径"
+    },
+    "language_arts_35b79a8b": {
+        "message": "语言艺术"
     },
     "large_9c5e80e7": {
         "message": "大"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "此处似乎没有任何内容"
+    },
+    "math_ede93050": {
+        "message": "数学"
     },
     "media_af190855": {
         "message": "媒体"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "日程规划预览"
     },
+    "science_8d92214a": {
+        "message": "科学"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "向上滚动以查看您的历史记录！"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "小"
+    },
+    "social_studies_13fa30c7": {
+        "message": "社会研究"
     },
     "something_went_wrong_89195131": {
         "message": "出了些问题。"
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "文字大小"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "最佳作业"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "完成该事项的日期和时间已截止"

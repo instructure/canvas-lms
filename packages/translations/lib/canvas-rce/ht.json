@@ -142,6 +142,9 @@
   "due_when_7eed10c6": { "message": "Delè: { when }" },
   "edit_c5fbea07": { "message": "Modifye" },
   "edit_equation_f5279959": { "message": "Modifye Ekwasyon" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Chanje kòn / Bouton ki egziste yo"
+  },
   "edit_link_7f53bebb": { "message": "Chanje Lyen" },
   "editor_statusbar_26ac81fc": { "message": "Editè Ba Estati" },
   "embed_828fac4a": { "message": "Entegre" },

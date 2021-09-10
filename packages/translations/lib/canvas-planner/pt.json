@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Uma grande discussão" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Uma missão maravilhosa" },
   "add_to_do_7537af64": { "message": "Adicionar Tarefa" },
   "add_to_do_7def3c37": { "message": "Adicionar A Fazer" },
   "address_3159962f": { "message": "Morada:" },
   "all_day_fb42c4fc": { "message": "Dia todo" },
   "all_items_loaded_aa256183": { "message": "Todos os itens carregados" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Um espantoso trabalho de discussão"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Ocorreu um erro ao tentar descartar a oportunidade."
   },
@@ -100,6 +105,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Erro ao carregar últimos itens"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Discussão estimulante" },
   "excused_cf8792eb": { "message": "Desculpado" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Falha ao espreitar o seu futuro"
@@ -122,6 +128,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Falha ao guardar tarefa" },
   "feedback_6dcc1991": { "message": "Resposta" },
+  "fun_quiz_47ab0b0": { "message": "Questionário divertido" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Ir para o Painel de Visualização do Cartão"
   },
@@ -133,10 +140,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } item { items, plural,\n     =1 {completados}\n  other {items}\n}"
   },
+  "join_6cafecca": { "message": "Junte-se" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "junte-se a uma reunião online activa"
+  },
+  "join_online_meeting_b1725843": { "message": "junte-se à reunião online" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Saltar para a barra de ferramentas de navegação"
   },
   "jump_to_today_254ccf41": { "message": "Saltar para hoje" },
+  "language_arts_35b79a8b": { "message": "Artes Linguísticas" },
   "late_2be42b88": { "message": "Atrasado" },
   "load_more_a36f9cf9": { "message": "Carregar mais" },
   "load_prior_dates_f2b0f6f0": { "message": "Carregar datas anteriores" },
@@ -154,6 +167,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Parece que não há nada aqui"
   },
+  "math_ede93050": { "message": "Matemática" },
   "missing_1a256b3b": { "message": "Em falta" },
   "missing_items_for_title_516511f8": {
     "message": "Itens em falta para { title }"
@@ -209,6 +223,7 @@
   "replies_4a8577c8": { "message": "Respostas" },
   "save_11a80ec3": { "message": "Guardar" },
   "schedule_preview_3bcda153": { "message": "Pré-visualização do horário" },
+  "science_8d92214a": { "message": "Ciência" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Role para cima para ver seu histórico!"
   },
@@ -217,6 +232,7 @@
   },
   "show_all_ae37d610": { "message": "Mostrar tudo" },
   "show_my_grades_ebd08684": { "message": "Mostrar minhas classificações" },
+  "social_studies_13fa30c7": { "message": "Estudos Sociais" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } a { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -228,6 +244,7 @@
   "submitted_318fad53": { "message": "Submetido" },
   "success_to_do_created_e34ed395": { "message": "Sucesso: Tarefa criada" },
   "task_16b0ef38": { "message": "Tarefa" },
+  "the_best_assignment_15e98be1": { "message": "A melhor missão" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "A data e a hora em que isso é feito"
   },

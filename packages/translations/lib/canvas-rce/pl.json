@@ -158,6 +158,9 @@
   "due_when_7eed10c6": { "message": "Termin: { when }" },
   "edit_c5fbea07": { "message": "Edytuj" },
   "edit_equation_f5279959": { "message": "Edytuj równanie" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edytuj istniejący przycisk / ikonę"
+  },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
   "editor_statusbar_26ac81fc": { "message": "Pasek stanu edytora" },
   "embed_828fac4a": { "message": "Osadź" },

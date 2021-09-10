@@ -162,6 +162,9 @@
   "due_when_7eed10c6": { "message": "Срок: { when }" },
   "edit_c5fbea07": { "message": "Редактировать" },
   "edit_equation_f5279959": { "message": "Редактировать уравнение" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Редактировать существующую кнопку / значок"
+  },
   "edit_link_7f53bebb": { "message": "Редактировать ссылку" },
   "editor_statusbar_26ac81fc": { "message": "Панель состояния редактора" },
   "embed_828fac4a": { "message": "Вставить" },
