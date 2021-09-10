@@ -124,25 +124,16 @@ describe BounceNotificationProcessor do
       expect(queue).to expectation
       allow(bnp).to receive(:bounce_queue).and_return(queue)
       allow(CommunicationChannel).to receive(:bounce_for_path)
-
-      expect { bnp.process }.to have_incremented_statsd_stats([
-        {
-          stat: 'bounce_notification_processor.processed.transient',
-          count: 1
-        },
-        {
-          stat: 'bounce_notification_processor.processed.no_bounce',
-          count: 2
-        },
-        {
-          stat: 'bounce_notification_processor.processed.suppression',
-          count: 3
-        },
-        {
-          stat: 'bounce_notification_processor.processed.permanent',
-          count: 4
-        }
-      ])
+      allow(InstStatsd::Statsd).to receive(:increment)
+      bnp.process
+      expect(InstStatsd::Statsd).to have_received(:increment)
+        .with('bounce_notification_processor.processed.transient').once
+      expect(InstStatsd::Statsd).to have_received(:increment)
+        .with('bounce_notification_processor.processed.no_bounce').twice
+      expect(InstStatsd::Statsd).to have_received(:increment)
+        .with('bounce_notification_processor.processed.suppression').exactly(3).times
+      expect(InstStatsd::Statsd).to have_received(:increment)
+        .with('bounce_notification_processor.processed.permanent').exactly(4).times
     end
   end
 end

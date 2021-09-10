@@ -338,21 +338,22 @@ describe RubricAssessment do
       end
 
       it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        allow(InstStatsd::Statsd).to receive(:increment)
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
-        expect {
-          @association.assess({
-            :user => @student,
-            :assessor => @teacher,
-            :artifact => @assignment.find_or_create_submission(@student),
-            :assessment => {
-              :assessment_type => 'grading',
-              criterion_id => {
-                :points => '3'
-              }
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => '3'
             }
-          })
-        }.to have_incremented_statsd_stat('learning_outcome_result.create')
+          }
+        })
+        expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
+        expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome_result.create')
       end
 
       it 'should use default ratings for scoring' do

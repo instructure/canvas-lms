@@ -168,16 +168,20 @@ module Turnitin
     describe "#update_originality_data" do
       it 'raises an error and sends stat if max attempts are not exceeded' do
         allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
+        allow(InstStatsd::Statsd).to receive(:increment)
         mock_turnitin_client = double('turnitin_client')
         allow(mock_turnitin_client).to receive(:scored?).and_return(false)
         allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
-        expect(InstStatsd::Statsd).to receive(:increment).with("submission_not_scored.account_#{lti_assignment.root_account.global_id}",
-                                                               short_stat: 'submission_not_scored',
-                                                               tags: { root_account_id: lti_assignment.root_account.global_id }).once
         expect do
           subject.update_originality_data(submission, attachment.asset_string)
         end.to raise_error Turnitin::Errors::SubmissionNotScoredError
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with(
+            "submission_not_scored.account_#{lti_assignment.root_account.global_id}",
+            short_stat: 'submission_not_scored',
+            tags: { root_account_id: lti_assignment.root_account.global_id }
+          ).once
       end
 
       it 'sets an error message if max attempts are exceeded' do

@@ -45,6 +45,10 @@ describe MicrosoftSync::LoginService do
     context 'when configured' do
       subject { described_class.new_token('mytenant') }
 
+      before :each do
+        allow(InstStatsd::Statsd).to receive(:increment)
+      end
+
       context 'when Microsoft returns a response' do
         before do
           allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
@@ -78,10 +82,11 @@ describe MicrosoftSync::LoginService do
           it { is_expected.to eq(response_body) }
 
           it 'increments a statsd metric' do
-            expect(InstStatsd::Statsd).to \
-              receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '200'})
-              .and_call_original
             subject
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              'microsoft_sync.login_service',
+              tags: {status_code: '200'}
+            )
           end
         end
 
@@ -90,12 +95,13 @@ describe MicrosoftSync::LoginService do
           let(:response_body) { {} }
 
           it 'increments a statsd metric and raises an HTTPInvalidStatus' do
-            expect(InstStatsd::Statsd).to \
-              receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '401'})
-              .and_call_original
             expect { subject }.to raise_error(
               MicrosoftSync::Errors::HTTPInvalidStatus,
               /Login service returned 401 for tenant mytenant/
+            )
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              'microsoft_sync.login_service',
+              tags: {status_code: '401'}
             )
           end
         end
@@ -150,10 +156,11 @@ describe MicrosoftSync::LoginService do
         it 'increments a statsd metric and bubbles up the error' do
           error = SocketError.new
           expect(HTTParty).to receive(:post).and_raise error
-          expect(InstStatsd::Statsd).to \
-            receive(:increment).with('microsoft_sync.login_service', tags: {status_code: 'error'})
-            .and_call_original
           expect { subject }.to raise_error(error)
+          expect(InstStatsd::Statsd).to have_received(:increment).with(
+            'microsoft_sync.login_service',
+            tags: {status_code: 'error'}
+          )
         end
       end
     end

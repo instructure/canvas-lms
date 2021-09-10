@@ -737,6 +737,7 @@ describe CommunicationChannel do
 
     it "sends directly via SMS if configured" do
       expect(cc.e164_path).to eq '+18015555555'
+      allow(InstStatsd::Statsd).to receive(:increment)
       account = double()
       allow(account).to receive(:feature_enabled?).and_return(true)
       allow(account).to receive(:global_id).and_return('totes_an_ID')
@@ -748,24 +749,22 @@ describe CommunicationChannel do
         true
       )
       expect(cc).to receive(:send_otp_via_sms_gateway!).never
-      expect {
-        cc.send_otp!('123456', account)
-      }.to have_incremented_statsd_stats([
+      cc.send_otp!('123456', account)
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
+        "message.deliver.sms.one_time_password",
         {
-          stat: "message.deliver.sms.one_time_password",
-          options: {
-            short_stat: "message.deliver",
-            tags: {path_type: "sms", notification_name: 'one_time_password'}
-          }
-        },
-        {
-          stat: "message.deliver.sms.totes_an_ID",
-          options: {
-            short_stat: "message.deliver_per_account",
-            tags: {path_type: "sms", root_account_id: 'totes_an_ID'}
-          }
+          short_stat: "message.deliver",
+          tags: { path_type: "sms", notification_name: 'one_time_password' }
         }
-      ])
+      )
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
+        "message.deliver.sms.totes_an_ID",
+        {
+          short_stat: "message.deliver_per_account",
+          tags: { path_type: "sms", root_account_id: 'totes_an_ID' }
+        }
+      )
     end
 
     it "sends via email if not configured" do

@@ -71,52 +71,38 @@ describe Attachments::Verification do
   end
 
   context "verifying a verifier" do
+    before :each do
+      allow(InstStatsd::Statsd).to receive(:increment)
+    end
+
     it "should verify a legacy verifier for read and download" do
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.legacy_verifier_success").twice
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to eq(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.legacy_verifier_success").twice
     end
 
     it "accepts the uuid of another copy of the file" do
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.related_verifier_success").twice
-      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
       clone = attachment.clone_for(course_factory)
       clone.save!
       v2 = Attachments::Verification.new(clone)
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :read)).to eq true
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :download)).to eq true
-    end
-
-    it "should return false on an expired verifier" do
-      expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::TokenExpired)
-
-      result = true
-      expect {
-        result = v.valid_verifier_for_permission?("token", :read)
-      }.to have_incremented_statsd_stat("attachments.token_verifier_expired")
-      expect(result).to eq(false)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.related_verifier_success").twice
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "should return false on an invalid verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::InvalidToken)
-
-      result = true
-      expect {
-        result = v.valid_verifier_for_permission?("token", :read)
-      }.to have_incremented_statsd_stat("attachments.token_verifier_invalid")
-      expect(result).to eq(false)
+      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_invalid")
     end
 
     it "should return false on token id mismatch" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
         id: attachment.global_id + 1
       })
-
-      result = true
-      expect {
-        result = v.valid_verifier_for_permission?("token", :read)
-      }.to have_incremented_statsd_stat("attachments.token_verifier_id_mismatch")
-      expect(result).to eq(false)
+      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_id_mismatch")
     end
 
     it "should not let a student download an attachment that's locked" do
@@ -126,11 +112,10 @@ describe Attachments::Verification do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
         id: att2.global_id, user_id: student.global_id
       }).twice
-      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_success").twice
-      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
-
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_success").twice
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "follows custom permissions" do

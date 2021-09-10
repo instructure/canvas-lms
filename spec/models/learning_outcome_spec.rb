@@ -115,6 +115,7 @@ describe LearningOutcome do
     end
 
     it "adding outcomes to a rubric should increment datadog counter" do
+      allow(InstStatsd::Statsd).to receive(:increment)
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -138,9 +139,9 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      expect {
-        @rubric.save!
-      }.to have_incremented_statsd_stat('learning_outcome.align')
+      @rubric.save!
+      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align')
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "should allow learning outcome rows in the rubric" do

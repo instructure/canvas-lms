@@ -369,17 +369,19 @@ describe SIS::CSV::ImportRefactored do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:fail_with_error!).once.and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:job_args).once.with(:term, attempt: 1).and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:job_args).once.with(:term, attempt: 2).and_call_original
+
+      csv_importer_double = instance_double(SIS::CSV::TermImporter)
+      allow(SIS::CSV::TermImporter).to receive(:new).and_return(csv_importer_double)
+      allow(csv_importer_double).to receive(:process).and_raise("error")
+
+      process_csv_data("term_id,name,status", "T001,Winter13,active")
+
       [0, 1, 2].each do |i|
-        expect(InstStatsd::Statsd).to receive(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
                                                                     tags: { attempt: i, retry: false})
-        expect(InstStatsd::Statsd).to receive(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
                                                                     tags: { attempt: i, retry: true})
       end
-      allow_any_instance_of(SIS::CSV::TermImporter).to receive(:process).and_raise("error")
-      process_csv_data(
-        "term_id,name,status",
-        "T001,Winter13,active"
-      )
     end
 
     it 'should only run an importer once if successful' do
