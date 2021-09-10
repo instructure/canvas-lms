@@ -18,7 +18,6 @@
 
 import {AssignmentAvailabilityContainer} from '../AssignmentAvailabilityContainer'
 import {Assignment} from '../../../../graphql/Assignment'
-import {Discussion} from '../../../../graphql/Discussion'
 
 import {responsiveQuerySizes} from '../../../utils/index'
 
@@ -74,11 +73,7 @@ beforeEach(() => {
 
 const setup = (assignmentData = {}) => {
   return render(
-    <AssignmentAvailabilityContainer
-      discussionTopic={Discussion.mock({
-        assignment: Assignment.mock({...assignmentData})
-      })}
-    />
+    <AssignmentAvailabilityContainer assignment={Assignment.mock({...assignmentData})} isAdmin />
   )
 }
 

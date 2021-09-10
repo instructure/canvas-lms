@@ -61,7 +61,10 @@ export function AssignmentDetails({...props}) {
       render={responsiveProps => (
         <Flex data-testid="graded-discussion-info">
           <Flex.Item padding="xx-small" shouldGrow shouldShrink align="start">
-            <AssignmentAvailabilityContainer discussionTopic={props.discussionTopic} />
+            <AssignmentAvailabilityContainer
+              assignment={props.assignment}
+              isAdmin={props.isAdmin}
+            />
           </Flex.Item>
           <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
@@ -76,7 +79,8 @@ export function AssignmentDetails({...props}) {
 
 AssignmentDetails.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
-  discussionTopic: PropTypes.object.isRequired
+  assignment: PropTypes.object.isRequired,
+  isAdmin: PropTypes.bool.isRequired
 }
 
 export default AssignmentDetails

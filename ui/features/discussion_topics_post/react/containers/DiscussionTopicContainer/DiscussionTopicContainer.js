@@ -301,7 +301,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         >
                           <AssignmentDetails
                             pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
-                            discussionTopic={props.discussionTopic}
+                            assignment={props.discussionTopic.assignment}
+                            isAdmin={props.discussionTopic.permissions.readAsAdmin}
                           />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (

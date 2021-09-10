@@ -38,31 +38,29 @@ import {InlineList} from '@instructure/ui-list'
 export function AssignmentAvailabilityContainer({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
 
-  let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
+  let assignmentOverrides = props.assignment?.assignmentOverrides?.nodes || []
 
   const defaultDateSet =
-    !!props.discussionTopic.assignment?.dueAt ||
-    !!props.discussionTopic.assignment?.lockAt ||
-    !!props.discussionTopic.assignment?.unlockAt
+    !!props.assignment?.dueAt || !!props.assignment?.lockAt || !!props.assignment?.unlockAt
 
   const singleOverrideWithNoDefault = !defaultDateSet && assignmentOverrides.length === 1
 
   if (defaultDateSet) {
-    assignmentOverrides = props.discussionTopic.permissions?.readAsAdmin
+    assignmentOverrides = props.isAdmin
       ? assignmentOverrides.concat({
-          dueAt: props.discussionTopic.assignment?.dueAt,
-          unlockAt: props.discussionTopic.assignment?.unlockAt,
-          lockAt: props.discussionTopic.assignment?.lockAt,
+          dueAt: props.assignment?.dueAt,
+          unlockAt: props.assignment?.unlockAt,
+          lockAt: props.assignment?.lockAt,
           title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-          id: props.discussionTopic.assignment?.id
+          id: props.assignment?.id
         })
       : [
           {
-            dueAt: props.discussionTopic.assignment?.dueAt,
-            unlockAt: props.discussionTopic.assignment?.unlockAt,
-            lockAt: props.discussionTopic.assignment?.lockAt,
+            dueAt: props.assignment?.dueAt,
+            unlockAt: props.assignment?.unlockAt,
+            lockAt: props.assignment?.lockAt,
             title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-            id: props.discussionTopic.assignment?.id
+            id: props.assignment?.id
           }
         ]
   }
@@ -84,16 +82,16 @@ export function AssignmentAvailabilityContainer({...props}) {
           const group = singleOverrideWithNoDefault ? assignmentOverrides[0]?.title : ''
           const availabilityInformation = singleOverrideWithNoDefault
             ? assignmentOverrides[0]
-            : props.discussionTopic.assignment
+            : props.assignment
 
           return (
             <InlineList delimiter="none" itemSpacing="none">
               {[
-                props.discussionTopic.permissions?.readAsAdmin && matches.includes('desktop') ? (
+                props.isAdmin && matches.includes('desktop') ? (
                   <AssignmentContext group={group} />
                 ) : null,
                 <AssignmentDueDate
-                  dueDate={availabilityInformation.dueAt}
+                  dueDate={availabilityInformation?.dueAt}
                   onSetDueDateTrayOpen={setDueDateTrayOpen}
                 />,
                 (availabilityInformation.unlockAt || availabilityInformation.lockAt) &&
@@ -115,12 +113,7 @@ export function AssignmentAvailabilityContainer({...props}) {
         }}
       />
     ),
-    [
-      assignmentOverrides,
-      props.discussionTopic.assignment,
-      props.discussionTopic.permissions.readAsAdmin,
-      singleOverrideWithNoDefault
-    ]
+    [assignmentOverrides, props.assignment, props.isAdmin, singleOverrideWithNoDefault]
   )
 
   const multipleDueDates = useMemo(
@@ -163,9 +156,7 @@ export function AssignmentAvailabilityContainer({...props}) {
 
   return (
     <>
-      {props.discussionTopic.permissions?.readAsAdmin && assignmentOverrides.length > 1
-        ? multipleDueDates
-        : singleDueDate}
+      {props.isAdmin && assignmentOverrides.length > 1 ? multipleDueDates : singleDueDate}
       <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
         <View as="div" padding="medium">
           <Flex direction="column">
@@ -193,5 +184,6 @@ export function AssignmentAvailabilityContainer({...props}) {
 }
 
 AssignmentAvailabilityContainer.propTypes = {
-  discussionTopic: PropTypes.object
+  assignment: PropTypes.object,
+  isAdmin: PropTypes.bool
 }

@@ -18,7 +18,6 @@
 
 import {AssignmentDetails} from '../AssignmentDetails'
 import {Assignment} from '../../../../graphql/Assignment'
-import {Discussion} from '../../../../graphql/Discussion'
 
 import {responsiveQuerySizes} from '../../../utils/index'
 
@@ -76,9 +75,8 @@ const setup = (props, overrides = []) => {
   return render(
     <AssignmentDetails
       pointsPossible={7}
-      discussionTopic={Discussion.mock({
-        assignment: Assignment.mock({assignmentOverrides: {nodes: overrides}})
-      })}
+      assignment={Assignment.mock({assignmentOverrides: {nodes: overrides}})}
+      isAdmin
       {...props}
     />
   )
