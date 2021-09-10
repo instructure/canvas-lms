@@ -520,6 +520,12 @@ describe('OutcomeManagementPanel', () => {
         ...groupDetailDefaultProps,
         mocks: [
           ...defaultMocks,
+          ...groupMocks({
+            title: 'Course 101',
+            groupId: '101',
+            parentOutcomeGroupTitle: 'Root course folder',
+            parentOutcomeGroupId: '2'
+          }),
           moveOutcomeMock({
             groupId: '2',
             parentGroupTitle: 'Root course folder',
