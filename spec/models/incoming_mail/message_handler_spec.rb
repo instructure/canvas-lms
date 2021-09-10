@@ -145,6 +145,13 @@ describe IncomingMail::MessageHandler do
                                                              :reply_to => ['also_not_lucy@example.com']))
           subject.handle(outgoing_from_address, body, html_body, message, tag)
         end
+
+        it 'raises BlankMessage for empty message' do
+          message = double("original message without notification id", original_message_attributes)
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
+          expect(original_message.context).to receive(:reply_from).never
+          subject.handle(outgoing_from_address, " ", html_body, incoming_message, tag)
+        end
       end
 
       context "bounced messages" do

@@ -516,8 +516,6 @@ class Conversation < ActiveRecord::Base
     user = nil unless user && participant
     if !user
       raise IncomingMail::Errors::InvalidParticipant
-    elsif message.blank?
-      raise IncomingMail::Errors::BlankMessage
     else
       participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
       message = truncate_message(message)

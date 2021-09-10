@@ -167,8 +167,6 @@ class DiscussionEntry < ActiveRecord::Base
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise IncomingMail::Errors::InvalidParticipant
-    elsif !message || message.empty?
-      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,
