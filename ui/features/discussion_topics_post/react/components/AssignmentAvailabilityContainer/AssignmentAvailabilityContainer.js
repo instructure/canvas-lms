@@ -18,22 +18,17 @@
 
 import I18n from 'i18n!discussion_posts'
 
-import {AssignmentAvailabilityWindow} from '../AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
-import {AssignmentContext} from '../AssignmentContext/AssignmentContext'
-import {AssignmentDueDate} from '../AssignmentDueDate/AssignmentDueDate'
-import {nanoid} from 'nanoid'
+import {AssignmentSingleAvailabilityWindow} from '../AssignmentSingleAvailabilityWindow/AssignmentSingleAvailabilityWindow'
+import {AssignmentMultipleAvailabilityWindows} from '../AssignmentMultipleAvailabilityWindows/AssignmentMultipleAvailabilityWindows'
 import PropTypes from 'prop-types'
-import React, {useMemo, useState} from 'react'
-import {responsiveQuerySizes} from '../../utils/index'
+import React, {useState} from 'react'
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Tray} from '@instructure/ui-tray'
-import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
-import {Responsive} from '@instructure/ui-responsive'
+import {CloseButton} from '@instructure/ui-buttons'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
-import {InlineList} from '@instructure/ui-list'
 
 export function AssignmentAvailabilityContainer({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
@@ -65,98 +60,22 @@ export function AssignmentAvailabilityContainer({...props}) {
         ]
   }
 
-  const singleDueDate = useMemo(
-    () => (
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({tablet: true, desktop: true})}
-        props={{
-          tablet: {
-            dueDateMargin: 'none'
-          },
-          desktop: {
-            dueDateMargin: '0 0 0 x-small'
-          }
-        }}
-        render={(_responsiveProps, matches) => {
-          const group = singleOverrideWithNoDefault ? assignmentOverrides[0]?.title : ''
-          const availabilityInformation = singleOverrideWithNoDefault
-            ? assignmentOverrides[0]
-            : props.assignment
-
-          return (
-            <InlineList delimiter="none" itemSpacing="none">
-              {[
-                props.isAdmin && matches.includes('desktop') ? (
-                  <AssignmentContext group={group} />
-                ) : null,
-                <AssignmentDueDate
-                  dueDate={availabilityInformation?.dueAt}
-                  onSetDueDateTrayOpen={setDueDateTrayOpen}
-                />,
-                (availabilityInformation.unlockAt || availabilityInformation.lockAt) &&
-                matches.includes('desktop') ? (
-                  <AssignmentAvailabilityWindow
-                    availableDate={availabilityInformation.unlockAt}
-                    untilDate={availabilityInformation.lockAt}
-                  />
-                ) : null
-              ]
-                .filter(item => item !== null)
-                .map(item => (
-                  <InlineList.Item key={`assignement-due-date-section-${nanoid()}`}>
-                    <View display="inline-block">{item}</View>
-                  </InlineList.Item>
-                ))}
-            </InlineList>
-          )
-        }}
-      />
-    ),
-    [assignmentOverrides, props.assignment, props.isAdmin, singleOverrideWithNoDefault]
-  )
-
-  const multipleDueDates = useMemo(
-    () => (
-      <>
-        <CondensedButton
-          onClick={() => {
-            setDueDateTrayOpen(true)
-          }}
-          data-testid="show-due-dates-button"
-        >
-          <Responsive
-            match="media"
-            query={responsiveQuerySizes({tablet: true, desktop: true})}
-            props={{
-              tablet: {
-                text: I18n.t('Due Dates (%{dueDateCount})', {
-                  dueDateCount: assignmentOverrides.length
-                }),
-                textSize: 'x-small'
-              },
-              desktop: {
-                text: I18n.t('Show Due Dates (%{dueDateCount})', {
-                  dueDateCount: assignmentOverrides.length
-                }),
-                textSize: 'small'
-              }
-            }}
-            render={responsiveProps => (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                {responsiveProps.text}
-              </Text>
-            )}
-          />
-        </CondensedButton>
-      </>
-    ),
-    [assignmentOverrides.length]
-  )
-
   return (
     <>
-      {props.isAdmin && assignmentOverrides.length > 1 ? multipleDueDates : singleDueDate}
+      {props.isAdmin && assignmentOverrides.length > 1 ? (
+        <AssignmentMultipleAvailabilityWindows
+          assignmentOverrides={assignmentOverrides}
+          onSetDueDateTrayOpen={setDueDateTrayOpen}
+        />
+      ) : (
+        <AssignmentSingleAvailabilityWindow
+          assignmentOverrides={assignmentOverrides}
+          assignment={props.assignment}
+          isAdmin={props.isAdmin}
+          singleOverrideWithNoDefault={singleOverrideWithNoDefault}
+          onSetDueDateTrayOpen={setDueDateTrayOpen}
+        />
+      )}
       <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
         <View as="div" padding="medium">
           <Flex direction="column">
