@@ -125,9 +125,9 @@ describe InfoController do
       expect(response).to be_successful
       components = JSON.parse(response.body)['components']
       expect(components.map { |c| c['name'] }).to eq %w[
-        common_css common_js consul filesystem jobs postgresql redis rev_manifest
+        common_css common_js consul filesystem jobs postgresql redis rev_manifest vault
       ]
-      expect(components.map { |c| c['status'] }).to eq [200, 200, 200, 200, 200, 200, 200, 200]
+      expect(components.map { |c| c['status'] }).to eq [200, 200, 200, 200, 200, 200, 200, 200, 200]
     end
   end
 

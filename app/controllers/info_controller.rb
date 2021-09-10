@@ -61,6 +61,8 @@ class InfoController < ApplicationController
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
     DynamicSettings.find(tree: :private)['enable_rack_brotli']
+    # vault works; asserting a hash is returned that is not null
+    !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? if Canvas::Vault
 
     # javascript/css build process didn't die, right?
     asset_urls = {
@@ -118,6 +120,8 @@ class InfoController < ApplicationController
     redis = -> { MultiCache.cache.fetch('readiness').nil? }
     # ensures `gulp rev` has ran; returns a string, treated as truthy
     rev_manifest = -> { Canvas::Cdn::RevManifest.gulp_manifest.values.first }
+    # ensures we retrieved something back from Vault; returns a boolean
+    vault = -> { !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? }
 
     components = {
       common_css: readiness_check(css),
@@ -127,7 +131,8 @@ class InfoController < ApplicationController
       jobs: readiness_check(jobs),
       postgresql: readiness_check(postgres),
       redis: readiness_check(redis),
-      rev_manifest: readiness_check(rev_manifest)
+      rev_manifest: readiness_check(rev_manifest),
+      vault: readiness_check(vault)
     }
 
     failed = components.reject { |_k, v| v[:status] }.map(&:first)
