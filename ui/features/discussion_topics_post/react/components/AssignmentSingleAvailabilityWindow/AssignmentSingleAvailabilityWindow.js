@@ -19,14 +19,13 @@
 import {AssignmentAvailabilityWindow} from '../AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 import {AssignmentContext} from '../AssignmentContext/AssignmentContext'
 import {AssignmentDueDate} from '../AssignmentDueDate/AssignmentDueDate'
-import {nanoid} from 'nanoid'
+
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
 
-import {View} from '@instructure/ui-view'
 import {Responsive} from '@instructure/ui-responsive'
-import {InlineList} from '@instructure/ui-list'
+import {Flex} from '@instructure/ui-flex'
 
 export function AssignmentSingleAvailabilityWindow({...props}) {
   return (
@@ -48,30 +47,43 @@ export function AssignmentSingleAvailabilityWindow({...props}) {
           : props.assignment
 
         return (
-          <InlineList delimiter="none" itemSpacing="none">
-            {[
-              props.isAdmin && matches.includes('desktop') ? (
-                <AssignmentContext group={group} />
-              ) : null,
-              <AssignmentDueDate
-                dueDate={availabilityInformation?.dueAt}
-                onSetDueDateTrayOpen={props.onSetDueDateTrayOpen}
-              />,
-              (availabilityInformation.unlockAt || availabilityInformation.lockAt) &&
-              matches.includes('desktop') ? (
-                <AssignmentAvailabilityWindow
-                  availableDate={availabilityInformation.unlockAt}
-                  untilDate={availabilityInformation.lockAt}
+          <Flex
+            direction={
+              availabilityInformation?.set?.__typename === 'AdhocStudents' ? 'column' : 'row'
+            }
+          >
+            {props.isAdmin && matches.includes('desktop') ? (
+              <Flex.Item padding="x-small small x-small 0">
+                <AssignmentContext
+                  group={group}
+                  assignmentOverride={
+                    availabilityInformation?.set?.__typename === 'AdhocStudents'
+                      ? availabilityInformation
+                      : null
+                  }
                 />
-              ) : null
-            ]
-              .filter(item => item !== null)
-              .map(item => (
-                <InlineList.Item key={`assignement-due-date-section-${nanoid()}`}>
-                  <View display="inline-block">{item}</View>
-                </InlineList.Item>
-              ))}
-          </InlineList>
+              </Flex.Item>
+            ) : null}
+            <Flex.Item>
+              <Flex>
+                <Flex.Item>
+                  <AssignmentDueDate
+                    dueDate={availabilityInformation?.dueAt}
+                    onSetDueDateTrayOpen={props.onSetDueDateTrayOpen}
+                  />
+                </Flex.Item>
+                {(availabilityInformation.unlockAt || availabilityInformation.lockAt) &&
+                matches.includes('desktop') ? (
+                  <Flex.Item margin="0 0 0 small">
+                    <AssignmentAvailabilityWindow
+                      availableDate={availabilityInformation.unlockAt}
+                      untilDate={availabilityInformation.lockAt}
+                    />
+                  </Flex.Item>
+                ) : null}
+              </Flex>
+            </Flex.Item>
+          </Flex>
         )
       }}
     />

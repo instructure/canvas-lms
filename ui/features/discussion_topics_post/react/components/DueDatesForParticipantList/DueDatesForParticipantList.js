@@ -28,19 +28,22 @@ export function DueDatesForParticipantList({...props}) {
   const [isExpanded, setIsExpanded] = useState(false)
   const truncateLength = 10
   const truncateTo = 5
-  const isExpandable = props.assignmentOverride.set?.students?.length > truncateLength
+  const isExpandable = props.assignmentOverride?.set?.students?.length > truncateLength
 
-  if (props.assignmentOverride.set?.students?.length > 0) {
+  if (props.assignmentOverride?.set?.students?.length > 0) {
     return (
       <>
-        {isExpanded || !isExpandable
-          ? props.assignmentOverride.set.students.map(student => student.shortName).join(', ') + ' '
-          : props.assignmentOverride.set.students
-              .slice(0, truncateTo)
-              .map(student => student.shortName)
-              .join(', ')}
+        <Text size={props.textSize}>
+          {isExpanded || !isExpandable
+            ? props.assignmentOverride.set.students.map(student => student.shortName).join(', ') +
+              ' '
+            : props.assignmentOverride.set.students
+                .slice(0, truncateTo)
+                .map(student => student.shortName)
+                .join(', ')}
+        </Text>
         {isExpandable && (
-          <Text>
+          <Text size={props.textSize}>
             {isExpanded ? ' ' : '... '}
             <Link onClick={() => setIsExpanded(!isExpanded)}>
               {isExpanded
@@ -56,11 +59,16 @@ export function DueDatesForParticipantList({...props}) {
       </>
     )
   } else {
-    return <Text wrap="break-word">{props.assignmentOverride.title}</Text>
+    return (
+      <Text size={props.textSize} wrap="break-word">
+        {props.overrideTitle || props.assignmentOverride?.title}
+      </Text>
+    )
   }
 }
 
 DueDatesForParticipantList.propTypes = {
   assignmentOverride: AssignmentOverride.shape,
-  textSize: PropTypes.string
+  textSize: PropTypes.string,
+  overrideTitle: PropTypes.string
 }

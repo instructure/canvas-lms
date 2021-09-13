@@ -22,10 +22,17 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
 
 import {Responsive} from '@instructure/ui-responsive'
-import {Text} from '@instructure/ui-text'
 import PropTypes from 'prop-types'
+import {DueDatesForParticipantList} from '../DueDatesForParticipantList/DueDatesForParticipantList'
 
 export function AssignmentContext({...props}) {
+  let groupDisplayText = null
+  if (props.group) {
+    groupDisplayText = props.group
+  } else if (props.assignmentOverride?.set?.__typename !== 'AdhocStudents') {
+    groupDisplayText = I18n.t('Everyone')
+  }
+
   return (
     <Responsive
       match="media"
@@ -37,14 +44,16 @@ export function AssignmentContext({...props}) {
         },
         desktop: {
           textSize: 'small',
-          displayText: props.group ? props.group : I18n.t('Everyone')
+          displayText: groupDisplayText
         }
       }}
       render={responsiveProps => {
         return responsiveProps.displayText ? (
-          <Text weight="normal" size={responsiveProps.textSize}>
-            {responsiveProps.displayText}
-          </Text>
+          <DueDatesForParticipantList
+            textSize={responsiveProps.textSize}
+            assignmentOverride={props.assignmentOverride}
+            overrideTitle={responsiveProps.displayText}
+          />
         ) : null
       }}
     />
@@ -52,5 +61,11 @@ export function AssignmentContext({...props}) {
 }
 
 AssignmentContext.propTypes = {
-  group: PropTypes.string
+  group: PropTypes.string,
+  assignmentOverride: PropTypes.object
+}
+
+AssignmentContext.defaultProps = {
+  group: '',
+  assignmentOverride: null
 }

@@ -92,6 +92,29 @@ describe('AssignmentSingleAvailabilityWindow', () => {
       expect(container.getByText('Due Mar 31 5:59am')).toBeInTheDocument()
       expect(container.getByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
     })
+
+    it('should show participant list when sinlge override is defined with student list', () => {
+      const container = setup({
+        assignmentOverrides: [
+          {
+            id: '29',
+            _id: '29',
+            dueAt: '2021-09-08T23:59:00-06:00',
+            lockAt: '2021-09-15T23:59:59-06:00',
+            unlockAt: '2021-09-01T00:00:00-06:00',
+            title: '1 student',
+            set: {
+              students: [{shortName: 'Tom Jones', __typename: 'User'}],
+              __typename: 'AdhocStudents'
+            },
+            __typename: 'AssignmentOverride'
+          }
+        ],
+        singleOverrideWithNoDefault: true
+      })
+
+      expect(container.getByText('Tom Jones')).toBeInTheDocument()
+    })
   })
 
   describe('mobile', () => {
