@@ -45,8 +45,8 @@ const ManageOutcomeItem = ({
   canUnlink
 }) => {
   const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
-  const [truncate, setTruncate] = useState(true)
-  const onClickHandler = () => setTruncate(prevState => !prevState)
+  const [truncated, setTruncated] = useState(true)
+  const onClickHandler = () => setTruncated(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
 
@@ -84,7 +84,7 @@ const ManageOutcomeItem = ({
                 <IconButton
                   size="small"
                   screenReaderLabel={
-                    truncate
+                    truncated
                       ? I18n.t('Expand outcome description')
                       : I18n.t('Collapse outcome description')
                   }
@@ -94,7 +94,7 @@ const ManageOutcomeItem = ({
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
-                    {truncate ? (
+                    {truncated ? (
                       <IconArrowOpenEndLine data-testid="icon-arrow-right" />
                     ) : (
                       <IconArrowOpenDownLine data-testid="icon-arrow-down" />
@@ -129,11 +129,9 @@ const ManageOutcomeItem = ({
           {(description || friendlyDescription) && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
-                withExternalControl
                 description={description}
-                truncate={truncate}
-                onClickHandler={onClickHandler}
                 friendlyDescription={friendlyDescription}
+                truncated={truncated}
               />
             </View>
           )}

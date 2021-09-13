@@ -90,9 +90,8 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('displays down pointing caret when description is expanded', () => {
-    const {queryByTestId, getByTestId} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const descTruncated = getByTestId('description-truncated')
-    fireEvent.click(descTruncated)
+    const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+    fireEvent.click(getByText('Expand outcome description'))
     expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
   })
 
