@@ -42,34 +42,19 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_inst_access_token(token_string)
-    return false unless InstAccess::Token.is_token?(token_string)
+    token = ::AuthenticationMethods::InstAccessToken.parse(token_string)
+    return false unless token
 
-    begin
-      token = InstAccess::Token.from_token_string(token_string)
-    rescue InstAccess::InvalidToken, # token didn't pass signature verification
-           InstAccess::TokenExpired # token passed signature verification, but is expired
-      raise AccessTokenError
-    rescue InstAccess::ConfigError => exception
-      # InstAccess isn't configured. A human should fix that, but this method
-      # should recover gracefully.
-      Canvas::Errors.capture_exception(:inst_access, exception, :warn)
-      return true
-    end
+    auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token, @domain_root_account)
 
-    @current_user = User.find_by(uuid: token.user_uuid)
-    @current_pseudonym = SisPseudonym.for(
-      @current_user, @domain_root_account, type: :implicit, require_sis: false
-    )
+    @current_user = auth_context[:current_user]
+    @current_pseudonym = auth_context[:current_pseudonym]
     raise AccessTokenError unless @current_user && @current_pseudonym
 
-    if token.masquerading_user_uuid && token.masquerading_user_shard_id
-      Shard.lookup(token.masquerading_user_shard_id).activate do
-        @real_current_user = User.find_by!(uuid: token.masquerading_user_uuid)
-        @real_current_pseudonym = SisPseudonym.for(
-          @real_current_user, @domain_root_account, type: :implicit, require_sis: false
-        )
-        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
-      end
+    if auth_context[:real_current_user]
+      @real_current_user = auth_context[:real_current_user]
+      @real_current_pseudonym = auth_context[:real_current_pseudonym]
+      logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
     end
     @authenticated_with_jwt = @authenticated_with_inst_access_token = true
   end
