@@ -28,29 +28,47 @@ const defaultProps = {
   index: 1,
   module: PLAN_MODULE_1,
   pacePlan: PRIMARY_PLAN,
+  responsiveSize: 'large' as const,
   showProjections: true
 }
 
 describe('Module', () => {
   it('is expanded by default, shows the module name always, and only shows column headers when expanded', () => {
     const {getByRole, queryByRole, queryByText} = renderConnected(<Module {...defaultProps} />)
-    const moduleHeader = getByRole('button', {name: '1. How 2 B A H4CK32 Days Due Date Status'})
+    const moduleHeader = getByRole('button', {name: '1. How 2 B A H4CK32'})
     expect(moduleHeader).toBeInTheDocument()
     expect(queryByText(PLAN_MODULE_1.items[0].assignment_title)).toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Days'})).toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Due Date'})).toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Status'})).toBeInTheDocument()
 
     act(() => moduleHeader.click())
-    expect(
-      queryByRole('button', {name: '1. How 2 B A H4CK32 Days Due Date Status'})
-    ).not.toBeInTheDocument()
-    expect(queryByText(PLAN_MODULE_1.items[0].assignment_title)).not.toBeInTheDocument()
     expect(getByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
+    expect(queryByText(PLAN_MODULE_1.items[0].assignment_title)).not.toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Days'})).not.toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Due Date'})).not.toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Status'})).not.toBeInTheDocument()
   })
 
   it('does not show due date column header when hiding projections', () => {
     const {queryByRole} = renderConnected(<Module {...defaultProps} showProjections={false} />)
+    expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Days'})).toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Due Date'})).not.toBeInTheDocument()
+    expect(queryByRole('columnheader', {name: 'Status'})).toBeInTheDocument()
+  })
+
+  it('displays headers and values in stacked format when at small screen sizes', () => {
+    const {queryAllByRole, queryByRole} = renderConnected(
+      <Module {...defaultProps} responsiveSize="small" showProjections />
+    )
+    expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
+    expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(
-      queryByRole('button', {name: '1. How 2 B A H4CK32 Days Due Date Status'})
-    ).not.toBeInTheDocument()
-    expect(queryByRole('button', {name: '1. How 2 B A H4CK32 Days Status'})).toBeInTheDocument()
+      queryByRole('cell', {name: 'Assignments : Basic encryption/decryption'})
+    ).toBeInTheDocument()
+    expect(queryAllByRole('cell', {name: /Days :/})[0]).toBeInTheDocument()
+    expect(queryByRole('cell', {name: 'Due Date : 9/9/2021'})).toBeInTheDocument()
+    expect(queryAllByRole('cell', {name: 'Status : Published'})[0]).toBeInTheDocument()
   })
 })
