@@ -104,7 +104,7 @@ module ImprovedOutcomeManagementPage
   end
 
   def individual_outcome_kabob_menu(index)
-    ffj("button:contains('Outcome Menu')")[index]
+    ffj("button:contains('Menu for outcome')")[index]
   end
 
   def edit_outcome_button

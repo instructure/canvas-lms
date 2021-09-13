@@ -64,12 +64,14 @@ describe('FindOutcomeItem', () => {
   it('enables add button with Add as text if outcome is not imported', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
     expect(getByText('Add')).toBeInTheDocument()
+    expect(getByText('Add outcome Outcome Title')).toBeInTheDocument()
     expect(getByText('Add').closest('button')).toBeEnabled()
   })
 
   it('disables add button with Added as text if outcome is imported', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps({isImported: true})} />)
     expect(getByText('Added')).toBeInTheDocument()
+    expect(getByText('Added outcome Outcome Title')).toBeInTheDocument()
     expect(getByText('Added').closest('button')).toBeDisabled()
   })
 
@@ -121,20 +123,20 @@ describe('FindOutcomeItem', () => {
 
   it('displays down pointing caret when description is expanded', () => {
     const {queryByTestId, getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand outcome description'))
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
   })
 
   it('expands description when user clicks on right pointing caret', () => {
     const {queryByTestId, getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand outcome description'))
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
   })
 
   it('collapses description when user clicks on downward pointing caret', () => {
     const {queryByTestId, getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand outcome description'))
-    fireEvent.click(getByText('Collapse outcome description'))
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
