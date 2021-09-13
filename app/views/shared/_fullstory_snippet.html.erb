@@ -54,7 +54,7 @@
     FS.setUserVars({
       accountName_str: '<%=@current_user&.account.name || '?'%>',
       feature_homeroom_course_bool: <%= !!(js_env&.fetch(:HOMEROOM_COURSE, false)) %>,
-      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>'
+      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>',
       k5_user_bool: <%=k5_user? %>
     })
   </script>
