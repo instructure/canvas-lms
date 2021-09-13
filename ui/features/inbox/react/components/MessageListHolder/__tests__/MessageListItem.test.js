@@ -112,7 +112,7 @@ describe('MessageListItem', () => {
     expect(queryByTestId('visible-star')).toBeInTheDocument()
 
     fireEvent.click(queryByTestId('visible-star'))
-    expect(onStarMock).toHaveBeenLastCalledWith(true)
+    expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
     // star always shows if selected
     fireEvent.mouseOut(subjectLine)
     expect(queryByTestId('visible-star')).toBeInTheDocument()

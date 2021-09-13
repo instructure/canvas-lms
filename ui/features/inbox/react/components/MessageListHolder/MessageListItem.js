@@ -61,7 +61,7 @@ export const MessageListItem = ({...props}) => {
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
-    props.onStar(!isStarred)
+    props.onStar(!isStarred, props.conversation._id)
     setIsStarred(!isStarred)
   }
 
@@ -188,7 +188,7 @@ export const MessageListItem = ({...props}) => {
             <Grid.Col>
               <Text color="secondary">
                 <TruncateText>
-                  {props.conversation.conversationMessagesConnection.nodes[0]?.body}
+                  {props.conversation.conversationMessagesConnection?.nodes[0]?.body}
                 </TruncateText>
               </Text>
             </Grid.Col>
@@ -259,7 +259,7 @@ export const MessageListItem = ({...props}) => {
 
 const participantProp = PropTypes.shape({name: PropTypes.string})
 
-const conversaionMessageProp = PropTypes.shape({
+const conversationMessageProp = PropTypes.shape({
   author: participantProp,
   participants: PropTypes.arrayOf(participantProp),
   created_at: PropTypes.string,
@@ -268,9 +268,11 @@ const conversaionMessageProp = PropTypes.shape({
 
 export const conversationProp = PropTypes.shape({
   id: PropTypes.string,
+  _id: PropTypes.string,
   subject: PropTypes.string,
   participants: PropTypes.arrayOf(participantProp),
-  conversationMessages: PropTypes.arrayOf(conversaionMessageProp)
+  conversationMessages: PropTypes.arrayOf(conversationMessageProp),
+  conversationMessagesConnection: PropTypes.object
 })
 
 MessageListItem.propTypes = {
