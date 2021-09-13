@@ -247,7 +247,7 @@ export function createMediaServerSession() {
   }
 }
 
-export function uploadToButtonsAndIconsFolder(svg) {
+export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
   return (_dispatch, getState) => {
     const {source, jwt, host, contextId, contextType} = getState()
     const svgAsFile = new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'})
@@ -256,7 +256,8 @@ export function uploadToButtonsAndIconsFolder(svg) {
         name: svg.name,
         type: 'image/svg+xml'
       },
-      name: svg.name
+      name: svg.name,
+      onDuplicate: uploadSettings.onDuplicate
     }
 
     return source

@@ -39,17 +39,22 @@ export const CreateButtonForm = ({editor, onClose, editing}) => {
   const [status, setStatus] = useState(statuses.IDLE)
   const storeProps = useStoreProps()
 
-  const handleSubmit = () => {
+  const handleSubmit = ({replaceFile = false}) => {
     setStatus(statuses.LOADING)
 
     const svg = buildSvg(settings, {isPreview: false})
     buildStylesheet()
       .then(stylesheet => {
         svg.appendChild(stylesheet)
-        return storeProps.startButtonsAndIconsUpload({
-          name: `${settings.name || formatMessage('untitled')}.svg`,
-          domElement: svg
-        })
+        return storeProps.startButtonsAndIconsUpload(
+          {
+            name: `${settings.name || formatMessage('untitled')}.svg`,
+            domElement: svg
+          },
+          {
+            onDuplicate: replaceFile && 'overwrite'
+          }
+        )
       })
       .then(writeButtonToRCE)
       .then(onClose)
@@ -81,7 +86,7 @@ export const CreateButtonForm = ({editor, onClose, editing}) => {
         disabled={status === statuses.LOADING}
         onCancel={onClose}
         onSubmit={handleSubmit}
-        onReplace={() => {}}
+        onReplace={() => handleSubmit({replaceFile: true})}
         editing={editing}
       />
     </View>

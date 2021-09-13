@@ -349,8 +349,10 @@ class RceApiSource {
       contextId: apiProps.contextId,
       contextType: apiProps.contextType,
       file: fileProps,
-      no_redirect: true
+      no_redirect: true,
+      onDuplicate: fileProps.onDuplicate
     }
+
     return this.apiPost(uri, headers, body)
   }
 
