@@ -316,17 +316,19 @@ const OutcomeManagementPanel = ({
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item as="div" position="relative" width="1%" display="inline-block">
-            {/* eslint-disable jsx-a11y/no-noninteractive-tabindex */}
+          <Flex.Item
+            as="div"
+            position="relative"
+            width="1%"
+            display="inline-block"
+            tabIndex="0"
+            role="separator"
+            aria-hidden="true"
+            aria-orientation="vertical"
+            onKeyDown={onKeyDownHandler}
+            elementRef={setDelimiterRef}
+          >
             <div
-              tabIndex="0"
-              role="separator"
-              aria-hidden="true"
-              aria-orientation="vertical"
-              minHeight="calc(720px - 10.75rem)"
-              height="calc(100vh - 16.35rem)"
-              onKeyDown={onKeyDownHandler}
-              ref={setDelimiterRef}
               style={{
                 width: '1vw',
                 cursor: 'col-resize',
@@ -336,7 +338,6 @@ const OutcomeManagementPanel = ({
                   '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
               }}
             />
-            {/* eslint-enable jsx-a11y/no-noninteractive-tabindex */}
           </Flex.Item>
           <Flex.Item
             as="div"
