@@ -5226,6 +5226,41 @@ describe Course, "#sync_homeroom_enrollments" do
   end
 end
 
+describe Course, "#sync_homeroom_participation" do
+  before :once do
+    @homeroom_course = course_factory(active_course: true)
+    @homeroom_course.account.settings[:enable_as_k5_account] = { value: true }
+    @homeroom_course.homeroom_course = true
+    @homeroom_course.save!
+
+    @course = course_factory(active_course: true, account: @homeroom_course.account)
+    @course.sync_enrollments_from_homeroom = true
+    @course.homeroom_course_id = @homeroom_course.id
+    @course.save!
+  end
+
+  it "syncs enrollment term from homeroom" do
+    homeroom_term = @homeroom_course.account.enrollment_terms.create!(:end_at => 1.week.ago, :name => 'homeroom term')
+    @homeroom_course.restrict_enrollments_to_course_dates = false
+    @homeroom_course.enrollment_term = homeroom_term
+    @homeroom_course.save!
+    @course.sync_homeroom_participation
+    expect(@course.restrict_enrollments_to_course_dates).to be_falsey
+    expect(@course.enrollment_term.name).to eql @homeroom_course.enrollment_term.name
+  end
+
+  it "syncs course dates from homeroom" do
+    @homeroom_course.restrict_enrollments_to_course_dates = true
+    @homeroom_course.start_at = 7.days.ago
+    @homeroom_course.conclude_at = 1.day.ago
+    @homeroom_course.save!
+    @course.sync_homeroom_participation
+    expect(@course.restrict_enrollments_to_course_dates).to be_truthy
+    expect(@course.start_at).to eq @homeroom_course.start_at
+    expect(@course.conclude_at).to eq @homeroom_course.conclude_at
+  end
+end
+
 describe Course, "user_is_instructor?" do
   before :once do
     @course = Course.create

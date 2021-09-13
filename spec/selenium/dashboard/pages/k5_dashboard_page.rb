@@ -290,7 +290,7 @@ module K5DashboardPageObject
   end
 
   def sync_enrollments_checkbox_selector
-    "input + label:contains('Sync enrollments from homeroom')"
+    "input + label:contains('Sync enrollments and course start/end dates from homeroom')"
   end
 
   def welcome_title_selector

@@ -886,12 +886,16 @@ class CoursesController < ApplicationController
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
-          # Sync homeroom enrollments if enabled and the course isn't a SIS import
+          # Sync homeroom enrollments and participation if enabled and the course isn't a SIS import
           if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
             progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
             progress.user = @current_user
             progress.reset!
             progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+            # Participation sync should be done in the normal request flow, as it only needs to update a couple of
+            # specific fields, delegating that to a job will cause the controller to return the old values, which will
+            # force the user to refresh the page after the job finishes to see the changes
+            @course.sync_homeroom_participation
           end
           format.html { redirect_to @course }
           format.json {
@@ -3066,12 +3070,16 @@ class CoursesController < ApplicationController
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
-        # Sync homeroom enrollments if enabled and course isn't a SIS import
+        # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
         if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!
           progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+          # Participation sync should be done in the normal request flow, as it only needs to update a couple of
+          # specific fields, delegating that to a job will cause the controller to return the old values, which will
+          # force the user to refresh the page after the job finishes to see the changes
+          @course.sync_homeroom_participation
         end
         render_update_success
       else

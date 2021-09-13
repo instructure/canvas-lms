@@ -3420,8 +3420,25 @@ class Course < ActiveRecord::Base
     !!lock_all_announcements || elementary_homeroom_course?
   end
 
-  def self.sync_homeroom_enrollments
-    sync_homeroom_enrollments_enabled.find_each(&:sync_homeroom_enrollments)
+  def self.sync_with_homeroom
+    sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
+  end
+
+  def sync_with_homeroom
+    sync_homeroom_participation
+    sync_homeroom_enrollments
+  end
+
+  def sync_homeroom_participation
+    if linked_homeroom_course.restrict_enrollments_to_course_dates
+      self.restrict_enrollments_to_course_dates = true
+      self.start_at = linked_homeroom_course.start_at
+      self.conclude_at = linked_homeroom_course.conclude_at
+    else
+      self.restrict_enrollments_to_course_dates = false
+      self.enrollment_term = linked_homeroom_course.enrollment_term
+    end
+    self.save!
   end
 
   def sync_homeroom_enrollments(progress = nil)
