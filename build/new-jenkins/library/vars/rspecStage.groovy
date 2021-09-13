@@ -20,7 +20,7 @@ def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
   def rspecqNodeTotal = env.TEST_QUEUE_NODES.toInteger()
-  def rspecqEnabled = useRspecQ(10)
+  def rspecqEnabled = env.RSPECQ_ENABLED == '1' || configuration.isRspecqEnabled()
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
@@ -36,7 +36,7 @@ def createDistribution(nestedStages) {
     'EXCLUDE_TESTS=.*/(selenium|contracts)',
     "FORCE_FAILURE=${configuration.isForceFailureRSpec() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
-    'RSPEC_PROCESSES=4',
+    "RSPEC_PROCESSES=${configuration.getInteger('rspec-processes')}",
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
   ]
 
@@ -46,7 +46,7 @@ def createDistribution(nestedStages) {
     'EXCLUDE_TESTS=.*/performance',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
-    'RSPEC_PROCESSES=3',
+    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
   ]
 
@@ -55,7 +55,7 @@ def createDistribution(nestedStages) {
     'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
-    'RSPEC_PROCESSES=6',
+    "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
     "RSPECQ_FILE_SPLIT_THRESHOLD=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '999' : '150'}",
     'RSPECQ_MAX_REQUEUES=2',
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
@@ -104,9 +104,8 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD}", 'UTF-8')
+  def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
   env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
-
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
