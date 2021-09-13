@@ -52,11 +52,13 @@ export function DueDateTray({...props}) {
                   {I18n.t('Due')}
                 </Text>
               </Table.ColHeader>
-              <Table.ColHeader id="due_date_tray_header_for">
-                <Text size={responsiveProps.textSize} weight="bold">
-                  {I18n.t('For')}
-                </Text>
-              </Table.ColHeader>
+              {props.isAdmin && (
+                <Table.ColHeader data-testid="due_date_tray_header_for">
+                  <Text size={responsiveProps.textSize} weight="bold">
+                    {I18n.t('For')}
+                  </Text>
+                </Table.ColHeader>
+              )}
               <Table.ColHeader id="due_date_tray_header_available_from">
                 <Text size={responsiveProps.textSize} weight="bold">
                   {I18n.t('Available From')}
@@ -79,11 +81,13 @@ export function DueDateTray({...props}) {
                       : I18n.t('No Due Date')}
                   </Text>
                 </Table.Cell>
-                <Table.Cell>
-                  <Text size={responsiveProps.textSize}>
-                    <DueDatesForParticipantList assignmentOverride={item} />
-                  </Text>
-                </Table.Cell>
+                {props.isAdmin && (
+                  <Table.Cell>
+                    <Text size={responsiveProps.textSize}>
+                      <DueDatesForParticipantList assignmentOverride={item} />
+                    </Text>
+                  </Table.Cell>
+                )}
                 <Table.Cell>
                   <Text size={responsiveProps.textSize}>
                     {item.unlockAt
@@ -109,5 +113,10 @@ export function DueDateTray({...props}) {
 
 DueDateTray.propTypes = {
   assignmentOverrides: PropTypes.arrayOf(AssignmentOverride.shape),
-  tableCaption: PropTypes.string
+  tableCaption: PropTypes.string,
+  isAdmin: PropTypes.bool
+}
+
+DueDateTray.defaultProps = {
+  isAdmin: true
 }

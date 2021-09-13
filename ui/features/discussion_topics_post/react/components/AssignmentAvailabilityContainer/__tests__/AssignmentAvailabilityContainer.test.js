@@ -160,5 +160,18 @@ describe('AssignmentAvailabilityContainer', () => {
       expect(getByText('Due Mar 31')).toBeTruthy()
       expect(getByTestId('assignment-override-row')).toBeTruthy()
     })
+
+    it("due date tray doesn't show assignment context when not admin", () => {
+      const {queryByText, getByText, queryByTestId} = setup({
+        assignmentOverrides: {nodes: []},
+        isAdmin: false
+      })
+
+      expect(queryByText('Due Mar 31')).toBeInTheDocument()
+      const dueDateTrayButton = queryByText('Due Mar 31')
+      fireEvent.click(dueDateTrayButton)
+      expect(getByText('Due Mar 31')).toBeTruthy()
+      expect(queryByTestId('due_date_tray_header_for')).toBeNull()
+    })
   })
 })

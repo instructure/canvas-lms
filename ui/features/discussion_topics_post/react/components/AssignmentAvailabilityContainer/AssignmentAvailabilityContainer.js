@@ -94,7 +94,7 @@ export function AssignmentAvailabilityContainer({...props}) {
                 {I18n.t('Due Dates')}
               </Text>
             </Flex.Item>
-            <DueDateTray assignmentOverrides={assignmentOverrides} />
+            <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
           </Flex>
         </View>
       </Tray>
