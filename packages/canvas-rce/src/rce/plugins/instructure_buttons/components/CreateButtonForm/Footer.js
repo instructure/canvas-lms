@@ -16,54 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 
 import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {Tooltip} from '@instructure/ui-tooltip'
 
 import formatMessage from '../../../../../format-message'
 
-export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => (
-  <View as="footer" padding="0 small">
-    <Flex>
-      <Flex.Item shouldGrow shouldShrink>
-        <Button disabled={disabled} onClick={onCancel}>
-          {formatMessage('Cancel')}
-        </Button>
-      </Flex.Item>
-      <Flex.Item>
-        {editing ? (
-          <>
-            <Tooltip
-              renderTip={formatMessage(
-                'Apply changes to all instances of this image in the course'
-              )}
-              on={['hover', 'focus']}
-            >
-              <Button disabled={disabled} color="primary" onClick={onReplace}>
-                {formatMessage('Save and Replace All')}
-              </Button>
-            </Tooltip>
+export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
+  const [replaceAll, setReplaceAll] = useState(false)
 
-            <Tooltip
-              renderTip={formatMessage(
-                'Save as a new image'
-              )}
-              on={['hover', 'focus']}
-            >
-              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small">
+  return (
+    <View as="footer">
+      {editing && (
+        <View as="div" padding="medium">
+          <Checkbox
+            label={formatMessage(
+              'Apply changes to all instances of this Button and Icon in the Course'
+            )}
+            data-testid='cb-replace-all'
+            checked={replaceAll}
+            onChange={() => {
+              setReplaceAll(prev => !prev)
+            }}
+          />
+        </View>
+      )}
+      <View
+        as="div"
+        background="secondary"
+        borderWidth="small none none none"
+        padding="small small x-small none"
+      >
+        <Flex>
+          <Flex.Item shouldGrow shouldShrink></Flex.Item>
+          <Flex.Item>
+            <Button disabled={disabled} onClick={onCancel}>
+              {formatMessage('Cancel')}
+            </Button>
+            {editing ? (
+              <Button
+                disabled={disabled}
+                color="primary"
+                onClick={replaceAll ? onReplace : onSubmit}
+                margin="0 0 0 x-small"
+              >
                 {formatMessage('Save')}
               </Button>
-            </Tooltip>
-          </>
-        ) : (
-          <Button disabled={disabled} color="primary" onClick={onSubmit}>
-            {formatMessage('Apply')}
-          </Button>
-        )}
-      </Flex.Item>
-    </Flex>
-  </View>
-)
+            ) : (
+              <Button disabled={disabled} margin="0 0 0 x-small" color="primary" onClick={onSubmit}>
+                {formatMessage('Apply')}
+              </Button>
+            )}
+          </Flex.Item>
+        </Flex>
+      </View>
+    </View>
+  )
+}

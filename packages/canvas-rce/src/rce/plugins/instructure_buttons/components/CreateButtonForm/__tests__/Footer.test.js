@@ -62,19 +62,28 @@ describe('<Footer />', () => {
 
     const subject = (overrides = {}) => render(<Footer {...defaults} {...overrides} />)
 
-    it('renders the "Save & Replace All" button', async () => {
-      const {findByText} = subject()
-      expect(await findByText('Save and Replace All')).toBeInTheDocument()
+    it('renders the "apply to all" checkbox', async () => {
+      const {findByTestId} = subject()
+      expect(await findByTestId('cb-replace-all')).toBeInTheDocument()
     })
 
-    it('renders the "Save" button', async () => {
+    it('renders the "save" button', async () => {
       const {findByText} = subject()
       expect(await findByText('Save')).toBeInTheDocument()
     })
 
+    it('does not render the "apply" button', async () => {
+      const {queryByText} = subject()
+      expect(await queryByText('Apply')).not.toBeInTheDocument()
+    })
+
     it('calls "onReplace" when "Save & Replace All" is pressed', async () => {
-      const {findByText} = subject()
-      userEvent.click(await findByText('Save and Replace All'))
+      const {findByText, findByLabelText} = subject()
+      const checkbox = await findByLabelText('Apply changes to all instances of this Button and Icon in the Course')
+
+      userEvent.click(checkbox)
+      userEvent.click(await findByText('Save'))
+
       expect(defaults.onReplace).toHaveBeenCalled()
     })
 
