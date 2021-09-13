@@ -252,8 +252,18 @@ module Api::V1::PlannerItem
   end
 
   def online_meeting_url(event_description, event_location)
-    config =  Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
-    url_regex_str = config["online-meeting-url-regex"] || 'https:\/\/\w+\.zoom\.us(?:\/my|\/j)?\/\d+'
+    config = Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
+    default_regex = <<~'REGEX'
+      https:\/\/\w+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
+      https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+      https:\/\/teams\.live\.com\/meet\/\d+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
+      https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
+    REGEX
+    url_regex_str = config["online-meeting-url-regex"] || default_regex
     url_regex_str = url_regex_str.split("\n").join('|')
     url_regex = Regexp.new "(#{url_regex_str})"
 
