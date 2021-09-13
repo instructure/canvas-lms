@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconOutcomesLine, IconTrashLine, IconMoveEndLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomesPopover from './OutcomesPopover'
 import {outcomeShape} from './shapes'
@@ -47,14 +48,30 @@ const ManageOutcomesFooter = ({
   }
 
   return (
-    <Flex as="div" data-testid="manage-outcomes-footer">
-      {!isMobileView && <Flex.Item as="div" width="34%" />}
-      <Flex.Item as="div" width={isMobileView ? '100%' : '66%'}>
+    <footer
+      style={{
+        position: 'fixed',
+        right: 0,
+        left: isMobileView ? '0px' : '270px',
+        bottom: 0,
+        padding: isMobileView ? '0px' : '0px 24px 8px 0px',
+        zIndex: '999',
+        backgroundColor: 'white'
+      }}
+    >
+      <hr style={{margin: '0'}} />
+      <View
+        as="div"
+        padding={isMobileView ? 'small' : '0'}
+        background={isMobileView ? 'secondary' : ''}
+      >
         <Flex
           justifyItems="space-between"
           wrap={isMobileView ? 'no-wrap' : 'wrap'}
           padding={isMobileView ? 'x-small 0 0' : '0'}
         >
+          {!isMobileView && <Flex.Item as="div" />}
+
           <Flex.Item>
             <Flex alignItems="center" padding="0 0 0 x-small">
               <Flex.Item as="div">
@@ -106,8 +123,8 @@ const ManageOutcomesFooter = ({
             )}
           </Flex.Item>
         </Flex>
-      </Flex.Item>
-    </Flex>
+      </View>
+    </footer>
   )
 }
 
