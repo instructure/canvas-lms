@@ -1,9 +1,0 @@
-{
-  "to": "s3",
-  "project": "Canvas Packages",
-  "projectSlug": "canvas-packages",
-  "resource": "packages",
-  "resourceSlug": "{lang}.json",
-  "fileName": "../packages/translations/lib/{lang}.json",
-  "sourceLanguage": "en"
-}

@@ -1,9 +1,0 @@
-{
-  "to": "transifex",
-  "project": "Canvas (Crowdsource)",
-  "projectSlug": "canvas-crowdsource",
-  "resource": "Canvas Packages",
-  "resourceSlug": "canvas-packages",
-  "fileName": "../packages/translations/lib/{lang}.json",
-  "sourceLanguage": "en"
-}
