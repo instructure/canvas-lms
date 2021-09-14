@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require 'spec_helper'
 
 describe SIS::CSV::ImportRefactored do
 
@@ -335,13 +335,24 @@ describe SIS::CSV::ImportRefactored do
   end
 
   it "should not invalidly break up UTF-8 characters" do
-    expect {process_csv_data_cleanly(
-      File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/utf8.csv'))
-    )}.not_to raise_error
+    expect {
+      process_csv_data_cleanly(
+        File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/utf8.csv"))
+      )
+    }.not_to raise_error
+  end
+
+  it "should ignore BOM chars" do
+    expect do
+      process_csv_data_cleanly(
+        File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/with_bom.csv"))
+      )
+    end.not_to raise_error
   end
 
   it 'should not fail on mac zip files' do
-    importer = process_csv_data(files: File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/mac_sis_batch.zip'))
+    path = File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/mac_sis_batch.zip")
+    importer = process_csv_data(files: path)
     expect(importer.errors).to eq []
   end
 
