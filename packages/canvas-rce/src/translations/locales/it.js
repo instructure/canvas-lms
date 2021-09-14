@@ -377,6 +377,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Purtroppo l’editor HTML sicuro non è accessibile dalla tastiera. Accedi qui a editor HTML non elaborato."
   },
+  "save_11a80ec3": { "message": "Salva" },
   "saved_buttons_and_icons_8278eed2": { "message": "Pulsanti e icone salvati" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Cerca termine" },

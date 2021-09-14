@@ -379,6 +379,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "L’éditeur HTML embelli n’est malheureusement pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
   },
+  "save_11a80ec3": { "message": "Enregistrer" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Boutons et icônes enregistrés."
   },

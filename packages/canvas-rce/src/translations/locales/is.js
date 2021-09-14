@@ -352,6 +352,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Því miður er ekki hægt að nota lyklaborð með pretty HTML ritlinum. Aðgangur að hráa HTML ritlinum hér."
   },
+  "save_11a80ec3": { "message": "Vista" },
   "saved_buttons_and_icons_8278eed2": { "message": "Vistaðir hnappar og tákn" },
   "search_280d00bd": { "message": "Leita" },
   "search_term_b2d2235": { "message": "Leitarhugtak" },

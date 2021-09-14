@@ -352,6 +352,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "น่าเสียดาย HTML Editor ที่สวยงามไม่สามารถใช้งานผ่านแป้นพิมพ์ ใช้งาน HTML Editor แบบไม่ปรุงแต่งที่นี่"
   },
+  "save_11a80ec3": { "message": "บันทึก" },
   "saved_buttons_and_icons_8278eed2": { "message": "ปุ่มและไอคอนที่บันทึกไว้" },
   "search_280d00bd": { "message": "ค้นหา" },
   "search_term_b2d2235": { "message": "คำค้นหา" },

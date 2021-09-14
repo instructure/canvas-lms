@@ -343,6 +343,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
   },
+  "save_11a80ec3": { "message": "حفظ" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "الأزرار والأيقونات المحفوظة"
   },

@@ -318,6 +318,7 @@ const locale = {
     "message": "Redigeringsprogram for rikt innhald"
   },
   "right_to_left_9cfb092a": { "message": "Høgre mot venstre" },
+  "save_11a80ec3": { "message": "Lagre" },
   "search_280d00bd": { "message": "Søk" },
   "search_term_b2d2235": { "message": "Søkeord" },
   "select_language_7c93a900": { "message": "Vel språk" },

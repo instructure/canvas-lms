@@ -355,6 +355,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Dessverre er Elegante HTML-redigering ikke tilgjengelig med tastaturet. Få tilgang til rå HTML-redigering her."
   },
+  "save_11a80ec3": { "message": "Lagre" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Lagrede knapper og ikoner"
   },

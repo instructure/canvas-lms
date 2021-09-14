@@ -364,6 +364,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "E pouri ana te ataahua HTML kaore i te papa patopato whakauru. Whakauru te mata HTML editor ataahua i konei."
   },
+  "save_11a80ec3": { "message": "Tiaki" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Pātene me ngā Ata kua Tiakina"
   },

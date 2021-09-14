@@ -365,6 +365,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "残念ながら、pretty HTMLエディタはキーボードからはアクセスできません。生のHTMLエディタにはこちらからアクセスできます。"
   },
+  "save_11a80ec3": { "message": "保存" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "保存されたボタンとアイコン"
   },

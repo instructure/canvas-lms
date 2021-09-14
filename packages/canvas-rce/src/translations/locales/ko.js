@@ -92,6 +92,7 @@ const locale = {
   "preview_53003fd2": { "message": "미리 보기" },
   "quizzes_7e598f57": { "message": "퀴즈" },
   "record_7c9448b": { "message": "녹음/녹화" },
+  "save_11a80ec3": { "message": "저장" },
   "search_280d00bd": { "message": "검색" },
   "size_b30e1077": { "message": "크기" },
   "sort_by_e75f9e3e": { "message": "정렬 조건" },

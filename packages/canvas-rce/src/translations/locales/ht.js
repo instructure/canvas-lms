@@ -338,6 +338,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Malerezman, bèl editè HTML la pa aksesib sou klavye. Gen aksè a bèl editè HTML la la a."
   },
+  "save_11a80ec3": { "message": "Anrejistre" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Bouton ak Ikòn anrejistreman"
   },

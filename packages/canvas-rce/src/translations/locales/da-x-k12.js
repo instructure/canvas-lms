@@ -357,6 +357,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Desværre er det pæne HTML-redigeringsværktøj ikke tilgængeligt på tastaturet. Få adgang til det rå HTML-redigeringsværktøj her."
   },
+  "save_11a80ec3": { "message": "Gem" },
   "saved_buttons_and_icons_8278eed2": { "message": "Gemte knapper og ikoner" },
   "search_280d00bd": { "message": "Søg" },
   "search_term_b2d2235": { "message": "Søgeord" },

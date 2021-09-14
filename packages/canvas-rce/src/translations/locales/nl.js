@@ -373,6 +373,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
   },
+  "save_11a80ec3": { "message": "Opslaan" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Opgeslagen knoppen en pictogrammen"
   },
