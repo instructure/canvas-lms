@@ -22,7 +22,7 @@ import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
-import {uniqWith, uniqBy, isEqual} from 'lodash'
+import {uniqWith, uniqBy, uniq, isEqual} from 'lodash'
 import {gql} from '@canvas/apollo'
 
 const useAbortController = dependencies => {
@@ -60,7 +60,8 @@ const useGroupDetail = ({
   query = SEARCH_GROUP_OUTCOMES,
   loadOutcomesIsImported = false,
   searchString = '',
-  id
+  id,
+  rhsGroupIdsToRefetch = []
 }) => {
   const {contextType, contextId, rootIds} = useCanvasContext()
   searchString = useSearchString(searchString)
@@ -68,8 +69,13 @@ const useGroupDetail = ({
   const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
   const client = useApolloClient()
   const allVariables = useRef([])
+  const refetchGroupIds = useRef([])
 
   if (searchString) queryVars.searchQuery = searchString
+
+  useEffect(() => {
+    refetchGroupIds.current = uniq(refetchGroupIds.current.concat(rhsGroupIdsToRefetch))
+  }, [rhsGroupIdsToRefetch])
 
   const skip = !id || rootIds.includes(id)
   const variables = {
@@ -78,7 +84,7 @@ const useGroupDetail = ({
     ...queryVars
   }
 
-  const {loading, error, data, fetchMore} = useQuery(query, {
+  const {loading, error, data, fetchMore, refetch} = useQuery(query, {
     variables,
     skip,
     context: {
@@ -90,6 +96,15 @@ const useGroupDetail = ({
       allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
     }
   })
+
+  // To handle refetching of groups when an outcome is created. This will ensure that
+  // all groups including parent, grandparent, etc... are refetched.
+  useEffect(() => {
+    if (refetchGroupIds.current.includes(id)) {
+      refetchGroupIds.current = refetchGroupIds.current.filter(groupId => groupId !== id)
+      refetch()
+    }
+  }, [id, refetch])
 
   // this will handle the case when we click in group 1, wait for group 1
   // load to finish, then click in a different group
@@ -224,7 +239,8 @@ const useGroupDetail = ({
     error,
     loadMore,
     removeLearningOutcomes,
-    readLearningOutcomes
+    readLearningOutcomes,
+    refetch
   }
 }
 

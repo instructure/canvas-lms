@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useState, useEffect} from 'react'
+import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -41,7 +42,7 @@ import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 
-const OutcomeManagementPanel = ({importNumber}) => {
+const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
@@ -75,7 +76,8 @@ const OutcomeManagementPanel = ({importNumber}) => {
 
   const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
-    searchString: debouncedSearchString
+    searchString: debouncedSearchString,
+    rhsGroupIdsToRefetch: createdOutcomeGroupIds
   })
 
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
@@ -419,6 +421,15 @@ const OutcomeManagementPanel = ({importNumber}) => {
       )}
     </div>
   )
+}
+
+OutcomeManagementPanel.defaultProps = {
+  createdOutcomeGroupIds: []
+}
+
+OutcomeManagementPanel.propTypes = {
+  createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
+  importNumber: PropTypes.number
 }
 
 export default OutcomeManagementPanel
