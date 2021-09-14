@@ -28,19 +28,22 @@ import {Text} from '@instructure/ui-text'
 
 export function AssignmentAvailabilityWindow({...props}) {
   let availabilityWindow = null
+  const dateFormat = props.showDateWithTime
+    ? DateHelper.formatDatetimeForDiscussions
+    : DateHelper.formatDateForDisplay
 
   if (props.availableDate && props.untilDate) {
     availabilityWindow = I18n.t('Available from %{availableDate} until %{untilDate}', {
-      availableDate: DateHelper.formatDateForDisplay(props.availableDate, 'short'),
-      untilDate: DateHelper.formatDateForDisplay(props.untilDate, 'short')
+      availableDate: dateFormat(props.availableDate, 'short'),
+      untilDate: dateFormat(props.untilDate, 'short')
     })
   } else if (props.availableDate) {
     availabilityWindow = I18n.t('Available from %{availableDate}', {
-      availableDate: DateHelper.formatDateForDisplay(props.availableDate, 'short')
+      availableDate: dateFormat(props.availableDate, 'short')
     })
   } else if (props.untilDate) {
     availabilityWindow = I18n.t('Available until %{untilDate}', {
-      untilDate: DateHelper.formatDateForDisplay(props.untilDate, 'short')
+      untilDate: dateFormat(props.untilDate, 'short')
     })
   }
 
@@ -51,7 +54,7 @@ export function AssignmentAvailabilityWindow({...props}) {
       props={{
         tablet: {
           textSize: 'x-small',
-          displayText: null
+          displayText: props.showOnMobile ? availabilityWindow : null
         },
         desktop: {
           textSize: 'small',
@@ -71,5 +74,12 @@ export function AssignmentAvailabilityWindow({...props}) {
 
 AssignmentAvailabilityWindow.prototypes = {
   availableDate: PropTypes.string,
-  untilDate: PropTypes.string
+  untilDate: PropTypes.string,
+  showOnMobile: PropTypes.bool,
+  showDateWithTime: PropTypes.bool
+}
+
+AssignmentAvailabilityWindow.defaultProps = {
+  showOnMobile: false,
+  showDateWithTime: false
 }

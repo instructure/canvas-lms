@@ -57,6 +57,7 @@ import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+import {AssignmentAvailabilityWindow} from '../../components/AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -293,7 +294,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     padding="xx-small 0 small"
                   >
                     <Flex direction="column" padding={responsiveProps.container.padding}>
-                      {isGraded(props.discussionTopic.assignment) && (
+                      {isGraded(props.discussionTopic.assignment) ? (
                         <Flex.Item
                           shouldShrink
                           shouldGrow
@@ -322,6 +323,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             )
                           )}
                         </Flex.Item>
+                      ) : (
+                        <AssignmentAvailabilityWindow
+                          availableDate={props.discussionTopic.delayedPostAt}
+                          untilDate={props.discussionTopic.lockAt}
+                          showOnMobile
+                          showDateWithTime
+                        />
                       )}
                       <Flex.Item shouldShrink shouldGrow>
                         <DiscussionEntryContainer
