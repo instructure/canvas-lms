@@ -50,6 +50,15 @@ class Linter
       options[:plugin] = nil
     end
 
+    if options[:plugin].nil?
+      canvas_dir = File.expand_path("..", __dir__)
+      plugins_dir = File.join(canvas_dir, "gems/plugins")
+      if Dir.pwd.start_with?(plugins_dir)
+        options[:plugin] = Dir.pwd[(plugins_dir.length + 1)..]
+        Dir.chdir(canvas_dir)
+      end
+    end
+
     options.each do |key, value|
       instance_variable_set("@#{key}", value)
     end
