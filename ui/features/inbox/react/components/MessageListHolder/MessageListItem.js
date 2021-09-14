@@ -29,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
+import {colors} from '@instructure/canvas-theme'
 
 export const MessageListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
@@ -150,6 +151,12 @@ export const MessageListItem = ({...props}) => {
                 count={props.conversation.conversationMessagesConnection.nodes?.length}
                 countUntil={99}
                 standalone
+                theme={{
+                  colorPrimary: colors.backgroundDarkest,
+                  borderRadius: '0.25rem',
+                  fontSize: '0.8125rem',
+                  fontWeight: '700'
+                }}
               />
             </Grid.Col>
           </Grid.Row>
