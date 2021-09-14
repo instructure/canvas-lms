@@ -1,4 +1,0 @@
-development:
-  # Twilio account credentials
-  account_sid: ACXXXXXX
-  auth_token: YYYYYY

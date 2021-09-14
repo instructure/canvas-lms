@@ -1,8 +1,0 @@
----
-moderated_grading:
-  type: setting
-  state: allowed
-  display_name: Moderated Grading
-  description: Enable moderated grading.
-  applies_to: Course
-  root_opt_in: true

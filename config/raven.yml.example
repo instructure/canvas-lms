@@ -1,4 +1,0 @@
-development:
-  dsn: 'your-sanbox-dsn-here'
-production:
-  dsn: 'your-real-dsn-here'

@@ -1,8 +1,0 @@
----
-anonymous_marking:
-  type: setting
-  state: allowed
-  display_name: Anonymous Grading
-  description: Enable anonymous grading of assignments.
-  applies_to: Course
-  root_opt_in: true
