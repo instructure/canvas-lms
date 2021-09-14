@@ -1,2 +1,0 @@
-width|expression|alert|xss
-<DIV STYLE="width: expression(alert('XSS'));">

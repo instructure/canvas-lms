@@ -1,2 +1,0 @@
-style|javascript
-<STYLE TYPE="text/javascript">alert('XSS');</STYLE>

@@ -1,2 +1,0 @@
-alert|javascript|background
-<BODY BACKGROUND="javascript:alert('XSS')">

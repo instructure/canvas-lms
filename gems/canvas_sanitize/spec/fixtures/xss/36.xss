@@ -1,2 +1,0 @@
-alert|onload|xss
-<BODY ONLOAD=alert('XSS')>

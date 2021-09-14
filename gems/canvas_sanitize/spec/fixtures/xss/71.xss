@@ -1,2 +1,0 @@
-base|javascript|alert|href
-<BASE HREF="javascript:alert('XSS');//">

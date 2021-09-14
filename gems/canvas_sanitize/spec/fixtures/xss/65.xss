@@ -1,2 +1,0 @@
-alert|style|xss|expression
-<XSS STYLE="xss:expression(alert('XSS'))">

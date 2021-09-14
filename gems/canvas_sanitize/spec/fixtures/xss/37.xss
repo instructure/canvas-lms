@@ -1,2 +1,0 @@
-alert|src|dynsrc|javascript
-<IMG DYNSRC="javascript:alert('XSS')">

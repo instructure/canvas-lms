@@ -1,2 +1,0 @@
-alert|size
-<BR SIZE="&{alert('XSS')}">

@@ -1,2 +1,0 @@
-src|javascript|alert
-<IMG SRC="jav	ascript:alert('XSS');">

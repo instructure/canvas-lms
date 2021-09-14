@@ -1,2 +1,0 @@
-alert|javascript|background
-<TABLE BACKGROUND="javascript:alert('XSS')">

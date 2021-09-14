@@ -1,4 +1,0 @@
-test:
-  host: localhost
-development:
-  host: localhost

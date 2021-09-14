@@ -1,6 +1,0 @@
-<tr>
-  <!--Select the term to run the report on-->
-  <td><%= t('account_reports.default.parameters.header', %{Term}) %>
-    <%= render :partial => 'shared/enrollment_term_select', :locals => { :name => 'parameters[enrollment_term_id]', :terms => @root_account.enrollment_terms.active, :selected_id => @term && @term.id, :exclude_all_option => !all_terms_option } %>
-  </td>
-</tr>

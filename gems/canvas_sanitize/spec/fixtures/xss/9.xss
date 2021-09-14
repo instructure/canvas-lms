@@ -1,2 +1,0 @@
-src\\s*=\\s*["']javascript
-<IMG SRC=`javascript:alert("RSnake says, 'XSS'")`>
