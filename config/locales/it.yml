@@ -1655,6 +1655,7 @@ it:
   add_a_new_user_9d041d3b: "Aggiungi un nuovo utente"
   add_a_new_user_c440d053: "Aggiungi un nuovo utente"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Aggiungi un revisore per gli studenti selezionati"
+  add_a_subject_e89e1cba: "Aggiungi oggetto"
   add_account_admins_99c03c9e: "Aggiungi amministratori account"
   add_additional_comments_ec34a62f: "Aggiungi commenti aggiuntivi"
   add_alert_b2729c99: "Aggiungi avviso"
@@ -1667,6 +1668,7 @@ it:
   add_app_baf540f: "Aggiungi app"
   add_as_allowed_e95540be: "Aggiungi come Permesso"
   add_assignment_to_name_caf173b0: "Aggiungi compito a %{name}"
+  add_assignments_and_quizzes_1085d2af: "Aggiungi compiti e quiz"
   add_attachment_93868828: "Aggiungi allegato"
   add_attribute_6d6d4a65: "Aggiungi attributo"
   add_bank: 
@@ -1689,6 +1691,7 @@ it:
   add_courses_c0696323: "Aggiungi corsi"
   add_criterion_eb9587ef: "Aggiungi criterio"
   add_custom_link_22059c0: "Aggiungi link personalizzato"
+  add_delete_b82d05f8: Aggiungi/Elimina
   add_delete_edit_7dbc9c5b: "aggiungi / elimina / modifica"
   add_delete_manage_d65e235: "aggiungi / elimina / gestisci"
   add_designers_to_courses_9588820b: "Aggiungi progettisti ai corsi"
@@ -2669,6 +2672,8 @@ it:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Si è verificato un errore durante la creazione di questo risultato: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Si è verificato un errore durante la creazione di questo risultato: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Si è verificato un errore durante l'eliminazione degli annunci."
+  an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Si è verificato un errore durante lo l’importazione di questi risultati."
+  an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "Si è verificato un errore durante lo l’importazione di questi risultati: %{message}."
   an_error_occurred_while_importing_this_group_9aef7c30: "Si è verificato un errore durante l’importazione di questo gruppo."
   an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Si è verificato un errore durante l’importazione di questo gruppo: %{message}."
   an_error_occurred_while_importing_this_outcome_2ce488af: "Si è verificato un errore durante l’importazione di questo risultato."
@@ -2727,6 +2732,7 @@ it:
   an_error_occurred_while_updating_this_outcome_e210547: "Si è verificato un errore durante l’aggiornamento di questo risultato."
   an_error_occurred_while_updating_this_outcome_mess_5ada5958: "Si è verificato un errore durante l’aggiornamento di questo risultato: %{message}"
   an_error_occurred_while_updating_this_outcome_mess_92be298e: "Si è verificato un errore durante l’aggiornamento di questo risultato: %{message}."
+  an_error_occurred_while_updating_view_options_c4807f37: "Si è verificato un errore durante l’aggiornamento delle opzioni di visualizzazione."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Si è verificato un errore durante l'eliminazione del gruppo di appuntamenti"
   an_error_ocurred_while_fetching_course_details_ple_9cab7735: "Si è verificato un errore durante il recupero dei dettagli del corso Riprova."
   an_error_ocurred_while_loading_announcements_32af2ce4: "Si è verificato un errore durante il caricamento degli annunci"
@@ -3286,6 +3292,7 @@ it:
   assignment_name_is_required_9d17311b: "Il nome compito è obbligatorio"
   assignment_name_options_43b1795: "opzioni %{name} compito"
   assignment_name_z_a_34f92f4b: "Nome compito - Z-A"
+  assignment_names_858b1880: "Nomi compito"
   assignment_options_1e5b7074: "Opzioni compiti"
   assignment_override: 
     student_count: 
@@ -3850,7 +3857,10 @@ it:
   assignments_2_teacher_view_3cd3aeda: "Compiti 2 Vista Insegnante"
   assignments_2_teacher_view_error_page_8e45dedc: "Pagina di errore visualizzazione insegnante compiti 2"
   assignments_and_gradebook_37e43d4f: "Compiti e registro dei voti"
+  assignments_and_quizzes_add_b1473591: "Compiti e quiz - Aggiungi"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Compiti e quiz - aggiungi/modifica/elimina"
+  assignments_and_quizzes_delete_84ecc680: "Compiti e quiz - Elimina"
+  assignments_and_quizzes_manage_edit_8b4b1edc: "Compiti e quiz - Gestisci/Modifica"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Compiti e quiz - visualizza matrice risposta"
   assignments_and_speedgrader_7a7cd90: "Compiti e SpeedGrader"
   assignments_api: 
@@ -5339,7 +5349,7 @@ it:
       page_title: Collaborazione
       titles: 
         current: "Collaborazioni attuali"
-    lti_collaborations: "Collaborazioni LTI"
+    lti_collaborations: "Collaborazioni esterne"
     show: 
       error_cause_1: "L'account Google Drive del creatore è diverso dall'account utilizzato per creare la collaborazione."
       error_cause_2: "Il creatore della collaborazione non è più un autore del documento Google."
@@ -5604,6 +5614,7 @@ it:
   compose_message_8abd180a: "Componi messaggio"
   computer_1d7dfa6f: Computer
   conclude_courses_a7ed8a8: "Concludi corsi"
+  conclude_delete_publish_reset_35b64f0f: Concludi/Elimina/Pubblica/Ripristina
   concluded_63150003: concluso
   concluded_conferences_cdbe53f9: "Conferenze concluse"
   concluded_courses_94782e21: "Corsi conclusi"
@@ -5625,6 +5636,7 @@ it:
   conference_has_been_removed_f771cb11: "La conferenza è stata rimossa"
   conference_has_been_updated_title_2bacc5fa: "La conferenza è stata aggiornata: %{title}"
   conference_selection_ea4050bb: "Selezione conferenza"
+  conference_type_names_conferences_6c019253: "%{conference_type_names} (Conferenze)"
   conference_type_names_formerly_conferences_c2e847b0: "%{conference_type_names} (ex Conferenze)"
   conference_was_deleted_30869390: "Conferenza eliminata"
   conferences: 
@@ -6613,6 +6625,7 @@ it:
   count_items_selected_91814713: 
     one: "%{count} elemento selezionato"
     other: "%{count} elementi selezionati"
+  count_less_e65e028b: "%{count} in meno"
   count_max_students_2db76773: "%{count} / %{max} studenti"
   count_max_users_bdebb537: "%{count} / %{max} utenti"
   count_messages_4f8ff204: 
@@ -6622,6 +6635,7 @@ it:
     one: "1 minuto"
     other: "%{count} minuti"
     zero: "meno di 1 minuto"
+  count_more_beba6428: "%{count} in più"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} di %{max} caratteri massimo"
   count_options_190d6373: 
     one: "1 opzione"
@@ -6639,6 +6653,12 @@ it:
   count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
     one: "\"%{outcomeTitle}\" è stato spostato in \"%{newGroupTitle}\"."
     other: "%{count} risultati sono stati spostati in \"%{newGroupTitle}\"."
+  count_outcomes_have_been_successfully_added_to_thi_7d0efc5b: 
+    one: "1 risultato è stato aggiunto correttamente a questo corso."
+    other: "%{count} risultati sono stati aggiunti correttamente a questo corso."
+  count_outcomes_have_been_successfully_added_to_thi_d3eaec7b: 
+    one: "1 risultato è stato aggiunto correttamente a questo account."
+    other: "%{count} risultati sono stati aggiunti correttamente a questo account."
   count_outcomes_selected_55902958: 
     one: "1 esito selezionato"
     other: "%{count} esiti selezionati"
@@ -7997,6 +8017,7 @@ it:
   delete_assignment_5d3f3f15: "elimina assegnazione"
   delete_assignment_group_7c3b01c4: "Elimina gruppo di compiti"
   delete_assignment_name_deec56e3: "Elimina compito %{name}"
+  delete_assignments_and_quizzes_b30347d7: "Elimina compiti e quiz"
   delete_bank_d8f4cb64: "Elimina %{bank}"
   delete_collaboration_23035eaf: "Elimina collaborazione"
   delete_comment_a71040c3: "Elimina commento"
@@ -8069,6 +8090,7 @@ it:
   delete_your_work_fe136221: "Vuoi eliminare il lavoro?"
   deleted_1be5ed1: Eliminato
   deleted_by_deletername_f269211a: "Eliminato da %{deleterName}"
+  deleted_by_editor_d3fdc2ee: "Eliminato da %{editor}"
   deleted_by_user_be69f8: "Eliminato da %{user}"
   deleted_caption_b5c66807: "Didascalia eliminata"
   deleted_ce03674d: eliminato
@@ -10842,6 +10864,7 @@ it:
   granular_course_notification_settings_will_be_conf_68f122db: "In futuro, le impostazioni notifiche corso granulari saranno configurabili qui."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Autorizzazioni granulari per aggiungi/rimuovi ruoli amministratore dal corso"
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Autorizzazioni granulari per Aggiungi/Rimuovi ruoli da corso"
+  granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Autorizzazioni granulari per compiti e quiz"
   granular_permissions_for_managing_course_files_1ed7f019: "Autorizzazioni granulari per gestire i file del corso"
   granular_permissions_for_managing_course_sections_da4b04b: "Autorizzazioni granulari per la gestione delle sezioni del corso"
   granular_permissions_for_managing_courses_a71be71d: "Autorizzazioni granulari per gestioni corsi"
@@ -11566,6 +11589,7 @@ it:
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Se l'opzione è disattivata, l'utente avrà comunque accesso alle impostazioni dei corsi."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Se abilitato, l’accesso a LTI 1.3 e LTI Advantage sarà abilitato."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Se abilitata, consente di fornire un valore superiore al punteggio massimo possibile per un esito in una rubrica."
+  if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Se abilitato, consente più supporti per deep linking per compiti e moduli."
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Se abilitato, Canvas fornirà degli strumenti per restituire elementi di contenuto multipli
       in una singola richiesta nella pagina moduli corso
@@ -11869,6 +11893,7 @@ it:
   include_deleted_objects_3cced3b5: "Includi oggetti eliminati;"
   include_fullstory_recording_of_the_user_s_session_656d131e: "Includi registrazione FullStory della sessione utente"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Includere gli ID di integrazione nelle esportazioni del registro dei voti."
+  include_quoted_reply_in_message_d0c8af8a: "Includi riposta citata nel messaggio"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Includi punteggi negli avvisi sui voti.
                 Se il tuo indirizzo email non appartiene all'istituto, i contenuti sensibili verranno inviati al di fuori dell'istituto.
@@ -12105,6 +12130,7 @@ it:
   invalid_sis_sync_status_b68db497: "Stato sincronizzazione SIS non valido"
   invalid_state_parameter_7a5aa108: "Parametro di stato non valido"
   invalid_submission_file_type_cda6742a: "Tipo di file consegna non valido"
+  invalid_targetcontexttype_53b96e87: "targetContextType non valido"
   invalid_timestamp_timestamp_in_future_5bc855d7: "Timestamp non valido - timestamp in futuro"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Timestamp non valido - timestamp non analizzabile"
   invalid_url_in_xml: "URL in XML non valido. Le e commerciali devono essere precedute da sequenze di escape."
@@ -12854,6 +12880,7 @@ it:
   lti_advantage_services_c1746cb4: "Servizi LTI Advantage"
   lti_key_14ad02b1: "Chiave LTI"
   lti_launch_error_41eac9a: "Errore di avvio LTI"
+  lti_multiple_assignment_deep_linking_b7d641d7: "Deep linking per più compiti LTI"
   lti_report_2b6193ab: "Report LTI"
   luxembourg_352_85f4124d: "Lussemburgo (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -12891,6 +12918,7 @@ it:
   manage_announcement_with_title_title_f2ce92de: "Gestisci annuncio con titolo %{title}"
   manage_app_list_994cc26c: "Gestisci elenco app"
   manage_assignment_31a132fb: "Gestisci compito"
+  manage_assignments_and_quizzes_170ccaf4: "Gestisci compiti e quiz"
   manage_avatars: 
     errors: 
       update_failed: "Aggiornamento non riuscito. Riprova"
@@ -12908,6 +12936,7 @@ it:
   manage_create_edit_delete_groups_f9046ee3: "Gestisci (crea/modifica/elimina) gruppi"
   manage_discussion_c1dd8f4e: "Gestisci discussione"
   manage_discussion_title_a2ecb3fb: "Gestisci discussione %{title}"
+  manage_edit_assignments_and_quizzes_572f3589: "Gestisci/Modifica compiti e quiz"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Gestisci stato iscrizione, crea gruppi e aggiungi utenti da questa pagina."
   manage_grading_schemes_in_context_name_e3678273: "Gestisci schemi di valutazione in %{context_name}"
   manage_group_group_name_ac8578c6: "Gestisci gruppo %{group_name}"
@@ -12948,6 +12977,7 @@ it:
   mark_all_as_read_8f3bdf57: "Contrassegna tutto come letto"
   mark_all_as_read_a995ffbe: "Contrassegna tutto come letto"
   mark_all_as_unread_10e7f0fe: "Contrassegna tutto come non letto"
+  mark_all_as_unread_a435be3d: "Contrassegna tutto come non letto"
   mark_as_done_6fa48d2f: "Contrassegna come fatto"
   mark_as_done_779556d7: "contrassegna come fatto"
   mark_as_important_date_533718de: "Contrassegna come data importante"
@@ -14288,13 +14318,13 @@ it:
         body: "Avviso Canvas - Nuovo corso: %{course}, %{account}"
     new_discussion_entry: 
       email: 
-        body: "%{user} ha pubblicato un nuovo commento nel thread %{discussion_topic} per %{course}:"
+        body: "%{user} ha risposto a %{discussion_topic}, %{course}:"
         html: 
-          body: "%{user} ha pubblicato un nuovo commento nel thread %{discussion_topic} per %{course}:"
+          body: "%{user} ha risposto a %{discussion_topic}, %{course}:"
           discussion_entry_reply_message: "Partecipa alla conversazione utilizzando il link sotto o commenta rispondendo a questo messaggio. Quando consentito, se è necessario includere un allegato, accedi a Canvas e rispondi alla discussione."
           link: "Fai clic qui per partecipare alla conversazione"
-          subject: "Nuovo commento per %{discussion_topic}: %{course}"
-        subject: "Nuovo commento per %{discussion_topic}: %{course}"
+          subject: "%{user} ha risposto a %{discussion_topic}, %{course}"
+        subject: "%{user} ha risposto a %{discussion_topic}, %{course}"
       sms: 
         details: "Maggiori informazioni su %{url}"
       summary: 
@@ -14303,12 +14333,12 @@ it:
         body: "Avviso Canvas - Commento: %{discussion_topic}, %{course}."
     new_discussion_mention: 
       email: 
-        body: "%{user} ti ha menzionato in un nuovo commento nel thread %{discussion_topic} per %{course}:"
+        body: "%{user} ti ha menzionato in %{discussion_topic}, %{course}:"
         html: 
-          body: "%{user} ti ha menzionato in un nuovo commento nel thread %{discussion_topic} per %{course}:"
+          body: "%{user} ti ha menzionato in %{discussion_topic}, %{course}:"
           link: "Fai clic qui per partecipare alla conversazione"
-          subject: "Sei stato menzionato a %{discussion_topic}: %{course}"
-        subject: "Sei stato menzionato a %{discussion_topic}: %{course}"
+          subject: "%{user} ti ha menzionato in %{discussion_topic}, %{course}"
+        subject: "%{user} ti ha menzionato in %{discussion_topic}, %{course}"
       summary: 
         subject: "Sei stato menzionato a %{discussion_topic}: %{course}"
       twitter: 
@@ -15412,6 +15442,7 @@ it:
   no_such_outcome_for_id_id_873a9c4c: "Nessun risultato simile per l’id %{id}"
   no_such_source_context_80a659ba: "nessun contesto origine simile"
   no_such_target_context_21158b9: "nessun contesto destinazione simile"
+  no_such_target_group_7e183d46: "nessun gruppo target simile"
   no_template_selected_f59e797: "Nessun modello selezionato"
   no_terms_eab5ee7b: "Nessun trimestre"
   no_tls_618add1a: "Nessun TLS"
@@ -17081,6 +17112,7 @@ it:
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: "Visualizza in anteprima i file collegati in RCE in una sovrapposizione piuttosto che in una nuova scheda browser."
   preview_removal_998101a9: "Rimozione anteprima"
   preview_unavailable_aacd459a: "Anteprima non disponibile"
+  preview_ungraded_as_0_e3b97df6: "Visualizza in anteprima non valutato come 0"
   preview_website_url_eb5b8a5f: "Anteprima url sito web"
   preview_your_changes_373557d8: "Anteprima delle tue modifiche"
   previous_445ca243: precedente
@@ -18817,6 +18849,7 @@ it:
   quizzes_tutorial_tray_6f87cdd3: "Riquadro tutorial quiz"
   quizzes_view_submission_log_ec105e3e: "Quiz - Visualizza log consegne"
   quotas_account_settings_22c12b8d: "Quote (Impostazioni account)"
+  quote_ae4462ad: Citazione
   radio_button_option_1_a8ec51f9: "Opzione pulsante di opzione 1"
   radio_button_option_2_31e50043: "Opzione pulsante di opzione 2"
   range_56b2f310: Intervallo
@@ -19728,6 +19761,7 @@ it:
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Cerca persone. Mentre digiti in questo campo, l'elenco delle persone viene automaticamente filtrato per includere solo quelle con nomi corrispondenti al tuo input."
   search_permissions_915bbd09: "Cerca autorizzazioni"
   search_results_for_62243f02: "risultati ricerca per"
+  search_students_e1f506c: "Cerca studenti"
   search_term_must_be_at_least_num_characters_669098ed: "Il termine di ricerca deve contenere almeno %{num} caratteri"
   search_title_body_or_author_1d26711f: "Cerca titolo, corpo o autore"
   search_within_grouptitle_4d38272f: "Cerca in %{groupTitle}"
@@ -20059,6 +20093,7 @@ it:
   sending_messages_f8f41998: "invio messaggi..."
   sent_f4ee89ec: Inviato.
   sent_fe0a1eb4: Inviato
+  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Separa autorizzazioni granulari per aggiunta ed eliminazione per i compiti e i quiz dall’autorizzazione di gestione esistente che li controlla tutti e tre."
   sequence_footer: 
     next_module: "Modulo successivo:"
     next_module_desc: "Modulo successivo: *modulo*"
@@ -21122,6 +21157,7 @@ it:
     previous_object: "Precedente %{type}"
     student_hidden_name: "Studente %{position}"
   sso_settings_ebf98263: "Impostazioni SSO"
+  stable_features_84154e5d: "Funzioni stabili"
   staff_contact_info_2f7a6603: "Informazioni di contatto del personale"
   star_2d27c137: "aggiungi a Speciali"
   star_8d156e09: "Aggiungi a Speciali"
@@ -21183,6 +21219,7 @@ it:
   statistics_for_name_f4b7b0fc: "Statistiche per %{name}"
   statistics_view_b19458: "Statistiche - visualizza"
   stats_9272cef3: Statistiche
+  status_color_1c4ce650: "Colore stato"
   status_color_picker_9ea0156b: "%{status} Selettore colori"
   status_e051bb30: stato
   status_e7fdbe06: Stato
@@ -21725,6 +21762,8 @@ it:
   take_the_survey_again_24ce22c2: "Esegui di nuovo il sondaggio"
   target_link_uri_bbed67d1: "* URI link target"
   target_link_uri_d166858: "Obiettivo link URI"
+  targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId necessario se viene fornito targetContextType"
+  targetcontexttype_required_if_targetcontextid_prov_2f6e77ad: "targetContextType necessario se viene fornito targetContextId"
   tas_add_ccec2573: "Assistenti - Aggiungi"
   tas_add_f4a16393: "TA - Aggiungi"
   tas_observers_designers_b705118a: TA/Osservatori/Progettisti
@@ -22088,6 +22127,7 @@ it:
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Si è verificato un problema durante il tentativo di nascondere la colonna per le note dell'insegnante."
   there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Si è verificato un problema durante l'importazione di alcuni esiti nel file caricato. Controlla l'email per maggiori dettagli."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "Si è verificato un errore durante il caricamento dei voti finali ignorati."
+  there_was_a_problem_loading_module_information_e79926f4: "Si è verificato un problema durante il caricamento delle informazioni modulo."
   there_was_a_problem_loading_students_5bdb6cf2: "Si è verificato un problema durante il caricamento degli studenti."
   there_was_a_problem_loading_submissions_39855ff0: "Si è verificato un problema durante il caricamento dei compiti."
   there_was_a_problem_logging_in_at_institution_5a298155: "Si è verificato un problema durante l'accesso a %{institution}"
@@ -22145,6 +22185,7 @@ it:
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Si è verificato un errore imprevisto durante il caricamento della voce di discussione."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Si è verificato un errore imprevisto durante il caricamento delle risposte."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Si è verificato un errore imprevisto durante il contrassegni di tutto come letto."
+  there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Si è verificato un errore imprevisto durante il contrassegno di tutto come non letto."
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: "Si è verificato un errore imprevisto durante l’aggiornamento dell'argomento di discussione."
   there_was_an_unexpected_error_updating_the_entry_5333eb80: "Si è verificato un errore imprevisto durante il caricamento dell’inserimento."
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: "Si è verificato un errore imprevisto durante l’aggiornamento della risposta."
@@ -22250,7 +22291,7 @@ it:
       Questa funzione migliora l’esperienza Canvas all’interno di Discussioni e Annunci.
       Quando questo flag è abilitato, l’accesso precoce ai miglioramenti continui sarà
       visualizzato automaticamente con ogni rilascio. Per i dettagli completi,
-      consultare il gruppo di utenti Riprogettazione discussioni/annunci 
+      consultare il gruppo di utenti Riprogettazione discussioni/annunci
       nella Canvas Community.
   this_feature_enhances_the_canvas_experience_within_d71a01c6: |-
       Questa funzione migliora l’esperienza Canvas nelle Discussioni.
@@ -24751,6 +24792,7 @@ it:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Hai raggiunto il numero massimo di webhook per il limite dell'account (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Hai raggiunto il numero massimo di webhook per il limite di utenti (%{max})"
   you_have_successfully_marked_all_as_read_f246ef1a: "Hai contrassegnato correttamente tutto come letto."
+  you_have_successfully_marked_all_as_unread_cb019eb9: "Hai contrassegnato correttamente tutto come non letto."
   you_have_successfully_published_the_discussion_top_fa0cdd42: "Hai pubblicato con successo l'argomento di discussione."
   you_have_successfully_subscribed_to_the_discussion_a577c521: "Ti sei iscritto con successo all'argomento di discussione."
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Hai cancellato con successo la pubblicazione dell'argomento di discussione."
@@ -24787,6 +24829,7 @@ it:
   you_must_provide_a_date_with_a_time_ec369ff4: "È necessario fornire data e ora."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Devi fornire un tenant e un attributo di accesso alla sincronizzazione Microsoft Teams abilitata"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Devi fornire un valore o deselezionare l'opzione."
+  you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Devi fornire targetGroupId o targetContextId e targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Devi selezionare un corso da cui copiare il contenuto"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Devi selezionare una cartella in cui caricare la migrazione"
   you_must_select_an_assignment_group_c16a2168: "Devi selezionare un gruppo di compiti."

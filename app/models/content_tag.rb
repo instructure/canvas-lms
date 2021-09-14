@@ -108,11 +108,11 @@ class ContentTag < ActiveRecord::Base
 
   def self.touch_context_modules(ids=[])
     if ids.length == 1
-      ContextModule.where(id: ids).update_all(updated_at: Time.now.utc)
+      ContextModule.where(id: ids).not_recently_touched.update_all(updated_at: Time.now.utc)
     elsif ids.empty?
       # do nothing
     else
-      ContextModule.where(id: ids).touch_all
+      ContextModule.where(id: ids).not_recently_touched.touch_all
     end
     true
   end
