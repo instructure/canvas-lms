@@ -36,6 +36,7 @@ const TeacherGroupsPage = props => (
     justifyItems="center"
     textAlign="center"
     margin="x-large large"
+    height="50vh"
   >
     <Img src={EmptyGroups} />
     <View width="25rem" margin="x-large none small none">
