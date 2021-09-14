@@ -135,7 +135,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def context_loaded?
-    @context || association(:course).loaded? || association(:@group).loaded?
+    @context || association(:course).loaded? || association(:group).loaded?
   end
 
   def context_type
