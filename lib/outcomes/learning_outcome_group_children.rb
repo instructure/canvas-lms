@@ -73,7 +73,7 @@ module Outcomes
     end
 
     def suboutcomes_by_group_id(learning_outcome_group_id, args={})
-      learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+      learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
       relation = ContentTag.active.learning_outcome_links
         .where(associated_asset_id: learning_outcome_groups_ids)
         .joins(:learning_outcome_content)
@@ -91,13 +91,6 @@ module Outcomes
       end
     end
 
-    def clear_descendants_cache
-      return unless improved_outcomes_management?
-
-      Rails.cache.delete(descendants_cache_key)
-      clear_total_outcomes_cache
-    end
-
     def clear_total_outcomes_cache
       Rails.cache.delete(context_timestamp_cache_key) if improved_outcomes_management?
     end
@@ -112,7 +105,7 @@ module Outcomes
     private
 
     def total_outcomes_for(learning_outcome_group_id, args={})
-      learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+      learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
 
       relation = ContentTag.active.learning_outcome_links
         .where(associated_asset_id: learning_outcome_groups_ids)
@@ -162,44 +155,27 @@ module Outcomes
       )
     end
 
-    def children_ids(learning_outcome_group_id)
-      parent = data.find { |d| d['parent_id'] == learning_outcome_group_id }
-      parent&.dig('descendant_ids')&.tr('{}', '')&.split(',') || []
-    end
-
-    def data
-      if improved_outcomes_management?
-        Rails.cache.fetch(descendants_cache_key) do
-          LearningOutcomeGroup.connection.execute(learning_outcome_group_descendants_query).as_json
-        end
-      else
-        LearningOutcomeGroup.connection.execute(learning_outcome_group_descendants_query).as_json
-      end
-    end
-
-    def learning_outcome_group_descendants_query
-      <<-SQL.squish
+    def children_ids_with_self(learning_outcome_group_id)
+      sql = <<-SQL.squish
         WITH RECURSIVE levels AS (
-          SELECT id, learning_outcome_group_id AS parent_id
-            FROM (#{LearningOutcomeGroup.active.where(context: context).to_sql}) AS data
+          SELECT id, id AS parent_id
+            FROM (#{LearningOutcomeGroup.active.where(id: learning_outcome_group_id).to_sql}) AS data
           UNION ALL
           SELECT child.id AS id, parent.parent_id AS parent_id
             FROM #{LearningOutcomeGroup.quoted_table_name} child
             INNER JOIN levels parent ON parent.id = child.learning_outcome_group_id
             WHERE child.workflow_state <> 'deleted'
         )
-        SELECT parent_id, array_agg(id) AS descendant_ids FROM levels WHERE parent_id IS NOT NULL GROUP BY parent_id
+        SELECT id FROM levels
       SQL
+
+      LearningOutcomeGroup.connection.execute(sql).as_json.map {|r| r["id"]}
     end
 
     def context_timestamp_cache
       Rails.cache.fetch(context_timestamp_cache_key) do
         (Time.zone.now.to_f * 1000).to_i
       end
-    end
-
-    def descendants_cache_key
-      ['learning_outcome_group_descendants', context_asset_string].cache_key
     end
 
     def total_outcomes_cache_key(learning_outcome_group_id = nil)
