@@ -548,10 +548,10 @@ describe('sources/api', () => {
     const fileProps = {}
     const apiProps = {}
 
-    it('includes "onDuplicate"', () => {
+    it.only('includes "onDuplicate"', () => {
       fetchMock.mock(uri, '{}')
 
-      return apiSource.preflightUpload({onDuplicate: 'overwrite'}, apiProps).then(() => {
+      return apiSource.preflightUpload(fileProps, {onDuplicate: 'overwrite'}, apiProps).then(() => {
         const body = JSON.parse(fetchMock.lastOptions(uri).body)
         assert.equal(body.onDuplicate, 'overwrite')
       })
