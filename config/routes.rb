@@ -934,6 +934,8 @@ CanvasRails::Application.routes.draw do
   get 'health_check' => 'info#health_check'
   get 'health_prognosis' => 'info#health_prognosis'
   get 'readiness' => 'info#readiness'
+  get 'deep' => 'info#deep'
+
   get 'web-app-manifest/manifest.json' => 'info#web_app_manifest'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
