@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PostContainer} from '../PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer'
 import {PostToolbar} from '../../../components/PostToolbar/PostToolbar'
 import React from 'react'
 import {render} from '@testing-library/react'
@@ -43,7 +43,7 @@ beforeEach(() => {
   }))
 })
 
-describe('PostContainer', () => {
+describe('DiscussionEntryContainer', () => {
   const topicPostUtilities = () => (
     <PostToolbar
       isPublished
@@ -95,7 +95,7 @@ describe('PostContainer', () => {
   })
 
   const setup = props => {
-    return render(<PostContainer {...props} />)
+    return render(<DiscussionEntryContainer {...props} />)
   }
 
   it('should render', () => {

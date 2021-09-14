@@ -65,6 +65,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
       scope = scope.preload(:user, :editor)
       fulfill(object, scope)
+    rescue ActiveRecord::RecordNotFound
+      raise GraphQL::ExecutionError, 'relative entry not found'
     end
   end
 

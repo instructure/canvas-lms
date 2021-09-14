@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PostContainer} from './PostContainer'
+import {DiscussionEntryContainer} from './DiscussionEntryContainer'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import React from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
@@ -26,14 +26,14 @@ import {User} from '../../../graphql/User'
 
 export default {
   title: 'Examples/Discussion Posts/Containers/Post Container',
-  component: PostContainer,
+  component: DiscussionEntryContainer,
   argTypes: {
     onSave: {action: 'On Save'},
     onCancel: {action: 'On Cancel'}
   }
 }
 
-const Template = args => <PostContainer {...args} />
+const Template = args => <DiscussionEntryContainer {...args} />
 
 export const DiscussionTopic = Template.bind({})
 DiscussionTopic.args = {

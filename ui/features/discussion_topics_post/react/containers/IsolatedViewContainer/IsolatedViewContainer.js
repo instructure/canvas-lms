@@ -193,7 +193,7 @@ export const IsolatedViewContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: replyId,
+        replyFromEntryId: replyId,
         message,
         includeReplyPreview
       },
@@ -390,14 +390,14 @@ export const IsolatedViewContainer = props => {
               >
                 <DiscussionEdit
                   onSubmit={(text, includeReplyPreview) => {
-                    onReplySubmit(text, props.replyId, includeReplyPreview)
+                    onReplySubmit(text, props.replyFromId, includeReplyPreview)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
                   quotedEntry={buildQuotedReply(
                     isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
                       .nodes,
-                    props.replyId
+                    props.replyFromId
                   )}
                 />
               </View>
@@ -455,7 +455,7 @@ IsolatedViewContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  replyId: PropTypes.string,
+  replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string
 }

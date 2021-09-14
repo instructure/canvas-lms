@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
-export const PostContainer = props => {
+export const DiscussionEntryContainer = props => {
   if (props.deleted) {
     return (
       <DeletedPostMessage
@@ -139,7 +139,7 @@ export const PostContainer = props => {
   )
 }
 
-PostContainer.propTypes = {
+DiscussionEntryContainer.propTypes = {
   isTopic: PropTypes.bool,
   postUtilities: PropTypes.node,
   author: User.shape,
@@ -161,6 +161,6 @@ PostContainer.propTypes = {
   quotedEntry: PropTypes.object
 }
 
-PostContainer.defaultProps = {
+DiscussionEntryContainer.defaultProps = {
   deleted: false
 }

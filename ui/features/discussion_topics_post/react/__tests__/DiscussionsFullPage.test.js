@@ -433,13 +433,65 @@ describe('DiscussionFullPage', () => {
       fireEvent.click(await container.findByTestId('toTopic'))
       expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
 
-      // expect the highlight to disapear
+      // expect the highlight to disappear
       await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
 
       // should be able to highlight the topic multiple times
       fireEvent.click(await container.findByTestId('thread-actions-menu'))
       fireEvent.click(await container.findByTestId('toTopic'))
       expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    })
+  })
+
+  describe('reply with ascending sort order', () => {
+    beforeEach(() => {
+      jest.mock('../utils/constants', () => ({
+        ...jest.requireActual('../utils/constants'),
+        PER_PAGE: 1
+      }))
+    })
+
+    afterEach(() => {
+      jest.mock('../utils/constants', () => ({
+        ...jest.requireActual('../utils/constants'),
+        HIGHLIGHT_TIMEOUT: 0
+      }))
+    })
+
+    it('should change to last page when sort order is asc', async () => {
+      const container = setup()
+
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+
+      const button = await container.getByTestId('sortButton')
+      await button.click()
+
+      const replyButton = await container.findByTestId('discussion-topic-reply')
+      fireEvent.click(replyButton)
+
+      await waitFor(() => {
+        expect(tinymce.editors[0]).toBeDefined()
+      })
+
+      const rce = await container.findByTestId('DiscussionEdit-container')
+      expect(rce.style.display).toBe('')
+
+      document.querySelectorAll('textarea')[0].value = 'This is a reply'
+
+      expect(container.queryAllByText('This is a reply')).toBeTruthy()
+
+      const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
+      fireEvent.click(doReplyButton)
+
+      await waitFor(() =>
+        expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
+      )
+
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+      )
     })
   })
 })

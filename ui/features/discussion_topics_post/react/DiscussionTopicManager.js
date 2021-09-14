@@ -58,7 +58,7 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
-  const [replyId, setReplyId] = useState(null)
+  const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
@@ -83,9 +83,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
-    setIsolatedEntryId(rootEntryId || discussionEntryId)
-    setReplyId(discussionEntryId)
+  const openIsolatedView = (discussionEntryId, isolatedEntryId, withRCE, relativeId = null) => {
+    setReplyFromId(discussionEntryId)
+    setIsolatedEntryId(isolatedEntryId || discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -142,6 +142,9 @@ const DiscussionTopicManager = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (sort === 'asc') {
+        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+      }
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -186,13 +189,13 @@ const DiscussionTopicManager = props => {
           discussionTopic={discussionTopicQuery.data.legacyNode}
           onOpenIsolatedView={(
             discussionEntryId,
-            rootEntryId,
+            isolatedEntryId,
             withRCE,
             relativeId,
             highlightId
           ) => {
             setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
+            openIsolatedView(discussionEntryId, isolatedEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
@@ -203,7 +206,7 @@ const DiscussionTopicManager = props => {
           relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
-          replyId={replyId}
+          replyFromId={replyFromId}
           open={isolatedViewOpen}
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}
