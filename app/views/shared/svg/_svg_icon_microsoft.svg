@@ -1,8 +1,0 @@
-<svg
-	class="ic-icon-svg ic-icon-svg--microsoft"
-	version="1.1"
-	xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	viewBox="0 0 30 30">
-	<path d="M26,0H4C1.8,0,0,1.8,0,4v22c0,2.2,1.8,4,4,4h22c2.2,0,4-1.8,4-4V4C30,1.8,28.2,0,26,0z M24.1,23.6l-6.6,1.6l-11-3.8l11,1.4
-		V7.2l-7.6,2v10.4l-4,1.6V8l11.6-4l6.6,1.6V23.6z"/>
-	</svg>

@@ -1,4 +1,0 @@
-<% define_content :link do -%>
-  <%= course_users_url(asset.course_id) %>
-<% end -%>
-<%= t "Accepted: %{user}, %{role_type}, course, %{course}", :user => asset.user.name, :course => asset.course.name, :role_type => asset.readable_role_name %>

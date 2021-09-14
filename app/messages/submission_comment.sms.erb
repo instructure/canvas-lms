@@ -1,7 +1,0 @@
-<%= t :body, "New comment by %{author} for %{assignment}, %{user}, %{context}.",
-      :author => submission_comment_author(asset, user),
-      :assignment => asset.submission.assignment.title,
-      :user => submission_comment_submittor(asset, user),
-      :context => asset.submission.assignment.context.name %>
-
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.submission.assignment.context) %>

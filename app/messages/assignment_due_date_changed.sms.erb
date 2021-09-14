@@ -1,6 +1,0 @@
-<% if asset.due_at %>
-  <%= t('%{assignment_name} is now due:', :assignment_name => asset.title) %>
-  <%= datetime_string(force_zone(asset.due_at)) %>
-<% else %>
-  <%= t('%{assignment_name} is now due: No Due Date', :assignment_name => asset.title) %>
-<% end %>

@@ -1,9 +1,0 @@
-<% if send_student_names(asset, user) %>
-<%= t "%{assignment} has been graded for %{name}.", :assignment => asset.assignment.title, name: asset.user.name %>
-<% else %>
-<%= t :sms_body, "%{assignment} has been graded.", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
-<% end %>
-<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
-  <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
-<% end %>
-

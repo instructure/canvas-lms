@@ -1,7 +1,0 @@
-<% if asset.group.context.class.to_s == 'Account' %>
-<%= t('account_group', "Your request to join the group %{group_name} for the account %{account_name} has been rejected.", :group_name => asset.group.name, :account_name => asset.group.context.name) %>
-<% elsif asset.group.context.class.to_s == 'Course' %>
-<%= t('course_group', "Your request to join the group %{group_name} for the course %{course_name} has been rejected.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
-<% end %>
-
-<%= t('more_info', 'More info at %{web_address}', :web_address => HostUrl.context_host(asset.group.context)) %>

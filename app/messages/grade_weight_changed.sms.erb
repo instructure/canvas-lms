@@ -1,3 +1,0 @@
-<% course = asset.is_a?(Course) ? asset : asset.context %>
-<%= t('grade_changed', "The grading policy for the course, %{course_name} has changed.", :course_name => course.name) %>
-<%= t('more_info_at', 'More info at %{course_url}', :course_url => HostUrl.context_host(asset)) %>

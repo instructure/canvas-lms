@@ -1,9 +1,0 @@
-<% define_content :link do %>
-  <%= course_url(asset.course) %>
-<% end %>
-
-<% define_content :subject do %>
-  <%= t :subject, "Course Enrollment" %>
-<% end %>
-
-<%= t "You've been enrolled in the course, %{course}. Course role: %{role_type}", :course => asset.course.name, :role_type => asset.readable_role_name %>

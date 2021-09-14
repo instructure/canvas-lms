@@ -1,9 +1,0 @@
-<%= t "You've been enrolled in the course, %{course}.", :course => asset.course.name %>
-<%= t "Course role: %{role_type}", :role_type => asset.readable_role_name %>
-
-<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-<%= before_label :name, "Name" %> <%= asset.user.name %>
-<%= before_label :email, "Email" %> <%= asset.user.email %>
-<% if email != login %><%= before_label :username, "Username" %> <%= asset.user.pseudonym.unique_id rescue t(:none, "none") %><% end %>
-
-<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.course) %>
