@@ -180,6 +180,17 @@ const useTreeBrowser = queryVariables => {
     setSelectedGroupId(id)
     setSelectedParentGroupId(parentGroupId)
 
+    // Will change in OUT-4760 as the group information will be gathered from the GraphQL
+    // and not the collection as there is a use case that will use queryCollections but will not
+    // necessarily have the aligning collection loaded
+    if (collections[id]) {
+      // screenreader only alert for when a user clicks on a group to load in the RHS (Find modal & Main Outcome Management)
+      showFlashAlert({
+        message: I18n.t(`Loading %{groupTitle}.`, {groupTitle: collections[id].name}),
+        srOnly: true
+      })
+    }
+
     if (loadedGroups.includes(id)) {
       return
     }

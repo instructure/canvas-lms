@@ -23,6 +23,7 @@ import {useManageOutcomes} from '../treeBrowser'
 import {accountMocks} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {MockedProvider} from '@apollo/react-testing'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()
 
@@ -43,7 +44,27 @@ describe('useManageOutcomes', () => {
     </OutcomesContext.Provider>
   )
 
-  test('it doesnt show deleted group after rerender', async () => {
+  beforeEach(() => {
+    cache = createCache()
+    mocks = smallOutcomeTree()
+  })
+
+  it('works with initialGroupId', async () => {
+    const {result} = renderHook(
+      () => useManageOutcomes({collection: 'test', initialGroupId: '400'}),
+      {wrapper}
+    )
+    await act(async () => jest.runAllTimers())
+    expect(result.current.selectedGroupId).toBe('400')
+    expect(result.current.selectedParentGroupId).toBe('100')
+
+    act(() => result.current.queryCollections({id: '100'}))
+    await act(async () => jest.runAllTimers())
+    expect(result.current.selectedGroupId).toBe('100')
+    expect(result.current.selectedParentGroupId).toBe('1')
+  })
+
+  it('it doesnt show deleted group after rerender', async () => {
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
     await act(async () => jest.runAllTimers())
 
@@ -54,5 +75,18 @@ describe('useManageOutcomes', () => {
     const {result: result2} = renderHook(() => useManageOutcomes(), {wrapper})
     await act(async () => jest.runAllTimers())
     expect(result2.current.collections['100']).toBeUndefined()
+  })
+
+  it('should flash a screenreader only info message when a group is loading', async () => {
+    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    const {result} = renderHook(() => useManageOutcomes(), {wrapper})
+    await act(async () => jest.runAllTimers())
+
+    expect(result.current.collections['100']).toBeDefined()
+    act(() => result.current.queryCollections({id: '100', parentGroupId: '1'}))
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'Loading Account folder 0.',
+      srOnly: true
+    })
   })
 })
