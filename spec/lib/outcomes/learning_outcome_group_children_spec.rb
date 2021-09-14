@@ -417,21 +417,6 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
   end
 
-  describe '#clear_descendants_cache' do
-    it 'clears the cache' do
-      enable_cache do
-        expect(LearningOutcomeGroup.connection).to receive(:execute).and_call_original.twice
-        expect(ContentTag).to receive(:active).and_call_original.exactly(4).times
-        expect(subject.total_outcomes(g0.id)).to eq 12
-        expect(subject.total_outcomes(g1.id)).to eq 9
-        subject.clear_descendants_cache
-        instance = described_class.new(context)
-        expect(instance.total_outcomes(g0.id)).to eq 12
-        expect(instance.total_outcomes(g1.id)).to eq 9
-      end
-    end
-  end
-
   describe '#clear_total_outcomes_cache' do
     it 'clears the cache' do
       enable_cache do
