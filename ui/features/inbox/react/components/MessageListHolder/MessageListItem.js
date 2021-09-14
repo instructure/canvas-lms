@@ -33,7 +33,6 @@ import {colors} from '@instructure/canvas-theme'
 
 export const MessageListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
-  const [isStarred, setIsStarred] = useState(props.isStarred)
 
   const handleMessageClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -62,8 +61,7 @@ export const MessageListItem = ({...props}) => {
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
-    props.onStar(!isStarred, props.conversation._id)
-    setIsStarred(!isStarred)
+    props.onStar(!props.isStarred, props.conversation._id)
   }
 
   const formatParticipants = () => {
@@ -205,14 +203,14 @@ export const MessageListItem = ({...props}) => {
                   {({focused}) => {
                     return (
                       <div>
-                        {focused || isHovering || isStarred ? (
+                        {focused || isHovering || props.isStarred ? (
                           <IconButton
                             size="small"
                             withBackground={false}
                             withBorder={false}
-                            renderIcon={isStarred ? IconStarSolid : IconStarLightLine}
+                            renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
                             screenReaderLabel={
-                              isStarred ? I18n.t('starred') : I18n.t('not starred')
+                              props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                             }
                             onClick={handleMessageStarClick}
                             data-testid="visible-star"
@@ -223,9 +221,9 @@ export const MessageListItem = ({...props}) => {
                               size="small"
                               withBackground={false}
                               withBorder={false}
-                              renderIcon={isStarred ? IconStarSolid : IconStarLightLine}
+                              renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
                               screenReaderLabel={
-                                isStarred ? I18n.t('starred') : I18n.t('not starred')
+                                props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                               }
                               onClick={handleMessageStarClick}
                             />
