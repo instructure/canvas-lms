@@ -1,4 +1,0 @@
---require spec_helper
---format doc
---format html
---out ../../tmp/spec_results/audits_results.html
