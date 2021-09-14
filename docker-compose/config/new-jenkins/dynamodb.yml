@@ -1,7 +1,0 @@
-test:
-  auditors:
-    region: US East
-    access_key_id: ASDFASDF
-    secret_access_key: ZXCVZXCV
-    endpoint: http://dynamodb:8000
-    table_prefix: canvas_auditors<%= ENV.fetch('PARALLEL_INDEX', '') %>

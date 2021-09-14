@@ -1,9 +1,0 @@
-production: &production
-  address: mailcatcher
-  port: 1025
-  domain: canvas.docker
-  outgoing_address: canvas@canvas.docker
-  default_name: Instructure Canvas
-
-development:
-  <<: *production
