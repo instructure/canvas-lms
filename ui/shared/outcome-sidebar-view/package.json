@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/outcome-sidebar-view",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./backbone/views/index.js"
-}

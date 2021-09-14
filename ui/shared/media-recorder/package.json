@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/media-recorder",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./renderRecorder.js"
-}

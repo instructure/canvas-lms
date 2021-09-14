@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/use-date-time-format-hook",
-  "private": true,
-  "version": "1.0.0",
-  "author": "cvk",
-  "main": "./index.js"
-}

@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/user-settings",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./index.js"
-}

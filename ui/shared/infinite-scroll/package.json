@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/infinite-scroll",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./react/components/InfiniteScroll.js"
-}

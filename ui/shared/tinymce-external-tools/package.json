@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/tinymce-external-tools",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./index.js"
-}
