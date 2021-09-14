@@ -70,7 +70,7 @@ describe('OutcomeManagement', () => {
           <OutcomeManagement />
         </MockedProvider>
       )
-      expect(getByText(/Loading/)).toBeInTheDocument()
+      expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
       expect(getByTestId('managementHeader')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
@@ -86,7 +86,7 @@ describe('OutcomeManagement', () => {
           <OutcomeManagement />
         </MockedProvider>
       )
-      expect(getByText(/Loading/)).toBeInTheDocument()
+      expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Import'))
@@ -107,7 +107,7 @@ describe('OutcomeManagement', () => {
           <OutcomeManagement />
         </MockedProvider>
       )
-      expect(getByText(/Loading/)).toBeInTheDocument()
+      expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
       expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(1)
       expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledWith(

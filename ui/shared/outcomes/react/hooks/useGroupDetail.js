@@ -233,6 +233,27 @@ const useGroupDetail = ({
       }, {})
   }
 
+  useEffect(() => {
+    if (!loading && group) {
+      // screenreader only alert for after a group loads in the RHS (Find modal & Main Outcome Management)
+      // NOTE: Could not place the reverse screenreader alert for "Loading {groupName}." due to group being null
+      // until after loading is completed.  Said screenreader alert is in the treeBrowser.js
+      showFlashAlert({
+        message: I18n.t(
+          {
+            one: `Showing %{count} outcome for %{groupTitle}.`,
+            other: `Showing %{count} outcomes for %{groupTitle}.`
+          },
+          {
+            count: group.outcomesCount,
+            groupTitle: group.title
+          }
+        ),
+        srOnly: true
+      })
+    }
+  }, [loading, group])
+
   return {
     loading,
     group,

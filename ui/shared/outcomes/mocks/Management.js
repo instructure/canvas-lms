@@ -283,6 +283,89 @@ export const outcomeGroup = {
   }
 }
 
+const createSearchGroupOutcomesOutcomeMocks = (
+  canUnlink,
+  canEdit,
+  contextId,
+  contextType,
+  title,
+  outcomeCount
+) => {
+  // Tech Debt - see OUT-4776 - need to switch this over to a dynamic array like the below code
+  // for now too many tests are dependant on the number of outcomes and the order
+  // of the outcomes to be exactly in the format returned by in the if statement on line 301
+  if (outcomeCount === 2) {
+    return [
+      {
+        canUnlink,
+        _id: '1',
+        node: {
+          _id: '1',
+          description: '',
+          title: `Outcome 1 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      },
+      {
+        canUnlink,
+        _id: '2',
+        node: {
+          _id: '2',
+          description: '',
+          title: `Outcome 2 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+    ]
+  } else {
+    return [
+      {
+        canUnlink,
+        _id: '1',
+        node: {
+          _id: '1',
+          description: '',
+          title: `Outcome 1 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+    ]
+  }
+}
+
 export const groupDetailMocks = ({
   groupId = '1',
   title = `Group ${groupId}`,
@@ -295,7 +378,8 @@ export const groupDetailMocks = ({
   outcomesGroupContextType = 'Account',
   searchQuery = '',
   withMorePage = true,
-  groupDescription = 'Group Description'
+  groupDescription = 'Group Description',
+  numOfOutcomes = 2
 } = {}) => [
   {
     request: {
@@ -315,7 +399,8 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 1`,
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
-          outcomesCount: 0,
+          outcomesCount: numOfOutcomes,
+          __typename: 'LearningOutcomeGroup',
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -347,8 +432,7 @@ export const groupDetailMocks = ({
               }
             ],
             __typename: 'ContentTagConnection'
-          },
-          __typename: 'LearningOutcomeGroup'
+          }
         }
       }
     }
@@ -485,57 +569,21 @@ export const groupDetailMocks = ({
           _id: groupId,
           description: `${groupDescription} 4`,
           title,
-          outcomesCount: 2,
+          outcomesCount: numOfOutcomes,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
               endCursor: 'Mx',
               __typename: 'PageInfo'
             },
-            edges: [
-              {
-                canUnlink,
-                _id: '1',
-                node: {
-                  _id: '1',
-                  description: '',
-                  title: `Outcome 1 - ${title}`,
-                  displayName: '',
-                  canEdit,
-                  contextId,
-                  contextType,
-                  friendlyDescription: null,
-                  __typename: 'LearningOutcome'
-                },
-                group: {
-                  _id: '101',
-                  title: 'Outcome Group 1',
-                  __typename: 'LearningOutcomeGroup'
-                },
-                __typename: 'ContentTag'
-              },
-              {
-                canUnlink,
-                _id: '2',
-                node: {
-                  _id: '2',
-                  description: '',
-                  title: `Outcome 2 - ${title}`,
-                  displayName: '',
-                  canEdit,
-                  contextId,
-                  contextType,
-                  friendlyDescription: null,
-                  __typename: 'LearningOutcome'
-                },
-                group: {
-                  _id: '101',
-                  title: 'Outcome Group 1',
-                  __typename: 'LearningOutcomeGroup'
-                },
-                __typename: 'ContentTag'
-              }
-            ],
+            edges: createSearchGroupOutcomesOutcomeMocks(
+              canUnlink,
+              canEdit,
+              contextId,
+              contextType,
+              title,
+              numOfOutcomes
+            ),
             __typename: 'ContentTagConnection'
           },
           __typename: 'LearningOutcomeGroup'
