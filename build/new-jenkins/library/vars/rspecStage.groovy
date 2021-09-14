@@ -19,7 +19,7 @@
 def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
-  def rspecqNodeTotal = env.TEST_QUEUE_NODES.toInteger()
+  def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
   def rspecqEnabled = env.RSPECQ_ENABLED == '1' || configuration.isRspecqEnabled()
   def setupNodeHook = this.&setupNode
 
@@ -56,8 +56,8 @@ def createDistribution(nestedStages) {
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
-    "RSPECQ_FILE_SPLIT_THRESHOLD=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '999' : '150'}",
-    'RSPECQ_MAX_REQUEUES=2',
+    "RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}",
+    "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
