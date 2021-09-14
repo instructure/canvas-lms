@@ -1,9 +1,0 @@
-node_modules
-lib
-.nyc_output
-coverage
-npm-debug*
-doc/*.js
-github-pages/dist
-canvas
-testcafe/build

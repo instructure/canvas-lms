@@ -1,7 +1,0 @@
-Dockerfile
-docker-compose.yml
-.gitignore
-README.md
-lib
-.git/*
-node_modules/*

@@ -1,7 +1,0 @@
-{
-  "name": "backbone-input-view",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./src/index.coffee"
-}

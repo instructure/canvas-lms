@@ -1,8 +1,0 @@
-{
-  "name": "jquery-tinypubsub",
-  "version": "1.0.0",
-  "author": "Ben Alman",
-  "homepage": "http://benalman.com",
-  "main": "index.js",
-  "private": true
-}
