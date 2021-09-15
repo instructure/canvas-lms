@@ -162,6 +162,11 @@ module Importers
         end
       end
 
+      # Create OutcomeFriendlyDescription from course import
+      if item && Account.site_admin.feature_enabled?(:outcomes_friendly_description) && item.context_type == 'Course' && hash[:friendly_description].present?
+        OutcomeFriendlyDescription.find_or_create_by(context: item.context, learning_outcome: item).update(description: hash[:friendly_description])
+      end
+
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 
       item

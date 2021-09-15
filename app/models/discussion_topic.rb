@@ -325,7 +325,7 @@ class DiscussionTopic < ActiveRecord::Base
       # prevent future syncs from recreating the deleted assignment
       if is_child_content?
         old_assignment.submission_types = 'none'
-        own_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).take
+        own_tag = MasterCourses::ChildContentTag.where(content: self).take
         own_tag.child_subscription.create_content_tag_for!(old_assignment, :downstream_changes => ['workflow_state']) if own_tag
       end
     elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
@@ -1439,6 +1439,7 @@ class DiscussionTopic < ActiveRecord::Base
       # user is the topic's author
       next true if user && user.id == self.user_id
 
+      next false unless context
       next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
       # Don't have visibilites for any of the specific sections in a section specific topic

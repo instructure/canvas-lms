@@ -244,7 +244,7 @@ class CollaborationsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read) &&
       tab_enabled?(@context.class::TAB_COLLABORATIONS)
 
-    @page_title = t('lti_collaborations', 'LTICollaborations')
+    @page_title = t('lti_collaborations', 'External Collaborations')
     @body_classes << 'full-width padless-content'
     js_bundle :lti_collaborations
     css_bundle :react_collaborations

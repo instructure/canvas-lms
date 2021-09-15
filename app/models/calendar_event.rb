@@ -140,37 +140,49 @@ class CalendarEvent < ActiveRecord::Base
   # grouping them under the effective context (i.e. appointment_group.context).
   # it's the responsibility of the caller to ensure the user has rights to the
   # specified codes (e.g. using User#appointment_context_codes)
-  scope :for_user_and_context_codes, lambda { |user, *args|
-    codes = args.shift
-    section_codes = args.shift || user.section_context_codes(codes)
+  scope :for_user_and_context_codes, ->(user, codes, section_codes = nil) do
+    section_codes ||= user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
     # the all_codes check is redundant, but makes the query more efficient
     all_codes = codes | effectively_courses_codes
+
     group_codes = codes.grep(/\Aappointment_group_\d+\z/)
     codes -= group_codes
 
-    codes_conditions = codes.map { |code|
-      wildcard(quoted_table_name + '.effective_context_code', code, :delimiter => ',')
-    }.join(" OR ")
-    codes_conditions = self.connection.quote(false) if codes_conditions.blank?
+    or_clauses = []
+    unscoped do
+      # explicit contexts (e.g. course_123)
+      or_clauses << where(context_code: codes, effective_context_code: nil) unless codes.empty?
 
-    where(<<~SQL, all_codes, codes, group_codes, effectively_courses_codes)
-      calendar_events.context_code IN (?)
-      AND (
-        ( -- explicit contexts (e.g. course_123)
-          calendar_events.context_code IN (?)
-          AND calendar_events.effective_context_code IS NULL
-        )
-        OR ( -- appointments (manageable or reservable)
-          calendar_events.context_code IN (?)
-        )
-        OR ( -- own appointment_participants, or section events in the course
-          calendar_events.context_code IN (?)
-          AND (#{codes_conditions})
-        )
-      )
-    SQL
-  }
+      # appointments (manageable or reservable)
+      or_clauses << where(context_code: group_codes) unless group_codes.empty?
+
+      # own appointment_participants, or section events in the course
+      unless codes.empty?
+        this_scope = where(context_code: effectively_courses_codes)
+
+        codes_conditions = codes.map do |code|
+          wildcard(quoted_table_name + '.effective_context_code', code, delimiter: ',')
+        end.join(" OR ")
+
+        this_scope = this_scope.where(codes_conditions)
+        or_clauses << this_scope
+      end
+    end
+
+    next none if or_clauses.empty?
+    next merge(or_clauses.first) if or_clauses.length == 1
+
+    # basically we're forming "context_code IN (<all_codes>) AND (... OR ... OR ...)"
+    result = where(context_code: all_codes)
+    or_clauses_merged = or_clauses.first
+    or_clauses[1..].each do |clause|
+      or_clauses_merged = or_clauses_merged.or(clause)
+    end
+
+    result = result.merge(or_clauses_merged)
+    result
+  end
 
   scope :not_hidden, -> do
     where("NOT EXISTS (

@@ -131,8 +131,13 @@ module SIS
 
           course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
           unless course_dates_stuck
+            if start_date == '<delete>' && end_date == '<delete>'
+              course.restrict_enrollments_to_course_dates = false
+            end
             course.start_at = start_date unless start_date == 'not_present'
+            course.start_at = nil if start_date == '<delete>'
             course.conclude_at = end_date unless end_date == 'not_present'
+            course.conclude_at = nil if end_date == '<delete>'
             if !course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates) && !(start_date == 'not_present' && end_date == 'not_present')
               course.restrict_enrollments_to_course_dates = (start_date.present? || end_date.present?)
             end

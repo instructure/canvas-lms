@@ -147,7 +147,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
-  has_many :trophies, inverse_of: :user, dependent: :destroy
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
   has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'
@@ -420,16 +419,23 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope)
-    Course.active.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).distinct
+  def courses_for_enrollments(enrollment_scope, associated_user = nil)
+    if associated_user && associated_user != self.id
+      Course.active.joins(:observer_enrollments)
+        .merge(enrollment_scope.except(:joins))
+        .where(enrollments: { associated_user_id: associated_user })
+    else
+      enrollments_to_include = associated_user == self.id ? :non_observer_enrollments : :all_enrollments
+      Course.active.joins(enrollments_to_include).merge(enrollment_scope.except(:joins)).distinct
+    end
   end
 
   def courses
     courses_for_enrollments(enrollments.current)
   end
 
-  def current_and_invited_courses
-    courses_for_enrollments(enrollments.current_and_invited)
+  def current_and_invited_courses(associated_user = nil)
+    courses_for_enrollments(enrollments.current_and_invited, associated_user)
   end
 
   def concluded_courses
@@ -606,10 +612,10 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.where("workflow_state NOT IN ('deleted','inactive','rejected') AND type<>'StudentViewEnrollment'").
-                where(:user_id => shard_user_ids).
-                select([:user_id, :course_id, :course_section_id]).
-                distinct.to_a
+          Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
+            .where(:user_id => shard_user_ids)
+            .select([:user_id, :course_id, :course_section_id])
+            .distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
@@ -1841,8 +1847,7 @@ class User < ActiveRecord::Base
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          scope = send(actual_association)
-
+          scope = send(actual_association, options[:observee_user])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -2143,9 +2148,9 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      instances = instances.polymorphic_where('stream_item_instances.context' => opts[:contexts])
+      instances = instances.where(context: opts[:contexts])
     elsif opts[:context]
-      instances = instances.where(:context_type => opts[:context].class.base_class.name, :context_id => opts[:context])
+      instances = instances.where(context: opts[:context])
     elsif opts[:only_active_courses]
       instances = instances.where(:context_type => "Course", :context_id => self.participating_course_ids)
     end
@@ -2665,18 +2670,22 @@ class User < ActiveRecord::Base
     }
   end
 
-  def menu_courses(enrollment_uuid = nil)
+  def menu_courses(enrollment_uuid = nil, opts = {})
     return @menu_courses if @menu_courses
 
-    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
+    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) }
+    # this terribleness is so we try to make sure that the newest courses show up in the menu
+    courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
+      .sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }
+      .first(Setting.get('menu_course_limit', '20').to_i)
+      .sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
+      .select { |c| can_favorite.call(c) }
+    # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
     if favorites.length > 0
-      @menu_courses = favorites
+      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
     else
-      # this terribleness is so we try to make sure that the newest courses show up in the menu
-      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).
-        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.
-        first(Setting.get('menu_course_limit', '20').to_i).
-        sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+      @menu_courses = courses
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses

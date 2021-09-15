@@ -24,6 +24,7 @@ import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContaine
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {getOptimisticResponse} from './utils'
 import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
@@ -32,59 +33,6 @@ import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-
-const getOptimisticResponse = text => {
-  return {
-    createDiscussionEntry: {
-      discussionEntry: {
-        id: 'PLACEHOLDER',
-        _id: 'PLACEHOLDER',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deleted: false,
-        message: text,
-        ratingCount: null,
-        ratingSum: null,
-        rating: false,
-        read: true,
-        forcedReadState: false,
-        subentriesCount: null,
-        rootEntryParticipantCounts: {
-          unreadCount: 0,
-          repliesCount: 0,
-          __typename: 'DiscussionEntryCounts'
-        },
-        author: {
-          id: 'PLACEHOLDER',
-          _id: ENV.current_user.id,
-          avatarUrl: ENV.current_user.avatar_image_url,
-          displayName: ENV.current_user.display_name,
-          courseRoles: [],
-          __typename: 'User'
-        },
-        editor: null,
-        lastReply: null,
-        permissions: {
-          attach: false,
-          create: false,
-          delete: false,
-          rate: false,
-          read: false,
-          reply: false,
-          update: false,
-          viewRating: false,
-          __typename: 'DiscussionEntryPermissions'
-        },
-        rootEntry: null,
-        rootEntryId: null,
-        parentId: 'PLACEHOLDER',
-        __typename: 'DiscussionEntry'
-      },
-      errors: null,
-      __typename: 'CreateDiscussionEntryPayload'
-    }
-  }
-}
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -110,7 +58,7 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
-  const [replyId, setReplyId] = useState(null)
+  const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
@@ -135,9 +83,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, rootEntryId, withRCE, relativeId = null) => {
-    setIsolatedEntryId(rootEntryId || discussionEntryId)
-    setReplyId(discussionEntryId)
+  const openIsolatedView = (discussionEntryId, isolatedEntryId, withRCE, relativeId = null) => {
+    setReplyFromId(discussionEntryId)
+    setIsolatedEntryId(isolatedEntryId || discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -191,8 +139,12 @@ const DiscussionTopicManager = props => {
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => {
+    onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (sort === 'asc') {
+        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+      }
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -235,11 +187,18 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          onOpenIsolatedView={(discussionEntryId, rootEntryId, withRCE, relativeId) => {
-            setHighlightEntryId(relativeId)
-            openIsolatedView(discussionEntryId, rootEntryId, withRCE, relativeId)
+          onOpenIsolatedView={(
+            discussionEntryId,
+            isolatedEntryId,
+            withRCE,
+            relativeId,
+            highlightId
+          ) => {
+            setHighlightEntryId(highlightId)
+            openIsolatedView(discussionEntryId, isolatedEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (
@@ -247,7 +206,7 @@ const DiscussionTopicManager = props => {
           relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
-          replyId={replyId}
+          replyFromId={replyFromId}
           open={isolatedViewOpen}
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}

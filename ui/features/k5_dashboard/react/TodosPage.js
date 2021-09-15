@@ -48,8 +48,7 @@ export const TodosPage = ({timeZone, visible}) => {
       path: '/api/v1/users/self/todo',
       success: useCallback(data => {
         if (data) {
-          data.sort(sortTodos)
-          setTodos(data)
+          setTodos(data.filter(todo => todo.type === 'grading').sort(sortTodos))
           setLoading(false)
         }
       }, []),

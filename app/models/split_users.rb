@@ -280,17 +280,21 @@ class SplitUsers
     restore_source_user
     pseudonyms_ids = merge_data.records.where(context_type: 'Pseudonym').pluck(:context_id)
     pseudonyms = Pseudonym.where(id: pseudonyms_ids)
-    # the where.not needs to be used incase that user is actually deleted.
-    name = merge_data.items.where.not(user_id: source_user).where(item_type: 'user_name').take&.item || pseudonyms.first.unique_id
-    prefs = merge_data.items.where.not(user_id: source_user).where(item_type: 'user_preferences').take&.item
+    # the where.not needs to be used incase that user is actually deleted
+    name =
+      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_name').take&.item
+    prefs =
+      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_preferences').take&.item
     @restored_user ||= User.new
-    @restored_user.name = name
-    @restored_user.preferences = prefs
+    @restored_user.name = name || pseudonyms.first&.unique_id || 'restored user'
+    @restored_user.preferences = prefs if prefs
     @restored_user.workflow_state = 'registered'
     shard = Shard.shard_for(merge_data.from_user_id)
     shard ||= source_user.shard
     @restored_user.shard = shard if @restored_user.new_record?
     @restored_user.save!
+    return [] unless pseudonyms.exists?
+
     move_pseudonyms_to_user(pseudonyms)
     pseudonyms
   end

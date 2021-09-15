@@ -22,6 +22,7 @@ require_relative '../helpers/assignments_common'
 require_relative '../helpers/public_courses_context'
 require_relative '../helpers/files_common'
 require_relative '../helpers/admin_settings_common'
+require_relative '../../helpers/k5_common'
 
 describe "assignments" do
   include_context "in-process server selenium tests"
@@ -30,6 +31,7 @@ describe "assignments" do
   include AdminSettingsCommon
   include CustomScreenActions
   include CustomSeleniumActions
+  include K5Common
 
   # note: due date testing can be found in assignments_overrides_spec
 
@@ -352,6 +354,26 @@ describe "assignments" do
       expect(f(".description.teacher-version")).to be_present
       expect(f("#content")).not_to contain_css(".edit_assignment_link")
     end
+
+    it "should show course name in the canvas for elementary header" do
+      toggle_k5_setting(@course.account)
+      get "/courses/#{@course.id}/assignments"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq @course.name
+    end
+
+    it "should show course friendly name in the canvas for elementary header if defined" do
+      toggle_k5_setting(@course.account)
+      @course.friendly_name = "Well hello there"
+      @course.save!
+      get "/courses/#{@course.id}/assignments"
+      name = f('.k5-heading-course-name')
+      expect(name).to be_displayed
+      expect(name.text).to eq "Well hello there"
+    end
+
+
 
     context "group assignments" do
       before(:once) do

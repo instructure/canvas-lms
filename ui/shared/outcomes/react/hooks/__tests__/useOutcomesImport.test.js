@@ -71,6 +71,8 @@ describe('useOutcomesImport', () => {
     expect(typeof result.current.clearOutcomesStatus).toBe('function')
     expect(typeof result.current.importGroupsStatus).toBe('object')
     expect(typeof result.current.importOutcomesStatus).toBe('object')
+    expect(typeof result.current.hasAddedOutcomes).toBe('boolean')
+    expect(typeof result.current.setHasAddedOutcomes).toBe('function')
   })
 
   describe('Group import', () => {
@@ -156,7 +158,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '2 outcomes have been successfully added to this account.',
+        message: 'All outcomes from 2 have been successfully added to this account.',
         type: 'success'
       })
     })
@@ -178,9 +180,20 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '2 outcomes have been successfully added to this course.',
+        message: 'All outcomes from 2 have been successfully added to this course.',
         type: 'success'
       })
+    })
+
+    it('sets hasAddedOutcomes to true after an import', async () => {
+      const {result} = renderHook(() => useOutcomesImport(), {
+        wrapper
+      })
+      act(() => {
+        result.current.importOutcomes(groupId, outcomesCount)
+      })
+      await act(async () => jest.runAllTimers())
+      expect(result.current.hasAddedOutcomes).toEqual(true)
     })
 
     it('displays flash error message with details if cannot import group', async () => {

@@ -16,30 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { configure } from './'
-import timezone from 'timezone'
-
-const snapshots = []
-
-export const configureAndRestoreLater = config => snapshots.push(configure(config))
-export const restore = () => snapshots.splice(0).reverse().forEach(configure)
-export const changeZone = (zoneData, zoneName) => configureAndRestoreLater({
-  tz: timezone(zoneData, zoneName),
-  tzData: {
-    [zoneName]: zoneData
-  }
-})
-
-export const changeLocale = (localeData, bigeasyLocale, momentLocale) => (
-  configureAndRestoreLater({
-    tz: timezone(localeData, bigeasyLocale),
-    momentLocale
-  })
-)
-
-export default {
-  configureAndRestoreLater,
-  changeLocale,
-  changeZone,
-  restore
-}
+export * from 'datetime/specHelpers'
+export { default as default } from 'datetime/specHelpers'

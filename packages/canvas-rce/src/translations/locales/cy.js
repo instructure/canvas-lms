@@ -77,6 +77,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Maint y Botwm" },
   "buttons_and_icons_e66ee12c": { "message": "Botymau ac Eiconau" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Canslo" },
   "choose_caption_file_9c45bc4e": { "message": "Dewiswch ffeil gapsiwn" },
   "choose_usage_rights_33683854": {
     "message": "Dewiswch hawliau defnyddio..."
@@ -176,6 +177,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Erbyn: Mwy nag un dyddiad" },
   "due_when_7eed10c6": { "message": "Erbyn: { when }" },
+  "edit_c5fbea07": { "message": "Golygu" },
   "edit_equation_f5279959": { "message": "Golygu Hafaliad" },
   "edit_link_7f53bebb": { "message": "Golygu Dolen" },
   "editor_statusbar_26ac81fc": { "message": "Bar Statws Golygydd" },
@@ -198,10 +200,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Adnoddau Allanol" },
   "extra_large_b6cdf1ff": { "message": "Mawr Iawn" },
   "extra_small_9ae33252": { "message": "Bach Iawn" },
-  "file_upload_failed_af22dd91": {
-    "message": "Wedi methu llwytho ffeil i fyny"
-  },
-  "file_uploading_56c9c0c8": { "message": "Ffeil wrthi’n llwytho i fyny" },
   "file_url_c12b64be": { "message": "URL Ffeil" },
   "filename_file_icon_602eb5de": { "message": "{ filename } eicon ffeil" },
   "filename_image_preview_6cef8f26": {
@@ -300,6 +298,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Fy ffeiliau" },
   "my_images_427f9b0c": { "message": "Fy Nelweddau" },
+  "name_1aed4a1b": { "message": "Enw" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Llywiwch trwy''r ddewislen neu''r bar offer"
   },
@@ -403,9 +402,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Arddulliau" },
   "submit_a3cc6859": { "message": "Cyflwyno" },
   "subscript_59744f96": { "message": "Isysgrif" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Wedi llwyddo: Ffeil wedi’i llwytho i fyny"
-  },
   "superscript_8cb349a2": { "message": "Uwchysgrif" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Mathau o ffeiliau y mae modd delio â nhw: SRT neu WebVTT"
@@ -458,13 +454,11 @@ const locale = {
     "message": "teipiwch Control F9 i gael mynediad at yr opsiynau tabl. { text }"
   },
   "unpublished_dfd8801": { "message": "heb gyhoeddi" },
+  "untitled_efdc2d7d": { "message": "dideitl" },
   "upload_document_253f0478": { "message": "Llwytho Dogfen i fyny" },
   "upload_file_fd2361b8": { "message": "Llwytho Ffeil i Fyny" },
   "upload_image_6120b609": { "message": "Llwytho Delwedd i Fyny" },
   "upload_media_ce31135a": { "message": "Llwytho Cyfryngau i fyny" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Nid yw llwytho i fyny ar gael ar gyfer y ffolder hon"
-  },
   "upload_record_media_e4207d72": {
     "message": "Llwytho i Fyny/Recordio Cyfryngau"
   },

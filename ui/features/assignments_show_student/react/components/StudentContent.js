@@ -59,12 +59,10 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
   // component will handle rendering the footer.  If not, we still need to show
   // the "Mark as Done" button for assignments that belong to modules.
   const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
-  if (moduleItem == null) {
-    return null
-  }
 
-  const buttons = [
-    {
+  const buttons = []
+  if (moduleItem != null) {
+    buttons.push({
       element: (
         <MarkAsDoneButton
           done={moduleItem.done}
@@ -73,12 +71,13 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
           onError={onMarkAsDoneError}
         />
       ),
-      key: 'mark-as-done',
-      align: 'right'
-    }
-  ]
+      key: 'mark-as-done'
+    })
+  }
 
-  return <StudentFooter buttons={buttons} />
+  return (
+    <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+  )
 }
 
 function renderAttemptsAndAvailability({assignment, submission}) {

@@ -147,44 +147,21 @@ export const MOCK_EVENTS = [
   }
 ]
 
-export const MOCK_OBSERVER_ENROLLMENTS = [
+export const MOCK_OBSERVER_LIST = [
   {
-    id: '179',
-    user_id: '13',
-    course_id: '30',
-    type: 'ObserverEnrollment',
-    enrollment_state: 'active',
-    role: 'ObserverEnrollment'
+    id: '13',
+    name: 'Zelda',
+    avatar_url: 'http://avatar'
   },
   {
-    id: '181',
-    user_id: '13',
-    course_id: '30',
-    type: 'ObserverEnrollment',
-    enrollment_state: 'active',
-    role: 'ObserverEnrollment',
-    observed_user: {
-      id: '4',
-      name: 'Student 4',
-      sortable_name: 'A',
-      short_name: 'Student 4',
-      avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
-    }
+    id: '4',
+    name: 'Student 4',
+    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
   },
   {
-    id: '180',
-    user_id: '13',
-    course_id: '30',
-    type: 'ObserverEnrollment',
-    enrollment_state: 'active',
-    role: 'ObserverEnrollment',
-    observed_user: {
-      id: '2',
-      name: 'Student 2',
-      sortable_name: 'B',
-      short_name: 'Student 2',
-      avatar_url:
-        'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
-    }
+    id: '2',
+    name: 'Student 2',
+    avatar_url:
+      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
   }
 ]

@@ -81,12 +81,25 @@ describe('FindOutcomeItem', () => {
     expect(getByText('Added').closest('button')).toBeDisabled()
   })
 
-  it('displays loader instead of Add button if group import status is pending', () => {
+  it('displays spinner for outcome if group import is pending and outcome import is not completed', () => {
     const {queryByText, getByTestId} = render(
       <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_PENDING})} />
     )
     expect(getByTestId('outcome-import-pending')).toBeInTheDocument()
     expect(queryByText('Add')).not.toBeInTheDocument()
+  })
+
+  it('does not display spinner for outcome if group import is pending and outcome import is completed', () => {
+    const {getByText, queryByTestId} = render(
+      <FindOutcomeItem
+        {...defaultProps({
+          importGroupStatus: IMPORT_PENDING,
+          importOutcomeStatus: IMPORT_COMPLETED
+        })}
+      />
+    )
+    expect(queryByTestId('outcome-import-pending')).not.toBeInTheDocument()
+    expect(getByText('Added')).toBeInTheDocument()
   })
 
   it('handles click on add button', () => {

@@ -77,6 +77,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Größe der Schaltfläche" },
   "buttons_and_icons_e66ee12c": { "message": "Schaltflächen und Icons" },
   "c_2001_acme_inc_283f7f80": { "message": "© 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Abbrechen" },
   "choose_caption_file_9c45bc4e": { "message": "Caption-Datei auswählen" },
   "choose_usage_rights_33683854": {
     "message": "Nutzungsrechte auswählen ...."
@@ -172,6 +173,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Fällig: Mehrere Daten" },
   "due_when_7eed10c6": { "message": "Fällig: { when }" },
+  "edit_c5fbea07": { "message": "Ändern" },
   "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
   "edit_link_7f53bebb": { "message": "Link bearbeiten" },
   "editor_statusbar_26ac81fc": { "message": "Editor-Statusleiste" },
@@ -194,10 +196,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Externe Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groß" },
   "extra_small_9ae33252": { "message": "Extra klein" },
-  "file_upload_failed_af22dd91": {
-    "message": "Hochladen der Datei fehlgeschlagen."
-  },
-  "file_uploading_56c9c0c8": { "message": "Datei wird hochgeladen" },
   "file_url_c12b64be": { "message": "Datei-URL" },
   "filename_file_icon_602eb5de": { "message": "Dateisymbol für { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -294,6 +292,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Meine Dateien" },
   "my_images_427f9b0c": { "message": "Meine Bilder" },
+  "name_1aed4a1b": { "message": "Name" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigieren Sie durch das Menü oder die Symbolleiste"
   },
@@ -399,7 +398,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Abgeben" },
   "subscript_59744f96": { "message": "Abonnieren" },
-  "success_file_uploaded_8174e93f": { "message": "Erfolg: Datei hochgeladen" },
   "superscript_8cb349a2": { "message": "Hochgestellt" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Unterstützte Dateitypen: SRT oder WebVTT"
@@ -454,13 +452,11 @@ const locale = {
     "message": "Geben Sie <Strg>+F9 ein, um auf die Tabellenoptionen zuzugreifen. { text }"
   },
   "unpublished_dfd8801": { "message": "nicht veröffentlicht" },
+  "untitled_efdc2d7d": { "message": "Ohne Titel" },
   "upload_document_253f0478": { "message": "Dokument hochladen" },
   "upload_file_fd2361b8": { "message": "Datei hochladen" },
   "upload_image_6120b609": { "message": "Bild hochladen" },
   "upload_media_ce31135a": { "message": "Medien hochladen" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Hochladen ist für diesen Ordner nicht verfügbar"
-  },
   "upload_record_media_e4207d72": { "message": "Medien hochladen/aufzeichnen" },
   "uploading_19e8a4e7": { "message": "Wird hochgeladen" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

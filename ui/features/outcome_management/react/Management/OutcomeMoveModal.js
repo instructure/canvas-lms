@@ -54,14 +54,13 @@ const OutcomeMoveModal = ({
             }
           }
         })
-
-        const movedOutcomeLinkIds = result.data?.moveOutcomeLinks?.movedOutcomeLinkIds
+        const movedLinks = result.data?.moveOutcomeLinks?.movedOutcomeLinks
         const errorMessage = result.data?.moveOutcomeLinks?.errors?.[0]?.message
-        if (movedOutcomeLinkIds.length === 0) throw new Error(errorMessage)
-        if (movedOutcomeLinkIds.length !== count) throw new Error()
+        if (movedLinks.length === 0) throw new Error(errorMessage)
+        if (movedLinks.length !== count) throw new Error()
 
         onSuccess({
-          movedOutcomeLinkIds,
+          movedOutcomeLinkIds: movedLinks.map(ct => ct._id),
           groupId: targetGroup.id,
           targetAncestorsIds
         })

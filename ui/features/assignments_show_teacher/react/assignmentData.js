@@ -28,10 +28,10 @@ export const EnvShape = shape({
   PERMISSIONS: shape({
     context: shape({
       read_as_admin: bool.isRequired,
-      // FYI the backend now separates manage_assignments_add and
-      // manage_assignments_delete as separate permissions. If this ends up
-      // needing to be used in the future, consider whether those might be more
-      // appropriate.
+      // FYI the backend now separates manage_assignments_add,
+      // manage_assignments_edit and manage_assignments_delete as separate
+      // permissions. If this ends up needing to be used in the future,
+      // consider whether those might be more appropriate.
       manage_assignments: bool.isRequired
     }).isRequired,
     assignment: shape({

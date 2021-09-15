@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mentionWasInitiated from '../mentionWasInitiated'
+import mentionWasInitiated, {spaceCharacters} from '../mentionWasInitiated'
 
 let anchorNode, anchorOffset, selection, triggerChar, selectedNode
 
@@ -92,6 +92,12 @@ describe('mentionWasInitiated', () => {
   })
 
   describe('when the proceeding char is a space character', () => {
+    describe('space character list', () => {
+      it('has a complete list', () => {
+        expect(spaceCharacters).toEqual(expect.arrayContaining([' ', '\u00A0', '\uFEFF']))
+      })
+    })
+
     describe('and the typed char is the trigger char', () => {
       beforeEach(() => {
         anchorOffset = 2

@@ -78,6 +78,7 @@ describe QuizzesNext::QuizSerializer do
     allow(controller).to receive(:context).and_return context
     allow(assignment).to receive(:grants_right?).at_least(:once).and_return true
     allow(context).to receive(:grants_right?).at_least(:once).and_return true
+    allow(context).to receive(:grants_any_right?).at_least(:once).and_return true
   end
 
   [

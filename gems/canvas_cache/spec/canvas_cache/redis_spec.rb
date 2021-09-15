@@ -45,6 +45,11 @@ describe CanvasCache::Redis do
     end
   end
 
+  it "should should not ignore redis guards when not enabled" do
+    allow(ConfigFile).to receive(:load).with('redis').and_return(nil)
+    expect(CanvasCache::Redis).to_not be_ignore_redis_guards
+  end
+
   describe "with redis" do
     before(:each) do
       skip("redis required to test") unless CanvasCache::Redis.enabled?
@@ -327,6 +332,10 @@ describe CanvasCache::Redis do
         redis_client.set('mykey', 'myvalue')
       end
       expect(log_lines).to be_empty
+    end
+
+    it "should not ignore redis guards by default" do
+      expect(CanvasCache::Redis).to_not be_ignore_redis_guards
     end
 
     describe "CanvasCache::RedisWrapper" do

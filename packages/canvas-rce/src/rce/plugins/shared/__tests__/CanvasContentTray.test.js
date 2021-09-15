@@ -112,6 +112,11 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await showTrayForPlugin('user_documents')
       expect(getTrayLabel()).toEqual('User Documents')
     })
+
+    it('is labeled with "Buttons and Icons" when using the "list_buttons_and_icons" content type', async () => {
+      await showTrayForPlugin('list_buttons_and_icons')
+      expect(getTrayLabel()).toEqual('Buttons and Icons')
+    })
   })
 
   describe('Tray Label in group context', () => {
@@ -160,6 +165,13 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
     it('is the images panel for image content types', async () => {
       await showTrayForPlugin('course_images')
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+      )
+    })
+
+    it('is the images panel for button and icons content types', async () => {
+      await showTrayForPlugin('list_buttons_and_icons')
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
       )

@@ -119,6 +119,10 @@
           <% end %>
         </div>
 
+        <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
+          <span class="k5-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
+        <% end %>
+
         <div class="right-of-crumbs">
           <% if tutorials_enabled? %>
             <div class="TutorialToggleHolder"></div>

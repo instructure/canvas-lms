@@ -73,7 +73,7 @@ export default function StaffInfo({
         <Flex.Item align="start">
           <Avatar name={name} src={avatarUrl} alt={I18n.t('Avatar for %{name}', {name})} />
         </Flex.Item>
-        <Flex.Item shouldShrink padding="0 small">
+        <Flex.Item shouldShrink shouldGrow padding="0 small">
           <Heading level="h3">{name}</Heading>
           <Text as="div" size="small" data-automation="instructor-role">
             {readableRoleName(role)}

@@ -518,7 +518,92 @@ export const groupDetailMocks = ({
           __typename: 'LearningOutcomeGroup'
         }
       }
-    }
+    },
+    // for testing graphqls refetch in index.js
+    newData: jest.fn(() => ({
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 4`,
+          title: `Refetched ${title}`,
+          outcomesCount: 3,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mx',
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                canUnlink,
+                _id: '1',
+                node: {
+                  _id: '1',
+                  description: '',
+                  title: `Refetched Outcome 1 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '2',
+                node: {
+                  _id: '2',
+                  description: '',
+                  title: `Refetched Outcome 2 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '11',
+                node: {
+                  _id: '11',
+                  description: '',
+                  title: `Newly Created Outcome - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }))
   },
   {
     request: {
@@ -1326,6 +1411,7 @@ export const deleteOutcomeMock = ({
 export const moveOutcomeMock = ({
   groupId = '101',
   outcomeLinkIds = ['1', '2'],
+  parentGroupTitle = 'Outcome Group',
   failResponse = false,
   failMutation = false,
   failMutationNoErrMsg = false,
@@ -1335,7 +1421,15 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: outcomeLinkIds,
+        movedOutcomeLinks: outcomeLinkIds.map(idx => ({
+          _id: idx,
+          group: {
+            _id: groupId,
+            title: parentGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'ContentTag'
+        })),
         errors: null
       }
     }
@@ -1356,7 +1450,7 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: [],
+        movedOutcomeLinks: [],
         errors: [
           {
             attribute: 'message',
@@ -1372,7 +1466,7 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         __typename: 'MoveOutcomeLinksPayload',
-        movedOutcomeLinkIds: [],
+        movedOutcomeLinks: [],
         errors: [
           {
             attribute: 'message',
@@ -1387,7 +1481,17 @@ export const moveOutcomeMock = ({
   const partialSuccessResponse = {
     data: {
       moveOutcomeLinks: {
-        movedOutcomeLinkIds: outcomeLinkIds.filter((_, idx) => idx !== 0),
+        movedOutcomeLinks: outcomeLinkIds
+          .filter((_, idx) => idx !== 0)
+          .map(idx => ({
+            _id: idx,
+            group: {
+              _id: '101',
+              title: parentGroupTitle,
+              __typename: 'LearningOutcomeGroup'
+            },
+            __typename: 'ContentTag'
+          })),
         __typename: 'MoveOutcomeLinksPayload',
         errors: [
           {

@@ -33,7 +33,8 @@ module Api::V1::PlannerItem
 
   API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
                           :read_state, :created_at, :updated_at].freeze
-  CALENDAR_PLANNABLE_FIELDS = [:all_day, :location_address, :description, :start_at, :end_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = [:all_day, :location_address, :description, :start_at, :end_at,
+    :online_meeting_url].freeze
   GRADABLE_FIELDS = [:assignment_id, :points_possible, :due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
   ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze
@@ -145,6 +146,8 @@ module Api::V1::PlannerItem
   def plannable_json(item_hash, extra_fields: [])
     item_hash = item_hash.with_indifferent_access
     item_hash[:due_at] = item_hash.delete(:user_due_date) if item_hash.key?(:user_due_date)
+    url = online_meeting_url(item_hash[:description], item_hash[:location_name])
+    item_hash[:online_meeting_url] = url if url
     item_hash.slice(*API_PLANNABLE_FIELDS, *extra_fields)
   end
 
@@ -245,5 +248,24 @@ module Api::V1::PlannerItem
 
   def discussion_topic_html_url(topic, user, submission_info)
     assignment_feedback_url(topic.assignment, user, submission_info) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
+  end
+
+  def online_meeting_url(event_description, event_location)
+    config =  Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
+    url_regex_str = config["online-meeting-url-regex"] || 'https:\/\/\w+\.zoom\.us(?:\/my|\/j)?\/\d+'
+    url_regex_str = url_regex_str.split("\n").join('|')
+    url_regex = Regexp.new "(#{url_regex_str})"
+
+    if (event_description)
+      m = event_description.match(url_regex)
+      return m[0] if m
+    end
+
+    if (event_location)
+      m = event_location.match(url_regex)
+      return m[0] if m
+    end
+
+    nil
   end
 end

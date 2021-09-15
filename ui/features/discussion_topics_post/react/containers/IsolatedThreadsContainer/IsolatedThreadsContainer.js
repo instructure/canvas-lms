@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import {isTopicAuthor, updateDiscussionTopicEntryCounts, responsiveQuerySizes} from '../../utils'
-import {PostContainer} from '../PostContainer/PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect, useRef} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
@@ -131,7 +131,7 @@ export const IsolatedThreadsContainer = props => {
           onOpenIsolatedView={props.onOpenIsolatedView}
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
-          isHighlighted={entry.id === props.highlightEntryId}
+          isHighlighted={entry._id === props.highlightEntryId}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -235,10 +235,11 @@ const IsolatedThreadContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        isIsolatedView
         onClick={() =>
           props.onOpenIsolatedView(
-            props.discussionEntry.id,
-            props.discussionEntry.rootEntryId,
+            props.discussionEntry._id,
+            props.discussionEntry.isolatedEntryId,
             true
           )
         }
@@ -269,7 +270,7 @@ const IsolatedThreadContainer = props => {
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenIsolatedView(props.discussionEntry.id, null, false)}
+        onClick={() => props.onOpenIsolatedView(props.discussionEntry._id, null, false)}
       />
     )
   }
@@ -292,7 +293,7 @@ const IsolatedThreadContainer = props => {
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
-                  <PostContainer
+                  <DiscussionEntryContainer
                     isTopic={false}
                     postUtilities={
                       <ThreadActions
@@ -318,10 +319,10 @@ const IsolatedThreadContainer = props => {
                         }
                         goToParent={() => {
                           props.onOpenIsolatedView(
-                            props.discussionEntry.rootEntry.id,
-                            props.discussionEntry.rootEntry.id,
+                            props.discussionEntry.rootEntryId,
+                            props.discussionEntry.rootEntryId,
                             false,
-                            props.discussionEntry.rootEntry.id
+                            props.discussionEntry.rootEntryId
                           )
                         }}
                         goToTopic={props.goToTopic}
@@ -350,13 +351,14 @@ const IsolatedThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     <View as="div" padding="x-small none none">
                       <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>
                         {threadActions}
                       </ThreadingToolbar>
                     </View>
-                  </PostContainer>
+                  </DiscussionEntryContainer>
                 </Flex.Item>
               </Flex>
             </Highlight>

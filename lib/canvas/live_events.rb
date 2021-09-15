@@ -947,4 +947,24 @@ module Canvas::LiveEvents
       calculation_int: method.calculation_int
     }
   end
+
+  def self.outcome_friendly_description_created(description)
+    post_event_stringified('outcome_friendly_description_created', get_outcome_friendly_description_data(description))
+  end
+
+  def self.outcome_friendly_description_updated(description)
+    post_event_stringified('outcome_friendly_description_updated', get_outcome_friendly_description_data(description).merge(updated_at: description.updated_at))
+  end
+
+  def self.get_outcome_friendly_description_data(description)
+    {
+      outcome_friendly_description_id: description.id,
+      context_type: description.context_type,
+      context_id: description.context_id,
+      description: description.description,
+      workflow_state: description.workflow_state,
+      learning_outcome_id: description.learning_outcome_id,
+      root_account_id: description.root_account_id
+    }
+  end
 end

@@ -87,6 +87,7 @@ const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, 
       <Flex as="div" direction="column" margin="0 small 0 0" width="27rem">
         <Link
           href={html_url}
+          target="_blank"
           isWithinText={false}
           theme={{
             fontWeight: '700'

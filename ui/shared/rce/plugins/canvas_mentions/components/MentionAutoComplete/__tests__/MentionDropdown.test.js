@@ -133,7 +133,7 @@ describe('Mention Dropdown', () => {
   })
 
   const setup = props => {
-    return render(<MentionDropdown editor={mockedEditor} {...props} />)
+    return render(<MentionDropdown editor={mockedEditor} rceRef={document.body} {...props} />)
   }
 
   describe('Rendering', () => {
@@ -176,7 +176,9 @@ describe('Mention Dropdown', () => {
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock
       })
-      expect(getAllByTestId('mention-dropdown-item').length).toBe(10)
+
+      // This number is always double menu count as two menus exist in the same dom
+      expect(getAllByTestId('mention-dropdown-item').length).toBe(20)
 
       expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
 
@@ -196,7 +198,8 @@ describe('Mention Dropdown', () => {
         onActiveDescendantChange: onActiveDescendantChangeMock
       })
 
-      expect(getAllByTestId('mention-dropdown-item').length).toBe(10)
+      // This number is always double menu count as two menus exist in the same dom
+      expect(getAllByTestId('mention-dropdown-item').length).toBe(20)
 
       const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[1].querySelector('li'))

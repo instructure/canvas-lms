@@ -34,7 +34,6 @@ import {
   showPillForOverdueStatus
 } from '../../utilities/statusUtils'
 import {animatable} from '../../dynamic-ui'
-import responsiviser from '../responsiviser'
 
 export class Grouping extends Component {
   static propTypes = {
@@ -186,6 +185,8 @@ export class Grouping extends Component {
           timeZone={this.props.timeZone}
           simplifiedControls={this.props.simplifiedControls}
           readOnly={item.readOnly}
+          responsiveSize={this.props.responsiveSize}
+          onlineMeetingURL={item.onlineMeetingURL}
         />
       </li>
     ))
@@ -317,8 +318,7 @@ export class Grouping extends Component {
   }
 }
 
-const ResponsiveGrouping = responsiviser()(Grouping)
-const ThemeableGrouping = themeable(theme, styles)(ResponsiveGrouping)
+const ThemeableGrouping = themeable(theme, styles)(Grouping)
 const AnimatableGrouping = animatable(ThemeableGrouping)
 AnimatableGrouping.theme = ThemeableGrouping.theme
 export default AnimatableGrouping

@@ -36,7 +36,6 @@ require 'rubocop_canvas/cops/lint/no_file_utils_rm_rf'
 require 'rubocop_canvas/cops/lint/no_sleep'
 ## migration
 require 'rubocop_canvas/cops/migration/non_transactional'
-require 'rubocop_canvas/cops/migration/model_behavior'
 require 'rubocop_canvas/cops/migration/primary_key'
 require 'rubocop_canvas/cops/migration/remove_column'
 require 'rubocop_canvas/cops/migration/delay'

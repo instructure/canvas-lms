@@ -32,6 +32,7 @@ import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView.js'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 function setupServerResponses() {
   const server = sinon.fakeServer.create()
@@ -126,7 +127,8 @@ QUnit.module('Syllabus', {
       tzData: {
         'America/Denver': denver,
         'America/New_York': newYork
-      }
+      },
+      formats: getI18nFormats(),
     })
 
     this.clock = sinon.useFakeTimers(new Date(2012, 0, 23, 15, 30).getTime())

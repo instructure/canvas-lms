@@ -185,6 +185,9 @@
     "calendar_event_89aadc1c": {
         "message": "Dogodek koledarja"
     },
+    "cancel_caeb1e68": {
+        "message": "Prekliči"
+    },
     "canvas_planner_98ed106": {
         "message": "Orodje Canvas Planner"
     },
@@ -530,12 +533,6 @@
     "feedback_6dcc1991": {
         "message": "Povratne informacije"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Nalaganje datoteke ni uspelo"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Nalaganje datoteke"
-    },
     "file_url_c12b64be": {
         "message": "URL datoteke"
     },
@@ -811,6 +808,9 @@
     },
     "my_images_427f9b0c": {
         "message": "Moje slike"
+    },
+    "name_1aed4a1b": {
+        "message": "Ime"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigirajte skozi meni ali orodno vrstico"
@@ -1130,9 +1130,6 @@
     "subscript_59744f96": {
         "message": "Podpisano"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Uspešno: Naložene datoteke"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Uspešno: Čakajoča opravila je ustvarjen."
     },
@@ -1262,6 +1259,9 @@
     "unpublished_dfd8801": {
         "message": "neobjavljeno"
     },
+    "untitled_efdc2d7d": {
+        "message": "brez naslova"
+    },
     "upload_document_253f0478": {
         "message": "Naloži dokument"
     },
@@ -1273,9 +1273,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Naloži medije"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Za to mapo ni na voljo nalaganje"
     },
     "upload_record_media_e4207d72": {
         "message": "Naloži/posnemi medij"

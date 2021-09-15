@@ -1128,6 +1128,16 @@ describe Enrollment do
     expect(@enrollment).to_not be_valid
   end
 
+  it "does not allow an enrollment to be created in a template course" do
+    course = course_factory
+    course.template = true
+    course.save!
+    enrollment = course.teacher_enrollments.new
+    enrollment.user = user_with_pseudonym
+    expect(enrollment).not_to be_valid
+    expect(enrollment.errors.to_a).to eq(["Course is a template course"])
+  end
+
   context "permissions" do
     before(:once) do
       course_with_student(:active_all => true)

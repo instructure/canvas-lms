@@ -31,7 +31,8 @@ export const KEY_CODES = {
   enter: 13,
   up: 38,
   down: 40,
-  escape: 27
+  escape: 27,
+  tab: 9
 }
 
 export const KEY_NAMES = {

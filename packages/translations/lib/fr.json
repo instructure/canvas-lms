@@ -185,6 +185,9 @@
     "calendar_event_89aadc1c": {
         "message": "Événement de calendrier"
     },
+    "cancel_caeb1e68": {
+        "message": "Annuler"
+    },
     "canvas_planner_98ed106": {
         "message": "Agenda Canvas"
     },
@@ -530,12 +533,6 @@
     "feedback_6dcc1991": {
         "message": "Commentaire"
     },
-    "file_upload_failed_af22dd91": {
-        "message": "Le téléchargement du fichier a échoué"
-    },
-    "file_uploading_56c9c0c8": {
-        "message": "Envoi de fichier"
-    },
     "file_url_c12b64be": {
         "message": "URL du fichier"
     },
@@ -811,6 +808,9 @@
     },
     "my_images_427f9b0c": {
         "message": "Mes images"
+    },
+    "name_1aed4a1b": {
+        "message": "Nom"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviguer dans le menu ou la barre d''outils"
@@ -1130,9 +1130,6 @@
     "subscript_59744f96": {
         "message": "En indice"
     },
-    "success_file_uploaded_8174e93f": {
-        "message": "Opération réussie : Fichier envoyé"
-    },
     "success_to_do_created_e34ed395": {
         "message": "Opération réussie : À faire créé"
     },
@@ -1262,6 +1259,9 @@
     "unpublished_dfd8801": {
         "message": "non publié(e)(s)"
     },
+    "untitled_efdc2d7d": {
+        "message": "sans titre"
+    },
     "upload_document_253f0478": {
         "message": "Télécharger le document"
     },
@@ -1273,9 +1273,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Télécharger un fichier multimédia"
-    },
-    "upload_not_available_for_this_folder_8f8623c6": {
-        "message": "Envoi indisponible pour ce dossier."
     },
     "upload_record_media_e4207d72": {
         "message": "Envoyer/enregistrer un fichier multimédia"

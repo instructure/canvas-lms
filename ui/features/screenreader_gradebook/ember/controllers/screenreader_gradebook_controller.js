@@ -329,7 +329,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
       return $.ajaxJSON(
         ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
-        'GET'
+        'POST'
       ).then(attachment_progress => this.pollGradebookCsvProgress(attachment_progress))
     },
 

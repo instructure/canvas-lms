@@ -21,7 +21,6 @@ group :test do
   gem 'rails-dom-testing', '2.0.3'
   gem 'rails-controller-testing', '1.0.5'
 
-  gem 'gergich', '1.2.1', require: false
   gem 'dotenv', '2.7.5', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
@@ -40,12 +39,6 @@ group :test do
   gem 'rspec-mocks', '3.10.2'
   gem 'shoulda-matchers', '4.3.0'
 
-  gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
-    gem 'rubocop', '0.68.0', require: false
-      gem 'rainbow', '3.0.0', require: false
-  gem 'rubocop-rspec', '1.33.0', require: false
-  gem 'rubocop-performance', '1.3.0', require: false
-
   gem 'once-ler', '0.1.4'
   gem 'sauce_whisk', '0.2.2'
 
@@ -55,7 +48,7 @@ group :test do
   gem 'testrailtagging', '0.3.8.7', require: false
 
   gem 'webmock', '3.8.2', require: false
-    gem 'crack', '0.4.3', require: false
+    gem 'crack', '0.4.5', require: false
   gem 'timecop', '0.9.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
@@ -65,13 +58,16 @@ group :test do
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.40.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
+  gem 'json-schema', '~> 2.8.1'
 
   gem 'parallel_tests'
+  gem 'rspecq', github: 'kyler-instructure/rspecq', branch: 'rspec-args'
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
-  gem 'axe-core-selenium', '4.1.0', require: false
-  gem 'axe-core-rspec', '4.1.0', require: false
-  gem 'axe-core-api', '4.1.0', require:false
-  gem 'stormbreaker', '0.0.3', require: false
+  # axe-core* versions at or above 4.2 have difficulties with iframes. Keep these at 4.1.0 until fixes are investigated
+  gem 'axe-core-selenium', '~> 4.1.0', require: false
+  gem 'axe-core-rspec', '~> 4.1.0', require: false
+  gem 'axe-core-api', '~> 4.1.0', require:false
+  gem 'stormbreaker', '0.0.4', require: false
 end

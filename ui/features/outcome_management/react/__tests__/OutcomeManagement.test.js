@@ -102,7 +102,7 @@ describe('OutcomeManagement', () => {
     it('checks for existing outcome imports when the user switches to the manage tab and renders the OutcomeManagementPanel', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
       const {getByText, getByTestId} = render(
-        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks, ...outcomeGroupsMocks]}>
           <OutcomeManagement />
         </MockedProvider>
       )

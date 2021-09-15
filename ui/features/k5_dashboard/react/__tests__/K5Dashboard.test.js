@@ -23,13 +23,14 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
+import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
 
 import {MOCK_TODOS} from './mocks'
 import {
   MOCK_ASSIGNMENTS,
   MOCK_CARDS,
   MOCK_EVENTS,
-  MOCK_OBSERVER_ENROLLMENTS
+  MOCK_OBSERVER_LIST
 } from '@canvas/k5/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
@@ -186,7 +187,8 @@ const defaultProps = {
   showImportantDates: true,
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
-  parentSupportEnabled: true
+  parentSupportEnabled: false,
+  observerList: MOCK_OBSERVER_LIST
 }
 
 beforeAll(() => {
@@ -304,12 +306,6 @@ beforeEach(() => {
   fetchMock.post(
     /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
     JSON.stringify({status: 'ok'})
-  )
-  fetchMock.get(
-    encodeURI(
-      '/api/v1/users/self/enrollments?type[]=ObserverEnrollment&include[]=avatar_url&include[]=observed_users&per_page=100'
-    ),
-    MOCK_OBSERVER_ENROLLMENTS
   )
 
   global.ENV = defaultEnv
@@ -492,7 +488,7 @@ describe('K-5 Dashboard', () => {
       expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
     })
 
-    it('only fetches announcements and LTIs based on cards once per page load', done => {
+    it('only fetches announcements based on cards once per page load', done => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
       moxios.withMock(() => {
         render(<K5Dashboard {...defaultProps} />)
@@ -508,10 +504,6 @@ describe('K-5 Dashboard', () => {
             .then(() => {
               // Expect just one announcement request for all cards
               expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(1)
-              // Expect one LTI request for each non-homeroom card
-              expect(
-                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length
-              ).toBe(1)
               done()
             })
         )
@@ -621,8 +613,21 @@ describe('K-5 Dashboard', () => {
       expect(
         getByText('Below is an example of how students will see their schedule')
       ).toBeInTheDocument()
+      expect(getByText('Math')).toBeInTheDocument()
+      expect(getByText('A wonderful assignment')).toBeInTheDocument()
       expect(getByText('Social Studies')).toBeInTheDocument()
-      expect(getByText('A great discussion assignment')).toBeInTheDocument()
+      expect(getByText('Exciting discussion')).toBeInTheDocument()
+    })
+
+    it('preloads surrounding weeks only once schedule tab is visible', async done => {
+      const {findByText, getByRole} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+      expect(moxios.requests.count()).toBe(5)
+      act(() => getByRole('tab', {name: 'Schedule'}).click())
+      moxios.wait(() => {
+        expect(moxios.requests.count()).toBe(7) // 2 more requests for prev and next week preloads
+        done()
+      })
     })
   })
 
@@ -761,13 +766,91 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Parent Support', () => {
-    it('shows picker when user is an observer', async () => {
-      const {findByRole} = render(
-        <K5Dashboard {...defaultProps} currentUserRoles={['user', 'observer', 'teacher']} />
-      )
-      const select = await findByRole('combobox', {name: 'Select a student to view'})
+    afterEach(() => {
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
+    })
+
+    beforeEach(() => {
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+    })
+
+    const getLastRequest = async () => {
+      const request = {}
+      await waitFor(() => {
+        const r = moxios.requests.mostRecent()
+        request.url = r.url
+        request.response = r.respondWith({
+          status: 200,
+          response: MOCK_CARDS
+        })
+      })
+      return request
+    }
+
+    it('shows picker when user is an observer', () => {
+      const {getByRole} = render(<K5Dashboard {...defaultProps} parentSupportEnabled />)
+      const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
-      expect(select.value).toBe('Geoffrey Jellineck')
+      expect(select.value).toBe('Student 4')
+    })
+
+    it('includes the student id when requesting dashboard cards', done => {
+      moxios.withMock(async () => {
+        const {getByRole} = render(
+          <K5Dashboard
+            {...defaultProps}
+            currentUserRoles={['user', 'observer', 'teacher']}
+            parentSupportEnabled
+          />
+        )
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          // Request with the cookie value
+          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+        })
+        done()
+      })
+    })
+
+    it('does not make a request if the user has been already requested', done => {
+      moxios.withMock(async () => {
+        const {getByRole, getByText} = render(
+          <K5Dashboard
+            {...defaultProps}
+            currentUserRoles={['user', 'observer', 'teacher']}
+            parentSupportEnabled
+          />
+        )
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          // Request with the cookie value
+          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+          act(() => select.click())
+          act(() => getByText('Student 2').click())
+          return onLoadRequest.response.then(async () => {
+            const onSelectRequest = await getLastRequest()
+            expect(onSelectRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+            act(() => select.click())
+            act(() => getByText('Student 4').click())
+            return onSelectRequest.response.then(async () => {
+              // It should not request Student 4, as it is already fetched
+              const lastRequest = await getLastRequest()
+              expect(select.value).toBe('Student 4')
+              expect(lastRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+              expect(moxios.requests.count()).toBe(3)
+            })
+          })
+        })
+        done()
+      })
     })
   })
 })

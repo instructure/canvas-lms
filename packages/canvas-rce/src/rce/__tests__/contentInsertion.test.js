@@ -150,6 +150,36 @@ describe('contentInsertion', () => {
       )
     })
 
+    describe('with anchor text', () => {
+      let anchorElm
+
+      beforeEach(() => {
+        anchorElm = {
+          innerText: 'anchor text'
+        }
+
+        editor.dom.getParent = () => anchorElm
+      })
+
+      it('uses the anchor text', () => {
+        contentInsertion.insertLink(editor, link)
+        expect(editor.content).toEqual(
+          '<a href="/some/path" title="Here Be Links">anchor text</a>'
+        )
+      })
+
+      describe('with "forceRename" set to "true"', () => {
+        beforeEach(() => link.forceRename = true)
+
+        it('uses the link "text"', () => {
+          contentInsertion.insertLink(editor, link)
+          expect(editor.content).toEqual(
+            '<a href="/some/path" title="Here Be Links">Click On Me</a>'
+          )
+        })
+      })
+    })
+
     it('includes attributes', () => {
       link['data-canvas-previewable'] = true
       link.class = 'instructure_file_link foo'

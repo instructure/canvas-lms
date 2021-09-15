@@ -183,15 +183,52 @@ OverrideStudentStore.getStudents = function() {
   return OverrideStudentStore.getState().students
 }
 
-OverrideStudentStore.addStudents = function(newlyFetchedStudents) {
-  _.each(newlyFetchedStudents, student => {
+function nameWithSecondaryInfo(student) {
+  const secondaryId = student.sis_user_id || student.email || student.login_id
+  return secondaryId ? `${student.name} (${secondaryId})` : student.name
+}
+
+const normalizeName = name =>
+  name
+    .replace(/\p{Punctuation}/gu, '')
+    .toLowerCase()
+    .trim()
+
+const addSecondaryNameInfoIfDuplicate = students => {
+  const normalizedNameCounts = {}
+  const nameToNormalizedName = {}
+  students.forEach(student => {
+    const normalizedName = normalizeName(student.name)
+    nameToNormalizedName[student.name] = normalizedName
+    normalizedNameCounts[normalizedName] = (normalizedNameCounts[normalizedName] || 0) + 1
+  })
+
+  return students.map(student => ({
+    ...student,
+    displayName:
+      normalizedNameCounts[nameToNormalizedName[student.name]] > 1
+        ? nameWithSecondaryInfo(student)
+        : student.name
+  }))
+}
+
+OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
+  newlyFetchedStudents.forEach(student => {
     student.enrollments = studentEnrollments(student)
     student.sections = sectionIDs(student.enrollments)
   })
-  const newStudentsHash = _.keyBy(newlyFetchedStudents, student => student.id)
-  const newStudentState = _.extend(newStudentsHash, this.getState().students)
+
+  const allStudents = Object.values({
+    ...this.getState().students,
+    ..._.keyBy(newlyFetchedStudents, student => student.id)
+  })
+
+  // If there are duplicate student names, show secondary info
+  const studentsWithSecondaryInfo = addSecondaryNameInfoIfDuplicate(allStudents)
+  const studentsWithSecondaryInfoHash = _.keyBy(studentsWithSecondaryInfo, student => student.id)
+
   this.setState({
-    students: newStudentState
+    students: studentsWithSecondaryInfoHash
   })
 }
 

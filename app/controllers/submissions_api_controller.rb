@@ -1063,7 +1063,7 @@ class SubmissionsApiController < ApplicationController
   # @argument grade_data[<student_id>][file_ids][] [Integer]
   #   See documentation for the comment[] arguments in the
   #   {api:SubmissionsApiController#update Submissions Update} documentation
-  # @argument grade_data[<student_id>][assignment_id] [Integer]
+  # @argument grade_data[<assignment_id>][<student_id>] [Integer]
   #   Specifies which assignment to grade.  This argument is not necessary when
   #   using the assignment-specific endpoints.
   #

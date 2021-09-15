@@ -71,11 +71,10 @@ const locale = {
     "message": "بکشید و رها کنید، یا برای مرور رایانه کلیک کنید"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "مهلت: چند تاریخ" },
+  "edit_c5fbea07": { "message": "ویرایش" },
   "embed_828fac4a": { "message": "قراردادن" },
   "embed_image_1080badc": { "message": "درج تصویر" },
   "external_tools_6e77821": { "message": "ابزارهای بیرونی" },
-  "file_upload_failed_af22dd91": { "message": "آپلود پرونده انجام نشد" },
-  "file_uploading_56c9c0c8": { "message": "بارگذاری پرونده" },
   "files_c300e900": { "message": "فایل ها" },
   "files_index_af7c662b": { "message": "فهرست فایل ها" },
   "folder_tree_fbab0726": { "message": "درخت پوشه" },
@@ -140,7 +139,6 @@ const locale = {
   "sort_by_e75f9e3e": { "message": "مرتب کردن بر اساس" },
   "star_8d156e09": { "message": "ستاره دار کردن" },
   "submit_a3cc6859": { "message": "ارسال" },
-  "success_file_uploaded_8174e93f": { "message": "موفقیت: پرونده بارگذاری شد" },
   "syllabus_f191f65b": { "message": "سرفصل" },
   "text_7f4593da": { "message": "متن" },
   "the_material_is_in_the_public_domain_279c39a3": {
@@ -153,9 +151,6 @@ const locale = {
   "unpublished_dfd8801": { "message": "منتشر نشده" },
   "upload_file_fd2361b8": { "message": "بارگذاری فایل" },
   "upload_media_ce31135a": { "message": "بارگذاری رسانه" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "بارگیری برای این پوشه در دسترس نیست"
-  },
   "uploading_19e8a4e7": { "message": "در حال بارگذاری" },
   "url_22a5f3b8": { "message": "نشانی اینترنتی" },
   "usage_right_ff96f3e2": { "message": "حق استفاده:" },

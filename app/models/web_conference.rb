@@ -544,7 +544,7 @@ class WebConference < ActiveRecord::Base
 
   def self.conference_tab_name
     if (names = WebConference.enabled_plugin_conference_names).any?
-      t("%{conference_type_names} (Formerly Conferences)", conference_type_names: names.join(" "))
+      t("%{conference_type_names} (Conferences)", conference_type_names: names.join(" "))
     else
       t('#tabs.conferences', "Conferences")
     end

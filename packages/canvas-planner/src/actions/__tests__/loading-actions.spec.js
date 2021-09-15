@@ -290,22 +290,6 @@ describe('api actions', () => {
             isPreload: false
           })
         )
-        // Pre-loading previous week
-        expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({
-            weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
-            weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
-            isPreload: true
-          })
-        )
-        // Pre-loading next week
-        expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({
-            weekStart: weeklyState.weekStart.clone().add(7, 'days'),
-            weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
-            isPreload: true
-          })
-        )
         const getWayFutureItemThunk = mockDispatch.mock.calls[2][0] // the function returned by getWayFutureItem()
         expect(typeof getWayFutureItemThunk).toBe('function')
         const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(() => {
@@ -323,6 +307,30 @@ describe('api actions', () => {
           })
         })
         return Promise.all([futurePromise, pastPromise])
+      })
+    })
+
+    describe('preloadSurroundingWeeks', () => {
+      it('preloads previous week', () => {
+        Actions.preloadSurroundingWeeks()(mockDispatch, getBasicState)
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({
+            weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
+            weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
+            isPreload: true
+          })
+        )
+      })
+
+      it('preloads next week', () => {
+        Actions.preloadSurroundingWeeks()(mockDispatch, getBasicState)
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({
+            weekStart: weeklyState.weekStart.clone().add(7, 'days'),
+            weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
+            isPreload: true
+          })
+        )
       })
     })
 
@@ -494,12 +502,10 @@ describe('api actions', () => {
       const expectedContextCodes = /context_codes\[]=course_7/
       moxios.wait(() => {
         // Fetching current week, far future date, and far past date should all be filtered by context_codes
-        expect(moxios.requests.count()).toBe(5)
+        expect(moxios.requests.count()).toBe(3)
         expect(moxios.requests.at(0).url).toMatch(expectedContextCodes)
         expect(moxios.requests.at(1).url).toMatch(expectedContextCodes)
         expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
-        expect(moxios.requests.at(3).url).toMatch(expectedContextCodes)
-        expect(moxios.requests.at(4).url).toMatch(expectedContextCodes)
         done()
       })
     })

@@ -16,10 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {IconArrowOpenStartSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import theme from '@instructure/canvas-theme'
+import {Tooltip} from '@instructure/ui-tooltip'
+
+import I18n from 'i18n!assignments_2_file_upload'
+
+import api from '../apis/ContextModuleApi'
 
 function buildFooterStyle() {
   return {
@@ -28,24 +36,82 @@ function buildFooterStyle() {
   }
 }
 
-const StudentFooter = ({buttons}) => (
-  <div data-testid="student-footer" id="assignments-student-footer" style={buildFooterStyle()}>
-    <Flex alignItems="center" height="100%" margin="0" justifyItems="space-between">
-      {['left', 'right'].map(align => (
-        <Flex key={align} alignItems="center" height="100%" margin="0" justifyItems="end">
-          {buttons.length === 0 && <></>}
-          {buttons
-            .filter(button => button.align === align)
-            .map(button => (
+const NextItem = ({tooltipText, url}) => (
+  <Tooltip tip={tooltipText}>
+    <Button data-testid="next-assignment-btn" margin="0 0 0 x-small" color="secondary" href={url}>
+      {I18n.t('Next')} <IconArrowOpenEndSolid />
+    </Button>
+  </Tooltip>
+)
+
+const PreviousItem = ({tooltipText, url}) => (
+  <Tooltip tip={tooltipText}>
+    <Button data-testid="previous-assignment-btn" margin="0 small 0 0" color="secondary" href={url}>
+      <IconArrowOpenStartSolid /> {I18n.t('Previous')}
+    </Button>
+  </Tooltip>
+)
+
+const StudentFooter = ({assignmentID, buttons, courseID}) => {
+  const alertContext = useContext(AlertManagerContext)
+  const [previousItem, setPreviousItem] = useState(null)
+  const [nextItem, setNextItem] = useState(null)
+
+  const convertModuleData = data => {
+    if (data?.url != null) {
+      return {
+        url: data.url,
+        tooltipText: data.tooltipText.string
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (courseID != null && assignmentID != null) {
+      api
+        .getContextModuleData(courseID, assignmentID)
+        .then(({next, previous}) => {
+          setPreviousItem(convertModuleData(previous))
+          setNextItem(convertModuleData(next))
+        })
+        .catch(() => {
+          alertContext?.setOnFailure(I18n.t('There was a problem loading module information.'))
+        })
+    }
+  }, [alertContext, assignmentID, courseID])
+
+  if (buttons.length === 0 && previousItem == null && nextItem == null) {
+    return null
+  }
+
+  return (
+    <div data-testid="student-footer" id="assignments-student-footer" style={buildFooterStyle()}>
+      <Flex alignItems="center" height="100%" margin="0" justifyItems="space-between">
+        {previousItem && (
+          <Flex.Item shouldShrink>
+            <PreviousItem {...previousItem} />
+          </Flex.Item>
+        )}
+
+        <Flex.Item shouldGrow margin="0 small">
+          <Flex justifyItems="end">
+            {buttons.map(button => (
               <Flex.Item key={button.key} padding="auto small">
                 {button.element}
               </Flex.Item>
             ))}
-        </Flex>
-      ))}
-    </Flex>
-  </div>
-)
+          </Flex>
+        </Flex.Item>
+
+        {nextItem && (
+          <Flex.Item shouldShrink>
+            <NextItem {...nextItem} />
+          </Flex.Item>
+        )}
+      </Flex>
+    </div>
+  )
+}
 
 const buttonPropType = PropTypes.shape({
   element: PropTypes.element,
@@ -53,7 +119,13 @@ const buttonPropType = PropTypes.shape({
 })
 
 StudentFooter.propTypes = {
-  buttons: PropTypes.arrayOf(buttonPropType)
+  assignmentID: PropTypes.string,
+  buttons: PropTypes.arrayOf(buttonPropType),
+  courseID: PropTypes.string
+}
+
+StudentFooter.defaultProps = {
+  buttons: []
 }
 
 export default StudentFooter

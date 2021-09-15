@@ -185,24 +185,24 @@ module DynamicSettings
       it 'sets multiple key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo1',
-              Value: Base64.strict_encode64('bar1')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo1',
+              'Value' => 'bar1'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo2',
-              Value: Base64.strict_encode64('bar2')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo2',
+              'Value' => 'bar2'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'foo/bar/foo3',
-              Value: Base64.strict_encode64('bar3')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'foo/bar/foo3',
+              'Value' => 'bar3'
             }
           }
         ])
@@ -212,24 +212,24 @@ module DynamicSettings
       it 'sets multiple global key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo1',
-              Value: Base64.strict_encode64('bar1')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo1',
+              'Value' => 'bar1'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo2',
-              Value: Base64.strict_encode64('bar2')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo2',
+              'Value' => 'bar2'
             }
           },
           {
-            KV: {
-              Verb: 'set',
-              Key: 'global/foo/bar/foo3',
-              Value: Base64.strict_encode64('bar3')
+            'KV' => {
+              'Verb' => 'set',
+              'Key' => 'global/foo/bar/foo3',
+              'Value' => 'bar3'
             }
           }
         ])

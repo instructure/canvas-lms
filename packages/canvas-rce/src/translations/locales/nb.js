@@ -75,6 +75,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Knappestørrelse" },
   "buttons_and_icons_e66ee12c": { "message": "Knapper og ikoner" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Velg undertekst-fil" },
   "choose_usage_rights_33683854": { "message": "Velg bruksrettigheter..." },
   "circle_484abe63": { "message": "Sirkel" },
@@ -170,6 +171,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Frist: Flere datoer" },
   "due_when_7eed10c6": { "message": "Frist: { when }" },
+  "edit_c5fbea07": { "message": "Rediger" },
   "edit_equation_f5279959": { "message": "Rediger likning" },
   "edit_link_7f53bebb": { "message": "Rediger lenke" },
   "editor_statusbar_26ac81fc": { "message": "Redigering Statusbar" },
@@ -192,8 +194,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Eksterne verktøy" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
   "extra_small_9ae33252": { "message": "Ekstra liten" },
-  "file_upload_failed_af22dd91": { "message": "Filopplasting mislyktes" },
-  "file_uploading_56c9c0c8": { "message": "Fil lastes opp" },
   "file_url_c12b64be": { "message": "Fil URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
@@ -288,6 +288,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mine filer" },
   "my_images_427f9b0c": { "message": "Mine bilder" },
+  "name_1aed4a1b": { "message": "Navn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigere gjennom menyen eller verktøylinjen"
   },
@@ -391,7 +392,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stiler" },
   "submit_a3cc6859": { "message": "Send inn" },
   "subscript_59744f96": { "message": "Senket skrift" },
-  "success_file_uploaded_8174e93f": { "message": "Vellykket: File lastet opp" },
   "superscript_8cb349a2": { "message": "Hevet skrift" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Filtyper som støttes: SRT eller WebVTT"
@@ -444,13 +444,11 @@ const locale = {
     "message": "Tast Kontroll F9 for å få tilgang til tabell-alternativer. { text }"
   },
   "unpublished_dfd8801": { "message": "ikke publisert" },
+  "untitled_efdc2d7d": { "message": "uten navn" },
   "upload_document_253f0478": { "message": "Last opp dokument" },
   "upload_file_fd2361b8": { "message": "Last opp fil" },
   "upload_image_6120b609": { "message": "Last opp bilde" },
   "upload_media_ce31135a": { "message": "Laste opp medier" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Opplasting er ikke tilgjengelig for denne mappen"
-  },
   "upload_record_media_e4207d72": { "message": "Laste opp/ spille inn medier" },
   "uploading_19e8a4e7": { "message": "Laster opp" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

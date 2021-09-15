@@ -44,6 +44,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :learning_outcome,
           :outcome_proficiency,
           :outcome_calculation_method,
+          :outcome_friendly_description,
           :sis_batch,
           :submission_comment,
           :submission,

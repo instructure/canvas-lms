@@ -163,7 +163,7 @@ module Importers
       tool_contexts = ContextExternalTool.contexts_to_search(migration.context)
       return unless tool_contexts.present?
 
-      tools = ContextExternalTool.active.polymorphic_where(:context => tool_contexts)
+      tools = ContextExternalTool.active.where(context: tool_contexts)
 
       tools.each do |tool|
         # check if tool is compatible

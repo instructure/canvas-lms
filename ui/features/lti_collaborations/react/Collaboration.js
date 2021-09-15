@@ -56,6 +56,10 @@ class Collaboration extends React.Component {
   render() {
     const {collaboration} = this.props
     const [context, contextId] = splitAssetString(ENV.context_asset_string)
+    // until there is an LTI 1.3 Collaborations service for editing, hide the edit button for 1.3 tools.
+    // the presence of update_url is a decent signal for a 1.1 collaboration, since the update_url
+    // functionality is built into that spec and tools should respect that if they allow editing.
+    const canEdit = collaboration.permissions.update && collaboration.update_url
     const editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}&display=borderless`
 
     return (
@@ -75,7 +79,7 @@ class Collaboration extends React.Component {
           <DatetimeDisplay datetime={collaboration.updated_at} format="%b %d, %l:%M %p" />
         </div>
         <div className="Collaboration-actions">
-          {collaboration.permissions.update && (
+          {canEdit && (
             <a className="icon-edit" href={editUrl}>
               <span className="screenreader-only">{I18n.t('Edit Collaboration')}</span>
             </a>

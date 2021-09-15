@@ -49,9 +49,6 @@ class AdjustGradeChangeTablesForOverrideGrades < CanvasPartman::Migration
   end
 
   def self.remove_records_with_null_values
-    null_record_scope = base_class.where("assignment_id IS NULL OR submission_id IS NULL")
-    null_record_scope.order(created_at: :asc).find_ids_in_batches(batch_size: 10_000) do |ids|
-      base_class.where(id: ids).delete_all
-    end
+    base_class.where("assignment_id IS NULL OR submission_id IS NULL").in_batches(of: 10_000).delete_all
   end
 end

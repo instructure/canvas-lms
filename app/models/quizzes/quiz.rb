@@ -205,6 +205,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def build_assignment(force: false)
+    # There is no need to create a new assignment if the quiz being deleted
+    return if self.workflow_state == 'deleted'
+
     if !self.assignment_id && self.graded? && (force || ![:assignment, :clone, :migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
@@ -1061,20 +1064,23 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :manage and can :read and can :update and can :submit and can :preview
-
     given do |user, session|
       !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :manage_assignments)
     end
-    can :read and can :create
+    can :manage and can :read and can :create and can :update and can :submit and can :preview
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
+
+    given do |user, session|
+      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        self.context.grants_right?(user, session, :manage_assignments_edit)
+    end
+    can :manage and can :read and can :update and can :submit and can :preview
 
     given do |user, session|
       !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&

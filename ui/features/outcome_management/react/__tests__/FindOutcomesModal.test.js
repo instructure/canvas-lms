@@ -20,7 +20,10 @@ import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext, {
+  ACCOUNT_GROUP_ID,
+  ROOT_GROUP_ID
+} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
@@ -30,6 +33,7 @@ import {
   importGroupMocks,
   importOutcomeMocks
 } from '@canvas/outcomes/mocks/Management'
+import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 
 jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers()
@@ -49,10 +53,6 @@ describe('FindOutcomesModal', () => {
       outcomesCount: 51
     })
   ]
-  const clickEl = async el => {
-    fireEvent.click(el)
-    await act(async () => jest.runAllTimers())
-  }
   const defaultProps = (props = {}) => ({
     open: true,
     onCloseHandler: onCloseHandlerMock,
@@ -72,10 +72,29 @@ describe('FindOutcomesModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      mocks = findModalMocks(),
+      renderer = rtlRender,
+      globalRootId = '',
+      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
+    } = {}
   ) => {
     return renderer(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, isMobileView}}}>
+      <OutcomesContext.Provider
+        value={{
+          env: {
+            contextType,
+            contextId,
+            isMobileView,
+            globalRootId,
+            rootIds,
+            treeBrowserRootGroupId: ROOT_GROUP_ID,
+            treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
+          }
+        }}
+      >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -108,14 +127,6 @@ describe('FindOutcomesModal', () => {
       const {queryByText} = render(<FindOutcomesModal {...defaultProps({open: false})} />)
       await act(async () => jest.runAllTimers())
       expect(queryByText('Close')).not.toBeInTheDocument()
-    })
-
-    it('calls onCloseHandlerMock on Close button click', async () => {
-      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      const closeBtn = getByText('Close')
-      fireEvent.click(closeBtn)
-      expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
     })
 
     describe('error handling', () => {
@@ -228,10 +239,8 @@ describe('FindOutcomesModal', () => {
       })
       await act(async () => jest.runAllTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
-      fireEvent.click(getByText('Account Standards'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Course Account Outcome Group'))
-      await act(async () => jest.runAllTimers())
+      await clickEl(getByText('Account Standards'))
+      await clickEl(getByText('Course Account Outcome Group'))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while loading course learning outcome groups.',
         type: 'error',
@@ -262,19 +271,10 @@ describe('FindOutcomesModal', () => {
     })
 
     describe('global standards', () => {
-      beforeEach(() => {
-        window.ENV = {
-          GLOBAL_ROOT_OUTCOME_GROUP_ID: '1'
-        }
-      })
-
-      afterEach(() => {
-        window.ENV = null
-      })
-
       it('renders the State Standards group and subgroups', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          mocks: findModalMocks({includeGlobalRootGroup: true})
+          mocks: findModalMocks({includeGlobalRootGroup: true}),
+          globalRootId: '1'
         })
         await act(async () => jest.runAllTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
@@ -282,14 +282,25 @@ describe('FindOutcomesModal', () => {
         await act(async () => jest.runAllTimers())
       })
 
-      it('does not render the State Standard group if no GLOBAL_ROOT_OUTCOME_GROUP_ID is set', async () => {
-        window.ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID = ''
+      it('does not render the State Standard group if no globalRootId is set', async () => {
         const {queryByText, getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: findModalMocks({includeGlobalRootGroup: true})
         })
         await act(async () => jest.runAllTimers())
         expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
         expect(queryByText('State Standards')).not.toBeInTheDocument()
+      })
+
+      it('does not list outcomes within the State Standard group', async () => {
+        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          mocks: [...findModalMocks({includeGlobalRootGroup: true}), ...groupMocks({groupId: '1'})],
+          globalRootId: '1'
+        })
+        await act(async () => jest.runAllTimers())
+        await clickWithinMobileSelect(queryByText('Groups'))
+        fireEvent.click(getByText('State Standards'))
+        await act(async () => jest.runAllTimers())
+        expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
       })
     })
   }
@@ -305,6 +316,39 @@ describe('FindOutcomesModal', () => {
       const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       expect(queryByText('Groups')).not.toBeInTheDocument()
+    })
+
+    describe('onCloseHandlerMock', () => {
+      it('calls with false when the modal is closed and no outcomes are added', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+        await act(async () => jest.runAllTimers())
+        const closeBtn = getByText('Close')
+        fireEvent.click(closeBtn)
+        expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+        expect(onCloseHandlerMock).toHaveBeenCalledWith(false)
+      })
+
+      it('calls with true when the modal is closed and outcomes were added', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Account',
+          mocks: [
+            ...findModalMocks(),
+            ...groupMocks({groupId: '100'}),
+            ...findOutcomesMocks({groupId: '300'}),
+            ...importGroupMocks({groupId: '300'})
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        await act(async () => jest.runAllTimers())
+        const closeBtn = getByText('Close')
+        fireEvent.click(closeBtn)
+        expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+        expect(onCloseHandlerMock).toHaveBeenCalledWith(true)
+      })
     })
 
     describe('group import', () => {
@@ -324,7 +368,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('25 outcomes have been successfully added to this account.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this account.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -352,7 +398,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('50 outcomes have been successfully added to this course.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this course.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -378,6 +426,59 @@ describe('FindOutcomesModal', () => {
         expect(AddAllButton).toBeDisabled()
         await act(async () => jest.runAllTimers())
         expect(AddAllButton).toBeDisabled()
+      })
+
+      it('imports outcomes with ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes > 50', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [
+            ...courseImportMocks,
+            ...importGroupMocks({
+              groupId: '300',
+              targetContextType: 'Course'
+            })
+          ]
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+      })
+
+      it('returns focus on Add All Outcomes button if Cancel button of ConfirmationBox is clicked', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: courseImportMocks
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const AddAllButton = getByText('Add All Outcomes').closest('button')
+        await clickEl(AddAllButton)
+        expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+        expect(AddAllButton).not.toHaveFocus()
+        await clickEl(getByText('Cancel'))
+        expect(AddAllButton).toHaveFocus()
+      })
+
+      it('returns focus on Done button if Import Anyway button of ConfirmationBox is clicked', async () => {
+        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: courseImportMocks
+        })
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        const DoneButton = getByText('Done').closest('button')
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+        expect(DoneButton).not.toHaveFocus()
+        await clickEl(getByText('Import Anyway'))
+        expect(DoneButton).toHaveFocus()
       })
 
       it('enables Add All Outcomes button if group import fails', async () => {
@@ -444,27 +545,6 @@ describe('FindOutcomesModal', () => {
         expect(getAllByText('Added').length).toBe(2)
       })
 
-      it('displays ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes > 50', async () => {
-        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            ...courseImportMocks,
-            ...importGroupMocks({
-              groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
-        })
-        await act(async () => jest.runAllTimers())
-        await clickEl(getByText('Account Standards'))
-        await clickEl(getByText('Root Account Outcome Group 0'))
-        await clickEl(getByText('Group 100 folder 0'))
-        await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(
-          getAllByText('You are about to add 51 outcomes to this course.')[0]
-        ).toBeInTheDocument()
-      })
-
       it('displays flash confirmation with proper message if group import to Course succeeds', async () => {
         const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
@@ -483,7 +563,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText('51 outcomes have been successfully added to this course.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this course.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -503,7 +585,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
-          getAllByText('25 outcomes have been successfully added to this account.')[0]
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to this account.'
+          )[0]
         ).toBeInTheDocument()
       })
 
@@ -759,48 +843,61 @@ describe('FindOutcomesModal', () => {
         ).toBeInTheDocument()
       })
     })
+  })
 
-    describe('mobileView', () => {
-      beforeEach(() => {
-        isMobileView = true
-      })
-      itBehavesLikeAModal()
-      itBehavesLikeATreeBrowser()
+  describe('mobileView', () => {
+    beforeEach(() => {
+      isMobileView = true
+    })
+    itBehavesLikeAModal()
+    itBehavesLikeATreeBrowser()
 
-      it('renders the action drilldown', async () => {
-        const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        expect(getByText('Groups')).toBeInTheDocument()
-      })
+    it('renders the action drilldown', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Groups')).toBeInTheDocument()
+    })
 
-      it('does not render the TreeBrowser', async () => {
-        const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        const treeBrowser = queryByTestId('groupsColumnRef')
-        expect(treeBrowser).not.toBeInTheDocument()
-      })
+    it('does not render the TreeBrowser', async () => {
+      const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      const treeBrowser = queryByTestId('groupsColumnRef')
+      expect(treeBrowser).not.toBeInTheDocument()
+    })
 
-      it('does not render the list of outcomes until the action link is clicked', async () => {
-        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        await fireEvent.click(queryByText('Groups'))
-        fireEvent.click(getByText('Account Standards'))
-        fireEvent.click(getByText('Root Account Outcome Group 0'))
-        await act(async () => jest.runAllTimers())
-        expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
-        await act(async () => jest.runAllTimers())
-        fireEvent.click(getByText('View 0 Outcomes'))
-        await act(async () => jest.runAllTimers())
-        expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
-      })
+    it('does not render the list of outcomes until the action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+      await clickEl(getByText('View 0 Outcomes'))
+      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
+    })
 
-      it('renders the billboard until an action link is clicked', async () => {
-        const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
-        await fireEvent.click(queryByText('Groups'))
-        fireEvent.click(getByText('Account Standards'))
-        expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
-      })
+    it('renders the billboard until an action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      fireEvent.click(getByText('View 0 Outcomes'))
+      expect(queryByText('Select a group to reveal outcomes here.')).not.toBeInTheDocument()
+    })
+
+    it('unselects the selected group when the modal is closed', async () => {
+      const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickEl(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      await clickEl(getByText('Root Account Outcome Group 0'))
+      fireEvent.click(getByText('View 0 Outcomes'))
+      render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
+      render(<FindOutcomesModal {...defaultProps({open: true})} />, {renderer: rerender})
+      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
     })
   })
 })

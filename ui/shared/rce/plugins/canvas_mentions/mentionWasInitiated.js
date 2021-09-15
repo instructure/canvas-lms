@@ -19,7 +19,7 @@
 import {MARKER_ID} from './constants'
 
 // characters allowed to proceed an "inline" @mention
-const spaceCharacters = [' ', '\u00A0']
+export const spaceCharacters = [' ', '\u00A0', '\uFEFF']
 
 /**
  * Returns true if a mention was initiated based on the selection. Otherwise,

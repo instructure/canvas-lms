@@ -76,7 +76,6 @@ function scrollTo($thing, time = 500) {
 
 function refreshDuplicateLinkStatus($module) {
   if (
-    ENV.DUPLICATE_ENABLED &&
     !$module.find('.context_module_item.quiz').length &&
     !$module.find('.cannot-duplicate').length
   ) {

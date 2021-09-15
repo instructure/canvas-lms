@@ -64,8 +64,8 @@ describe('AuthorInfo', () => {
   it('renders the author roles when there is an author', () => {
     const container = setup()
     expect(container.getByTestId('pill-container')).toBeInTheDocument()
-    expect(container.getByTestId('pill-Student')).toBeInTheDocument()
-    expect(container.getByTestId('pill-TA')).toBeInTheDocument()
+    expect(container.getByTestId('mobile-Student')).toBeInTheDocument()
+    expect(container.getByTestId('mobile-TA')).toBeInTheDocument()
   })
 
   it('does not render the avatar when there is no author', () => {
@@ -98,7 +98,7 @@ describe('AuthorInfo', () => {
     expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe('true')
   })
 
-  it.skip('should highlight terms in the author name', () => {
+  it('should highlight terms in the author name', () => {
     const container = setup({searchTerm: 'Harry'})
     expect(container.getByTestId('highlighted-search-item')).toBeInTheDocument()
   })

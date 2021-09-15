@@ -19,10 +19,10 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ManageOutcomesFooter from '../ManageOutcomesFooter'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('ManageOutcomesFooter', () => {
-  let onRemoveHandlerMock
-  let onMoveHandlerMock
+  let onRemoveHandlerMock, onMoveHandlerMock, isMobileView
   const generateOutcomes = (num, canUnlink) =>
     new Array(num).fill(0).reduce(
       (_val, idx) => ({
@@ -46,52 +46,72 @@ describe('ManageOutcomesFooter', () => {
     jest.clearAllMocks()
   })
 
-  it('# of selected outcomes is enabled when selected props provided and ge 0 ', () => {
-    const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
-    expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
-    expect(getByText('2 Outcomes Selected').hasAttribute('aria-disabled')).toBe(false)
-  })
+  const renderWithContext = children => {
+    return render(
+      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>
+    )
+  }
 
-  it('# selected outcomes is disabled when selected props provided and eq 0', () => {
-    const {getByText} = render(<ManageOutcomesFooter {...defaultProps(0)} />)
-    expect(getByText(`0 Outcomes Selected`).hasAttribute('aria-disabled')).toBe(true)
-  })
-
-  describe('Buttons and click handlers', () => {
-    it('renders buttons enabled when selected props provided and gt 0 ', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
-      expect(getByText('Remove').closest('button')).not.toHaveAttribute('disabled')
-    })
-
-    it('renders buttons disabled when selected props provided and eq 0 ', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(0)} />)
-      expect(getByText('Remove').closest('button')).toHaveAttribute('disabled')
-    })
-
-    it('handles click on Remove button', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
-      const btn = getByText('Remove')
-      fireEvent.click(btn)
-      expect(onRemoveHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('handles click on Move button', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
-      const btn = getByText('Move')
-      fireEvent.click(btn)
-      expect(onMoveHandlerMock).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('Text pluralization', () => {
-    it('handles properly pluralization if 1 Outcome Selected', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(1)} />)
-      expect(getByText('1 Outcome Selected')).toBeInTheDocument()
-    })
-
-    it('handles properly pluralization if gt 1 Outcome Selected', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(2)} />)
+  const itBehavesLikeAFooter = () => {
+    it('# of selected outcomes is enabled when selected props provided and ge 0 ', () => {
+      const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps()} />)
       expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
+      expect(getByText('2 Outcomes Selected').hasAttribute('aria-disabled')).toBe(false)
     })
+
+    it('# selected outcomes is disabled when selected props provided and eq 0', () => {
+      const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(0)} />)
+      expect(getByText(`0 Outcomes Selected`).hasAttribute('aria-disabled')).toBe(true)
+    })
+
+    describe('Buttons and click handlers', () => {
+      it('renderWithContexts buttons enabled when selected props provided and gt 0 ', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps()} />)
+        expect(getByText('Remove').closest('button')).toBeEnabled()
+      })
+
+      it('renderWithContexts buttons disabled when selected props provided and eq 0 ', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(0)} />)
+        expect(getByText('Remove').closest('button')).toBeDisabled()
+      })
+
+      it('handles click on Remove button', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps()} />)
+        const btn = getByText('Remove')
+        fireEvent.click(btn)
+        expect(onRemoveHandlerMock).toHaveBeenCalledTimes(1)
+      })
+
+      it('handles click on Move button', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps()} />)
+        const btn = getByText('Move')
+        fireEvent.click(btn)
+        expect(onMoveHandlerMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('Text pluralization', () => {
+      it('handles properly pluralization if 1 Outcome Selected', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(1)} />)
+        expect(getByText('1 Outcome Selected')).toBeInTheDocument()
+      })
+
+      it('handles properly pluralization if gt 1 Outcome Selected', () => {
+        const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(2)} />)
+        expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
+      })
+    })
+  }
+
+  describe('desktop', () => {
+    itBehavesLikeAFooter()
+  })
+
+  describe('mobile', () => {
+    beforeAll(() => {
+      isMobileView = true
+    })
+
+    itBehavesLikeAFooter()
   })
 })

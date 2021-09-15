@@ -1310,7 +1310,7 @@ describe Lti::Ims::NamesAndRolesController do
     total_pages = page_count(total_items, effective_page_size)
     pass_thrus = as_query_params(pass_thru_params)
 
-    # rubocop:disable Metrics/LineLength
+    # rubocop:disable Layout/LineLength
     expected_links = [
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{effective_page_size}>; rel=\"current\"",
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page+1}&per_page=#{effective_page_size}>; rel=\"next\"",
@@ -1319,7 +1319,7 @@ describe Lti::Ims::NamesAndRolesController do
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
 
-    # rubocop:enable Metrics/LineLength
+    # rubocop:enable Layout/LineLength
     expected_links.reject! {|el| el.include?('rel="next"')} if rsp_page == total_pages
     expected_links.reject! {|el| el.include?('rel="prev"')} if rsp_page <= 1
     expected_links.reject! {|el| el.include?('rel="last"')} if rsp_page > total_pages

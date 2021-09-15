@@ -97,6 +97,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
       }
 
       data.subentriesCount += 1
+      data.rootEntryParticipantCounts.repliesCount += 1
 
       cache.writeFragment({
         ...discussionEntryOptions,
@@ -144,7 +145,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
     querySizes.mobile = {maxWidth: '767px'}
   }
   if (tablet) {
-    querySizes.tablet = {minWidth: '768px'}
+    querySizes.tablet = {maxWidth: '1023px'}
   }
   if (desktop) {
     querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
@@ -154,4 +155,64 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
 
 export const isTopicAuthor = (topicAuthor, entryAuthor) => {
   return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
+}
+
+export const getOptimisticResponse = (
+  message,
+  parentId = 'PLACEHOLDER',
+  rootEntryId = null,
+  isolatedEntryId = null
+) => {
+  return {
+    createDiscussionEntry: {
+      discussionEntry: {
+        id: 'DISCUSSION_ENTRY_PLACEHOLDER',
+        _id: 'DISCUSSION_ENTRY_PLACEHOLDER',
+        createdAt: new Date().toString(),
+        updatedAt: new Date().toString(),
+        deleted: false,
+        message,
+        ratingCount: null,
+        ratingSum: null,
+        rating: false,
+        read: true,
+        replyPreview: '',
+        forcedReadState: false,
+        subentriesCount: null,
+        rootEntryParticipantCounts: {
+          unreadCount: 0,
+          repliesCount: 0,
+          __typename: 'DiscussionEntryCounts'
+        },
+        author: {
+          id: 'USER_PLACEHOLDER',
+          _id: ENV.current_user.id,
+          avatarUrl: ENV.current_user.avatar_image_url,
+          displayName: ENV.current_user.display_name,
+          courseRoles: [],
+          __typename: 'User'
+        },
+        editor: null,
+        lastReply: null,
+        permissions: {
+          attach: false,
+          create: false,
+          delete: false,
+          rate: false,
+          read: false,
+          reply: false,
+          update: false,
+          viewRating: false,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        parentId,
+        rootEntryId,
+        isolatedEntryId,
+        quotedEntry: null,
+        __typename: 'DiscussionEntry'
+      },
+      errors: null,
+      __typename: 'CreateDiscussionEntryPayload'
+    }
+  }
 }

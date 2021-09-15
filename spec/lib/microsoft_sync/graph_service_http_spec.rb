@@ -42,12 +42,13 @@ describe MicrosoftSync::GraphServiceHttp do
         }
       end
       WebMock.disable_net_connect!
-      WebMock.stub_request(:get, url).and_return(responses)
+      WebMock.stub_request(http_method, url).and_return(responses)
 
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
       allow(InstStatsd::Statsd).to receive(:increment).and_call_original
     end
 
+    let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/foo/bar' }
     let(:statuses) { [status] }
     let(:status) { 200 }
@@ -181,6 +182,7 @@ describe MicrosoftSync::GraphServiceHttp do
     end
 
     shared_examples_for 'retrying an intermittent error' do
+      let(:http_method) { :post }
       let(:requests) { [:bad] }
 
       context 'if the first response is an intermittent error' do
@@ -191,30 +193,30 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:requests) { [:bad, :good] }
 
         it 'tries again immediately' do
-          expect(subject.request(:get, 'foo/bar')).to eq('foo' => 'bar')
+          expect(subject.request(:post, 'foo/bar', body: {hello: 'world'})).to eq('foo' => 'bar')
           expect(subject).to have_received(:request_without_metrics).exactly(2).times
-            .with(:get, 'foo/bar', anything)
+            .with(:post, 'foo/bar', body: {hello: 'world'})
         end
 
         it 'increments a "retried" statsd counter' do
-          subject.request(:get, 'foo/bar')
+          subject.request(:post, 'foo/bar', body: {hello: 'world'})
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.retried",
-                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc',
+                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
                          status_code: status_code_statsd_tag})
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.success",
-                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200'})
+                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc', status_code: '200'})
         end
 
         it 'logs the outcome of each request' do
           allow(Rails.logger).to receive(:info).and_call_original
-          subject.request(:get, 'foo/bar')
+          subject.request(:post, 'foo/bar')
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, retried"
+            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, retried"
           )
           expect(Rails.logger).to have_received(:info).with(
-            'MicrosoftSync::GraphServiceHttp: get foo/bar -- 200, success'
+            'MicrosoftSync::GraphServiceHttp: post foo/bar -- 200, success'
           )
         end
       end
@@ -223,36 +225,40 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:requests) { [:bad, :bad] }
 
         it 'fails and increments "retried" and "error" statsd counters' do
-          expect { subject.request(:get, 'foo/bar') }.to raise_error(error_class)
+          expect { subject.request(:post, 'foo/bar', body: {hello: 'world'}) }.to raise_error(error_class)
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.retried",
-                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc',
+                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
                          status_code: status_code_statsd_tag})
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.intermittent",
-                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc',
+                  tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
                          status_code: status_code_statsd_tag})
         end
 
         it 'logs the outcome of each request' do
           allow(Rails.logger).to receive(:info).and_call_original
-          expect { subject.request(:get, 'foo/bar') }.to raise_error(error_class)
+          expect { subject.request(:post, 'foo/bar', body: {hello: 'world'}) }.to raise_error(error_class)
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, retried"
+            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, retried"
           )
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, intermittent"
+            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, intermittent"
           )
         end
       end
 
       it 'fails immediately if DEFAULT_N_INTERMITTENT_RETRIES is 0' do
         stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
-        expect { subject.request(:get, 'foo/bar') }.to raise_error(error_class)
+        expect {
+          subject.request(:post, 'foo/bar', body: {hello: 'world'})
+        }.to raise_error(error_class)
       end
 
       it 'fails immediately if retries: 0 is passed in' do
-        expect { subject.request(:get, 'foo/bar', retries: 0) }.to raise_error(error_class)
+        expect {
+          subject.request(:post, 'foo/bar', retries: 0, body: {hello: 'world'})
+        }.to raise_error(error_class)
       end
     end
 
@@ -263,9 +269,9 @@ describe MicrosoftSync::GraphServiceHttp do
           # :good], raise an error the second time called
           requests.each do |bad_or_good|
             if bad_or_good == :good
-              expect(HTTParty).to receive(:get).exactly(:once).and_call_original
+              expect(HTTParty).to receive(:post).exactly(:once).and_call_original
             else
-              expect(HTTParty).to receive(:get).exactly(:once).and_raise(klass)
+              expect(HTTParty).to receive(:post).exactly(:once).and_raise(klass)
             end
           end
         end
@@ -290,10 +296,13 @@ describe MicrosoftSync::GraphServiceHttp do
       429 => MicrosoftSync::Errors::HTTPTooManyRequests,
     }.each do |status_code, error_class|
       context "when the error is a #{status_code}" do
+        let(:http_method) { :post }
         let(:status) { status_code }
 
-        it 'raises the error immediately and does not retried' do
-          expect { subject.request(:get, 'foo/bar') }.to raise_error(error_class)
+        it 'raises the error immediately and does not retry' do
+          expect {
+            subject.request(:post, 'foo/bar', body: {hello: 'world'})
+          }.to raise_error(error_class)
         end
       end
     end

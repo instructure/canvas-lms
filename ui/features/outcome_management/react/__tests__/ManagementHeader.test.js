@@ -39,15 +39,22 @@ const render = (
 }
 
 describe('ManagementHeader', () => {
+  let handleAddOutcomesMock
   const defaultProps = (props = {}) => ({
     handleFileDrop: () => {},
+    handleAddOutcomes: handleAddOutcomesMock,
     canManage: true,
     canImport: true,
     ...props
   })
 
+  beforeEach(() => {
+    handleAddOutcomesMock = jest.fn()
+  })
+
   afterEach(() => {
     showImportOutcomesModal.mockRestore()
+    jest.clearAllMocks()
   })
 
   it('renders Outcomes title', () => {
@@ -121,6 +128,13 @@ describe('ManagementHeader', () => {
     fireEvent.click(getByText('Find'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
+  })
+
+  it('calls handleAddOutcomes when the Find Modal is closed', async () => {
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
+    fireEvent.click(getByText('Find'))
+    fireEvent.click(getByText('Close'))
+    expect(handleAddOutcomesMock).toHaveBeenCalled()
   })
 
   it('opens CreateOutcomeModal when Create button is clicked', async () => {

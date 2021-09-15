@@ -19,7 +19,8 @@
 import {
   updateDiscussionTopicEntryCounts,
   addReplyToDiscussionEntry,
-  getSpeedGraderUrl
+  getSpeedGraderUrl,
+  getOptimisticResponse
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -57,12 +58,15 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId: props?.relativeEntryId,
+      relativeEntryId:
+        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
       includeRelativeEntry: !!props?.relativeEntryId
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+
+    props.setHighlightEntryId(newDiscussionEntry.id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -185,13 +189,15 @@ export const IsolatedViewContainer = props => {
     )
   }
 
-  const onReplySubmit = (message, replyId) => {
+  const onReplySubmit = (message, replyId, includeReplyPreview) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: replyId,
-        message
-      }
+        replyFromEntryId: replyId,
+        message,
+        includeReplyPreview
+      },
+      optimisticResponse: getOptimisticResponse(message, replyId, props.discussionEntryId)
     })
   }
 
@@ -297,12 +303,16 @@ export const IsolatedViewContainer = props => {
     })
   }
 
-  const replyPreview = (nodes, previewId) => {
+  const buildQuotedReply = (nodes, previewId) => {
     if (!nodes) return ''
-    let preview = ''
+    let preview = {}
     nodes.every(reply => {
       if (reply._id === previewId) {
-        preview = reply.replyPreview
+        preview = {
+          author: {shortName: reply.author.displayName},
+          createdAt: reply.createdAt,
+          previewMessage: reply.message.replace(/<[^>]*>?/gm, '')
+        }
         return false
       }
       return true
@@ -379,15 +389,15 @@ export const IsolatedViewContainer = props => {
                 margin="none none x-small"
               >
                 <DiscussionEdit
-                  onSubmit={text => {
-                    onReplySubmit(text, props.replyId)
+                  onSubmit={(text, includeReplyPreview) => {
+                    onReplySubmit(text, props.replyFromId, includeReplyPreview)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  replyPreview={replyPreview(
+                  quotedEntry={buildQuotedReply(
                     isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
                       .nodes,
-                    props.replyId
+                    props.replyFromId
                   )}
                 />
               </View>
@@ -445,7 +455,7 @@ IsolatedViewContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  replyId: PropTypes.string,
+  replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string
 }

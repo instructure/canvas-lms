@@ -22,9 +22,8 @@ import {createCache} from '@canvas/apollo'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
-import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import OutcomesContext from '../../contexts/OutcomesContext'
+import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -49,7 +48,9 @@ describe('groupDetailHook', () => {
 
   const wrapper = ({children}) => (
     <MockedProvider cache={cache} mocks={mocks}>
-      <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+      <OutcomesContext.Provider
+        value={{env: {contextType: 'Account', contextId: '1', rootIds: [ACCOUNT_GROUP_ID]}}}
+      >
         {children}
       </OutcomesContext.Provider>
     </MockedProvider>
@@ -127,8 +128,27 @@ describe('groupDetailHook', () => {
     ])
   })
 
-  it('should not load group info if ACCOUNT_FOLDER_ID passed as id', async () => {
-    const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_FOLDER_ID}), {wrapper})
+  it('refetches when id is in rhsGroupIdsToRefetch', async () => {
+    mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '200'})]
+    const {result, rerender} = renderHook(
+      id => useGroupDetail({id, rhsGroupIdsToRefetch: ['200']}),
+      {wrapper, initialProps: '1'}
+    )
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.title).toBe('Group 1')
+    expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
+    act(() => rerender('200'))
+    await act(async () => jest.runAllTimers())
+    expect(result.current.group.title).toBe('Refetched Group 200')
+    expect(outcomeTitles(result)).toEqual([
+      'Refetched Outcome 1 - Group 200',
+      'Refetched Outcome 2 - Group 200',
+      'Newly Created Outcome - Group 200'
+    ])
+  })
+
+  it('should not load group info if ACCOUNT_GROUP_ID passed as id', async () => {
+    const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_GROUP_ID}), {wrapper})
     expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
     await act(async () => jest.runAllTimers())

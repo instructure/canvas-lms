@@ -24,7 +24,7 @@ const setup = props => {
   return render(<SearchSpan searchTerm="" text="" {...props} />)
 }
 
-describe.skip('SearchSpan', () => {
+describe('SearchSpan', () => {
   it('should perform no highlights if no searchTerm is present', () => {
     const {queryAllByTestId} = setup()
     expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
@@ -63,5 +63,14 @@ describe.skip('SearchSpan', () => {
       isIsolatedView: true
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
+  })
+
+  it('should remove inner html tags', () => {
+    const container = setup({
+      searchTerm: 'strong',
+      text: "Around here, however, we don't look backwards for very long. <strong>We keep moving forward</strong>, opening up new doors and doing new things, because we're curious... and curiosity keeps leading us down new paths."
+    })
+    expect(container.queryAllByTestId('highlighted-search-item').length).toBe(0)
+    expect(container.queryByText('strong')).toBeNull()
   })
 })

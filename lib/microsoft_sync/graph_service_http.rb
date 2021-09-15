@@ -213,7 +213,9 @@ module MicrosoftSync
     # -- Helpers for request():
 
     def request_without_metrics(method, path, options)
-      options[:headers] ||= {}
+      options = options.dup
+      options[:headers] = options[:headers]&.dup || {}
+
       options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
       if options[:body]
         options[:headers]['Content-type'] = 'application/json'

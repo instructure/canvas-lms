@@ -28,8 +28,8 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
     The id of the destination group
   DESC
 
-  field :moved_outcome_link_ids, [ID], <<~DOC, null: false
-    List of Outcome Link ids that were sucessfully moved to the group
+  field :moved_outcome_links, [Types::ContentTagType], <<~DOC, null: false
+    List of Outcome Links that were sucessfully moved to the group
   DOC
 
   def resolve(input:)
@@ -50,7 +50,7 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
 
     {
       errors: errors,
-      moved_outcome_link_ids: outcome_links.pluck(:id)
+      moved_outcome_links: ContentTag.where(id: outcome_links.pluck(:id))
     }
   end
 

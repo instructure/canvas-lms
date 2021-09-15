@@ -25,8 +25,10 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
   argument :outcome_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcome')
   argument :source_context_id, ID, required: false
   argument :source_context_type, String, required: false
-  argument :target_context_id, ID, required: true
-  argument :target_context_type, String, required: true
+  # after Remove target_context attributes, the target_group_id should be required
+  argument :target_group_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+  argument :target_context_id, ID, required: false
+  argument :target_context_type, String, required: false
 
   field :progress, Types::ProgressType, null: true
 
@@ -61,18 +63,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       )
     end
 
-    target_context =
-      begin
-        context_class(input[:target_context_type]).find_by(id: input[:target_context_id])
-      rescue NameError
-        return validation_error(
-          I18n.t('invalid value'), attribute: 'targetContextType'
-        )
-      end
-
-    if target_context.nil?
-      raise GraphQL::ExecutionError, I18n.t('no such target context')
-    end
+    target_context, target_group = get_target(input)
 
     verify_authorized_action!(target_context, :manage_outcomes)
 
@@ -100,11 +91,13 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         raise GraphQL::ExecutionError, I18n.t('cannot import a root group')
       end
 
-      return process_job(source_context: source_context, group: group, target_context: target_context)
+      return process_job(
+        source_context: source_context, group: group, target_group: target_group
+      )
     elsif (outcome_id = input[:outcome_id].presence)
-      # Import the selected outcome into the given context
+      # Import the selected outcome into the given group
 
-      # verify the outcome is eligible to be linked into the context
+      # verify the outcome is eligible to be linked into the group's context
       unless target_context.available_outcome(outcome_id, allow_global: true)
         raise GraphQL::ExecutionError, I18n.t(
           "Outcome %{outcome_id} is not available in context %{context_type}#%{context_id}",
@@ -114,7 +107,9 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         )
       end
 
-      return process_job(source_context: source_context, outcome_id: outcome_id, target_context: target_context)
+      return process_job(
+        source_context: source_context, outcome_id: outcome_id, target_group: target_group
+      )
     end
 
     validation_error(
@@ -123,17 +118,17 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
   end
 
   class << self
-    def execute(progress, source_context, group, outcome_id, target_context)
+    def execute(progress, source_context, group, outcome_id, target_group)
       if outcome_id
-        import_single_outcome(progress, source_context, outcome_id, target_context)
+        import_single_outcome(progress, source_context, outcome_id, target_group)
       else
-        import_group(progress, group, target_context)
+        import_group(progress, group, target_group)
       end
     end
 
     private
 
-    def import_single_outcome(progress, source_context, outcome_id, target_context)
+    def import_single_outcome(progress, source_context, outcome_id, target_group)
       source_outcome_group = get_outcome_group(outcome_id, source_context)
       unless source_outcome_group
         progress.message = I18n.t(
@@ -145,29 +140,24 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         return
       end
 
-      # If root outcome group
-      target_group = if source_outcome_group.learning_outcome_group_id.nil?
-        # dont mimic source group structure, but import the outcome to the root outcome group
-        # later (OUT-4684) we'll be able to import group/outcomes to a specific group
-        # So we'll probably need to change here as well
-        target_context.root_outcome_group
-      else
+      # if source group isn't root outcome group
+      if source_outcome_group.learning_outcome_group_id
         # build the group structure
-        make_group_structure(source_outcome_group, target_context, progress)
+        target_group = make_group_structure(source_outcome_group, progress, target_group)
       end
 
       target_group.add_outcome(LearningOutcome.find(outcome_id))
     end
 
-    def import_group(progress, group, target_context)
-      target_group = make_group_structure(group, target_context, progress)
+    def import_group(progress, group, target_group)
+      target_group = make_group_structure(group, progress, target_group)
       target_group.sync_source_group
     end
 
-    def make_group_structure(source_group, target_context, progress)
+    def make_group_structure(source_group, progress, target_group)
       source_context = source_group.context
-      ancestors_to_be_imported_map = get_ancestors_to_be_imported_map(source_group, target_context, source_context)
-      source_target_groups_map = import_groups(ancestors_to_be_imported_map, target_context, progress)
+      ancestors_to_be_imported_map = get_ancestors_to_be_imported_map(source_group, source_context, target_group)
+      source_target_groups_map = import_groups(ancestors_to_be_imported_map, target_group, progress)
       source_target_groups_map[source_group.id]
     end
 
@@ -180,13 +170,13 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     # returns a hash where the key is the id of the group that must be added
     # and the values are the ids of its ancestors that must be added as well
     # It also pushes the group id that was imported before
-    def get_ancestors_to_be_imported_map(group, target_context, source_context)
+    def get_ancestors_to_be_imported_map(group, source_context, target_group)
       group_ids = [group.id]
 
-      # In the target context, look for top-level groups that were previously imported
+      # In the target group, look for top-level groups that were previously imported
       # from the source context, excluding the current group being imported,
       # and then get their source group ids.
-      group_ids_from_source_in_target = target_context.root_outcome_group
+      group_ids_from_source_in_target = target_group
         .child_outcome_groups
         .active
         .where(
@@ -252,23 +242,20 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       end
     end
 
-    def import_groups(ancestors_to_be_imported_map, target_context, progress)
+    def import_groups(ancestors_to_be_imported_map, target_group, progress)
       source_target_groups_map = {}
 
       groups_hash = LearningOutcomeGroup.where(id: ancestors_to_be_imported_map.values.flatten.uniq).to_a.index_by(&:id)
 
       total = ancestors_to_be_imported_map.values.size
       i = 0
-
-      target_root_outcome_group = target_context.root_outcome_group
-
       ancestors_to_be_imported_map.each do |_, ancestors_ids|
-        destination_parent_group = target_root_outcome_group
+        destination_parent_group = target_group
         ancestors_ids.each do |gid|
           unless source_target_groups_map[gid]
             source_group = groups_hash[gid]
             source_target_groups_map[gid] = copy_or_get_existing_group!(
-              source_group, destination_parent_group, target_context
+              source_group, destination_parent_group, target_group
             )
           end
 
@@ -282,9 +269,9 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       source_target_groups_map
     end
 
-    def copy_or_get_existing_group!(source_group, destination_parent_group, context)
+    def copy_or_get_existing_group!(source_group, destination_parent_group, target_group)
       # check if we have the group as a root group
-      if (group = context.root_outcome_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
+      if (group = target_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
         group.learning_outcome_group_id = destination_parent_group.id
         group.workflow_state = "active"
         group.save!
@@ -303,7 +290,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       group = source_group.clone
       group.learning_outcome_group_id = destination_parent_group.id
       group.source_outcome_group_id = source_group.id
-      group.context = context
+      group.context = target_group.context
       group.save!
 
       group
@@ -312,13 +299,56 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
   private
 
+  def get_target(input)
+    if input[:target_group_id]
+      target_group = LearningOutcomeGroup.active.find_by(id: input[:target_group_id])
+      if target_group.nil?
+        raise GraphQL::ExecutionError, I18n.t('no such target group')
+      end
+
+      target_context = target_group.context
+
+      [target_context, target_group]
+    else
+      if input[:target_context_type].blank? && input[:target_context_id].blank?
+        raise GraphQL::ExecutionError, I18n.t(
+          "You must provide targetGroupId or targetContextId and targetContextType",
+        )
+      elsif input[:target_context_type].blank? && input[:target_context_id].present?
+        raise GraphQL::ExecutionError, I18n.t(
+          "targetContextType required if targetContextId provided",
+        )
+      elsif input[:target_context_type].present? && input[:target_context_id].blank?
+        raise GraphQL::ExecutionError, I18n.t(
+          "targetContextId required if targetContextType provided",
+        )
+      end
+
+      target_context =
+        begin
+          context_class(input[:target_context_type]).find_by(
+            id: input[:target_context_id]
+          )
+        rescue NameError
+          raise GraphQL::ExecutionError, I18n.t('Invalid targetContextType')
+        end
+
+      if target_context.nil?
+        raise GraphQL::ExecutionError, I18n.t('no such target context')
+      end
+
+      [target_context, target_context.root_outcome_group]
+    end
+  end
+
   def context_class(context_type)
     raise NameError unless VALID_CONTEXTS.include? context_type
 
     context_type.constantize
   end
 
-  def process_job(source_context:, target_context:, group: nil, outcome_id: nil)
+  def process_job(source_context:, target_group:, group: nil, outcome_id: nil)
+    target_context = target_group.context
     progress = target_context.progresses.new(tag: "import_outcomes", user: current_user)
 
     if progress.save
@@ -331,7 +361,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         source_context,
         group,
         outcome_id,
-        target_context
+        target_group
       )
 
       {progress: progress}

@@ -439,7 +439,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def require_all_assignments_edit
-    authorized_action(@course, @current_user, :manage_assignments)
+    authorized_action(@course, @current_user, [:manage_assignments, :manage_assignments_edit])
   end
 
   def require_override

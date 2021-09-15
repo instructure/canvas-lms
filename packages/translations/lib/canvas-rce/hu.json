@@ -132,6 +132,7 @@
     "message": "Határidő: Több határidő van érvényben"
   },
   "due_when_7eed10c6": { "message": "Határidő: { when }" },
+  "edit_c5fbea07": { "message": "Szerkesztés" },
   "edit_equation_f5279959": { "message": "Egyenlet szerkesztése" },
   "edit_link_7f53bebb": { "message": "Link szerkesztése" },
   "editor_statusbar_26ac81fc": { "message": "Szerkesztő állapotsor" },
@@ -152,10 +153,6 @@
   "external_links_3d9f074e": { "message": "Külső linkek" },
   "external_tools_6e77821": { "message": "Külső eszközök" },
   "extra_large_b6cdf1ff": { "message": "Extra nagy" },
-  "file_upload_failed_af22dd91": {
-    "message": "A fájl feltöltése nem sikerült"
-  },
-  "file_uploading_56c9c0c8": { "message": "Fájl feltöltése" },
   "file_url_c12b64be": { "message": "Fájl URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } fájl ikon" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } kép előnézet" },
@@ -334,7 +331,6 @@
   "styles_2aa721ef": { "message": "Stílusok" },
   "submit_a3cc6859": { "message": "Beküldés" },
   "subscript_59744f96": { "message": "alsó index" },
-  "success_file_uploaded_8174e93f": { "message": "A fájl felöltése sikeres" },
   "superscript_8cb349a2": { "message": "felső index" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Támogatott fájltípusok: SRT vagy WebVTT"
@@ -376,9 +372,6 @@
   "upload_file_fd2361b8": { "message": "Fájl feltöltése" },
   "upload_image_6120b609": { "message": "Kép feltöltése" },
   "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "A feltöltés nem elérhető erre a mappára"
-  },
   "upload_record_media_e4207d72": { "message": "Média feltöltés/rögzítés" },
   "uploading_19e8a4e7": { "message": "Feltöltés" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {

@@ -25,15 +25,15 @@ import {
   up as configureDateTimeMomentParser
 } from './initializers/configureDateTimeMomentParser'
 import {
-  up as configureTimezone
-} from './initializers/configureTimezone'
+  up as configureDateTime
+} from './initializers/configureDateTime'
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
 // on the page from rails, so this should not cause a new network request.
 moment().locale(ENV.MOMENT_LOCALE)
 
 configureDateTimeMomentParser()
-configureTimezone()
+configureDateTime()
 
 // This will inject and set up sentry for deprecation reporting.  It should be
 // stripped out and be a no-op in production.

@@ -212,10 +212,10 @@ module DynamicSettings
       opts = @data_center.present? && global ? { dc: @data_center } : {}
       Diplomat::Kv.txn(kvs.map do |k, v|
         {
-          KV: {
-            Verb: "set",
-            Key: full_key(k, global: global),
-            Value: Base64.strict_encode64(v)
+          'KV' => {
+            'Verb' => "set",
+            'Key' => full_key(k, global: global),
+            'Value' => v,
           }
         }
       end)

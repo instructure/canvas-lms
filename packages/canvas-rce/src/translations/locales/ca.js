@@ -79,6 +79,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Mida del botó" },
   "buttons_and_icons_e66ee12c": { "message": "Botons i icones" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Cancel·la" },
   "choose_caption_file_9c45bc4e": { "message": "Tria un fitxer de subtítols" },
   "choose_usage_rights_33683854": { "message": "Tria els drets d''ús..." },
   "circle_484abe63": { "message": "Cercle" },
@@ -180,6 +181,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Venciment: Dates múltiples" },
   "due_when_7eed10c6": { "message": "Venciment: { when }" },
+  "edit_c5fbea07": { "message": "Edita" },
   "edit_equation_f5279959": { "message": "Edita l''equació" },
   "edit_link_7f53bebb": { "message": "Edita l''enllaç" },
   "editor_statusbar_26ac81fc": { "message": "Editor de la barra d''estat" },
@@ -204,10 +206,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Eines externes" },
   "extra_large_b6cdf1ff": { "message": "Extragran" },
   "extra_small_9ae33252": { "message": "Molt petit" },
-  "file_upload_failed_af22dd91": {
-    "message": "No s''ha pogut carregar el fitxer"
-  },
-  "file_uploading_56c9c0c8": { "message": "S''està carregant el fitxer" },
   "file_url_c12b64be": { "message": "URL del fitxer" },
   "filename_file_icon_602eb5de": { "message": "Icona del fitxer { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -308,6 +306,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Els meus fitxers" },
   "my_images_427f9b0c": { "message": "Les meves imatges" },
+  "name_1aed4a1b": { "message": "Nom" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegueu pel menú o per la barra d''eines"
   },
@@ -419,9 +418,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Estils" },
   "submit_a3cc6859": { "message": "Entrega" },
   "subscript_59744f96": { "message": "Subíndex" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Operació correcta: S''ha carregat el fitxer"
-  },
   "superscript_8cb349a2": { "message": "Superíndex" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipus de fitxer admesos: SRT o WebVTT"
@@ -474,13 +470,11 @@ const locale = {
     "message": "premeu les tecles Control+F9 per accedir a les opcions de taula. { text }"
   },
   "unpublished_dfd8801": { "message": "no publicat" },
+  "untitled_efdc2d7d": { "message": "sense títol" },
   "upload_document_253f0478": { "message": "Penja un document" },
   "upload_file_fd2361b8": { "message": "Penja el fitxer" },
   "upload_image_6120b609": { "message": "Penja una imatge" },
   "upload_media_ce31135a": { "message": "Penja l''element multimèdia" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "La càrrega no està disponible per a aquesta carpeta"
-  },
   "upload_record_media_e4207d72": {
     "message": "Penja o enregistra l''element multimèdia"
   },

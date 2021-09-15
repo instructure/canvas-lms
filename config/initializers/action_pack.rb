@@ -55,3 +55,17 @@ module DataStreamingContentLength
 end
 
 ActionController::Base.include(DataStreamingContentLength)
+
+
+module FileAccessUserOnSession
+  def self.included(klass)
+    klass.attr_writer :file_access_user
+  end
+
+  def file_access_user
+    @file_access_user ||= self['file_access_user_id'] && User.find_by(id: self['file_access_user_id'])
+  end
+end
+ActionDispatch::Request::Session.include(FileAccessUserOnSession)
+
+Autoextend.hook(:"ActionController::TestSession", FileAccessUserOnSession)

@@ -20,6 +20,10 @@ import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 import {
+  up as configureDateTime
+} from '../ui/boot/initializers/configureDateTime'
+
+import {
   up as configureDateTimeMomentParser
 } from '../ui/boot/initializers/configureDateTimeMomentParser'
 
@@ -37,6 +41,7 @@ Enzyme.configure({adapter: new Adapter()})
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
 
+configureDateTime()
 configureDateTimeMomentParser()
 
 // because everyone implements `flat()` and `flatMap()` except JSDOM 🤦🏼‍♂️

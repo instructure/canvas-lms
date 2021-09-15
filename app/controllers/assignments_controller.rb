@@ -96,7 +96,7 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view?
-    @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
       !@context_enrollment&.observer?
   end
@@ -296,8 +296,12 @@ class AssignmentsController < ApplicationController
           @external_tools = []
         end
 
+        context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
+        if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
+          context_rights[:manage_assignments] = context_rights[:manage_assignments_edit]
+        end
         permissions = {
-          context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
+          context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
           can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         }
@@ -509,6 +513,14 @@ class AssignmentsController < ApplicationController
     rce_js_env
     add_crumb @context.elementary_enabled? ? t("Important Info") : t('#crumbs.syllabus', "Syllabus")
     active_tab = "Syllabus"
+
+    @course_home_sub_navigation_tools =
+      ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
+                                        root_account: @domain_root_account, current_user: @current_user).to_a
+    unless @context.grants_right?(@current_user, session, :manage_content)
+      @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
+    end
+
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
       @groups = @context.assignment_groups.active.order(

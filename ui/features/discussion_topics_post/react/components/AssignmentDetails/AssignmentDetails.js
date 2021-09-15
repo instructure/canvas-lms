@@ -38,9 +38,9 @@ export function AssignmentDetails({...props}) {
       <Flex.Item padding="xx-small" shouldGrow align="start">
         <Responsive
           match="media"
-          query={responsiveQuerySizes({mobile: true, desktop: true})}
+          query={responsiveQuerySizes({tablet: true, desktop: true})}
           props={{
-            mobile: {
+            tablet: {
               textSize: 'x-small'
             },
             desktop: {
@@ -69,9 +69,9 @@ export function AssignmentDetails({...props}) {
         >
           <Responsive
             match="media"
-            query={responsiveQuerySizes({mobile: true, desktop: true})}
+            query={responsiveQuerySizes({tablet: true, desktop: true})}
             props={{
-              mobile: {
+              tablet: {
                 text: I18n.t('Due Dates (%{dueDateCount})', {
                   dueDateCount: props.assignmentOverrides.length
                 }),
@@ -121,9 +121,9 @@ export function AssignmentDetails({...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           text: I18n.t(
             {
               one: '1 point',
@@ -153,7 +153,7 @@ export function AssignmentDetails({...props}) {
           {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
             ? multipleDueDates
             : singleDueDate}
-          <Flex.Item shouldShrink align="end" overflowY="hidden">
+          <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
             <Text weight="normal" size={responsiveProps.textSize}>
               {responsiveProps.text}
             </Text>

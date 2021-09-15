@@ -33,7 +33,7 @@ import {
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
-import {PostContainer} from '../PostContainer/PostContainer'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
@@ -63,6 +63,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
+  const [lastMarkAllAction, setLastMarkAllAction] = useState('')
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
@@ -173,9 +174,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     update: resetDiscussionCache,
     onCompleted: data => {
       if (!data.updateDiscussionReadState.errors) {
-        setOnSuccess(I18n.t('You have successfully marked all as read.'))
-      } else {
+        if (lastMarkAllAction === 'read') {
+          setOnSuccess(I18n.t('You have successfully marked all as read.'))
+        } else if (lastMarkAllAction === 'unread') {
+          setOnSuccess(I18n.t('You have successfully marked all as unread.'))
+        }
+      } else if (lastMarkAllAction === 'read') {
         setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
+      } else if (lastMarkAllAction === 'unread') {
+        setOnFailure(I18n.t('There was an unexpected error marking all as unread.'))
       }
     },
     onError: () => {
@@ -230,10 +237,21 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   }
 
   const onMarkAllAsRead = () => {
+    setLastMarkAllAction('read')
     updateDiscussionReadState({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         read: true
+      }
+    })
+  }
+
+  const onMarkAllAsUnread = () => {
+    setLastMarkAllAction('unread')
+    updateDiscussionReadState({
+      variables: {
+        discussionTopicId: props.discussionTopic._id,
+        read: false
       }
     })
   }
@@ -375,13 +393,18 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         </Flex.Item>
                       )}
                       <Flex.Item shouldShrink shouldGrow>
-                        <PostContainer
+                        <DiscussionEntryContainer
                           isTopic
                           postUtilities={
                             <PostToolbar
                               onReadAll={
                                 !props.discussionTopic.initialPostRequiredForCurrentUser
                                   ? onMarkAllAsRead
+                                  : null
+                              }
+                              onUnreadAll={
+                                !props.discussionTopic.initialPostRequiredForCurrentUser
+                                  ? onMarkAllAsUnread
                                   : null
                               }
                               onDelete={props.discussionTopic.permissions.delete ? onDelete : null}
@@ -495,7 +518,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               </Button>
                             </View>
                           )}
-                        </PostContainer>
+                        </DiscussionEntryContainer>
                       </Flex.Item>
                       <Flex.Item
                         shouldShrink

@@ -22,9 +22,9 @@ const path = require('path')
 /**
  * This returns the contents of the translations for the given package and locale
  */
-async function readTRanslationFile(packageName, locale) {
+function readTRanslationFile(packageName, locale) {
   const filePath = path.resolve(__dirname, `../lib/${packageName}/${locale}.json`)
-  const jsonData = await fs.promises.readFile(filePath, {encoding: 'utf8'})
+  const jsonData = fs.readFileSync(filePath, {encoding: 'utf8'})
   // sanity check
   try {
     JSON.parse(jsonData)

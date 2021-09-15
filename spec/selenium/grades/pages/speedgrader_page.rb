@@ -326,6 +326,19 @@ class Speedgrader
       f("#reassign_assignment")
     end
 
+    def status_menu_btn
+      fj("button:contains(\"Edit status\")")
+    end
+
+    def status_menu_option(desired_option)
+      menu_options = ff("[role='menuitemradio']")
+      menu_options.find { |option| option.text == desired_option}
+    end
+
+    def time_late_input
+      f("#speed_grader_edit_status_mount_point").find_element(:css, "input")
+    end
+
     # action
     def visit(course_id, assignment_id, timeout = 10)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"

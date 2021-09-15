@@ -58,6 +58,7 @@ class Enrollment < ActiveRecord::Base
 
   validate :valid_role?
   validate :valid_course?
+  validate :not_template_course?
   validate :valid_section?
   validate :not_student_view
 
@@ -83,7 +84,9 @@ class Enrollment < ActiveRecord::Base
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
   after_update :needs_grading_count_updated, if: :active_student_changed?
+
   after_commit :sync_microsoft_group
+  scope :microsoft_sync_relevant, -> { active_or_pending.accepted.not_fake }
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -103,6 +106,12 @@ class Enrollment < ActiveRecord::Base
   def valid_course?
     if !deleted? && course.deleted?
       self.errors.add(:course_id, "is not a valid course")
+    end
+  end
+
+  def not_template_course?
+    if course.template?
+      self.errors.add(:course_id, "is a template course")
     end
   end
 
@@ -252,6 +261,10 @@ class Enrollment < ActiveRecord::Base
   scope :of_instructor_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment']) }
 
   scope :of_content_admins, -> { where(:type => ['TeacherEnrollment', 'DesignerEnrollment']) }
+
+  scope :of_observer_type, -> { where(:type => "ObserverEnrollment") }
+
+  scope :not_of_observer_type, -> { where.not(:type => "ObserverEnrollment") }
 
   scope :student, -> {
     select(:course_id).
@@ -1446,6 +1459,10 @@ class Enrollment < ActiveRecord::Base
 
   def student_or_fake_student?
     ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
+  end
+
+  def allows_favoriting?
+    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer?
   end
 
   private

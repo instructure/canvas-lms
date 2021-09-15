@@ -99,6 +99,10 @@ class Course < ActiveRecord::Base
   has_many :tas, :through => :ta_enrollments, :source => :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'ObserverEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
+  has_many :non_observer_enrollments, -> {
+    where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
+      .preload(:user)
+  }, class_name: 'Enrollment'
   has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
   has_many :participating_observers_by_date, -> { where(enrollments: { type: 'ObserverEnrollment', workflow_state: 'active' }).
     joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id").
@@ -949,6 +953,14 @@ class Course < ActiveRecord::Base
       else
         User.where(:id => instructor_enrollment_scope.select(:id)).to_a
       end
+    end
+  end
+
+  def user_is_admin?(user)
+    return unless user
+
+    fetch_on_enrollments('user_is_admin', user) do
+      self.enrollments.for_user(user).active.of_admin_type.exists?
     end
   end
 
@@ -2866,6 +2878,7 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
+  TAB_PACE_PLANS = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES].freeze
@@ -3020,17 +3033,30 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
+    pace_plans_allowed = false
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
+                     pace_plans_allowed = true
                      Course.elementary_course_nav_tabs
                    else
+                     pace_plans_allowed = true
                      Course.default_tabs
                    end
     # can't manage people in template courses
     default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
+    # only show pace plans if enabled
+    if pace_plans_allowed && account.feature_enabled?(:pace_plans) && enable_pace_plans
+      default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
+        :id => TAB_PACE_PLANS,
+        :label => t('#tabs.pace_plans', "Pace Plans"),
+        :css_class => 'pace_plans',
+        :href => :course_pace_plans_path,
+        :visibility => 'admins'
+      })
+    end
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
@@ -3137,7 +3163,7 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES], :read, :manage_content)
+        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES, TAB_PACE_PLANS], :read, :manage_content)
 
         member_only_tabs = tabs.select{ |t| t[:visibility] == 'members' }
         tabs -= member_only_tabs if member_only_tabs.present? && !check_for_permission.call(:participate_as_student, :read_as_admin)
@@ -3345,16 +3371,22 @@ class Course < ActiveRecord::Base
 
   def sync_homeroom_enrollments(progress=nil)
     return false unless elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course
-
     progress&.calculate_completion!(0, linked_homeroom_course.enrollments.size)
     linked_homeroom_course.all_enrollments.find_each do |enrollment|
-      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
-      course_enrollment.workflow_state = enrollment.workflow_state
-      course_enrollment.start_at = enrollment.start_at
-      course_enrollment.end_at = enrollment.end_at
-      course_enrollment.completed_at = enrollment.completed_at
-      course_enrollment.save!
-      progress.increment_completion!(1) if progress&.total
+      self.shard.activate do
+        course_enrollment = if self.shard == enrollment.shard
+          all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
+        else
+          # roles don't apply across shards, so fall back to the base type
+          all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id)
+        end
+        course_enrollment.workflow_state = enrollment.workflow_state
+        course_enrollment.start_at = enrollment.start_at
+        course_enrollment.end_at = enrollment.end_at
+        course_enrollment.completed_at = enrollment.completed_at
+        course_enrollment.save!
+        progress.increment_completion!(1) if progress&.total
+      end
     end
   end
 

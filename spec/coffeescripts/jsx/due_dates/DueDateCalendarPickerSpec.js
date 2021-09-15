@@ -20,10 +20,10 @@ import React from 'react'
 import {mount} from 'enzyme'
 import chicago from 'timezone/America/Chicago'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
+import timezone from 'timezone'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateCalendarPicker', suiteHooks => {
@@ -99,15 +99,16 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
 
   test('#formattedDate() returns a localized Date', () => {
     mountComponent()
-    tzInTest.changeLocale(french, 'fr_FR', 'fr')
-    I18nStubber.pushFrame()
-    I18nStubber.setLocale('fr_FR')
-    I18nStubber.stub('fr_FR', {
-      'date.formats.medium': '%-d %b %Y',
-      'time.formats.tiny': '%-k:%M'
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(french, 'fr_FR'),
+      tzData: {},
+      momentLocale: 'fr',
+      formats: {
+        'date.formats.medium': '%-d %b %Y',
+        'time.formats.tiny': '%-k:%M'
+      }
     })
     equal(wrapper.instance().formattedDate(), '1 févr. 2012 7:01')
-    I18nStubber.clear()
   })
 
   test('call the update prop when changed', () => {

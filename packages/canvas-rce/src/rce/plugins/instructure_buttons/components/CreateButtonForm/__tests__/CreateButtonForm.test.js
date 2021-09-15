@@ -30,10 +30,11 @@ useStoreProps.mockReturnValue({startButtonsAndIconsUpload})
 
 const editor = {
   dom: {
-    createHTML: jest.fn((tagName, {src, alt}) => {
+    createHTML: jest.fn((tagName, {src, alt, ...rest}) => {
       const element = document.createElement(tagName)
       element.setAttribute('src', src)
       element.setAttribute('alt', alt)
+      element.setAttribute('data-inst-buttons-and-icons', rest['data-inst-buttons-and-icons'])
       return element
     })
   },
@@ -63,46 +64,46 @@ describe('<CreateButtonForm />', () => {
     await waitFor(() => {
       if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
       expect(startButtonsAndIconsUpload.mock.calls[0]).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "domElement": <svg
-            fill="none"
-            height="122px"
-            viewBox="0 0 122 122"
-            width="122px"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <metadata>
-              {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
-            </metadata>
-            <svg
-              fill="none"
-              height="122px"
-              viewBox="0 0 122 122"
-              width="122px"
-              x="0"
-            >
-              <g
-                fill="none"
-              >
-                <rect
-                  height="114"
-                  width="114"
-                  x="4"
-                  y="4"
-                />
-              </g>
-            </svg>
-            <style
-              type="text/css"
-            >
-              @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
-            </style>
-          </svg>,
-          "name": "untitled.svg",
-        },
-      ]
-    `)
+              Array [
+                Object {
+                  "domElement": <svg
+                    fill="none"
+                    height="122px"
+                    viewBox="0 0 122 122"
+                    width="122px"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <metadata>
+                      {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle"}
+                    </metadata>
+                    <svg
+                      fill="none"
+                      height="122px"
+                      viewBox="0 0 122 122"
+                      width="122px"
+                      x="0"
+                    >
+                      <g
+                        fill="none"
+                      >
+                        <rect
+                          height="114"
+                          width="114"
+                          x="4"
+                          y="4"
+                        />
+                      </g>
+                    </svg>
+                    <style
+                      type="text/css"
+                    >
+                      @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+                    </style>
+                  </svg>,
+                  "name": "untitled.svg",
+                },
+              ]
+          `)
     })
     await waitFor(() => expect(defaults.onClose).toHaveBeenCalled())
   })
@@ -116,6 +117,7 @@ describe('<CreateButtonForm />', () => {
       Array [
         <img
           alt=""
+          data-inst-buttons-and-icons="true"
           src="https://uploaded.url"
         />,
       ]

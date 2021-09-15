@@ -73,6 +73,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "按钮大小" },
   "buttons_and_icons_e66ee12c": { "message": "按钮和图标" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "选择标题文件" },
   "choose_usage_rights_33683854": { "message": "选择使用权限..." },
   "circle_484abe63": { "message": "圆圈" },
@@ -156,6 +157,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "到期：多个日期" },
   "due_when_7eed10c6": { "message": "到期：{ when }" },
+  "edit_c5fbea07": { "message": "编辑" },
   "edit_equation_f5279959": { "message": "编辑等式" },
   "edit_link_7f53bebb": { "message": "编辑链接" },
   "editor_statusbar_26ac81fc": { "message": "编辑器状态栏" },
@@ -176,8 +178,6 @@ const locale = {
   "external_tools_6e77821": { "message": "外部工具" },
   "extra_large_b6cdf1ff": { "message": "超大" },
   "extra_small_9ae33252": { "message": "特小" },
-  "file_upload_failed_af22dd91": { "message": "文件上传失败" },
-  "file_uploading_56c9c0c8": { "message": "正在上传文件" },
   "file_url_c12b64be": { "message": "文件URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename }文件图标" },
   "filename_image_preview_6cef8f26": { "message": "{ filename }图像预览" },
@@ -258,6 +258,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "我的文件" },
   "my_images_427f9b0c": { "message": "我的图像" },
+  "name_1aed4a1b": { "message": "名称" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "导航菜单或工具栏"
   },
@@ -351,7 +352,6 @@ const locale = {
   "styles_2aa721ef": { "message": "样式" },
   "submit_a3cc6859": { "message": "提交" },
   "subscript_59744f96": { "message": "下标" },
-  "success_file_uploaded_8174e93f": { "message": "成功：文件已上传" },
   "superscript_8cb349a2": { "message": "上标" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "支持的文件类型：SRT或WebVTT"
@@ -402,13 +402,11 @@ const locale = {
     "message": "键入 Control F9 以访问表格选项。{ text }"
   },
   "unpublished_dfd8801": { "message": "取消发布" },
+  "untitled_efdc2d7d": { "message": "无标题" },
   "upload_document_253f0478": { "message": "上传文档" },
   "upload_file_fd2361b8": { "message": "上传文件" },
   "upload_image_6120b609": { "message": "上传图像" },
   "upload_media_ce31135a": { "message": "上传媒体" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "无法上传此文件"
-  },
   "upload_record_media_e4207d72": { "message": "上传/录制媒体" },
   "uploading_19e8a4e7": { "message": "正在上传" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

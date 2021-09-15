@@ -230,6 +230,28 @@ describe('RCE Plugins > Filter', () => {
       selectContentSubtype('Media')
       expect(currentFilterSettings.sortValue).toEqual('date_added')
     })
+
+    describe('when "Buttons and Icons" is selected', () => {
+      beforeEach(() => {
+        selectContentSubtype('Buttons and Icons')
+      })
+
+      it('sets the content subtype to "buttons_and_icons"', () => {
+        expect(currentFilterSettings.contentSubtype).toEqual('buttons_and_icons')
+      })
+
+      it('sets the content type to "course_files"', () => {
+        expect(currentFilterSettings.contentType).toEqual('course_files')
+      })
+
+      it('does not render "User Files" content type', () => {
+        expect(component.queryByTitle('User Files')).toBeNull()
+      })
+
+      it('renders the "Course Files" content type', () => {
+        expect(component.getByTitle('Course Files')).toBeInTheDocument()
+      })
+    })
   })
 
   describe('deals with switching to and from Links', () => {

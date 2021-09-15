@@ -25,6 +25,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    global_id_field :id
 
     field :discussion_topic_id, ID, null: false
     field :parent_id, ID, null: true
@@ -48,23 +49,24 @@ module Types
     def message
       if object.deleted?
         nil
-      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
-        load_association(:parent_entry).then do |parent|
-          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
-            parent.quoted_reply_html + object.message
-          end
-        end
       else
         object.message
       end
     end
 
-    field :reply_preview, String, null: true
-    def reply_preview
-      if Account.site_admin.feature_enabled?(:isolated_view)
-        Promise.all([load_association(:user), load_association(:editor)]).then do
-          object.quoted_reply_html
-        end
+    field :preview_message, String, null: true
+    def preview_message
+      object.deleted? ? nil : object.summary
+    end
+
+    field :quoted_entry, Types::DiscussionEntryType, null: true
+    def quoted_entry
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry)
+      else
+        nil
       end
     end
 

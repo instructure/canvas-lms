@@ -24,19 +24,22 @@ describe "Enrollment::QueryBuilder" do
     let(:conditions)     { Enrollment::QueryBuilder.new(state, options).conditions }
     let(:options)        { {} }
     let(:account_id)     { Account.create(name: "Account").id }
-    let(:term_id)        { create_record(EnrollmentTerm, name: "default", root_account_id: account_id) }
-    let(:user)           { create_record(User, {name: "User", workflow_state: "active"}, :record) }
+    let(:term_id)        { create_record(EnrollmentTerm, name: "default", root_account_id: account_id, created_at: Time.now.utc, updated_at: Time.now.utc) }
+    let(:user)           { create_record(User, {name: "User", workflow_state: "active", created_at: Time.now.utc, updated_at: Time.now.utc}, :record) }
     let(:enrollment_map) { {} }
 
     # each item corresponds to a unique course the user is enrolled in
     def create_enrollments(*matrix)
+      now = Time.now.utc
       course_ids = create_records(Course, matrix.map{ |e_state, c_state, type|
         {
           name: "Course",
           account_id: account_id,
           workflow_state: c_state,
           root_account_id: account_id,
-          enrollment_term_id: term_id
+          enrollment_term_id: term_id,
+          created_at: now,
+          updated_at: now,
         }
       })
 
@@ -44,7 +47,9 @@ describe "Enrollment::QueryBuilder" do
         {
           course_id: course_ids[i],
           root_account_id: account_id,
-          name: "Section"
+          name: "Section",
+          created_at: now,
+          updated_at: now,
         }
       })
 
@@ -56,7 +61,9 @@ describe "Enrollment::QueryBuilder" do
           workflow_state: e_state,
           course_section_id: section_ids[i],
           role_id: Role.get_built_in_role(type, root_account_id: account_id).id,
-          root_account_id: account_id
+          root_account_id: account_id,
+          created_at: now,
+          updated_at: now,
         }
       })
 

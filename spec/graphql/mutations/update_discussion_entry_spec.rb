@@ -28,13 +28,15 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     discussion_topic_model({context: @course})
     @attachment = attachment_with_context(@student)
     @entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment)
+    @topic.update!(discussion_type: 'threaded')
   end
 
   def mutation_str(
     discussion_entry_id: nil,
     message: nil,
     remove_attachment: nil,
-    file_id: nil
+    file_id: nil,
+    include_reply_preview: nil
   )
     <<~GQL
       mutation {
@@ -43,6 +45,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
           #{"message: \"#{message}\"" unless message.nil?}
           #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
+          #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
         }) {
           discussionEntry {
             _id
@@ -95,6 +98,44 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry', 'attachment', '_id')).to eq attachment.id.to_s
     expect(@entry.reload.attachment_id).to eq attachment.id
+  end
+
+  context 'include reply preview' do
+    it 'cannot be true on a root entry' do
+      result = run_mutation(discussion_entry_id: @entry.id, include_reply_preview: true)
+      expect(result.dig('errors')).to be nil
+      expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
+      expect(@entry.reload.include_reply_preview).to be false
+    end
+
+    it 'cannot be true on a reply to a root entry' do
+      parent_entry = @topic.discussion_entries.create!(message: 'I am the parent reply', user: @student, attachment: @attachment)
+      entry = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id, include_reply_preview: false, root_entry_id: parent_entry.id)
+      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
+      expect(result.dig('errors')).to be nil
+      expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
+      expect(entry.reload.include_reply_preview).to be false
+    end
+
+    it 'does set on reply to a child reply' do
+      parent_entry = @topic.discussion_entries.create!(message: 'I am the parent reply', user: @student, attachment: @attachment)
+      child_reply = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id)
+      entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: false)
+      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
+      expect(result.dig('errors')).to be nil
+      expect(result.dig('data', 'updateDiscussion
+        Entry', 'errors')).to be nil
+      expect(entry.reload.include_reply_preview).to be true
+    end
+
+    it 'allows removing reply preview' do
+      parent_entry = @topic.discussion_entries.create!(message: 'I am the parent reply', user: @student, attachment: @attachment)
+      child_reply = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id)
+      entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: true)
+      expect(entry.reload.include_reply_preview).to be true
+      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: false)
+      expect(entry.reload.include_reply_preview).to be false
+    end
   end
 
   context 'errors' do

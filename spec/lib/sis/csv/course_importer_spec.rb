@@ -281,6 +281,19 @@ describe SIS::CSV::CourseImporter do
     expect(@account.courses.where(sis_source_id: "test4").first.restrict_enrollments_to_course_dates).to be_truthy
   end
 
+  it 'should remove dates with <delete>' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+      "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+    )
+    expect(@account.courses.where(sis_source_id: "test4").first.restrict_enrollments_to_course_dates).to be_truthy
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+      "test4,TC 104,Test Course 4,,,active,<delete>,<delete>"
+    )
+    expect(@account.courses.where(sis_source_id: "test4").first.restrict_enrollments_to_course_dates).to be_falsey
+  end
+
   it 'should support start/end date and restriction stickiness' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",

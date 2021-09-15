@@ -191,6 +191,19 @@ shared_examples_for 'k5 important dates calendar picker' do |context|
         @new_course_list << @course
       end
       user_session(@homeroom_teacher)
+    when :observer
+      Account.site_admin.enable_feature!(:k5_parent_support)
+      @observer = user_with_pseudonym(name: "Mom", email: "bestmom@example.com", workflow_state: "available")
+      add_linked_observer(@student, @observer, root_account: @account)
+      2.times do |x|
+        course_with_student(
+          active_all: true,
+          user: @student,
+          course_name: "#{subject_course_title_prefix}#{x + 1}"
+        )
+        @new_course_list << @course
+      end
+      user_session(@observer)
     end
   end
 

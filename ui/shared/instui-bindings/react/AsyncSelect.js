@@ -88,14 +88,26 @@ export default function CanvasAsyncSelect({
   }
 
   function renderOption(option) {
-    const {id, ...optionProps} = option.props
+    const {id, renderBeforeLabel, ...optionProps} = option.props
     const props = {
       isHighlighted: id === highlightedOptionId,
       isSelected: id === selectedOptionId
     }
+    const optionChildren = option.props.children
+    const renderBeforeText =
+      typeof renderBeforeLabel === 'function' ? renderBeforeLabel(props) : renderBeforeLabel
+    const renderChildren =
+      typeof optionChildren === 'function' ? optionChildren(props) : optionChildren
+
     return (
-      <Select.Option key={id} id={id} {...optionProps} {...props}>
-        {option.props.children}
+      <Select.Option
+        key={id}
+        id={id}
+        {...optionProps}
+        {...props}
+        renderBeforeLabel={renderBeforeText}
+      >
+        {renderChildren}
       </Select.Option>
     )
   }

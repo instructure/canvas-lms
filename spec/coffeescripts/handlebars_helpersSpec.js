@@ -29,6 +29,7 @@ import detroit from 'timezone/America/Detroit'
 import chicago from 'timezone/America/Chicago'
 import newYork from 'timezone/America/New_York'
 import I18n from 'i18n-js'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const {helpers} = Handlebars
 const {contains} = assertions
@@ -127,7 +128,13 @@ test('supports truncation left', () => {
 
 QUnit.module('friendlyDatetime', {
   setup() {
-    return tz.changeZone(detroit, 'America/Detroit')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(detroit, 'America/Detroit'),
+      tzData: {
+        'America/Detroit': detroit
+      },
+      formats: getI18nFormats(),
+    })
   },
 
   teardown() {
@@ -174,7 +181,8 @@ QUnit.module('contextSensitive FriendlyDatetime', {
       tzData: {
         'America/Chicago': chicago,
         'America/Detroit': detroit,
-      }
+      },
+      formats: getI18nFormats()
     })
   },
 
@@ -218,7 +226,6 @@ test('reverts to friendly display when there is no contextual timezone', () => {
 
 QUnit.module('contextSensitiveDatetimeTitle', {
   setup() {
-    this.snapshot = tz.snapshot()
     fakeENV.setup()
     ENV.CONTEXT_TIMEZONE = 'America/Chicago'
     tzInTest.configureAndRestoreLater({
@@ -227,7 +234,8 @@ QUnit.module('contextSensitiveDatetimeTitle', {
         'America/Chicago': chicago,
         'America/Detroit': detroit,
         'America/New_York': newYork
-      }
+      },
+      formats: getI18nFormats(),
     })
   },
 
@@ -259,7 +267,8 @@ test('properly spans day boundaries', () => {
     tzData: {
       'America/Chicago': chicago,
       'America/New_York': newYork
-    }
+    },
+    formats: getI18nFormats(),
   })
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 05:30:00Z', {
@@ -295,16 +304,20 @@ test('produces the html attributes if you dont specify just_text', () => {
 })
 
 QUnit.module('datetimeFormatted', {
-  setup() {
-    this.snapshot = tz.snapshot()
-  },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
   }
 })
 
 test('should parse and format relative to profile timezone', () => {
-  tz.changeZone(detroit, 'America/Detroit')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(detroit, 'America/Detroit'),
+    tzData: {
+      'America/Detroit': detroit
+    },
+    formats: getI18nFormats()
+  })
+
   equal(helpers.datetimeFormatted('1970-01-01 00:00:00'), 'Jan 1, 1970 at 12am')
 })
 

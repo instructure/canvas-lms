@@ -34,11 +34,16 @@ import CreateOutcomeModal from './CreateOutcomeModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 
-const ManagementHeader = ({handleFileDrop}) => {
+const ManagementHeader = ({handleFileDrop, handleAddOutcomes, onSuccessfulCreateOutcome}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
   const {isMobileView, canManage, canImport} = useCanvasContext()
   const showImportModal = () => showImportOutcomesModal({onFileDrop: handleFileDrop})
+
+  const handleCloseFindModal = hasAddedOutcomes => {
+    handleAddOutcomes(hasAddedOutcomes)
+    closeFindOutcomeModal()
+  }
 
   return (
     <div className="management-header" data-testid="managementHeader">
@@ -103,17 +108,24 @@ const ManagementHeader = ({handleFileDrop}) => {
           )}
         </View>
       </Flex>
-      <FindOutcomesModal open={isFindOutcomeModalOpen} onCloseHandler={closeFindOutcomeModal} />
+      <FindOutcomesModal open={isFindOutcomeModalOpen} onCloseHandler={handleCloseFindModal} />
       <CreateOutcomeModal
         isOpen={isCreateOutcomeModalOpen}
         onCloseHandler={closeCreateOutcomeModal}
+        onSuccess={onSuccessfulCreateOutcome}
       />
     </div>
   )
 }
 
+ManagementHeader.defaultProps = {
+  onSuccessfulCreateOutcome: () => {}
+}
+
 ManagementHeader.propTypes = {
-  handleFileDrop: PropTypes.func.isRequired
+  handleFileDrop: PropTypes.func.isRequired,
+  handleAddOutcomes: PropTypes.func.isRequired,
+  onSuccessfulCreateOutcome: PropTypes.func
 }
 
 export default ManagementHeader

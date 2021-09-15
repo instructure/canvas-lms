@@ -26,6 +26,7 @@ require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
 require_relative '../pages/k5_important_dates_section_page'
 require_relative '../shared_examples/k5_important_dates_shared_examples'
+require_relative '../shared_examples/k5_announcements_shared_examples'
 
 describe "student k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -56,40 +57,6 @@ describe "student k5 dashboard" do
       expect(resources_tab).to be_displayed
     end
 
-    it 'presents latest homeroom announcements' do
-      announcement_heading = "K5 Let's do this"
-      announcement_content = "So happy to see all of you."
-      new_announcement(@homeroom_course, announcement_heading, announcement_content)
-
-      announcement_heading = "Happy Monday!"
-      announcement_content = "Let's get to work"
-      new_announcement(@homeroom_course, announcement_heading, announcement_content)
-
-      get "/"
-
-      expect(homeroom_course_title(@course_name)).to be_displayed
-      expect(announcement_title(announcement_heading)).to be_displayed
-      expect(announcement_content_text(announcement_content)).to be_displayed
-    end
-
-    it 'opens up the announcement when announcement title is clicked' do
-      announcement_title = "Happy Monday!"
-      announcement = new_announcement(@homeroom_course, announcement_title, "Let's get to work")
-
-      get "/"
-
-      click_announcement_title(announcement_title)
-      wait_for_ajaximations
-
-      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}")
-    end
-
-    it 'shows no announcement creation button when there are no announcements' do
-      get "/"
-
-      expect(announcement_button_exists?).to be_falsey
-    end
-
     it 'dashboard tabs are sticky when scrolling down on homeroom view' do
       create_courses(10,enroll_user: @student, return_type: :record)
 
@@ -102,6 +69,18 @@ describe "student k5 dashboard" do
       expect(retrieve_welcome_text).to match(/Welcome,/)
       expect(homeroom_tab).to be_displayed
     end
+  end
+
+  context 'homeroom section' do
+    it 'shows no announcement creation button when there are no announcements' do
+      get "/"
+
+      expect(announcement_button_exists?).to be_falsey
+    end
+
+    it_behaves_like 'k5 homeroom announcements'
+
+    it_behaves_like 'k5 homeroom announcements with multiple homerooms', :student
   end
 
   context 'dashboard cards' do

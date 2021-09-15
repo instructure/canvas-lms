@@ -77,6 +77,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "حجم الزر" },
   "buttons_and_icons_e66ee12c": { "message": "الأزرار والأيقونات" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "إلغاء" },
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
   "choose_usage_rights_33683854": { "message": "اختر حقوق الاستخدام..." },
   "circle_484abe63": { "message": "الدائرة" },
@@ -166,6 +167,7 @@ const locale = {
     "message": "تاريخ الاستحقاق: تواريخ متعددة"
   },
   "due_when_7eed10c6": { "message": "تاريخ الاستحقاق: { when }" },
+  "edit_c5fbea07": { "message": "تحرير" },
   "edit_equation_f5279959": { "message": "تحرير المعادلة" },
   "edit_link_7f53bebb": { "message": "تحرير الارتباط" },
   "editor_statusbar_26ac81fc": { "message": "شريط حالة المحرر" },
@@ -188,8 +190,6 @@ const locale = {
   "external_tools_6e77821": { "message": "الأدوات الخارجية" },
   "extra_large_b6cdf1ff": { "message": "كبير جداً" },
   "extra_small_9ae33252": { "message": "صغير للغاية" },
-  "file_upload_failed_af22dd91": { "message": "فشل تحميل الملف" },
-  "file_uploading_56c9c0c8": { "message": "جارٍ تحميل الملف" },
   "file_url_c12b64be": { "message": "عنوان URL للملف" },
   "filename_file_icon_602eb5de": { "message": "أيقونة الملف { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -280,6 +280,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "ملفاتي" },
   "my_images_427f9b0c": { "message": "صوري" },
+  "name_1aed4a1b": { "message": "الاسم" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
@@ -379,7 +380,6 @@ const locale = {
   "styles_2aa721ef": { "message": "الأنماط" },
   "submit_a3cc6859": { "message": "إرسال" },
   "subscript_59744f96": { "message": "منخفض" },
-  "success_file_uploaded_8174e93f": { "message": "نجاح: تم تحميل الملف" },
   "superscript_8cb349a2": { "message": "مرتفع" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
@@ -430,13 +430,11 @@ const locale = {
     "message": "اضغط Control F9 للوصول إلى اختيارات الجدول. { text }"
   },
   "unpublished_dfd8801": { "message": "غير منشور" },
+  "untitled_efdc2d7d": { "message": "بدون عنوان" },
   "upload_document_253f0478": { "message": "تحميل المستند" },
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "التحميل غير متاح لهذا المجلد"
-  },
   "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

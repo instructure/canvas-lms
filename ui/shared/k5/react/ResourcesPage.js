@@ -80,11 +80,12 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
   const [isInfoLoading, setInfoLoading] = useState(true)
   const [isAppsLoading, setAppsLoading] = useState(true)
   const [isStaffLoading, setStaffLoading] = useState(true)
+  const [alreadyLoaded, setAlreadyLoaded] = useState(false)
   const homerooms = cards.filter(c => c.isHomeroom)
 
   useImmediate(
     () => {
-      if (cards && cardsSettled) {
+      if (cards && cardsSettled && visible && !alreadyLoaded) {
         setInfoLoading(true)
         fetchImportantInfos(!isSingleCourse ? cards.filter(c => c.isHomeroom) : cards)
           .then(setInfos)
@@ -107,9 +108,10 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
             })
             .finally(() => setStaffLoading(false))
         }
+        setAlreadyLoaded(true)
       }
     },
-    [cards, cardsSettled],
+    [cards, cardsSettled, visible],
     {deep: true}
   )
 

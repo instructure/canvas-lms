@@ -52,7 +52,9 @@ export const OutcomePanel = () => {
 export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
   const [importRef, setImportRef] = useState(null)
+  const [importNumber, setImportNumber] = useState(0)
   const [isImporting, setIsImporting] = useState(false)
+  const [createdOutcomeGroupIds, setCreatedOutcomeGroupIds] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
@@ -148,14 +150,44 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
     })
   }
 
+  const onSuccessfulCreateOutcome = ({selectedGroupAncestorIds}) => {
+    setCreatedOutcomeGroupIds(selectedGroupAncestorIds)
+  }
+
   const isMobileView = !breakpoints?.tablet
+
+  const onAddOutcomes = addedOutcomes => {
+    if (addedOutcomes) {
+      setImportNumber(prevState => prevState + 1)
+    }
+  }
 
   return (
     <OutcomesContext.Provider value={getContext(isMobileView)}>
-      {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
+      {improvedManagement && (
+        <ManagementHeader
+          handleFileDrop={onFileDrop}
+          handleAddOutcomes={onAddOutcomes}
+          onSuccessfulCreateOutcome={onSuccessfulCreateOutcome}
+        />
+      )}
       <Tabs onRequestTabChange={handleTabChange}>
-        <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0} id="management">
-          {improvedManagement ? !isImporting && <OutcomeManagementPanel /> : <OutcomePanel />}
+        <Tabs.Panel
+          padding="0"
+          renderTitle={I18n.t('Manage')}
+          isSelected={selectedIndex === 0}
+          id="management"
+        >
+          {improvedManagement ? (
+            !isImporting && (
+              <OutcomeManagementPanel
+                importNumber={importNumber}
+                createdOutcomeGroupIds={createdOutcomeGroupIds}
+              />
+            )
+          ) : (
+            <OutcomePanel />
+          )}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1} id="scale">
           <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />

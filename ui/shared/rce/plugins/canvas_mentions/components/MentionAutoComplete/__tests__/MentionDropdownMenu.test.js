@@ -56,34 +56,14 @@ describe('MentionDropdownMenu tests', () => {
   })
 
   it('should render correct number of menu items', () => {
-    const component = setup({
-      show: true
-    })
+    const component = setup()
     const items = component.container.querySelectorAll('li')
     expect(items.length).toBe(2)
   })
 
-  it('should not show when prop is false', () => {
-    const {container} = setup({
-      show: false
-    })
-    const menuComponent = container.querySelector('.mention-dropdown-menu')
-    expect(menuComponent).toBeFalsy()
-  })
-
-  it('should show when prop is true', () => {
-    const {container} = setup({
-      show: true
-    })
-    const menuComponent = container.querySelector('.mention-dropdown-menu')
-    expect(menuComponent).toBeTruthy()
-  })
-
   it('should call ARIA template for the Popup menu', () => {
     const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
-    setup({
-      show: true
-    })
+    setup()
     expect(spy).toHaveBeenCalled()
     expect(spy.mock.calls.length).toBe(2)
   })

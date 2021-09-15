@@ -1658,7 +1658,7 @@ describe CoursesController do
         user_session(@teacher)
 
         get 'show', params: {:id => @course.id}
-        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_as_admin: true})
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true, read_announcements: true, read_as_admin: true})
       end
 
       it "sets COURSE.color appropriately in js_env" do
@@ -1681,6 +1681,17 @@ describe CoursesController do
         expect(bundle.size).to eq 1
       end
 
+      it "sets the course_home_view to 'Important Info' if the teacher has no announcement reading permission for the homeroom" do
+        @course.homeroom_course = true
+        @course.save!
+
+        @course.account.role_overrides.create!(permission: :read_announcements, role: teacher_role, enabled: false)
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq 'syllabus'
+      end
+
       it "sets COURSE.has_syllabus_body to true when syllabus exists" do
         @course.syllabus_body = "Welcome"
         @course.save!
@@ -1698,15 +1709,62 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_falsey
       end
-    end
 
+      it "sets ENV.OBSERVER_LIST with self and observed users" do
+        user_session(@student)
 
-    it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
-      @course.enable_feature!(:student_outcome_gradebook)
-      user_session(@student)
+        get 'show', params: {:id => @course.id}
+        observers = assigns[:js_env][:OBSERVER_LIST]
+        expect(observers.length).to be(1)
+        expect(observers[0][:name]).to eq(@student.name)
+        expect(observers[0][:id]).to eq(@student.id)
+      end
 
-      get 'show', params: {:id => @course.id}
-      expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+      it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
+        @course.enable_feature!(:student_outcome_gradebook)
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+      end
+
+      describe "update" do
+
+        it "syncs enrollments if setting is set" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).to receive(:process_job)
+
+          user_session(@teacher)
+
+          get 'update', params: {
+            :id => @course.id,
+            :course => {
+              homeroom_course_id: '17',
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+
+        it "does not sync if course is a sis import" do
+          progress = double('Progress').as_null_object
+          allow(Progress).to receive(:new).and_return(progress)
+          expect(progress).not_to receive(:process_job)
+
+          user_session(@teacher)
+          sis = @course.account.sis_batches.create
+          @course.sis_batch_id = sis.id
+          @course.save!
+
+          get 'update', params: {
+            :id => @course.id,
+            :course => {
+              homeroom_course_id: '17',
+              sync_enrollments_from_homeroom: '1'
+            }
+          }
+        end
+      end
     end
 
     context 'COURSE.latest_announcement' do
@@ -2488,7 +2546,7 @@ describe CoursesController do
     it "should render the show page with a flash on error" do
       user_session(@teacher)
       # cause the course to be invalid
-      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      Course.where(id: @course).update_all(restrict_enrollments_to_course_dates: true, start_at: Time.now.utc, conclude_at: 1.day.ago)
       put 'update', params: {:id => @course.id, :course => { :name => "name change" }}
       expect(flash[:error]).to match(/There was an error saving the changes to the course/)
     end

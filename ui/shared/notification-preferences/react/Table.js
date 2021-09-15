@@ -25,6 +25,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import theme from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -90,16 +91,12 @@ const formatCategoryKey = category => {
   return categoryStrings.join('_').replace(/\s/g, '')
 }
 
-const smsNotificationCategoryDeprecated = category => {
-  return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
-}
-
 const pushNotificationCategoryRestricted = category => {
   return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
 }
 
 const menuShouldBeDisabled = (category, pathType) => {
-  if (pathType === 'sms') return smsNotificationCategoryDeprecated(category)
+  if (pathType === 'sms') return true
   else if (pathType === 'push') return pushNotificationCategoryRestricted(category)
   else return false
 }
@@ -190,10 +187,18 @@ const renderNotificationCategory = (
                     }
                     placement="end"
                   >
-                    {
-                      notificationPreferences.channels[0].categories[notificationCategory][category]
-                        .notification.categoryDisplayName
-                    }
+                    <span
+                      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                      tabIndex="0"
+                      style={{padding: theme.variables.spacing.xxSmall}}
+                      data-testid={`${formatCategoryKey(category)}_header`}
+                    >
+                      {
+                        notificationPreferences.channels[0].categories[notificationCategory][
+                          category
+                        ].notification.categoryDisplayName
+                      }
+                    </span>
                   </Tooltip>
                   <ScreenReaderContent>
                     <div

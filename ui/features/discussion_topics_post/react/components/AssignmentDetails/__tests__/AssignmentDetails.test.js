@@ -135,7 +135,7 @@ describe('AssignmentDetails', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'}
+        tablet: {maxWidth: '767px'}
       }))
     })
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,17 +30,17 @@ import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
 import {showImportConfirmBox} from './ImportConfirmBox'
-import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
+import {useFindOutcomeModal} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
-import useModal from '@canvas/outcomes/react/hooks/useModal'
+import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {isMobileView, isCourse} = useCanvasContext()
+  const {isMobileView, isCourse, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {
@@ -64,34 +64,65 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
+  useEffect(() => {
+    if (!open) {
+      setShowOutcomesView(false)
+    }
+  }, [open])
+
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
-  const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
 
   const {
     importOutcomes,
     importGroupsStatus,
     importOutcomesStatus,
     clearGroupsStatus,
-    clearOutcomesStatus
+    clearOutcomesStatus,
+    hasAddedOutcomes,
+    setHasAddedOutcomes
   } = useOutcomesImport()
 
   const onCloseModalHandler = () => {
     clearGroupsStatus()
     clearOutcomesStatus()
-    onCloseHandler()
+    onCloseHandler(hasAddedOutcomes)
   }
+
+  const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useBoolean()
+  const [shouldFocusAddAllBtn, focusAddAllBtn, blurAddAllBtn] = useBoolean()
+  const [shouldFocusDoneBtn, focusDoneBtn, blurDoneBtn] = useBoolean()
+  const doneBtnRef = useRef()
+
+  useEffect(() => {
+    if (shouldFocusDoneBtn) doneBtnRef.current?.focus()
+  }, [shouldFocusDoneBtn])
+
+  useEffect(() => {
+    if (open) {
+      setHasAddedOutcomes(false)
+    }
+  }, [open, setHasAddedOutcomes])
 
   const onAddAllHandler = () => {
     if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
+      blurAddAllBtn()
+      blurDoneBtn()
       openConfirmBox()
       showImportConfirmBox({
         count: group.outcomesCount,
-        onImportHandler: () => importOutcomes(selectedGroupId, group.outcomesCount),
-        onCloseHandler: closeConfirmBox
+        onImportHandler: () => {
+          importOutcomes(selectedGroupId, group.title)
+          closeConfirmBox()
+          focusDoneBtn()
+        },
+        onCloseHandler: () => {
+          closeConfirmBox()
+          focusAddAllBtn()
+        }
       })
     } else {
-      importOutcomes(selectedGroupId, group.outcomesCount)
+      importOutcomes(selectedGroupId, group.title)
     }
   }
 
@@ -110,6 +141,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       mobileScrollContainer={scrollContainer}
       importOutcomesStatus={importOutcomesStatus}
       importOutcomeHandler={importOutcomes}
+      shouldFocusAddAllBtn={shouldFocusAddAllBtn}
     />
   )
 
@@ -209,7 +241,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               overflowX="auto"
               elementRef={setRightColumnRef}
             >
-              {selectedGroupId && selectedGroupId !== ACCOUNT_FOLDER_ID ? (
+              {selectedGroupId && !rootIds.includes(selectedGroupId) ? (
                 findOutcomesView
               ) : (
                 <FindOutcomesBillboard />
@@ -234,7 +266,13 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseModalHandler}>
+        <Button
+          type="button"
+          color="primary"
+          margin="0 x-small 0 0"
+          ref={doneBtnRef}
+          onClick={onCloseModalHandler}
+        >
           {I18n.t('Done')}
         </Button>
       </Modal.Footer>

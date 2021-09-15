@@ -19,6 +19,7 @@
 def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
+  def rspecqNodeTotal = env.TEST_QUEUE_NODES.toInteger()
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
@@ -47,29 +48,63 @@ def createDistribution(nestedStages) {
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
   ]
 
+  def rspecqEnvVars = baseEnvVars + [
+    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
+    'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
+    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
+    "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
+    'RSPEC_PROCESSES=6',
+    'RSPECQ_FILE_SPLIT_THRESHOLD=120',
+    'RSPECQ_MAX_REQUEUES=1',
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
+  ]
+
   def rspecNodeRequirements = [label: 'canvas-docker']
 
-  rspecNodeTotal.times { index ->
-    extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
-      .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
-      .nodeRequirements(rspecNodeRequirements)
-      .timeout(15)
-      .queue(nestedStages, this.&runSuite)
-  }
-
-  seleniumNodeTotal.times { index ->
-    extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
-      .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
-      .nodeRequirements(rspecNodeRequirements)
-      .timeout(15)
-      .queue(nestedStages, this.&runSuite)
+  if (configuration.isRspecqEnabled()) {
+    rspecqNodeTotal.times { index ->
+      extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
+        .nodeRequirements(rspecNodeRequirements)
+        .timeout(15)
+        .queue(nestedStages, this.&runRspecqSuite)
     }
+
+    extendedStage('RSpecQ Reporter for Rspec')
+      .envVars(rspecqEnvVars)
+      .hooks([onNodeAcquired: setupNodeHook])
+      .nodeRequirements(rspecNodeRequirements)
+      .timeout(15)
+      .queue(nestedStages, this.&runReporter)
+  } else {
+    rspecNodeTotal.times { index ->
+      extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
+        .nodeRequirements(rspecNodeRequirements)
+        .timeout(15)
+        .queue(nestedStages, this.&runLegacySuite)
+    }
+
+    seleniumNodeTotal.times { index ->
+      extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
+        .nodeRequirements(rspecNodeRequirements)
+        .timeout(15)
+        .queue(nestedStages, this.&runLegacySuite)
+    }
+  }
 }
 
 def setupNode() {
   distribution.unstashBuildScripts()
+
+  if (configuration.isRspecqEnabled()) {
+    def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD}", 'UTF-8')
+    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
+  }
 
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
@@ -80,8 +115,8 @@ def setupNode() {
 
 def tearDownNode(prefix) {
   sh 'rm -rf ./tmp && mkdir -p tmp'
-  sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
+  sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
   if (configuration.getBoolean('upload-docker-logs', 'false')) {
     sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log"
@@ -129,9 +164,84 @@ def tearDownNode(prefix) {
   sh 'rm -rf ./tmp'
 }
 
-def runSuite() {
+def runRspecqSuite() {
+  try {
+    def workers = [:]
+    def rspecProcesses = env.RSPEC_PROCESSES.toInteger()
+
+    rspecProcesses.times { index ->
+      def workerName = "${env.JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
+      workers[workerName] = { ->
+        def workerStartTime = System.currentTimeMillis()
+        sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
+                                        -e SENTRY_DSN \
+                                        -e RAILS_DB_NAME_TEST=canvas_test_${index} \
+                                        -T canvas bundle exec rspecq \
+                                          --build ${env.JOB_NAME}_build${BUILD_NUMBER} \
+                                          --worker ${workerName} \
+                                          --include-pattern '${TEST_PATTERN}'  \
+                                          --exclude-pattern '${EXCLUDE_TESTS}' \
+                                          --junit-output log/results/junit{{JOB_INDEX}}-${index}.xml \
+                                          --queue-wait-timeout 120 \
+                                          -- --require './spec/formatters/error_context/stderr_formatter.rb' \
+                                          --require './spec/formatters/error_context/html_page_formatter.rb' \
+                                          --format ErrorContext::HTMLPageFormatter \
+                                          --format ErrorContext::StderrFormatter .")
+        def workerEndTime = System.currentTimeMillis()
+
+        //To Do: remove once data gathering exercise is complete and RspecQ is enabled by default.
+        def specCount = sh(script: "docker-compose exec -e ${env.RSPECQ_REDIS_PASSWORD} -T redis redis-cli -h ${env.TEST_QUEUE_HOST} -p 6379 llen ${env.JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
+
+        reportToSplunk('test_queue_worker_ended', [
+            'workerName': workerName,
+            'workerRunTime': workerEndTime - workerStartTime,
+            'wokerSpecCount' : specCount,
+        ])
+      }
+    }
+    parallel(workers)
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      /* groovylint-disable-next-line GStringExpressionWithinString */
+      sh '''#!/bin/bash
+        ids=( $(docker ps -aq --filter "name=canvas_") )
+        for i in "${ids[@]}"
+        do
+          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+        done
+      '''
+    }
+
+    throw e
+  }
+}
+
+def runLegacySuite() {
   try {
     sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      /* groovylint-disable-next-line GStringExpressionWithinString */
+      sh '''#!/bin/bash
+        ids=( $(docker ps -aq --filter "name=canvas_") )
+        for i in "${ids[@]}"
+        do
+          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+        done
+      '''
+    }
+
+    throw e
+  }
+}
+
+def runReporter() {
+  try {
+    sh(script: "docker-compose exec -e SENTRY_DSN -T canvas bundle exec rspecq \
+                                            --build=${env.JOB_NAME}_build${BUILD_NUMBER} \
+                                            --queue-wait-timeout 120 \
+                                            --redis-url ${env.RSPECQ_REDIS_URL} \
+                                            --report", label: 'Reporter')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */

@@ -53,6 +53,7 @@ class UserList
     @initial_type = initial_type
     @search_method = (@root_account.open_registration? ? :open : :closed) if @search_method == :infer
     @current_user = current_user
+    list_in ||= ''
     parse_list(list_in)
     resolve
   end
@@ -217,7 +218,7 @@ class UserList
     associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
-      
+
       pseudos = Pseudonym.active
           .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
           .joins(:user => :communication_channels)

@@ -34,7 +34,8 @@ export function propsFromState(state) {
     newPageLinkExpanded,
     all_files,
     jwt,
-    host
+    host,
+    source
   } = state
 
   const collections = {}
@@ -61,6 +62,7 @@ export function propsFromState(state) {
     ...ui,
     all_files,
     jwt,
-    host
+    host,
+    source
   }
 }

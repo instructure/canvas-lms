@@ -169,12 +169,12 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
-      # rubocop:disable SymbolArray
+      # rubocop:disable Style/SymbolArray
       match :join, via: [:get, :post]
       match :close, via: [:get, :post]
       match :recording, via: [:get]
       match :recording, via: [:delete], to: 'conferences#delete_recording', as: :delete_recording
-      # rubocop:enable SymbolArray
+      # rubocop:enable Style/SymbolArray
       get :settings
     end
   end
@@ -241,7 +241,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resource :gradebook_csv, only: [:show]
+    resource :gradebook_csv, only: [:create]
 
     # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     get 'imports/list' => 'content_imports#index', as: :import_list
@@ -455,6 +455,8 @@ CanvasRails::Application.routes.draw do
         get :progressions
       end
     end
+
+    get 'pace_plans' => 'pace_plans#show'
 
     post 'collapse_all_modules' => 'context_modules#toggle_collapse_all'
     resources :content_exports, only: [:create, :index, :destroy, :show]
@@ -872,8 +874,6 @@ CanvasRails::Application.routes.draw do
   end
 
   get 'account_notifications' => 'account_notifications#render_past_global_announcements'
-
-  resource :trophy_case, controller: :user_trophies, only: [:show]
 
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
@@ -2351,6 +2351,12 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :gradebooks) do
       put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
+    end
+
+    scope(controller: :pace_plans) do
+      post 'courses/:course_id/pace_plans', action: :create
+      get 'courses/:course_id/pace_plans/:id', action: :api_show
+      put 'courses/:course_id/pace_plans/:id', action: :update
     end
   end
 

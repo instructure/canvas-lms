@@ -37,13 +37,14 @@ import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 
 import K5Tabs from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import TodosPage from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import loadCardDashboard from '@canvas/dashboard-card'
+import loadCardDashboard, {resetDashboardCards} from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
@@ -58,7 +59,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions from '@canvas/k5/react/ObserverOptions'
+import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
 
 const DASHBOARD_TABS = [
   {
@@ -138,7 +139,9 @@ export const K5Dashboard = ({
   showImportantDates,
   selectedContextCodes,
   selectedContextsLimit,
-  parentSupportEnabled
+  parentSupportEnabled,
+  observerList,
+  canAddObservee
 }) => {
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
@@ -150,6 +153,7 @@ export const K5Dashboard = ({
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
   const [observedUserId, setObservedUserId] = useState(null)
+  const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -158,26 +162,45 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
+  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
     setTrayOpen(false)
   }
 
+  const loadCardDashboardCallBack = (dc, cardsFinishedLoading, observedUser) => {
+    const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
+    setCards(activeCards)
+    setCardsSettled(cardsFinishedLoading)
+    if (cardsFinishedLoading && observedUser) {
+      setObservedUsersCards(cachedCards => ({
+        ...cachedCards,
+        [observedUser]: activeCards
+      }))
+    }
+    if (cardsFinishedLoading && activeCards?.length === 0) {
+      setLoadingAnnouncements(false)
+      setHomeroomAnnouncements([])
+      setSubjectAnnouncements([])
+    }
+  }
+
   useEffect(() => {
     if (!cards) {
-      loadCardDashboard((dc, cardsFinishedLoading) => {
-        const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
-        setCards(activeCards)
-        setCardsSettled(cardsFinishedLoading)
-        if (cardsFinishedLoading && activeCards?.length === 0) {
-          setLoadingAnnouncements(false)
-          setHomeroomAnnouncements([])
-          setSubjectAnnouncements([])
-        }
-      })
+      loadCardDashboard(loadCardDashboardCallBack)
+    } else if (observedUserId && observerMode) {
+      const cachedCards = observedUsersCards[observedUserId]
+      if (cachedCards) {
+        setCards(cachedCards) // Using cards from state if the selected user has been requested already
+      } else if (cardsSettled) {
+        // fetching cards if the user hasn't been requested and there is not a request in progress
+        setCardsSettled(false)
+        resetDashboardCards() // Only reset the dashboard cards state if there is not a request in progress
+        loadCardDashboard(loadCardDashboardCallBack, observedUserId)
+      }
     }
-  }, [cards])
+  }, [cards, observedUserId, observedUsersCards]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useFetchApi({
     path: '/api/v1/announcements',
@@ -266,11 +289,16 @@ export const K5Dashboard = ({
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
           {parentSupportEnabled && (
-            <ObserverOptions
-              currentUser={currentUser}
-              currentUserRoles={currentUserRoles}
-              handleChangeObservedUser={setObservedUserId}
-            />
+            <View as="div" maxWidth="16em">
+              <ObserverOptions
+                observerList={observerList}
+                currentUser={currentUser}
+                handleChangeObservedUser={setObservedUserId}
+                margin="medium 0 xx-small 0"
+                canAddObservee={canAddObservee}
+                currentUserRoles={currentUserRoles}
+              />
+            </View>
           )}
           <K5DashboardContext.Provider
             value={{
@@ -300,6 +328,7 @@ export const K5Dashboard = ({
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
+              loadingCards={!cardsSettled}
             />
             <SchedulePage
               plannerEnabled={plannerEnabled}
@@ -307,6 +336,7 @@ export const K5Dashboard = ({
               timeZone={timeZone}
               userHasEnrollments={!!cards?.length}
               visible={currentTab === TAB_IDS.SCHEDULE}
+              singleCourse={false}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
@@ -370,7 +400,9 @@ K5Dashboard.propTypes = {
   showImportantDates: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired
+  parentSupportEnabled: PropTypes.bool.isRequired,
+  observerList: ObserverListShape.isRequired,
+  canAddObservee: PropTypes.bool.isRequired
 }
 
 const mapDispatchToProps = {

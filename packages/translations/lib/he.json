@@ -347,6 +347,9 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
+    "join_6cafecca": {
+        "message": "הצטרפות"
+    },
     "jump_to_today_254ccf41": {
         "message": "עבור להיום"
     },

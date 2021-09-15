@@ -26,5 +26,6 @@ module IncomingMail
     class ReplyToDeletedDiscussion < ReplyFrom; end
     class InvalidParticipant < ReplyFrom; end
     class BlankMessage < ReplyFrom; end
+    class MessageTooLong < ReplyFrom; end
   end
 end

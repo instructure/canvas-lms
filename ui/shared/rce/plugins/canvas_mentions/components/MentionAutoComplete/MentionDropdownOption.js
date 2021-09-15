@@ -28,18 +28,37 @@ const MentionDropdownOption = props => {
 
   // Scroll individual item into view when its selected or navigated towards
   useEffect(() => {
-    if (props.isSelected) {
-      optionRef.current.scrollIntoView(false)
+    if (
+      props.isSelected &&
+      optionRef.current &&
+      props.menuRef &&
+      !props.highlightMouse &&
+      props.isInteractive
+    ) {
+      const menuItemOffsetTop = optionRef.current?.offsetTop
+      const menuHeight = props.menuRef.current?.clientHeight
+      const itemHeight = optionRef.current?.clientHeight
+      props.menuRef.current.scrollTop = menuItemOffsetTop - (menuHeight - itemHeight) / 2
     }
-  }, [props.isSelected])
+  }, [props.highlightMouse, props.isInteractive, props.isSelected, props.menuRef, props.optionRef])
 
   return (
     <View
       as="div"
-      background={isHover || props.isSelected ? 'brand' : null}
+      background={
+        (isHover && props.highlightMouse) || (props.isSelected && !props.highlightMouse)
+          ? 'brand'
+          : null
+      }
+      elementRef={el => {
+        optionRef.current = el
+      }}
       padding="xx-small"
       onMouseEnter={() => {
-        setHover(true)
+        if (props.highlightMouse) {
+          props.onOptionMouseEnter()
+          setHover(true)
+        }
       }}
       onMouseLeave={() => {
         setHover(false)
@@ -49,14 +68,21 @@ const MentionDropdownOption = props => {
       <li
         aria-selected={props.isSelected}
         id={props.id}
-        ref={optionRef}
         role="option"
         style={{listStyle: 'none'}}
         onClick={props.onSelect}
       >
         <View as="div">
           <Avatar name={props.name} margin="0 small 0 0" size="x-small" />
-          <Text color={isHover ? 'primary-inverse' : null}>{props.name}</Text>
+          <Text
+            color={
+              (isHover && props.highlightMouse) || (props.isSelected && !props.highlightMouse)
+                ? 'primary-inverse'
+                : null
+            }
+          >
+            {props.name}
+          </Text>
         </View>
       </li>
     </View>
@@ -77,5 +103,17 @@ MentionDropdownOption.props = {
   /**
    * onSelect callback that accepts a function
    */
-  onSelect: PropTypes.string.isRequired
+  onSelect: PropTypes.string.isRequired,
+  /**
+   * Bool to control mouse highlighting
+   */
+  highlightMouse: PropTypes.bool,
+  /**
+   * Callback to set focused user
+   */
+  onOptionMouseEnter: PropTypes.func,
+  /**
+   * Menu Ref is needed to scroll menu correctly
+   */
+  menuRef: PropTypes.node
 }

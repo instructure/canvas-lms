@@ -38,21 +38,22 @@
 }
 
 .activityIndicator + .completed {
-  margin-inline-start: calc(var(--gutterWidth) - var(--activityIndicatorWidth))
+  margin-inline-start: calc(var(--gutterWidth) - var(--activityIndicatorWidth));
 }
 
 .icon {
   color: var(--iconColor);
   margin: 0 var(--gutterWidth);
 
-  > svg { /* stylelint-disable-line selector-no-type */
+  > svg {
+    /* stylelint-disable-line selector-no-type */
     display: block;
   }
 }
 
 .avatar {
   /* adjust margin so <Avatar size="small"> fits in same space as the icon */
-  margin: 0 calc(var(--gutterWidth) - ((1em*2.5) - var(--iconFontSize))/2);
+  margin: 0 calc(var(--gutterWidth) - ((1em * 2.5) - var(--iconFontSize)) / 2);
 }
 
 .layout {
@@ -75,8 +76,8 @@
   box-sizing: border-box;
   min-width: 1px;
   &.details_no_badges {
-     flex: 0 0 75%;
-   }
+    flex: 0 0 75%;
+  }
 }
 
 .secondary {
@@ -87,8 +88,8 @@
   justify-content: flex-end;
   min-width: 1px;
   &.secondary_no_badges {
-     flex: 0 0 25%;
-   }
+    flex: 0 0 25%;
+  }
 }
 
 .type {
@@ -143,7 +144,7 @@
 .feedback {
   display: flex;
   align-items: center;
-  min-height: 40px;   /* height of the avater, so ie11 doesn't squish it */
+  min-height: 40px; /* height of the avater, so ie11 doesn't squish it */
 
   .feedbackAvatar {
     flex-shrink: 0;
@@ -156,7 +157,13 @@
   }
 }
 
-.small, .medium {
+.location {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.small,
+.medium {
   .title {
     overflow: hidden;
     white-space: nowrap;
@@ -174,13 +181,17 @@
   }
   .innerLayout {
     flex-direction: column;
-    align-items:flex-start;
+    align-items: flex-start;
     margin-inline-start: 1rem;
   }
   .details {
     margin-bottom: 1rem;
     flex: 1 0 auto;
-    width: 100%
+    width: 100%;
+  }
+  .moreDetails {
+    display: flex;
+    justify-content: space-between;
   }
   .secondary {
     flex: 1 0 auto;
@@ -198,7 +209,11 @@
   .due {
     width: 100%;
   }
-  .icon, .avatar, .badges, .feedback, .editButton {
+  .icon,
+  .avatar,
+  .badges,
+  .feedback,
+  .editButton {
     display: none;
   }
   .location {

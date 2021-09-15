@@ -1577,6 +1577,7 @@ sv-x-k12:
   add_a_new_user_9d041d3b: "Lägg till ny användare"
   add_a_new_user_c440d053: "Lägg till en ny användare"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Lägg till en bedömare för de valda eleverna"
+  add_a_subject_e89e1cba: "Lägg till ett ämne"
   add_account_admins_99c03c9e: "Lägg till kontoadmin"
   add_additional_comments_ec34a62f: "Lägg till ytterligare kommentarer"
   add_alert_b2729c99: "Lägg till notis"
@@ -1589,6 +1590,7 @@ sv-x-k12:
   add_app_baf540f: "Lägg till app"
   add_as_allowed_e95540be: "Lägg till som Tillåten"
   add_assignment_to_name_caf173b0: "Lägg till uppgiften till %{name}"
+  add_assignments_and_quizzes_1085d2af: "Lägg till uppgifter och quiz"
   add_attachment_93868828: "Lägg till bilaga"
   add_attribute_6d6d4a65: "Lägg till attribut"
   add_bank: 
@@ -1611,6 +1613,7 @@ sv-x-k12:
   add_courses_c0696323: "Lägg till kurser"
   add_criterion_eb9587ef: "Lägg till kriterium"
   add_custom_link_22059c0: "Lägg till anpassad länk"
+  add_delete_b82d05f8: "lägg till/radera"
   add_delete_edit_7dbc9c5b: "lägg till/ta bort/redigera"
   add_delete_manage_d65e235: "lägg till/ta bort/hantera"
   add_designers_to_courses_9588820b: "Lägg till designers i kurser"
@@ -2572,6 +2575,8 @@ sv-x-k12:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Ett fel inträffade när lärandemålet skulle skapas: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Ett fel inträffade när lärandemålet skulle skapas: %{message}."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Ett fel uppstod vid borttagning av anslag."
+  an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Ett fel inträffade vid import av dessa lärandemål."
+  an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "Ett fel inträffade vid import av dessa lärandemål: %{message}."
   an_error_occurred_while_importing_this_group_9aef7c30: "Ett fel inträffade när den här gruppen importerades."
   an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Ett fel inträffade när den här gruppen importerades: %{message}."
   an_error_occurred_while_importing_this_outcome_2ce488af: "Ett fel inträffade när det här lärandemålet importerades."
@@ -2630,6 +2635,7 @@ sv-x-k12:
   an_error_occurred_while_updating_this_outcome_e210547: "Ett fel inträffade när lärandemålet skulle uppdateras."
   an_error_occurred_while_updating_this_outcome_mess_5ada5958: "Ett fel inträffade när lärandemålet skulle uppdateras: %{message}"
   an_error_occurred_while_updating_this_outcome_mess_92be298e: "Ett fel inträffade när lärandemålet skulle uppdateras: %{message}."
+  an_error_occurred_while_updating_view_options_c4807f37: "Ett fel inträffade vid uppdatering av vyalternativen"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ett fel uppstod vid radering av mötesgruppen"
   an_error_ocurred_while_fetching_course_details_ple_9cab7735: "Ett fel uppstod när din kursinformation skulle hämtas. Försök igen."
   an_error_ocurred_while_loading_announcements_32af2ce4: "Ett fel uppstod vid inläsning av anslag"
@@ -3174,6 +3180,7 @@ sv-x-k12:
   assignment_name_is_required_9d17311b: "Namn på uppgiften krävs"
   assignment_name_options_43b1795: "uppgift %{name} alternativ"
   assignment_name_z_a_34f92f4b: "Uppgiftens namn – Ö–A"
+  assignment_names_858b1880: Uppgiftsnamn
   assignment_options_1e5b7074: Uppgiftsalternativ
   assignment_override: 
     student_count: 
@@ -3722,7 +3729,10 @@ sv-x-k12:
   assignments_2_student_view_224cb233: "Uppgifter till elevens vy"
   assignments_2_teacher_view_3cd3aeda: "Uppgifter till lärare-vy"
   assignments_2_teacher_view_error_page_8e45dedc: "Sida med visningsfel för lärare för uppgifter 2"
+  assignments_and_quizzes_add_b1473591: "Uppgifter och quiz – lägg till"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Uppgifter och quiz – lägg till/redigera/ta bort"
+  assignments_and_quizzes_delete_84ecc680: "Uppgifter och quiz – radera"
+  assignments_and_quizzes_manage_edit_8b4b1edc: "Uppgifter och quiz – hantera/redigera"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Uppgifter och frågesporter - visa svarsmatris"
   assignments_api: 
     invalid_date_time: "Ogiltig datumtid för %{attribute}"
@@ -5179,7 +5189,7 @@ sv-x-k12:
       page_title: Samarbete
       titles: 
         current: "Nuvarande samarbeten"
-    lti_collaborations: LTI-samarbeten
+    lti_collaborations: "Externa samarbeten"
     show: 
       error_cause_1: "Skaparens Google Drive-konto är inte samma som det konto som användes för att skapa samarbetet."
       error_cause_2: "Samarbetes skapare är inte längre en författare på Google Dokument."
@@ -5443,6 +5453,7 @@ sv-x-k12:
   compose_message_8abd180a: "Skriv meddelande"
   computer_1d7dfa6f: Dator
   conclude_courses_a7ed8a8: "Avsluta kurser"
+  conclude_delete_publish_reset_35b64f0f: slutför/radera/publicera/återställ
   concluded_63150003: avslutad
   concluded_conferences_cdbe53f9: "Avslutade konferenser"
   concluded_courses_94782e21: "Avslutade kurser"
@@ -5464,6 +5475,7 @@ sv-x-k12:
   conference_has_been_removed_f771cb11: "Konferensen har tagits bort"
   conference_has_been_updated_title_2bacc5fa: "Konferensen har uppdaterats: %{title}"
   conference_selection_ea4050bb: Konferensurval
+  conference_type_names_conferences_6c019253: "%{conference_type_names} (konferenser)"
   conference_type_names_formerly_conferences_c2e847b0: "%{conference_type_names} (tidigare konferenser)"
   conference_was_deleted_30869390: "Konferensen raderades"
   conferences: 
@@ -6417,6 +6429,7 @@ sv-x-k12:
   count_items_selected_91814713: 
     one: "%{count} objekt valt"
     other: "%{count} objekt valda"
+  count_less_e65e028b: "%{count} färre"
   count_max_students_2db76773: "%{count}/%{max} elever"
   count_max_users_bdebb537: "%{count}/%{max} användare"
   count_messages_4f8ff204: 
@@ -6426,6 +6439,7 @@ sv-x-k12:
     one: "1 minut"
     other: "%{count} minuter"
     zero: "mindre än 1 minut"
+  count_more_beba6428: "%{count} till"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} av %{max} maximala tecken"
   count_options_190d6373: 
     one: "1 Alternativ"
@@ -6443,6 +6457,12 @@ sv-x-k12:
   count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
     one: "”%{outcomeTitle}” har flyttats till ”%{newGroupTitle}”."
     other: "%{count} lärandemål har flyttats till ”%{newGroupTitle}”."
+  count_outcomes_have_been_successfully_added_to_thi_7d0efc5b: 
+    one: "1 lärandemål har lagts till i den här kursen."
+    other: "%{count} lärandemål har lagts till i den här kursen."
+  count_outcomes_have_been_successfully_added_to_thi_d3eaec7b: 
+    one: "1 lärandemål har lagts till i det här kontot."
+    other: "%{count} lärandemål har lagts till i det här kontot."
   count_outcomes_selected_55902958: 
     one: "1 lärandemål har valts"
     other: "%{count} lärandemål är valda"
@@ -7782,6 +7802,7 @@ sv-x-k12:
   delete_assignment_5d3f3f15: "ta bort uppgift"
   delete_assignment_group_7c3b01c4: "Ta bort uppgiftsgrupp"
   delete_assignment_name_deec56e3: "Ta bort uppgiften %{name}"
+  delete_assignments_and_quizzes_b30347d7: "Radera uppgifter och quiz"
   delete_bank_d8f4cb64: "Radera %{bank}"
   delete_collaboration_23035eaf: "Ta bort samarbete"
   delete_comment_a71040c3: "Radera kommentar"
@@ -7853,6 +7874,7 @@ sv-x-k12:
   delete_your_work_fe136221: "Vill du ta bort arbetet?"
   deleted_1be5ed1: Raderad
   deleted_by_deletername_f269211a: "Borttagen av %{deleterName}"
+  deleted_by_editor_d3fdc2ee: "Borttagen av %{editor}"
   deleted_by_user_be69f8: "Borttagen av %{user}"
   deleted_caption_b5c66807: "Tog bort undertext"
   deleted_ce03674d: raderad
@@ -10574,6 +10596,7 @@ sv-x-k12:
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljinställningar för kursaviseringar kan konfigureras här i framtiden."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granulära behörigheter för administratörsroller för Lägg till/ta bort i kurser."
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Granulära behörigheter för Lägg till-/ta bort-roller från kurs"
+  granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Granulära behörigheter för uppgifter och quiz"
   granular_permissions_for_managing_course_files_1ed7f019: "Granulära behörigheter för hantering av kursfiler"
   granular_permissions_for_managing_course_sections_da4b04b: "Granulära behörigheter för hantering av kurssektioner"
   granular_permissions_for_managing_courses_a71be71d: "Granulära behörigheter för hantering av kurser"
@@ -11272,6 +11295,7 @@ sv-x-k12:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Om inaktiverad, har användare ändå åtkomst till kursinställningar. Användare kan inte hantera individuellt kursinnehåll utan korrekt behörighet för det innehållsobjektet. Om kurssynligheten är begränsad till användare som registrerat sig för kusen, gör den här behörigheten att användare kan visa kursinnehåll utan att vara registrerad i kursen."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Om inaktiverad, har användare ändå åtkomst till kursinställningar."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Om alternativet är aktiverat tillåts att mer än högsta möjliga resultat ges för ett lärandemål i en matris."
+  if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Om aktiverad tillåts stöd för flera djuplänkar till uppgifter och moduler."
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Om du aktiverar den här inställningen kommer Canvas att tillåta verktyg att returnera flera innehållsobjekt
       i en enda begäran på kursmodulsidan
@@ -11568,6 +11592,7 @@ sv-x-k12:
   include_deleted_objects_3cced3b5: "Inkludera raderade objekt;"
   include_fullstory_recording_of_the_user_s_session_656d131e: "Inkludera FullStory-inspelning av användarsessionen"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inkludera Integrations-ID:n i export av bedömningsböcker."
+  include_quoted_reply_in_message_d0c8af8a: "Ta med citerade svar i meddelandet"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkludera resultat vid notifiering om omdömen.
                 Om din e-postadress inte är en institutionsadress innebär det att känsligt innehåll skickas utanför institutionen.
@@ -11800,6 +11825,7 @@ sv-x-k12:
   invalid_sis_sync_status_b68db497: "ogiltig synkroniseringsstatus för SIS"
   invalid_state_parameter_7a5aa108: "Ogiltig tillståndsparameter"
   invalid_submission_file_type_cda6742a: "Ogiltig filtyp för inlämning"
+  invalid_targetcontexttype_53b96e87: "Ogiltig targetContextType"
   invalid_timestamp_timestamp_in_future_5bc855d7: "Ogiltig tidsstämpel ‒ tidsstämpeln är i framtiden"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Ogiltig tidsstämpel ‒ tidsstämpeln går inte att tolka"
   invalid_url_in_xml: "Ogiltig url i xml. Et-tecknet måste undvikas."
@@ -12535,6 +12561,7 @@ sv-x-k12:
   lti_advantage_services_c1746cb4: "LTI Advantage Services"
   lti_key_14ad02b1: LTI-nyckel
   lti_launch_error_41eac9a: LTI-startfel
+  lti_multiple_assignment_deep_linking_b7d641d7: "Djuplänkning för flera LTI-uppgifter"
   lti_report_2b6193ab: LTI-rapport
   luxembourg_352_85f4124d: "Luxemburg (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -12571,6 +12598,7 @@ sv-x-k12:
   manage_announcement_with_title_title_f2ce92de: "Hantera tillkännagivande med titel %{title}"
   manage_app_list_994cc26c: "Hantera applista"
   manage_assignment_31a132fb: "Hantera uppgift"
+  manage_assignments_and_quizzes_170ccaf4: "Hantera uppgifter och quiz"
   manage_avatars: 
     errors: 
       update_failed: "Uppdatering misslyckades, försök igen"
@@ -12588,6 +12616,7 @@ sv-x-k12:
   manage_create_edit_delete_groups_f9046ee3: "Hantera (skapa/redigera/radera) grupper"
   manage_discussion_c1dd8f4e: "Hantera diskussion"
   manage_discussion_title_a2ecb3fb: "Hantera diskussioner %{title}"
+  manage_edit_assignments_and_quizzes_572f3589: "Hantera/redigera uppgifter och quiz"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Hantera registreringsstatus, skapa grupper och lägg till användare från denna sida."
   manage_grading_schemes_in_context_name_e3678273: "Hantera bedömningsscheman i %{context_name}"
   manage_group_group_name_ac8578c6: "Hantera gruppen %{group_name}"
@@ -12627,6 +12656,7 @@ sv-x-k12:
   mark_all_as_read_8f3bdf57: "Markera alla som lästa"
   mark_all_as_read_a995ffbe: "Markera alla som lästa"
   mark_all_as_unread_10e7f0fe: "Markera alla som olästa"
+  mark_all_as_unread_a435be3d: "Markera alla som olästa"
   mark_as_done_6fa48d2f: "Markera som färdig"
   mark_as_done_779556d7: "markera som färdig"
   mark_as_important_date_533718de: "Markera som viktigt datum"
@@ -13932,13 +13962,13 @@ sv-x-k12:
         body: "Canvas-notis – Ny kurs: %{course}, %{account}"
     new_discussion_entry: 
       email: 
-        body: "%{user} lämnade en ny kommentar i tråden %{discussion_topic} för %{course}:"
+        body: "%{user} svarade på %{discussion_topic}, %{course}:"
         html: 
-          body: "%{user} lämnade en ny kommentar i tråden %{discussion_topic} för %{course}:"
+          body: "%{user} svarade på %{discussion_topic}, %{course}:"
           discussion_entry_reply_message: "Gå med i konversationen via länken nedan, eller kommentera genom att svara på det här meddelandet. Om det är tillåtet och du behöver inkludera en bilaga kan du logga in på Canvas och svara på diskussionen."
           link: "Klicka här för att ansluta dig till konversationen"
-          subject: "Ny kommentar för %{discussion_topic}: %{course}"
-        subject: "Ny kommentar för %{discussion_topic}: %{course}"
+          subject: "%{user} svarade på %{discussion_topic}, %{course}"
+        subject: "%{user} svarade på %{discussion_topic}, %{course}"
       sms: 
         details: "Mer information på %{url}"
       summary: 
@@ -13947,12 +13977,12 @@ sv-x-k12:
         body: "Canvas-notis – Kommentar: %{discussion_topic}, %{course}."
     new_discussion_mention: 
       email: 
-        body: "%{user} nämnde dig i en ny kommentar i tråden %{discussion_topic} för %{course}:"
+        body: "%{user} nämnde dig i %{discussion_topic}, %{course}:"
         html: 
-          body: "%{user} nämnde dig i en ny kommentar i tråden %{discussion_topic} för %{course}:"
+          body: "%{user} nämnde dig i %{discussion_topic}, %{course}:"
           link: "Klicka här för att gå med i konversationen"
-          subject: "Du har nämnts i  %{discussion_topic}: %{course}"
-        subject: "Du har nämnts i  %{discussion_topic}: %{course}"
+          subject: "%{user} nämnde dig i %{discussion_topic}, %{course}"
+        subject: "%{user} nämnde dig i %{discussion_topic}, %{course}"
       summary: 
         subject: "Du har nämnts i  %{discussion_topic}: %{course}"
       twitter: 
@@ -15036,6 +15066,7 @@ sv-x-k12:
   no_such_outcome_for_id_id_873a9c4c: "Inget sådant lärandemål för ID:t %{id}"
   no_such_source_context_80a659ba: "ingen sådan källkontext"
   no_such_target_context_21158b9: "ingen sådan målkontext"
+  no_such_target_group_7e183d46: "ingen sådan målgrupp"
   no_template_selected_f59e797: "Ingen mall har valts"
   no_terms_eab5ee7b: "Inga villkor"
   no_tls_618add1a: "Ingen TLS"
@@ -16670,6 +16701,7 @@ sv-x-k12:
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: "Förhandsgranska filer länkade i RCE:n i ett överlägg istället för i en ny webbläsarflik."
   preview_removal_998101a9: "Borttagning av förhandsvisning"
   preview_unavailable_aacd459a: "Förhandsvisning ej tillgänglig"
+  preview_ungraded_as_0_e3b97df6: "Förhandsgranskning ej bedömd som 0"
   preview_website_url_eb5b8a5f: "Förhandsgranska webbplats-URL"
   preview_your_changes_373557d8: "Förhandsgranska dina ändringar"
   previous_445ca243: föregående
@@ -18391,6 +18423,7 @@ sv-x-k12:
   quizzes_tutorial_tray_6f87cdd3: "Självstudiefack för quiz"
   quizzes_view_submission_log_ec105e3e: "Quiz – visa inlämningslogg"
   quotas_account_settings_22c12b8d: "Kvoter (kontoinställningar)"
+  quote_ae4462ad: Citat
   radio_button_option_1_a8ec51f9: "Radioknapp alternativ 1"
   radio_button_option_2_31e50043: "Radioknapp alternativ 2"
   range_56b2f310: Intervall
@@ -19280,6 +19313,7 @@ sv-x-k12:
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Sök efter personer. När du börjar skriva i det här fältet filtreras listan automatiskt till att bara inkludera de namn som matchar din inmatning."
   search_permissions_915bbd09: "Sök behörigheter"
   search_results_for_62243f02: "sökresultat för"
+  search_students_e1f506c: "Sök elever"
   search_term_must_be_at_least_num_characters_669098ed: "Söktermen måste bestå av minst %{num} tecken"
   search_title_body_or_author_1d26711f: "Söker efter titel, brödtext, eller författare"
   search_within_grouptitle_4d38272f: "Sök i %{groupTitle}"
@@ -19604,6 +19638,7 @@ sv-x-k12:
   sending_messages_f8f41998: "skickar meddelanden ..."
   sent_f4ee89ec: Skickat!
   sent_fe0a1eb4: Skickade
+  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Separera granulära behörigheter för att lägga till och radera för uppgifter och quiz från de befintliga hanteringsbehörigheterna som styr alla tre."
   sequence_footer: 
     next_module: "Nästa modul:"
     next_module_desc: "Nästa modul: *modul*"
@@ -20636,6 +20671,7 @@ sv-x-k12:
     previous_object: "Föregående %{type}"
     student_hidden_name: "Elev %{position}"
   sso_settings_ebf98263: SSO-inställningar
+  stable_features_84154e5d: "Stabila funktioner"
   staff_contact_info_2f7a6603: "Kontaktuppgifter för personal"
   star_2d27c137: stjärna
   star_8d156e09: Favoritmarkera
@@ -20695,6 +20731,7 @@ sv-x-k12:
   statistics_for_name_f4b7b0fc: "Statistik för %{name}"
   statistics_view_b19458: "Statistik – visa"
   stats_9272cef3: Statistik
+  status_color_1c4ce650: Statusfärg
   status_color_picker_9ea0156b: "%{status} Färgväljare"
   status_e051bb30: status
   status_e7fdbe06: Status
@@ -21227,6 +21264,8 @@ sv-x-k12:
   take_the_survey_again_24ce22c2: "Besvara enkäten igen"
   target_link_uri_bbed67d1: "* URI för mållänk"
   target_link_uri_d166858: "URI för mållänk"
+  targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId krävs targetContextType har angetts"
+  targetcontexttype_required_if_targetcontextid_prov_2f6e77ad: "targetContextType krävs targetContextId har angetts"
   tas_add_ccec2573: "Lärarassistenter – lägg till"
   tas_add_f4a16393: "TA:er – Lägg till"
   tas_observers_designers_b705118a: "TA:er/observatörer/designers"
@@ -21585,6 +21624,7 @@ sv-x-k12:
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Det uppstod ett problem med att dölja kolumnen för läraranteckningar."
   there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Det uppstod ett problem med att importera några av lärandemålen i den uppladdade filen. Kontrollera din e-post för mer information."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "Det gick inte att läsa in åsidosättningar för slutbedömningar."
+  there_was_a_problem_loading_module_information_e79926f4: "Ett problem uppstod vid inläsning av modulinformationen."
   there_was_a_problem_loading_students_5bdb6cf2: "Det gick inte att läsa in elever."
   there_was_a_problem_loading_submissions_39855ff0: "Det gick inte att läsa in inlämningar."
   there_was_a_problem_logging_in_at_institution_5a298155: "Ett problem uppstod vid inloggning på %{institution}"
@@ -21641,6 +21681,7 @@ sv-x-k12:
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Ett oväntat fel inträffade när diskussionsinlägget lästes in."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Ett oväntat fel uppstod när svaren lästes in."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Ett oväntat fel inträffade när alla skulle markeras som lästa."
+  there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Ett oväntat fel inträffade som markerade allt som oläst."
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: "Ett oväntat fel uppstod när diskussionsämnet uppdaterades."
   there_was_an_unexpected_error_updating_the_entry_5333eb80: "Ett oväntat fel uppstod är inlägget uppdaterades."
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: "Ett oväntat fel uppstod är svaret uppdaterades."
@@ -21726,9 +21767,9 @@ sv-x-k12:
       beta-användargruppen för Nya Diskussioner i Canvas Community.
   this_feature_enhances_the_canvas_experience_within_6e056472: |-
       Den här funktionen ger en förbättrad Canvas-upplevelse i Diskussioner och Meddelanden.
-      När den här flaggan är aktiverad visas tidig åtkomst till pågående förbättringar
-      automatiskt i varje version. För fullständig information,
-      se användargruppen Ny design för Diskussioner/Meddelanden 
+      När den här flaggan aktiveras
+      visas tidig åtkomst automatiskt för varje version. För fullständig information,
+      se användargruppen Ny design för Diskussioner och Meddelanden
       i Canvas Community.
   this_feature_enhances_the_canvas_experience_within_d71a01c6: |-
       Den här funktionen ger en förbättrad upplevelse av Diskussioner i Canvas.
@@ -24179,6 +24220,7 @@ sv-x-k12:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nått det högsta antalet beteedendemönster för webbsida för varje konto (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nått det högsta antalet beteedendemönster för webbsida per användare (%{max})"
   you_have_successfully_marked_all_as_read_f246ef1a: "Du har markerat alla som lästa."
+  you_have_successfully_marked_all_as_unread_cb019eb9: "Du har markerat alla som olästa."
   you_have_successfully_published_the_discussion_top_fa0cdd42: "Du har publicerat diskussionsämnet."
   you_have_successfully_subscribed_to_the_discussion_a577c521: "Du prenumererar på diskussionsämnet."
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Du har avpublicerat diskussionsämnet."
@@ -24215,6 +24257,7 @@ sv-x-k12:
   you_must_provide_a_date_with_a_time_ec369ff4: "Du måste ange ett datum med en tid."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Du måste ange en klientorganisation och ett inloggningsattribut för att aktivera Microsoft Teams Sync."
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Du måste ange ett värde eller avmarkera alternativet."
+  you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Du måste tillhandahålla targetGroupId eller targetContextId och targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du måste välja en kurs att kopiera innehåll från"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Du måste välja en mapp att ladda upp din migrering till"
   you_must_select_an_assignment_group_c16a2168: "Du måste välja en uppgiftsgrupp."

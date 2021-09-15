@@ -83,7 +83,7 @@ describe('PostMessage', () => {
     expect(queryByText('Smol children')).toBeTruthy()
   })
 
-  describe.skip('search highlighting', () => {
+  describe('search highlighting', () => {
     it('should not highlight text if no search term is present', () => {
       const {queryAllByTestId} = setup()
       expect(queryAllByTestId('highlighted-search-item').length).toBe(0)

@@ -72,6 +72,42 @@ describe "Gradebook" do
     end
   end
 
+  context "export options with enhanced filters enabled" do
+    before do
+      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      Gradebook.visit(@course)
+    end
+
+    it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
+      Gradebook.select_export
+
+      Gradebook.action_menu_item_selector("export").click
+
+      expect(current_active_element.tag_name).to eq('button')
+      expect(current_active_element.text).to eq('Export')
+    end
+
+    context "when a csv already exists" do
+      let(:extra_setup) do
+        attachment = @course.attachments.create!(uploaded_data: default_uploaded_data)
+        progress = @course.progresses.new(tag: 'gradebook_export')
+        progress.workflow_state = 'completed'
+        progress.save!
+        @course.gradebook_csvs.create!(user: @teacher,
+                                       progress: progress,
+                                       attachment: attachment)
+      end
+
+      it "maintains focus to Actions menu trigger during past csv export", priority: "2", test_id: 720460 do
+        Gradebook.select_export
+        Gradebook.select_previous_grade_export
+
+        expect(current_active_element.tag_name).to eq('button')
+        expect(current_active_element.text).to eq('Export')
+      end
+    end
+  end
+
   context "return focus to settings menu when it closes" do
     before { Gradebook.visit(@course) }
 

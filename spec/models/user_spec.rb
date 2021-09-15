@@ -21,8 +21,11 @@
 require 'rotp'
 
 require_relative '../sharding_spec_helper'
+require_relative '../helpers/k5_common'
 
 describe User do
+  include K5Common
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       expect(user_model).to be_valid
@@ -535,17 +538,30 @@ describe User do
       expect(@fake_student.reload.user_account_associations).to be_empty
     end
 
-    it "removes account associations for inactive/rejected enrollments" do
-      subaccount1 = Account.default.sub_accounts.create!
-      subaccount2 = Account.default.sub_accounts.create!
-      enrollment1 = course_with_student(active_all: true, account: subaccount1)
-      enrollment2 = course_with_student(active_all: true, account: subaccount2, user: @student)
-      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+    it "removes account associations for rejected enrollments" do
+      subaccount = Account.default.sub_accounts.create!
+      enrollment = course_with_student(active_all: true, account: subaccount)
+      expect(@student.user_account_associations.pluck(:account_id)).to(
+        match_array([Account.default, subaccount].map(&:id))
+      )
 
-      enrollment1.reject
-      enrollment2.update workflow_state: 'inactive'
+      enrollment.reject
       @student.update_account_associations
       expect(@student.user_account_associations.pluck(:account_id)).to be_empty
+    end
+
+    it "should not remove account associations for inactive enrollments" do
+      subaccount = Account.default.sub_accounts.create!
+      enrollment = course_with_student(active_all: true, account: subaccount, user: @student)
+      expect(@student.user_account_associations.pluck(:account_id)).to(
+        match_array([Account.default, subaccount].map(&:id))
+      )
+
+      enrollment.update workflow_state: 'inactive'
+      @student.update_account_associations
+      expect(@student.user_account_associations.pluck(:account_id)).to(
+        match_array([Account.default, subaccount].map(&:id))
+      )
     end
 
     context "sharding" do
@@ -752,6 +768,51 @@ describe User do
         [@course3.id, 'TeacherEnrollment'],
         [@course1.id, 'StudentEnrollment']
       ]
+    end
+
+    describe "should filter by associated_user if provided" do
+      before(:once) do
+      @student = user_model
+      @observer = user_model
+
+      @observer_course = course_factory(:course_name => "Physics", :active_course => true)
+      @observer_course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      observer_enrollment = @observer_course.enroll_user(@user, 'ObserverEnrollment', :enrollment_state => 'active')
+      observer_enrollment.associated_user_id = @student.id
+      observer_enrollment.save!
+
+      @observer_course2 = course_factory(:course_name => "Math", :active_course => true)
+      @observer_course2.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      observer_enrollment2 = @observer_course2.enroll_user(@user, 'ObserverEnrollment', :enrollment_state => 'active')
+      observer_enrollment2.associated_user_id = @student.id
+      observer_enrollment2.save!
+
+      @teacher_course = course_factory(:course_name => "English ", :active_course => true)
+      teacher_entollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+      teacher_entollment.save!
+
+      @student_course = course_factory(:course_name => "Leadership", :active_course => true)
+      teacher_entollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+      teacher_entollment.save!
+
+      end
+
+      it "returns observed courses related to the associated_user" do
+      expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student.id)
+      .map{|c| [c.id, c.primary_enrollment_type]}).to eq [
+        [@observer_course2.id, 'ObserverEnrollment'],
+        [@observer_course.id, 'ObserverEnrollment']
+      ]
+      end
+
+      it "returns only own courses if the associated_user is the current user" do
+        expect(@observer
+        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer.id)
+        .map{|c| [c.id, c.primary_enrollment_type]}).to eq [
+          [@teacher_course.id, 'TeacherEnrollment'],
+          [@student_course.id, 'StudentEnrollment']
+        ]
+      end
     end
 
     it "includes invitations to temporary users" do
@@ -1598,6 +1659,126 @@ describe User do
       @course.enroll_user(@user2)
 
       expect(@user1.menu_courses).to eq [@course]
+    end
+
+    context "with favoriting" do
+      before :once do
+        k5_account = Account.create!(name: "Elementary")
+        toggle_k5_setting(k5_account)
+        @user = user_factory(active_all: true)
+
+        @classic1 = course_factory(course_name: "Classic 1", active_all: true)
+        @classic2 = course_factory(course_name: "Classic 2", active_all: true)
+        @k51 = course_factory(course_name: "K5 1", active_all: true, account: k5_account)
+        @k52 = course_factory(course_name: "K5 2", active_all: true, account: k5_account)
+        @k52.homeroom_course = true
+        @k52.save!
+        @courses = [@classic1, @classic2, @k51, @k52]
+      end
+
+      def assert_has_courses(courses)
+        menu_courses = @user.menu_courses
+        expect(menu_courses.length).to eq courses.length
+        courses.each do |course|
+          expect(menu_courses.any? { |mc| mc.name == course.name }).to be_truthy
+        end
+      end
+
+      shared_examples_for "all enrollments" do
+        it "returns all courses when nothing is favorited" do
+          assert_has_courses(@courses)
+        end
+
+        it "returns all courses when everything is favorited" do
+          @courses.each { |c| @user.favorites.create!(context: c) }
+          assert_has_courses(@courses)
+        end
+      end
+
+      context "as a student" do
+        before :once do
+          @courses.each { |c| c.enroll_student(@user, enrollment_state: "active") }
+        end
+
+        it_behaves_like "all enrollments"
+
+        it "returns all k5 courses even if not favorited" do
+          @user.favorites.create!(context: @classic1)
+          @user.favorites.create!(context: @classic2)
+          assert_has_courses(@courses)
+        end
+
+        it "returns favorited classic and all k5 courses if some classic courses are favorited" do
+          @user.favorites.create!(context: @classic1)
+          assert_has_courses([@classic1, @k51, @k52])
+        end
+
+        it "still returns all courses if a k5 subject is favorited (ignores k5 favorites)" do
+          @user.favorites.create!(context: @k51)
+          assert_has_courses(@courses)
+        end
+      end
+
+      context "as a teacher" do
+        before :once do
+          @courses.each { |c| c.enroll_teacher(@user, enrollment_state: "active") }
+        end
+
+        it_behaves_like "all enrollments"
+
+        it "does not return unfavorited k5 courses if there's other favorited courses" do
+          @user.favorites.create!(context: @classic1)
+          assert_has_courses([@classic1])
+        end
+
+        it "does not return unfavorited classic courses if there's other favorited courses" do
+          @user.favorites.create!(context: @k52)
+          assert_has_courses([@k52])
+        end
+      end
+
+      context "with mixed enrollment types" do
+        it "returns favorited classic and all k5 courses where user is a student" do
+          @classic1.enroll_student(@user, enrollment_state: "active")
+          @classic2.enroll_teacher(@user, enrollment_state: "active")
+          @k51.enroll_student(@user, enrollment_state: "active")
+          @k52.enroll_teacher(@user, enrollment_state: "active")
+          @user.favorites.create!(context: @classic1)
+
+          assert_has_courses([@classic1, @k51])
+        end
+
+        it "returns all k5 courses if user only has teacher enrollment in a classic course" do
+          @classic1.enroll_teacher(@user, enrollment_state: "active")
+          @classic2.enroll_student(@user, enrollment_state: "active")
+          @k51.enroll_student(@user, enrollment_state: "active")
+          @k52.enroll_student(@user, enrollment_state: "active")
+          @user.favorites.create!(context: @classic1)
+
+          assert_has_courses([@classic1, @k51, @k52])
+        end
+
+        it "allows users with TA enrollment to favorite a k5 course" do
+          @classic1.enroll_student(@user, enrollment_state: "active")
+          @classic2.enroll_student(@user, enrollment_state: "active")
+          @k51.enroll_ta(@user, enrollment_state: "active")
+          @k52.enroll_ta(@user, enrollment_state: "active")
+          @user.favorites.create!(context: @classic1)
+          @user.favorites.create!(context: @k51)
+
+          assert_has_courses([@classic1, @k51])
+        end
+
+        it "allows users with designer enrollment to favorite a k5 course" do
+          @classic1.enroll_student(@user, enrollment_state: "active")
+          @classic2.enroll_student(@user, enrollment_state: "active")
+          @k51.enroll_designer(@user, enrollment_state: "active")
+          @k52.enroll_student(@user, enrollment_state: "active")
+          @user.favorites.create!(context: @classic2)
+
+          assert_has_courses([@classic2, @k52])
+        end
+      end
     end
   end
 

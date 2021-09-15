@@ -41,7 +41,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     <li
       key="five"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={101}
         color="#5678"
         context={
@@ -54,6 +54,7 @@ exports[`grouping contains link pointing to course url 1`] = `
         courseName="Board Games"
         date={"2017-04-25T13:06:07.000Z"}
         id="5"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"
@@ -66,7 +67,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     <li
       key="six"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={102}
         color="#5678"
         context={
@@ -78,6 +79,7 @@ exports[`grouping contains link pointing to course url 1`] = `
         courseName="Board Games"
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"
@@ -132,7 +134,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     <li
       key="six"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={101}
         color="#5678"
         context={
@@ -144,6 +146,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
         courseName="Board Games"
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"
@@ -221,7 +224,7 @@ exports[`renders the base component with required props 1`] = `
     <li
       key="five"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={101}
         color="#5678"
         context={
@@ -234,6 +237,7 @@ exports[`renders the base component with required props 1`] = `
         courseName="Board Games"
         date={"2017-04-25T13:06:07.000Z"}
         id="5"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"
@@ -246,7 +250,7 @@ exports[`renders the base component with required props 1`] = `
     <li
       key="six"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={102}
         color="#5678"
         context={
@@ -258,6 +262,7 @@ exports[`renders the base component with required props 1`] = `
         courseName="Board Games"
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"
@@ -306,13 +311,14 @@ exports[`renders to do items correctly 1`] = `
     <li
       key="seven hundred"
     >
-      <Animatable(ResponsivePlannerItem)
+      <Animatable(PlannerItem)
         animatableIndex={101}
         color={null}
         context={Object {}}
         courseName={null}
         date={"2017-06-16T11:06:07.000Z"}
         id="700"
+        responsiveSize="large"
         showNotificationBadge={false}
         simplifiedControls={false}
         timeZone="America/Denver"

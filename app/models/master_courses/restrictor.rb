@@ -140,7 +140,7 @@ module MasterCourses::Restrictor
         tag_content = self
       end
       MasterCourses::ChildContentTag.transaction do
-        child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => tag_content).lock.first
+        child_tag = MasterCourses::ChildContentTag.where(content: tag_content).lock.first
         if child_tag
           new_changes = changed_columns - child_tag.downstream_changes
           if new_changes.any?

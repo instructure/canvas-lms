@@ -52,6 +52,12 @@ describe('Reply', () => {
     const {getByText} = setup()
     expect(getByText('Reply to post from Nikita')).toBeTruthy()
   })
+
+  it('renders quote when in isolated view', () => {
+    const {getByText} = setup({isIsolatedView: true})
+    expect(getByText('Quote')).toBeTruthy()
+  })
+
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getByText} = setup({onClick: onClickMock})

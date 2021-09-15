@@ -260,4 +260,8 @@ shared_context "in-process server selenium tests" do
       end
     end
   end
+
+  after(:all) do
+    ENV.delete('CANVAS_CDN_HOST')
+  end
 end

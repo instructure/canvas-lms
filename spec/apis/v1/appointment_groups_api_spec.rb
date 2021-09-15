@@ -507,6 +507,7 @@ describe AppointmentGroupsController, type: :request do
       before :once, &block
 
       it "should return all #{type}" do
+        skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :format => 'json'})
@@ -529,6 +530,7 @@ describe AppointmentGroupsController, type: :request do
       end
 
       it "should return registered #{type}" do
+        skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=registered", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :registration_status => 'registered', :format => 'json'})
@@ -537,6 +539,7 @@ describe AppointmentGroupsController, type: :request do
       end
 
       it "should return unregistered #{type}" do
+        skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=unregistered", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :registration_status => 'unregistered', :format => 'json'})

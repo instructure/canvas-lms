@@ -79,6 +79,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Taille du bouton" },
   "buttons_and_icons_e66ee12c": { "message": "Boutons et icônes" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annuler" },
   "choose_caption_file_9c45bc4e": {
     "message": "Choisir le fichier de légende"
   },
@@ -182,6 +183,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "À rendre le : Plusieurs dates" },
   "due_when_7eed10c6": { "message": "À rendre le : { when }" },
+  "edit_c5fbea07": { "message": "Modifier" },
   "edit_equation_f5279959": { "message": "Modifier l''équation" },
   "edit_link_7f53bebb": { "message": "Modifier lien" },
   "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
@@ -206,10 +208,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Outils externes" },
   "extra_large_b6cdf1ff": { "message": "Extra Large" },
   "extra_small_9ae33252": { "message": "Très petit" },
-  "file_upload_failed_af22dd91": {
-    "message": "Le téléchargement du fichier a échoué"
-  },
-  "file_uploading_56c9c0c8": { "message": "Envoi de fichier" },
   "file_url_c12b64be": { "message": "URL du fichier" },
   "filename_file_icon_602eb5de": { "message": "{ filename } icône de fichier" },
   "filename_image_preview_6cef8f26": {
@@ -312,6 +310,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mes fichiers" },
   "my_images_427f9b0c": { "message": "Mes images" },
+  "name_1aed4a1b": { "message": "Nom" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviguer dans le menu ou la barre d''outils"
   },
@@ -423,9 +422,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Soumettre" },
   "subscript_59744f96": { "message": "En indice" },
-  "success_file_uploaded_8174e93f": {
-    "message": "Opération réussie : Fichier envoyé"
-  },
   "superscript_8cb349a2": { "message": "En exposant" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Types de fichiers pris en charge : SRT ou WebVTT"
@@ -480,13 +476,11 @@ const locale = {
     "message": "appuyez sur Control + F9 pour accéder aux options de tableau. { text }"
   },
   "unpublished_dfd8801": { "message": "non publié(e)(s)" },
+  "untitled_efdc2d7d": { "message": "sans titre" },
   "upload_document_253f0478": { "message": "Télécharger le document" },
   "upload_file_fd2361b8": { "message": "Envoyer fichier" },
   "upload_image_6120b609": { "message": "Télécharger l’image" },
   "upload_media_ce31135a": { "message": "Télécharger un fichier multimédia" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Envoi indisponible pour ce dossier."
-  },
   "upload_record_media_e4207d72": {
     "message": "Envoyer/enregistrer un fichier multimédia"
   },

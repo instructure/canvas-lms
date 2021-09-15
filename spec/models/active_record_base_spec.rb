@@ -354,9 +354,10 @@ describe ActiveRecord::Base do
 
   context "bulk_insert" do
     it "should work" do
+      now = Time.now.utc
       User.bulk_insert [
-        {:name => "bulk_insert_1", :workflow_state => "registered"},
-        {:name => "bulk_insert_2", :workflow_state => "registered"}
+        {:name => "bulk_insert_1", :workflow_state => "registered", created_at: now, updated_at: now },
+        {:name => "bulk_insert_2", :workflow_state => "registered", created_at: now, updated_at: now }
       ]
       names = User.order(:name).pluck(:name)
       expect(names).to be_include("bulk_insert_1")
@@ -366,9 +367,10 @@ describe ActiveRecord::Base do
     it "should handle arrays" do
       arr1 = ['1, 2', 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
       arr2 = ['4', '5;', nil, "string with \t tab and \n newline and slash \\"]
+      now = Time.now.utc
       DeveloperKey.bulk_insert [
-        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id},
-        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id}
+        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id, created_at: now, updated_at: now },
+        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id, created_at: now, updated_at: now }
       ]
       names = DeveloperKey.order(:name).pluck(:redirect_uris)
       expect(names).to be_include(arr1.map(&:to_s))
@@ -380,7 +382,8 @@ describe ActiveRecord::Base do
     end
 
     it 'should work through bulk insert objects' do
-      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: {accepted_terms: Time.zone.now})]
+      now = Time.zone.now
+      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: {accepted_terms: now}, created_at: now, updated_at: now) ]
       User.bulk_insert_objects users
       names = User.order(:name).pluck(:name, :preferences)
       expect(names.first.last[:accepted_terms]).not_to be_nil
@@ -726,24 +729,6 @@ describe ActiveRecord::Base do
   describe "nested conditions" do
     it "should not barf if the condition has a question mark" do
       expect(User.joins(:enrollments).where(enrollments: { workflow_state: 'a?c'}).first).to be_nil
-    end
-  end
-
-  describe ".polymorphic_where" do
-    it "should work" do
-      relation = Assignment.all
-      user1 = User.create!
-      account1 = Account.create!
-      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
-      relation.polymorphic_where(context: [user1, account1])
-    end
-
-    it "should work with NULLs" do
-      relation = Assignment.all
-      user1 = User.create!
-      account1 = Account.create!
-      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
-      relation.polymorphic_where(context: [nil, user1, account1])
     end
   end
 

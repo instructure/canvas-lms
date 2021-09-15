@@ -68,13 +68,15 @@ function ColorPreview({color = '#FFF'}) {
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
 const mod = (n, m) => ((n % m) + m) % m
 
-const handleOptionNavigation = (focusedColorIndex = 0, onChangeFocus) => e => {
-  if (e.keyCode !== 37 && e.keyCode !== 39) return
-  const offset = e.keyCode - 38
-  const newIndex = mod(focusedColorIndex + offset, COLOR_OPTIONS.length)
-  onChangeFocus(newIndex)
-  document.getElementById(`color-${COLOR_OPTIONS[newIndex]}`).focus()
-}
+const handleOptionNavigation =
+  (focusedColorIndex = 0, onChangeFocus) =>
+  e => {
+    if (e.keyCode !== 37 && e.keyCode !== 39) return
+    const offset = e.keyCode - 38
+    const newIndex = mod(focusedColorIndex + offset, COLOR_OPTIONS.length)
+    onChangeFocus(newIndex)
+    document.getElementById(`color-${COLOR_OPTIONS[newIndex]}`).focus()
+  }
 
 const getSelectedColorIndex = color => {
   const selectedColorIndex = COLOR_OPTIONS.indexOf(color)
@@ -127,8 +129,8 @@ const validateColorString = (oldColor, color) => {
   return `#${newColor}`
 }
 
-export default function CourseColorSelector({courseColor = ''}) {
-  const [color, setColor] = useState(courseColor)
+export default function CourseColorSelector({courseColor}) {
+  const [color, setColor] = useState(courseColor || '')
   const [focusedColorIndex, setFocusedColorIndex] = useState(() => getSelectedColorIndex(color))
   return (
     <View as="section" margin="0 0 small 0">
@@ -146,7 +148,7 @@ export default function CourseColorSelector({courseColor = ''}) {
           </ScreenReaderContent>
         }
         name="course[course_color]"
-        value={color}
+        value={color || ''}
         onChange={(_, newColor) => setColor(validateColorString(color, newColor))}
         display="inline-block"
         width="10rem"

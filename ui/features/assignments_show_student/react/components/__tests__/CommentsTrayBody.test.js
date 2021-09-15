@@ -144,7 +144,7 @@ describe('CommentsTrayBody', () => {
     })
 
     it.skip('renders a message (no image) if there are comments', async () => {
-      // unskip in EVAL-1845
+      // unskip in EVAL-1903
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [{_id: '1'}, {_id: '2'}]
@@ -332,7 +332,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('renders the message when sent', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, findByText} = render(
@@ -392,7 +392,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('marks submission comments as read after timeout', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
@@ -416,7 +416,7 @@ describe('CommentsTrayBody', () => {
       )
     )
 
-    jest.runAllTimers()
+    act(() => jest.runAllTimers())
     await waitFor(() =>
       expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
     )
@@ -496,7 +496,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('renders comment rows when provided', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [{_id: '1'}, {_id: '2'}]
@@ -513,7 +513,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('renders shortname when shortname is provided', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       User: {shortName: 'bob builder'}
@@ -527,7 +527,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('renders Anonymous when author is not provided', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {nodes: [{author: null}]}
     }
@@ -542,7 +542,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('displays a single attachment', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       File: {url: 'test-url.com', displayName: 'Test Display Name'}
@@ -559,7 +559,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('displays multiple attachments', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
@@ -588,7 +588,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('does not display attachments if there are none', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {nodes: [{attachments: []}]}
     }
@@ -603,7 +603,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('displays the comments in chronological order', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
@@ -632,7 +632,7 @@ describe('CommentsTrayBody', () => {
   })
 
   it.skip('includes an icon on an attachment', async () => {
-    // unskip in EVAL-1845
+    // unskip in EVAL-1903
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       File: {url: 'test-url.com', displayName: 'Test Display Name', mimeClass: 'pdf'}

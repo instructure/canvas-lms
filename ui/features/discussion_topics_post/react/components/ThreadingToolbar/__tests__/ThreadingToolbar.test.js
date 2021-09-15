@@ -91,14 +91,65 @@ describe('PostToolbar', () => {
     expect(queryByText('Go to Reply')).toBeNull()
   })
 
-  it('calls the onOpenIsolatedView callback with the root entry id', async () => {
+  describe('when rootEntryId is present', () => {
+    it('calls the onOpenIsolatedView callback with the isolated entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: '2',
+            isolatedEntryId: '3',
+            parentId: '3'
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('3', '3', false, '1', '1')
+      )
+    })
+  })
+
+  describe('when rootEntryId is not present', () => {
+    it('calls the onOpenIsolatedView callback with the entry id', async () => {
+      window.ENV.isolated_view = true
+      const onOpenIsolatedView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            _id: '1',
+            rootEntryId: null,
+            isolatedEntryId: null,
+            parentId: null
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenIsolatedView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
+      )
+    })
+  })
+
+  it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
+    window.ENV.isolated_view = true
     const onOpenIsolatedView = jest.fn()
     const container = render(
       <ThreadingToolbar
         discussionEntry={DiscussionEntry.mock({
           id: '1',
           _id: '1',
-          rootEntry: DiscussionEntry.mock({id: '2', _id: '2'})
+          isolatedEntryId: null,
+          rootEntryId: null
         })}
         searchTerm="neato"
         onOpenIsolatedView={onOpenIsolatedView}
@@ -106,24 +157,9 @@ describe('PostToolbar', () => {
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('2', '77', false, '1'))
-  })
-
-  it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
-    const onOpenIsolatedView = jest.fn()
-    const container = render(
-      <ThreadingToolbar
-        discussionEntry={DiscussionEntry.mock({
-          id: '1',
-          _id: '1'
-        })}
-        searchTerm="neato"
-        onOpenIsolatedView={onOpenIsolatedView}
-      />
+    await waitFor(() =>
+      expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
     )
-
-    fireEvent.click(container.getByText('Go to Reply'))
-    await waitFor(() => expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '77', false, '1'))
   })
 
   describe('Mobile', () => {

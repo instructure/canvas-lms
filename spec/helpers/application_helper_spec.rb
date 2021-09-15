@@ -836,31 +836,19 @@ describe ApplicationHelper do
   end
 
   describe "file_access_user" do
-    context "not on the files domain" do
-      before :each do
-        @files_domain = false
-      end
-
-      it "should return @current_user" do
-        @current_user = user_model
-        expect(file_access_user).to be @current_user
-      end
+    it "returns access user from session" do
+      access_user = user_model
+      session['file_access_user_id'] = access_user.id
+      expect(file_access_user).to eql access_user
     end
 
-    context "on the files domain" do
-      before :each do
-        @files_domain = true
-      end
+    it "returns the current user" do
+      @current_user = user_model
+      expect(file_access_user).to eql @current_user
+    end
 
-      it "should return access user from session" do
-        access_user = user_model
-        session['file_access_user_id'] = access_user.id
-        expect(file_access_user).to eql access_user
-      end
-
-      it "should return nil if not set" do
-        expect(file_access_user).to be nil
-      end
+    it "returns nil if not set" do
+      expect(file_access_user).to be nil
     end
   end
 

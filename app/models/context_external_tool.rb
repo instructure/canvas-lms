@@ -717,7 +717,7 @@ end
     return nil if contexts.empty?
 
     context.shard.activate do
-      scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      scope = ContextExternalTool.shard(context.shard).where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
       scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
@@ -729,15 +729,15 @@ end
   end
 
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
+    self.active.where(consumer_key: consumer_key, context: contexts_to_search(context)).first
   end
 
   def self.find_active_external_tool_by_client_id(client_id, context)
-    self.active.where(developer_key_id: client_id).polymorphic_where(context: contexts_to_search(context)).first
+    self.active.where(developer_key_id: client_id, context: contexts_to_search(context)).first
   end
 
   def self.find_external_tool_by_id(id, context)
-    self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
+    self.where(id: id, context: contexts_to_search(context)).first
   end
 
   # Order of precedence: Basic LTI defines precedence as first
@@ -764,7 +764,7 @@ end
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
-      query = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      query = ContextExternalTool.shard(context.shard).where(context: contexts).active
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
 
       all_external_tools = query.to_a

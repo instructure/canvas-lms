@@ -18,12 +18,12 @@
 
 import {useEffect, useRef} from 'react'
 import {useApolloClient, useQuery} from 'react-apollo'
-import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
-import {uniqWith, uniqBy, isEqual} from 'lodash'
+import {uniqWith, uniqBy, uniq, isEqual} from 'lodash'
+import {gql} from '@canvas/apollo'
 
 const useAbortController = dependencies => {
   const abortRef = useRef()
@@ -60,37 +60,51 @@ const useGroupDetail = ({
   query = SEARCH_GROUP_OUTCOMES,
   loadOutcomesIsImported = false,
   searchString = '',
-  id
+  id,
+  rhsGroupIdsToRefetch = []
 }) => {
-  const {contextType, contextId} = useCanvasContext()
+  const {contextType, contextId, rootIds} = useCanvasContext()
   searchString = useSearchString(searchString)
   const abortController = useAbortController([id, searchString])
   const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
   const client = useApolloClient()
   const allVariables = useRef([])
+  const refetchGroupIds = useRef([])
 
   if (searchString) queryVars.searchQuery = searchString
 
-  const skip = !id || id === ACCOUNT_FOLDER_ID
+  useEffect(() => {
+    refetchGroupIds.current = uniq(refetchGroupIds.current.concat(rhsGroupIdsToRefetch))
+  }, [rhsGroupIdsToRefetch])
+
+  const skip = !id || rootIds.includes(id)
   const variables = {
     id,
     outcomeIsImported: loadOutcomesIsImported,
     ...queryVars
   }
 
-  if (!skip) {
-    allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
-  }
-
-  const {loading, error, data, fetchMore} = useQuery(query, {
+  const {loading, error, data, fetchMore, refetch} = useQuery(query, {
     variables,
     skip,
     context: {
       fetchOptions: {
         signal: abortController.signal
       }
+    },
+    onCompleted: () => {
+      allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
     }
   })
+
+  // To handle refetching of groups when an outcome is created. This will ensure that
+  // all groups including parent, grandparent, etc... are refetched.
+  useEffect(() => {
+    if (refetchGroupIds.current.includes(id)) {
+      refetchGroupIds.current = refetchGroupIds.current.filter(groupId => groupId !== id)
+      refetch()
+    }
+  }, [id, refetch])
 
   // this will handle the case when we click in group 1, wait for group 1
   // load to finish, then click in a different group
@@ -181,12 +195,52 @@ const useGroupDetail = ({
     })
   }
 
+  const readLearningOutcomes = selectedIds => {
+    return [...selectedIds]
+      .map(linkId => {
+        const link = client.readFragment({
+          id: `ContentTag${linkId}`,
+          fragment: gql`
+            fragment LearningOutcomeFragment on ContentTag {
+              _id
+              canUnlink
+              node {
+                ... on LearningOutcome {
+                  _id
+                  description
+                  title
+                }
+              }
+              group {
+                _id
+                title
+              }
+            }
+          `
+        })
+        return {
+          linkId: link._id,
+          _id: link.node._id,
+          title: link.node.title,
+          canUnlink: link.canUnlink,
+          parentGroupId: link.group._id,
+          parentGroupTitle: link.group.title
+        }
+      })
+      .reduce((dict, link) => {
+        dict[link.linkId] = link
+        return dict
+      }, {})
+  }
+
   return {
     loading,
     group,
     error,
     loadMore,
-    removeLearningOutcomes
+    removeLearningOutcomes,
+    readLearningOutcomes,
+    refetch
   }
 }
 

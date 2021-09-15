@@ -45,7 +45,9 @@ export default class EditConferenceView extends DialogBaseView
     @delegateEvents()
     @toggleAllUsers()
     @markInvitedUsers()
+    @markInvitedSectionsAndGroups()
     @renderConferenceFormUserSettings()
+    @setupGroupAndSectionEventListeners()
     @$('form').formSubmit(
       object_name: 'web_conference'
       beforeSubmit: (data) =>
@@ -105,14 +107,23 @@ export default class EditConferenceView extends DialogBaseView
     if numberHelper.validate(conferenceData.duration)
       conferenceData.duration = I18n.n(conferenceData.duration)
 
+    hide_groups = !ENV.groups || ENV.groups.length == 0
+    hide_sections = !ENV.sections || ENV.sections.length <= 1
+    hide_user_header = hide_groups && hide_sections
+
     json =
       settings:
         is_editing: is_editing
         is_adding: is_adding
         disable_duration_changes: ((conferenceData['long_running'] || is_editing) && conferenceData['started_at'])
         auth_token: authenticity_token()
+        hide_sections: hide_sections
+        hide_groups: hide_groups
+        hide_user_header: hide_user_header
       conferenceData: conferenceData
       users: ENV.users
+      sections: ENV.sections
+      groups: ENV.groups
       context_is_group: ENV.context_asset_string.split("_")[0] == "group"
       conferenceTypes: ENV.conference_type_details.map((type) ->
         {name: type.name, type: type.type, selected: (conferenceData.conference_type == type.type)}
@@ -203,9 +214,71 @@ export default class EditConferenceView extends DialogBaseView
       el.attr('disabled', true)
     )
 
+  markInvitedSectionsAndGroups: ->
+    _.each(ENV.sections, (section) =>
+      section_user_ids = ENV.section_user_ids_map[section.id]
+      intersection = _.intersection(section_user_ids, @model.get("user_ids"))
+      if (intersection.length == section_user_ids.length)
+        el = $("#members_list .member.section_" + section.id).find(":checkbox")
+        el.attr('checked', true)
+        el.attr('disabled', true)
+    )
+
+    _.each(ENV.groups, (group) =>
+      group_user_ids = ENV.group_user_ids_map[group.id]
+      intersection = _.intersection(group_user_ids, @model.get("user_ids"))
+      if (intersection.length == group_user_ids.length)
+        el = $("#members_list .member.group_" + group.id).find(":checkbox")
+        el.attr('checked', true)
+        el.attr('disabled', true)
+    )
+
+
   changeLongRunning: (e) ->
     if ($(e.currentTarget).is(':checked'))
       $('#web_conference_duration').prop('disabled', true).val('')
     else
       # use restore time from data attribute
       $('#web_conference_duration').prop('disabled', false).val($('#web_conference_duration').data('restore-value'))
+
+  setupGroupAndSectionEventListeners: () ->
+    selectedBySection = []
+    selectedByGroup = []
+    toggleMember = (id, checked) ->
+      memberEl = $("#members_list .member.user_" + id).find(":checkbox")
+      memberEl.attr('checked', checked)
+      memberEl.attr('disabled', checked)
+
+    _.each(ENV.groups, (group) =>
+      el = $("#members_list .member.group_" + group.id)
+      el.on("change", (e) =>
+        _.each(
+          ENV.group_user_ids_map[group.id],
+          (id) =>
+            if (e.target.checked)
+              selectedByGroup.push(id)
+              toggleMember(id, e.target.checked)
+            else
+              selectedByGroup = _.without(selectedByGroup, id)
+              if (!_.contains(selectedBySection, id) && !_.contains(@model.get("user_ids"), id))
+                toggleMember(id, e.target.checked)
+        )
+      )
+    )
+
+    _.each(ENV.sections, (section) =>
+      el = $("#members_list .member.section_" + section.id)
+      el.on("change", (e) =>
+        _.each(
+          ENV.section_user_ids_map[section.id],
+          (id) =>
+            if (e.target.checked)
+              selectedBySection.push(id)
+              toggleMember(id, e.target.checked)
+            else
+              selectedBySection = _.without(selectedBySection, id)
+              if (!_.contains(selectedByGroup, id) && !_.contains(@model.get("user_ids"), id))
+                toggleMember(id, e.target.checked)
+        )
+      )
+    )

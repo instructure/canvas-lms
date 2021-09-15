@@ -34,11 +34,12 @@ QUnit.module('DueDateTokenWrapper', {
       ],
       potentialOptions: [
         {course_section_id: '1', name: 'Patricians'},
-        {id: '1', name: 'Seneca The Elder'},
-        {id: '2', name: 'Agrippa'},
-        {id: '3', name: 'Publius'},
-        {id: '4', name: 'Scipio'},
-        {id: '5', name: 'Baz'},
+        {id: '1', name: 'Seneca The Elder', displayName: 'Seneca The Elder'},
+        {id: '2', name: 'Agrippa', displayName: 'Agrippa'},
+        {id: '3', name: 'Publius', displayName: 'Publius (publius@example.com)'},
+        {id: '4', name: 'Scipio', displayName: 'Scipio'},
+        {id: '5', name: 'Baz', displayName: 'Baz'},
+        {id: '6', name: 'Publius', displayName: 'Publius (pub123)'},
         {course_section_id: '2', name: 'Plebs | [ $'}, // named strangely to test regex
         {course_section_id: '3', name: 'Foo'},
         {course_section_id: '4', name: 'Bar'},
@@ -76,6 +77,14 @@ test('renders a TokenInput', function() {
   ok(this.TokenInput)
 })
 
+test('displays the student displayName', function () {
+  const options = Array.from(document.querySelectorAll('div[role="option"][value="Publius"]'))
+  propEqual(
+    options.map(elem => elem.innerText),
+    ['Publius (publius@example.com)', 'Publius (pub123)']
+  )
+})
+
 test('call to fetchStudents on input changes', function() {
   const fetch = sandbox.stub(this.DueDateTokenWrapper, 'safeFetchStudents')
   this.DueDateTokenWrapper.handleInput('to')
@@ -88,8 +97,8 @@ test('if a user types handleInput filters the options', function() {
   // having debouncing enabled for fetching makes tests hard to contend with.
   this.DueDateTokenWrapper.removeTimingSafeties()
 
-  // 1 prompt, 3 sections, 4 students, 2 groups, 3 headers, 1 Noop = 14
-  equal(this.DueDateTokenWrapper.optionsForMenu().length, 14)
+  // 1 prompt, 3 sections, 5 students, 2 groups, 3 headers, 1 Noop = 15
+  equal(this.DueDateTokenWrapper.optionsForMenu().length, 15)
   this.DueDateTokenWrapper.handleInput('scipio')
 
   // 0 sections, 1 student, 1 header = 2

@@ -77,6 +77,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Knapstørrelse" },
   "buttons_and_icons_e66ee12c": { "message": "Knapper og ikoner" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annullér" },
   "choose_caption_file_9c45bc4e": { "message": "Vælg billedtekstfil" },
   "choose_usage_rights_33683854": { "message": "Vælg brugsrettigheder ..." },
   "circle_484abe63": { "message": "Cirkel" },
@@ -172,6 +173,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Forfalder: Flere datoer" },
   "due_when_7eed10c6": { "message": "Forfalder: { when }" },
+  "edit_c5fbea07": { "message": "Redigér" },
   "edit_equation_f5279959": { "message": "Rediger ligning" },
   "edit_link_7f53bebb": { "message": "Rediger link" },
   "editor_statusbar_26ac81fc": { "message": "Editor-statusbar" },
@@ -196,8 +198,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Eksterne værktøjer" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
   "extra_small_9ae33252": { "message": "Ekstra lille" },
-  "file_upload_failed_af22dd91": { "message": "Filupload mislykkedes" },
-  "file_uploading_56c9c0c8": { "message": "Fil overføres" },
   "file_url_c12b64be": { "message": "Fil-URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
@@ -292,6 +292,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mine filer" },
   "my_images_427f9b0c": { "message": "Mine billeder" },
+  "name_1aed4a1b": { "message": "Navn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gennem menuen eller værktøjslinjen"
   },
@@ -391,7 +392,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Stile" },
   "submit_a3cc6859": { "message": "Aflever" },
   "subscript_59744f96": { "message": "Sænket skrift" },
-  "success_file_uploaded_8174e93f": { "message": "Succes: Fil overført" },
   "superscript_8cb349a2": { "message": "Hævet skrift" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Understøttede filtyper: SRT eller WebVTT"
@@ -444,13 +444,11 @@ const locale = {
     "message": "tryk Ctrl + F9 for at få adgang til tabelindstillinger. { text }"
   },
   "unpublished_dfd8801": { "message": "Ikke offentliggjort" },
+  "untitled_efdc2d7d": { "message": "uden titel" },
   "upload_document_253f0478": { "message": "Upload dokument" },
   "upload_file_fd2361b8": { "message": "Overfør fil" },
   "upload_image_6120b609": { "message": "Upload billede" },
   "upload_media_ce31135a": { "message": "Upload medier" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Upload ikke tilgængelig for denne mappe"
-  },
   "upload_record_media_e4207d72": { "message": "Upload / optag medier" },
   "uploading_19e8a4e7": { "message": "Uploader" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

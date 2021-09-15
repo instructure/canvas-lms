@@ -181,6 +181,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Roki: Več datumov" },
   "due_when_7eed10c6": { "message": "Roki: { when }" },
+  "edit_c5fbea07": { "message": "Uredi" },
   "edit_equation_f5279959": { "message": "Uredi enačbo" },
   "edit_link_7f53bebb": { "message": "Uredi povezavo" },
   "editor_statusbar_26ac81fc": { "message": "Vrstica stanja urejevalnika" },
@@ -203,8 +204,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Zunanja orodja" },
   "extra_large_b6cdf1ff": { "message": "Zelo veliko" },
   "extra_small_9ae33252": { "message": "Zelo majhen" },
-  "file_upload_failed_af22dd91": { "message": "Nalaganje datoteke ni uspelo" },
-  "file_uploading_56c9c0c8": { "message": "Nalaganje datoteke" },
   "file_url_c12b64be": { "message": "URL datoteke" },
   "filename_file_icon_602eb5de": { "message": "Ikona datoteke { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -408,7 +407,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Slogi" },
   "submit_a3cc6859": { "message": "Pošlji" },
   "subscript_59744f96": { "message": "Podpisano" },
-  "success_file_uploaded_8174e93f": { "message": "Uspešno: Naložene datoteke" },
   "superscript_8cb349a2": { "message": "Nadpisano" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Podprte vrste datotek: SRT ali WebVTT"
@@ -467,9 +465,6 @@ const locale = {
   "upload_file_fd2361b8": { "message": "Naloži datoteko" },
   "upload_image_6120b609": { "message": "Naloži sliko" },
   "upload_media_ce31135a": { "message": "Naloži medije" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Za to mapo ni na voljo nalaganje"
-  },
   "upload_record_media_e4207d72": { "message": "Naloži/posnemi medij" },
   "uploading_19e8a4e7": { "message": "Nalaganje" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

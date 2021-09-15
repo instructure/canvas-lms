@@ -34,6 +34,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
   const [importOutcomesStatus, setImportOutcomesStatus] = useState({})
   const {contextId: targetContextId, contextType: targetContextType, isCourse} = useCanvasContext()
   const [importOutcomesMutation] = useMutation(IMPORT_OUTCOMES)
+  const [hasAddedOutcomes, setHasAddedOutcomes] = useState(false)
 
   const setStatus = useCallback(
     (outcomeOrGroupId, status, isGroup) => {
@@ -69,7 +70,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     })
 
   const trackProgress = useCallback(
-    async (progress, outcomeOrGroupId, outcomesCount, isGroup) => {
+    async (progress, outcomeOrGroupId, isGroup, groupTitle) => {
       try {
         await resolveProgress(
           {
@@ -84,21 +85,15 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
           showFlashAlert({
             message: isCourse
               ? I18n.t(
+                  'All outcomes from %{groupTitle} have been successfully added to this course.',
                   {
-                    one: '1 outcome has been successfully added to this course.',
-                    other: '%{count} outcomes have been successfully added to this course.'
-                  },
-                  {
-                    count: outcomesCount
+                    groupTitle
                   }
                 )
               : I18n.t(
+                  'All outcomes from %{groupTitle} have been successfully added to this account.',
                   {
-                    one: '1 outcome has been successfully added to this account.',
-                    other: '%{count} outcomes have been successfully added to this account.'
-                  },
-                  {
-                    count: outcomesCount
+                    groupTitle
                   }
                 ),
             type: 'success'
@@ -114,7 +109,13 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
   )
 
   const importOutcomes = useCallback(
-    async (outcomeOrGroupId, outcomesCount, isGroup = true, sourceContextId, sourceContextType) => {
+    async (
+      outcomeOrGroupId,
+      groupTitle = null,
+      isGroup = true,
+      sourceContextId,
+      sourceContextType
+    ) => {
       try {
         const input = {
           targetContextId,
@@ -136,13 +137,21 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const importErrors = importResult.data?.importOutcomes?.errors
         if (importErrors !== null) throw new Error(importErrors?.[0]?.message)
 
-        trackProgress(progress, outcomeOrGroupId, outcomesCount, isGroup)
+        trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle)
+        setHasAddedOutcomes(true)
       } catch (err) {
         showFlashError(err, isGroup)
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
       }
     },
-    [importOutcomesMutation, setStatus, trackProgress, targetContextId, targetContextType]
+    [
+      importOutcomesMutation,
+      setStatus,
+      trackProgress,
+      targetContextId,
+      targetContextType,
+      setHasAddedOutcomes
+    ]
   )
 
   const clearGroupsStatus = () => setImportGroupsStatus({})
@@ -154,7 +163,9 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     importGroupsStatus,
     importOutcomesStatus,
     clearGroupsStatus,
-    clearOutcomesStatus
+    clearOutcomesStatus,
+    hasAddedOutcomes,
+    setHasAddedOutcomes
   }
 }
 

@@ -22,135 +22,10 @@
 
 <% unless @context.elementary_subject_course? %>
   <% provide :right_side do %>
-    <div id="course_show_secondary">
-      <% @can_manage = can_do(@context, @current_user, :manage) %>
-      <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
-      <% if can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) %>
-        <div id="course_status">
-          <h3>
-            <%= t('headers.course_status', %{Course Status}) %>
-          </h3>
-          <%= render :partial => 'publish_buttons', :locals => {redirect_to_settings: false} %>
-        </div>
-      <% end %>
-
-      <% if can_do(@context, @current_user, :manage_content) %>
-        <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
-          <i class="icon-import"></i>
-          <%= t('links.import', %{Import Existing Content}) %>
-        </a>
-      <% end %>
-
-      <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
-        <div class="course-options">
-          <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
-          <% if @can_manage && !@context.elementary_homeroom_course? %>
-            <div id="choose_home_page"></div>
-            <div id="choose_home_page_not_modules"></div>
-          <% end %>
-
-          <% if @course_home_view != 'feed' && !@context.elementary_homeroom_course? %>
-            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
-              <i class="icon-stats"></i>
-              <%= t('links.view_course_stream', %{View Course Stream}) %>
-            </a>
-          <% end %>
-
-          <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) && !@context.elementary_homeroom_course? %>
-            <script>
-                Object.assign(
-                    ENV,
-                    <%= raw StringifyIds.recursively_stringify_ids({
-                      COURSE_WIZARD: {
-                        just_saved: @context_just_saved,
-                        checklist_states: {
-                          import_step: !@context.attachments.active.exists?,
-                          assignment_step: !@context.assignments.active.exists?,
-                          add_student_step: !@context.students.exists?,
-                          navigation_step: @context.tab_configuration.empty?,
-                          home_page_step: true,
-                          # The current wizard just always marks this as complete.
-                          calendar_event_step: !@context.calendar_events.active.exists?,
-                          add_ta_step: !@context.tas.exists?,
-                          publish_step: @context.workflow_state === 'available'
-                        },
-                        urls: {
-                          content_import: context_url(@context, :context_content_migrations_url),
-                          add_assignments: context_url(@context, :context_assignments_url, wizard: 1),
-                          add_students: course_users_path(course_id: @context),
-                          add_files: context_url(@context, :context_files_url, wizard: 1),
-                          select_navigation: context_url(@context, :context_details_url),
-                          course_calendar: calendar_path(course_id: @context),
-                          add_tas: course_users_path(course_id: @context),
-                          publish_course: course_path(@context)
-                        },
-                        permissions: {
-                          can_change_course_publish_state: can_do(@context, @current_user, :change_course_state, :manage_courses_publish)
-                        }
-                      }
-                    }).to_json %>
-                )
-            </script>
-
-            <% js_bundle :course_wizard %>
-            <% css_bundle :course_wizard %>
-            <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-              <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
-            </a>
-          <% end %>
-
-          <% if @can_create_announcements && !@context.elementary_homeroom_course? %>
-            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
-            </a>
-          <% end %>
-
-          <% course_custom_links.each do |link| %>
-            <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
-          <% end %>
-        </div>
-      <% end %>
-
-      <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
-        <a href="<%= enroll_url(@context.self_enrollment_code) %>" class="btn button-sidebar-wide self_enrollment_link">
-          <i class="icon-user-add"></i>
-          <%= t('links.join_course', %{Join this Course}) %>
-        </a>
-      <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
-        <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
-          <i class="icon-end"></i>
-          <%= t('links.drop_course', %{Drop this Course}) %>
-        </a>
-        <div id="self_unenrollment_dialog" style="display: none;">
-          <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
-          <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
-          <div class="button-container">
-            <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
-            <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @context_enrollment&.student? %>
-        <a class="btn button-sidebar-wide" href="<%= calendar_url_for(@context) %>">
-          <i class="icon-calendar-day"></i>
-          <%= t('links.view_course_calendar', %{View Course Calendar}) %>
-        </a>
-      <% end %>
-
-      <% if @context_enrollment %>
-        <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
-          <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
-          <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
-        </a>
-      <% end %>
-
-      <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
-      <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
-      <%= nbsp unless @current_user %>
-    </div>
+    <%= render :partial => 'courses/course_show_secondary' %>
     <% if @course_home_view == 'assignments' %>
       <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
-    <% elsif @course_home_view == 'syllabus' %>
+    <% elsif @course_home_view == 'syllabus' && !@context.elementary_enabled? %>
       <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
     <% elsif @context.elementary_homeroom_course? %>
     <% elsif !@context_enrollment&.student? %>
@@ -188,9 +63,9 @@
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'assignments' %>
-  <% elsif @context.elementary_homeroom_course? %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
+  <% elsif @context.elementary_homeroom_course? %>
   <% elsif @course_home_view == 'k5_dashboard' %>
     <div id="course-dashboard-container"></div>
     <div id="k5-modules-container" style="display: none; padding-top: 17px;">

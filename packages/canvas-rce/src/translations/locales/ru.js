@@ -75,6 +75,7 @@ const locale = {
   "button_size_20f5fce1": { "message": "Кнопка «Размер»" },
   "buttons_and_icons_e66ee12c": { "message": "Кнопки и пиктограммы" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 г. Acme Inc." },
+  "cancel_caeb1e68": { "message": "Отменить" },
   "choose_caption_file_9c45bc4e": {
     "message": "Выберите файл подписи к изображению"
   },
@@ -180,6 +181,7 @@ const locale = {
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Срок: Несколько дат" },
   "due_when_7eed10c6": { "message": "Срок: { when }" },
+  "edit_c5fbea07": { "message": "Редактировать" },
   "edit_equation_f5279959": { "message": "Редактировать уравнение" },
   "edit_link_7f53bebb": { "message": "Редактировать ссылку" },
   "editor_statusbar_26ac81fc": { "message": "Панель состояния редактора" },
@@ -204,8 +206,6 @@ const locale = {
   "external_tools_6e77821": { "message": "Внешние инструменты" },
   "extra_large_b6cdf1ff": { "message": "Очень крупный" },
   "extra_small_9ae33252": { "message": "Очень мелкое изображение" },
-  "file_upload_failed_af22dd91": { "message": "Не удалось загрузить файл" },
-  "file_uploading_56c9c0c8": { "message": "Отправка файла" },
   "file_url_c12b64be": { "message": "URL файла" },
   "filename_file_icon_602eb5de": { "message": "иконка файла { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -306,6 +306,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Мои файлы" },
   "my_images_427f9b0c": { "message": "Мои изображения" },
+  "name_1aed4a1b": { "message": "Имя" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Навигация в меню или панели инструментов"
   },
@@ -417,7 +418,6 @@ const locale = {
   "styles_2aa721ef": { "message": "Стили" },
   "submit_a3cc6859": { "message": "Отправить" },
   "subscript_59744f96": { "message": "Надпись снизу" },
-  "success_file_uploaded_8174e93f": { "message": "Успешно: Файл отправлен" },
   "superscript_8cb349a2": { "message": "Надпись сверху" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Поддерживаемые типы файлов: SRT или WebVTT"
@@ -472,13 +472,11 @@ const locale = {
     "message": "Наберите Control F9 для доступа к опциям таблицы. { text }"
   },
   "unpublished_dfd8801": { "message": "не опубликовано" },
+  "untitled_efdc2d7d": { "message": "без названия" },
   "upload_document_253f0478": { "message": "Загрузить документ" },
   "upload_file_fd2361b8": { "message": "Загрузить файл" },
   "upload_image_6120b609": { "message": "Загрузить изображение" },
   "upload_media_ce31135a": { "message": "Загрузить медиа" },
-  "upload_not_available_for_this_folder_8f8623c6": {
-    "message": "Отправка недоступна для этой папки"
-  },
   "upload_record_media_e4207d72": { "message": "Загрузить/записать медиа" },
   "uploading_19e8a4e7": { "message": "Загрузка" },
   "uploading_closed_captions_subtitles_failed_bc093f3": {

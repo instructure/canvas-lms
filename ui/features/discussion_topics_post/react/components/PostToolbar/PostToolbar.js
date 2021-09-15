@@ -33,6 +33,7 @@ import {
   IconLockLine,
   IconMarkAsReadLine,
   IconMoreLine,
+  IconNextUnreadLine,
   IconNoSolid,
   IconPeerReviewLine,
   IconRubricSolid,
@@ -50,9 +51,9 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
-        mobile: {
+        tablet: {
           justifyItems: 'space-between',
           textSize: 'x-small'
         },
@@ -148,6 +149,14 @@ const getMenuConfigs = props => {
       icon: <IconMarkAsReadLine />,
       label: I18n.t('Mark All as Read'),
       selectionCallback: props.onReadAll
+    })
+  }
+  if (props.onUnreadAll) {
+    options.push({
+      key: 'unread-all',
+      icon: <IconNextUnreadLine />,
+      label: I18n.t('Mark All as Unread'),
+      selectionCallback: props.onUnreadAll
     })
   }
   if (props.onEdit) {
@@ -259,6 +268,10 @@ PostToolbar.propTypes = {
    * Behavior for marking the thread as read
    */
   onReadAll: PropTypes.func,
+  /**
+   * Behavior for marking the thread as unread
+   */
+  onUnreadAll: PropTypes.func,
   /**
    * Behavior for deleting the discussion post.
    * Providing this function will result in the menu option being rendered.

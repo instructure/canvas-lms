@@ -240,7 +240,13 @@ export const UPDATE_LEARNING_OUTCOME = gql`
 export const MOVE_OUTCOME_LINKS = gql`
   mutation MoveOutcomeLinks($input: MoveOutcomeLinksInput!) {
     moveOutcomeLinks(input: $input) {
-      movedOutcomeLinkIds
+      movedOutcomeLinks {
+        _id
+        group {
+          _id
+          title
+        }
+      }
       errors {
         attribute
         message

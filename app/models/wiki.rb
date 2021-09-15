@@ -41,7 +41,7 @@ class Wiki < ActiveRecord::Base
 
   # some hacked up stuff similar to what's in MasterCourses::Restrictor
   def load_tag_for_master_course_import!(child_subscription_id)
-    @child_tag_for_import = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).first ||
+    @child_tag_for_import = MasterCourses::ChildContentTag.where(content: self).first ||
       MasterCourses::ChildContentTag.create(:content => self, :child_subscription_id => child_subscription_id)
   end
 
@@ -51,7 +51,7 @@ class Wiki < ActiveRecord::Base
 
   def set_downstream_change_for_master_courses
     if self.saved_change_to_front_page_url? && !@child_tag_for_import
-      child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).first
+      child_tag = MasterCourses::ChildContentTag.where(content: self).first
       if child_tag
         child_tag.downstream_changes = ["front_page_url"]
         child_tag.save! if child_tag.changed?
@@ -131,9 +131,11 @@ class Wiki < ActiveRecord::Base
   end
 
   def context
-    shard.activate do
-      @context ||= self.id && (self.course || self.group)
-    end
+    @context ||= id && (course || group)
+  end
+
+  def context_loaded?
+    @context || association(:course).loaded? || association(:group).loaded?
   end
 
   def context_type

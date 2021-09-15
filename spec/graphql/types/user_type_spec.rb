@@ -291,19 +291,6 @@ describe Types::UserType do
     end
   end
 
-  context 'trophies' do
-    it 'returns empty values for the trophies the user has not unlocked' do
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response[0]).to be_nil
-    end
-
-    it 'returns values for the trophies the user has unlocked' do
-      @student.trophies.create!(name: 'balloon')
-      response = user_type.resolve('trophies { displayName }', current_user: @student)
-      expect(response.include?('Balloon')).to be true
-    end
-  end
-
   context 'notificationPreferences' do
     it 'returns the users notification preferences' do
       Notification.delete_all
@@ -652,25 +639,25 @@ describe Types::UserType do
     it "does not return student role" do
       expect(
         user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when no course id is given" do
+    it "returns nil when no course id is given" do
       expect(
         user_type.resolve(%|courseRoles(roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
-    it "returns empty array when course id is null" do
+    it "returns nil when course id is null" do
       expect(
         user_type.resolve(%|courseRoles(courseId: null, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "does not return custom roles based on teacher" do
       expect(
         custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
-      ).to eq []
+      ).to be_nil
     end
 
     it "Returns multiple roles when mutiple enrollments exist" do

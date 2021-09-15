@@ -102,9 +102,21 @@ describe 'Gradebook Controls' do
   context 'using Actions dropdown' do
 
     it 'navigates to upload page', test_id: 3265129, priority: '1' do
+      Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
       Gradebook.open_action_menu
       Gradebook.action_menu_item_selector("import").click
+
+      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
+    end
+  end
+
+  context 'using enhanced filter actions' do
+
+    it 'navigates to upload page', test_id: 3265130, priority: '1' do
+      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      Gradebook.visit(@course)
+      Gradebook.select_import
 
       expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
     end

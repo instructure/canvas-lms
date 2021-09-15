@@ -79,7 +79,7 @@ module CanvasSecurity
     @config ||= begin
       path = Rails.root + 'config/security.yml'
       raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
-      YAML.safe_load(ERB.new(File.read(path)).result)[Rails.env]
+      YAML.safe_load(ERB.new(File.read(path)).result, aliases: true)[Rails.env]
     end
   end
 

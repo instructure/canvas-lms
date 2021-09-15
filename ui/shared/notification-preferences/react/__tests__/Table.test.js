@@ -33,7 +33,6 @@ describe('Notification Preferences Table', () => {
         send_scores_in_emails_text: {
           label: 'Some Label Text'
         },
-        allowed_sms_categories: ['announcement', 'grading'],
         allowed_push_categories: ['announcement']
       }
     }
@@ -43,8 +42,7 @@ describe('Notification Preferences Table', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: null,
-        allowed_push_categories: [],
-        allowed_sms_categories: ['announcement', 'grading']
+        allowed_push_categories: []
       }
     }
 
@@ -197,5 +195,17 @@ describe('Notification Preferences Table', () => {
 
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
     expect(sendScoresToggle.checked).toBe(false)
+  })
+
+  it('allows tabbing to the row headers', () => {
+    const container = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
+    )
+
+    const dueDate = container.getByTestId('due_date_header')
+    expect(dueDate.tabIndex).toBe(0)
   })
 })

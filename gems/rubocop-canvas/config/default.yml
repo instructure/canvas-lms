@@ -20,26 +20,6 @@ Migration/ConcurrentIndex:
   Include:
     - "**/db/migrate/*.rb"
 
-Migration/ModelBehavior:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-    - "lib/data_fixup/*.rb"
-  Whitelist:
-    - "ActiveRecord::Base"
-    - "ActiveRecord::Migration"
-    - Canvas
-    - DatabaseServer
-    - DataFixup
-    - GuardRail
-    - Switchman
-    - Shard
-    - Account.default
-    - Account.site_admin
-    - "connection.*"
-    - "find_ids_in_batches"
-    - "find_ids_in_ranges"
-
 Migration/PrimaryKey:
   Enabled: true
   Include:

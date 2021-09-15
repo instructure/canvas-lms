@@ -1182,20 +1182,15 @@ class CalendarEventsApiController < ApplicationController
     # contexts have to be partitioned into two groups so they can be queried effectively
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    sql = []
-    conditions = []
     unless view_unpublished.empty?
-      sql << '(assignments.context_code IN (?))'
-      conditions << view_unpublished.map(&:asset_string)
+      scope = Assignment.for_course(view_unpublished)
     end
 
     unless other.empty?
-      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
-      conditions << other.map(&:asset_string)
-      conditions << 'published'
+      scope2 = Assignment.published.for_course(other)
+      scope = scope ? scope.or(scope2) : scope2
     end
 
-    scope = Assignment.where([sql.join(' OR ')] + conditions)
     return scope if @public_to_auth || !user
 
     student_ids = Set.new

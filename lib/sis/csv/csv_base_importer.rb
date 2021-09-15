@@ -25,11 +25,13 @@ require_dependency 'sis/common'
 module SIS
   module CSV
     class CSVBaseImporter
-      PARSE_ARGS = {headers: :first_row,
-                    skip_blanks: true,
-                    header_converters: :downcase,
-                    converters: ->(field) { field&.strip&.presence }
-      }
+      PARSE_ARGS = {
+        headers: :first_row,
+        encoding: 'bom|utf-8',
+        skip_blanks: true,
+        header_converters: :downcase,
+        converters: ->(field) { field&.strip&.presence }
+      }.freeze
 
       def initialize(sis_csv)
         @sis = sis_csv
