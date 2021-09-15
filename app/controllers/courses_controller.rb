@@ -3188,9 +3188,10 @@ class CoursesController < ApplicationController
   # Update multiple courses in an account.  Operates asynchronously; use the {api:ProgressController#show progress endpoint}
   # to query the status of an operation.
   #
-  # @argument course_ids[] [Required] List of ids of courses to update. At most 500 courses may be updated in one call.
+  # @argument course_ids[] [Required]
+  #   List of ids of courses to update. At most 500 courses may be updated in one call.
   # @argument event [Required, String, "offer"|"conclude"|"delete"|"undelete"]
-  # The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
+  #   The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
   #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
   #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
   #     in prior-enrollment lists.
