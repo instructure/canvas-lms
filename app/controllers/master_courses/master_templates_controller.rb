@@ -458,11 +458,12 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @subtopic Blueprint Management
   #
   # Retrieve a list of learning objects that have changed since the last blueprint sync operation.
+  # If no syncs have been completed, a ChangeRecord with a change_type of +initial_sync+ is returned.
   #
   # @returns [ChangeRecord]
   def unsynced_changes
     cutoff_time = @template.last_export_started_at
-    return render :json => [] unless cutoff_time
+    return render :json => [{asset_name: @template.course.name, change_type: 'initial_sync'}] unless cutoff_time
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []

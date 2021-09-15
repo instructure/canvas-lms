@@ -560,44 +560,58 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @folder = @master.folders.create!(:name => 'Blargh')
         @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
-        run_master_migration
       end
     end
 
-    it 'detects creates, updates, and deletes since the last sync' do
-      @ann.destroy
-      @file.update_attribute(:display_name, 'Renamed')
-      @folder.update_attribute(:name, 'Blergh')
-      @new_page = @master.wiki_pages.create! :title => 'New News'
-      @master.syllabus_body = "srslywat"; @master.save!
-
+    it "reports an incomplete initial sync" do
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
         :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
         :course_id => @master.to_param, :action => 'unsynced_changes')
-      expect(json).to match_array([
-       {"asset_id"=>@ann.id,"asset_type"=>"announcement","asset_name"=>"Boring","change_type"=>"deleted",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}","locked"=>false},
-       {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
-       {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false},
-       {"asset_id"=>@folder.id,"asset_type"=>"folder","asset_name"=>"Blergh","change_type"=>"updated",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/folders/#{@folder.id}","locked"=>false},
-       {"asset_id"=>@master.id,"asset_type"=>"syllabus","asset_name"=>"Syllabus","change_type"=>"updated",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/syllabus","locked"=>false}
-      ])
+      expect(json).to eq([{'asset_name' => @master.name, 'change_type' => 'initial_sync'}])
     end
 
-    it "limits result size" do
-      Setting.set('master_courses_history_count', '2')
+    context "after migration is run" do
+      before do
+        Timecop.travel(30.minutes.ago) do
+          run_master_migration
+        end
+      end
 
-      3.times { |x| @master.wiki_pages.create! :title => "Page #{x}" }
+      it 'detects creates, updates, and deletes since the last sync' do
+        @ann.destroy
+        @file.update_attribute(:display_name, 'Renamed')
+        @folder.update_attribute(:name, 'Blergh')
+        @new_page = @master.wiki_pages.create! :title => 'New News'
+        @master.syllabus_body = "srslywat"; @master.save!
 
-      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
-        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
-        :course_id => @master.to_param, :action => 'unsynced_changes')
+        json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+          :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+          :course_id => @master.to_param, :action => 'unsynced_changes')
+        expect(json).to match_array([
+         {"asset_id"=>@ann.id,"asset_type"=>"announcement","asset_name"=>"Boring","change_type"=>"deleted",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}","locked"=>false},
+         {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
+         {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false},
+         {"asset_id"=>@folder.id,"asset_type"=>"folder","asset_name"=>"Blergh","change_type"=>"updated",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/folders/#{@folder.id}","locked"=>false},
+         {"asset_id"=>@master.id,"asset_type"=>"syllabus","asset_name"=>"Syllabus","change_type"=>"updated",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/syllabus","locked"=>false}
+        ])
+      end
 
-      expect(json.length).to eq 2
+      it "limits result size" do
+        Setting.set('master_courses_history_count', '2')
+
+        3.times { |x| @master.wiki_pages.create! :title => "Page #{x}" }
+
+        json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+          :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+          :course_id => @master.to_param, :action => 'unsynced_changes')
+
+        expect(json.length).to eq 2
+      end
     end
   end
 
