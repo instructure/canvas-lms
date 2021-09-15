@@ -55,6 +55,13 @@ td {
   margin: 0;
 }
 
+a {
+  color: #0770A3;
+  &:focus, &:hover {
+    color: darken(#0770A3, 10%);
+  }
+}
+
 .mce-content-body {
   box-sizing: border-box;
   padding: 11px;
