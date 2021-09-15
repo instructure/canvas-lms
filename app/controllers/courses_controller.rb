@@ -2793,6 +2793,7 @@ class CoursesController < ApplicationController
   # @argument course[enable_pace_plans] [Boolean]
   #   Enable or disable Pace Plans for the course. This setting only has an effect when the Pace Plans feature flag is
   #   enabled for the sub-account. Otherwise, Pace Plans are always disabled.
+  #     Note: Pace Plans is in active development.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
