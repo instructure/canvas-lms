@@ -434,6 +434,12 @@ export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentU
   return users
 }
 
+export const dropCourse = url =>
+  doFetchApi({
+    path: url,
+    method: 'POST'
+  })
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

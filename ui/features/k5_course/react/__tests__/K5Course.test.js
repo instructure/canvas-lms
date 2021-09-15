@@ -97,7 +97,11 @@ const defaultProps = {
   hasWikiPages: true,
   hasSyllabusBody: true,
   parentSupportEnabled: true,
-  observerList: MOCK_OBSERVER_LIST
+  observerList: MOCK_OBSERVER_LIST,
+  selfEnrollment: {
+    option: null,
+    url: null
+  }
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -359,7 +363,65 @@ describe('K-5 Subject Course', () => {
     }) */
   })
 
-  describe('subject announcements', () => {
+  describe('Self-enrollment buttons', () => {
+    it("renders a join button if selfEnrollment.option is 'enroll'", () => {
+      const selfEnrollment = {
+        option: 'enroll',
+        url: 'http://enroll_url/'
+      }
+      const {getByRole} = render(<K5Course {...defaultProps} selfEnrollment={selfEnrollment} />)
+      const button = getByRole('link', {name: 'Join this Course'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toBe('http://enroll_url/')
+    })
+
+    it("renders a drop button and modal if selfEnrollment.option is 'unenroll'", () => {
+      const selfEnrollment = {
+        option: 'unenroll',
+        url: 'http://unenroll_url/'
+      }
+      const {getByRole, getByText} = render(
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+      )
+      const button = getByRole('button', {name: 'Drop this Course'})
+      expect(button).toBeInTheDocument()
+      act(() => button.click())
+      expect(getByText('Drop Arts and Crafts')).toBeInTheDocument()
+      expect(getByText('Confirm Unenrollment')).toBeInTheDocument()
+      expect(
+        getByText(
+          'Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.'
+        )
+      ).toBeInTheDocument()
+      expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
+    })
+
+    it('sends a POST to drop the course after confirming in the modal', () => {
+      fetchMock.post('http://unenroll_url/', 200)
+      const selfEnrollment = {
+        option: 'unenroll',
+        url: 'http://unenroll_url/'
+      }
+      const {getByRole, getAllByRole, getByText} = render(
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+      )
+      const openModalButton = getByRole('button', {name: 'Drop this Course'})
+      act(() => openModalButton.click())
+      const dropButton = getAllByRole('button', {name: 'Drop this Course'})[1]
+      act(() => dropButton.click())
+      expect(getByText('Dropping course')).toBeInTheDocument()
+      expect(fetchMock.called(selfEnrollment.url)).toBeTruthy()
+    })
+
+    it('renders neither if selfEnrollment is nil', () => {
+      const {getByText, queryByText} = render(<K5Course {...defaultProps} />)
+      expect(getByText('Arts and Crafts')).toBeInTheDocument()
+      expect(queryByText('Join this Course')).not.toBeInTheDocument()
+      expect(queryByText('Drop this Course')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Subject announcements', () => {
     it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
       expect(getByText('Important announcement')).toBeInTheDocument()
@@ -391,7 +453,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('home tab', () => {
+  describe('Home tab', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Time to learn!')).toBeInTheDocument()
@@ -444,7 +506,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('schedule tab', () => {
+  describe('Schedule tab', () => {
     it('shows a planner preview scoped to a single course if user has no student enrollments', async () => {
       const {findByTestId, getByText, queryByText} = render(
         <K5Course
@@ -466,7 +528,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('modules tab', () => {
+  describe('Modules tab', () => {
     it('shows modules content if modules tab is selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />)
       expect(getByText('Course modules content')).toBeVisible()
@@ -498,7 +560,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('grades tab', () => {
+  describe('Grades tab', () => {
     it('fetches and displays grade information', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
       await waitFor(() => expect(getByText('WWII Report')).toBeInTheDocument())
@@ -521,7 +583,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('groups tab', () => {
+  describe('Groups tab', () => {
     describe('user is a student', () => {
       it('fetches and displays group information', async () => {
         const {findByText, getByText} = render(
@@ -565,7 +627,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('resources tab', () => {
+  describe('Resources tab', () => {
     describe('important info section', () => {
       it('shows syllabus content with link to edit if teacher', async () => {
         const {findByText, getByRole} = render(

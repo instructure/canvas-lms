@@ -2249,6 +2249,10 @@ class CoursesController < ApplicationController
             OBSERVER_LIST: observed_users(@current_user, session, @context.id)
           )
 
+          self_enrollment_option = visible_self_enrollment_option
+          self_enrollment_url = enroll_url(@context.self_enrollment_code) if self_enrollment_option == :enroll
+          self_enrollment_url = course_self_unenrollment_path(@context, @context_enrollment.uuid) if self_enrollment_option == :unenroll
+
           course_env_variables.merge!({
             name: @context.nickname_for(@current_user),
             image_url: @context.image,
@@ -2265,7 +2269,11 @@ class CoursesController < ApplicationController
             latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
             has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
             has_syllabus_body: @context.syllabus_body.present?,
-            is_student_or_fake_student: @context.user_is_student?(@current_user, include_fake_student: true)
+            is_student_or_fake_student: @context.user_is_student?(@current_user, include_fake_student: true),
+            self_enrollment: {
+              option: self_enrollment_option,
+              url: self_enrollment_url
+            }
           })
 
           js_env({COURSE: course_env_variables}, true)
@@ -3762,6 +3770,18 @@ class CoursesController < ApplicationController
       redirect_to context_url(@context, :context_offline_web_exports_url)
     end
   end
+
+  def visible_self_enrollment_option
+    if @context.available? &&
+      @context.self_enrollment_enabled? &&
+      @context.open_enrollment &&
+      (!@context_enrollment || !@context_enrollment.active?)
+      :enroll
+    elsif @context_enrollment&.self_enrolled && @context_enrollment&.active?
+      :unenroll
+    end
+  end
+  helper_method :visible_self_enrollment_option
 
   private
 

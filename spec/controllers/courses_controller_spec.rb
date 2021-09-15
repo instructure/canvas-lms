@@ -1731,6 +1731,35 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
       end
 
+      context "ENV.COURSE.self_enrollment" do
+        before :once do
+          @course.root_account.allow_self_enrollment!
+          @course.is_public = true
+          @course.save!
+          @student.enrollments.destroy_all
+        end
+
+        before :each do
+          user_session(@student)
+        end
+
+        it "is set to to 'enroll' if self-enrollment is enabled" do
+          @course.self_enrollment = true
+          @course.open_enrollment = true
+          @course.save!
+
+          get 'show', params: {:id => @course.id}
+          expect(assigns[:js_env][:COURSE][:self_enrollment][:option]).to be(:enroll)
+          expect(assigns[:js_env][:COURSE][:self_enrollment][:url]).not_to be_nil
+        end
+
+        it "is set to to nil if self-enrollment is disabled" do
+          get 'show', params: {:id => @course.id}
+          expect(assigns[:js_env][:COURSE][:self_enrollment][:option]).to be_nil
+          expect(assigns[:js_env][:COURSE][:self_enrollment][:url]).to be_nil
+        end
+      end
+
       describe "update" do
 
         it "syncs enrollments if setting is set" do
@@ -3909,6 +3938,81 @@ describe CoursesController do
       expect(new_course.name).to eq 'copied course'
       expect(new_course.wiki_pages.length).to eq 1
       expect(new_course.assignments.length).to eq 0
+    end
+  end
+
+  describe "visible_self_enrollment_option" do
+    before :once do
+      Account.default.allow_self_enrollment!
+      @user = user_factory(active_all: true)
+      @course = course_factory(active_all: true)
+    end
+
+    before :each do
+      user_session(@user)
+    end
+
+    context "when self_enrollment and open_enrollment is enabled" do
+      before :once do
+        @course.self_enrollment = true
+        @course.open_enrollment = true
+        @course.save!
+      end
+
+      it "returns :enroll if user is not enrolled" do
+        get 'show', params: {id: @course.id}
+
+        expect(controller.visible_self_enrollment_option).to be(:enroll)
+      end
+
+      it "returns :unenroll if user has self-enrolled" do
+        enrollment = @course.enroll_student(@user, enrollment_state: 'active')
+        enrollment.self_enrolled = true
+        enrollment.save!
+
+        get 'show', params: {id: @course.id}
+        expect(controller.visible_self_enrollment_option).to be(:unenroll)
+      end
+
+      it "returns nil if user is enrolled (but not self_enrolled)" do
+        @course.enroll_student(@user, enrollment_state: 'active')
+
+        get 'show', params: {id: @course.id}
+        expect(controller.visible_self_enrollment_option).to be_nil
+      end
+
+      it "returns nil if user self-enrolled but the course is concluded" do
+        enrollment = @course.enroll_student(@user, enrollment_state: 'active')
+        enrollment.self_enrolled = true
+        enrollment.save!
+        @course.complete!
+
+        get 'show', params: {id: @course.id}
+        expect(controller.visible_self_enrollment_option).to be_nil
+      end
+
+      it "returns nil if course enabled options but account disabled self-enrollment" do
+        Account.default.allow_self_enrollment!('')
+
+        get 'show', params: {id: @course.id}
+        expect(controller.visible_self_enrollment_option).to be_nil
+      end
+    end
+
+    it "returns nil if self_enrollment is disabled" do
+      @course.open_enrollment = true
+      @course.save!
+
+      get 'show', params: {id: @course.id}
+      expect(controller.visible_self_enrollment_option).to be_nil
+    end
+
+    it "returns nil if open_enrollment is disabled" do
+      @course.self_enrollment = true
+      @course.save!
+
+      get 'show', params: {id: @course.id}
+      expect(controller.visible_self_enrollment_option).to be_nil
     end
   end
 end

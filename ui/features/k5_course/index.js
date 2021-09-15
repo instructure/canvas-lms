@@ -58,6 +58,7 @@ ready(() => {
         hasSyllabusBody={ENV.COURSE.has_syllabus_body}
         parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
         observerList={ENV.OBSERVER_LIST}
+        selfEnrollment={ENV.COURSE.self_enrollment}
       />,
       courseContainer
     )
