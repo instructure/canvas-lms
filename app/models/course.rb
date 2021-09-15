@@ -1191,7 +1191,6 @@ class Course < ActiveRecord::Base
         Enrollment.where(:course_id => self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
         User.touch_and_clear_cache_keys(user_ids, :enrollments)
-        User.clear_cache_keys(user_ids, :k5_user)
       end
 
       data
@@ -1473,7 +1472,6 @@ class Course < ActiveRecord::Base
       EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
         update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
-      User.clear_cache_keys(user_ids, :k5_user)
       User.delay_if_production.update_account_associations(user_ids) if user_ids.any?
     end
     c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: 'deleted', batch_mode_delete: batch_mode)
@@ -2832,7 +2830,7 @@ class Course < ActiveRecord::Base
 
     # e.g. observer, can only see admins in the course
     return :restricted unless has_read_roster || has_admin
- 
+
     if visibility_limited_to_section
       has_admin ? :sections : :sections_limited
     elsif has_admin

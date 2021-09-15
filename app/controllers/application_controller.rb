@@ -2843,15 +2843,30 @@ class ApplicationController < ActionController::Base
   helper_method :show_immersive_reader?
 
   def uncached_k5_user?
-    if @current_user && @domain_root_account
-      # See if the user has associations with any k5-enabled accounts
-      k5_accounts = @domain_root_account.settings[:k5_accounts]
-      return false if k5_accounts.blank?
-      enrolled_course_ids = @current_user.enrollments.shard(@domain_root_account).new_or_active_by_date.select(:course_id)
-      enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
-      enrolled_account_ids += @current_user.account_users.shard(@domain_root_account).active.pluck(:account_id)
-      enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
-      (enrolled_account_chain_ids & k5_accounts).any?
+    if @current_user
+      # Collect global ids of all accounts in current region with k5 enabled
+      global_k5_account_ids = []
+      Account.shard(@current_user.in_region_associated_shards).root_accounts.active.non_shadow
+        .where("settings LIKE '%k5_accounts:\n- %'").select(:settings).each do |account|
+        account.settings[:k5_accounts]&.each do |k5_account_id|
+          global_k5_account_ids << Shard.global_id_for(k5_account_id, account.shard)
+        end
+      end
+      return false if global_k5_account_ids.blank?
+
+      # See if the user has associations with any k5-enabled accounts on each shard
+      k5_associations = Shard.partition_by_shard(global_k5_account_ids) do |k5_account_ids|
+        enrolled_course_ids = @current_user.enrollments.shard(Shard.current).new_or_active_by_date.select(:course_id)
+        enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
+        break true if (enrolled_account_ids & k5_account_ids).any?
+
+        enrolled_account_ids += @current_user.account_users.shard(Shard.current).active.pluck(:account_id)
+        break true if (enrolled_account_ids & k5_account_ids).any?
+
+        enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
+        break true if (enrolled_account_chain_ids & k5_account_ids).any?
+      end
+      k5_associations == true
     else
       # Default to classic canvas if the user isn't logged in
       false
@@ -2868,8 +2883,9 @@ class ApplicationController < ActionController::Base
     RequestCache.cache('k5_user', @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
       if @current_user
         next false if check_disabled && k5_disabled?
+
         # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: [:k5_user, :enrollments, :account_users], expires_in: 12.hours) do
           uncached_k5_user?
         end
       else

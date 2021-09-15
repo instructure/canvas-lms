@@ -2183,22 +2183,39 @@ describe ApplicationController do
   describe "k5_user? helper" do
     before :once do
       course_with_teacher :active_all => true
-      student_in_course :context => @course
+      @student1 = student_in_course(:context => @course).user
       toggle_k5_setting(@course.account)
     end
 
     before :each do
-      user_session(@student)
-      @controller.instance_variable_set(:@current_user, @student)
+      user_session(@student1)
+      @controller.instance_variable_set(:@current_user, @student1)
       @controller.instance_variable_set(:@domain_root_account, @course.root_account)
     end
 
     it "caches the result after computing" do
       enable_cache do
-        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @student, batched_keys: [:k5_user]) do
-          "cached :)"
-        end
-        expect(@controller.send(:k5_user?)).to eq "cached :)"
+        expect(@controller).to receive(:uncached_k5_user?).once
+        @controller.send(:k5_user?)
+        @controller.send(:k5_user?)
+      end
+    end
+
+    it "does not use cached value if enrollments have been invalidated" do
+      enable_cache(:redis_cache_store) do
+        expect(@controller).to receive(:uncached_k5_user?).twice
+        @controller.send(:k5_user?)
+        @student1.clear_cache_key(:enrollments)
+        @controller.send(:k5_user?)
+      end
+    end
+
+    it "does not use cached value if account_users have been invalidated" do
+      enable_cache(:redis_cache_store) do
+        expect(@controller).to receive(:uncached_k5_user?).twice
+        @controller.send(:k5_user?)
+        @student1.clear_cache_key(:account_users)
+        @controller.send(:k5_user?)
       end
     end
 
@@ -2223,7 +2240,7 @@ describe ApplicationController do
     end
 
     it "returns false if all k5 enrollments are concluded" do
-      @student.enrollments.where(course_id: @course.id).take.complete
+      @student1.enrollments.where(course_id: @course.id).take.complete
       expect(@controller.send(:k5_user?)).to eq false
     end
 
@@ -2259,8 +2276,8 @@ describe ApplicationController do
     end
 
     it "returns true even if a student has opted-out of the k5 dashboard" do
-      @student.preferences[:elementary_dashboard_disabled] = true
-      @student.save!
+      @student1.preferences[:elementary_dashboard_disabled] = true
+      @student1.save!
       expect(@controller.send(:k5_user?)).to be_truthy
     end
 
@@ -2285,8 +2302,44 @@ describe ApplicationController do
         @controller.instance_variable_set(:@current_user, @student2)
       end
 
-      it "returns true for user on another shard if associated with a k5 account" do
+      it "returns true for user from another shard if associated with a k5 account on current shard" do
         expect(@controller.send(:k5_user?)).to be_truthy
+      end
+
+      it "returns true for a user with k5 enrollments on another shard" do
+        @shard2.activate do
+          expect(@controller.send(:k5_user?)).to be_truthy
+        end
+      end
+
+      it "returns true for a user with k5 enrollments on a subaccount of another shard" do
+        toggle_k5_setting(@course.account, false)
+        @shard2.activate do
+          subaccount = Account.default.sub_accounts.create!
+          toggle_k5_setting(subaccount)
+          @course2 = course_factory(account: subaccount)
+          @course2.enroll_student(@student1)
+          user_session(@student1)
+          @controller.instance_variable_set(:@current_user, @student1)
+          expect(@controller.send(:k5_user?)).to eq true
+        end
+      end
+
+      it "returns true for an admin with an AccountUser on another shard" do
+        admin = User.create!
+        @shard2.activate do
+          account_admin_user(user: admin)
+          user_session(admin)
+          @controller.instance_variable_set(:@current_user, admin)
+          expect(@controller.send(:k5_user?)).to eq true
+        end
+      end
+
+      it "returns false for users on multiple shards with no k5 enrollments" do
+        toggle_k5_setting(@course.account, false)
+        @shard2.activate do
+          expect(@controller.send(:k5_user?)).to be_falsey
+        end
       end
     end
   end

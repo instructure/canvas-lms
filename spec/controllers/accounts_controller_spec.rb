@@ -600,16 +600,11 @@ describe AccountsController do
         @user = account_admin_user(account: @account)
         user_session(@user)
         enable_cache(:redis_cache_store) do
-          Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
-            "cached!"
-          end
+          expect(@controller).to receive(:uncached_k5_user?).twice
+          @controller.send(:k5_user?)
           post 'update', params: toggle_k5_params(@account.id, true)
           run_jobs
-          other_value = "something else"
-          cached_value = Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
-            other_value # only takes this value if the cache key is empty - i.e., its been cleared
-          end
-          expect(cached_value).to eq other_value
+          @controller.send(:k5_user?)
         end
       end
     end
