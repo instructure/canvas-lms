@@ -16,22 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios, {AxiosPromise} from '@canvas/axios'
-
 import {BlackoutDate} from '../shared/types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API methods */
 
-export const create = (blackoutDate: BlackoutDate): AxiosPromise => {
-  return axios.post(`/api/v1/blackout_dates`, {
-    blackout_date: transformBlackoutDateForApi(blackoutDate)
-  })
-}
+export const create = async (blackoutDate: BlackoutDate) =>
+  (
+    await doFetchApi<{blackout_date: BlackoutDate}>({
+      path: '/api/v1/blackout_dates',
+      method: 'POST',
+      body: transformBlackoutDateForApi(blackoutDate)
+    })
+  ).json
 
-export const deleteBlackoutDate = (id: number | string): AxiosPromise => {
-  return axios.delete(`/api/v1/blackout_dates/${id}`)
-}
+export const deleteBlackoutDate = async (id: number | string) =>
+  (await doFetchApi({path: `/api/v1/blackout_dates/${id}`, method: 'DELETE'})).json
 
 /* API transformers */
 
