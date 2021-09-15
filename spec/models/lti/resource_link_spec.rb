@@ -129,4 +129,77 @@ RSpec.describe Lti::ResourceLink, type: :model do
       end
     end
   end
+
+  describe '.find_or_initialize_for_context_and_lookup_uuid' do
+    subject do
+      described_class.find_or_initialize_for_context_and_lookup_uuid(
+        context: context, context_external_tool: tool, lookup_uuid: lookup_uuid, custom: {'a' => 'b'}
+      )
+    end
+
+    let(:context) { course }
+    let(:tool) { external_tool_model(context: context) }
+    let(:resource_link) do
+      Lti::ResourceLink.create!(context_external_tool: tool, context: course)
+    end
+
+    before { resource_link }
+
+    shared_examples_for 'creating a new resource link' do
+      it 'returns a new resource link' do
+        expect(subject.id).to eq(nil)
+        expect(subject.original_context_external_tool).to eq(tool)
+        expect(subject.custom).to eq('a' => 'b')
+        expect(subject.context).to eq(context)
+        expect(subject.lookup_uuid).to eq(lookup_uuid)
+        expect(subject).to be_valid
+      end
+    end
+
+    context 'when passing in nil lookup_uuid' do
+      let(:lookup_uuid) { nil }
+
+      it_behaves_like 'creating a new resource link'
+
+      context 'when passing in context_external_tool_launch_url' do
+        subject do
+          described_class.find_or_initialize_for_context_and_lookup_uuid(
+            context: context, context_external_tool_launch_url: tool.url,
+            lookup_uuid: lookup_uuid, custom: {'a' => 'b'}
+          )
+        end
+
+        it_behaves_like 'creating a new resource link'
+
+        it 'ContextExternalTool.find_external_tool to look up the tool' do
+          expect(ContextExternalTool).to receive(:find_external_tool)
+            .with(tool.url, context).and_call_original
+          subject
+        end
+      end
+    end
+
+    context 'when passing in a lookup_uuid' do
+      context 'when a resource link exists for that context and lookup_uuid' do
+        let(:lookup_uuid) { resource_link.lookup_uuid }
+
+        it 'returns the existing resource link' do
+          expect(subject.id).to eq(resource_link.id)
+        end
+      end
+
+      context 'when a resource link does not exist for that lookup_uuid' do
+        let(:lookup_uuid) { SecureRandom.uuid }
+
+        it_behaves_like 'creating a new resource link'
+      end
+
+      context 'when a resource link does not exist for that course' do
+        let(:lookup_uuid) { resource_link.lookup_uuid }
+        let(:context) { course_model }
+
+        it_behaves_like 'creating a new resource link'
+      end
+    end
+  end
 end

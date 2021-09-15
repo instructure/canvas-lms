@@ -41,49 +41,19 @@ module Importers
         next if updated
 
         create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
-        update_resource_link_for_context_module_context(lti_resource_link, migration)
       end
 
       true
     end
 
-    # Some resource links are tied to ContextModule's items, which are stored as ContentTags.
-    # These resource links will already have been created by the context_module importer with the
-    # appropriate lookup_uuid, they just need to be updated to use the custom params of the old
-    # matching Lti::ResourceLink.
-    def self.update_resource_link_for_context_module_context(lti_resource_link, migration)
-      existing_resource_link = migration.context.lti_resource_links.find_by(lookup_uuid: lti_resource_link[:lookup_uuid])
-      # If this isn't a resource link that already exists, it won't be for a context module.
-      return unless existing_resource_link
-
-      existing_resource_link.custom =
-        Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link[:custom])
-      existing_resource_link.save
-    end
-
     def self.create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
-      custom_params = Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link['custom'])
-      destination_course = migration.context
-
-      # In case a user import a course, and then delete the assignments, in the
-      # next importation, should we need to consider just the RL's active?
-      resource_link_for_course = Lti::ResourceLink.find_by(
-        context: destination_course,
-        lookup_uuid: lti_resource_link['lookup_uuid']
+      resource_link_for_course = Lti::ResourceLink.find_or_initialize_for_context_and_lookup_uuid(
+        context: migration.context,
+        lookup_uuid: lti_resource_link['lookup_uuid'],
+        context_external_tool_launch_url: lti_resource_link['launch_url']
       )
-
-      unless resource_link_for_course
-        tool = ContextExternalTool.find_external_tool(lti_resource_link['launch_url'], destination_course)
-
-        resource_link_for_course = Lti::ResourceLink.new(
-          context_external_tool: tool,
-          context: destination_course,
-          custom: custom_params,
-          lookup_uuid: lti_resource_link['lookup_uuid']
-        )
-      end
-
-      resource_link_for_course.custom = custom_params
+      resource_link_for_course.custom =
+        Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link['custom'])
       resource_link_for_course.save
     end
 

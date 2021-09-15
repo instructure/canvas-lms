@@ -305,6 +305,15 @@ module Importers
             :id => external_tool_id,
             :lti_resource_link_lookup_uuid => hash[:lti_resource_link_lookup_uuid]
           }, existing_item, :position => context_module.migration_position)
+          if item.associated_asset && item.associated_asset_id.nil?
+            migration.add_warning(
+              t(
+                'The External Tool resource link (including any possible custom ' \
+                  'parameters) could not be set for module item "%{title}"',
+                title: title
+              )
+            )
+          end
         end
       elsif resource_class == Quizzes::Quiz
         quiz = context_module.context.quizzes.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
