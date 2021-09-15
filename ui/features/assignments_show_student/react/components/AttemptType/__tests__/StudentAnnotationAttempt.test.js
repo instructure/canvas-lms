@@ -48,9 +48,8 @@ describe('StudentAnnotationAttempt', () => {
   })
 
   describe('when fetching canvadocs session succeeds', () => {
-    let axiosMock
     beforeEach(() => {
-      axiosMock = jest
+      jest
         .spyOn(axios, 'post')
         .mockResolvedValue({data: {canvadocs_session_url: 'CANVADOCS_SESSION_URL'}})
     })
@@ -106,21 +105,6 @@ describe('StudentAnnotationAttempt', () => {
       render(<StudentAnnotationAttempt {...props} />)
       await waitFor(() => {
         expect(props.createSubmissionDraft).not.toHaveBeenCalled()
-      })
-    })
-
-    it('sets submission_attempt=draft when attempt index is 0', async () => {
-      const props = await makeProps({
-        Submission: {
-          state: 'unsubmitted',
-          attempt: 0
-        }
-      })
-
-      render(<StudentAnnotationAttempt {...props} />)
-      const params = {submission_attempt: 'draft', submission_id: '1'}
-      await waitFor(() => {
-        expect(axiosMock).toHaveBeenCalledWith('/api/v1/canvadoc_session', params)
       })
     })
   })
