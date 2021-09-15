@@ -214,8 +214,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               as="div"
               position="relative"
               width="1%"
-              height="calc(100vh - 10.25rem)"
-              margin="xxx-small 0 0"
+              height="calc(100vh - 8.75rem)"
             >
               {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div
