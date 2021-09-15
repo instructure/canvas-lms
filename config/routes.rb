@@ -456,7 +456,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get 'pace_plans' => 'pace_plans#show'
+    get 'pace_plans' => 'pace_plans#index'
 
     post 'collapse_all_modules' => 'context_modules#toggle_collapse_all'
     resources :content_exports, only: [:create, :index, :destroy, :show]

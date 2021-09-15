@@ -86,11 +86,11 @@ describe PacePlansController, type: :controller do
     user_session(@teacher)
   end
 
-  describe "GET #show" do
+  describe "GET #index" do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      get :show, { params: { course_id: @course.id } }
+      get :index, { params: { course_id: @course.id } }
 
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:pace_plans)
@@ -138,10 +138,20 @@ describe PacePlansController, type: :controller do
                                                                                             }))
     end
 
+    it "creates a pace plan if no primary pace plans are available" do
+      @pace_plan.update(user_id: @student)
+      expect(@course.pace_plans.count).to eq(1)
+      expect(@course.pace_plans.primary).to be_empty
+      get :index, params: { course_id: @course.id }
+      expect(@course.pace_plans.count).to eq(2)
+      expect(@course.pace_plans.primary.count).to eq(1)
+      expect(@course.pace_plans.primary.first.pace_plan_module_items.count).to eq(3)
+    end
+
     it "responds with not found if the pace_plans feature is disabled" do
       @course.account.disable_feature!(:pace_plans)
       assert_page_not_found do
-        get :show, params: { course_id: @course.id }
+        get :index, params: { course_id: @course.id }
       end
     end
 
@@ -149,13 +159,13 @@ describe PacePlansController, type: :controller do
       @course.enable_pace_plans = false
       @course.save!
       assert_page_not_found do
-        get :show, params: { course_id: @course.id }
+        get :index, params: { course_id: @course.id }
       end
     end
 
     it "responds with forbidden if the user doesn't have authorization" do
       user_session(@student)
-      get :show, params: { course_id: @course.id }
+      get :index, params: { course_id: @course.id }
       assert_unauthorized
     end
   end
