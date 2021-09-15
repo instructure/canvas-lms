@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MARKER_SELECTOR} from './constants'
+import {MARKER_SELECTOR, MARKER_ID, TRIGGER_CHAR} from './constants'
 
 /**
  * Simple wrapper function that inserts an html string
@@ -64,7 +64,28 @@ export function insertMentionFor(user, editor = tinymce.activeEditor) {
 
   newElem.classList.add('mceNonEditable', 'mention')
   newElem.setAttribute('data-mention', user?.id)
-  newElem.textContent = user?.shortName
+  newElem.textContent = `${TRIGGER_CHAR}${user?.shortName}`
+
+  removeTriggerChar(editor)
 
   replace(MARKER_SELECTOR, newElem.outerHTML, editor)
+}
+
+/**
+ * Removes the trigger char from the editor body
+ */
+function removeTriggerChar(editor) {
+  const markerElem = editor.dom.select(MARKER_SELECTOR)[0]
+  const parentElem = markerElem?.parentElement
+  // xsslint safeString.identifier TRIGGER_CHAR
+  // xsslint safeString.identifier MARKER_ID
+  const triggerMatcher = `${TRIGGER_CHAR}<span id="${MARKER_ID}"`
+
+  if (parentElem?.innerHTML?.includes(TRIGGER_CHAR)) {
+    const {innerHTML} = parentElem
+    const triggerIndex = innerHTML.lastIndexOf(triggerMatcher)
+
+    // slice out the trigger char and keep all surrounding content
+    parentElem.innerHTML = innerHTML.slice(0, triggerIndex) + innerHTML.slice(triggerIndex + 1)
+  }
 }
