@@ -56,9 +56,10 @@ td {
 }
 
 a {
-  color: #0770A3;
+  // Canvas High-Contrast link color
+  color: darken(#0770A3, 10%);
   &:focus, &:hover {
-    color: darken(#0770A3, 10%);
+    color: darken(#0770A3, 20%);
   }
 }
 
