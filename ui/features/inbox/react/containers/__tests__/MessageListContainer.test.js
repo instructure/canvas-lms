@@ -115,7 +115,7 @@ describe('MessageListContainer', () => {
         })
       )
 
-      expect(mock.mock.calls.length).toBe(2)
+      expect(mock.mock.calls.length).toBe(3)
     })
   })
 })
