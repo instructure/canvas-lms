@@ -112,7 +112,7 @@ module AccountReports::ReportHelper
   end
 
   def section
-    if section_id = @account_report.value_for_param("section_id")
+    if (section_id = @account_report.value_for_param("section_id"))
       @section ||= api_find(root_account.course_sections, section_id)
     end
   end
@@ -172,10 +172,7 @@ module AccountReports::ReportHelper
 
   def extra_text_term(account_report = @account_report)
     account_report.parameters ||= {}
-    add_extra_text(I18n.t(
-                     'account_reports.default.extra_text_term', "Term: %{term_name};",
-                     :term_name => term_name
-                   ))
+    add_extra_text(I18n.t('account_reports.default.extra_text_term', "Term: %{term_name};", :term_name => term_name))
   end
 
   def check_report_key(key)
@@ -235,12 +232,12 @@ module AccountReports::ReportHelper
   end
 
   def emails_by_user_id(user_ids)
-    Shard.partition_by_shard(user_ids) do |user_ids|
+    Shard.partition_by_shard(user_ids) do |shard_user_ids|
       CommunicationChannel
         .email
         .unretired
         .select([:user_id, :path])
-        .where(user_id: user_ids)
+        .where(user_id: shard_user_ids)
         .order('user_id, position ASC')
         .distinct_on(:user_id)
     end.index_by(&:user_id)
@@ -299,12 +296,12 @@ module AccountReports::ReportHelper
     )
   end
 
-  def write_report(headers, enable_i18n_features = false, compile: false, &block)
-    file = generate_and_run_report(headers, 'csv', enable_i18n_features, compile: compile, &block)
+  def write_report(headers, enable_i18n_features = false, &block)
+    file = generate_and_run_report(headers, 'csv', enable_i18n_features, &block)
     GuardRail.activate(:primary) { send_report(file) }
   end
 
-  def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false, compile: false)
+  def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false)
     file = AccountReports.generate_file(@account_report, extension)
     options = {}
     if enable_i18n_features
@@ -313,7 +310,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w", **options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      activate_report_db(use_primary: compile) { yield csv } if block_given?
+      activate_report_db { yield csv } if block_given?
       GuardRail.activate(:primary) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
@@ -397,17 +394,10 @@ module AccountReports::ReportHelper
     GuardRail.activate(:primary) { @account_report.write_report_runners }
   end
 
-  def activate_report_db(use_primary: false, &block)
-    # for parallel account_reports we write rows to account_report_rows and then
-    # read from account_report_rows to generate the csv file. If this is done on
-    # a replica, it can be lagging and not get all the records. Typical reports,
-    # this would not be a problem because it is old data for a report...
-    # but when we just wrote the data it may not exist, so use the primary
-    # database.
-    if use_primary == true
-      GuardRail.activate(:primary, &block)
-    elsif !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
-      GuardRail.activate(:report, &block)
+  def activate_report_db(replica: :report, &block)
+    # if there is no report db configured, use the secondary.
+    if Shard.current.database_server.config[:report]
+      GuardRail.activate(replica, &block)
     else
       GuardRail.activate(:secondary, &block)
     end
@@ -437,30 +427,46 @@ module AccountReports::ReportHelper
   end
 
   def compile_parallel_report(headers, files: nil)
-    @account_report.update(total_lines: @account_report.account_report_rows.count + 1)
-    files ? compile_parallel_zip_report(files) : write_report_from_rows(headers)
-    @account_report.delete_account_report_rows
+    GuardRail.activate(:primary) { @account_report.update(total_lines: @account_report.account_report_rows.count + 1) }
+    xlog_location = AccountReport.current_xlog_location
+    # wait 2 minutes for report db to catch up, if it does not catch up, use the
+    # secondary db when it is caught up.
+    replica = if AccountReport.wait_for_replication(start: xlog_location, timeout: 120, use_report: true)
+                :report
+              else
+                AccountReport.wait_for_replication(start: xlog_location)
+                :secondary
+              end
+    files ? compile_parallel_zip_report(files, replica: replica) : write_report_from_rows(headers, replica: replica)
+    GuardRail.activate(:primary) { @account_report.delete_account_report_rows }
   end
 
-  def write_report_from_rows(headers)
-    write_report(headers, compile: true) do |csv|
-      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_in_batches(strategy: :cursor) do |batch|
-        batch.each { |record| csv << record.row }
+  def write_report_from_rows(headers, replica: :report)
+    activate_report_db(replica: replica) do
+      write_report(headers) do |csv|
+        @account_report.account_report_rows.order(:account_report_runner_id, :row_number)
+                       .find_in_batches(strategy: :cursor) do |batch|
+          batch.each { |record| csv << record.row }
+        end
       end
     end
   end
 
-  def compile_parallel_zip_report(files)
+  def compile_parallel_zip_report(files, replica: :report)
     csvs = {}
-    files.each do |file, headers_for_file|
-      if @account_report.account_report_rows.where(file: file).exists?
-        csvs[file] = generate_and_run_report(headers_for_file, compile: true) do |csv|
-          @account_report.account_report_rows.where(file: file).order(:account_report_runner_id, :row_number).find_in_batches(strategy: :cursor) do |batch|
-            batch.each { |record| csv << record.row }
-          end
-        end
-      else
-        csvs[file] = generate_and_run_report(headers_for_file, compile: true)
+    activate_report_db(replica: replica) do
+      files.each do |file, headers_for_file|
+        csvs[file] = if @account_report.account_report_rows.exists?(file: file)
+                       generate_and_run_report(headers_for_file) do |csv|
+                         @account_report.account_report_rows.where(file: file)
+                                        .order(:account_report_runner_id, :row_number)
+                                        .find_in_batches(strategy: :cursor) do |batch|
+                           batch.each { |record| csv << record.row }
+                         end
+                       end
+                     else
+                       generate_and_run_report(headers_for_file)
+                     end
       end
     end
     send_report(csvs)
