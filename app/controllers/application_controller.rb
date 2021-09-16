@@ -1750,7 +1750,10 @@ class ApplicationController < ActionController::Base
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = tag.tag_type == 'context_module' ? { :module_item_id => tag.id } : {}
     if tag.content_type == 'Assignment'
-      use_edit_url = Account.site_admin.feature_enabled?(:new_quizzes_modules_support) && @context.grants_right?(@current_user, :manage) && tag.quiz_lti
+      use_edit_url = params[:build].nil? &&
+        Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
+        @context.grants_right?(@current_user, :manage) &&
+        tag.quiz_lti
       redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
       redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
@@ -1840,6 +1843,7 @@ class ApplicationController < ActionController::Base
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
             domain: HostUrl.context_host(@domain_root_account, request.host),
+            include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1947,7 +1951,7 @@ class ApplicationController < ActionController::Base
   def external_tool_redirect_display_type
     if params['display'].present?
       params['display']
-    elsif @assignment&.quiz_lti? && @module_tag
+    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
       'in_nav_context'
     else
       @tool&.extension_setting(:assignment_selection)&.dig('display_type')
@@ -2823,14 +2827,18 @@ class ApplicationController < ActionController::Base
   end
   helper_method :show_student_view_button?
 
-  IMMERSIVE_READER_PAGES = ["wiki_pages#show"].freeze
-
   def show_immersive_reader?
     controller_action = "#{params[:controller]}##{params[:action]}"
+    immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
+      ["assignments#show", "courses#show", "assignments#syllabus", "wiki_pages#show"].freeze
+    else
+      ["wiki_pages#show"].freeze
+    end
 
-    return false unless IMMERSIVE_READER_PAGES.include?(controller_action)
+    return false unless immersive_reader_pages.include?(controller_action)
 
-    @context&.account&.feature_enabled?(:immersive_reader_wiki_pages)
+    @context&.root_account&.feature_enabled?(:immersive_reader_wiki_pages) ||
+      @current_user&.feature_enabled?(:user_immersive_reader_wiki_pages)
   end
   helper_method :show_immersive_reader?
 

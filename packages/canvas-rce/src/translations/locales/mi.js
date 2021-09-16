@@ -182,6 +182,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "E tika ana: { when }" },
   "edit_c5fbea07": { "message": "Whakatika" },
   "edit_equation_f5279959": { "message": "Whakatika Tatauranga" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Whakatika Pātene e Ora ana / Ata"
+  },
   "edit_link_7f53bebb": { "message": "Whakatika hononga" },
   "editor_statusbar_26ac81fc": { "message": "Editor Pae tūnga" },
   "embed_828fac4a": { "message": "Whakauru" },
@@ -361,6 +364,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "E pouri ana te ataahua HTML kaore i te papa patopato whakauru. Whakauru te mata HTML editor ataahua i konei."
   },
+  "save_11a80ec3": { "message": "Tiaki" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Pātene me ngā Ata kua Tiakina"
   },

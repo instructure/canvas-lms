@@ -65,3 +65,17 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-late-p
     equal(call.args[1], spans[idx])
   })
 })
+
+test('renderPills mounts a <Pill /> with correct text to each .submission-excused-pill', () => {
+  const stubbedRender = sandbox.stub(ReactDOM, 'render')
+  const spans = [1, 2, 3].map(() => addSpan('submission-excused-pill'))
+  StatusPill.renderPills()
+
+  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx))
+
+  calls.forEach((call, idx) => {
+    equal(call.args[0].type, Pill)
+    equal(call.args[0].props.text, 'excused')
+    equal(call.args[1], spans[idx])
+  })
+})

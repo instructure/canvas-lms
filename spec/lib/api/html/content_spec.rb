@@ -103,6 +103,13 @@ module Api
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p>")
         end
+
+        it "does not re-write root-relative urls to be absolute if requested not to" do
+          string = "<p><a href=\"/blah\"></a></p>"
+          url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
+          html = Content.new(string, rewrite_api_urls: false).rewritten_html(url_helper)
+          expect(html).to eq("<p><a href=\"/blah\"></a></p>")
+        end
     end
 
       describe "#add_css_and_js_overrides" do

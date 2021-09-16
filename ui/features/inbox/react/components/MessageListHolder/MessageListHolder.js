@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 
 import {MessageListItem, conversationProp} from './MessageListItem'
@@ -32,6 +32,15 @@ export const MessageListHolder = ({...props}) => {
       .map(c => c.conversation)
     props.onSelect(matchedConversations)
   }
+
+  /*
+   * When conversations change, we need to re-provide the selectedConversations (CanvasInbox).
+   * That way, other components have the latest state of the selected the conversations.
+   * For example, MessageListActionContainer would have the correct actions.
+   */
+  useEffect(() => {
+    provideConversationsForOnSelect(selectedMessages)
+  }, [props.conversations])
 
   // Toggle function for adding/removing IDs from state
   const updatedSelectedItems = _id => {

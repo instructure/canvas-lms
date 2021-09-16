@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {removeOutcomeGroup, addOutcomeGroup} from '../Management'
+import {removeOutcomeGroup} from '../Management'
 
 jest.mock('@canvas/axios')
 
@@ -35,22 +35,6 @@ describe('api', () => {
     it('provides correct arguments to API request to delete group within course context', () => {
       removeOutcomeGroup('Course', '1', '2')
       expect(axios.delete).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2')
-    })
-  })
-
-  describe('addOutcomeGroup', () => {
-    it('provides correct arguments to request to move group within account context', () => {
-      addOutcomeGroup('Account', '1', '2', 'new group title')
-      expect(axios.post).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2/subgroups', {
-        title: 'new group title'
-      })
-    })
-
-    it('provides correct arguments to API request to move group within course context', () => {
-      addOutcomeGroup('Course', '1', '2', 'new group title')
-      expect(axios.post).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/subgroups', {
-        title: 'new group title'
-      })
     })
   })
 })

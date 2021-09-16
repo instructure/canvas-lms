@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Yon gran deba"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Yon devwa eksepsyonèl"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Gen aksè a bèl editè HTML la"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Tèks Altèn"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Yon devwa diskisyon san parèy"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Gen yon erè ki fèt pandan lekti fichye a"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Modifye Ekwasyon"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Chanje kòn / Bouton ki egziste yo"
+    },
     "edit_link_7f53bebb": {
         "message": "Chanje Lyen"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Erè chajman eleman pase yo"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Yon deba pasyonan"
     },
     "excused_cf8792eb": {
         "message": "Egzante"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Plen Ekran"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Quiz amizan"
     },
     "generating_preview_45b53be0": {
         "message": "Jenerasyon apèsi..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } eleman { items, plural,\n     =1 {eleman}\n  other {konplete}\n}"
     },
+    "join_6cafecca": {
+        "message": "Antre"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "Patisipe nan rankont aktif anliy"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "patisipe nan rankont anliy"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Ale sou ba zouti navigasyon an"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Rakousi Klavye"
+    },
+    "language_arts_35b79a8b": {
+        "message": "La Langaj"
     },
     "large_9c5e80e7": {
         "message": "Laj"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Ta sanble pa gen anyen la a"
+    },
+    "math_ede93050": {
+        "message": "Matematik"
     },
     "media_af190855": {
         "message": "Medya"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Apèsi Pwogram"
     },
+    "science_8d92214a": {
+        "message": "Syans"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Navige monte pou wè istoryal ou!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Piti"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Syans Sosyal"
     },
     "something_went_wrong_89195131": {
         "message": "Gen yon bagay ki mal fèt."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Gwosè Tèks"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Meyè devwa a"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Dat ak lè pou sa fèt la se"

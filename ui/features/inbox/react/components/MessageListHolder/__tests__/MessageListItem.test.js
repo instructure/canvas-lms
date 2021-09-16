@@ -112,10 +112,7 @@ describe('MessageListItem', () => {
     expect(queryByTestId('visible-star')).toBeInTheDocument()
 
     fireEvent.click(queryByTestId('visible-star'))
-    expect(onStarMock).toHaveBeenLastCalledWith(true)
-    // star always shows if selected
-    fireEvent.mouseOut(subjectLine)
-    expect(queryByTestId('visible-star')).toBeInTheDocument()
+    expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
   })
 
   it('renders the unread badge when the conversation is unread', () => {

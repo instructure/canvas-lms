@@ -52,6 +52,7 @@ export default class MediaAttempt extends React.Component {
   static propTypes = {
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func.isRequired,
+    focusOnInit: bool.isRequired,
     submission: Submission.shape.isRequired,
     updateUploadingFiles: func.isRequired,
     uploadingFiles: bool.isRequired
@@ -66,6 +67,7 @@ export default class MediaAttempt extends React.Component {
 
   componentDidMount() {
     if (
+      this.props.focusOnInit &&
       !this.props.uploadingFiles &&
       !isSubmitted(this.props.submission) &&
       !this.props.submission.submissionDraft?.mediaObject?._id

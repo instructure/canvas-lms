@@ -315,6 +315,7 @@ const locale = {
   },
   "rich_content_editor_2708ef21": { "message": "Vizuális szövegszerkesztő" },
   "right_to_left_9cfb092a": { "message": "Jobbról balra" },
+  "save_11a80ec3": { "message": "Mentés" },
   "search_280d00bd": { "message": "Keresés" },
   "search_term_b2d2235": { "message": "Kifejezés keresése" },
   "select_language_7c93a900": { "message": "Válasszon nyelvet" },

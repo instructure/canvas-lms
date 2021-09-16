@@ -69,9 +69,16 @@ const Settings = props => (
     <Menu.Item value="Forward" onSelect={() => props.forward()}>
       {I18n.t('Forward')}
     </Menu.Item>
-    <Menu.Item value="Star" onSelect={() => props.star()}>
-      {I18n.t('Star')}
-    </Menu.Item>
+    {props.star && (
+      <Menu.Item value="Star" onSelect={() => props.star()}>
+        {I18n.t('Star')}
+      </Menu.Item>
+    )}
+    {props.unstar && (
+      <Menu.Item value="Unstar" onSelect={() => props.unstar()}>
+        {I18n.t('Unstar')}
+      </Menu.Item>
+    )}
   </Menu>
 )
 
@@ -156,7 +163,8 @@ MessageActionButtons.propTypes = {
   markAsUnread: PropTypes.func,
   markAsRead: PropTypes.func,
   forward: PropTypes.func.isRequired,
-  star: PropTypes.func.isRequired,
+  star: PropTypes.func,
+  unstar: PropTypes.func,
   shouldRenderMarkAsRead: PropTypes.bool,
   shouldRenderMarkAsUnread: PropTypes.bool,
   hasMultipleSelectedMessages: PropTypes.bool

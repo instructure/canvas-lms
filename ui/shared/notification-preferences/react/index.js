@@ -18,21 +18,24 @@
 
 import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
-import NotificationPreferencesShape from './Shape'
+import {NotificationPreferencesShape} from './Shape'
 import NotificationPreferencesTable from './Table'
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
+import {NotificationPreferencesContext} from './NotificationPreferencesContextProvider'
+import NotificationPreferencesContextSelectQuery from './NotificationPreferencesContextSelectQuery'
 
 const NotificationPreferences = props => {
   const [enabled, setEnabled] = useState(props.enabled)
   const [sendObservedNamesEnabled, setSendObservedNames] = useState(
     props.notificationPreferences?.sendObservedNamesInNotifications
   )
+  const contextSelectable = useContext(NotificationPreferencesContext) !== null
 
   const renderMuteToggle = () => {
     if (props.contextType === 'course') {
@@ -80,7 +83,7 @@ const NotificationPreferences = props => {
 
   const renderNotificationInfoAlert = () => (
     <Flex.Item>
-      <Alert variant="info" renderCloseButtonLabel={I18n.t('Close')}>
+      <Alert variant="info" transition="none">
         {props.contextType === 'course'
           ? I18n.t(
               'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.'
@@ -132,17 +135,36 @@ const NotificationPreferences = props => {
     }
   }
 
+  const renderContextSelect = () => {
+    return (
+      <NotificationPreferencesContext.Consumer>
+        {context =>
+          context ? (
+            <NotificationPreferencesContextSelectQuery
+              currentContext={context.currentContext}
+              onContextChanged={context.setContext}
+              userId={props.userId}
+            />
+          ) : null
+        }
+      </NotificationPreferencesContext.Consumer>
+    )
+  }
+
   return (
     <Flex direction="column">
       <Flex.Item overflowY="visible" margin="0 0 small 0">
         <Heading level="h2" as="h1">
-          {props.contextType === 'course'
+          {contextSelectable
+            ? I18n.t('Notification Settings')
+            : props.contextType === 'course'
             ? I18n.t('Course Notification Settings')
             : I18n.t('Account Notification Settings')}
         </Heading>
       </Flex.Item>
       {renderNotificationInfoAlert()}
       {renderAccountPrivacyInfoAlert()}
+      {contextSelectable && renderContextSelect()}
       {renderMuteToggle()}
       {renderSendObservedNamesInNotificationsToggle()}
       {renderNotificationPreferences()}
@@ -155,6 +177,7 @@ NotificationPreferences.propTypes = {
   contextName: string,
   enabled: bool,
   updatePreference: func.isRequired,
+  userId: string.isRequired,
   notificationPreferences: NotificationPreferencesShape
 }
 

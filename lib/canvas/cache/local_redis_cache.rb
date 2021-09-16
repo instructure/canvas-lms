@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require "redis/scripting"
+
 module Canvas
   module Cache
     class LocalRedisCache < ActiveSupport::Cache::RedisCacheStore
@@ -29,7 +32,7 @@ module Canvas
           port: local_cache_conf[:redis_port],
           db: local_cache_conf[:redis_db]
         )
-        @debounced_clear = ::Redis::Scripting::Script.new(File.expand_path("../debounced_clear.lua", __FILE__))
+        @debounced_clear = ::Redis::Scripting::Script.new(File.expand_path("debounced_clear.lua", __dir__))
         super(redis: redis)
       end
 

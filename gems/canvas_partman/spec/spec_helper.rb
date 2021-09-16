@@ -35,10 +35,14 @@ module CanvasPartmanTest
 end
 
 require 'active_record'
+require 'rails/version'
 require 'canvas_partman'
 
 require 'uri'
 ActiveRecord::Base.establish_connection(ENV.fetch('DATABASE_URL', nil))
+# we need to ensure this callback is called for active_record-pg_extensions,
+# which isn't running because we're not using Rails to setup the database
+ActiveRecord::PGExtensions::Railtie.run_initializers
 require 'support/schema_helper'
 require 'fixtures/zoo'
 require 'fixtures/animal'

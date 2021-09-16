@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../helpers/k5_common'
 
 describe ContentExportsController do
+  include K5Common
+
   describe "POST 'create'" do
     it "should explicitly export everything" do
       course_with_teacher_logged_in(:active_all => true)
@@ -28,6 +31,29 @@ describe ContentExportsController do
       expect(response).to be_successful
 
       expect(ContentExport.last.selected_content[:everything]).to be_present
+    end
+  end
+
+  describe "GET 'index'" do
+    before :once do
+      course_factory(active_all: true)
+    end
+
+    before :each do
+      user_session(@teacher)
+    end
+
+    it 'loads classic theming in a classic course' do
+      get :index, params: {course_id: @course.id}
+      expect(assigns(:css_bundles)).to be_nil
+      expect(assigns(:js_bundles)).to be_nil
+    end
+
+    it 'loads k5 theming in a k5 course' do
+      toggle_k5_setting(@course.account)
+      get :index, params: {course_id: @course.id}
+      expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+      expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
   end
 

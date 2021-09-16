@@ -22,6 +22,9 @@ class PacePlan < ActiveRecord::Base
   include Workflow
   include Canvas::SoftDeletable
 
+  extend RootAccountResolver
+  resolves_root_account through: :course
+
   belongs_to :course, inverse_of: :pace_plans
   has_many :pace_plan_module_items, dependent: :destroy
 
@@ -31,23 +34,18 @@ class PacePlan < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_account, class_name: 'Account'
 
-  before_save :infer_root_account_id
-
   validates :course_id, presence: true
   validate :valid_secondary_context
 
   scope :primary, -> { where(course_section_id: nil, user_id: nil) }
   scope :for_section, ->(section) { where(course_section_id: section) }
   scope :for_user, ->(user) { where(user_id: user) }
+  scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
 
   workflow do
     state :unpublished
     state :active
     state :deleted
-  end
-
-  def infer_root_account_id
-    self.root_account_id ||= course&.root_account_id
   end
 
   def valid_secondary_context

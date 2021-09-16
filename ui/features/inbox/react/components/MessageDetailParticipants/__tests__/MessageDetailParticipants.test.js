@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {MessageDetailParticipants} from '../MessageDetailParticipants'
+
+import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../../util/constants'
 
 describe('MessageDetailParticipants', () => {
   it('renders with provided data', () => {
@@ -33,5 +35,52 @@ describe('MessageDetailParticipants', () => {
 
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
+  })
+
+  it('renders with limited list until expanded', () => {
+    const participantList = [
+      {name: 'Bob Barker'},
+      {name: 'Sally Ford'},
+      {name: 'Russel Franks'},
+      {name: 'Dipali Vega'},
+      {name: 'Arlet Tuân'},
+      {name: 'Tshepo Jehoiachin'},
+      {name: 'Ráichéal Mairead'},
+      {name: 'Renāte Tarik'},
+      {name: "Jocelin 'Avshalom"},
+      {name: 'Marisa Ninurta'},
+      {name: 'Régine Teige'},
+      {name: 'Norman Iustina'},
+      {name: 'Ursula Siddharth'},
+      {name: 'Cristoforo Gülnarə'},
+      {name: 'Katka Lauge'},
+      {name: 'Sofia Fernanda'},
+      {name: 'Orestes Etheldreda'}
+    ]
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: participantList
+      }
+    }
+
+    const container = render(<MessageDetailParticipants {...props} />)
+
+    expect(
+      container.queryByText(
+        `, ${participantList
+          .map(person => person.name)
+          .slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
+          .join(', ')}`
+      )
+    ).toBeInTheDocument()
+    expect(
+      container.queryByText(`, ${participantList.map(person => person.name).join(', ')}`)
+    ).toBeNull()
+    const expandBtn = container.getByTestId('expand-participants-button')
+    fireEvent.click(expandBtn)
+    expect(
+      container.getByText(`, ${participantList.map(person => person.name).join(', ')}`)
+    ).toBeInTheDocument()
   })
 })

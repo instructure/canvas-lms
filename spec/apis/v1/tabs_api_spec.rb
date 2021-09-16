@@ -553,6 +553,15 @@ describe TabsController, type: :request do
             "visibility" => "public",
             "label" => "Grades",
             "type" => "internal"
+          },
+          {
+            "id" => "groups",
+            "html_url" => "/courses/#{@course.id}/groups",
+            "full_url" => "http://localhost/courses/#{@course.id}/groups",
+            "position" => 5,
+            "visibility" => "public",
+            "label" => "Groups",
+            "type" => "internal"
           }
         ]
       end

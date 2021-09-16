@@ -40,7 +40,7 @@ describe('OutcomeEditModal', () => {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: 1
+    contextId: '1'
   }
 
   const defaultProps = (props = {}) => ({

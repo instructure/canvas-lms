@@ -25,6 +25,7 @@ require_relative '../pages/k5_modules_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_announcements_shared_examples'
+require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
 
 describe "student k5 course dashboard" do
   include_context "in-process server selenium tests"
@@ -135,5 +136,9 @@ describe "student k5 course dashboard" do
 
       expect(important_info_content).to include_text(important_info_text)
     end
+  end
+
+  context 'course tab navigation shared examples' do
+    it_behaves_like 'k5 subject navigation tabs'
   end
 end

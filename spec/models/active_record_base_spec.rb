@@ -191,7 +191,7 @@ describe ActiveRecord::Base do
       include_examples "batches"
 
       it "works with load: false" do
-        User.in_batches(strategy: :copy) { |r| expect(r.to_a).to eq [@u1, @u2, @u3] }
+        User.in_batches(strategy: :copy) { |r| expect(r.to_a).to match_array([@u1, @u2, @u3]) }
       end
     end
 

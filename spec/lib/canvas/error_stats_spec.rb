@@ -39,19 +39,19 @@ module Canvas
       let(:data){ {} }
 
       it "increments the error level by default" do
-        expect(InstStatsd::Statsd).to receive(:increment) do |key, data|
+        described_class.capture("something", data)
+        expect(InstStatsd::Statsd).to have_received(:increment) do |key, data|
           expect(key).to eq("errors.error")
           expect(data[:tags][:category]).to eq("something")
         end
-        described_class.capture("something", data)
       end
 
       it "uses the exception name for the category tag" do
-        expect(InstStatsd::Statsd).to receive(:increment) do |key, data|
+        described_class.capture(StandardError.new, data, :warn)
+        expect(InstStatsd::Statsd).to have_received(:increment) do |key, data|
           expect(key).to eq("errors.warn")
           expect(data[:tags][:category]).to eq("StandardError")
         end
-        described_class.capture(StandardError.new, data, :warn)
       end
 
       it "increments the inner exception too" do

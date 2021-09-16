@@ -31,19 +31,6 @@ it('renders normally', async () => {
   expect(getByTestId('assignment-student-header')).toBeInTheDocument()
 })
 
-it('renders a "View Feedback" button', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {getByText} = render(<Header {...props} />)
-  expect(getByText('View Feedback')).toBeInTheDocument()
-})
-
-it('does not render a "View Feedback" button when no submission is present', async () => {
-  const props = await mockAssignmentAndSubmission({Submission: null})
-  props.allSubmissions = [{id: 1}]
-  const {queryByText} = render(<Header {...props} />)
-  expect(queryByText('View Feedback')).not.toBeInTheDocument()
-})
-
 it('renders a "late" status pill if the last graded submission is late', async () => {
   const props = await mockAssignmentAndSubmission({
     Assignment: {
@@ -304,6 +291,39 @@ it('will not render the grade if the last submitted submission is excused', asyn
   expect(getByTestId('grade-display').textContent).toEqual('Excused')
 })
 
+it('renders the attempt select', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  props.allSubmissions = [props.submission]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).toBeInTheDocument()
+})
+
+it('does not render the attempt select if there is no submission', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: null})
+  props.allSubmissions = [{id: 1}]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})
+
+it('does not render the attempt select if allSubmissions is not provided', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})
+
+it('does not render the attempt select if the assignment has non-digital submissions', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {nonDigitalSubmission: true},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})
+
 describe('submission workflow tracker', () => {
   it('is rendered when a submission exists and the assignment is available', async () => {
     const props = await mockAssignmentAndSubmission()
@@ -340,35 +360,82 @@ describe('submission workflow tracker', () => {
   })
 })
 
-it('renders the attempt select', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Submission: {...SubmissionMocks.submitted}
+describe('Add Comment/View Feedback button', () => {
+  it('renders as "Add Comment" by default', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('Add Comment')).toBeInTheDocument()
   })
-  props.allSubmissions = [props.submission]
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('attemptSelect')).toBeInTheDocument()
-})
 
-it('does not render the attempt select if there is no submission', async () => {
-  const props = await mockAssignmentAndSubmission({Submission: null})
-  props.allSubmissions = [{id: 1}]
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
-})
-
-it('does not render the attempt select if allSubmissions is not provided', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Submission: {...SubmissionMocks.submitted}
+  it('renders as "View Feedback" if feedback exists', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {feedbackForCurrentAttempt: true}
+    })
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('View Feedback')).toBeInTheDocument()
   })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
-})
 
-it('does not render the attempt select if the assignment has non-digital submissions', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Assignment: {nonDigitalSubmission: true},
-    Submission: {...SubmissionMocks.submitted}
+  it('renders as "Add Comment" and disabled if unsubmitted attempt>1', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        ...SubmissionMocks.unsubmitted,
+        attempt: 2
+      }
+    })
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('Add Comment').closest('button')).toBeDisabled()
   })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+
+  it('renders additional info button if unsubmitted attempt>1', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        ...SubmissionMocks.unsubmitted,
+        attempt: 2
+      }
+    })
+    const {getByRole} = render(<Header {...props} />)
+    expect(
+      getByRole('button', {
+        name: /After the first attempt, you cannot leave comments until you submit the assignment./
+      })
+    ).toBeInTheDocument()
+  })
+
+  it('does not render additional info button if unsubmitted attempt==1', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        ...SubmissionMocks.unsubmitted,
+        attempt: 1
+      }
+    })
+    const {queryByRole} = render(<Header {...props} />)
+    expect(
+      queryByRole('button', {
+        name: /After the first attempt, you cannot leave comments until you submit the assignment./
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not render additional info button if submitted attempt>1', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        ...SubmissionMocks.submitted,
+        attempt: 2
+      }
+    })
+    const {queryByRole} = render(<Header {...props} />)
+    expect(
+      queryByRole('button', {
+        name: /After the first attempt, you cannot leave comments until you submit the assignment./
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not render when no submission is present', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: null})
+    props.allSubmissions = [{id: 1}]
+    const {queryByText} = render(<Header {...props} />)
+    expect(queryByText('View Feedback')).not.toBeInTheDocument()
+    expect(queryByText('Add Comment')).not.toBeInTheDocument()
+  })
 })

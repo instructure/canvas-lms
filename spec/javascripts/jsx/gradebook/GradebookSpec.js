@@ -6289,41 +6289,6 @@ QUnit.module('GridColor', {
   }
 })
 
-test('is rendered on init', () => {
-  const gradebook = createGradebook()
-  const renderGridColorStub = sandbox.stub(gradebook, 'renderGridColor')
-  sandbox.stub(gradebook, 'onGridInit')
-  gradebook.initGrid()
-  ok(renderGridColorStub.called)
-})
-
-test('is rendered on renderGridColor', () => {
-  const gradebook = createGradebook({colors: statusColors()})
-  gradebook.renderGridColor()
-  const style = document.querySelector('[data-component="GridColor"] style').innerText
-  equal(
-    style,
-    [
-      `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }`,
-      `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.late { background-color: white; }',
-      `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }`,
-      `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
-      `.even .gradebook-cell.resubmitted { background-color: ${defaultColors.green}; }`,
-      `.odd .gradebook-cell.resubmitted { background-color: ${darken(defaultColors.green, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.resubmitted { background-color: white; }',
-      `.even .gradebook-cell.dropped { background-color: ${defaultColors.orange}; }`,
-      `.odd .gradebook-cell.dropped { background-color: ${darken(defaultColors.orange, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.dropped { background-color: white; }',
-      `.even .gradebook-cell.excused { background-color: ${defaultColors.yellow}; }`,
-      `.odd .gradebook-cell.excused { background-color: ${darken(defaultColors.yellow, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.excused { background-color: white; }'
-    ].join('')
-  )
-  $fixtures.innerHTML = ''
-})
-
 QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
   const url = '/api/v1/courses/1/assignments/2/submissions/3'
   const mountPointId = 'StudentTray__Container'
@@ -8936,12 +8901,6 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
         gradebook.initShowUnpublishedAssignments('not true')
         gradebook.renderGradebookSettingsModal()
         strictEqual(viewOptions().showUnpublishedAssignments, false)
-      })
-
-      test('sets statusColors to the current status colors', () => {
-        gradebook = createGradebook({enhanced_gradebook_filters: true})
-        gradebook.renderGradebookSettingsModal()
-        deepEqual(viewOptions().statusColors, statusColors())
       })
 
       test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {

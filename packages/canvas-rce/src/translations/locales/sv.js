@@ -177,6 +177,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Inlämningsdatum: { when }" },
   "edit_c5fbea07": { "message": "Redigera" },
   "edit_equation_f5279959": { "message": "Redigera ekvation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Redigera befintlig knapp/ikon"
+  },
   "edit_link_7f53bebb": { "message": "Redigera länk" },
   "editor_statusbar_26ac81fc": { "message": "Statusfält för redigeraren" },
   "embed_828fac4a": { "message": "Bädda in" },
@@ -364,6 +367,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Tyvärr fungerar inte tangentbordet i den nätta HTML-redigeraren. Öppna den råa HTML-redigeraren här."
   },
+  "save_11a80ec3": { "message": "Spara" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Sparade knappar och ikoner"
   },

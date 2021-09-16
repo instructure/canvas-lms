@@ -175,6 +175,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Fällig: { when }" },
   "edit_c5fbea07": { "message": "Ändern" },
   "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Vorhandene/s Schaltfläche/Symbol bearbeiten"
+  },
   "edit_link_7f53bebb": { "message": "Link bearbeiten" },
   "editor_statusbar_26ac81fc": { "message": "Editor-Statusleiste" },
   "embed_828fac4a": { "message": "Einbetten" },
@@ -356,6 +359,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."
   },
+  "save_11a80ec3": { "message": "Speichern" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Gespeicherte Schaltflächen und Icons"
   },

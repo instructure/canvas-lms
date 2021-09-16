@@ -260,7 +260,7 @@ module Lti
         # content migrations that directly or indirectly provided content to
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
-        results = ActiveRecord::Base.with_statement_timeout do
+        results = Course.connection.with_statement_timeout do
           Course.from("(WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id
               FROM #{ContentMigration.quoted_table_name}

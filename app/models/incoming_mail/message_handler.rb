@@ -40,6 +40,7 @@ module IncomingMail
           raise IncomingMail::Errors::UnknownSender unless from_channel
           raise IncomingMail::Errors::MessageTooLong if body.length > ActiveRecord::Base.maximum_text_length
           raise IncomingMail::Errors::MessageTooLong if html_body.length > ActiveRecord::Base.maximum_text_length
+          raise IncomingMail::Errors::BlankMessage if body.blank?
 
           Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
             context.reply_from({

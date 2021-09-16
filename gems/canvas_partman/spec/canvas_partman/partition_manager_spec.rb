@@ -208,7 +208,7 @@ describe CanvasPartman::PartitionManager do
         pm.with_statement_timeout(timeout_override: 1) do
           pm.send(:execute, "select pg_sleep(5)")
         end
-      end.to raise_error(ActiveRecord::QueryCanceled)
+      end.to raise_error(ActiveRecord::QueryTimeout)
     end
   end
 end

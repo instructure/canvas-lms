@@ -33,6 +33,7 @@ import contentShareShape from '@canvas/content-sharing/react/proptypes/contentSh
 
 const friendlyShareNames = {
   assignment: I18n.t('Assignment'),
+  attachment: I18n.t('File'),
   discussion_topic: I18n.t('Discussion Topic'),
   module: I18n.t('Module'),
   page: I18n.t('Page'),

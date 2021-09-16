@@ -788,13 +788,19 @@ describe('K-5 Dashboard', () => {
     }
 
     it('shows picker when user is an observer', () => {
-      const {getByRole} = render(<K5Dashboard {...defaultProps} parentSupportEnabled />)
+      const {getByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          parentSupportEnabled
+          currentUserRoles={['user', 'observer']}
+        />
+      )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
       expect(select.value).toBe('Student 4')
     })
 
-    it('includes the student id when requesting dashboard cards', done => {
+    it('prefetches dashboard cards with the correct url param', done => {
       moxios.withMock(async () => {
         const {getByRole} = render(
           <K5Dashboard
@@ -805,11 +811,11 @@ describe('K-5 Dashboard', () => {
         )
         const select = getByRole('combobox', {name: 'Select a student to view'})
         const preFetchedRequest = await getLastRequest()
-        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
         await preFetchedRequest.response.then(async () => {
           const onLoadRequest = await getLastRequest()
           expect(select.value).toBe('Student 4')
-          // Request with the cookie value
+          // Same request
           expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
         })
         done()
@@ -827,12 +833,10 @@ describe('K-5 Dashboard', () => {
         )
         const select = getByRole('combobox', {name: 'Select a student to view'})
         const preFetchedRequest = await getLastRequest()
-        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards')
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
         await preFetchedRequest.response.then(async () => {
           const onLoadRequest = await getLastRequest()
           expect(select.value).toBe('Student 4')
-          // Request with the cookie value
-          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
           act(() => select.click())
           act(() => getByText('Student 2').click())
           return onLoadRequest.response.then(async () => {
@@ -845,7 +849,7 @@ describe('K-5 Dashboard', () => {
               const lastRequest = await getLastRequest()
               expect(select.value).toBe('Student 4')
               expect(lastRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
-              expect(moxios.requests.count()).toBe(3)
+              expect(moxios.requests.count()).toBe(2)
             })
           })
         })

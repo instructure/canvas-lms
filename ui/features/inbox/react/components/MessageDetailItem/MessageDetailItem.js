@@ -48,7 +48,7 @@ export const MessageDetailItem = ({...props}) => {
             src={props.conversationMessage.author.avatarUrl}
           />
         </Flex.Item>
-        <Flex.Item shouldGrow>
+        <Flex.Item shouldShrink shouldGrow>
           <MessageDetailParticipants conversationMessage={props.conversationMessage} />
           <View as="div" margin="xx-small none xxx-small">
             <Text color="secondary" weight="light">

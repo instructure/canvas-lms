@@ -19,7 +19,11 @@
 import ReactDOM from 'react-dom'
 import StudentView from './react/index'
 import ready from '@instructure/ready'
+import React from 'react'
 
 ready(() => {
-  ReactDOM.render(StudentView, document.getElementById('content'))
+  ReactDOM.render(
+    <StudentView enableGroupCreation enableEveryoneTab />,
+    document.getElementById('content')
+  )
 })

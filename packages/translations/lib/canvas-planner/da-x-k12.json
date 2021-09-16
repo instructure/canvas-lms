@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "En fantastisk diskussion" },
+  "a_wonderful_assignment_d3139d9b": { "message": "En fantastisk opgave" },
   "add_to_do_7537af64": { "message": "Tilføj opgaveliste" },
   "add_to_do_7def3c37": { "message": "Tilføj til opgaveliste" },
   "address_3159962f": { "message": "Adresse:" },
   "all_day_fb42c4fc": { "message": "Hele dagen" },
   "all_items_loaded_aa256183": { "message": "Alle elementer er indlæst" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "En fantastisk diskussionsopgave"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Der opstod en fejl under forsøg på at afvise muligheden."
   },
@@ -102,6 +107,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Fejl ved indlæsning af forrige elementer"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Spændende diskussion" },
   "excused_cf8792eb": { "message": "Undskyldt" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Mislykkedes at kigge ind i din fremtid"
@@ -124,6 +130,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Kunne ikke gemme opgave" },
   "feedback_6dcc1991": { "message": "Feedback" },
+  "fun_quiz_47ab0b0": { "message": "Sjov quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Gå til Oversigt over kortvisning"
   },
@@ -133,10 +140,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } færdigt / færdige { items, plural,\n     =1 {element}\n  other {elementer}\n}"
   },
+  "join_6cafecca": { "message": "Deltag" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "deltage i et aktivt onlinemøde"
+  },
+  "join_online_meeting_b1725843": { "message": "deltage i onlinemøde" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Gå til navigationsværktøjslinjen"
   },
   "jump_to_today_254ccf41": { "message": "Spring til i dag" },
+  "language_arts_35b79a8b": { "message": "Sprog" },
   "late_2be42b88": { "message": "Sen" },
   "load_more_a36f9cf9": { "message": "Indlæs mere" },
   "load_prior_dates_f2b0f6f0": { "message": "Indlæs tidligere datoer" },
@@ -154,6 +167,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Det ser ud som om, der ikke er noget her"
   },
+  "math_ede93050": { "message": "Matematik" },
   "missing_1a256b3b": { "message": "Mangler" },
   "missing_items_for_title_516511f8": {
     "message": "Manglende elementer for { title }"
@@ -209,6 +223,7 @@
   "replies_4a8577c8": { "message": "Svar" },
   "save_11a80ec3": { "message": "Gem" },
   "schedule_preview_3bcda153": { "message": "Forhåndsvisning af tidsplan" },
+  "science_8d92214a": { "message": "Videnskab" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Rul op for at se din historik!"
   },
@@ -217,6 +232,7 @@
   },
   "show_all_ae37d610": { "message": "Vis alle" },
   "show_my_grades_ebd08684": { "message": "Vis mine vurderinger" },
+  "social_studies_13fa30c7": { "message": "Sociale studier" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
   },
@@ -234,6 +250,7 @@
     "message": "Succes: Opgaveliste oprettet"
   },
   "task_16b0ef38": { "message": "Opgave" },
+  "the_best_assignment_15e98be1": { "message": "Den bedste opgave" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dato og klokkeslæt hvor denne opgave forfalder"
   },

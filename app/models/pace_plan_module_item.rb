@@ -23,15 +23,13 @@ class PacePlanModuleItem < ActiveRecord::Base
   belongs_to :module_item, class_name: 'ContentTag'
   belongs_to :root_account, class_name: 'Account'
 
-  before_save :infer_root_account_id
+  extend RootAccountResolver
+  resolves_root_account through: :pace_plan
+
   validates :pace_plan, presence: true
   validates :module_item_id, presence: true
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }
   scope :ordered, -> { joins(module_item: :context_module).
     order('context_modules.position, context_modules.id, content_tags.position, content_tags.id') }
-
-  def infer_root_account_id
-    self.root_account_id ||= pace_plan&.root_account_id
-  end
 end

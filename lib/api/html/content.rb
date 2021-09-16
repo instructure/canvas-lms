@@ -32,17 +32,19 @@ module Api
         content.modified_html
       end
 
-      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false)
+      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
         return html if html.blank?
-        self.new(html, account, include_mobile: include_mobile).rewritten_html(url_helper)
+        self.new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
+          .rewritten_html(url_helper)
       end
 
       attr_reader :html
 
-      def initialize(html_string, account = nil, include_mobile: false, host: nil, port: nil)
+      def initialize(html_string, account = nil, include_mobile: false, rewrite_api_urls: true, host: nil, port: nil)
         @account = account
         @html = html_string
         @include_mobile = include_mobile
+        @rewrite_api_urls = rewrite_api_urls
         @host = host
         @port = port
       end
@@ -98,9 +100,11 @@ module Api
           apply_mathml(node)
         end
 
-        URL_ATTRIBUTES.each do |tag, attributes|
-          parsed_html.css(tag).each do |element|
-            url_helper.rewrite_api_urls(element, attributes)
+        if @rewrite_api_urls || @rewrite_api_urls.nil?
+          URL_ATTRIBUTES.each do |tag, attributes|
+            parsed_html.css(tag).each do |element|
+              url_helper.rewrite_api_urls(element, attributes)
+            end
           end
         end
 

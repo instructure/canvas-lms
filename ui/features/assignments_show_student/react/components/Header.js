@@ -25,9 +25,10 @@ import GradeDisplay from './GradeDisplay'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
-import {IconChatLine} from '@instructure/ui-icons'
+import {IconChatLine, IconQuestionLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
+import {Popover} from '@instructure/ui-popover'
 import {arrayOf, func} from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -53,10 +54,7 @@ class Header extends React.Component {
   }
 
   state = {
-    commentsTrayOpen:
-      this.props.submission &&
-      this.props.submission.unreadCommentCount &&
-      this.props.submission.unreadCommentCount !== 0
+    commentsTrayOpen: !!this.props.submission?.unreadCommentCount
   }
 
   isSubmissionLate = () => {
@@ -153,30 +151,56 @@ class Header extends React.Component {
     )
   }
 
-  renderViewFeedbackButton = () => {
-    const buttonMargin = this.props.submission.unreadCommentCount ? {} : {margin: 'small xxx-small'}
-    const button = (
-      <Button renderIcon={IconChatLine} onClick={this.openCommentsTray} {...buttonMargin}>
-        {I18n.t('View Feedback')}
-      </Button>
+  renderViewFeedbackButton = addCommentsDisabled => {
+    const popoverMessage = I18n.t(
+      'After the first attempt, you cannot leave comments until you submit the assignment.'
     )
 
-    if (!this.props.submission.unreadCommentCount) {
-      return button
-    }
-
     return (
-      <div data-testid="unread_comments_badge">
-        <Badge margin="x-small" count={this.props.submission.unreadCommentCount} countUntil={100}>
-          {button}
-        </Badge>
-      </div>
+      <>
+        <div data-testid="unread_comments_badge">
+          <Badge
+            margin="x-small"
+            count={this.props.submission.unreadCommentCount || null}
+            countUntil={100}
+          >
+            <Button
+              renderIcon={IconChatLine}
+              onClick={this.openCommentsTray}
+              disabled={addCommentsDisabled}
+            >
+              {this.props.submission.feedbackForCurrentAttempt
+                ? I18n.t('View Feedback')
+                : I18n.t('Add Comment')}
+            </Button>
+          </Badge>
+          {addCommentsDisabled && (
+            <Popover
+              renderTrigger={
+                <Button variant="link" size="small" icon={IconQuestionLine}>
+                  <ScreenReaderContent>{popoverMessage}</ScreenReaderContent>
+                </Button>
+              }
+            >
+              <View display="block" padding="small" maxWidth="15rem">
+                {popoverMessage}
+              </View>
+            </Popover>
+          )}
+        </div>
+      </>
     )
   }
 
   render() {
     const lockAssignment =
       this.props.assignment.env.modulePrereq || this.props.assignment.env.unlockDate
+
+    /* In the case where the current attempt is backed by a submission draft after the first,
+     students are not able to leave comments. Disabling the add comments button and adding
+     an info button will help make this clear. */
+    const addCommentsDisabled =
+      this.props.submission?.attempt > 1 && this.props.submission.state === 'unsubmitted'
 
     return (
       <>
@@ -217,9 +241,9 @@ class Header extends React.Component {
             )}
           </Flex>
           {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
-            <Flex alignItems="center">
+            <Flex alignItems="center" wrap="wrap">
               <Flex.Item shouldGrow>
-                <Flex>
+                <Flex wrap="wrap">
                   {this.props.allSubmissions && (
                     <Flex.Item>
                       <AttemptSelect
@@ -239,12 +263,14 @@ class Header extends React.Component {
               </Flex.Item>
 
               <Flex.Item shouldShrink>
-                <Flex as="div">
+                <Flex as="div" wrap="wrap">
                   {(this.props.submission.state === 'graded' ||
                     this.props.submission.state === 'submitted') && (
                     <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
                   )}
-                  <Flex.Item>{this.renderViewFeedbackButton()}</Flex.Item>
+                  <Flex.Item margin="0 small 0 0">
+                    {this.renderViewFeedbackButton(addCommentsDisabled)}
+                  </Flex.Item>
                 </Flex>
               </Flex.Item>
             </Flex>

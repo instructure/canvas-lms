@@ -19,6 +19,7 @@
 
 require 'canvas_partman/partition_manager/by_date'
 require 'canvas_partman/partition_manager/by_id'
+require "active_record/pg_extensions"
 
 module CanvasPartman
   class PartitionManager
@@ -118,12 +119,9 @@ SQL
       drop_partition_table(partition_table)
     end
 
-    def with_statement_timeout(timeout_override: nil)
+    def with_statement_timeout(timeout_override: nil, &block)
       tv = timeout_override || ::CanvasPartman.timeout_value
-      base_class.transaction do
-        execute("SET LOCAL statement_timeout=#{tv}")
-        yield
-      end
+      base_class.connection.with_statement_timeout(tv.to_f, &block)
     end
 
     protected

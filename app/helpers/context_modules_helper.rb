@@ -153,4 +153,8 @@ module ContextModulesHelper
     end
     TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
   end
+
+  def module_item_new_quizzes_build_button_enabled?
+    Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button)
+  end
 end

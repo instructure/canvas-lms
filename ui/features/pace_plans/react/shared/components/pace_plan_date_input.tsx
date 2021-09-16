@@ -115,12 +115,13 @@ class PacePlanDateInput extends React.Component<PassedProps, LocalState> {
   /* Renderers */
 
   render() {
+    const {dateValue} = this.props
     return (
       <CanvasDateInput
         renderLabel={this.props.label}
         formatDate={this.formatDate}
         onSelectedDateChange={this.onDateChange}
-        selectedDate={this.props.dateValue || ''}
+        selectedDate={dateValue && moment(dateValue).isValid() ? dateValue : ''}
         width={this.props.width}
         messages={this.state.error ? [{type: 'error', text: this.state.error}] : []}
       />

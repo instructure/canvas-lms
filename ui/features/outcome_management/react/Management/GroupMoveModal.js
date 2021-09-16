@@ -28,19 +28,10 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 
-const GroupMoveModal = ({
-  groupId,
-  groupTitle,
-  parentGroupId,
-  isOpen,
-  onCloseHandler,
-  onSuccess,
-  rootGroup
-}) => {
-  const [targetGroup, setTargetGroup] = useState(rootGroup)
+const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandler, onSuccess}) => {
+  const [targetGroup, setTargetGroup] = useState(parentGroup)
   const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
-  const disableGroupMove =
-    !targetGroup || targetGroup?.id === parentGroupId || targetGroup?.id === groupId
+  const disableGroupMove = parentGroup.id === targetGroup.id
 
   const onMoveGroupHandler = () => {
     ;(async () => {
@@ -100,8 +91,9 @@ const GroupMoveModal = ({
           </Text>
           <TargetGroupSelector
             groupId={groupId}
-            // eslint-disable-next-line no-shadow
+            // eslint-disable-next-line @typescript-eslint/no-shadow
             setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
+            starterGroupId={parentGroup.id}
           />
         </View>
       </Modal.Body>
@@ -126,11 +118,10 @@ const GroupMoveModal = ({
 GroupMoveModal.propTypes = {
   groupId: PropTypes.string.isRequired,
   groupTitle: PropTypes.string.isRequired,
-  parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  rootGroup: PropTypes.object.isRequired
+  parentGroup: PropTypes.object.isRequired
 }
 
 GroupMoveModal.defaultProps = {

@@ -358,7 +358,8 @@ class RCEWrapper extends React.Component {
 
     this.a11yCheckerReady = import('./initA11yChecker')
       .then(initA11yChecker => {
-        initA11yChecker.default(this.language, this.props.highContrastCSS)
+        initA11yChecker.default(this.language)
+        this.checkAccessibility()
       })
       .catch(err => {
         // eslint-disable-next-line no-console
@@ -1001,7 +1002,6 @@ class RCEWrapper extends React.Component {
     if (this.props.use_rce_a11y_checker_notifications) {
       editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
     }
-    this.checkAccessibility()
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {

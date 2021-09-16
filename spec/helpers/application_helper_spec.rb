@@ -1280,4 +1280,89 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "show_cc_prefs?" do
+    before :once do
+      student_in_course(active_all: true)
+      @pseudonym = @user.pseudonyms.create!(unique_id: 'blah', account: Account.default)
+    end
+
+    before :each do
+      @current_user = @user
+      @current_pseudonym = @pseudonym
+      @domain_root_account = Account.default
+    end
+
+    context "with no k5 enrollments" do
+      before :each do
+        allow(helper).to receive(:k5_user?).and_return(false)
+      end
+
+      it "returns true if they haven't logged in and haven't visited notification settings" do
+        expect(helper).to be_show_cc_prefs
+      end
+
+      it "returns false if they have logged in more than 10 times" do
+        @pseudonym.login_count = 11
+        @pseudonym.save!
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns false if they have already visited notification settings" do
+        @user.used_feature "cc_prefs"
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns false if the user is a fake student" do
+        @user.preferences[:fake_student] = true
+        @user.save!
+        enrollment = @user.enrollments.first
+        enrollment.type = 'StudentViewEnrollment'
+        enrollment.save!
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns false if @current_user is nil" do
+        @current_user = nil
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns false if @current_pseudonym is nil" do
+        @current_pseudonym = nil
+        expect(helper).not_to be_show_cc_prefs
+      end
+    end
+
+    context "with k5 enrollments" do
+      before :each do
+        allow(helper).to receive(:k5_user?).and_return(true)
+      end
+
+      it "returns false for k5 students even if they haven't logged in" do
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "still returns false for k5 students if they have logged in" do
+        @pseudonym.login_count = 11
+        @pseudonym.save!
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns true for k5 teachers" do
+        @course.enroll_teacher(@user, enrollment_state: 'active')
+        expect(helper).to be_show_cc_prefs
+      end
+
+      it "returns false for k5 teachers if they've already visited notification preferences" do
+        @course.enroll_teacher(@user, enrollment_state: 'active')
+        @user.used_feature "cc_prefs"
+        expect(helper).not_to be_show_cc_prefs
+      end
+
+      it "returns true for k5 admins" do
+        AccountUser.create!(user: @user, account: Account.default)
+        expect(helper).to be_show_cc_prefs
+      end
+    end
+  end
 end

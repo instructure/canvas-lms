@@ -168,4 +168,42 @@ describe "Importing modules" do
     expect(migration.import_object?('context_external_tools', 'i33dc99b0f1e2eaf393029aa0ff9b498d')).to be_truthy
   end
 
+  it "resolves module item position conflicts" do
+    module_data = {
+      migration_id: "M",
+      title: "Teh Module",
+      items: [{
+                item_migration_id: 'icats',
+                title: 'cats',
+                position: 1,
+                linked_resource_type: "ContextModuleSubHeader"
+              },
+              {
+                item_migration_id: 'ifrogs',
+                title: 'frogs',
+                position: 2,
+                linked_resource_type: "ContextModuleSubHeader"
+              },
+              {
+                item_migration_id: 'idogs',
+                title: 'dogs',
+                position: 3,
+                linked_resource_type: "ContextModuleSubHeader"
+              },
+      ]
+    }
+
+    course_model
+    mod = @course.context_modules.create! migration_id: 'M', name: 'Teh Module'
+    mod.content_tags.create!(context: @course, tag_type: 'context_module', content_type: 'ContextModuleSubHeader', position: 1, title: 'cats', migration_id: 'icats')
+    mod.content_tags.create!(context: @course, tag_type: 'context_module', content_type: 'ContextModuleSubHeader', position: 2, title: 'dogs', migration_id: 'idogs')
+    mod.content_tags.create!(context: @course, tag_type: 'context_module', content_type: 'ContextModuleSubHeader', position: 3, title: 'pigs', migration_id: 'ipigs')
+
+    migration = ContentMigration.new
+    Importers::ContextModuleImporter.import_from_migration(module_data, @course, migration)
+
+    # new items are appended to the end
+    expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4])
+    expect(mod.content_tags.pluck(:title)).to eq(['cats', 'dogs', 'pigs', 'frogs'])
+  end
 end

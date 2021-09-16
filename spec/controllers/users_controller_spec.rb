@@ -2689,6 +2689,32 @@ describe UsersController do
             expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
           end
         end
+
+        context "@cards_prefetch_observer_param" do
+          before :once do
+            Account.site_admin.enable_feature!(:k5_parent_support)
+            @user1 = user_factory(active_all: true, account: @account)
+            @course = course_factory(active_all: true, account: @account)
+          end
+
+          before :each do
+            user_session(@user1)
+          end
+
+          it "is set to id of selected observed user when user is an observer" do
+            student = user_factory(active_all: true, account: @account)
+            @course.enroll_student(student)
+            @course.enroll_user(@user1, "ObserverEnrollment", {associated_user_id: student.id})
+            get 'user_dashboard'
+            expect(controller.instance_variable_get(:@cards_prefetch_observer_param)).to eq student.id
+          end
+
+          it "is undefined when user is not an observer" do
+            @course.enroll_student(@user1)
+            get 'user_dashboard'
+            expect(controller.instance_variable_get(:@cards_prefetch_observer_param)).to be_nil
+          end
+        end
       end
     end
   end

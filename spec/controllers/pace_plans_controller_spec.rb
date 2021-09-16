@@ -114,8 +114,8 @@ describe PacePlansController, type: :controller do
         id: @section.id,
         course_id: @course.id,
         name: @section.name,
-        start_date: @section.start_at,
-        end_date: @section.end_at
+        start_at: @section.start_at,
+        end_at: @section.end_at
       }))
       expect(controller.js_env[:PACE_PLAN]).to match(hash_including({
         id: @pace_plan.id,

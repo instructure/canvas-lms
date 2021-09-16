@@ -50,6 +50,7 @@ class PacePlanPresenter
   def modules_json
     pace_plan_module_items.map do |context_module, items|
       {
+        id: context_module.id,
         name: context_module.name,
         position: context_module.position,
         items: items_json(items),

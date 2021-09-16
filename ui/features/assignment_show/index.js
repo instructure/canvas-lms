@@ -106,6 +106,33 @@ function renderStudentGroupFilter() {
   }
 }
 
+// Attach the immersive reader button if enabled
+const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+const immersive_reader_mobile_mount_point = document.getElementById(
+  'immersive_reader_mobile_mount_point'
+)
+if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
+  import('../../shared/immersive-reader/ImmersiveReader')
+    .then(ImmersiveReader => {
+      const content = document.querySelector('.description')?.innerHTML
+      const title = document.querySelector('.title')?.textContent
+
+      if (immersive_reader_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+      }
+
+      if (immersive_reader_mobile_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+          content,
+          title
+        })
+      }
+    })
+    .catch(e => {
+      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+    })
+}
+
 const promiseToGetModuleSequenceFooter = import('@canvas/module-sequence-footer')
 $(() => {
   const $el = $('#assignment_publish_button')

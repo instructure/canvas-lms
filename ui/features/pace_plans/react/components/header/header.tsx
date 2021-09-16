@@ -20,30 +20,26 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-import PlanLengthPicker from './plan_length_picker/plan_length_picker'
 import PlanPicker from './plan_picker'
-import PlanTypePicker from './plan_type_picker'
+import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
+import ShowProjectionsButton from './show_projections_button'
 
 const Header: React.FC = () => (
-  <Flex wrap="wrap" alignItems="center" justifyItems="space-between">
-    <Flex
-      as="div"
-      height="9rem"
-      direction="column"
-      justifyItems="space-between"
-      margin="0 x-small medium 0"
-    >
-      <Flex alignItems="center" margin="0 0 x-small 0">
-        <PlanTypePicker />
+  <View as="div">
+    <View as="div" borderWidth="0 0 small 0" margin="0 0 medium">
+      <Flex as="section" alignItems="end" margin="0 0 medium">
+        <PlanPicker />
         <View margin="0 0 0 small">
           <Settings />
         </View>
+        <View margin="0 0 0 small">
+          <ShowProjectionsButton />
+        </View>
       </Flex>
-      <PlanPicker />
-    </Flex>
-    <PlanLengthPicker />
-  </Flex>
+    </View>
+    <ProjectedDates />
+  </View>
 )
 
 export default Header

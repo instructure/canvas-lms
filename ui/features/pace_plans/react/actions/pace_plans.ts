@@ -61,7 +61,7 @@ const regularActions = {
     // This calculates the new end date based off of the number of plan days specified and invokes
     // a setEndDate action. This would potentially be better with a thunked action, but I'm not
     // sure how to get that to work with a typesafe-actions createAction call.
-    let newEndDate: string
+    let newEndDate: string | undefined
 
     if (planDays === 0) {
       newEndDate = plan.start_date
@@ -78,8 +78,8 @@ const regularActions = {
 const thunkActions = {
   publishPlan: (
     publishForOption: PublishOptions,
-    publishForSectionIds: Array<string | number>,
-    publishForEnrollmentIds: Array<string | number>
+    publishForSectionIds: Array<string>,
+    publishForEnrollmentIds: Array<string>
   ): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay('Publishing...'))
@@ -109,7 +109,7 @@ const thunkActions = {
   },
   resetToLastPublished: (
     contextType: PlanContextTypes,
-    contextId: string | number
+    contextId: string
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay('Loading...'))
@@ -133,7 +133,7 @@ const thunkActions = {
   },
   loadLatestPlanByContext: (
     contextType: PlanContextTypes,
-    contextId: number | string,
+    contextId: string,
     afterAction: LoadingAfterAction = pacePlanActions.setPacePlan
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
@@ -160,7 +160,7 @@ const thunkActions = {
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
-      return Api.relinkToParentPlan(getState().pacePlan.id as number)
+      return Api.relinkToParentPlan(getState().pacePlan.id)
         .then(response => {
           const plan: PacePlan = response.data.pace_plan
           dispatch(pacePlanActions.setPacePlan(plan))

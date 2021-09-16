@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "การพูดคุยที่ดีเยี่ยม" },
+  "a_wonderful_assignment_d3139d9b": { "message": "ภารกิจที่น่าชื่นชม" },
   "add_to_do_7537af64": { "message": "เพิ่มรายการสิ่งที่ต้องทำ" },
   "add_to_do_7def3c37": { "message": "เพิ่มรายการสิ่งที่ต้องทำ" },
   "address_3159962f": { "message": "ที่อยู่:" },
   "all_day_fb42c4fc": { "message": "ทั้งวัน" },
   "all_items_loaded_aa256183": { "message": "โหลดทุกรายการแล้ว" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "ภารกิจการพูดคุยที่น่าจดจำ"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "เกิดข้อผิดพลาดขณะพยายามยกเลิกโอกาส"
   },
@@ -98,6 +103,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "มีข้อผิดพลาดในการโหลดรายการในอดีต"
   },
+  "exciting_discussion_9f67bd0a": { "message": "การพูดคุยที่น่าตื่นเต้น" },
   "excused_cf8792eb": { "message": "ได้รับการยกเว้น" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "ไม่สามารถดูตัวอย่างอนาคตของคุณ"
@@ -120,6 +126,7 @@
     "message": "ไม่สามารถบันทึกรายการสิ่งที่ต้องทำ"
   },
   "feedback_6dcc1991": { "message": "ผลตอบรับ" },
+  "fun_quiz_47ab0b0": { "message": "แบบทดสอบสนุก ๆ" },
   "go_to_card_view_dashboard_9d03970e": { "message": "ไปที่แผงข้อมูลบัตร" },
   "graded_25cd3fcd": { "message": "ให้เกรดแล้ว" },
   "grades_are_loading_c899652d": { "message": "กำลังโหลดเกรด" },
@@ -127,10 +134,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } เสร็จสิ้น { items, plural,\n     =1 {รายการ}\n  other {รายการ}\n}"
   },
+  "join_6cafecca": { "message": "เข้าร่วม" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "เข้าร่วมการประชุมออนไลน์แบบแอคทีฟ"
+  },
+  "join_online_meeting_b1725843": { "message": "เข้าร่วมการประชุมออนไลน์" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "ข้ามไปที่แถบเครื่องมือสืบค้นเนื้อหา"
   },
   "jump_to_today_254ccf41": { "message": "ข้ามไปที่วันนี้" },
+  "language_arts_35b79a8b": { "message": "ศิลปศาสตร์ด้านภาษา" },
   "late_2be42b88": { "message": "ล่าช้า" },
   "load_more_a36f9cf9": { "message": "โหลดเพิ่มเติม" },
   "load_prior_dates_f2b0f6f0": { "message": "โหลดวันที่ก่อนหน้า" },
@@ -148,6 +161,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "ดูเหมือนจะไม่มีอะไรที่นี่"
   },
+  "math_ede93050": { "message": "คณิตศาสตร์" },
   "missing_1a256b3b": { "message": "ขาดหาย" },
   "missing_items_for_title_516511f8": {
     "message": "ไม่มีรายการสำหรับ { title }"
@@ -199,6 +213,7 @@
   "replies_4a8577c8": { "message": "การตอบกลับ" },
   "save_11a80ec3": { "message": "บันทึก" },
   "schedule_preview_3bcda153": { "message": "กำหนดเวลาแสดงตัวอย่าง" },
+  "science_8d92214a": { "message": "วิทยาศาสตร์" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "เลื่อนขึ้นเพื่อดูประวัติของคุณ!"
   },
@@ -207,6 +222,7 @@
   },
   "show_all_ae37d610": { "message": "แสดงทั้งหมด" },
   "show_my_grades_ebd08684": { "message": "แสดงเกรดของฉัน" },
+  "social_studies_13fa30c7": { "message": "สังคมศึกษา" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } ถึง { endDate }"
   },
@@ -224,6 +240,7 @@
     "message": "เสร็จสิ้น: จัดทำรายการสิ่งที่ต้องทำแล้ว"
   },
   "task_16b0ef38": { "message": "งาน" },
+  "the_best_assignment_15e98be1": { "message": "ภารกิจที่ดีที่สุด" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "วันที่และเวลาครบกำหนดสำหรับสิ่งที่ต้องทำนี้"
   },

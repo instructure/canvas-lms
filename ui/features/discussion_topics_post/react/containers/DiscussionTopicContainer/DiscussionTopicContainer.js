@@ -72,76 +72,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     rubricTriggers.initDialog()
   }
 
-  let assignmentOverrides = props.discussionTopic?.assignment?.assignmentOverrides?.nodes || []
-  let dueAt = ''
-
-  const canSeeMultipleDueDates = !!(
-    props.discussionTopic.permissions?.readAsAdmin && assignmentOverrides.length > 0
-  )
-
   const isAnnouncementDelayed =
     props.discussionTopic.isAnnouncement &&
     props.discussionTopic.delayedPostAt &&
     Date.parse(props.discussionTopic.delayedPostAt) > Date.now()
-
-  const defaultDateSet =
-    !!props.discussionTopic.assignment?.dueAt ||
-    !!props.discussionTopic.assignment?.lockAt ||
-    !!props.discussionTopic.assignment?.unlockAt
-
-  const singleOverrideWithNoDefault = !defaultDateSet && assignmentOverrides.length === 1
-
-  if (isGraded(props.discussionTopic.assignment)) {
-    if (assignmentOverrides.length > 0 && canSeeMultipleDueDates && defaultDateSet) {
-      assignmentOverrides = assignmentOverrides.concat({
-        dueAt: props.discussionTopic.assignment?.dueAt,
-        unlockAt: props.discussionTopic.assignment?.unlockAt,
-        lockAt: props.discussionTopic.assignment?.lockAt,
-        title: I18n.t('Everyone Else'),
-        id: props.discussionTopic.assignment?.id
-      })
-    }
-
-    const showSingleOverrideDueDate = () => {
-      return assignmentOverrides[0]?.dueAt
-        ? I18n.t('%{title}: Due %{date}', {
-            title: assignmentOverrides[0]?.title,
-            date: DateHelper.formatDatetimeForDiscussions(assignmentOverrides[0]?.dueAt)
-          })
-        : I18n.t('%{title}: No Due Date', {
-            title: assignmentOverrides[0]?.title
-          })
-    }
-
-    const showDefaultDueDate = () => {
-      return props.discussionTopic.assignment?.dueAt
-        ? I18n.t('Everyone: Due %{dueAtDisplayDate}', {
-            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
-              props.discussionTopic.assignment?.dueAt
-            )
-          })
-        : I18n.t('No Due Date')
-    }
-
-    const showNonAdminDueDate = () => {
-      return props.discussionTopic.assignment?.dueAt
-        ? I18n.t('Due: %{dueAtDisplayDate}', {
-            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
-              props.discussionTopic.assignment?.dueAt
-            )
-          })
-        : I18n.t('No Due Date')
-    }
-
-    const getDueDateText = () => {
-      if (props.discussionTopic.permissions?.readAsAdmin)
-        return singleOverrideWithNoDefault ? showSingleOverrideDueDate() : showDefaultDueDate()
-
-      return showNonAdminDueDate()
-    }
-
-    dueAt = getDueDateText()
-  }
 
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
@@ -366,12 +300,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           margin={responsiveProps.assignmentDetails.margin}
                         >
                           <AssignmentDetails
-                            dueAtDisplayText={dueAt}
                             pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
-                            assignmentOverrides={
-                              singleOverrideWithNoDefault ? [] : assignmentOverrides
-                            }
-                            canSeeMultipleDueDates={canSeeMultipleDueDates}
+                            assignment={props.discussionTopic.assignment}
+                            isAdmin={props.discussionTopic.permissions.readAsAdmin}
                           />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (

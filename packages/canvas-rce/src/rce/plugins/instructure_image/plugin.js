@@ -31,7 +31,7 @@ const GROUP_PLUGIN_KEY = 'group_images'
 const trayController = new TrayController()
 
 function getMenuItems(ed) {
-  const contextType = ed.settings.canvas_rce_user_context.type
+  const contextType = ed.settings.canvas_rce_user_context?.type
   const items = [
     {
       text: formatMessage('Upload Image'),

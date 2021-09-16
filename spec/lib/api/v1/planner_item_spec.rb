@@ -100,6 +100,7 @@ describe Api::V1::PlannerItem do
       before(:once) do
         @meeting_urls = ['https://myschool.zoom.us/123456', 'https://myschool.zoom.us/j/123456', 'https://myschool.zoom.us/my/123456']
       end
+
       it 'should include it in the result if found in the event description' do
         event_start_date = 2.days.from_now
         @meeting_urls.each do |zurl|
@@ -108,7 +109,7 @@ describe Api::V1::PlannerItem do
           expect(event_hash[:plannable][:online_meeting_url]).to eq zurl
         end
       end
-  
+
       it 'should include it in the event if found in the event location' do
         event_start_date = 2.days.from_now
         @meeting_urls.each do |zurl|
@@ -117,7 +118,56 @@ describe Api::V1::PlannerItem do
           expect(event_hash[:plannable][:online_meeting_url]).to eq zurl
         end
       end
-    end  
+
+      context "default meeting url regex" do
+        let(:valid_links) do
+          %w(
+            https://instructure.zoom.us/my/abcd.12345
+            https://instructure.zoom.us/j/9585021282
+            https://us01.zoom.us/j/9585001282?
+            https://instructure.zoom.us/j/9585021282?pwd=NlRIRURaRlRmTC9kVUU2QnIwQkJZZz09
+            https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
+            https://teams.live.com/meet/93298311589140
+            https://meet146.webex.com/meet/pr-._25535050184
+            https://meet146.webex.com/meet146/j.php?MTID=mb0f63c6586178c903f161b109886066b
+            https://meet.google.com/sbs-ycbe-yhu
+          )
+        end
+
+        let(:invalid_links) do
+          %w(
+            http://instructure.zoom.us/my/abcd.12345
+            https://us01.zoom.us/j/abc123
+            https://zoom.us/j/9585021282?pwd=NlRIRURaRlRmTC9kVUU2QnIwQkJZZz09
+            https://teams.live.com/join/93298311589140
+            https://meet146.webex.com/join/pr-._25535050184
+            https://meet146.webex.com/meet146/j?MTID=mb0f63c6586178c903f161b109886066b
+            https://google.com/sbs-ycbe-yhu
+            https://instructure.com
+            not even a link
+            .
+            zoom
+            http://example.com/124?pwd=1234
+          )
+        end
+
+        it "matches valid video conferencing links" do
+          valid_links.each do |l|
+            event = calendar_event_model(start_at: 1.day.from_now, description: l)
+            event_hash = api.planner_item_json(event, @student, session)
+            expect(event_hash[:plannable][:online_meeting_url]).to eq l
+          end
+        end
+
+        it "does not match invalid links" do
+          invalid_links.each do |l|
+            event = calendar_event_model(start_at: 1.day.from_now, description: l)
+            event_hash = api.planner_item_json(event, @student, session)
+            expect(event_hash[:plannable][:online_meeting_url]).to be_nil
+          end
+        end
+      end
+    end
 
     context 'planner overrides' do
       it 'should return the planner override id' do

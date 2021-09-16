@@ -168,6 +168,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Due: { when }" },
   "edit_c5fbea07": { "message": "Edit" },
   "edit_equation_f5279959": { "message": "Edit Equation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edit Existing Button / Icon"
+  },
   "edit_link_7f53bebb": { "message": "Edit Link" },
   "editor_statusbar_26ac81fc": { "message": "Editor Status bar" },
   "embed_828fac4a": { "message": "Embed" },
@@ -343,6 +346,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
+  "save_11a80ec3": { "message": "Save" },
   "saved_buttons_and_icons_8278eed2": { "message": "Saved Buttons and Icons" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },

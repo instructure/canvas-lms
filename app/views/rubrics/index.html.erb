@@ -41,7 +41,7 @@
   </style>
 
 <% js_bundle 'rubrics_index' %>
-<h1>
+<h1 class="screenreader-only">
   <% case @context.class.to_s %>
     <% when 'Course' %>
       <%= t 'course_rubrics', "Course Rubrics" %>

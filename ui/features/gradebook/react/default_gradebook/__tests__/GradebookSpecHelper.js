@@ -21,6 +21,7 @@ import Gradebook from '../Gradebook'
 export const defaultGradebookProps = {
   gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
+  gridColorNode: document.createElement('div'),
 
   api_max_per_page: 50,
   chunk_size: 50,

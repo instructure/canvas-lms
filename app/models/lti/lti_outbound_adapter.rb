@@ -53,6 +53,7 @@ module Lti
       link_code = opts[:link_code] || default_link_code
       @overrides = opts[:overrides] || {}
       link_params = opts[:link_params] || {}
+      include_module_context = opts[:include_module_context] || false
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
       lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
@@ -72,7 +73,8 @@ module Lti
             tool: lti_tool,
             account: lti_account,
             variable_expander: variable_expander,
-            link_params: link_params
+            link_params: link_params,
+            include_module_context: include_module_context
         }
       )
       self

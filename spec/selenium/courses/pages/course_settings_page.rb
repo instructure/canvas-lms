@@ -42,6 +42,14 @@ module CourseSettingsPage
     '#feature_flags_tab'
   end
 
+  def course_show_announcements_on_home_page_selector
+    '#course_show_announcements_on_home_page'
+  end
+
+  def course_show_announcements_on_home_page_label_selector
+    'label[for=course_show_announcements_on_home_page]'
+  end
+
   #------------------------- Elements ---------------------------
   def course_details_tab_link
     f(course_details_tab_link_selector)
@@ -61,6 +69,14 @@ module CourseSettingsPage
 
   def feature_options_tab_link
     f(feature_options_tab_link_selector)
+  end
+
+  def course_show_announcements_on_home_page
+    f(course_show_announcements_on_home_page_selector)
+  end
+
+  def course_show_announcements_on_home_page_label
+    f(course_show_announcements_on_home_page_label_selector)
   end
 
   #----------------------- Actions/Methods ----------------------

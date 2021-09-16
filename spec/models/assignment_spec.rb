@@ -9734,6 +9734,112 @@ describe Assignment do
         end
       end
     end
+
+    describe '#create_results_from_prior_grades' do
+      let(:dev_key) { DeveloperKey.create! }
+      let(:tool) do
+        external_tool_model(opts: {
+          settings: { use_1_3: true },
+          workflow_state: 'public',
+          developer_key: dev_key
+        })
+      end
+      let(:assignment) { @course.assignments.create!(submission_types: 'online_text_entry', **assignment_valid_attributes) }
+      let(:teacher) { course.enroll_teacher(user_factory, enrollment_state: 'active').user }
+      let(:student1) { course.enroll_student(user_factory, enrollment_state: 'active').user }
+      let(:student2) { course.enroll_student(user_factory, enrollment_state: 'active').user }
+
+      # scenario: an existing assignment with student submissions and grades is converted to an
+      # LTI tool assignment. Line Items are created, along with Results for the graded submissions.
+      # step 1: submit for some students
+      before :each do
+        assignment.submit_homework(student1, {
+          submission_type: 'online_text_entry',
+          body: 'hello world!'
+        })
+        assignment.submit_homework(student2, {
+          submission_type: 'online_text_entry',
+          body: 'I will not have a Result!'
+        })
+      end
+
+      # step 2: convert to submission via LTI tool
+      def switch_to_tool_submission
+        assignment.update!(submission_types: 'external_tool', external_tool_tag_attributes: { content: tool })
+      end
+
+      context 'when submissions do not have a prior score' do
+        before :each do
+          switch_to_tool_submission
+        end
+
+        it 'does not create Lti::Results' do
+          expect(assignment.line_items.first.results).to be_empty
+        end
+      end
+
+      shared_examples_for 'results are created' do
+        let(:result) { assignment.line_items.first.results.first }
+        let(:submission) { assignment.submissions.find_by(user: student1) }
+
+        it 'creates an Lti::Result per submission' do
+          expect(assignment.line_items.first.results.count).to eq 1
+        end
+
+        it 'uses submission submitted_at for submitted_at extension' do
+          expect(result.extensions.dig(Lti::Result::AGS_EXT_SUBMISSION, 'submitted_at')).to eq submission.submitted_at.iso8601
+        end
+
+        it 'uses submission graded_at for updated_at' do
+          expect(result.updated_at).to eq submission.graded_at
+        end
+
+        it 'correctly sets current submission score on result' do
+          expect(result.result_score).to eq submission.score
+        end
+
+        it 'correctly sets maximum score on result' do
+          expect(result.result_maximum).to eq assignment.points_possible
+        end
+      end
+
+      context 'when submissions do have a prior score' do
+        # step 1a: grade submissions so that Results are created
+        before :each do
+          assignment.grade_student(student1, { score: 1, grader: teacher })
+          switch_to_tool_submission
+        end
+
+        it_behaves_like 'results are created'
+      end
+
+      context 'when submissions have multiple prior scores' do
+        # step 1a: Grading multiple times should only use the most recent score for the Result
+        before :each do
+          assignment.grade_student(student1, { score: 1, grader: teacher })
+          assignment.submit_homework(student1, {
+            submission_type: 'online_text_entry',
+            body: 'version 2!'
+          })
+          assignment.grade_student(student1, { score: 0.5, grader: teacher })
+          switch_to_tool_submission
+        end
+
+        it_behaves_like 'results are created'
+      end
+
+      context 'when multiple submissions are graded' do
+        before :each do
+          assignment.grade_student(student1, { score: 1, grader: teacher })
+          assignment.grade_student(student2, { score: 1, grader: teacher })
+          switch_to_tool_submission
+        end
+
+        it 'creates an Lti::Result per submission' do
+          expect(assignment.line_items.first.results.count).to eq 2
+        end
+      end
+    end
   end
 
   describe 'sis_source_id' do

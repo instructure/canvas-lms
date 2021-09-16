@@ -22,9 +22,11 @@
 }
 
 .assignment-student-header {
-  position: sticky;
+  @include desktop-only {
+    position: sticky;
+    top: 0px;
+  }
   padding-bottom: 12px;
-  top: 0px;
   #{direction(right)}: 0px;
   background-color: white;
   z-index: 100;

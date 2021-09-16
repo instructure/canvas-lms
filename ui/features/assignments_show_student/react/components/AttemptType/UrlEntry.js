@@ -18,7 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {func} from 'prop-types'
+import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
@@ -66,7 +66,7 @@ class UrlEntry extends React.Component {
     }
     window.addEventListener('message', this.handleLTIURLs)
 
-    if (!isSubmitted(this.props.submission)) {
+    if (this.props.focusOnInit && !isSubmitted(this.props.submission)) {
       this._urlInputRef.current.focus()
     }
   }
@@ -246,6 +246,7 @@ class UrlEntry extends React.Component {
 UrlEntry.propTypes = {
   assignment: Assignment.shape,
   createSubmissionDraft: func,
+  focusOnInit: bool.isRequired,
   submission: Submission.shape,
   updateEditingDraft: func
 }

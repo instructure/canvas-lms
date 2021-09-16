@@ -185,6 +185,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Échéance : { when }" },
   "edit_c5fbea07": { "message": "Modifier" },
   "edit_equation_f5279959": { "message": "Modifier l’équation" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Modifier le bouton/icône existant"
+  },
   "edit_link_7f53bebb": { "message": "Modifier le lien" },
   "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "embed_828fac4a": { "message": "Intégrer" },
@@ -380,6 +383,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Malheureusement, l’éditeur Pretty HTML n’est pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
   },
+  "save_11a80ec3": { "message": "Enregistrer" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Boutons et icônes enregistrés"
   },

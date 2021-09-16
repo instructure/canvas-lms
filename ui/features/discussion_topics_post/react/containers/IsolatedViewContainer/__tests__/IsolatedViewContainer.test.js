@@ -72,9 +72,7 @@ describe('IsolatedViewContainer', () => {
   afterEach(() => {
     mswClient.resetStore()
     server.resetHandlers()
-    setOnFailure.mockClear()
-    setOnSuccess.mockClear()
-    onOpenIsolatedView.mockClear()
+    jest.clearAllMocks()
   })
 
   afterAll(() => {
@@ -157,7 +155,7 @@ describe('IsolatedViewContainer', () => {
     expect(onOpenIsolatedView).toHaveBeenCalledWith('70', '70', false)
   })
 
-  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
+  it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -166,12 +164,12 @@ describe('IsolatedViewContainer', () => {
 
     const goToTopicButton = await findByText('Go To Topic')
     expect(goToTopicButton).toBeInTheDocument()
-    fireEvent.click(goToTopicButton)
+    fireEvent.click(goToTopicButton, {clientY: 100})
 
-    expect(onClose).toHaveBeenCalled()
+    expect(goToTopic).toHaveBeenCalled()
   })
 
-  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from child)', async () => {
+  it('calls the goToTopic callback when clicking Go To Topic (from child)', async () => {
     const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
@@ -180,9 +178,34 @@ describe('IsolatedViewContainer', () => {
 
     const goToTopicButton = await findByText('Go To Topic')
     expect(goToTopicButton).toBeInTheDocument()
-    fireEvent.click(goToTopicButton)
+    fireEvent.click(goToTopicButton, {clientY: 100})
 
-    expect(onClose).toHaveBeenCalled()
+    expect(goToTopic).toHaveBeenCalled()
+  })
+
+  describe('when a ui-dialog is clicked', () => {
+    const modalTestId = 'test-modal'
+
+    beforeEach(() => {
+      const elem = document.createElement('div')
+      elem.classList.add('ui-dialog')
+      elem.setAttribute('data-testid', modalTestId)
+      document.body.prepend(elem)
+    })
+
+    it('does not call "onClose"', async () => {
+      const {findAllByTestId, findByTestId} = setup(defaultProps())
+
+      const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+      expect(threadActionsMenus[1]).toBeInTheDocument()
+      fireEvent.click(threadActionsMenus[1])
+
+      const modal = await findByTestId(modalTestId)
+      expect(modal).toBeInTheDocument()
+      fireEvent.click(modal, {clientY: 100})
+
+      expect(onClose).not.toHaveBeenCalled()
+    })
   })
 
   it('should not render a back button', async () => {
@@ -350,7 +373,7 @@ describe('IsolatedViewContainer', () => {
     describe('RCE is closed', () => {
       const props = defaultProps({RCEOpen: false})
 
-      it('should display children', async () => {
+      it.skip('should display children', async () => {
         const {findByTestId} = setup(props)
         expect(await findByTestId('isolated-view-children')).toBeTruthy()
       })
@@ -398,5 +421,24 @@ describe('IsolatedViewContainer', () => {
     const {findByTestId} = setup(defaultProps({highlightEntryId: '50'}))
 
     expect(await findByTestId('isHighlighted')).toBeInTheDocument()
+  })
+
+  describe('graphql error', () => {
+    it('should render generic error page when DISCUSSION_SUBENTRIES_QUERY returns errors', async () => {
+      server.use(
+        graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+          return res.once(
+            ctx.errors([
+              {
+                message: 'generic error'
+              }
+            ])
+          )
+        })
+      )
+
+      const container = setup(defaultProps())
+      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
+    })
   })
 })

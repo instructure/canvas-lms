@@ -1351,6 +1351,42 @@ describe "Outcome Groups API", type: :request do
       })
     end
 
+    it "should create a new global outcome" do
+      @account_user = @user.account_users.create(:account => Account.site_admin)
+      @global_group = LearningOutcomeGroup.global_root_outcome_group
+      json = api_call(:post, "/api/v1/global/outcome_groups/#{@global_group.id}/outcomes",
+               { :controller => 'outcome_groups_api',
+                 :action => 'link',
+                 :id => @global_group.id.to_s,
+                 :format => 'json' },
+               { :title => "My Outcome",
+                 :display_name => "Friendly Name",
+                 :description => "Description of my outcome",
+                 :mastery_points => 5,
+                 :ratings => [
+                   { :points => 5, :description => "Exceeds Expectations" },
+                   { :points => 3, :description => "Meets Expectations" },
+                   { :points => 0, :description => "Does Not Meet Expectations" }
+                 ]
+               })
+      expect(json["errors"]).to be_nil
+      expect(LearningOutcome.global.active.count).to eq 1
+      @outcome = LearningOutcome.global.active.first
+      expect(@outcome.title).to eq "My Outcome"
+      expect(@outcome.display_name).to eq "Friendly Name"
+      expect(@outcome.description).to eq "Description of my outcome"
+      expect(@outcome.data[:rubric_criterion]).to eq({
+        :description => 'My Outcome',
+        :mastery_points => 5,
+        :points_possible => 5,
+        :ratings => [
+          { :points => 5, :description => "Exceeds Expectations" },
+          { :points => 3, :description => "Meets Expectations" },
+          { :points => 0, :description => "Does Not Meet Expectations" }
+        ]
+      })
+    end
+
     it "should create a new outcome with default values for mastery calculation" do
       prev_count = LearningOutcome.active.count
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",

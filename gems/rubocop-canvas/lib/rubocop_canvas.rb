@@ -31,7 +31,6 @@ require 'rubocop_canvas/helpers/migration_tags'
 ## datafixup
 require 'rubocop_canvas/cops/datafixup/eager_load'
 ## lint
-require 'rubocop_canvas/cops/lint/freeze_constants'
 require 'rubocop_canvas/cops/lint/no_file_utils_rm_rf'
 require 'rubocop_canvas/cops/lint/no_sleep'
 ## migration

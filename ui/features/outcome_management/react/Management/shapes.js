@@ -22,7 +22,7 @@ export const outcomeGroupShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  contextId: PropTypes.number,
+  contextId: PropTypes.string,
   contextType: PropTypes.string
 })
 

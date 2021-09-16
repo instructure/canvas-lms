@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {HTMLButtonElement, HTMLElement, MouseEventHandler} from 'react'
+import {HTMLElement, KeyboardEventHandler, MouseEventHandler} from 'react'
 
 // These are special webpack-processed imports that Typescript doesn't understand
 // by default. Declaring them as wildcard modules allows TS to recognize them as
@@ -30,8 +30,10 @@ declare module '*.svg'
 
 // InstUI v7 is missing type information for a lot of its props, so these suppress
 // TS errors on valid props until we upgrade to v8.
-interface MissingButtonProps {
-  onClick?: MouseEventHandler<HTMLButtonElement>
+interface MissingInputProps {
+  onClick?: MouseEventHandler<HTMLElement>
+  onKeyDown?: KeyboardEventHandler<HTMLElement>
+  role?: string
 }
 
 interface MissingElementProps {
@@ -44,12 +46,16 @@ interface MissingThemeableProps {
 }
 
 declare module '@instructure/ui-buttons' {
-  export interface BaseButtonProps extends MissingButtonProps {}
-  export interface ButtonProps extends MissingButtonProps {}
-  export interface CloseButtonProps extends MissingButtonProps {}
-  export interface CondensedButtonProps extends MissingButtonProps {}
-  export interface IconButtonProps extends MissingButtonProps {}
-  export interface ToggleButtonProps extends MissingButtonProps {}
+  export interface BaseButtonProps extends MissingInputProps {}
+  export interface ButtonProps extends MissingInputProps {}
+  export interface CloseButtonProps extends MissingInputProps {}
+  export interface CondensedButtonProps extends MissingInputProps {}
+  export interface IconButtonProps extends MissingInputProps {}
+  export interface ToggleButtonProps extends MissingInputProps {}
+}
+
+declare module '@instructure/ui-text-input' {
+  export interface TextInputProps extends MissingInputProps {}
 }
 
 declare module '@instructure/ui-toggle-details' {

@@ -1489,6 +1489,7 @@ en:
     default_name: No Name
   add_cc_subtitle_a9ef4a66: Add CC/Subtitle
   add_collaboration_da9665ac: Add Collaboration
+  add_comment_3205529f: Add Comment
   add_comment_to_library_1e3d95db: Add comment to library
   add_conference_7bcc625b: Add Conference
   add_conferencing_9f4ccded: Add Conferencing
@@ -1502,7 +1503,6 @@ en:
   add_courses_c0696323: Add courses
   add_criterion_eb9587ef: Add Criterion
   add_custom_link_22059c0: Add Custom Link
-  add_delete_b82d05f8: add / delete
   add_delete_edit_7dbc9c5b: add / delete / edit
   add_delete_manage_d65e235: add / delete / manage
   add_designers_to_courses_9588820b: Add Designers to courses
@@ -1598,6 +1598,7 @@ en:
   adds_analytics_link_on_the_user_settings_menu_3a048816: Adds analytics link on the user settings menu.
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: Adds analytics to a student’s context card.
   adds_granular_permissions_for_adding_and_removing__e1e484a3: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
+  adjusting_due_dates_a5918b9c: Adjusting due dates...
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: Admin CSV
   admin_export_for_multiple_grading_periods_8a0c5ac1: Admin Export for Multiple Grading Periods
@@ -1625,6 +1626,7 @@ en:
   after_last_attempt_c9168da2: After Last Attempt
   after_the_assignment_is_graded_53754607: After the assignment is graded
   after_the_due_date_eee89c9c: After the due date
+  after_the_first_attempt_you_cannot_leave_comments__3922325f: After the first attempt, you cannot leave comments until you submit the assignment.
   ajax_errors:
     error_heading: 'Ajax Error: %{status_code}'
     errors:
@@ -1762,6 +1764,7 @@ en:
   allow_students_to_download_course_content_and_view_810e66ec: Allow students to download course content and view offline
   allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: Allow students to see who has signed up for time slots that are still available.
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: Allow students to see who was signed up for time slots that are still available
+  allow_sub_account_selection_when_users_manually_cr_d0a6e2e6: Allow sub-account selection when users manually create courses
   allow_switching_to_the_enhanced_rce_317e746f: Allow switching to the enhanced RCE
   allow_the_ability_to_send_notifications_through_ou_13cc8537: Allow the ability to send notifications through our dispatch queue
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: Allow this tool to access the IMS Names and Role Provisioning Service
@@ -1778,6 +1781,7 @@ en:
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu.
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: Allows learning outcomes to be selectable when migrating course content
+  allows_modifying_notification_settings_for_any_cou_5004ac71: Allows modifying notification settings for any course from within the account-level notification settings page.
   allows_setting_account_course_level_mastery_scales_1939e0fd: Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods
   allows_students_to_access_other_student_groups_wit_43918810: Allows students to access other student groups within a group set with a direct link.
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: Allows syncing of Canvas course members to a Microsoft Team
@@ -1816,6 +1820,8 @@ en:
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: Allows user to add, edit, and delete events in the course calendar.
   allows_user_to_add_edit_and_delete_global_announce_8463e383: Allows user to add, edit, and delete global announcements.
   allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: Allows user to add, edit, and update grades in the Gradebook.
+  allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: Allows user to add, edit, delete, and publish and unpublish assignments.
+  allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: Allows user to add, edit, delete, and publish and unpublish quizzes.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: 'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. '
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox.
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: Allows user to add group members to account or course groups.
@@ -1879,6 +1885,7 @@ en:
   allows_user_to_delete_course_groups_5ce7382e: Allows user to delete course groups.
   allows_user_to_delete_course_pages_dfaf4fb7: Allows user to delete course pages.
   allows_user_to_delete_course_sections_19193a35: Allows user to delete course sections.
+  allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: Allows user to delete question banks in a course or account.
   allows_user_to_delete_quizzes_in_a_course_acdbdfba: Allows user to delete quizzes in a course.
   allows_user_to_designate_a_course_as_a_blueprint_c_15109885: Allows user to designate a course as a Blueprint Course.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: Allows user to differentiate assignments to individual students.
@@ -1889,11 +1896,13 @@ en:
   allows_user_to_edit_account_and_course_groups_259139c0: Allows user to edit account and course groups.
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: Allows user to edit and publish/unpublish assignments.
   allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: Allows user to edit and publish/unpublish quizzes.
+  allows_user_to_edit_assignment_details_on_individu_ecf19e63: Allows user to edit assignment details on individual discussions.
   allows_user_to_edit_blueprint_content_lock_setting_58a85315: Allows user to edit Blueprint content lock settings on individual settings if the user is enrolled in a Blueprint master course.
   allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: Allows user to edit Blueprint content lock settings on individual discussions.
   allows_user_to_edit_blueprint_course_lock_settings_c89e1787: Allows user to edit Blueprint Course lock settings in the Pages index page and for an individual page in a Blueprint master course.
   allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.
   allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: Allows user to edit Blueprint lock settings in the Pages index page and for an individual page in a Blueprint master course.
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: Allows user to edit Blueprint lock settings on the Assignments and Quizzes index pages in a Blueprint master course.
   allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.
   allows_user_to_edit_conferences_61eb62e0: Allows user to edit Conferences.
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: Allows user to edit configurations for manually added external apps.
@@ -1906,9 +1915,11 @@ en:
   allows_user_to_edit_grading_schemes_98c35117: Allows user to edit grading schemes.
   allows_user_to_edit_lock_settings_on_individual_as_80ed188a: Allows user to edit lock settings on individual assignments, pages, or discussions.
   allows_user_to_edit_lock_settings_on_the_assignmen_4c347262: Allows user to edit lock settings on the Assignments and Quizzes index pages.
+  allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: Allows user to edit question banks in a course or account.
   allows_user_to_edit_the_course_sis_id_e1eccee3: Allows user to edit the course SIS ID.
   allows_user_to_edit_the_course_syllabus_a28ff262: Allows user to edit the course syllabus.
   allows_user_to_edit_title_description_or_remove_co_483daae5: Allows user to edit title, description, or remove collaborators on all collaborations.
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: Allows user to enable and edit assignment group weighting in a course.
   allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: Allows user to export the Gradebook to a comma separated values (CSV) file.
   allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: Allows user to filter for Blueprint courses as the account level. Allows user to add associated courses.
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: Allows user to generate a pairing code on behalf of a student to share with an observer.
@@ -2463,6 +2474,7 @@ en:
   are_you_sure_you_want_to_unarchive_your_copy_of_th_c961b520:
     one: Are you sure you want to unarchive your copy of this conversation?
     other: Are you sure you want to unarchive your copy of these conversations?
+  are_you_sure_you_want_to_unenroll_in_this_course_y_9c8105c8: Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.
   argentina_54_375d6af4: Argentina (+54)
   armenian_12da6118: Armenian
   arrange_by_a121617c: Arrange By
@@ -3080,6 +3092,7 @@ en:
     attempts:
       filter: Attempts
     submission_attempts: Attempts
+  assignments_2_student_description: This feature enhances the assignment submission and feedback workflow for students. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Assignment Enhancements User Group* in the Canvas Community.
   assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
   assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
   assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
@@ -3088,7 +3101,7 @@ en:
   assignments_and_quizzes_add_b1473591: Assignments and Quizzes - add
   assignments_and_quizzes_add_edit_delete_5bac17ed: Assignments and Quizzes - add / edit / delete
   assignments_and_quizzes_delete_84ecc680: Assignments and Quizzes - delete
-  assignments_and_quizzes_manage_edit_8b4b1edc: Assignments and Quizzes - manage / edit
+  assignments_and_quizzes_edit_1c23f658: Assignments and Quizzes - edit
   assignments_api:
     invalid_date_time: Invalid datetime for %{attribute}
     invalid_submission_types: Invalid submission types
@@ -3297,6 +3310,8 @@ en:
   available_date_must_be_before_the_until_date_9ccc52b: Available date must be before the Until date
   available_folders_694d0436: Available folders
   available_from_587ce92f: Available From
+  available_from_availabledate_b8cb93ef: Available from %{availableDate}
+  available_from_availabledate_until_untildate_f27b70aa: Available from %{availableDate} until %{untilDate}
   available_from_date_43b5e11d: Available From Date
   available_from_date_must_precede_available_until_c9f9e533: '"Available From" date must precede "Available Until"'
   available_from_f84e4611: Available from
@@ -3307,6 +3322,7 @@ en:
   available_until_date_d2fe6cb1: Available until %{date}
   available_until_f3b9c4ed: Available Until
   available_until_lock_at_ab022445: Available until %{lock_at}
+  available_until_untildate_b926fe11: Available until %{untilDate}
   availableslots_available_87b8b69d: "%{availableSlots} Available"
   availableslots_more_available_be5193a8: "%{availableSlots} more available"
   avatar_8a8aa935: Avatar
@@ -3370,6 +3386,7 @@ en:
     recording_setting_enabled_description: Enable recording for this conference
   blackboard:
     no_manifest: This Blackboard .zip has no imsmanifest.xml file in the root directory.
+  blackout_dates_4a140a72: Blackout Dates
   blank_38df4238: blank
   blocked_by_running_migration_d8a57cb7: Blocked by running migration
   blocked_domain_name_b5b93150: Blocked Domain Name
@@ -3423,6 +3440,8 @@ en:
   broken_file_link_found_in_your_course_7cc24395: Broken file link found in your course
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: 'bucket name must be one of the following: %{bucket_names}'
   bucks_zero_activity_6f9b5ee3: Bucks Zero Activity
+  build_78955b82: Build
+  build_quiz_7f4cdc74: Build quiz
   bulgarian_feccab7e: Bulgarian
   bulk_course_migration:
     export_failed: There was an error exporting the course with bb_lcid %{id} from Blackboard
@@ -4678,6 +4697,7 @@ en:
   confirm_qr_code_display_49664fa3: Confirm QR code display
   confirm_removal_a9bb889: Confirm Removal
   confirm_reservation_removal_e6350e7c: Confirm Reservation Removal
+  confirm_unenrollment_64333263: Confirm Unenrollment
   confirm_unfavorite_course_fa01966d: Confirm unfavorite course
   confirmation_code_required_22984955: Confirmation code (required)
   confirmation_failed_please_try_again_ae566d37: Confirmation failed.  Please try again.
@@ -5380,6 +5400,9 @@ en:
     zero: No alignments
   count_announcements_found_b7b055b3: "%{count} announcements found."
   count_apps_found_f4d86860: "%{count} apps found"
+  count_assignments_bce378d7:
+    one: 1 assignment
+    other: "%{count} assignments"
   count_assignments_found_17520826:
     one: 1 assignment found.
     other: "%{count} assignments found."
@@ -5560,6 +5583,9 @@ en:
     other: "%{count} unread shares."
   count_unsynced_changes_1fc147e5: "%{count} Unsynced Changes"
   count_users_374d6e47: "(%{count} Users)"
+  count_weeks_11fbd2dc:
+    one: 1 week
+    other: "%{count} weeks"
   country_or_region_26ea046c: Country or Region
   country_or_region_is_required_86917b39: Country or Region is required
   course:
@@ -5789,6 +5815,7 @@ en:
   course_option_links_a79d263d: Course option links
   course_outcome_mastery_bb12e292: Course Outcome Mastery
   course_outcomes_7dc1cbc7: Course Outcomes
+  course_pace_plan_c79cbffc: Course Pace Plan
   course_pages_449f1dd4: Course Pages
   course_participation_and_access_settings_7a3d6297: Course Participation and Access Settings
   course_participation_is_limited_to_course_start_an_7315866d: Course participation is limited to *course* start and end dates. Any section dates created in the course may override course dates.
@@ -6211,6 +6238,10 @@ en:
         other: "%{count} files"
       headings:
         students: Recently Logged-In Users
+      labels:
+        allotted_storage: Allotted Storage
+        media_files: Media Files
+        uploaded_files: Uploaded Files
       page_title: Course Statistics
     titles:
       rss:
@@ -6637,6 +6668,7 @@ en:
       year: Year
   day_9d999bec: Day
   day_s_7cc1231f: Day(s)
+  days_af2ac87b: Days
   days_late_a3a721b0: Days late
   deactivate_this_key_3e79a2b5: Deactivate this key
   deactivate_user_86c09036: Deactivate User
@@ -6858,11 +6890,12 @@ en:
   disabling_sync_to_name_failed_e7521ebb: Disabling Sync to %{name} failed
   disabling_the_assignments_and_quizzes_add_permissi_e06f1379: Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.
+  disabling_the_assignments_and_quizzes_edit_permiss_529f9360: Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course.
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
     Disabling the Mastery Paths feature will release configured assignments and content to all students.
                       If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.
-  disabling_this_permission_will_override_if_enabled_30d8f1f0: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.
+  disabling_this_permission_will_override_if_enabled_59c2b5c9: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.
   disallow_comments_6d04b47a: Disallow Comments
   disallow_comments_for_title_21f9c653: Disallow comments for %{title}
   discovery_service_url_ca13d3f4: Discovery Service URL
@@ -6886,6 +6919,7 @@ en:
   discussion_mention_c70cb87a: Discussion Mention
   discussion_post_count_report_2da4c6c: Discussion Post Count Report
   discussion_posts_c998c9ad: Discussion Posts
+  discussion_redesign_description: This feature enhances the Canvas experience within Discussions and Announcements. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Discussions/Announcements Redesign user group* in the Canvas Community
   discussion_settings_2fbf0b95: Discussion Settings
   discussion_submission_781d5d33: Discussion Submission
   discussion_topic:
@@ -7216,13 +7250,16 @@ en:
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: Drag and drop or click to browse your computer
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
   drag_to_rearrange_sections_637efee3: Drag to rearrange sections
+  drop_coursename_813d3162: Drop %{courseName}
   drop_files_here_to_add_to_module_236304f5: Drop files here to add to module
   drop_files_here_to_upload_ce0f50f9: Drop files here to upload
+  drop_this_course_53eb5370: Drop this Course
   dropdown_changed_state_to_expanded_517689c2: dropdown changed state to %{expanded}.
   dropdown_option_1_e6ff2fc: Dropdown option 1
   dropdown_option_2_9766a346: Dropdown option 2
   dropped_38031953: Dropped
   dropped_for_grading_purposes_46256461: Dropped for grading purposes
+  dropping_course_80aabb72: Dropping course
   due_5d7267be: 'Due:'
   due_639f281d: 'Due: '
   due_a73610f6: Due
@@ -7260,7 +7297,6 @@ en:
   due_datetime_f5a81b81: 'Due: %{dateTime}'
   due_due_today_4dfe420a: "%{due} due today"
   due_dueat_ef67f6f4: 'Due: %{dueAt}'
-  due_dueatdisplaydate_c4291f53: 'Due: %{dueAtDisplayDate}'
   due_multiple_dates_cc0ee3f5: 'Due: Multiple Dates'
   due_multiple_dates_ea8a95e1: 'due: Multiple Dates'
   due_multiple_due_dates_d1b141b: 'Due: Multiple Due Dates'
@@ -7432,12 +7468,12 @@ en:
   email_actions_a9bfe457: Email Actions
   email_address_6e0443a5: Email address
   email_address_a1b97a39: Email Address
-  email_address_optional_72795076: Email Address (Optional)
   email_addresses_893faeb2: Email Addresses
   email_addresses_required_14483dc8: Email Addresses (required)
   email_alias_mailnickname_d92fa8bd: Email Alias (mailNickname)
   email_already_in_use_330248e: Email already in use
   email_e366fa29: email
+  email_example_com_99490d29: email@example.com
   email_is_invalid_e0d982eb: Email is invalid!
   email_is_required_736ac26b: Email is required
   email_the_user_about_this_account_creation_e63f8759: Email the user about this account creation
@@ -7476,6 +7512,7 @@ en:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
   enables_support_for_observers_within_canvas_for_el_c5e31b5b: Enables support for observers within Canvas for Elementary.
   enables_the_course_templates_feature_globally_79d5302f: Enables the Course Templates feature globally
+  enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: Enables the Microsoft Immersive Reader button in supported areas of Canvas. The button may still be enabled in a course regardless of this setting if the account administrator has turned it on for all users.
   enabling_the_elementary_theme_will_change_the_font_c944b619: Enabling the Elementary Theme will change the font in the Canvas interface and simplify the Course Navigation Menu for all users in your course.
   encourage_student_discourse_7836b9f7: Encourage student discourse
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: Encrypted Sourcedids for Basic Outcomes
@@ -7952,7 +7989,6 @@ en:
   everthing_updated_after_start_date_f3be8ba: Everthing updated after start date
   every_665d821e: Every
   everyone_854554dd: Everyone
-  everyone_due_dueatdisplaydate_5c920f8b: 'Everyone: Due %{dueAtDisplayDate}'
   everyone_else_6c6dc7b6: Everyone Else
   everyone_else_cc5f6888: Everyone else
   everyone_public_45ff1f25: Everyone (public)
@@ -8082,6 +8118,7 @@ en:
   failed_to_delete_external_feed_36f19d70: Failed to delete external feed
   failed_to_delete_role_label_27959de3: Failed to delete role %{label}
   failed_to_delete_selected_pages_26fa87db: Failed to delete selected pages
+  failed_to_export_pace_plans_9832daac: Failed to export pace plans
   failed_to_ignore_assignment_46565fa3: Failed to ignore assignment
   failed_to_import_media_objects_4c1fcb4f: Failed to import media objects
   failed_to_import_some_lti_resource_links_ab124c3f: Failed to import some LTI resource links
@@ -8089,6 +8126,7 @@ en:
   failed_to_load_announcements_429c16fc: Failed to load announcements.
   failed_to_load_apps_db37e651: Failed to load apps.
   failed_to_load_assignments_in_important_dates_ce3b4227: Failed to load assignments in important dates.
+  failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: Failed to load courses. Refresh the page to try again.
   failed_to_load_csp_information_try_refreshing_the__4a056997: Failed to load CSP information, try refreshing the page.
   failed_to_load_events_in_important_dates_2195b227: Failed to load events in important dates.
   failed_to_load_external_feeds_7ac8411d: Failed to Load External Feeds
@@ -9286,6 +9324,7 @@ en:
   hide_navigation_menu_f0b3e90: Hide Navigation Menu
   hide_outcomes_with_no_results_7e4ce06f: Hide outcomes with no results
   hide_params_eadf0961: Hide params
+  hide_projections_9d4ed1e1: Hide Projections
   hide_score_total_for_assessment_results_d0ef117f: Hide score total for assessment results
   hide_sidebar_2b5b3776: Hide Sidebar
   hide_sub_accounts_for_account_name_a6de98bd: Hide Sub-Accounts for %{account_name}
@@ -9457,7 +9496,7 @@ en:
   idp_metadata_uri_dae5314a: IdP Metadata URI
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: If an attribute is marked as provisioning only, then it will only be used when Just in Time Provisioning creates a new user, and will not be kept up to date each time the user logs in.
   if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: If an enrollment is created via SIS, only admins can remove the enrollment from a course.
-  if_blueprint_courses_add_edit_associate_delete_and_a9009383: If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - manage / edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.
+  if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.
   if_commons_is_installed_allows_importing_favorited_eff368f: If Commons is installed, allows importing favorited content items from within Canvas.
   if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view, edit, and delete all collaborations.
@@ -9524,6 +9563,7 @@ en:
   if_the_open_registration_account_setting_is_enable_b6fdaab4: If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the People page via email address or login ID even if a TA does not already have a Canvas account.
   if_the_open_registration_account_setting_is_enable_e7f97cf0: If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Courses page via email address or login ID even if a teacher does not already have a Canvas account.
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: If the Pages - Update permission is disabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.
+  if_these_additional_permissions_are_enabled_but_as_d264879d: If these additional permissions are enabled, but Assignments and Quizzes - add / edit / delete is not enabled, Blueprint lock settings for an assignment can be managed from the assignment’s details page.
   if_this_account_already_uses_sftp_please_reach_out_377296d1: 'If this account already uses SFTP, please reach out in Slack at #canvas-sre. Their username does not match our standard used for usernames.'
   if_this_account_does_not_use_sftp_currently_press__eb1b3b88: If this account does not use SFTP currently, press enable to create an SFTP user.
   if_this_permission_is_disabled_and_courses_add_is__acccce1b: If this permission is disabled and Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings.
@@ -9798,6 +9838,7 @@ en:
   invalid_context_type_68f40a61: Invalid context type
   invalid_context_type_72085a6a: invalid context type
   invalid_csv_file_2c076da5: Invalid CSV File
+  invalid_custom_parameters_please_ensure_they_match_b35cd355: Invalid custom parameters. Please ensure they match the LTI 1.3 specification.
   invalid_date_2a10bb7b: Invalid Date
   invalid_date_and_time_1a42d206: Invalid date and time
   invalid_date_or_datetime_for_field_b38fe386: Invalid date or datetime for %{field}
@@ -9853,6 +9894,8 @@ en:
   ireland_353_3cd32cc0: Ireland (+353)
   irish_567e109f: Irish
   is_public_ca8561e8: is_public
+  isolated_entry_post_error_page_2a447d08: Isolated Entry Post Error Page
+  isolated_entry_query_error_f0bfae18: Isolated Entry query error
   israel_972_e671df75: Israel (+972)
   it_divides_students_into_three_groups_based_on_the_1a107f5b: "\n        It divides students into three groups based on their score on the whole\n        quiz and displays those groups by who answered the question correctly.\n      "
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: 'It looks like you have an invalid email address: "%{addr}"'
@@ -9947,6 +9990,7 @@ en:
   join_group_group_name_871a5e3f: Join group %{group_name}
   join_the_conversation_using_the_link_below_54ab1f0e: Join the conversation using the link below.
   join_the_conversation_using_this_link_link_9017499: 'Join the conversation using this link: %{link}.'
+  join_this_course_7d26a944: Join this Course
   joined_group_group_name_e3802c04: Joined Group %{group_name}
   joining_81f8b6c9: Joining
   joplin_assignment_submission_a4cf7899: Joplin Assignment Submission
@@ -10351,6 +10395,7 @@ en:
   loading_grades_for_coursename_26784c2d: Loading grades for %{courseName}
   loading_grading_periods_c635d96: Loading grading periods...
   loading_grading_periods_for_coursename_bbe46919: Loading grading periods for %{courseName}
+  loading_grouptitle_dba362d2: Loading %{groupTitle}.
   loading_homeroom_course_name_9f63923d: Loading Homeroom Course Name
   loading_important_date_2d3a29ce: Loading Important Date
   loading_important_date_details_1b2d2b85: Loading Important Date Details
@@ -10564,6 +10609,7 @@ en:
           course, allow students to manage course content areas, and hide grade
           details from students. You may also be able to adjust the course name and code.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
+  makes_microsoft_immersive_reader_appear_in_more_su_b8a360d9: Makes Microsoft Immersive Reader appear in more supported areas.
   makes_the_student_grades_page_responsive_c13e00eb: Makes the student grades page responsive.
   making_a_copy_of_original_assignment_name_8f029a9b: Making a copy of "%{original_assignment_name}"
   making_a_copy_of_originalassignmentname_b7268992: Making a copy of "%{originalAssignmentName}"
@@ -12417,6 +12463,7 @@ en:
   moderation_page_4061aa2b: Moderation Page
   modified_by_c1584b3c: Modified By
   modified_by_user_e6c8ade3: 'modified by: %{user}'
+  modify_settings_ed8b9ccf: Modify Settings
   module_90d9fd32: Module
   module_completed_50c50762: Module Completed
   module_filter_63b17d11: Module Filter
@@ -12474,6 +12521,7 @@ en:
   more_info_at_url_41b4764b: More info at %{url}
   more_info_at_web_address_dba7e187: More info at %{web_address}
   more_information_about_ratings_57cdd446: More Information About Ratings
+  more_microsoft_immersive_reader_78c32ad5: More Microsoft Immersive Reader
   more_modules_d9a9f003: More Modules
   more_options_e89670cf: More options
   more_people_options_730e9686: More People Options
@@ -12724,6 +12772,7 @@ en:
   new_quizzes_account_and_course_level_item_banks_9152fb1: New Quizzes Account and Course Level Item Banks
   new_quizzes_assignment_build_button_72b6531a: New Quizzes Assignment Build Button
   new_quizzes_banks_migrations_9ab4de4a: New Quizzes Banks Migrations
+  new_quizzes_build_button_in_module_items_10f651fb: New Quizzes Build Button In Module Items
   new_quizzes_dbda7e0a: New Quizzes
   new_quizzes_migration_during_course_import_copy_e9dd124e: New Quizzes migration during course import/copy
   new_quizzes_migration_enabled_by_default_5f9bcc81: New Quizzes migration enabled by default
@@ -12758,6 +12807,7 @@ en:
   next_mastery_path_is_currently_locked_a9253711: Next mastery path is currently locked
   next_mastery_path_is_still_processing_please_perio_bb0121af: Next mastery path is still processing, please periodically refresh the page
   next_message_780bcf24: Next Message
+  next_module_66f58e91: Next Module
   next_module_item_19e835f3: Next Module Item
   next_module_item_9bb8a222: Next Module/Item
   next_month_b55a387c: Next month
@@ -13164,6 +13214,8 @@ en:
     web_conference_recording_ready: A conference recording is ready
   notification_policies_requires_the_communication_c_2e7ded08: Notification policies requires the communication channel id, the notification category, and the frequency to update
   notification_preferences_cf47083d: Notification Preferences
+  notification_settings_652dc60b: Notification Settings
+  notification_settings_course_selector_ff07468b: 'Notification settings: Course selector'
   notifications_cbfa7704: Notifications
   notifications_off_80da021c: Notifications off
   notifications_search_results_80a0b06f: Notifications Search Results
@@ -13554,6 +13606,7 @@ en:
   own_copyright_cc59db55: Own Copyright
   owner_email_236d1b2: Owner Email
   owner_email_4d02f795: 'Owner Email:'
+  pace_plan_56e8fb1d: Pace Plan
   pace_plans_4bb9c5ff: Pace Plans
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: Pace Plans adds support for rolling enrollments to Canvas; allowing magical distribution of due dates for students with different start dates based on an instructor's defined pace. Learn more and give feedback by joining the Pace Plans User Group.
   pace_plans_is_in_active_development_f6c20046: Pace Plans is in active development.
@@ -13658,6 +13711,8 @@ en:
   partially_anonymous_483a892d: Partially Anonymous
   partially_enabled_and_locked_9a39d38a: Partially enabled and Locked
   partially_enabled_cd506819: Partially enabled
+  participantcount_less_8d258f6: "%{participantCount} less"
+  participantcount_more_50363e55: "%{participantCount} more"
   participation_af2598: Participation
   participations_1823832d: Participations
   pass_2a8c4f07: pass
@@ -14305,6 +14360,7 @@ en:
   preview_filename_f1b58572: Preview %{filename}
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: Preview files linked in the RCE in an overlay rather than a new browser tab.
   preview_unavailable_aacd459a: Preview Unavailable
+  preview_ungraded_as_0_e3b97df6: Preview ungraded as 0
   preview_website_url_eb5b8a5f: Preview website url
   preview_your_changes_373557d8: Preview Your Changes
   previous_445ca243: previous
@@ -14314,6 +14370,7 @@ en:
   previous_bd2ac015: Previous
   previous_export_c6a997f7: Previous Export
   previous_message_8804f87e: Previous Message
+  previous_module_8801a74b: Previous Module
   previous_module_item_2bb5e499: Previous Module/Item
   previous_module_item_a9e57348: Previous Module Item
   previous_month_7adf1380: Previous month
@@ -14352,7 +14409,7 @@ en:
         token_never_expires: never
       titles:
         delete_this_token: Delete this Token
-    account_notification_settings_title: Account Notification Settings
+    account_notification_settings_title: Notification Settings
     buttons:
       generate_token: Generate Token
       generating_token: Generating Token...
@@ -14594,6 +14651,8 @@ en:
   progress_loading_bar_a26b8861: Progress/loading bar
   progress_percent_ae80cd55: "%{progress} percent"
   project_groups_1fa0320b: Project Groups
+  projected_end_date_bf3185fe: Projected End Date
+  projected_start_date_9626c9d9: Projected Start Date
   pronouns_28bbef86: pronouns
   pronouns_d1cd8dd0: Pronouns
   proper_noun_singular_genitive: "%{noun}'s"
@@ -14610,6 +14669,7 @@ en:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: Provide tutorial information for new users in a flyout tray.
   provider_attribute_b1cad655: Provider Attribute
   provider_icon_5064fa6e: Provider icon
+  provides_a_button_which_navigates_straight_to_the__5891d96a: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page.
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: Provides a flag on the Devloper Key to support Include Parameters on API requests
   provision_a_catalog_account_8cea67f6: Provision a Catalog Account
   provision_a_quiz_next_service_c7c6bd87: Provision a Quiz.Next Service
@@ -15844,6 +15904,11 @@ en:
   range_56b2f310: Range
   range_name_90614433: Range name
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} out of %{totalStudents} students"
+  rather_than_automatically_placing_manually_created_35195e72: |-
+    Rather than automatically placing manually created courses into the
+    "Manually Created Courses" sub-account, when enabled, this feature allows
+    people who can manually create courses to put those courses into any sub-account
+    where they have enrollments.
   rating_description_db6adf39: Rating Description
   rating_max_score_eade1523: Rating max score
   rating_min_score_3d35a762: Rating min score
@@ -16170,6 +16235,7 @@ en:
   require_assignment_due_date_778b200d: Require assignment due date
   require_authentication_provider_on_logins_2aeb580e: Require Authentication Provider on Logins
   require_captcha_for_self_registration_b3b2ea02: Require Captcha for Self Registration
+  require_completion_by_specified_end_date_ed742ecb: Require Completion by Specified End Date
   require_group_members_to_be_in_the_same_section_7f6c36af: Require group members to be in the same section
   require_respondus_lockdown_browser_31425b3a: Require Respondus LockDown Browser
   require_signed_token_for_oembed_64883303: Require signed token for oEmbed
@@ -16763,6 +16829,7 @@ en:
     other: Select All (%{count}) Courses
   select_an_edit_operation_ec1467d: Select an edit operation
   select_an_outcome_group_6edb08a7: Select an outcome group
+  select_another_group_24773e5f: Select another group
   select_assignment_title_4571ffcb: 'Select assignment: %{title}'
   select_audio_file_7d905cce: Select Audio File
   select_by_date_range_c3af0101: Select by date range
@@ -16997,6 +17064,7 @@ en:
   settings_5aa0fd0c: Settings
   settings_changed_exceptions_e5247936: 'Settings changed exceptions:'
   settings_for_assignment_name_c19565e1: Settings for Assignment %{name}
+  settings_for_e2322172: Settings for
   settings_for_env_dcae6f02: Settings for %{env}
   settings_for_name_7731a33d: Settings for %{name}
   settings_for_tab_label_3bff4468: Settings for %{tab_label}
@@ -17492,6 +17560,7 @@ en:
   show_online_classes_only_f9d7b938: Show online classes only
   show_only_blueprint_courses_9fb37b41: Show only blueprint courses
   show_params_3401895b: Show params
+  show_projections_32a3756: Show Projections
   show_question_details_b059df00: Show Question Details
   show_report_to_students_a07888a6: Show report to students
   show_rubric_dca783f2: Show Rubric
@@ -17502,6 +17571,9 @@ en:
   show_welcome_tour_a105aa2e: Show Welcome Tour
   showing_1ac6ed70: 'Showing:'
   showing_all_sets_of_grading_periods_6c160874: Showing all sets of grading periods.
+  showing_count_outcomes_for_grouptitle_32d7988b:
+    one: Showing %{count} outcome for %{groupTitle}.
+    other: Showing %{count} outcomes for %{groupTitle}.
   shrink_permission_74b01aed: Shrink %{permission}
   shuffle_answers_edb602b7: Shuffle Answers
   sign_up_dafdee18: Sign Up
@@ -17599,6 +17671,7 @@ en:
   size_b30e1077: Size
   size_size_a77bd760: 'size: %{size}'
   skip_bcb86160: Skip
+  skip_weekends_13cbd889: Skip Weekends
   skipped_file_filename_due_to_error_94f0194: Skipped file %{filename} due to error
   skipping_unknown_file_type_cd1086ee: Skipping unknown file type
   skype_18850ba7: Skype
@@ -17832,6 +17905,7 @@ en:
   statuses_f41543d8: Statuses
   stemscopes_namespace_custom_data_87bcd65a: STEMScopes - Namespace Custom Data
   step: Step
+  sticky_left_navigation_3d438a81: Sticky Left Navigation
   still_having_difficulty_get_more_help_here_3cdc8de1: 'Still having difficulty? Get more help here:'
   stop_acting_as_user_8809a97f: Stop Acting as User
   storage_quotas_manage_6ca14bbb: Storage Quotas - manage
@@ -18307,6 +18381,7 @@ en:
     eportfolios: ePortfolios
     files: Files
     grades: Grades
+    groups: Groups
     home: Home
     item_banks: Item Banks
     modules: Modules
@@ -18492,6 +18567,14 @@ en:
                    up to %{max_domains} allowed domains. Wild cards are recommended
                    (e.g. *.instructure.com). Canvas and Instructure domains are included
                    automatically and do not count against your 50 domain limit.
+  the_conversation_has_been_successfully_starred_ce079a12: The conversation has been successfully starred
+  the_conversation_has_been_successfully_unstarred_6514095d: The conversation has been successfully unstarred
+  the_conversations_has_been_successfully_starred_315da1a:
+    one: The conversation has been successfully starred.
+    other: The conversations has been successfully starred.
+  the_conversations_has_been_successfully_unstarred_fb69c53d:
+    one: The conversation has been successfully unstarred.
+    other: The conversations has been successfully unstarred.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
     The Course Home Page is the first page students see when they open
           your course. The Home Page can display the course participation activity
@@ -18746,17 +18829,17 @@ en:
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.
   there_was_an_error_submitting_your_attempt_fdbe9259: There was an error submitting your attempt.
   there_was_an_error_updating_this_assignment_please_59fc608d: There was an error updating this assignment. Please refresh the page and try again.
-  there_was_an_error_updating_view_options_d024a3ec: There was an error updating view options.
   there_was_an_error_uploading_the_image_932fc4ce: There was an error uploading the image
   there_was_an_error_uploading_your_file_please_try__ce458566: There was an error uploading your file. Please try again.
   there_was_an_error_with_your_import_please_examine_7b42f29d: There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.
   there_was_an_error_with_your_query_please_try_a_di_761dff12: There was an error with your query; please try a different search
   there_was_an_unexpected_error_creating_the_discuss_8811a868: There was an unexpected error creating the discussion entry.
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: There was an unexpected error deleting the discussion topic.
-  there_was_an_unexpected_error_loading_the_discussi_cc4ee42: There was an unexpected error loading the discussion entry.
   there_was_an_unexpected_error_loading_the_replies_578d9738: There was an unexpected error loading the replies.
   there_was_an_unexpected_error_marking_all_as_read_117fe739: There was an unexpected error marking all as read.
   there_was_an_unexpected_error_marking_all_as_unrea_e4658766: There was an unexpected error marking all as unread.
+  there_was_an_unexpected_error_updating_the_convers_a1a37400: There was an unexpected error updating the conversation participants
+  there_was_an_unexpected_error_updating_the_convers_d44c9fde: There was an unexpected error updating the conversation participants.
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: There was an unexpected error updating the discussion topic.
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: There was an unexpected error updating the reply.
   there_was_an_unexpected_error_while_deleting_the_r_7df6ebe0: There was an unexpected error while deleting the reply.
@@ -18825,12 +18908,6 @@ en:
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: This feature affects existing data for an entire account.
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: This feature can't be enabled while autodetection of field separators is enabled
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: This feature can't be enabled while semicolons are forced to be field separators
-  this_feature_enhances_the_canvas_experience_within_6e056472: |-
-    This feature enhances the Canvas experience within Discussions and Announcements.
-    When this flag is enabled, early access to ongoing improvements will be
-    displayed automatically with every release. For full details,
-    please see the Discussions/Announcements Redesign user group
-    in the Canvas Community.
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
     This feature flag enables Isolated View inside the new
     Discussions Redesign work.
@@ -18872,6 +18949,7 @@ en:
   this_is_not_a_valid_grade_9cc2cb8: This is not a valid grade
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while.
   this_is_the_default_email_address_f3c421fb: This is the default email address
+  this_is_where_students_can_see_their_groups_7dd2dae3: This is where students can see their groups.
   this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: This is where you can leave a comment and view your instructor's feedback.
   this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: This is where you’ll land when your home is complete.
   this_is_your_current_theme_4331709b: This is your current theme
@@ -19202,7 +19280,7 @@ en:
     new_topic: New Discussion Topic
   title_52b8638d: 'Title:'
   title_current_750a3c65: "%{title} (Current)"
-  title_due_date_d3f46bfb: "%{title}: Due %{date}"
+  title_eb77c512: "%{title}"
   title_ee03d132: Title
   title_f8e03596: "* Title"
   title_is_locked_click_to_unlock_21548cfb: "%{title} is locked. Click to unlock"
@@ -19211,7 +19289,6 @@ en:
   title_is_too_long_b192a46a: Title is too long
   title_is_too_long_must_be_under_length_characters_ab694ae4: Title is too long, must be under %{length} characters
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} is unlocked. Click to lock."
-  title_no_due_date_bbbd3b53: "%{title}: No Due Date"
   title_outcomes_7adbd9cc: "%{title} Outcomes"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tray"
@@ -19298,6 +19375,7 @@ en:
   to_date_cannot_come_before_from_date_3eeb2633: To Date cannot come before From Date
   to_delete_groups_groups_delete_must_also_be_enable_5157ff6e: To delete groups, Groups - delete must also be enabled.
   to_differentiate_assignments_to_individual_student_69373d88: To differentiate assignments to individual students, Users - view list must also be enabled.
+  to_differentiate_assignments_to_individual_student_6cc40fde: To differentiate assignments to individual students, Users - view list ​must also be enabled.
   to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: To disallow users from viewing any SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
   to_do_1d554f36: To Do
@@ -19317,7 +19395,6 @@ en:
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: 'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. '
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.
   to_edit_assignment_details_on_individual_discussio_99f718a7: To edit assignment details on individual discussions, Discussions - manage must also be enabled.
-  to_edit_assignments_assignments_and_quizzes_manage_12d11783: To edit assignments, Assignments and Quizzes - manage / edit must also be enabled.
   to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: To edit Blueprint lock settings from the Discussions index page, Discussions - moderate must also be enabled.
   to_edit_course_grading_schemes_courses_manage_upda_f34b25b3: To edit course grading schemes, Courses - manage / update must also be enabled.
   to_edit_course_settings_courses_manage_update_must_172a4fe5: To edit course settings, Courses - manage / update must be enabled.
@@ -19370,6 +19447,7 @@ en:
   to_merge_users_the_self_service_user_merge_feature_351a98f: To merge users, the Self Service User Merge feature preview must also be enabled.
   to_minscore_43e5452e: to %{minScore}%
   to_moderate_a_quiz_assignments_and_quizzes_manage__b96b1937: To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: To moderate a quiz, Grades - edit​ must also be enabled.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_eae38da2: To moderate a quiz, Grades - edit must also be enabled.
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: To moderate grades, Grades - Select final grade for moderation must also be enabled.
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: To obtain a client ID, an account admin will need to generate an LTI developer key.
@@ -19528,6 +19606,7 @@ en:
     originality_report_visible_after_due_date: After the Due Date
     originality_report_visible_after_grading: After the assignment is graded
     originality_report_visible_immediately: Immediately
+  turns_left_side_navigation_sidebar_sticky_333df56f: Turns left-side navigation sidebar sticky.
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: Type a date or use arrow keys to navigate date picker.
@@ -19569,6 +19648,7 @@ en:
     Unable to determine next sftp user uid. Please try again in a minute.
                                   If it continues to fail, please reach out in #canvas-sre in Slack.
   unable_to_dismiss_update_df1e32eb: Unable to dismiss update
+  unable_to_drop_the_course_67f112c4: Unable to drop the course
   unable_to_fetch_current_microsoft_teams_sync_setti_3ad2f08b: Unable to fetch current Microsoft Teams Sync settings. Please check your internet connection. If the problem persists, please contact support.
   unable_to_find_a_sftp_user_for_this_account_b6d0b69a: Unable to find a SFTP user for this Account.
   unable_to_find_clever_district_district_id_61deb1cb: Unable to find Clever District %{district_id}
@@ -19724,6 +19804,7 @@ en:
   unselected_course_course_89995a83: Unselected course %{course}
   unselected_external_tool_tool_1bd68403: Unselected external tool %{tool}
   unsplash_ee049fbf: Unsplash
+  unstar_b84daaef: Unstar
   unstar_conversation_45fc43d6: Unstar conversation
   unstarted_932f2990: Unstarted
   unsubscribe_8be438ff: Unsubscribe
@@ -19843,7 +19924,6 @@ en:
   use_remote_service_for_notifications_9fe667c6: Use remote service for notifications
   use_semicolons_instead_of_commas_to_separate_field_62d24565: Use semicolons instead of commas to separate fields in compatible spreadsheet exports so they can be imported into Excel for users in some locales.
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: Use semicolons to separate fields in compatible spreadsheet exports
-  use_the_new_assignments_student_page_944262af: Use the new assignments student page
   use_the_new_assignments_teacher_page_8add7e46: Use the new assignments teacher page
   use_the_new_collaborations_external_tool_enabling__5f0ed73: Use the new Collaborations external tool enabling more options for tools to use to collaborate
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: Use this list to remove assigned students. Add new students with combo box after list.
@@ -20313,6 +20393,7 @@ en:
   view_app_configurations_52b52441: View App Configurations
   view_assignment_group_totals_c8db16b2: View Assignment Group Totals
   view_ba339f93: View
+  view_blackout_dates_1723673a: View Blackout Dates
   view_count_outcomes_9609792:
     one: View 1 Outcome
     other: View %{count} Outcomes
@@ -20330,6 +20411,7 @@ en:
   view_gradebook_for_course_10cbf171: View Gradebook for %{course}
   view_grades_8d3bae6c: View Grades
   view_grades_for_name_45aeb2f2: View grades for %{name}
+  view_groups_47b5f60c: View Groups
   view_important_dates_173c7e1b: View Important Dates
   view_login_ids_for_users_142bbe7a: View login ids for users
   view_longer_description_6b762087: view longer description
@@ -20351,7 +20433,6 @@ en:
   view_this_message_in_conversations_5a16bc9f: View this message in Conversations
   view_toolname_placements_4a5724d1: View %{toolName} Placements
   view_ungraded_as_0_1a9631a1: View Ungraded as 0
-  view_ungraded_as_0_a9e87a54: View ungraded as 0
   view_ungraded_as_zero_e19da657: View Ungraded as Zero
   view_ungraded_as_zero_view_in_gradebook_1bfc0783: View Ungraded as Zero View in Gradebook
   view_uploads_status_4c836211: View Uploads Status
@@ -20732,6 +20813,7 @@ en:
   you_can_t_edit_this_rubric_either_because_you_don__5247d35d: You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric. Any associated outcome criteria will use the course mastery scale. Continue anyway?
   you_can_t_edit_this_rubric_either_because_you_don__ab22f243: You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric. Any associated outcome criteria will use the account mastery scale. Continue anyway?
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric. Continue anyway?
+  you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: You can't submit an assignment when it is unpublished
   you_can_try_to_log_in_again_2b23ef0f: You can try to *log in again*.
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: You can use a single 16x16, 32x32, 48x48 ico file.
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
@@ -20897,6 +20979,7 @@ en:
   your_comment_was_auto_saved_as_a_draft_c49d3510: Your comment was auto-saved as a draft.
   your_content_has_been_exported_bbb57764: Your content has been exported.
   your_course_db806851: Your Course
+  your_email_address_844297ea: Your Email Address
   your_email_address_f881e583: Your email address
   your_email_b5364bee: Your Email
   your_groups_are_being_created_50156e34: Your groups are being created.

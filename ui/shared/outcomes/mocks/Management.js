@@ -25,7 +25,8 @@ import {
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
-  IMPORT_OUTCOMES
+  IMPORT_OUTCOMES,
+  CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -94,7 +95,27 @@ export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
   }
 ]
 
-export const groupMocks = ({groupId, childGroupsCount = 1, childGroupOffset = 300} = {}) => [
+const buildGroup = (_id, title) => {
+  if (!_id && !title) {
+    return null
+  }
+
+  return {
+    __typename: 'LearningOutcomeGroup',
+    _id,
+    title
+  }
+}
+
+export const groupMocks = ({
+  groupId,
+  childGroupsCount = 1,
+  childGroupOffset = 300,
+  title = `Group ${groupId}`,
+  parentOutcomeGroupId,
+  parentOutcomeGroupTitle,
+  childGroupTitlePrefix = `Group ${groupId} folder`
+} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -108,12 +129,14 @@ export const groupMocks = ({groupId, childGroupsCount = 1, childGroupOffset = 30
         context: {
           __typename: 'LearningOutcomeGroup',
           _id: groupId,
+          title,
+          parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               _id: (childGroupOffset + i).toString(),
-              title: `Group ${groupId} folder ${i}`
+              title: `${childGroupTitlePrefix} ${i}`
             }))
           }
         }
@@ -260,6 +283,89 @@ export const outcomeGroup = {
   }
 }
 
+const createSearchGroupOutcomesOutcomeMocks = (
+  canUnlink,
+  canEdit,
+  contextId,
+  contextType,
+  title,
+  outcomeCount
+) => {
+  // Tech Debt - see OUT-4776 - need to switch this over to a dynamic array like the below code
+  // for now too many tests are dependant on the number of outcomes and the order
+  // of the outcomes to be exactly in the format returned by in the if statement on line 301
+  if (outcomeCount === 2) {
+    return [
+      {
+        canUnlink,
+        _id: '1',
+        node: {
+          _id: '1',
+          description: '',
+          title: `Outcome 1 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      },
+      {
+        canUnlink,
+        _id: '2',
+        node: {
+          _id: '2',
+          description: '',
+          title: `Outcome 2 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+    ]
+  } else {
+    return [
+      {
+        canUnlink,
+        _id: '1',
+        node: {
+          _id: '1',
+          description: '',
+          title: `Outcome 1 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: '101',
+          title: 'Outcome Group 1',
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+    ]
+  }
+}
+
 export const groupDetailMocks = ({
   groupId = '1',
   title = `Group ${groupId}`,
@@ -272,7 +378,8 @@ export const groupDetailMocks = ({
   outcomesGroupContextType = 'Account',
   searchQuery = '',
   withMorePage = true,
-  groupDescription = 'Group Description'
+  groupDescription = 'Group Description',
+  numOfOutcomes = 2
 } = {}) => [
   {
     request: {
@@ -292,7 +399,8 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 1`,
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
-          outcomesCount: 0,
+          outcomesCount: numOfOutcomes,
+          __typename: 'LearningOutcomeGroup',
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -324,8 +432,7 @@ export const groupDetailMocks = ({
               }
             ],
             __typename: 'ContentTagConnection'
-          },
-          __typename: 'LearningOutcomeGroup'
+          }
         }
       }
     }
@@ -462,57 +569,21 @@ export const groupDetailMocks = ({
           _id: groupId,
           description: `${groupDescription} 4`,
           title,
-          outcomesCount: 2,
+          outcomesCount: numOfOutcomes,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
               endCursor: 'Mx',
               __typename: 'PageInfo'
             },
-            edges: [
-              {
-                canUnlink,
-                _id: '1',
-                node: {
-                  _id: '1',
-                  description: '',
-                  title: `Outcome 1 - ${title}`,
-                  displayName: '',
-                  canEdit,
-                  contextId,
-                  contextType,
-                  friendlyDescription: null,
-                  __typename: 'LearningOutcome'
-                },
-                group: {
-                  _id: '101',
-                  title: 'Outcome Group 1',
-                  __typename: 'LearningOutcomeGroup'
-                },
-                __typename: 'ContentTag'
-              },
-              {
-                canUnlink,
-                _id: '2',
-                node: {
-                  _id: '2',
-                  description: '',
-                  title: `Outcome 2 - ${title}`,
-                  displayName: '',
-                  canEdit,
-                  contextId,
-                  contextType,
-                  friendlyDescription: null,
-                  __typename: 'LearningOutcome'
-                },
-                group: {
-                  _id: '101',
-                  title: 'Outcome Group 1',
-                  __typename: 'LearningOutcomeGroup'
-                },
-                __typename: 'ContentTag'
-              }
-            ],
+            edges: createSearchGroupOutcomesOutcomeMocks(
+              canUnlink,
+              canEdit,
+              contextId,
+              contextType,
+              title,
+              numOfOutcomes
+            ),
             __typename: 'ContentTagConnection'
           },
           __typename: 'LearningOutcomeGroup'
@@ -1707,11 +1778,135 @@ export const importGroupMocks = ({
   ]
 }
 
-export const smallOutcomeTree = () => [
+export const createOutcomeGroupMocks = ({
+  id = '101',
+  title = 'New Group',
+  description = null,
+  vendorGuid = null,
+  parentOutcomeGroupId = '100',
+  parentOutcomeGroupTitle = 'Parent Outcome Group',
+  failResponse = false,
+  failMutation = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      createLearningOutcomeGroup: {
+        learningOutcomeGroup: {
+          _id: id,
+          title,
+          description,
+          vendorGuid,
+          parentOutcomeGroup: {
+            _id: parentOutcomeGroupId,
+            title: parentOutcomeGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'LearningOutcomeGroup'
+        },
+        errors: null,
+        __typename: 'CreateLearningOutcomeGroupPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: id,
+        message: 'Network error',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutation = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: 'Mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  const input = {
+    id: parentOutcomeGroupId,
+    title
+  }
+  if (description) input.description = description
+  if (vendorGuid) input.vendorGuid = vendorGuid
+
+  return [
+    {
+      request: {
+        query: CREATE_LEARNING_OUTCOME_GROUP,
+        variables: {
+          input
+        }
+      },
+      result
+    }
+  ]
+}
+
+export const smallOutcomeTree = ({group100childCounts = 1} = {}) => [
   ...accountMocks({childGroupsCount: 2}),
-  ...groupMocks({groupId: '100', childGroupOffset: 400}),
-  ...groupMocks({groupId: '101', childGroupsCount: 0}),
-  ...groupMocks({groupId: '400', childGroupsCount: 0}),
+  ...groupMocks({
+    groupId: '100',
+    childGroupOffset: 400,
+    parentOutcomeGroupId: '1',
+    childGroupsCount: group100childCounts,
+    title: 'Account folder 0',
+    parentOutcomeGroupTitle: 'Root account folder'
+  }),
+  ...groupMocks({
+    groupId: '101',
+    childGroupsCount: 0,
+    parentOutcomeGroupId: '1',
+    title: 'Account folder 1',
+    parentOutcomeGroupTitle: 'Root account folder'
+  }),
+  ...groupMocks({
+    groupId: '400',
+    childGroupsCount: 0,
+    parentOutcomeGroupId: '100',
+    parentOutcomeGroupTitle: 'Account folder 0',
+    title: 'Group 100 folder 0'
+  }),
   ...groupDetailMocks({groupId: '100'}),
   ...groupDetailMocks({groupId: '101'}),
   ...groupDetailMocks({groupId: '400'})

@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Замечательная дискуссия"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Прекрасное задание"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Обращение к редактору HTML Pretty"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Альтернативный текст"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Отличное задание для обсуждения"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Произошла ошибка при чтении файла"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Редактировать уравнение"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Редактировать существующую кнопку / значок"
+    },
     "edit_link_7f53bebb": {
         "message": "Редактировать ссылку"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Ошибка загрузки прошлых элементов"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Захватывающее обсуждение"
     },
     "excused_cf8792eb": {
         "message": "По уважительной причине"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "На весь экран"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Занимательный контрольный тест"
     },
     "generating_preview_45b53be0": {
         "message": "Создание предварительного просмотра"
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } завершенный(-е) { items, plural,\n     =1 {элемент}\n  other {элементы}\n}"
     },
+    "join_6cafecca": {
+        "message": "Присоединиться"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "присоединяйтесь к активному онлайн-совещанию"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "присоединяйтесь к онлайн-совещанию"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Перейти к панели инструментов навигации"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Клавиши быстрого доступа"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Язык Искусство"
     },
     "large_9c5e80e7": {
         "message": "Большой"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Похоже, здесь ничего нет"
+    },
+    "math_ede93050": {
+        "message": "Математика"
     },
     "media_af190855": {
         "message": "Мультимедиа"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Предварительный просмотр расписания"
     },
+    "science_8d92214a": {
+        "message": "Наука"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Прокрутите вверх, чтобы просмотреть свою историю!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Маленький"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Обществоведение"
     },
     "something_went_wrong_89195131": {
         "message": "Возникла проблема."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Размер текста"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Самое лучшее задание"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Дата и время выполнения этого установлены на"

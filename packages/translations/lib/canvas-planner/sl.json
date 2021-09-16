@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Odlična razprava" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Čudovita naloga" },
   "add_to_do_7537af64": { "message": "Dodaj seznamu opravil" },
   "add_to_do_7def3c37": { "message": "Dodaj seznamu opravil" },
   "address_3159962f": { "message": "Naslov:" },
   "all_day_fb42c4fc": { "message": "Ves dan" },
   "all_items_loaded_aa256183": { "message": "Vsi elementi so naloženi." },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Krasna naloga pri razpravi"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Prišlo je do napake pri poskusu opuščanja priložnosti."
   },
@@ -100,6 +105,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Napaka pri nalaganju preteklih elementov"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Vznemirljiva razprava" },
   "excused_cf8792eb": { "message": "Opravičeno" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Kukanje v vašo prihodnost ni uspelo"
@@ -126,6 +132,7 @@
     "message": "Neuspelo shranjevanje seznama opravil."
   },
   "feedback_6dcc1991": { "message": "Povratne informacije" },
+  "fun_quiz_47ab0b0": { "message": "Zabavni kviz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Pojdi v preglednico ogleda kartice"
   },
@@ -135,10 +142,18 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } zaključen(-ih) { items, plural,\n     =1 {element}\n  other {elementov}\n}"
   },
+  "join_6cafecca": { "message": "Pridružite se" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "pridružite se aktivni spletni konferenci"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "pridružite se spletni konferenci"
+  },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Skoči na orodno vrstico za navigacijo"
   },
   "jump_to_today_254ccf41": { "message": "Preskoči na danes" },
+  "language_arts_35b79a8b": { "message": "Jezikovni tečaj" },
   "late_2be42b88": { "message": "Zamuda" },
   "load_more_a36f9cf9": { "message": "Naloži več" },
   "load_prior_dates_f2b0f6f0": { "message": "Naloži predhodne datume" },
@@ -156,6 +171,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Zdi se, da tu ni ničesar."
   },
+  "math_ede93050": { "message": "Matematika" },
   "missing_1a256b3b": { "message": "Manjkajoče" },
   "missing_items_for_title_516511f8": {
     "message": "Manjkajoči elementi za { title }"
@@ -209,6 +225,7 @@
   "replies_4a8577c8": { "message": "Odgovori" },
   "save_11a80ec3": { "message": "Shrani" },
   "schedule_preview_3bcda153": { "message": "Predogled urnika" },
+  "science_8d92214a": { "message": "Naravoslovje" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Za ogled zgodovine se z drsnikom pomaknite navzgor."
   },
@@ -217,6 +234,7 @@
   },
   "show_all_ae37d610": { "message": "Prikaži vse" },
   "show_my_grades_ebd08684": { "message": "Prikaži moje ocene" },
+  "social_studies_13fa30c7": { "message": "Družboslovje" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } do { endDate }"
   },
@@ -234,6 +252,7 @@
     "message": "Uspešno: Čakajoča opravila je ustvarjen."
   },
   "task_16b0ef38": { "message": "Opravilo" },
+  "the_best_assignment_15e98be1": { "message": "Najboljša naloga" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Datum in čas roka tega seznama opravil."
   },

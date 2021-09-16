@@ -29,6 +29,10 @@ module K5DashboardPageObject
     "[placeholder='Begin typing to search']"
   end
 
+  def add_paired_student_selector
+    "[data-testid='add-student-btn']"
+  end
+
   def announcement_button_selector
     "//a[*//. = 'Announcement']"
   end
@@ -63,6 +67,10 @@ module K5DashboardPageObject
 
   def classic_dashboard_header_selector
     "h1:contains('Dashboard')"
+  end
+
+  def close_pairing_modal_selector
+    "[data-testid='close-modal']"
   end
 
   def course_card_selector(course_title)
@@ -103,6 +111,10 @@ module K5DashboardPageObject
 
   def dashboard_options_button_selector
     "[data-testid = 'k5-dashboard-options']"
+  end
+
+  def dashboard_card_specific_subject_selector(subject)
+    "[data-testid='k5-dashboard-card'][aria-label='#{subject}'"
   end
 
   def empty_dashboard_selector
@@ -217,6 +229,14 @@ module K5DashboardPageObject
     "[data-testid='observed-student-dropdown']"
   end
 
+  def pairing_code_input_selector
+    "[placeholder='Pairing code']"
+  end
+
+  def pairing_modal_selector
+    "[aria-label='Pair with student']"
+  end
+
   def pink_color_button_selector
     "//button[contains(@id,'DF6B91')]"
   end
@@ -263,6 +283,10 @@ module K5DashboardPageObject
     f(account_name_selector)
   end
 
+  def add_paired_student
+    f(add_paired_student_selector)
+  end
+
   def announcement_button
     fxpath(announcement_button_selector)
   end
@@ -299,6 +323,10 @@ module K5DashboardPageObject
     fj(classic_dashboard_header_selector)
   end
 
+  def close_pairing_modal
+    f(close_pairing_modal_selector)
+  end
+
   def course_card(course_title)
     f("div[title='#{course_title}']")
   end
@@ -333,6 +361,10 @@ module K5DashboardPageObject
 
   def dashboard_card
     f(dashboard_card_selector)
+  end
+
+  def dashboard_card_specific_subject(subject)
+    f(dashboard_card_specific_subject_selector(subject))
   end
 
   def dashboard_header
@@ -451,6 +483,14 @@ module K5DashboardPageObject
     f(observed_student_dropdown_selector)
   end
 
+  def pairing_code_input
+    f(pairing_code_input_selector)
+  end
+
+  def pairing_modal
+    f(pairing_modal_selector)
+  end
+
   def pink_color_button
     fxpath(pink_color_button_selector)
   end
@@ -522,6 +562,11 @@ module K5DashboardPageObject
     dashboard_options_button.click
   end
 
+  def click_close_pairing_button
+    close_pairing_modal.click
+    wait_for_ajaximations
+  end
+
   def click_duetoday_subject_item(title)
     subject_items_due(title).click
   end
@@ -566,6 +611,11 @@ module K5DashboardPageObject
 
   def click_observed_student_option(student_name)
     click_option(observed_student_dropdown_selector, student_name)
+  end
+
+  def click_pairing_button
+    add_paired_student.click
+    wait_for_ajaximations
   end
 
   def click_pink_color_button

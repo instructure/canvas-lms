@@ -24,10 +24,12 @@ export const initialState: UIState = {
   errorMessage: '',
   divideIntoWeeks: true,
   planPublishing: false,
-  selectedPlanType: 'template',
+  selectedContextType: 'Course',
+  selectedContextId: window.ENV.COURSE?.id || '',
   loadingMessage: '',
   showLoadingOverlay: false,
   editingBlackoutDates: false,
+  showProjections: false,
   adjustingHardEndDatesAfter: undefined
 }
 
@@ -37,9 +39,11 @@ export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
 export const getErrorMessage = (state: StoreState) => state.ui.errorMessage
 export const getDivideIntoWeeks = (state: StoreState) => state.ui.divideIntoWeeks
 export const getPlanPublishing = (state: StoreState) => state.ui.planPublishing
-export const getSelectedPlanType = (state: StoreState) => state.ui.selectedPlanType
+export const getSelectedContextType = (state: StoreState) => state.ui.selectedContextType
+export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
+export const getShowProjections = (state: StoreState) => state.ui.showProjections
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getAdjustingHardEndDatesAfter = (state: StoreState) =>
   state.ui.adjustingHardEndDatesAfter
@@ -56,12 +60,18 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, errorMessage: action.payload}
     case UIConstants.TOGGLE_DIVIDE_INTO_WEEKS:
       return {...state, divideIntoWeeks: !state.divideIntoWeeks}
+    case UIConstants.TOGGLE_SHOW_PROJECTIONS:
+      return {...state, showProjections: !state.showProjections}
     case UIConstants.PUBLISH_PLAN_STARTED:
       return {...state, planPublishing: true}
     case UIConstants.PUBLISH_PLAN_FINISHED:
       return {...state, planPublishing: false}
-    case UIConstants.SET_SELECTED_PLAN_TYPE:
-      return {...state, selectedPlanType: action.payload.planType}
+    case UIConstants.SET_SELECTED_PLAN_CONTEXT:
+      return {
+        ...state,
+        selectedContextType: action.payload.contextType,
+        selectedContextId: action.payload.contextId
+      }
     case UIConstants.SHOW_LOADING_OVERLAY:
       return {...state, showLoadingOverlay: true, loadingMessage: action.payload}
     case UIConstants.HIDE_LOADING_OVERLAY:

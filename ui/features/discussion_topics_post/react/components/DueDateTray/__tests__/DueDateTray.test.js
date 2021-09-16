@@ -63,7 +63,7 @@ const setup = props => {
   return render(<DueDateTray assignmentOverrides={overrides} {...props} />)
 }
 
-describe('AssignmentDetails', () => {
+describe('DueDateTray', () => {
   describe('desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -153,7 +153,7 @@ describe('AssignmentDetails', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'}
       }))
     })
 

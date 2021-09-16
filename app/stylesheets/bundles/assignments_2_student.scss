@@ -35,10 +35,14 @@ $student-view-banner-height: 50px;
 #assignments-student-footer {
   position: fixed;
   bottom: 0;
-  height: $student-footer-height;
-  // don't get covered by the navigation bar
-  #{direction(left)}: 90px;
+  min-height: $student-footer-height;
   #{direction(right)}: 10px;
+  #{direction(left)}: 10px;
+
+  @include desktop-only {
+    // don't get covered by the navigation bar if it's shown
+    margin-#{direction(left)}: 80px;
+  }
   box-sizing: border-box;
   padding: 0;
   border-top: 1px solid gray;

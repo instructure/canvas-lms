@@ -14,25 +14,39 @@ def git(command)
   end
 end
 
-def comment(severity, line, message, link_to_guidelines = false)
-  $stderr.puts "line #{line}: [#{severity}]: #{message}"
+# rubocop:disable Style/GlobalVars yeah a global, I'm being lazy and refactoring to an object
+def comment(severity, line, message, link_to_guidelines: false)
   if ENV['GERRIT_REFSPEC']
-    message += "\n\nHere are some guidelines to keep our git log pretty and useful: http://chris.beams.io/posts/git-commit/" if link_to_guidelines
+    if link_to_guidelines
+      message += "\n\nHere are some guidelines to keep our git log pretty and useful: http://chris.beams.io/posts/git-commit/"
+    end
 
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
-    payload = {path: "/COMMIT_MSG", position: line + 6, severity: severity, message: message}
+    payload = {path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message}
     `gergich comment #{Shellwords.escape(payload.to_json)}`
+    $stderr.puts "line #{line}: [#{severity}]: #{message}"
+  elsif line
+    $stderr.puts $lines[line - 1]
+    $stderr.puts "  ^: [#{severity}]: #{message}"
+  else
+    $stderr.puts "[#{severity}]: #{message}"
   end
 end
 
-commit_message = ARGV[0] == "--stdin" ? STDIN.read : git("show --pretty=format:%B -s")
+commit_message = case ARGV[0]
+                 when "--stdin" then $stdin.read
+                 when nil then git("show --pretty=format:%B -s")
+                 else File.read(ARGV[0])
+end
 
-exit if commit_message =~ /\A\[?wip($|[\] :-])/i
-lines = commit_message.split(/\n/)
+exit if commit_message.match?(/\A\[?wip($|[\] :-])/i)
+lines = commit_message.split("\n")
+$lines = lines.dup
 subject = lines.shift
+# rubocop:enable Style/GlobalVars
 
 if lines.shift != ""
-  comment "error", 2, "add a blank line after the subject line", true
+  comment "error", 2, "add a blank line after the subject line", link_to_guidelines: true
 end
 
 SUBJECT_MAX_LINE_LEN = 75
@@ -41,9 +55,11 @@ SUBJECT_IDEAL_LINE_LEN = 65
 length_exemption_regex = /^Revert/
 
 if subject.size > SUBJECT_MAX_LINE_LEN && subject !~ length_exemption_regex
-  comment "error", 1, "subject line can't exceed #{SUBJECT_MAX_LINE_LEN} chars (ideally keep it well under #{SUBJECT_IDEAL_LINE_LEN})", true
+  comment "error", 1,
+          "subject line can't exceed #{SUBJECT_MAX_LINE_LEN} chars (ideally keep it well under #{SUBJECT_IDEAL_LINE_LEN})",
+          link_to_guidelines: true
 elsif subject.size > SUBJECT_IDEAL_LINE_LEN && subject !~ length_exemption_regex
-  comment "warn", 1, "subject line shouldn't exceed #{SUBJECT_IDEAL_LINE_LEN} chars", true
+  comment "warn", 1, "subject line shouldn't exceed #{SUBJECT_IDEAL_LINE_LEN} chars", link_to_guidelines: true
 end
 
 # not perfect (won't get irregular verbs, only checks first word), but
@@ -66,72 +82,79 @@ actually_ok_regex = /\A
 maybe_start_with_wrong_tense = subject =~ maybe_wrong_tense_regex &&
                                subject !~ actually_ok_regex
 if maybe_start_with_wrong_tense
-  comment "warn", 1, "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")", true
+  comment "warn", 1,
+          "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")",
+          link_to_guidelines: true
 end
 
 has_the_word_i = subject =~ /(\A| )i('m)? /i
 if has_the_word_i
-  comment "warn", 1, "just say what the commit does, and not in the first person :P", true
+  comment "warn", 1, "just say what the commit does, and not in the first person :P", link_to_guidelines: true
 end
 
 
 BODY_IDEAL_LINE_LENGTH = 75
 
-long_lines = lines.each_with_index.select do |line, i|
+long_lines = lines.each_with_index.select do |line, _i|
   line.size > BODY_IDEAL_LINE_LENGTH
 end
 
 if long_lines.size > 0
   comment "warn", long_lines.first[1] + 3,
-    "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
-    (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""), true
+          "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
+          (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),
+          link_to_guidelines: true
 end
 
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
-commit_files = git("show --pretty=format:"" --name-only").split("\n")
-puts "detected file changes"
-puts commit_files
-only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
-if only_affects_specs
-  comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""
-  exit
+commit_files = git("show --pretty=format:'' --name-only").split("\n")
+if ENV['GERRIT_REFSPEC']
+  puts "detected file changes"
+  puts commit_files
 end
 
-touches_db_migrate_file = commit_files.any? { |f| f =~ %r{\Adb\/migrate/}}
+touches_db_migrate_file = commit_files.any? { |f| f.start_with?("db/migrate/") }
 if touches_db_migrate_file
-  comment "warn", 1, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
-  exit
+  comment "info", nil, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
 end
 
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
-SAFE_PARTS_REGEX = /UTF\-8/
-TICKET_REGEX = /([A-Z]+\-[0-9]+)/
+SAFE_PARTS_REGEX = /UTF-8/.freeze
+TICKET_REGEX = /([A-Z]+-[0-9]+)/.freeze
 
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
 if issue_ids.empty? && !gh_issue
   parts = commit_message.gsub(SAFE_PARTS_REGEX, "")
-            .split(TICKET_REGEX)
+    .split(TICKET_REGEX)
   if parts.size > 1
     jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
-    comment "warn", parts.first.count("\n") + 1, "the jira hooks won't link this commit to #{parts[1]} unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
+    comment "warn", parts.first.count("\n") + 1,
+            "the jira hooks won't link this commit to #{parts[1]} unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
   else
-    comment "warn", 3, "you should really reference a ticket ლ(ٱ٥ٱლ)"
+    comment "warn", nil, "you should really reference a ticket ლ(ٱ٥ٱლ)"
   end
+end
+
+only_affects_specs = commit_files.all? { |f| f.start_with?("spec/") }
+if only_affects_specs
+  comment "warn", nil, "since your commit only affects specs, please prefix your commit message with \"spec: \""
+  exit
 end
 
 flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
 unless flag_name
-  comment "warn", 1, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
+  comment "warn", nil, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
 end
 
 has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
-  comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
+  comment "warn", nil, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
 
 skip_eslint_flag = commit_message.include? '[skip-eslint]'
 if skip_eslint_flag
-  comment "error", 1, "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"
+  comment "error", nil,
+          "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"
 end

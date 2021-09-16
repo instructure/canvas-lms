@@ -31,8 +31,11 @@ module Types
       load_association(:attachments)
     end
 
-    field :body, String, null: true
-    def body
+    field :body, String, null: true do
+      argument :rewrite_urls, Boolean, required: false
+    end
+
+    def body(rewrite_urls: true)
       load_association(:submission).then do |submission|
         Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
           Loaders::AssociationLoader.for(Assignment, :context).load(assignment).then do
@@ -43,7 +46,8 @@ module Types
                 in_app: context[:in_app],
                 request: context[:request],
                 preloaded_attachments: preloaded_attachments,
-                user: current_user
+                user: current_user,
+                options: { :rewrite_api_urls => rewrite_urls }
               )
             end
           end

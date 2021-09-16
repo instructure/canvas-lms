@@ -1,10 +1,15 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Frábær umræða" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Mjög góð verkefni" },
   "add_to_do_7537af64": { "message": "Bæta við Verkefni" },
   "add_to_do_7def3c37": { "message": "Bæta við Verkefni" },
   "address_3159962f": { "message": "Aðsetur:" },
   "all_day_fb42c4fc": { "message": "Allan dag" },
   "all_items_loaded_aa256183": {
     "message": "Öllum atriðum hefur verið hlaðið"
+  },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Mjög góðar verkefnisumræður"
   },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Villa kom upp við að reyna að hafna tækifærinu."
@@ -106,6 +111,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Villa kom upp við að hlaða eldri atriðum"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Spennandi umræður" },
   "excused_cf8792eb": { "message": "Undanþegið" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Tókst ekki að kíkja á framtíð þína"
@@ -128,6 +134,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Mistókst að vista Verkefni" },
   "feedback_6dcc1991": { "message": "Endurgjöf" },
+  "fun_quiz_47ab0b0": { "message": "Skemmtilegar spurningar" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Fara í spjaldskoðunarstjórnborð"
   },
@@ -137,10 +144,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
   },
+  "join_6cafecca": { "message": "Taka þátt" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "taka þátt í virkum netfundi"
+  },
+  "join_online_meeting_b1725843": { "message": "taka þátt í netfundi" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Hoppa í verkfæraslá leiðarstýringar"
   },
   "jump_to_today_254ccf41": { "message": "Fara á daginn í dag" },
+  "language_arts_35b79a8b": { "message": "Tungumál" },
   "late_2be42b88": { "message": "Seint" },
   "load_more_a36f9cf9": { "message": "Hlaða meira" },
   "load_prior_dates_f2b0f6f0": { "message": "Hlaða fyrri dagsetningum" },
@@ -156,6 +169,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Lítur út fyrir að vera autt"
   },
+  "math_ede93050": { "message": "Stærðfræði" },
   "missing_1a256b3b": { "message": "Vantar" },
   "missing_items_for_title_516511f8": {
     "message": "Atriði sem vantar fyrir { title }"
@@ -207,6 +221,7 @@
   "replies_4a8577c8": { "message": "Svör" },
   "save_11a80ec3": { "message": "Vista" },
   "schedule_preview_3bcda153": { "message": "Forskoðun stundaskrár" },
+  "science_8d92214a": { "message": "Vísindi" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Skruna upp til að sjá sögu þína!"
   },
@@ -215,6 +230,7 @@
   },
   "show_all_ae37d610": { "message": "Sýna allt" },
   "show_my_grades_ebd08684": { "message": "Sýna einkunnir mínar" },
+  "social_studies_13fa30c7": { "message": "Félagslegar rannsóknir" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
   },
@@ -230,6 +246,7 @@
   "submitted_318fad53": { "message": "Skilað" },
   "success_to_do_created_e34ed395": { "message": "Árangur: Verkefni búið til" },
   "task_16b0ef38": { "message": "Verk" },
+  "the_best_assignment_15e98be1": { "message": "Bestu verkefnin" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dagsetning og tími skilafrests þessa verkefnis"
   },

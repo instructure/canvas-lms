@@ -41,7 +41,7 @@ describe('GradesPage', () => {
     courseId: '12',
     courseName: 'History',
     userIsStudent: true,
-    userIsInstructor: false,
+    userIsCourseAdmin: false,
     hideFinalGrades: false,
     currentUser: {
       id: '1'
@@ -118,7 +118,7 @@ describe('GradesPage', () => {
 
     it('shows a panda and link to gradebook for teachers', async () => {
       const {getByText, getByTestId, getByRole, queryByText} = render(
-        <GradesPage {...getProps({userIsInstructor: true, userIsStudent: false})} />
+        <GradesPage {...getProps({userIsCourseAdmin: true, userIsStudent: false})} />
       )
       await waitFor(() => expect(getByText('Students see their grades here.')).toBeInTheDocument())
       expect(getByTestId('empty-grades-panda')).toBeInTheDocument()

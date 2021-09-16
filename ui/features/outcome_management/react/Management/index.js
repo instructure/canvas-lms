@@ -41,8 +41,13 @@ import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
+import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
 
-const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
+const OutcomeManagementPanel = ({
+  importNumber,
+  createdOutcomeGroupIds,
+  onLhsSelectedGroupIdChanged
+}) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
@@ -65,7 +70,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
     clearCache
-  } = useManageOutcomes('OutcomeManagementPanel', {importNumber})
+  } = useManageOutcomes({collection: 'OutcomeManagementPanel', importNumber})
 
   useEffect(() => {
     return () => {
@@ -83,6 +88,14 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [showGroupOptions, setShowGroupOptions] = useState(false)
+
+  useEffect(() => {
+    if (onLhsSelectedGroupIdChanged) {
+      onLhsSelectedGroupIdChanged(selectedGroupId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGroupId])
+
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
@@ -115,10 +128,16 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
   }
+
+  const {selectParentGroupInLhs, treeBrowserViewRef} = useLhsTreeBrowserSelectParentGroup({
+    selectedParentGroupId,
+    selectedGroupId,
+    collections,
+    queryCollections
+  })
+
   const onSucessGroupRemove = () => {
-    if (selectedParentGroupId) {
-      queryCollections({id: selectedParentGroupId})
-    }
+    selectParentGroupInLhs()
     removeGroup(selectedGroupId)
     clearSelectedOutcomes()
   }
@@ -240,7 +259,9 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
                 showOptions={showGroupOptions}
                 setShowOutcomesView={setShowOutcomesView}
               />
-              <ManageOutcomesBillboard />
+              <View as="div" padding="small 0 0">
+                <ManageOutcomesBillboard />
+              </View>
             </>
           )}
         </View>
@@ -250,17 +271,24 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             width="33%"
             display="inline-block"
             position="relative"
-            height="60vh"
             as="div"
             overflowY="auto"
             overflowX="hidden"
             elementRef={setLeftColumnRef}
           >
-            <View as="div" padding="small x-small none x-small">
+            <View
+              as="div"
+              padding="small x-small none x-small"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
+            >
               <Text size="large" weight="light" fontStyle="normal">
                 {I18n.t('Outcome Groups')}
               </Text>
-              <View data-testid="outcomes-management-tree-browser">
+              <View
+                data-testid="outcomes-management-tree-browser"
+                elementRef={el => (treeBrowserViewRef.current = el)}
+              >
                 <TreeBrowser
                   onCollectionToggle={queryCollections}
                   collections={collections}
@@ -273,18 +301,21 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item as="div" position="relative" width="1%" height="60vh" display="inline-block">
+          <Flex.Item as="div" position="relative" width="1%" display="inline-block">
             {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             <div
               tabIndex="0"
               role="separator"
               aria-orientation="vertical"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
               onKeyDown={onKeyDownHandler}
               ref={setDelimiterRef}
               style={{
                 width: '1vw',
-                height: '100%',
                 cursor: 'col-resize',
+                minHeight: 'calc(720px - 10.5rem)',
+                height: 'calc(100vh - 16.35rem)',
                 background:
                   '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
               }}
@@ -296,7 +327,6 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             width="66%"
             display="inline-block"
             position="relative"
-            height="60vh"
             overflowY="visible"
             overflowX="auto"
             elementRef={el => {
@@ -304,7 +334,12 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               setScrollContainer(el)
             }}
           >
-            <View as="div" padding="small none none x-small">
+            <View
+              as="div"
+              padding="small none none x-small"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
+            >
               {selectedGroupId && (
                 <ManageOutcomesView
                   key={selectedGroupId}
@@ -326,7 +361,6 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
           </Flex.Item>
         </Flex>
       )}
-      <hr style={{margin: '0 0 7px'}} />
       {canManage && (
         <ManageOutcomesFooter
           selected={selectedOutcomes}
@@ -349,15 +383,10 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             <GroupMoveModal
               groupId={selectedGroupId}
               groupTitle={group?.title}
-              parentGroupId={selectedParentGroupId}
               isOpen={isGroupMoveModalOpen}
               onCloseHandler={closeGroupMoveModal}
-              onSuccess={() => {
-                queryCollections({
-                  id: selectedParentGroupId
-                })
-              }}
-              rootGroup={collections[rootId]}
+              onSuccess={selectParentGroupInLhs}
+              parentGroup={collections[selectedParentGroupId]}
             />
           )}
           {selectedOutcome && (
@@ -380,7 +409,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
                 onCloseHandler={onCloseOutcomeMoveModal}
                 onCleanupHandler={onCloseOutcomeMoveModal}
                 onSuccess={onSuccessMoveOutcomes}
-                rootGroup={collections[rootId]}
+                initialTargetGroup={collections[selectedGroupId]}
               />
             </>
           )}
@@ -415,7 +444,7 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             onCloseHandler={closeOutcomesMoveModal}
             onCleanupHandler={onCloseOutcomesMoveModal}
             onSuccess={onSuccessMoveOutcomes}
-            rootGroup={collections[rootId]}
+            initialTargetGroup={collections[selectedGroupId]}
           />
         </>
       )}
@@ -429,6 +458,7 @@ OutcomeManagementPanel.defaultProps = {
 
 OutcomeManagementPanel.propTypes = {
   createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
+  onLhsSelectedGroupIdChanged: PropTypes.func,
   importNumber: PropTypes.number
 }
 
