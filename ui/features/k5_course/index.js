@@ -29,6 +29,7 @@ ready(() => {
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
+        canManageGroups={ENV.PERMISSIONS.manage_groups}
         canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
         canReadAnnouncements={ENV.PERMISSIONS.read_announcements}
         currentUser={ENV.current_user}
@@ -40,23 +41,24 @@ ready(() => {
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
-        userIsStudent={ENV.COURSE.is_student}
-        userIsInstructor={ENV.COURSE.is_instructor}
+        userIsStudent={ENV.COURSE.is_student_or_fake_student}
         hideFinalGrades={ENV.COURSE.hide_final_grades}
         showLearningMasteryGradebook={
-          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student
+          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student_or_fake_student
         }
         outcomeProficiency={ENV.COURSE.outcome_proficiency}
         showStudentView={ENV.COURSE.show_student_view}
         studentViewPath={ENV.COURSE.student_view_path}
         tabs={ENV.TABS}
         settingsPath={ENV.COURSE.settings_path}
+        groupsPath={ENV.COURSE.groups_path}
         latestAnnouncement={ENV.COURSE.latest_announcement}
         pagesPath={ENV.COURSE.pages_url}
         hasWikiPages={ENV.COURSE.has_wiki_pages}
         hasSyllabusBody={ENV.COURSE.has_syllabus_body}
         parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
         observerList={ENV.OBSERVER_LIST}
+        selfEnrollment={ENV.COURSE.self_enrollment}
       />,
       courseContainer
     )

@@ -560,9 +560,12 @@ class FilesController < ApplicationController
           # it, since this should also count as an access.
         elsif params[:inline]
           @attachment.context_module_action(@current_user, :read) if @current_user
-          log_asset_access(@attachment, 'files', 'files')
+          log_attachment_access(@attachment)
           render :json => {:ok => true}
         else
+          # Module items count as an asset access
+          log_attachment_access(@attachment) if params[:module_item_id]
+
           render_attachment(@attachment)
         end
       end
@@ -1299,6 +1302,10 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def log_attachment_access(attachment)
+    log_asset_access(attachment, 'files', 'files')
+  end
 
   def open_cors
     headers['Access-Control-Allow-Origin'] = '*'

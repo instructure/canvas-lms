@@ -95,7 +95,15 @@ describe SisBatch do
     expect(enrollment.scores.exists?).to eq true
   end
 
+  it 'should log stats' do
+    allow(InstStatsd::Statsd).to receive(:increment)
+    process_csv_data([%{user_id,login_id,status
+                        user_1,user_1,active}])
+    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_completed", tags: { failed: false })
+  end
+
   it 'should restore linked observers when restoring enrollments' do
+    allow(InstStatsd::Statsd).to receive(:increment)
     course = @account.courses.create!(name: 'one', sis_source_id: 'c1', workflow_state: 'available')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
     observer = user_with_managed_pseudonym(account: @account)
@@ -107,10 +115,12 @@ describe SisBatch do
                                 c1,u1,student,deleted,}])
     expect(student_enrollment.reload.workflow_state).to eq 'deleted'
     expect(observer_enrollment.reload.workflow_state).to eq 'deleted'
+    tags = { undelete_only: false, unconclude_only: false, batch_mode: false }
     batch.restore_states_for_batch
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq 'active'
     expect(observer_enrollment.reload.workflow_state).to eq 'active'
+    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_restored", tags: tags)
   end
 
   it 'should create new linked observer enrollments when restoring enrollments' do
@@ -357,8 +367,8 @@ test_1,TC 101,Test Course 101,,term1,deleted
             batch1.process
             batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => {:import_type => "silly_sis_batch"})
             batch2.process
-            expect(Delayed::Job.where(:tag => "SisBatch.process_all_for_account",
-              :strand => SisBatch.strand_for_account(@account)).count).to eq 1
+            expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
+                                      singleton: SisBatch.strand_for_account(@account)).count).to eq 1
             SisBatch.process_all_for_account(@account)
             expect(batch1.reload.data[:silliness_complete]).to eq true
             expect(batch2.reload.data[:silliness_complete]).to eq true

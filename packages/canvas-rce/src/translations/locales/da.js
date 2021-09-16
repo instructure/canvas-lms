@@ -175,6 +175,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Forfalder: { when }" },
   "edit_c5fbea07": { "message": "Redigér" },
   "edit_equation_f5279959": { "message": "Rediger ligning" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Rediger eksisterende knap/ikon"
+  },
   "edit_link_7f53bebb": { "message": "Rediger link" },
   "editor_statusbar_26ac81fc": { "message": "Editor-statusbar" },
   "embed_828fac4a": { "message": "Indlejre" },
@@ -354,6 +357,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Desværre er det pæne HTML-redigeringsværktøj ikke tilgængeligt på tastaturet. Få adgang til det rå HTML-redigeringsværktøj her."
   },
+  "save_11a80ec3": { "message": "Gem" },
   "saved_buttons_and_icons_8278eed2": { "message": "Gemte knapper og ikoner" },
   "search_280d00bd": { "message": "Søg" },
   "search_term_b2d2235": { "message": "Søgeord" },

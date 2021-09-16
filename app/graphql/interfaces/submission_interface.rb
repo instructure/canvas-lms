@@ -104,6 +104,11 @@ module Interfaces::SubmissionInterface
     load_association(:assignment)
   end
 
+  field :feedback_for_current_attempt, Boolean, null: false
+  def feedback_for_current_attempt
+    submission.feedback_for_current_attempt?
+  end
+
   field :unread_comment_count, Integer, null: false
   def unread_comment_count
     Promise.all([

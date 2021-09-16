@@ -37,6 +37,8 @@ class ItemCog extends React.Component {
   static propTypes = {
     model: customPropTypes.filesystemObject,
     modalOptions: PropTypes.object.isRequired,
+    onCopyToClick: PropTypes.func,
+    onSendToClick: PropTypes.func,
     externalToolsForContext: PropTypes.arrayOf(PropTypes.object),
     userCanEditFilesForContext: PropTypes.bool,
     userCanDeleteFilesForContext: PropTypes.bool,
@@ -165,6 +167,35 @@ class ItemCog extends React.Component {
           </a>
         </li>
       )
+
+      if (this.props.userCanEditFilesForContext) {
+        menuItems.push(
+          <li key="send-to" role="presentation">
+            <a
+              href="#"
+              onClick={() => {
+                this.props.onSendToClick(this.props.model)
+              }}
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Send To...')}
+            </a>
+          </li>,
+          <li key="copy-to" role="presentation">
+            <a
+              href="#"
+              onClick={() => {
+                this.props.onCopyToClick(this.props.model)
+              }}
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Copy To...')}
+            </a>
+          </li>
+        )
+      }
     }
 
     if (!this.isMasterCourseRestricted()) {

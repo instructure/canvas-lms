@@ -16,14 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%
-  @show_cc_prefs = @current_pseudonym &&
-    @current_pseudonym.login_count < 10 &&
-    @current_user &&
-    !@current_user.fake_student? &&
-    !@current_user.used_feature?(:cc_prefs)
-%>
-<% if @show_cc_prefs %>
+<% if show_cc_prefs? %>
 <div class="ic-notification">
   <div class="ic-notification__icon" role="presentation">
     <i class="icon-info"></i>

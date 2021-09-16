@@ -32,7 +32,7 @@ describe Types::LearningOutcomeType do
 
   it "works" do
     expect(outcome_type.resolve("_id")).to eq @outcome.id.to_s
-    expect(outcome_type.resolve("contextId")).to eq @outcome.context_id
+    expect(outcome_type.resolve("contextId")).to eq @outcome.context_id.to_s
     expect(outcome_type.resolve("contextType")).to eq @outcome.context_type
     expect(outcome_type.resolve("title")).to eq @outcome.title
     expect(outcome_type.resolve("description")).to eq @outcome.description

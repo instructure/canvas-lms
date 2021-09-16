@@ -181,6 +181,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Vencimento: { when }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar Equação" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Editar Botão / Ícone Existente"
+  },
   "edit_link_7f53bebb": { "message": "Editar ligação" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado do editor" },
   "embed_828fac4a": { "message": "Incluído" },
@@ -366,6 +369,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Infelizmente, o editor de HTML bonito não está acessível através do teclado. Aceda aqui ao editor de HTML em bruto."
   },
+  "save_11a80ec3": { "message": "Guardar" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Botões e Ícones Guardados"
   },

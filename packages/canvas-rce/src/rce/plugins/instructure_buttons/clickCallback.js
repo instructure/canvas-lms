@@ -22,7 +22,11 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 
-export default function (ed, document) {
+export const CREATE_BUTTON = 'create_buttons_and_icons'
+export const LIST_BUTTON = 'list_buttons_and_icons'
+export const EDIT_BUTTON = 'edit_buttons_and_icons'
+
+export default function (ed, document, type) {
   return import('./components/ButtonsTray').then(({ButtonsTray}) => {
     let container = document.querySelector('#instructure-rce-buttons-tray-container')
     const trayProps = bridge.trayProps.get(ed)
@@ -40,7 +44,7 @@ export default function (ed, document) {
 
     ReactDOM.render(
       <StoreProvider {...trayProps}>
-        {() => <ButtonsTray editor={ed} onUnmount={handleUnmount} />}
+        {() => <ButtonsTray editor={ed} editing={type === EDIT_BUTTON} onUnmount={handleUnmount} />}
       </StoreProvider>,
       container
     )

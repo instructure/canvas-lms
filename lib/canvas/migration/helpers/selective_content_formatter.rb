@@ -21,6 +21,7 @@ module Canvas::Migration::Helpers
   class SelectiveContentFormatter
     COURSE_SETTING_TYPE = -> { I18n.t('lib.canvas.migration.course_settings', 'Course Settings') }
     COURSE_SYLLABUS_TYPE = -> { I18n.t('lib.canvas.migration.syllabus_body', 'Syllabus Body') }
+    PACE_PLAN_TYPE = -> { I18n.t('Pace Plan') }
     SELECTIVE_CONTENT_TYPES = [
             ['context_modules', -> { I18n.t('lib.canvas.migration.context_modules', 'Modules') }],
             ['assignments', -> { I18n.t('lib.canvas.migration.assignments', 'Assignments') }],
@@ -122,6 +123,9 @@ module Canvas::Migration::Helpers
           if course_data['course']['syllabus_body']
             content_list << {type: 'syllabus_body', property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call}
           end
+        end
+        if course_data['pace_plans']
+          content_list << {type: 'pace_plans', property: "#{property_prefix}[all_pace_plans]", title: PACE_PLAN_TYPE.call}
         end
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
@@ -314,6 +318,7 @@ module Canvas::Migration::Helpers
         else
           content_list << {type: 'course_settings', property: "#{property_prefix}[all_course_settings]", title: COURSE_SETTING_TYPE.call}
           content_list << {type: 'syllabus_body', property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call}
+          content_list << {type: 'pace_plans', property: "#{property_prefix}[all_pace_plans]", title: PACE_PLAN_TYPE.call} if source.pace_plans.primary.not_deleted.any?
 
           SELECTIVE_CONTENT_TYPES.each do |type, title|
             next if type == 'groups'

@@ -109,6 +109,30 @@ describe('groupDetailHook', () => {
     expect(result.current.error).not.toBe(null)
   })
 
+  describe('should flash a screenreader message when group has finshed loading', () => {
+    it('shows pluralized info message when a group has more than 1 outcome', async () => {
+      mocks = [...groupDetailMocks()]
+      const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
+      await act(async () => jest.runAllTimers())
+      expect(result.current.group.title).toBe('Group 1')
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Showing 2 outcomes for Group 1.',
+        srOnly: true
+      })
+    })
+
+    it('shows singularized info message when a group has only 1 outcome', async () => {
+      mocks = [...groupDetailMocks({numOfOutcomes: 1})]
+      const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
+      await act(async () => jest.runAllTimers())
+      expect(result.current.group.title).toBe('Group 1')
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Showing 1 outcome for Group 1.',
+        srOnly: true
+      })
+    })
+  })
+
   it('resets and loads correctly when change the id', async () => {
     mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '2'})]
     const {result, rerender} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})

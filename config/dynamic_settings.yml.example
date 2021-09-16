@@ -17,9 +17,14 @@ development:
         # one per line. will get | or'd together to form the regex
         # that's eventually used.
         online-meeting-url-regex: |-
-          https:\/\/\w+\.zoom\.us\/\d+
-          https:\/\/\w+\.zoom\.us\/my\/\d+
-          https:\/\/\w+\.zoom\.us\/j\/\d+
+          https:\/\/\w+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/\w+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
+          https:\/\/\w+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.live\.com\/meet\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/\w+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/\w+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
+          https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
       datadog-rum:
         application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81"
         client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r"

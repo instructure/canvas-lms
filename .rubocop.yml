@@ -8,7 +8,7 @@ require:
   - outrigger/cops/migration/tagged
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
   NewCops: enable
 
 # our style changes: disabling style rules we aren't interested in

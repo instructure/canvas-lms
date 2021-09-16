@@ -71,7 +71,7 @@ describe Mutations::CreateLearningOutcome do
     result = result.dig('data', 'createLearningOutcome', 'learningOutcome')
     record = LearningOutcome.find(result.dig('_id'))
     expect(result.dig('contextType')).to eq 'Course'
-    expect(result.dig('contextId')).to eq @course.id
+    expect(result.dig('contextId')).to eq @course.id.to_s
     expect(result.dig('title')).to eq 'Spec Learning Outcome via Mutation'
     expect(result.dig('description')).to be_nil
     expect(result.dig('vendorGuid')).to be_nil

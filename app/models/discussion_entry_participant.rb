@@ -27,6 +27,14 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   before_create :set_root_account_id
 
   validates_presence_of :discussion_entry_id, :user_id, :workflow_state
+  validate :prevent_creates
+
+  def prevent_creates
+    if self.new_record?
+      # e.g. DiscussionEntryParticipant.upsert_for_entries(entry, user, new_state: 'read')
+      self.errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
+    end
+  end
 
   def self.read_entry_ids(entry_ids, user)
     self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read').

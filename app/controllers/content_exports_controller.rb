@@ -19,6 +19,8 @@
 #
 
 class ContentExportsController < ApplicationController
+  include K5Mode
+
   before_action :require_permission, :except => :xml_schema
   before_action { |c| c.active_tab = "settings" }
 

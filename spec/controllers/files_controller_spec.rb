@@ -424,6 +424,25 @@ describe FilesController do
         user_session(@student)
       end
 
+      describe "with a module item ID" do
+        let(:params) do
+          {
+            course_id: @course.id,
+            id: @file.id,
+            module_item_id: 1
+          }
+        end
+
+        it 'should log asset access for the attachment' do
+          expect(controller).to receive(:log_asset_access).with(
+            @file,
+            'files',
+            'files'
+          )
+          get 'show', params: params
+        end
+      end
+
       it "should allow concluded students to read and download files" do
         @enrollment.conclude
         get 'show', params: {:course_id => @course.id, :id => @file.id}
@@ -553,6 +572,25 @@ describe FilesController do
         @file.save!
         get 'show', params: {:course_id => @course.id, :id => @file.id}
         expect(response).to be_successful
+      end
+
+      describe "with a module item ID" do
+        let(:params) do
+          {
+            course_id: @course.id,
+            id: @file.id,
+            module_item_id: 1
+          }
+        end
+
+        it 'should log asset access for the attachment' do
+          expect(controller).to receive(:log_asset_access).with(
+            @file,
+            'files',
+            'files'
+          )
+          get 'show', params: params
+        end
       end
     end
 

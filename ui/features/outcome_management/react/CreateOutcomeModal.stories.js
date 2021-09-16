@@ -37,7 +37,7 @@ const Template = args => {
     <OutcomesContext.Provider
       value={{env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: true}}}
     >
-      <MockedProvider cache={createCache()} mocks={smallOutcomeTree('Account')}>
+      <MockedProvider cache={createCache()} mocks={smallOutcomeTree()}>
         <CreateOutcomeModal {...args} />
       </MockedProvider>
     </OutcomesContext.Provider>

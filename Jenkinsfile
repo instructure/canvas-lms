@@ -248,7 +248,6 @@ pipeline {
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
-    RSPEC_PROCESSES = "${configuration.isRspecqEnabled() ? 6 : 4}"
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
@@ -325,6 +324,13 @@ pipeline {
               postFn(stageConfig.status())
             }
           ]
+
+          // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
+          if (rspecStage.useRspecQ(10)) {
+            env.RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
+          } else {
+            env.RSPEC_PROCESSES = configuration.getInteger('rspec-processes')
+          }
 
           extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).timings(false).execute {
             def rootStages = [:]

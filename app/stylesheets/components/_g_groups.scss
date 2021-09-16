@@ -120,10 +120,10 @@
     flex-basis: 10rem;
   }
   .student-group-join {
-    text-transform: uppercase;
-    font-weight: bold;
-    text-align: direction(right);
-    flex-basis: 2rem;
+    flex-basis: 7rem;
+    button {
+      display: block;
+    }
   }
   .student-group-body {
     padding: direction-sides(16px 16px 16px 36px);

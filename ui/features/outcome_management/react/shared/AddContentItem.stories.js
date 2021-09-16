@@ -24,7 +24,7 @@ export default {
   title: 'Examples/Outcomes/AddContentItem',
   component: AddContentItem,
   contextType: 'Account',
-  contextId: 1,
+  contextId: '1',
   args: {
     parentGroupId: '1',
     labelInstructions: 'Add New Group',

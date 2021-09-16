@@ -25,7 +25,7 @@ module Audits
   class << self
     def stream(&block)
       ::EventStream::Stream.new(&block).tap do |stream|
-        stream.raise_on_error = Rails.env.test?
+        stream.raise_on_error ||= Rails.env.test?
 
         stream.on_insert do |record|
           EventStream::Logger.info('AUDITOR', identifier, 'insert', record.to_json)

@@ -804,6 +804,19 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:redirect_to)
         controller.send(:content_tag_redirect, Account.default, tag, nil)
       end
+
+      context 'when the build param is passed' do
+        it 'redirects to build for a quiz_lti assignment' do
+          tag = create_tag(content_type: 'Assignment')
+          allow(tag).to receive(:quiz_lti).and_return true
+          expect(controller).to receive(:named_context_url).with(
+            Account.default, :context_assignment_url, 44, {module_item_id: 42}
+          ).and_return('nil')
+          allow(controller).to receive(:redirect_to)
+          controller.params[:build] = true
+          controller.send(:content_tag_redirect, Account.default, tag, nil)
+        end
+      end
     end
 
     it 'redirects for a quiz' do
@@ -2048,6 +2061,68 @@ describe ApplicationController do
       controller.instance_variable_set(:@current_user, @student)
     end
 
+    shared_examples_for "pages with an immersive reader flag enabled" do
+      it "is true for wiki_pages#show" do
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
+
+      it "is false on pages where immersive reader is not supported" do
+        controller.params[:controller] = "discussion_topics"
+        controller.params[:action] = "index"
+        expect(controller.send(:show_immersive_reader?)).to be false
+      end
+
+      context "when more_immersive_reader feature flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:more_immersive_reader)
+        end
+
+        it "is true for the assignments show page" do
+          controller.params[:controller] = "assignments"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
+
+        it "is true for the course page" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
+
+        it "is true for the syllabus page" do
+          controller.params[:controller] = "assignments"
+          controller.params[:action] = "syllabus"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
+      end
+
+      context "when more_immersive_reader feature flag is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:more_immersive_reader)
+        end
+
+        it "is false for the assignments show page" do
+          controller.params[:controller] = "assignments"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be false
+        end
+
+        it "is false for the course page" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:show_immersive_reader?)).to be false
+        end
+
+        it "is false for the syllabus page" do
+          controller.params[:controller] = "assignments"
+          controller.params[:action] = "syllabus"
+          expect(controller.send(:show_immersive_reader?)).to be false
+        end
+      end
+    end
+
     it "is false when no immersive reader flags are enabled, even on supported pages" do
       controller.params[:controller] = "wiki_pages"
       controller.params[:action] = "show"
@@ -2059,17 +2134,15 @@ describe ApplicationController do
         @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
       end
 
-      it "is true for wiki_pages#show" do
-        controller.params[:controller] = "wiki_pages"
-        controller.params[:action] = "show"
-        expect(controller.send(:show_immersive_reader?)).to be true
+      it_behaves_like "pages with an immersive reader flag enabled"
+    end
+
+    context "when user has immersive reader flag enabled" do
+      before(:each) do
+        @student.enable_feature!(:user_immersive_reader_wiki_pages)
       end
 
-      it "is false on pages where immersive reader is not supported" do
-        controller.params[:controller] = "courses"
-        controller.params[:action] = "show"
-        expect(controller.send(:show_immersive_reader?)).to be false
-      end
+      it_behaves_like "pages with an immersive reader flag enabled"
     end
   end
 

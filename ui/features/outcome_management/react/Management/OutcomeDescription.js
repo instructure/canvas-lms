@@ -16,27 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import I18n from 'i18n!OutcomeManagement'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const OutcomeDescription = ({
-  description,
-  friendlyDescription,
-  withExternalControl,
-  truncate,
-  onClickHandler
-}) => {
-  const [truncateInternal, setTruncateInternal] = useState(true)
-  const truncated = withExternalControl ? truncate : truncateInternal
-  const onToggleHandler = () =>
-    withExternalControl ? onClickHandler() : setTruncateInternal(prevState => !prevState)
+const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
   const {friendlyDescriptionFF, isStudent} = useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
   let fullDescription = description
@@ -53,21 +42,7 @@ const OutcomeDescription = ({
   if (!description && !friendlyDescription) return null
 
   return (
-    <Button
-      size="medium"
-      display="block"
-      textAlign="start"
-      withBackground={false}
-      onClick={onToggleHandler}
-      theme={{
-        borderWidth: '0',
-        mediumPaddingHorizontal: '0',
-        mediumPaddingTop: '0',
-        mediumPaddingBottom: '0',
-        primaryGhostHoverBackground: 'transparent',
-        secondaryGhostHoverBackground: 'transparent'
-      }}
-    >
+    <View>
       {truncated && truncatedDescription && (
         <View as="div" padding="0 small 0 0" data-testid="description-truncated">
           <PresentationContent>
@@ -114,21 +89,18 @@ const OutcomeDescription = ({
           dangerouslySetInnerHTML={{__html: fullDescription}}
         />
       )}
-    </Button>
+    </View>
   )
 }
 
 OutcomeDescription.defaultProps = {
-  withExternalControl: false,
   friendlyDescription: ''
 }
 
 OutcomeDescription.propTypes = {
   description: PropTypes.string,
   friendlyDescription: PropTypes.string,
-  withExternalControl: PropTypes.bool,
-  truncate: PropTypes.bool,
-  onClickHandler: PropTypes.func
+  truncated: PropTypes.bool.isRequired
 }
 
 export default OutcomeDescription

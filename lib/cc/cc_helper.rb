@@ -88,6 +88,7 @@ module CCHelper
   LEARNING_OUTCOMES = "learning_outcomes.xml"
   MANIFEST = 'imsmanifest.xml'
   MODULE_META = "module_meta.xml"
+  PACE_PLANS = 'pace_plans.xml'
   RUBRICS = "rubrics.xml"
   EXTERNAL_TOOLS = "external_tools.xml"
   FILES_META = "files_meta.xml"

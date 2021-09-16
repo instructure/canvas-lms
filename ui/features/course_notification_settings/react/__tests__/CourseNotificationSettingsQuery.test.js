@@ -117,7 +117,7 @@ const mockedPrefs = {
 describe('Course Notification Settings', () => {
   it('displays the correct messaging for enabled notification settings', async () => {
     const mocks = await createQueryMocks({Node: {__typename: 'User'}})
-    mocks[0].result.data.legacyNode.notificationPreferencesEnabled = true
+    mocks[0].result.data.userLegacyNode.notificationPreferencesEnabled = true
     const {findByText, findByTestId} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <AlertManager>
@@ -136,7 +136,7 @@ describe('Course Notification Settings', () => {
 
   it('displays the correct messaging for disabled notification settings', async () => {
     const mocks = await createQueryMocks({Node: {__typename: 'User'}})
-    mocks[0].result.data.legacyNode.notificationPreferencesEnabled = false
+    mocks[0].result.data.userLegacyNode.notificationPreferencesEnabled = false
     const {findByText} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <AlertManager>

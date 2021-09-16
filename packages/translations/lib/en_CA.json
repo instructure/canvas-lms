@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "A great discussion"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "A wonderful assignment"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Access the pretty HTML editor"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alt Text"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "An amazing discussion assignment"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "An error occured reading the file"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Edit Equation"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Edit Existing Button / Icon"
+    },
     "edit_link_7f53bebb": {
         "message": "Edit Link"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Error loading past items"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Exciting discussion"
     },
     "excused_cf8792eb": {
         "message": "Excused"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Fullscreen"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Fun quiz"
     },
     "generating_preview_45b53be0": {
         "message": "Generating preview..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
+    "join_6cafecca": {
+        "message": "Join"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "join active online meeting"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "join online meeting"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Jump to navigation toolbar"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Keyboard Shortcuts"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Language Arts"
     },
     "large_9c5e80e7": {
         "message": "Large"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Looks like there isn''t anything here"
+    },
+    "math_ede93050": {
+        "message": "Math"
     },
     "media_af190855": {
         "message": "Media"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Schedule Preview"
     },
+    "science_8d92214a": {
+        "message": "Science"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Scroll up to see your history!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Small"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Social Studies"
     },
     "something_went_wrong_89195131": {
         "message": "Something went wrong."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Text Size"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "The best assignment"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "The date and time this to do is due"

@@ -28,10 +28,12 @@ import {
   MOCK_COURSE_TABS,
   MOCK_GRADING_PERIODS_EMPTY,
   MOCK_ASSIGNMENT_GROUPS,
-  MOCK_ENROLLMENTS
+  MOCK_ENROLLMENTS,
+  MOCK_GROUPS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
+import sinon from 'sinon'
 
 const currentUser = {
   id: '1',
@@ -40,6 +42,7 @@ const currentUser = {
 }
 const defaultEnv = {
   current_user: currentUser,
+  course_id: '30',
   K5_USER: true,
   FEATURES: {},
   PREFERENCES: {
@@ -48,7 +51,14 @@ const defaultEnv = {
   MOMENT_LOCALE: 'en',
   TIMEZONE: 'America/Denver'
 }
-const defaultTabs = [{id: '0'}, {id: '19'}, {id: '10'}, {id: '5'}, {id: 'context_external_tool_1'}]
+const defaultTabs = [
+  {id: '0'},
+  {id: '19'},
+  {id: '10'},
+  {id: '7'},
+  {id: '5'},
+  {id: 'context_external_tool_1'}
+]
 const defaultProps = {
   currentUser,
   loadAllOpportunities: () => {},
@@ -60,12 +70,12 @@ const defaultProps = {
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
   userIsStudent: true,
-  userIsInstructor: false,
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
   showLearningMasteryGradebook: false,
   tabs: defaultTabs,
   settingsPath: '/courses/30/settings',
+  groupsPath: '/courses/30/groups',
   latestAnnouncement: {
     id: '12',
     title: 'Important announcement',
@@ -87,7 +97,11 @@ const defaultProps = {
   hasWikiPages: true,
   hasSyllabusBody: true,
   parentSupportEnabled: true,
-  observerList: MOCK_OBSERVER_LIST
+  observerList: MOCK_OBSERVER_LIST,
+  selfEnrollment: {
+    option: null,
+    url: null
+  }
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -100,6 +114,10 @@ const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
+
+const GROUPS_URL = encodeURI(
+  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true'
+)
 
 const createModulesPartial = () => {
   const modulesContainer = document.createElement('div')
@@ -135,7 +153,10 @@ const createStudentView = () => {
   return studentViewBarContainer
 } */
 
+let fakeXhrServer
+
 beforeEach(() => {
+  fakeXhrServer = sinon.fakeServer.create({autoRespond: true})
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
@@ -143,6 +164,11 @@ beforeEach(() => {
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
+  fakeXhrServer.respondWith('GET', GROUPS_URL, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(MOCK_GROUPS)
+  ])
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
 })
@@ -154,6 +180,7 @@ afterEach(() => {
   localStorage.clear()
   moxios.uninstall()
   fetchMock.restore()
+  fakeXhrServer.restore()
 })
 
 describe('K-5 Subject Course', () => {
@@ -336,7 +363,65 @@ describe('K-5 Subject Course', () => {
     }) */
   })
 
-  describe('subject announcements', () => {
+  describe('Self-enrollment buttons', () => {
+    it("renders a join button if selfEnrollment.option is 'enroll'", () => {
+      const selfEnrollment = {
+        option: 'enroll',
+        url: 'http://enroll_url/'
+      }
+      const {getByRole} = render(<K5Course {...defaultProps} selfEnrollment={selfEnrollment} />)
+      const button = getByRole('link', {name: 'Join this Course'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toBe('http://enroll_url/')
+    })
+
+    it("renders a drop button and modal if selfEnrollment.option is 'unenroll'", () => {
+      const selfEnrollment = {
+        option: 'unenroll',
+        url: 'http://unenroll_url/'
+      }
+      const {getByRole, getByText} = render(
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+      )
+      const button = getByRole('button', {name: 'Drop this Course'})
+      expect(button).toBeInTheDocument()
+      act(() => button.click())
+      expect(getByText('Drop Arts and Crafts')).toBeInTheDocument()
+      expect(getByText('Confirm Unenrollment')).toBeInTheDocument()
+      expect(
+        getByText(
+          'Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.'
+        )
+      ).toBeInTheDocument()
+      expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
+    })
+
+    it('sends a POST to drop the course after confirming in the modal', () => {
+      fetchMock.post('http://unenroll_url/', 200)
+      const selfEnrollment = {
+        option: 'unenroll',
+        url: 'http://unenroll_url/'
+      }
+      const {getByRole, getAllByRole, getByText} = render(
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+      )
+      const openModalButton = getByRole('button', {name: 'Drop this Course'})
+      act(() => openModalButton.click())
+      const dropButton = getAllByRole('button', {name: 'Drop this Course'})[1]
+      act(() => dropButton.click())
+      expect(getByText('Dropping course')).toBeInTheDocument()
+      expect(fetchMock.called(selfEnrollment.url)).toBeTruthy()
+    })
+
+    it('renders neither if selfEnrollment is nil', () => {
+      const {getByText, queryByText} = render(<K5Course {...defaultProps} />)
+      expect(getByText('Arts and Crafts')).toBeInTheDocument()
+      expect(queryByText('Join this Course')).not.toBeInTheDocument()
+      expect(queryByText('Drop this Course')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Subject announcements', () => {
     it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
       expect(getByText('Important announcement')).toBeInTheDocument()
@@ -368,7 +453,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('home tab', () => {
+  describe('Home tab', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Time to learn!')).toBeInTheDocument()
@@ -421,15 +506,15 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('schedule tab', () => {
+  describe('Schedule tab', () => {
     it('shows a planner preview scoped to a single course if user has no student enrollments', async () => {
       const {findByTestId, getByText, queryByText} = render(
         <K5Course
           {...defaultProps}
           defaultTab={TAB_IDS.SCHEDULE}
           canManage
+          canReadAsAdmin
           userIsStudent={false}
-          userIsInstructor
         />
       )
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()
@@ -443,7 +528,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('modules tab', () => {
+  describe('Modules tab', () => {
     it('shows modules content if modules tab is selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />)
       expect(getByText('Course modules content')).toBeVisible()
@@ -475,7 +560,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('grades tab', () => {
+  describe('Grades tab', () => {
     it('fetches and displays grade information', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
       await waitFor(() => expect(getByText('WWII Report')).toBeInTheDocument())
@@ -498,7 +583,51 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('resources tab', () => {
+  describe('Groups tab', () => {
+    describe('user is a student', () => {
+      it('fetches and displays group information', async () => {
+        const {findByText, getByText} = render(
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.GROUPS} />
+        )
+        expect(await findByText('Fight Club')).toBeInTheDocument()
+        ;['Student Clubs', '0 students'].forEach(t => expect(getByText(t)).toBeInTheDocument())
+      })
+    })
+
+    describe('user is an instructor', () => {
+      it('displays welcome page', () => {
+        const {getByText} = render(
+          <K5Course {...defaultProps} canReadAsAdmin defaultTab={TAB_IDS.GROUPS} />
+        )
+        expect(getByText('This is where students can see their groups.')).toBeInTheDocument()
+      })
+
+      describe('can manage groups', () => {
+        it('displays a Manage Groups button', () => {
+          const {getByText} = render(
+            <K5Course
+              {...defaultProps}
+              canManageGroups
+              canReadAsAdmin
+              defaultTab={TAB_IDS.GROUPS}
+            />
+          )
+          expect(getByText('Manage Groups')).toBeInTheDocument()
+        })
+      })
+
+      describe('can not manage groups', () => {
+        it('displays a View Groups button', () => {
+          const {getByText} = render(
+            <K5Course {...defaultProps} canReadAsAdmin defaultTab={TAB_IDS.GROUPS} />
+          )
+          expect(getByText('View Groups')).toBeInTheDocument()
+        })
+      })
+    })
+  })
+
+  describe('Resources tab', () => {
     describe('important info section', () => {
       it('shows syllabus content with link to edit if teacher', async () => {
         const {findByText, getByRole} = render(

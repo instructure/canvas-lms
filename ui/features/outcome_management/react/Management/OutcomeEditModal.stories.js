@@ -30,7 +30,7 @@ export default {
       description: 'Outcome description',
       displayName: 'Friendly outcome name',
       contextType: 'Account',
-      contextId: 1
+      contextId: '1'
     },
     isOpen: true,
     onCloseHandler: () => {}
@@ -54,7 +54,7 @@ withNoName.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: 1
+    contextId: '1'
   }
 }
 
@@ -66,7 +66,7 @@ withLongName.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: 1
+    contextId: '1'
   }
 }
 
@@ -78,7 +78,7 @@ withLongDisplayName.args = {
     description: 'Outcome description',
     displayName: 'Long friendly outcome name. '.repeat(10),
     contextType: 'Account',
-    contextId: 1
+    contextId: '1'
   }
 }
 
@@ -90,7 +90,7 @@ withLongDescription.args = {
     description: 'A very long outcome description. '.repeat(18),
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: 1
+    contextId: '1'
   }
 }
 
@@ -102,7 +102,7 @@ withoutEditPermission.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: 2
+    contextId: '2'
   }
 }
 

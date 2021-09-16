@@ -125,9 +125,8 @@ const MessageListActionContainer = props => {
       )
     )
 
-    const conversationParticipantIDsFromResult = result.data.updateConversationParticipants.conversationParticipants.map(
-      cp => cp._id
-    )
+    const conversationParticipantIDsFromResult =
+      result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
 
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
       conversationParticipant =>
@@ -195,6 +194,43 @@ const MessageListActionContainer = props => {
     }
   })
 
+  const firstConversation =
+    props.selectedConversations.length > 0 ? props.selectedConversations[0] : {}
+  const myConversationParticipant =
+    firstConversation?.conversationParticipantsConnection?.nodes.find(
+      node => node.user._id === ENV.current_user_id
+    )
+  const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
+
+  const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted: () => {
+      if (firstConversationIsStarred) {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully unstarred.',
+              other: 'The conversations has been successfully unstarred.'
+            },
+            {count: props.selectedConversations.length}
+          )
+        )
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully starred.',
+              other: 'The conversations has been successfully starred.'
+            },
+            {count: props.selectedConversations.length}
+          )
+        )
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the conversation participants.'))
+    }
+  })
+
   const {loading, error, data} = useQuery(COURSES_QUERY, {
     variables: {userID}
   })
@@ -215,8 +251,7 @@ const MessageListActionContainer = props => {
   const handleDelete = () => {
     const delMsg = I18n.t(
       {
-        one:
-          'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
+        one: 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
         other:
           'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
       },
@@ -275,6 +310,15 @@ const MessageListActionContainer = props => {
       // confirm message was cancelled by user
       props.archiveToggler(false)
     }
+  }
+
+  const handleStar = starred => {
+    starConversationParticipants({
+      variables: {
+        conversationIds: props.selectedConversations.map(convo => convo._id),
+        starred
+      }
+    })
   }
 
   const handleMarkAsUnread = () => {
@@ -337,7 +381,8 @@ const MessageListActionContainer = props => {
             markAsRead={handleMarkAsRead}
             reply={props.onReply}
             replyAll={props.onReplyAll}
-            star={() => {}}
+            star={!firstConversationIsStarred ? () => handleStar(true) : null}
+            unstar={firstConversationIsStarred ? () => handleStar(false) : null}
             settingsDisabled={!hasSelectedConversations()}
             shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
             shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}

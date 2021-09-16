@@ -24,6 +24,7 @@ group :test do
   dedicated_gemfile = ENV['BUNDLE_GEMFILE']&.end_with?('rubocop.rb')
 
   gem 'gergich', '1.2.3', require: false
+    gem 'mime-types-data', '3.2021.0901', require: false
 
   gem 'rubocop', '1.19.1', require: false
   gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"

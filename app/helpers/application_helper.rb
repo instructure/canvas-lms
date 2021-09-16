@@ -1304,4 +1304,14 @@ module ApplicationHelper
       )
     end
   end
+
+  def show_cc_prefs?
+    k5_student = k5_user? && (@current_user.roles(@domain_root_account) - %w[user student]).empty?
+    @current_pseudonym &&
+      @current_pseudonym.login_count < 10 &&
+      @current_user &&
+      !@current_user.fake_student? &&
+      !@current_user.used_feature?(:cc_prefs) &&
+      !k5_student
+  end
 end

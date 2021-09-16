@@ -41,10 +41,12 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
           #{"forcedReadState: #{forcedReadState}" unless forcedReadState.nil?}
         }) {
           discussionEntry {
-            read
-            rating
             ratingSum
-            forcedReadState
+            entryParticipant {
+              read
+              rating
+              forcedReadState
+            }
           }
         }
       }
@@ -67,7 +69,15 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     expect(@discussion_entry.read?(@discussion_entry.user)).to be true
     result = run_mutation({id: @discussion_entry.id, read: false})
     expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be false
+    expect(
+      result.dig(
+        'data', 
+        'updateDiscussionEntryParticipant', 
+        'discussionEntry', 
+        'entryParticipant', 
+        'read'
+      )
+    ).to be false
     @discussion_entry.reload
     expect(@discussion_entry.read?(@discussion_entry.user)).to be false
   end
@@ -78,8 +88,23 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     result = run_mutation({id: @discussion_entry.id, rating: 'liked'})
 
     expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'rating')).to be true
-    expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'ratingSum')).to eq 1
+    expect(
+      result.dig(
+        'data', 
+        'updateDiscussionEntryParticipant', 
+        'discussionEntry', 
+        'entryParticipant', 
+        'rating'
+      )
+    ).to be true
+    expect(
+      result.dig(
+        'data', 
+        'updateDiscussionEntryParticipant', 
+        'discussionEntry', 
+        'ratingSum'
+      )
+    ).to eq 1
     expect(@discussion_entry.rating(@discussion_entry.user)).to be_equal 1
   end
 
@@ -89,8 +114,24 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         result = run_mutation({id: @discussion_entry.id, read: false, forcedReadState:true})
         expect(result.dig('errors')).to be nil
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be false
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be true
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'read'
+          )
+        ).to be false
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'forcedReadState'
+          )
+        ).to be true
         @discussion_entry.reload
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
@@ -99,8 +140,24 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         result = run_mutation({id: @discussion_entry.id, read: false, forcedReadState:false})
         expect(result.dig('errors')).to be nil
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be false
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be false
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'read'
+          )
+        ).to be false
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'forcedReadState'
+          )
+        ).to be false
         @discussion_entry.reload
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be false
@@ -115,8 +172,24 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({id: @discussion_entry.id, read: true, forcedReadState:true})
         expect(result.dig('errors')).to be nil
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be true
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be true
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'read'
+          )
+        ).to be true
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'forcedReadState'
+          )
+        ).to be true
         @discussion_entry.reload
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
@@ -125,8 +198,24 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({id: @discussion_entry.id, read: true, forcedReadState:false})
         expect(result.dig('errors')).to be nil
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be true
-        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be false
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'read'
+          )
+        ).to be true
+        expect(
+          result.dig(
+            'data', 
+            'updateDiscussionEntryParticipant', 
+            'discussionEntry', 
+            'entryParticipant', 
+            'forcedReadState'
+          )
+        ).to be false
         @discussion_entry.reload
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be false

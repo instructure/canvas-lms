@@ -158,6 +158,9 @@
   "due_when_7eed10c6": { "message": "Vencimento: { when }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar equação" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Editar botão/ícone existente"
+  },
   "edit_link_7f53bebb": { "message": "Editar link" },
   "editor_statusbar_26ac81fc": { "message": "Barra de status do Editor" },
   "embed_828fac4a": { "message": "Incorporar" },
@@ -343,6 +346,7 @@
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Infelizmente, o lindo editor de HTML não é acessível por teclado. Acesse o editor de HTML bruto aqui."
   },
+  "save_11a80ec3": { "message": "Salvar" },
   "saved_buttons_and_icons_8278eed2": { "message": "Botões e ícones salvos" },
   "search_280d00bd": { "message": "Pesquisar" },
   "search_term_b2d2235": { "message": "Termo de pesquisa" },

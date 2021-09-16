@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Un debat genial" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Una tasca magnífica" },
   "add_to_do_7537af64": { "message": "Afegeix les tasques pendents" },
   "add_to_do_7def3c37": { "message": "Afegeix les tasques pendents" },
   "address_3159962f": { "message": "Adreça:" },
   "all_day_fb42c4fc": { "message": "Tot el dia" },
   "all_items_loaded_aa256183": { "message": "Tots els elements carregats" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Una tasca de debat sorprenent"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "S''ha produït un error en provar de descartar l''oportunitat."
   },
@@ -102,6 +107,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "S''ha produït un error en carregar els elements anteriors"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Un debat fascinant" },
   "excused_cf8792eb": { "message": "Excusat" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "S’ha produït un error en revisar el teu futur"
@@ -128,6 +134,7 @@
     "message": "No s''han pogut desar les tasques pendents"
   },
   "feedback_6dcc1991": { "message": "Suggeriments" },
+  "fun_quiz_47ab0b0": { "message": "Un qüestionari divertit" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Ves al tauler de control de la vista de targetes"
   },
@@ -139,10 +146,18 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completats { items, plural,\n     =1 {element}\n  other {elements}\n}"
   },
+  "join_6cafecca": { "message": "Inscriu-t''hi" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "participa en una reunió en línia activa"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "participa en una reunió en línia"
+  },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Salta a la barra d''eines de navegació"
   },
   "jump_to_today_254ccf41": { "message": "Salta a avui" },
+  "language_arts_35b79a8b": { "message": "Arts lingüístiques" },
   "late_2be42b88": { "message": "Tardà" },
   "load_more_a36f9cf9": { "message": "Carrega''n més" },
   "load_prior_dates_f2b0f6f0": { "message": "Carrega les dates anteriors" },
@@ -164,6 +179,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Sembla que no hi ha res aquí"
   },
+  "math_ede93050": { "message": "Matemàtiques" },
   "missing_1a256b3b": { "message": "Falta" },
   "missing_items_for_title_516511f8": {
     "message": "Falten elements per a { title }"
@@ -225,6 +241,7 @@
   "schedule_preview_3bcda153": {
     "message": "Visualització prèvia de la planificació"
   },
+  "science_8d92214a": { "message": "Ciència" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Desplaceu la pantalla cap a dalt per consultar l''historial."
   },
@@ -233,6 +250,7 @@
   },
   "show_all_ae37d610": { "message": "Mostra-ho tot" },
   "show_my_grades_ebd08684": { "message": "Mostra Les meves qualificacions" },
+  "social_studies_13fa30c7": { "message": "Ciències socials" },
   "startdate_to_enddate_d245175b": {
     "message": "De { startDate } a { endDate }"
   },
@@ -250,6 +268,7 @@
     "message": "Operació correcta: S''han creat tasques pendents"
   },
   "task_16b0ef38": { "message": "Tasca" },
+  "the_best_assignment_15e98be1": { "message": "La millor tasca" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "La data i l''hora en què venç aquesta tasca pendent"
   },

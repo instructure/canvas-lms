@@ -200,11 +200,13 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               elementRef={setLeftColumnRef}
             >
               <View as="div" padding="small x-small none x-small">
-                <Heading level="h3">
-                  <Text size="large" weight="light" fontStyle="normal">
-                    {I18n.t('Outcome Groups')}
-                  </Text>
-                </Heading>
+                <div style={{paddingBottom: '6px'}}>
+                  <Heading level="h3">
+                    <Text size="large" weight="light" fontStyle="normal">
+                      {I18n.t('Outcome Groups')}
+                    </Text>
+                  </Heading>
+                </div>
                 {renderGroupNavigation}
               </View>
             </Flex.Item>
@@ -212,8 +214,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               as="div"
               position="relative"
               width="1%"
-              height="calc(100vh - 10.25rem)"
-              margin="xxx-small 0 0"
+              height="calc(100vh - 8.75rem)"
             >
               {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div

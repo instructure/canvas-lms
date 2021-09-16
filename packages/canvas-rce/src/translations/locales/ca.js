@@ -183,6 +183,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Venciment: { when }" },
   "edit_c5fbea07": { "message": "Edita" },
   "edit_equation_f5279959": { "message": "Edita l''equació" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edita el botó i la icona actuals"
+  },
   "edit_link_7f53bebb": { "message": "Edita l''enllaç" },
   "editor_statusbar_26ac81fc": { "message": "Editor de la barra d''estat" },
   "embed_828fac4a": { "message": "Integra" },
@@ -378,6 +381,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Malauradament, no es pot accedir a l’editor de dades HTML processades amb el teclat. Accediu a l’editor de dades HTML sense processar aquí."
   },
+  "save_11a80ec3": { "message": "Desa" },
   "saved_buttons_and_icons_8278eed2": { "message": "Botons i icones desats" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Terme de cerca" },

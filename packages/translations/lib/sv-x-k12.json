@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "En mycket bra diskussion"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "En underbar uppgift"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Öppna den nätta versionen av HTML-redigeraren"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternativ text"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "En otrolig diskussionsuppgift"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Ett fel inträffade vid inläsning av filen"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Redigera ekvation"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Redigera befintlig knapp/ikon"
+    },
     "edit_link_7f53bebb": {
         "message": "Redigera länk"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Det gick inte att läsa in tidigare objekt"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Spännande diskussion"
     },
     "excused_cf8792eb": {
         "message": "Ursäktad"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Helskärm"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Roligt quiz"
     },
     "generating_preview_45b53be0": {
         "message": "Genererar förhandsvisning ..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } fullgjorda { items, plural,\n     =1 {objekt}\n  other {objekt}\n}"
     },
+    "join_6cafecca": {
+        "message": "Gå med"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "delta i aktivt onlinemöte"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "delta i onlinemöte"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Hoppa till verktygsfältet för navigering"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Kortkommandon"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Språkstudier"
     },
     "large_9c5e80e7": {
         "message": "Stor"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Det verkar inte finnas något här"
+    },
+    "math_ede93050": {
+        "message": "Matematik"
     },
     "media_af190855": {
         "message": "Media"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Förhandsgranskning av scheman"
     },
+    "science_8d92214a": {
+        "message": "Naturvetenskap"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Bläddra uppåt för att se din historik."
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Liten"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Samhällsvetenskap"
     },
     "something_went_wrong_89195131": {
         "message": "Någonting gick fel."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Textstorlek"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Den bästa uppgiften"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Datum och tid dessa att göra-uppgifter ska vara klara"

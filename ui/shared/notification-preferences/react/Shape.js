@@ -39,9 +39,19 @@ const ChannelShape = shape({
   notificationPolicyOverrides: arrayOf(NotificationPolicyShape)
 })
 
-const NotificationPreferencesShape = shape({
+export const NotificationPreferencesShape = shape({
   sendScoresInEmails: bool,
   channels: arrayOf(ChannelShape)
 })
 
-export default NotificationPreferencesShape
+const CourseShape = shape({
+  id: string.isRequired,
+  _id: string.isRequired,
+  name: string.isRequired
+})
+
+export const EnrollmentShape = shape({
+  course: CourseShape.isRequired,
+  state: string.isRequired,
+  type: string.isRequired
+})

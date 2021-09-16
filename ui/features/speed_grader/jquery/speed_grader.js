@@ -111,6 +111,8 @@ const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
+const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
+  'speed_grader_edit_status_secondary_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -1143,8 +1145,20 @@ function allowsReassignment(submission) {
   )
 }
 
-function renderStatusMenu(component) {
-  ReactDOM.render(component, document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT))
+function availableMountPointForStatusMenu() {
+  const elementId = $submission_details.is(':hidden')
+    ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
+    : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+  return document.getElementById(elementId)
+}
+
+function renderStatusMenu(component, mountPoint) {
+  const unmountPoint =
+    mountPoint.id === SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+      ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
+      : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+  ReactDOM.render(null, document.getElementById(unmountPoint))
+  ReactDOM.render(component, mountPoint)
 }
 
 function statusMenuComponent(submission) {
@@ -1160,8 +1174,10 @@ function statusMenuComponent(submission) {
   )
 }
 
-function getLateAndMissingPills() {
-  return document.querySelectorAll('.submission-missing-pill, .submission-late-pill')
+function getLateMissingAndExcusedPills() {
+  return document.querySelectorAll(
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill'
+  )
 }
 
 function updateSubmissionAndPageEffects(data) {
@@ -1171,8 +1187,8 @@ function updateSubmissionAndPageEffects(data) {
     .then(() => {
       refreshGrades(() => {
         EG.refreshSubmissionsToView()
-        styleSubmissionStatusPills(getLateAndMissingPills())
-        renderStatusMenu(statusMenuComponent(submission))
+        styleSubmissionStatusPills(getLateMissingAndExcusedPills())
+        renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
       })
     })
     .catch(showFlashError())
@@ -2037,13 +2053,6 @@ EG = {
         submissionHistory[currentSelectedIndex]
     }
 
-    const mountPoint = document.getElementById(SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT)
-    if (mountPoint) {
-      styleSubmissionStatusPills(getLateAndMissingPills())
-      const component = isMostRecent ? statusMenuComponent(this.currentStudent.submission) : null
-      renderStatusMenu(component)
-    }
-
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'
     const vericiteEnabled =
@@ -2263,6 +2272,16 @@ EG = {
     if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass('with_enrollment_notice')
     }
+
+    const mountPoint = availableMountPointForStatusMenu()
+    if (mountPoint) {
+      const isInModeration = isModerated && !jsonData.grades_published_at
+      const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
+      styleSubmissionStatusPills(getLateMissingAndExcusedPills())
+      const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
+      renderStatusMenu(component, mountPoint)
+    }
+
     EG.showDiscussion()
   },
 
@@ -2330,6 +2349,7 @@ EG = {
           value: i,
           late: s.late,
           missing: s.missing,
+          excused: s.excused,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade

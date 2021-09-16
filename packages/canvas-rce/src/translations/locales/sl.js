@@ -80,6 +80,7 @@ const locale = {
   "c_2001_acme_inc_283f7f80": {
     "message": "Avtorske pravice (c) 2001 Acme Inc."
   },
+  "cancel_caeb1e68": { "message": "Prekliči" },
   "choose_caption_file_9c45bc4e": {
     "message": "Izberite datoteko spremnega besedila"
   },
@@ -183,6 +184,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Roki: { when }" },
   "edit_c5fbea07": { "message": "Uredi" },
   "edit_equation_f5279959": { "message": "Uredi enačbo" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Uredi obstoječi gumb/ikono"
+  },
   "edit_link_7f53bebb": { "message": "Uredi povezavo" },
   "editor_statusbar_26ac81fc": { "message": "Vrstica stanja urejevalnika" },
   "embed_828fac4a": { "message": "Vdelaj" },
@@ -298,6 +302,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Moje datoteke" },
   "my_images_427f9b0c": { "message": "Moje slike" },
+  "name_1aed4a1b": { "message": "Ime" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigirajte skozi meni ali orodno vrstico"
   },
@@ -365,6 +370,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Žal urejevalnik Pretty HTML Editor ni dostopen s tipkovnico. Tukaj lahko dostopate do surovega urejevalnika HTML."
   },
+  "save_11a80ec3": { "message": "Shrani" },
   "saved_buttons_and_icons_8278eed2": { "message": "Shranjeni gumbi in ikone" },
   "search_280d00bd": { "message": "Iskanje" },
   "search_term_b2d2235": { "message": "Iskalni izraz" },
@@ -461,6 +467,7 @@ const locale = {
     "message": "pritisnite Ctrl+F9 za dostop do možnosti preglednice. { text }"
   },
   "unpublished_dfd8801": { "message": "neobjavljeno" },
+  "untitled_efdc2d7d": { "message": "brez naslova" },
   "upload_document_253f0478": { "message": "Naloži dokument" },
   "upload_file_fd2361b8": { "message": "Naloži datoteko" },
   "upload_image_6120b609": { "message": "Naloži sliko" },

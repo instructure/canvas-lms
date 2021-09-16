@@ -199,6 +199,8 @@ export const ObserverListShape = PropTypes.arrayOf(
 export const shouldShowObserverOptions = (observerList, currentUser) =>
   observerList.length > 1 || (observerList.length === 1 && observerList[0].id !== currentUser.id)
 
+export const defaultSelectedObserverId = () => getCookie(SELECTED_OBSERVED_USER_COOKIE)
+
 ObserverOptions.propTypes = {
   observerList: ObserverListShape.isRequired,
   currentUser: PropTypes.shape({

@@ -315,3 +315,14 @@ testRights('CAN (manage, course home page)', {
     ACCESS_GEAR_MENU: true
   }
 })
+
+testRights('CAN (view toolbar on course_home)', {
+  course_home: true,
+  display_show_all_pages: false,
+  WIKI_RIGHTS: {
+    manage: false
+  },
+  CAN: {
+    VIEW_TOOLBAR: true
+  }
+})

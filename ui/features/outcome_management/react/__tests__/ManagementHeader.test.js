@@ -21,19 +21,42 @@ import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import ManagementHeader from '../ManagementHeader'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
+import CreateOutcomeModal from '../CreateOutcomeModal'
 import {MockedProvider} from '@apollo/react-testing'
+import {createCache} from '../../../../shared/apollo'
+import {smallOutcomeTree} from '../../../../shared/outcomes/mocks/Management'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
+jest.mock('../CreateOutcomeModal')
+CreateOutcomeModal.mockImplementation(({starterGroupId = ''}) => (
+  <div>
+    CreateOutcomeModal <span>{starterGroupId}</span>
+  </div>
+))
 jest.useFakeTimers()
+
+let cache
 
 const render = (
   children,
-  {isMobileView = false, canManage = true, canImport = true, renderer = rtlRender} = {}
+  {
+    contextType = 'Account',
+    contextId = '1',
+    isMobileView = false,
+    canManage = true,
+    canImport = true,
+    renderer = rtlRender,
+    mocks = []
+  } = {}
 ) => {
   return renderer(
-    <OutcomesContext.Provider value={{env: {isMobileView, canManage, canImport}}}>
-      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    <OutcomesContext.Provider
+      value={{env: {isMobileView, canManage, canImport, contextType, contextId}}}
+    >
+      <MockedProvider cache={cache} mocks={mocks}>
+        {children}
+      </MockedProvider>
     </OutcomesContext.Provider>
   )
 }
@@ -50,11 +73,13 @@ describe('ManagementHeader', () => {
 
   beforeEach(() => {
     handleAddOutcomesMock = jest.fn()
+    cache = createCache()
   })
 
   afterEach(() => {
     showImportOutcomesModal.mockRestore()
     jest.clearAllMocks()
+    showImportOutcomesModal.mockRestore()
   })
 
   it('renders Outcomes title', () => {
@@ -140,8 +165,9 @@ describe('ManagementHeader', () => {
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Create Outcome')).toBeInTheDocument()
+    await act(async () => jest.runAllTimers())
+    expect(CreateOutcomeModal).toHaveBeenCalled()
+    expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
   })
 
   describe('Responsiveness', () => {
@@ -202,12 +228,13 @@ describe('ManagementHeader', () => {
       expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
     })
 
-    it('opens FindOutcomesModal when Find Menu Item is clicked', () => {
+    it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
+      await act(async () => jest.runAllTimers())
       expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
     })
 
@@ -217,8 +244,23 @@ describe('ManagementHeader', () => {
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Create'))
+      await act(async () => jest.runAllTimers())
+      expect(CreateOutcomeModal).toHaveBeenCalled()
+      expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
+    })
+  })
+
+  describe('Drilldown', () => {
+    it('renders CreateOutcomeModal with starterGroupId if lhsGroupId is provided', async () => {
+      const lhsGroupId = 'starter group id'
+
+      const {queryByText} = render(<ManagementHeader {...defaultProps({lhsGroupId})} />, {
+        mocks: smallOutcomeTree()
+      })
       await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Create Outcome')).toBeInTheDocument()
+      fireEvent.click(queryByText('Create'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText(lhsGroupId)).toBeInTheDocument()
     })
   })
 })

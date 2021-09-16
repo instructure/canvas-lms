@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Une super discussion."
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Un merveilleux travail."
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Accéder à l’éditeur HTML embelli"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Texte alternatif"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Un fantastique travail de type discussion."
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Une erreur est survenue pendant la lecture du fichier."
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Modifier l''équation"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Modifier une icône ou un bouton existant"
+    },
     "edit_link_7f53bebb": {
         "message": "Modifier lien"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Erreur lors du chargement des éléments passés"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Discussion passionnante"
     },
     "excused_cf8792eb": {
         "message": "Excusé"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Plein écran"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Questionnaire amusant"
     },
     "generating_preview_45b53be0": {
         "message": "Création de l''aperçu en cours..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } terminé(s) { items, plural,\n     =1 {élément}\n  other {éléments}\n}"
     },
+    "join_6cafecca": {
+        "message": "Rejoindre"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "rejoindre une réunion en ligne active"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "rejoindre une réunion en ligne"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Aller à la barre d''outils de navigation"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Raccourcis clavier"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Arts de la langue"
     },
     "large_9c5e80e7": {
         "message": "Grand"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Apparemment, il n''y a rien ici."
+    },
+    "math_ede93050": {
+        "message": "Mathématiques"
     },
     "media_af190855": {
         "message": "Média"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Aperçu de l’emploi du temps"
     },
+    "science_8d92214a": {
+        "message": "Science"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Faites défiler vers le haut pour voir votre histoire !"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Petit"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Sciences sociales"
     },
     "something_went_wrong_89195131": {
         "message": "Un problème est survenu."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Taille du texte"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Le meilleur travail"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "La date et l''heure à laquelle cela doit être fait est passé."

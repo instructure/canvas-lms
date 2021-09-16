@@ -26,7 +26,7 @@ import formatMessage from '../../../../format-message'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {CreateButtonForm} from './CreateButtonForm'
 
-export function ButtonsTray({editor, onUnmount}) {
+export function ButtonsTray({editor, onUnmount, editing}) {
   const [isOpen, setIsOpen] = useState(true)
 
   const title = formatMessage('Buttons and Icons')
@@ -59,7 +59,7 @@ export function ButtonsTray({editor, onUnmount}) {
         </Flex.Item>
 
         <Flex.Item as="slot" padding="small">
-          <CreateButtonForm editor={editor} onClose={() => setIsOpen(false)} />
+          <CreateButtonForm editor={editor} editing={editing} onClose={() => setIsOpen(false)} />
         </Flex.Item>
       </Flex>
     </Tray>

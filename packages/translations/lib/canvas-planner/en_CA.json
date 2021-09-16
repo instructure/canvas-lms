@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "A great discussion" },
+  "a_wonderful_assignment_d3139d9b": { "message": "A wonderful assignment" },
   "add_to_do_7537af64": { "message": "Add To-Do" },
   "add_to_do_7def3c37": { "message": "Add To Do" },
   "address_3159962f": { "message": "Address:" },
   "all_day_fb42c4fc": { "message": "All Day" },
   "all_items_loaded_aa256183": { "message": "All items loaded" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "An amazing discussion assignment"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "An error occurred attempting to dismiss the opportunity."
   },
@@ -98,6 +103,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Error loading past items"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "Excused" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Failed peeking into your future"
@@ -118,6 +124,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Failed to save to do" },
   "feedback_6dcc1991": { "message": "Feedback" },
+  "fun_quiz_47ab0b0": { "message": "Fun quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Go to Card View Dashboard"
   },
@@ -127,10 +134,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "join_6cafecca": { "message": "Join" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "join active online meeting"
+  },
+  "join_online_meeting_b1725843": { "message": "join online meeting" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Jump to navigation toolbar"
   },
   "jump_to_today_254ccf41": { "message": "Jump to Today" },
+  "language_arts_35b79a8b": { "message": "Language Arts" },
   "late_2be42b88": { "message": "Late" },
   "load_more_a36f9cf9": { "message": "Load more" },
   "load_prior_dates_f2b0f6f0": { "message": "Load prior dates" },
@@ -146,6 +159,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Looks like there isn''t anything here"
   },
+  "math_ede93050": { "message": "Math" },
   "missing_1a256b3b": { "message": "Missing" },
   "missing_items_for_title_516511f8": {
     "message": "Missing items for { title }"
@@ -197,6 +211,7 @@
   "replies_4a8577c8": { "message": "Replies" },
   "save_11a80ec3": { "message": "Save" },
   "schedule_preview_3bcda153": { "message": "Schedule Preview" },
+  "science_8d92214a": { "message": "Science" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Scroll up to see your history!"
   },
@@ -205,6 +220,7 @@
   },
   "show_all_ae37d610": { "message": "Show All" },
   "show_my_grades_ebd08684": { "message": "Show My Grades" },
+  "social_studies_13fa30c7": { "message": "Social Studies" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } to { endDate }"
   },
@@ -220,6 +236,7 @@
   "submitted_318fad53": { "message": "Submitted" },
   "success_to_do_created_e34ed395": { "message": "Success: To Do created" },
   "task_16b0ef38": { "message": "Task" },
+  "the_best_assignment_15e98be1": { "message": "The best assignment" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "The date and time this to do is due"
   },

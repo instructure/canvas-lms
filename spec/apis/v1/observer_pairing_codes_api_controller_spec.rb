@@ -26,9 +26,18 @@ describe ObserverPairingCodesApiController, type: :request do
   describe '#create' do
     before :once do
       @student = student_in_course(active_all: true).user
+      @course.account.enable_self_registration
       @path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       @params = {user_id: @student.to_param,
         controller: 'observer_pairing_codes_api', action: 'create', format: 'json'}
+    end
+
+    it "does not permit pairing code generation if self-registration is disabled" do
+      ap = @course.account.canvas_authentication_provider
+      ap.self_registration = "none"
+      ap.save!
+      api_call_as_user(@student, :post, @path, @params)
+      expect(response.code).to eq "401"
     end
 
     it 'students can create pairing codes for themselves' do

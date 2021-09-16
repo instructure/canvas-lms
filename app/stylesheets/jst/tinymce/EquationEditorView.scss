@@ -37,8 +37,12 @@
        url(/fonts/Symbola.svg#webfont7MzkO3xs) format("svg");
 }
 
-div.math-dialog > span {
-  padding: 0 !important;
+div.math-dialog {
+  z-index: 10001 !important;
+
+  & > span {
+    padding: 0 !important;
+  }
 }
 
 .mathquill-editor {

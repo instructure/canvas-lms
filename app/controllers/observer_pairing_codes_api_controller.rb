@@ -63,7 +63,7 @@ class ObserverPairingCodesApiController < ApplicationController
   # @returns PairingCode
   def create
     user = api_find(User, params[:user_id])
-    return render_unauthorized_action unless user.has_student_enrollment?
+    return render_unauthorized_action unless user.has_student_enrollment? && @domain_root_account.self_registration?
 
     if authorized_action(user, @current_user, :generate_observer_pairing_code)
       code = user.generate_observer_pairing_code

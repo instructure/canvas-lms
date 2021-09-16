@@ -19,6 +19,7 @@
 import I18n from 'i18n!student_groups'
 import React from 'react'
 import natcompare from '@canvas/util/natcompare'
+import {Button} from '@instructure/ui-buttons'
 
 class Group extends React.Component {
   state = {open: false}
@@ -176,23 +177,23 @@ class Group extends React.Component {
     if (isMember && canSelfSignup) {
       ariaLabel = I18n.t('Leave group %{group_name}', {group_name: groupName})
       membershipAction = (
-        <a href="#" onClick={this._onLeave} aria-label={ariaLabel}>
+        <Button onClick={this._onLeave} aria-label={ariaLabel} size="small" margin="0 auto">
           {I18n.t('Leave')}
-        </a>
+        </Button>
       )
     } else if (!isMember && canSelfSignup && !isFull && isAllowedToJoin && !shouldSwitch) {
       ariaLabel = I18n.t('Join group %{group_name}', {group_name: groupName})
       membershipAction = (
-        <a href="#" onClick={this._onJoin} aria-label={ariaLabel}>
+        <Button onClick={this._onJoin} aria-label={ariaLabel} size="small" margin="0 auto">
           {I18n.t('Join')}
-        </a>
+        </Button>
       )
     } else if (!isMember && canSelfSignup && !isFull && isAllowedToJoin && shouldSwitch) {
       ariaLabel = I18n.t('Switch to group %{group_name}', {group_name: groupName})
       membershipAction = (
-        <a href="#" onClick={this._onJoin} aria-label={ariaLabel}>
+        <Button onClick={this._onJoin} aria-label={ariaLabel} size="small" margin="0 auto">
           {I18n.t('Switch To')}
-        </a>
+        </Button>
       )
     } else if (!isMember) {
       if (isFull) {
@@ -228,7 +229,7 @@ class Group extends React.Component {
         className={`accordion student-groups content-box${showBody ? ' show-body' : ''}`}
         onClick={this.toggleOpen}
       >
-        <div className="student-group-header clearfix">
+        <div className="student-group-header align-items-center clearfix">
           <div ref="groupTitle" className="student-group-title">
             <h2 aria-label={groupName}>
               {this.props.group.name}
@@ -241,7 +242,7 @@ class Group extends React.Component {
             {leaderBadge}
             {I18n.t('student', {count: this.props.group.users.length})}
           </span>
-          <span className="student-group-join">&nbsp;{membershipAction}</span>
+          <span className="student-group-join">{membershipAction}</span>
         </div>
         {body}
       </div>

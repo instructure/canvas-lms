@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Un debat genial"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Una tasca magnífica"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Accediu a l’editor de dades HTML processades"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Text alternatiu"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Una tasca de debat sorprenent"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "S''ha produït un error en llegir el fitxer"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Edita l''equació"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Edita el botó i la icona actuals"
+    },
     "edit_link_7f53bebb": {
         "message": "Edita l''enllaç"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "S''ha produït un error en carregar els elements anteriors"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Un debat fascinant"
     },
     "excused_cf8792eb": {
         "message": "Excusat"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Pantalla completa"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Un qüestionari divertit"
     },
     "generating_preview_45b53be0": {
         "message": "S''està generant la visualització prèvia…"
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completats { items, plural,\n     =1 {element}\n  other {elements}\n}"
     },
+    "join_6cafecca": {
+        "message": "Inscriu-t''hi"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "participa en una reunió en línia activa"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "participa en una reunió en línia"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Salta a la barra d''eines de navegació"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Dreceres del teclat"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Arts lingüístiques"
     },
     "large_9c5e80e7": {
         "message": "Gran"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sembla que no hi ha res aquí"
+    },
+    "math_ede93050": {
+        "message": "Matemàtiques"
     },
     "media_af190855": {
         "message": "Element multimèdia"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Visualització prèvia de la planificació"
     },
+    "science_8d92214a": {
+        "message": "Ciència"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Desplaceu la pantalla cap a dalt per consultar l''historial."
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Petita"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Ciències socials"
     },
     "something_went_wrong_89195131": {
         "message": "Alguna cosa no ha anat bé."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Mida del text"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "La millor tasca"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "La data i l''hora en què venç aquesta tasca pendent"

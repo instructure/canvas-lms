@@ -155,6 +155,7 @@ export default function ComputerPanel({
         </View>
         <View display="block" padding="medium 0 0">
           <TextInput
+            renderLabel={formatMessage('File name')}
             placeholder={formatMessage('File name')}
             value={theFile.title}
             onChange={(e, val) => {

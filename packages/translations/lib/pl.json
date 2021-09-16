@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Bardzo udana dyskusja"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Wspaniałe zadanie"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Uzyskaj dostęp do ulepszonego edytora HTML"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternatywny tekst"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Cudowne zadanie dyskusji"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Wystąpił błąd podczas odczytywania pliku"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Edytuj równanie"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Edytuj istniejący przycisk / ikonę"
+    },
     "edit_link_7f53bebb": {
         "message": "Edytuj łącze"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Błąd podczas wczytywania wcześniejszych elementów"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Ekscytująca dyskusja"
     },
     "excused_cf8792eb": {
         "message": "Usprawiedliwiony"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Pełny ekran"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Fajny test"
     },
     "generating_preview_45b53be0": {
         "message": "Generowanie podglądu..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
     },
+    "join_6cafecca": {
+        "message": "Dołącz"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "Dołącz do aktywnego spotkania online"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "Dołącz do spotkania online"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Przeskocz do paska nawigacji"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Skróty klawiaturowe"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Języki obce"
     },
     "large_9c5e80e7": {
         "message": "Duży"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Wygląda na to, że nic tu nie ma"
+    },
+    "math_ede93050": {
+        "message": "Matematyka"
     },
     "media_af190855": {
         "message": "Multimedia"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Zaplanuj podgląd"
     },
+    "science_8d92214a": {
+        "message": "Przyroda / Biologia"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Przewiń w górę, aby wyświetlić historię!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Mały"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Nauki społeczne"
     },
     "something_went_wrong_89195131": {
         "message": "Coś poszło nie tak."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Rozmiar tekstu"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Najlepsze zadanie"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Minęły już termin i godzina na wykonanie tego zadania"
