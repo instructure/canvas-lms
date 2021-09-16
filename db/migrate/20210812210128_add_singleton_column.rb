@@ -217,8 +217,8 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
   end
 
   def drop_triggers
-    execute("DROP TRIGGER delayed_jobs_before_insert_row_tr ON #{::Delayed::Job.quoted_table_name}")
-    execute("DROP TRIGGER delayed_jobs_after_delete_row_tr ON #{::Delayed::Job.quoted_table_name}")
+    execute("DROP TRIGGER IF EXISTS delayed_jobs_before_insert_row_tr ON #{::Delayed::Job.quoted_table_name}")
+    execute("DROP TRIGGER IF EXISTS delayed_jobs_after_delete_row_tr ON #{::Delayed::Job.quoted_table_name}")
   end
 end
 # rubocop:enable Rails/SquishedSQLHeredocs
