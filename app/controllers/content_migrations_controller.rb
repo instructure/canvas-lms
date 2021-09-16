@@ -127,7 +127,6 @@ class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
   include Api::V1::ExternalTools
   include NewQuizzesFeaturesHelper
-  include K5Mode
 
   before_action :require_context
   before_action :require_auth

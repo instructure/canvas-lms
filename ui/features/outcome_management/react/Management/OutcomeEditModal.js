@@ -243,7 +243,7 @@ OutcomeEditModal.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     displayName: PropTypes.string,
-    contextId: PropTypes.string,
+    contextId: PropTypes.number,
     contextType: PropTypes.string,
     friendlyDescription: PropTypes.shape({
       description: PropTypes.string.isRequired

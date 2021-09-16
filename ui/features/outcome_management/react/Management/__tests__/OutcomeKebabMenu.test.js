@@ -30,8 +30,7 @@ describe('OutcomeKebabMenu', () => {
       {
         menuTitle: groupMenuTitle,
         onMenuHandler: onMenuHandlerMock,
-        canDestroy: true,
-        canEdit: true
+        canDestroy: true
       },
       props
     )
@@ -111,37 +110,12 @@ describe('OutcomeKebabMenu', () => {
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('description')
     })
 
-    it('disables View Description if groupDescription is null', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: null})} />)
-      fireEvent.click(getByText(groupMenuTitle))
-      fireEvent.click(getByText('View Description'))
-      expect(onMenuHandlerMock).not.toHaveBeenCalled()
-    })
-
-    it('disables View Description if groupDescription is an empty string', () => {
+    it('does not call menuHandler if View Description item is disabled', () => {
       const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: ''})} />)
-      fireEvent.click(getByText(groupMenuTitle))
-      fireEvent.click(getByText('View Description'))
-      expect(onMenuHandlerMock).not.toHaveBeenCalled()
-    })
-
-    it('disables View Description if groupDescription is an HTML with only spaces', () => {
-      const {getByText} = render(
-        <OutcomeKebabMenu {...defaultProps({groupDescription: '<div><p>   </p></div>'})} />
-      )
-      fireEvent.click(getByText(groupMenuTitle))
-      fireEvent.click(getByText('View Description'))
-      expect(onMenuHandlerMock).not.toHaveBeenCalled()
-    })
-
-    it('disables View Description if groupDescription is an HTML with only &nbsp;', () => {
-      const {getByText} = render(
-        <OutcomeKebabMenu
-          {...defaultProps({groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>'})}
-        />
-      )
-      fireEvent.click(getByText(groupMenuTitle))
-      fireEvent.click(getByText('View Description'))
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('View Description')
+      fireEvent.click(menuItem)
       expect(onMenuHandlerMock).not.toHaveBeenCalled()
     })
 
@@ -150,15 +124,6 @@ describe('OutcomeKebabMenu', () => {
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
       const menuItem = getByText('Remove')
-      fireEvent.click(menuItem)
-      expect(onMenuHandlerMock).toHaveBeenCalledTimes(0)
-    })
-
-    it('does not call menuHandler if canEdit is false', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({canEdit: false})} />)
-      const menuButton = getByText(groupMenuTitle)
-      fireEvent.click(menuButton)
-      const menuItem = getByText('Edit')
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(0)
     })

@@ -83,7 +83,7 @@ export const IsolatedParent = props => {
           }
         }}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.entryParticipant?.rating}
+        isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
@@ -168,7 +168,7 @@ export const IsolatedParent = props => {
                     postUtilities={
                       <ThreadActions
                         id={props.discussionEntry.id}
-                        isUnread={!props.discussionEntry.entryParticipant?.read}
+                        isUnread={!props.discussionEntry.read}
                         onToggleUnread={props.onToggleUnread}
                         onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
                         onEdit={
@@ -208,8 +208,8 @@ export const IsolatedParent = props => {
                     onCancel={() => setIsEditing(false)}
                     isIsolatedView
                     editor={props.discussionEntry.editor}
-                    isUnread={!props.discussionEntry.entryParticipant?.read}
-                    isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
+                    isUnread={!props.discussionEntry.read}
+                    isForcedRead={props.discussionEntry.forcedReadState}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}

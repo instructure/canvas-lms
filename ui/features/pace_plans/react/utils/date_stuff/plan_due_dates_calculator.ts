@@ -55,7 +55,7 @@ import * as DateHelpers from './date_helpers'
 
 export const getDueDates = (
   pacePlanItems: PacePlanItem[],
-  startDate: string | undefined,
+  startDate: string,
   excludeWeekends: boolean,
   blackoutDates: BlackoutDate[]
 ): PacePlanItemDueDates => {

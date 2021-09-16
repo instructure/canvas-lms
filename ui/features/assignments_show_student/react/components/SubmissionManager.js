@@ -162,7 +162,6 @@ export default class SubmissionManager extends Component {
   state = {
     draftStatus: null,
     editingDraft: false,
-    focusAttemptOnInit: false,
     openSubmitModal: false,
     similarityPledgeChecked: false,
     showConfetti: false,
@@ -196,8 +195,7 @@ export default class SubmissionManager extends Component {
   }
 
   updateActiveSubmissionType = activeSubmissionType => {
-    const focusAttemptOnInit = this.props.assignment.submissionTypes.length > 1
-    this.setState({activeSubmissionType, focusAttemptOnInit})
+    this.setState({activeSubmissionType})
   }
 
   updateEditingDraft = editingDraft => {
@@ -381,7 +379,6 @@ export default class SubmissionManager extends Component {
               assignment={this.props.assignment}
               createSubmissionDraft={createSubmissionDraft}
               editingDraft={this.state.editingDraft}
-              focusAttemptOnInit={this.state.focusAttemptOnInit}
               onContentsChanged={() => {
                 this.setState({draftStatus: 'saving'})
               }}
@@ -603,6 +600,7 @@ export default class SubmissionManager extends Component {
                 !activeTypeMeetsCriteria
               }
               color="primary"
+              margin="auto 0 auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}
             >
               {I18n.t('Submit Assignment')}

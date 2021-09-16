@@ -69,11 +69,6 @@ describe('getBadgesForItem', () => {
     expect(getBadgesForItem(item)).toEqual([])
   })
 
-  it('will supress graded if posted_at is null', () => {
-    const item = {status: {posted_at: null, graded: true}}
-    expect(getBadgesForItem(item)).toEqual([])
-  })
-
   it('prefers excused over graded if both are present', () => {
     const item = {status: {excused: true, graded: true}}
     expect(getBadgesForItem(item)).toEqual([
@@ -85,7 +80,7 @@ describe('getBadgesForItem', () => {
   })
 
   it('allows graded status if not excused', () => {
-    const item = {status: {posted_at: Date.now() - 100000, excused: false, graded: true}}
+    const item = {status: {excused: false, graded: true}}
     expect(getBadgesForItem(item)).toEqual([
       {
         id: 'graded',
@@ -95,7 +90,7 @@ describe('getBadgesForItem', () => {
   })
 
   it('prefers graded over submitted if both are present', () => {
-    const item = {status: {posted_at: Date.now() - 100000, graded: true, submitted: true}}
+    const item = {status: {graded: true, submitted: true}}
     expect(getBadgesForItem(item)).toEqual([
       {
         id: 'graded',

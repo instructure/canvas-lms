@@ -60,8 +60,7 @@ async function makeProps(overrides) {
   const props = {
     ...assignmentAndSubmission,
     createSubmissionDraft: jest.fn().mockResolvedValue({}),
-    updateEditingDraft: jest.fn(),
-    focusOnInit: false
+    updateEditingDraft: jest.fn()
   }
   return props
 }
@@ -95,7 +94,7 @@ describe('UrlEntry', () => {
       expect(getByTestId('url-entry')).toBeInTheDocument()
     })
 
-    it('moves focus to the website url input after render when focusOnInit is true', async () => {
+    it('moves focus to the website url input after render', async () => {
       const props = await makeProps({
         Submission: {
           submissionDraft: {
@@ -107,7 +106,6 @@ describe('UrlEntry', () => {
           }
         }
       })
-      props.focusOnInit = true
       const overrides = {
         ExternalToolConnection: {
           nodes: [{}]
@@ -121,33 +119,6 @@ describe('UrlEntry', () => {
       )
 
       expect(getByTestId('url-input')).toHaveFocus()
-    })
-
-    it('does not move focus to the website url input after render when focusOnInit is false', async () => {
-      const props = await makeProps({
-        Submission: {
-          submissionDraft: {
-            activeSubmissionType: 'online_url',
-            attachments: () => [],
-            body: null,
-            meetsUrlCriteria: false,
-            url: null
-          }
-        }
-      })
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const {getByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <UrlEntry {...props} />
-        </MockedProvider>
-      )
-
-      expect(getByTestId('url-input')).not.toHaveFocus()
     })
 
     it('renders an upload button for each external tool', async () => {

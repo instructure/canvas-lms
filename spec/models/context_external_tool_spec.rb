@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextExternalTool do
   before(:once) do
@@ -345,13 +345,6 @@ describe ContextExternalTool do
 
       context 'and the tool domain contains the protocol' do
         let(:domain) { 'https://www.given-url.com' }
-
-        it { is_expected.to eq true }
-      end
-
-      context 'and the domain and given URL contain a port' do
-        let(:domain) { 'localhost:3001' }
-        let(:given_url) { 'http://localhost:3001/link_location' }
 
         it { is_expected.to eq true }
       end

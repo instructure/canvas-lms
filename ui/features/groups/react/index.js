@@ -35,16 +35,11 @@ import Filter from './Filter'
 import NewGroupDialog from './NewGroupDialog'
 import ManageGroupDialog from './ManageGroupDialog'
 import 'jqueryui/dialog'
-import PropTypes from 'prop-types'
 
 const StudentView = createReactClass({
   displayName: 'StudentView',
   mixins: [BackboneState],
   panelRef: null,
-  propTypes: {
-    enableGroupCreation: PropTypes.bool,
-    enableEveryoneTab: PropTypes.bool
-  },
 
   getInitialState() {
     return {
@@ -239,28 +234,6 @@ const StudentView = createReactClass({
     this.openManageGroupDialog(group)
   },
 
-  renderGroupList(filter, filteredGroups, loading) {
-    return (
-      <>
-        <Filter onChange={e => this.setState({filter: e.target.value})} />
-        <PaginatedGroupList
-          loading={this.state.groupCollection.fetchingNextPage}
-          groups={filteredGroups}
-          filter={filter}
-          loadMore={() => this._loadMore(this.state.groupCollection)}
-          onLeave={this.leave}
-          onJoin={this.join}
-          onManage={this.manage}
-        />
-        {loading && (
-          <div className="spinner-container">
-            <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
-          </div>
-        )}
-      </>
-    )
-  },
-
   render() {
     const filteredGroups = this.state.groupCollection.toJSON().filter(this._filter)
     const {filter, groupCollection} = this.state
@@ -285,38 +258,46 @@ const StudentView = createReactClass({
     return (
       <div>
         <h1 className="screenreader-only">{I18n.t('Groups')}</h1>
-        {this.props.enableEveryoneTab ? (
+        <div
+          id="group_categories_tabs"
+          className="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all"
+        >
+          <ul className="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+            <li className="ui-state-default ui-corner-top">
+              <a href={`/courses/${ENV.course_id}/users`}>{I18n.t('Everyone')}</a>
+            </li>
+            <li className="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
+              <a href="#" tabIndex="-1">
+                {I18n.t('Groups')}
+              </a>
+            </li>
+          </ul>
+          <div className="pull-right group-categories-actions">{newGroupButton}</div>
           <div
-            id="group_categories_tabs"
-            className="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all"
+            className="roster-tab tab-panel"
+            ref={ref => {
+              this.panelRef = ref
+            }}
           >
-            <ul className="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-              <li className="ui-state-default ui-corner-top">
-                <a href={`/courses/${ENV.course_id}/users`}>{I18n.t('Everyone')}</a>
-              </li>
-              <li className="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
-                <a href="#" tabIndex="-1">
-                  {I18n.t('Groups')}
-                </a>
-              </li>
-            </ul>
-            {this.props.enableGroupCreation && newGroupButton && (
-              <div className="pull-right group-categories-actions">{newGroupButton}</div>
-            )}
-            <div
-              className="roster-tab tab-panel"
-              ref={ref => {
-                this.panelRef = ref
-              }}
+            <Filter onChange={e => this.setState({filter: e.target.value})} />
+            <PaginatedGroupList
+              loading={this.state.groupCollection.fetchingNextPage}
+              groups={filteredGroups}
+              filter={filter}
+              loadMore={() => this._loadMore(this.state.groupCollection)}
+              onLeave={this.leave}
+              onJoin={this.join}
+              onManage={this.manage}
             />
-            {this.renderGroupList(filter, filteredGroups, loading)}
+            {loading && (
+              <div className="spinner-container">
+                <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
+              </div>
+            )}
           </div>
-        ) : (
-          this.renderGroupList(filter, filteredGroups, loading)
-        )}
+        </div>
       </div>
     )
   }
 })
-
-export default StudentView
+export default <StudentView />

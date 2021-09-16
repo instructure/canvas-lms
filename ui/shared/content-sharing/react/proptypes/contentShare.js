@@ -22,7 +22,6 @@ import contentExport from './contentExport'
 
 export const CONTENT_SHARE_TYPES = [
   'assignment',
-  'attachment',
   'discussion_topic',
   'page',
   'quiz',

@@ -22,7 +22,6 @@ import ReceivedTable from '../ReceivedTable'
 import {
   mockShare,
   assignmentShare,
-  attachmentShare,
   readDiscussionShare,
   unreadDiscussionShare
 } from './test-utils'
@@ -45,16 +44,6 @@ describe('content shares table', () => {
     expect(getByText(assignmentShare.sender.display_name)).toBeInTheDocument()
     expect(getAllByText(/2019/)[0]).toBeInTheDocument()
     expect(getByText(/manage options/i)).toBeInTheDocument()
-  })
-
-  it('renders attachment shares', () => {
-    const {getByText} = render(<ReceivedTable shares={[attachmentShare]} />)
-    expect(getByText(attachmentShare.name)).toBeInTheDocument()
-  })
-
-  it('renders attachment shares as a "File" type', () => {
-    const {getByText} = render(<ReceivedTable shares={[attachmentShare]} />)
-    expect(getByText('File')).toBeInTheDocument()
   })
 
   it('renders multiple rows of share data', () => {

@@ -31,7 +31,8 @@ export interface BlackoutDate {
 export type CourseExternalToolStatus = 'OFF' | 'ON' | 'HIDE'
 
 export interface Course {
-  readonly id: string
+  // These are the only types we really need
+  readonly id: number
   readonly name: string
   readonly start_at: string
   readonly end_at: string

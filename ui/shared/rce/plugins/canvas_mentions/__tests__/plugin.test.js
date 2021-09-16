@@ -136,7 +136,7 @@ describe('pluginDefinition', () => {
     })
   })
 
-  function sharedExamplesForEventHandlers(subject, markerContent = 'wes') {
+  function sharedExamplesForEventHandlers(subject) {
     it('makes the body contenteditable', () => {
       subject()
       expect(editor.getBody().getAttribute('contenteditable')).toEqual('true')
@@ -144,12 +144,12 @@ describe('pluginDefinition', () => {
 
     it('removes contenteditable from the marker span', () => {
       subject()
-      expect(screen.getByText(markerContent).getAttribute('contenteditable')).toBeNull()
+      expect(screen.getByText('wes').getAttribute('contenteditable')).toBeNull()
     })
 
     it('removes the ID from the marker span', () => {
       subject()
-      expect(screen.getByText(markerContent).id).toEqual('')
+      expect(screen.getByText('wes').id).toEqual('')
     })
   }
 
@@ -164,7 +164,8 @@ describe('pluginDefinition', () => {
       insertionContent = '<h1>Hello!</h1>'
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
           <span id="mention-menu"></span>
         </div>`
@@ -194,7 +195,8 @@ describe('pluginDefinition', () => {
     beforeEach(() => {
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
         </div>`
       )
@@ -243,7 +245,8 @@ describe('pluginDefinition', () => {
       preventDefault = jest.fn()
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
         </div>`
@@ -314,19 +317,20 @@ describe('pluginDefinition', () => {
         })
       })
 
-      describe('with the key down for an "enter"', () => {
+      describe('whith the key down for an "enter"', () => {
         beforeEach(() => {
           which = 13
           editor.setContent(
             `<div data-testid="fake-body" contenteditable="false">
-              <span id="test"> @<span id="mentions-marker" contenteditable="true" aria-activedescendant="test" data-userid="123" data-displayname="Test">wes</span>
+              <span id="test"> @
+                <span id="mentions-marker" contenteditable="true" aria-activedescendant="test" data-userid="123" data-displayname="Test">wes</span>
                 <span id="mention-menu"></span>
               </span>
             </div>`
           )
         })
 
-        sharedExamplesForEventHandlers(subject, '@wes')
+        sharedExamplesForEventHandlers(subject)
       })
     })
   })
@@ -340,7 +344,8 @@ describe('pluginDefinition', () => {
       target = {id: ''}
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
         </div>`
@@ -373,7 +378,8 @@ describe('pluginDefinition', () => {
     beforeEach(() => {
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
         </div>`
@@ -390,7 +396,8 @@ describe('pluginDefinition', () => {
     beforeEach(() => {
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
-          <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
         </div>`

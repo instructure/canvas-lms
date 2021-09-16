@@ -19,11 +19,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require_relative '../helpers/k5_common'
 
 describe ContentMigrationsController do
-  include K5Common
-
   context 'course' do
     before(:once) do
       course_factory active_all: true
@@ -35,30 +32,12 @@ describe ContentMigrationsController do
       migration
     end
 
-    describe '#index' do
-      before :each do
-        user_session(@teacher)
-      end
-
-      it 'exports quizzes_next environment' do
-        get :index, params: {course_id: @course.id}
-        expect(response).to be_successful
-        expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be(nil)
-        expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be(nil)
-      end
-
-      it 'loads classic theming in a classic course' do
-        get :index, params: {course_id: @course.id}
-        expect(assigns(:css_bundles)).to be_nil
-        expect(assigns(:js_bundles)).to be_nil
-      end
-
-      it 'loads k5 theming in a k5 course' do
-        toggle_k5_setting(@course.account)
-        get :index, params: {course_id: @course.id}
-        expect(assigns(:css_bundles).flatten).to include(:k5_theme)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
-      end
+    it 'index exports quizzes_next environment' do
+      user_session(@teacher)
+      get :index, params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be(nil)
+      expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be(nil)
     end
 
     describe '#show' do

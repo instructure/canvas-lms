@@ -30,13 +30,10 @@ import {
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
-import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
-const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupDescription}) => {
+const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescription}) => {
   const isGroup = groupDescription !== undefined
-  const hasDescription =
-    typeof groupDescription === 'string' &&
-    stripHtmlTags(groupDescription).replace(/[\n\r\t\s(&nbsp;)]+/g, '')
+  const hasDescription = groupDescription !== ''
   return (
     <Menu
       trigger={
@@ -46,7 +43,7 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupD
       }
       onSelect={onMenuHandler}
     >
-      <Menu.Item disabled={!canEdit} value="edit">
+      <Menu.Item value="edit">
         <IconEditLine size="x-small" />
         <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-edit">
           {I18n.t('Edit')}
@@ -79,13 +76,11 @@ OutcomeKebabMenu.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
   menuTitle: PropTypes.string,
   canDestroy: PropTypes.bool.isRequired,
-  groupDescription: PropTypes.string,
-  canEdit: PropTypes.bool
+  groupDescription: PropTypes.string
 }
 
 OutcomeKebabMenu.defaultProps = {
-  menuTitle: '',
-  canEdit: true
+  menuTitle: ''
 }
 
 export default OutcomeKebabMenu

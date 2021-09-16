@@ -17,8 +17,6 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!pace_plans_module'
-
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,13 +28,11 @@ import {View} from '@instructure/ui-view'
 
 import AssignmentRow, {ColumnWrapper, COLUMN_WIDTHS} from './assignment_row'
 import {Module as IModule, PacePlan} from '../../types'
-import SlideTransition from '../../utils/slide_transition'
 
 interface PassedProps {
-  readonly index: number
   readonly module: IModule
+  readonly index: number
   readonly pacePlan: PacePlan
-  readonly showProjections: boolean
 }
 
 interface LocalState {
@@ -54,7 +50,7 @@ export class Module extends React.Component<PassedProps, LocalState> {
     if (this.props.pacePlan.hard_end_dates && this.props.pacePlan.context_type === 'Enrollment') {
       return null
     } else {
-      return <Text weight="bold">{I18n.t('Days')}</Text>
+      return <Text weight="bold">Days</Text>
     }
   }
 
@@ -63,19 +59,11 @@ export class Module extends React.Component<PassedProps, LocalState> {
       return (
         <Flex alignItems="end">
           <ColumnWrapper width={COLUMN_WIDTHS.DURATION}>{this.renderDaysText()}</ColumnWrapper>
-          <SlideTransition
-            direction="horizontal"
-            expanded={this.props.showProjections}
-            size={COLUMN_WIDTHS.DATE}
-          >
-            <Text weight="bold">
-              <ColumnWrapper height="18px" width={COLUMN_WIDTHS.DATE}>
-                {I18n.t('Due Date')}
-              </ColumnWrapper>
-            </Text>
-          </SlideTransition>
+          <ColumnWrapper width={COLUMN_WIDTHS.DATE}>
+            <Text weight="bold">Due Date</Text>
+          </ColumnWrapper>
           <ColumnWrapper width={COLUMN_WIDTHS.STATUS}>
-            <Text weight="bold">{I18n.t('Status')}</Text>
+            <Text weight="bold">Status</Text>
           </ColumnWrapper>
         </Flex>
       )
@@ -104,7 +92,7 @@ export class Module extends React.Component<PassedProps, LocalState> {
     })
 
     return (
-      <View margin="0 0 medium">
+      <View margin="medium 0 0">
         <ApplyTheme
           theme={{
             [(Button as any).theme]: {

@@ -87,13 +87,14 @@ describe SisImportsApiController, type: :request do
 
   it 'should kick off a sis import via multipart attachment' do
     json = nil
+    expect {
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s },
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
-    expect(Delayed::Job.where(singleton: "sis_batch:account:#{@account.id}").count).to eq 1
+    }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(1)
 
     expect(json.has_key?("created_at")).to be_truthy
     json.delete("created_at")

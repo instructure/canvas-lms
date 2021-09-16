@@ -35,9 +35,9 @@ const OutcomeMoveModal = ({
   onCloseHandler,
   onCleanupHandler,
   onSuccess,
-  initialTargetGroup
+  rootGroup
 }) => {
-  const [targetGroup, setTargetGroup] = useState(initialTargetGroup)
+  const [targetGroup, setTargetGroup] = useState(rootGroup)
   const [targetAncestorsIds, setTargetAncestorsIds] = useState([])
   const count = Object.keys(outcomes).length
   const outcomeTitle = Object.values(outcomes)[0]?.title
@@ -145,12 +145,12 @@ const OutcomeMoveModal = ({
             )}
           </Text>
           <TargetGroupSelector
-            // eslint-disable-next-line @typescript-eslint/no-shadow
+            modalName="outcomeMoveModal"
+            // eslint-disable-next-line no-shadow
             setTargetGroup={({targetGroup, targetAncestorsIds}) => {
               setTargetGroup(targetGroup)
               setTargetAncestorsIds(targetAncestorsIds)
             }}
-            starterGroupId={initialTargetGroup.id}
           />
         </View>
       </Modal.Body>
@@ -177,10 +177,7 @@ OutcomeMoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
-  initialTargetGroup: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired,
+  rootGroup: PropTypes.object.isRequired,
   onSuccess: PropTypes.func
 }
 

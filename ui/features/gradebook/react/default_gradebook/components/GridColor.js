@@ -32,11 +32,7 @@ function GridColor(props) {
     )
     .join('')
 
-  return (
-    <style type="text/css" data-testid="grid-color">
-      {styleRules}
-    </style>
-  )
+  return <style type="text/css">{styleRules}</style>
 }
 
 GridColor.propTypes = {

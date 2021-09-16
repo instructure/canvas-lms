@@ -59,10 +59,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {
-  ObserverListShape,
-  defaultSelectedObserverId
-} from '@canvas/k5/react/ObserverOptions'
+import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
 
 const DASHBOARD_TABS = [
   {
@@ -155,7 +152,7 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(defaultSelectedObserverId)
+  const [observedUserId, setObservedUserId] = useState(null)
   const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -165,8 +162,7 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
-  const observerMode =
-    parentSupportEnabled && currentUserRoles.includes('observer') && observedUserId
+  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
@@ -192,8 +188,8 @@ export const K5Dashboard = ({
 
   useEffect(() => {
     if (!cards) {
-      loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
-    } else if (observerMode) {
+      loadCardDashboard(loadCardDashboardCallBack)
+    } else if (observedUserId && observerMode) {
       const cachedCards = observedUsersCards[observedUserId]
       if (cachedCards) {
         setCards(cachedCards) // Using cards from state if the selected user has been requested already
@@ -292,7 +288,7 @@ export const K5Dashboard = ({
     <>
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
-          {parentSupportEnabled && currentUserRoles.includes('observer') && (
+          {parentSupportEnabled && (
             <View as="div" maxWidth="16em">
               <ObserverOptions
                 observerList={observerList}
@@ -345,8 +341,6 @@ export const K5Dashboard = ({
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
               currentUserRoles={currentUserRoles}
-              observedUserId={observedUserId}
-              currentUser={currentUser}
             />
             {cards && (
               <ResourcesPage

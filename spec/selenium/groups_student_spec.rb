@@ -181,25 +181,23 @@ describe "student groups" do
       it "leaving a group should decrement student count", priority: "1", test_id: 180678 do
         expect(f(".student-group-students")).to include_text("1 student")
 
-        find_button("Leave").click
+        f(".student-group-join a").click
 
         expect(f(".student-group-students")).to include_text("0 students")
-        expect(find_button("Join")).to be_displayed
+        expect(f(".student-group-join a")).to include_text("JOIN")
       end
 
       it "student should be able to leave a group and rejoin", priority: "1", test_id: 180679 do
         # verify that you are in the group
-        leave_button = find_button("Leave")
-        expect(leave_button).to be_displayed
+        expect(f(".student-group-join a")).to include_text("LEAVE")
 
         # leave group and verify leaving
-        leave_button.click
-        join_button = find_button("Join")
-        expect(join_button).to be_displayed
+        f(".student-group-join a").click
+        expect(f(".student-group-join a")).to include_text("JOIN")
 
         # rejoin group
-        join_button.click
-        expect(find_button("Leave")).to be_displayed
+        f(".student-group-join a").click
+        expect(f(".student-group-join a")).to include_text("LEAVE")
       end
 
       it "should visit the group", priority: "1", test_id: 180680 do
@@ -223,8 +221,8 @@ describe "student groups" do
         get "/courses/#{@course.id}/groups"
 
         # join group
-        find_button("Join").click
-        expect(find_button("Leave")).to be_displayed
+        f(".student-group-join a").click
+        expect(f(".student-group-join a")).to include_text("LEAVE")
       end
     end
 

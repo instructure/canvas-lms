@@ -29,7 +29,6 @@ const saveDraftDelayMS = 1000
 export default class TextEntry extends React.Component {
   static propTypes = {
     createSubmissionDraft: func,
-    focusOnInit: bool.isRequired,
     onContentsChanged: func,
     submission: Submission.shape,
     readOnly: bool
@@ -97,7 +96,7 @@ export default class TextEntry extends React.Component {
       this._tinyeditor.setContent(body)
       this._lastSavedContent = body
 
-      if (this.props.focusOnInit && !this.props.readOnly) {
+      if (!this.props.readOnly) {
         this._rceRef.current.focus()
       }
     }
@@ -158,7 +157,7 @@ export default class TextEntry extends React.Component {
     tinyeditor.setContent(draftBody)
     this._lastSavedContent = draftBody
 
-    if (this.props.focusOnInit && !this.props.readOnly) {
+    if (!this.props.readOnly) {
       this._rceRef.current.focus()
     }
     this._isInitted = true

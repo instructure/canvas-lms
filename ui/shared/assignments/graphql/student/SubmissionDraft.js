@@ -28,7 +28,7 @@ export const SubmissionDraft = {
       attachments {
         ...SubmissionDraftFile
       }
-      body(rewriteUrls: false)
+      body
       mediaObject {
         ...MediaObject
       }

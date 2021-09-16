@@ -24,7 +24,6 @@ module Api::V1::ContentShare
   # map content export selected-content collection to API-visible content type
   EXPORT_TYPES = {
     'assignments' => 'assignment',
-    'attachments' => 'attachment',
     'discussion_topics' => 'discussion_topic',
     'wiki_pages' => 'page',
     'quizzes' => 'quiz',

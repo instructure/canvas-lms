@@ -19,7 +19,8 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {Popover} from '@instructure/ui-popover'
@@ -56,8 +57,8 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
         shouldReturnFocus
       >
         <Popover.Trigger>
-          <Button
-            variant="link"
+          <Link
+            isWithinText={false}
             size="medium"
             interaction={outcomeCount > 0 ? 'enabled' : 'disabled'}
           >
@@ -70,7 +71,7 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
                 count: outcomeCount
               }
             )}
-          </Button>
+          </Link>
         </Popover.Trigger>
         <Popover.Content>
           <View padding="small" display="block" as="div">
@@ -105,9 +106,9 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
             </View>
           </View>
           <View as="div" padding="small" borderWidth="small 0 0">
-            <Button variant="link" size="medium" onClick={closeAndClear}>
+            <Link isWithinText={false} size="medium" interaction="enabled" onClick={closeAndClear}>
               {I18n.t('Clear all')}
-            </Button>
+            </Link>
           </View>
         </Popover.Content>
       </Popover>

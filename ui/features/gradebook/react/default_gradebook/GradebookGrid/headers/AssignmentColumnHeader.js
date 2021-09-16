@@ -387,9 +387,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </Menu.Group>
         </Menu>
 
-        <Menu.Item href={speedGraderUrl(this.props.assignment)} target="_blank">
-          {I18n.t('SpeedGrader')}
-        </Menu.Item>
+        <Menu.Item href={speedGraderUrl(this.props.assignment)}>{I18n.t('SpeedGrader')}</Menu.Item>
 
         <Menu.Item
           disabled={!this.props.submissionsLoaded || this.props.assignment.anonymizeStudents}

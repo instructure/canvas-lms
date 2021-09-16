@@ -47,16 +47,15 @@ export default function CourseNotificationSettingsQuery(props) {
   return (
     <CourseNotificationSettingsManager
       courseId={props.courseId}
-      userId={props.userId}
-      courseName={props.courseName || data?.courseLegacyNode?.name || I18n.t('Course')}
-      enabled={data?.userLegacyNode?.notificationPreferencesEnabled}
-      notificationPreferences={data?.userLegacyNode?.notificationPreferences}
+      courseName={props.courseName}
+      enabled={data?.legacyNode?.notificationPreferencesEnabled}
+      notificationPreferences={data?.legacyNode?.notificationPreferences}
     />
   )
 }
 
 CourseNotificationSettingsQuery.propTypes = {
   courseId: string.isRequired,
-  courseName: string,
+  courseName: string.isRequired,
   userId: string.isRequired
 }

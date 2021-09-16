@@ -19,8 +19,7 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import GenericErrorPage from '../index'
-import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, fireEvent} from '@testing-library/react'
 import moxios from 'moxios'
 
 beforeEach(() => {
@@ -43,28 +42,14 @@ describe('GenericErrorPage component', () => {
     expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
-  test('show input fields when report issue button is clicked', () => {
+  test('show the comment box when feedback button is clicked', () => {
     const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
-    userEvent.click(getByText('Report Issue'))
-    expect(getByText('What happened?')).toBeInTheDocument()
-    expect(getByText('Your Email Address')).toBeInTheDocument()
-  })
-
-  test('disables the submit button if email address is empty', () => {
-    const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
-    userEvent.click(getByText('Report Issue'))
-    expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
-  })
-
-  it('enables the submit button if email address is provided', () => {
-    const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...defaultProps()} />)
-    userEvent.click(getByText('Report Issue'))
-    userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
+    fireEvent.click(getByText('Report Issue'))
+    expect(getByText('Email Address (Optional)')).toBeInTheDocument()
   })
 
   test('show the submitted text when comment is submitted', done => {
-    const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...defaultProps()} />)
+    const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
     moxios.stubRequest('/error_reports', {
       status: 200,
       response: {
@@ -72,9 +57,8 @@ describe('GenericErrorPage component', () => {
         id: '7'
       }
     })
-    userEvent.click(getByText('Report Issue'))
-    userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    userEvent.click(getByText('Submit'))
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
     moxios.wait(() => {
       expect(getByText('Comment submitted!')).toBeInTheDocument()
       done()
@@ -82,12 +66,9 @@ describe('GenericErrorPage component', () => {
   })
 
   test('show the loading indicator when comment is submitted', () => {
-    const {getByText, getByTitle, getByPlaceholderText} = render(
-      <GenericErrorPage {...defaultProps()} />
-    )
-    userEvent.click(getByText('Report Issue'))
-    userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    userEvent.click(getByText('Submit'))
+    const {getByText, getByTitle} = render(<GenericErrorPage {...defaultProps()} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
@@ -101,10 +82,9 @@ describe('GenericErrorPage component', () => {
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
-    const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...modifiedProps} />)
-    userEvent.click(getByText('Report Issue'))
-    userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    userEvent.click(getByText('Submit'))
+    const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
@@ -124,10 +104,9 @@ describe('GenericErrorPage component', () => {
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
-    const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...modifiedProps} />)
-    userEvent.click(getByText('Report Issue'))
-    userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    userEvent.click(getByText('Submit'))
+    const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)

@@ -20,7 +20,6 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ShowFolder from '../ShowFolder'
 import sinon from 'sinon'
-import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import {merge} from 'lodash'
 
@@ -34,29 +33,21 @@ const defaultProps = (props = {}) => {
     {
       filesDirectoryRef: ref,
       currentFolder: folder,
-      externalToolsForContext: [],
       params: {},
       areAllItemsSelected: () => {},
       query: {},
-      modalOptions: {},
       pathname: '/',
-      previewItem: () => {},
-      toggleItemSelected: () => {},
-      userCanAddFilesForContext: true,
-      userCanEditFilesForContext: true,
-      userCanRestrictFilesForContext: true
+      userCanAddFilesForContext: true
     },
     props
   )
 }
 
 describe('ShowFolder', () => {
-  let oldEnv, sandbox
+  let sandbox
 
   beforeEach(() => {
-    oldEnv = window.ENV
     window.ENV = {
-      COURSE_ID: '101',
       FEATURES: {
         files_dnd: true
       }
@@ -67,7 +58,7 @@ describe('ShowFolder', () => {
 
   afterEach(() => {
     sandbox.restore()
-    window.ENV = oldEnv
+    window.ENV = {}
   })
 
   it('renders the FileUpload component if userCanAddFilesForContext is true', () => {
@@ -93,27 +84,5 @@ describe('ShowFolder', () => {
     sandbox.stub(props.currentFolder, 'isEmpty').returns(false)
     const {queryByText} = render(<ShowFolder {...props} />)
     expect(queryByText('This folder is empty')).not.toBeInTheDocument()
-  })
-
-  describe('Send To file menu item', () => {
-    test('renders a modal for sending the file, when clicked', () => {
-      const props = {...defaultProps()}
-      props.currentFolder.files = new FilesCollection([{id: '1'}])
-      props.currentFolder.files.loadedAll = true
-      const {queryByRole} = render(<ShowFolder {...props} />)
-      queryByRole('menuitem', {hidden: true, name: 'Send To...'}).click()
-      expect(queryByRole('dialog', {name: 'Send To...'})).toBeInTheDocument()
-    })
-  })
-
-  describe('Copy To file menu item', () => {
-    test('renders a modal for sending the file, when clicked', async () => {
-      const props = {...defaultProps()}
-      props.currentFolder.files = new FilesCollection([{id: '1'}])
-      props.currentFolder.files.loadedAll = true
-      const {queryByRole} = render(<ShowFolder {...props} />)
-      queryByRole('menuitem', {hidden: true, name: 'Copy To...'}).click()
-      expect(queryByRole('dialog', {name: 'Copy To...'})).toBeInTheDocument()
-    })
   })
 })

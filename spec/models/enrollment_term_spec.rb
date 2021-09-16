@@ -90,7 +90,7 @@ describe EnrollmentTerm do
     term = @account.default_enrollment_term
 
     translations = {
-      :'en-BACKW' => {
+      test_locale: {
         account: {
           default_term_name: "mreT tluafeD"
         }
@@ -98,7 +98,7 @@ describe EnrollmentTerm do
     }
 
     I18n.backend.stub(translations) do
-      I18n.locale = 'en-BACKW'
+      I18n.locale = :test_locale
 
       expect(term.name).to eq "mreT tluafeD"
       expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME

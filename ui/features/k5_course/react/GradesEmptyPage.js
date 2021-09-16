@@ -28,10 +28,10 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import EmptyGradesUrl from '../images/empty-grades.svg'
 
-const GradesEmptyPage = ({userIsCourseAdmin, courseId, courseName}) => (
+const GradesEmptyPage = ({userIsInstructor, courseId, courseName}) => (
   <Flex direction="column" alignItems="center" margin="x-large large">
     <Img src={EmptyGradesUrl} margin="0 0 medium 0" data-testid="empty-grades-panda" />
-    {userIsCourseAdmin ? (
+    {userIsInstructor ? (
       <>
         <Text size="large">{I18n.t('Students see their grades here.')}</Text>
         <Button href={`/courses/${courseId}/gradebook`} margin="small 0 0 0">
@@ -47,7 +47,7 @@ const GradesEmptyPage = ({userIsCourseAdmin, courseId, courseName}) => (
 )
 
 GradesEmptyPage.propTypes = {
-  userIsCourseAdmin: PropTypes.bool.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired,
   courseId: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired
 }

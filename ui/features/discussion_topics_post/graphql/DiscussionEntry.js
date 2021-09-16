@@ -33,12 +33,10 @@ export const DiscussionEntry = {
       message
       ratingCount
       ratingSum
+      rating
+      read
+      forcedReadState
       subentriesCount
-      entryParticipant {
-        rating
-        read
-        forcedReadState
-      }
       rootEntryParticipantCounts {
         unreadCount
         repliesCount
@@ -76,14 +74,12 @@ export const DiscussionEntry = {
     message: string,
     ratingCount: number,
     ratingSum: number,
+    rating: bool,
+    read: bool,
+    forcedReadState: bool,
     subentriesCount: number,
     author: User.shape,
     editor: User.shape,
-    entryParticipant: shape({
-      rating: bool,
-      read: bool,
-      forcedReadState: bool
-    }),
     rootEntryParticipantCounts: shape({
       unreadCount: number,
       repliesCount: number
@@ -117,15 +113,12 @@ export const DiscussionEntry = {
     message = '<p>This is the parent reply</p>',
     ratingCount = null,
     ratingSum = null,
+    rating = false,
+    read = true,
+    forcedReadState = false,
     subentriesCount = 2,
     author = User.mock(),
     editor = User.mock(),
-    entryParticipant = {
-      rating: false,
-      read: true,
-      forcedReadState: false,
-      __typename: 'EntryParticipant'
-    },
     rootEntryParticipantCounts = {
       unreadCount: 1,
       repliesCount: 1,
@@ -154,10 +147,12 @@ export const DiscussionEntry = {
     message,
     ratingCount,
     ratingSum,
+    rating,
+    read,
+    forcedReadState,
     subentriesCount,
     author,
     editor,
-    entryParticipant,
     rootEntryParticipantCounts,
     lastReply,
     permissions,
@@ -179,11 +174,8 @@ export const DefaultMocks = {
     message: 'Howdy Partner, this is a message!',
     ratingCount: 5,
     ratingSum: 5,
-    entryParticipant: {
-      rating: true,
-      read: true,
-      forcedReadState: false
-    },
+    rating: true,
+    read: true,
     subentriesCount: 5,
     lastReply: {
       createdAt: '2021-03-25T13:22:24-06:00'

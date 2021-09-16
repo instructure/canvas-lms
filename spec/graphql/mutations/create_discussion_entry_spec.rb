@@ -47,7 +47,9 @@ RSpec.describe Mutations::CreateDiscussionEntry do
           discussionEntry {
             _id
             message
-            parentId
+            parent {
+              _id
+            }
             attachment {
               _id
             }
@@ -91,7 +93,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     entry = @topic.discussion_entries.last
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', '_id')).to eq entry.id.to_s
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
-    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parentId')).to eq parent_entry.id.to_s
+    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parent', '_id')).to eq parent_entry.id.to_s
   end
 
   it 'replies to an existing discussion child entry' do
@@ -104,7 +106,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     entry = @topic.discussion_entries.last
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', '_id')).to eq entry.id.to_s
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
-    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parentId')).to eq parent_entry.id.to_s
+    expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'parent', '_id')).to eq parent_entry.id.to_s
     expect(entry.root_entry_id).to eq root_entry.id
     expect(entry.include_reply_preview?).to be false
   end

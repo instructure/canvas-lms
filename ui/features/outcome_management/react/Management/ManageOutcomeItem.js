@@ -36,17 +36,14 @@ const ManageOutcomeItem = ({
   title,
   description,
   friendlyDescription,
-  outcomeContextType,
-  outcomeContextId,
   canManageOutcome,
   isChecked,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
 }) => {
-  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
-  const [truncated, setTruncated] = useState(true)
-  const onClickHandler = () => setTruncated(prevState => !prevState)
+  const [truncate, setTruncate] = useState(true)
+  const onClickHandler = () => setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
 
@@ -54,8 +51,6 @@ const ManageOutcomeItem = ({
   // within a course. See OUT-1415, OUT-1511
   const {canManage, isAdmin, isCourse} = useCanvasContext()
   const allowAdminEdit = isCourse && canManage && isAdmin
-  const canEdit =
-    friendlyDescriptionFF || (outcomeContextType === contextType && outcomeContextId === contextId)
 
   if (!title) return null
 
@@ -84,7 +79,7 @@ const ManageOutcomeItem = ({
                 <IconButton
                   size="small"
                   screenReaderLabel={
-                    truncated
+                    truncate
                       ? I18n.t('Expand outcome description')
                       : I18n.t('Collapse outcome description')
                   }
@@ -94,7 +89,7 @@ const ManageOutcomeItem = ({
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
-                    {truncated ? (
+                    {truncate ? (
                       <IconArrowOpenEndLine data-testid="icon-arrow-right" />
                     ) : (
                       <IconArrowOpenDownLine data-testid="icon-arrow-down" />
@@ -116,7 +111,6 @@ const ManageOutcomeItem = ({
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}
-              canEdit={canEdit}
               menuTitle={I18n.t('Outcome Menu')}
               onMenuHandler={onMenuHandlerWrapper}
             />
@@ -129,9 +123,11 @@ const ManageOutcomeItem = ({
           {(description || friendlyDescription) && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
+                withExternalControl
                 description={description}
+                truncate={truncate}
+                onClickHandler={onClickHandler}
                 friendlyDescription={friendlyDescription}
-                truncated={truncated}
               />
             </View>
           )}
@@ -146,8 +142,6 @@ ManageOutcomeItem.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   friendlyDescription: PropTypes.string,
-  outcomeContextType: PropTypes.string,
-  outcomeContextId: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,

@@ -642,10 +642,9 @@ class ContextExternalTool < ActiveRecord::Base
     return false if domain.blank?
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).normalize.host rescue nil
-    port = Addressable::URI.parse(url).normalize.port rescue nil
     d = domain.downcase.gsub(/http[s]?\:\/\//, '')
-    !!(host && ('.' + host + (port ? ":#{port}" : '')).match(/\.#{d}\z/))
-  end
+    !!(host && ('.' + host).match(/\.#{d}\z/))
+end
 
   def matches_domain?(url)
     url = ContextExternalTool.standardize_url(url)

@@ -295,28 +295,19 @@ module CanvasSanitize #:nodoc:
       }.freeze,
       css: {
         properties: ([
-          'align-content', 'align-items', 'align-self',
           'background', 'border', 'border-radius', 'clear', 'clip', 'color',
-          'column-gap', 'cursor', 'direction', 'display', 'flex',
-          'flex-basis', 'flex-direction', 'flex-flow',
-          'flex-grow', 'flex-shrink', 'flex-wrap','float',
-          'font', 'gap', 'grid', 'height',
-          'justify-content', 'justify-items', 'justify-self', 'left',
-          'line-height', 'list-style', 'margin', 'max-height',
+          'cursor', 'direction', 'display', 'flex', 'float',
+          'font', 'grid', 'height', 'left', 'line-height',
+          'list-style', 'margin', 'max-height',
           'max-width', 'min-height', 'min-width',
-          'order', 'overflow', 'overflow-x', 'overflow-y',
-          'padding', 'position', 'place-content',
-          'place-items', 'place-self', 'right', 'row-gap',
+          'overflow', 'overflow-x', 'overflow-y',
+          'padding', 'position', 'right',
           'text-align', 'table-layout',
           'text-decoration', 'text-indent',
           'top', 'vertical-align',
           'visibility', 'white-space', 'width',
           'z-index', 'zoom'
         ] +
-        %w{area auto-columns auto-flow auto-rows column gap row template}.map { |i| "grid-#{i}"} +
-        %w{areas columns rows}.map { |i| "grid-template-#{i}"} +
-        %w{end gap start}.map { |i| "grid-column-#{i}"} +
-        %w{end gap start}.map { |i| "grid-row-#{i}"} +
         %w{attachment color image position repeat}.map { |i| "background-#{i}"} +
         %w{x y}.map { |i| "background-position-#{i}" } +
         %w{bottom collapse color left right spacing style top width}.map { |i| "border-#{i}" } +

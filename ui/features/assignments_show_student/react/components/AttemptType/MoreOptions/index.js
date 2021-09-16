@@ -33,7 +33,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TakePhotoUrl from '../../../../images/TakePhoto.svg'
 import {Text} from '@instructure/ui-text'
 import WebcamCapture from './WebcamCapture'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import {View} from '@instructure/ui-view'
 
@@ -287,14 +286,7 @@ function WebcamPhotoUpload({onPhotoTaken}) {
   )
 }
 
-function MoreOptions({
-  assignmentID,
-  breakpoints,
-  courseID,
-  handleCanvasFiles,
-  handleWebcamPhotoUpload,
-  userID
-}) {
+function MoreOptions({assignmentID, courseID, handleCanvasFiles, handleWebcamPhotoUpload, userID}) {
   const {loading, error, data} = useQuery(EXTERNAL_TOOLS_QUERY, {
     variables: {courseID}
   })
@@ -324,22 +316,20 @@ function MoreOptions({
       assignmentID
     )}`
 
-  const itemMargin = breakpoints.desktopOnly ? '0 x-small' : 'xx-small xxx-small'
-
   return (
     <Flex direction="row" justifyItems="center" wrap="wrap">
       {handleWebcamPhotoUpload && (
-        <Flex.Item margin={itemMargin}>
+        <Flex.Item margin="0 x-small">
           <WebcamPhotoUpload onPhotoTaken={handleWebcamPhotoUpload} />
         </Flex.Item>
       )}
       {handleCanvasFiles && (
-        <Flex.Item margin={itemMargin}>
+        <Flex.Item margin="0 x-small">
           <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
         </Flex.Item>
       )}
       {externalTools.map(tool => (
-        <Flex.Item key={tool._id} margin={itemMargin}>
+        <Flex.Item key={tool._id} margin="0 x-small">
           <ExternalTool launchUrl={buildLaunchUrl(tool)} tool={tool} />
         </Flex.Item>
       ))}
@@ -349,11 +339,10 @@ function MoreOptions({
 
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
-  breakpoints: breakpointsShape,
   courseID: string.isRequired,
   handleCanvasFiles: func,
   handleWebcamPhotoUpload: func,
   userID: string
 }
 
-export default WithBreakpoints(MoreOptions)
+export default MoreOptions

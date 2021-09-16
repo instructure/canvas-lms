@@ -48,7 +48,7 @@ const GradeDetails = ({
   showTotals,
   currentUser,
   loadingGradingPeriods,
-  userIsCourseAdmin
+  userIsInstructor
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -56,17 +56,11 @@ const GradeDetails = ({
   const [totalGrade, setTotalGrade] = useState(null)
   const [assignmentGroupTotals, setAssignmentGroupTotals] = useState(null)
   const [grades, setGrades] = useState([])
-  const [mqList] = useState(() => window.matchMedia('(max-width: 767px)')) // keep in sync with k5_theme.scss
-  const [isStacked, setIsStacked] = useState(mqList.matches)
 
   const gradingPeriodParam = {}
   if (selectedGradingPeriodId) {
     gradingPeriodParam.grading_period_id = selectedGradingPeriodId
   }
-
-  useEffect(() => {
-    mqList.onchange = event => setIsStacked(event.matches)
-  }, [mqList])
 
   useFetchApi({
     path: `/api/v1/courses/${courseId}/assignment_groups`,
@@ -126,31 +120,21 @@ const GradeDetails = ({
   )
 
   const gradesDetailsTable = content => (
-    <div className={isStacked ? 'grade-details narrow' : 'grade-details'}>
-      <Table
-        caption={I18n.t('Grades for %{courseName}', {courseName})}
-        margin="medium 0"
-        layout={isStacked ? 'stacked' : 'auto'}
-      >
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
-            <Table.ColHeader id="dueDate">{I18n.t('Due Date')}</Table.ColHeader>
-            <Table.ColHeader id="assignmentGroup">{I18n.t('Assignment Group')}</Table.ColHeader>
-            <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>{content}</Table.Body>
-      </Table>
-    </div>
+    <Table caption={I18n.t('Grades for %{courseName}', {courseName})} margin="medium 0">
+      <Table.Head>
+        <Table.Row>
+          <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
+          <Table.ColHeader id="dueDate">{I18n.t('Due Date')}</Table.ColHeader>
+          <Table.ColHeader id="assignmentGroup">{I18n.t('Assignment Group')}</Table.ColHeader>
+          <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>{content}</Table.Body>
+    </Table>
   )
 
   return !loadingAssignmentGroups && grades?.length === 0 ? (
-    <GradesEmptyPage
-      userIsCourseAdmin={userIsCourseAdmin}
-      courseId={courseId}
-      courseName={courseName}
-    />
+    <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
   ) : (
     <>
       {showTotals && (
@@ -221,13 +205,9 @@ const GradeDetails = ({
         renderSkeletonsContainer={gradesDetailsTable}
         renderLoadedContainer={gradesDetailsTable}
       >
-        {grades.map(assignment =>
-          GradeRow({
-            isStacked,
-            currentUserId: currentUser.id,
-            ...assignment
-          })
-        )}
+        {grades.map(assignment => (
+          <GradeRow key={assignment.id} currentUserId={currentUser.id} {...assignment} />
+        ))}
       </LoadingWrapper>
     </>
   )
@@ -240,7 +220,7 @@ GradeDetails.propTypes = {
   showTotals: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   loadingGradingPeriods: PropTypes.bool.isRequired,
-  userIsCourseAdmin: PropTypes.bool.isRequired
+  userIsInstructor: PropTypes.bool.isRequired
 }
 
 export default GradeDetails

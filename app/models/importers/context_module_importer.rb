@@ -179,8 +179,6 @@ module Importers
         tag.destroy # clear out missing items afterwards
       end
 
-      item.content_tags.first&.fix_position_conflicts
-
       if hash[:completion_requirements]
         c_reqs = []
         hash[:completion_requirements].each do |req|

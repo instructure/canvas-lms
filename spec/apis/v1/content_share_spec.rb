@@ -33,10 +33,6 @@ describe ContentShare do
     detect_export('assignment')
   end
 
-  it "detects an attachment export" do
-    detect_export("attachment")
-  end
-
   it "detects a discussion topic export" do
     detect_export('discussion_topic')
   end
@@ -59,7 +55,6 @@ describe ContentShare do
 
   EXPORT_SETTINGS = {
     "assignment" => {"assignments" => {'blah' => '1'}},
-    "attachment" => {"attachments" => {"blah" => "1"}},
     "discussion_topic" => {"discussion_topics" => {'blah' => '1'}},
     "page" => {"wiki_pages" => {'blah' => '1'}},
     "quiz" => {"quizzes" => {'blah' => '1'}},

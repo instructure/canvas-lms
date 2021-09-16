@@ -58,12 +58,12 @@ class UserObserveesController < ApplicationController
   end
 
   # @API List observers
-  # A paginated list of the observers of a given user.
+  # A paginated list of the users that the given user is observing.
   #
-  # *Note:* all users are allowed to list their own observers. Administrators can list
-  # other users' observers.
+  # *Note:* all users are allowed to list their own observees. Administrators can list
+  # other users' observees.
   #
-  # The returned observers will include an attribute "observation_link_root_account_ids", a list
+  # The returned observees will include an attribute "observation_link_root_account_ids", a list
   # of ids for the root accounts the observer and observee are linked on. The observer will only be able to
   # observe in courses associated with these root accounts.
   #
@@ -71,7 +71,7 @@ class UserObserveesController < ApplicationController
   #   - "avatar_url": Optionally include avatar_url.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/<user_id>/observers \
+  #     curl https://<canvas>/api/v1/users/<user_id>/observees \
   #          -X GET \
   #          -H 'Authorization: Bearer <token>'
   #
@@ -204,7 +204,7 @@ class UserObserveesController < ApplicationController
 
   # @API Show an observer
   #
-  # Gets information about an observer.
+  # Gets information about an observed user.
   #
   # *Note:* all users are allowed to view their own observers.
   #

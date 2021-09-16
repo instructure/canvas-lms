@@ -37,6 +37,7 @@ const itemsReducer = (state: PacePlanItem[], action: PacePlanItemAction): PacePl
 // Modules are read-only currently, so this is just deferring to the itemsReducer for
 // each  module's item.
 export default (state: Module[], action: PacePlanItemAction): Module[] => {
-  if (!state) return state
-  return state.map(module => ({...module, items: itemsReducer(module.items, action)}))
+  return state.map(module => {
+    return {...module, items: itemsReducer(module.items, action)}
+  })
 }

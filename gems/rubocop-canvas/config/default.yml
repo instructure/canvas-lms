@@ -4,6 +4,9 @@ Datafixup/EagerLoad:
     - "**/db/migrate/*.rb"
     - "**/lib/data_fixup/*.rb"
 
+Lint/FreezeConstants:
+  Enabled: true
+
 Lint/NoFileUtilsRmRf:
   Enabled: true
 

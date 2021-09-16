@@ -29,10 +29,10 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
-import {colors} from '@instructure/canvas-theme'
 
 export const MessageListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
+  const [isStarred, setIsStarred] = useState(props.isStarred)
 
   const handleMessageClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -61,7 +61,8 @@ export const MessageListItem = ({...props}) => {
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
-    props.onStar(!props.isStarred, props.conversation._id)
+    props.onStar(!isStarred)
+    setIsStarred(!isStarred)
   }
 
   const formatParticipants = () => {
@@ -149,12 +150,6 @@ export const MessageListItem = ({...props}) => {
                 count={props.conversation.conversationMessagesConnection.nodes?.length}
                 countUntil={99}
                 standalone
-                theme={{
-                  colorPrimary: colors.backgroundDarkest,
-                  borderRadius: '0.25rem',
-                  fontSize: '0.8125rem',
-                  fontWeight: '700'
-                }}
               />
             </Grid.Col>
           </Grid.Row>
@@ -193,7 +188,7 @@ export const MessageListItem = ({...props}) => {
             <Grid.Col>
               <Text color="secondary">
                 <TruncateText>
-                  {props.conversation.conversationMessagesConnection?.nodes[0]?.body}
+                  {props.conversation.conversationMessagesConnection.nodes[0]?.body}
                 </TruncateText>
               </Text>
             </Grid.Col>
@@ -203,14 +198,14 @@ export const MessageListItem = ({...props}) => {
                   {({focused}) => {
                     return (
                       <div>
-                        {focused || isHovering || props.isStarred ? (
+                        {focused || isHovering || isStarred ? (
                           <IconButton
                             size="small"
                             withBackground={false}
                             withBorder={false}
-                            renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                            renderIcon={isStarred ? IconStarSolid : IconStarLightLine}
                             screenReaderLabel={
-                              props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                              isStarred ? I18n.t('starred') : I18n.t('not starred')
                             }
                             onClick={handleMessageStarClick}
                             data-testid="visible-star"
@@ -221,9 +216,9 @@ export const MessageListItem = ({...props}) => {
                               size="small"
                               withBackground={false}
                               withBorder={false}
-                              renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                              renderIcon={isStarred ? IconStarSolid : IconStarLightLine}
                               screenReaderLabel={
-                                props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                                isStarred ? I18n.t('starred') : I18n.t('not starred')
                               }
                               onClick={handleMessageStarClick}
                             />
@@ -264,7 +259,7 @@ export const MessageListItem = ({...props}) => {
 
 const participantProp = PropTypes.shape({name: PropTypes.string})
 
-const conversationMessageProp = PropTypes.shape({
+const conversaionMessageProp = PropTypes.shape({
   author: participantProp,
   participants: PropTypes.arrayOf(participantProp),
   created_at: PropTypes.string,
@@ -273,11 +268,9 @@ const conversationMessageProp = PropTypes.shape({
 
 export const conversationProp = PropTypes.shape({
   id: PropTypes.string,
-  _id: PropTypes.string,
   subject: PropTypes.string,
   participants: PropTypes.arrayOf(participantProp),
-  conversationMessages: PropTypes.arrayOf(conversationMessageProp),
-  conversationMessagesConnection: PropTypes.object
+  conversationMessages: PropTypes.arrayOf(conversaionMessageProp)
 })
 
 MessageListItem.propTypes = {

@@ -21,12 +21,10 @@ import {BlackoutDate, Course} from './shared/types'
 /* Model types */
 
 export interface Enrollment {
-  readonly id: string
-  readonly course_id: string
-  readonly user_id: string
+  readonly id: number
   readonly full_name: string
   readonly sortable_name: string
-  readonly start_at?: string
+  readonly start_at: string
   readonly completed_pace_plan_at?: string
 }
 
@@ -35,11 +33,10 @@ export interface Enrollments {
 }
 
 export interface Section {
-  readonly id: string
-  readonly course_id: string
+  readonly id: number
   readonly name: string
-  readonly start_at?: string
-  readonly end_at?: string
+  readonly start_at: string
+  readonly end_at: string
 }
 
 export interface Sections {
@@ -47,11 +44,11 @@ export interface Sections {
 }
 
 export interface PacePlanItem {
-  readonly id: string
+  readonly id: number
   readonly duration: number
   readonly assignment_title: string
   readonly position: number
-  readonly module_item_id: string
+  readonly module_item_id: number
   readonly module_item_type: string
   readonly published: boolean
 }
@@ -64,21 +61,21 @@ export interface Module {
 }
 
 export type PlanContextTypes = 'Course' | 'Section' | 'Enrollment'
-export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
+export type WorkflowStates = 'unpublished' | 'published' | 'deleted'
 
 export interface PacePlan {
-  readonly id?: string
-  readonly start_date?: string
-  readonly end_date?: string
+  readonly id?: number | string
+  readonly start_date: string
+  readonly end_date: string
   readonly workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean
   readonly hard_end_dates?: boolean
-  readonly course_id: string
-  readonly course_section_id?: string
-  readonly user_id?: string
+  readonly course_id: string | number
+  readonly course_section_id?: string | number
+  readonly user_id?: string | number
   readonly context_type: PlanContextTypes
-  readonly context_id: string
+  readonly context_id: string | number
   readonly published_at?: string
   readonly unpublished_changes?: boolean
   readonly linked_to_parent: boolean
@@ -103,11 +100,9 @@ export interface UIState {
   readonly errorMessage: string
   readonly divideIntoWeeks: boolean
   readonly planPublishing: boolean
-  readonly selectedContextType: PlanContextTypes
-  readonly selectedContextId: string
+  readonly selectedPlanType: PlanTypes
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
-  readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
   readonly adjustingHardEndDatesAfter?: number
 }
@@ -125,6 +120,8 @@ export interface StoreState {
 
 // Key is the pace plan item id and value is the date string
 export type PacePlanItemDueDates = {[key: number]: string}
+
+export type PlanTypes = 'template' | 'student'
 
 /*
  * Use this when creating a payload that should map to a specific pace plan item,

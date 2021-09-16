@@ -50,8 +50,6 @@ FolderChild.renderItemCog = function(canManage) {
         modalOptions={this.props.modalOptions}
         clearSelectedItems={this.props.clearSelectedItems}
         onMove={this.props.onMove}
-        onCopyToClick={this.props.onCopyToClick}
-        onSendToClick={this.props.onSendToClick}
       />
     )
   }

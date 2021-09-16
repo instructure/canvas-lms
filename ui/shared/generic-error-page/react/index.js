@@ -54,7 +54,7 @@ export default class GenericErrorPage extends React.Component {
     commentPosted: false,
     commentPostError: false,
     submitLoading: false,
-    email: '',
+    optionalEmail: '',
     textAreaComment: ''
   }
 
@@ -67,8 +67,8 @@ export default class GenericErrorPage extends React.Component {
     this.setState({textAreaComment: event.target.value})
   }
 
-  handleChangeEmail = event => {
-    this.setState({email: event.target.value})
+  handleChangeOptionalEmail = event => {
+    this.setState({optionalEmail: event.target.value})
   }
 
   // Submit makes a post to the create method used in the errors_controller.rb
@@ -80,7 +80,7 @@ export default class GenericErrorPage extends React.Component {
         category: this.props.errorCategory,
         url: window.location.href,
         comments: this.state.textAreaComment,
-        email: this.state.email
+        email: this.state.optionalEmail
       }
     }
     this.setState({submitLoading: true, showingCommentBox: false})
@@ -127,9 +127,9 @@ export default class GenericErrorPage extends React.Component {
           {this.state.showingCommentBox && (
             <ErrorTextInputForm
               textAreaComment={this.state.textAreaComment}
-              email={this.state.email}
+              optionalEmail={this.state.optionalEmail}
               handleChangeCommentBox={this.handleChangeCommentBox}
-              handleChangeEmail={this.handleChangeEmail}
+              handleChangeOptionalEmail={this.handleChangeOptionalEmail}
               handleSubmitErrorReport={this.handleSubmitErrorReport}
             />
           )}

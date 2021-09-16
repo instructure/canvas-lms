@@ -48,8 +48,8 @@ const FindOutcomeItem = ({
   sourceContextType,
   importOutcomeHandler
 }) => {
-  const [truncated, setTruncated] = useState(true)
-  const onClickHandler = () => description && setTruncated(prevState => !prevState)
+  const [truncate, setTruncate] = useState(true)
+  const onClickHandler = () => description && setTruncate(prevState => !prevState)
   const {isMobileView} = useCanvasContext()
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
@@ -106,7 +106,7 @@ const FindOutcomeItem = ({
                 <IconButton
                   size="small"
                   screenReaderLabel={
-                    truncated
+                    truncate
                       ? I18n.t('Expand outcome description')
                       : I18n.t('Collapse outcome description')
                   }
@@ -116,7 +116,7 @@ const FindOutcomeItem = ({
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
-                    {truncated ? (
+                    {truncate ? (
                       <IconArrowOpenEnd data-testid="icon-arrow-right" />
                     ) : (
                       <IconArrowOpenDown data-testid="icon-arrow-down" />
@@ -150,7 +150,12 @@ const FindOutcomeItem = ({
           </div>
           {description && (
             <div style={{paddingBottom: '0.75rem'}}>
-              <OutcomeDescription description={description} truncated={truncated} />
+              <OutcomeDescription
+                withExternalControl
+                description={description}
+                truncate={truncate}
+                onClickHandler={onClickHandler}
+              />
             </div>
           )}
         </Flex.Item>

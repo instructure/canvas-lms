@@ -27,9 +27,7 @@ const InfiniteScroll = {
     return el.offsetTop + this.topPosition(el.offsetParent)
   },
 
-  loadMoreIfNeeded: _.throttle(function () {
-    if (this.detached) return
-
+  loadMoreIfNeeded: _.throttle(function() {
     let atBottom = false
     if (this.scrollElement) {
       atBottom =
@@ -52,7 +50,6 @@ const InfiniteScroll = {
     if (this.refs.scrollElement) {
       this.scrollElement = this.refs.scrollElement
     }
-    this.detached = false
     ;(this.scrollElement || window).addEventListener('scroll', this.loadMoreIfNeeded)
     ;(this.scrollElement || window).addEventListener('resize', this.loadMoreIfNeeded)
     this.loadMoreIfNeeded()
@@ -62,7 +59,6 @@ const InfiniteScroll = {
     ;(this.scrollElement || window).removeEventListener('scroll', this.loadMoreIfNeeded)
     ;(this.scrollElement || window).removeEventListener('resize', this.loadMoreIfNeeded)
     this.scrollElement = null
-    this.detached = true
   },
 
   componentDidMount() {

@@ -27,7 +27,9 @@ module AccountReports
   end
 
   # This hash is modified below and should not be frozen.
-  REPORTS = {} # rubocop:disable Style/MutableConstant
+  # rubocop:disable Lint/FreezeConstants, Style/MutableConstant
+  REPORTS = {}
+  # rubocop:enable Lint/FreezeConstants, Style/MutableConstant
 
   Report = Struct.new(:type, :title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
     def module_name

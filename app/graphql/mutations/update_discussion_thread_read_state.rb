@@ -30,10 +30,11 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
     raise GraphQL::ExecutionError, 'not found' unless root_entry.grants_right?(current_user, session, :read)
 
     read_state = input[:read] ? 'read' : 'unread'
+    force_read_state = read_state == 'read' ? false : true
 
     DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry, current_user,
       new_state: read_state,
-      forced: true)
+      forced: force_read_state)
 
     {
       discussion_entry: root_entry

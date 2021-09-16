@@ -38,7 +38,7 @@ export const GradesPage = ({
   hideFinalGrades,
   currentUser,
   userIsStudent,
-  userIsCourseAdmin,
+  userIsInstructor,
   showLearningMasteryGradebook,
   outcomeProficiency
 }) => {
@@ -94,7 +94,7 @@ export const GradesPage = ({
         showTotals={showTotals}
         currentUser={currentUser}
         loadingGradingPeriods={loadingGradingPeriods}
-        userIsCourseAdmin={userIsCourseAdmin}
+        userIsInstructor={userIsInstructor}
       />
     </>
   )
@@ -117,7 +117,7 @@ export const GradesPage = ({
   if (!userIsStudent) {
     return (
       <GradesEmptyPage
-        userIsCourseAdmin={userIsCourseAdmin}
+        userIsInstructor={userIsInstructor}
         courseId={courseId}
         courseName={courseName}
       />
@@ -158,7 +158,7 @@ GradesPage.propTypes = {
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   userIsStudent: PropTypes.bool.isRequired,
-  userIsCourseAdmin: PropTypes.bool.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape
 }

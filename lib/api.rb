@@ -529,8 +529,7 @@ module Api
     ) || attachment&.grants_right?(user, nil, :download)
   end
 
-  def api_user_content(html, context = @context, user = @current_user,
-    preloaded_attachments = {}, options = {}, is_public=false)
+  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
     return html if html.blank?
 
     # use the host of the request if available;
@@ -569,10 +568,7 @@ module Api
                                     target_shard: target_shard)
     account = Context.get_account(context) || @domain_root_account
     include_mobile = !(respond_to?(:in_app?, true) && in_app?)
-    Html::Content.rewrite_outgoing(
-      html, account, url_helper,
-      include_mobile: include_mobile,
-      rewrite_api_urls: options[:rewrite_api_urls])
+    Html::Content.rewrite_outgoing(html, account, url_helper, include_mobile: include_mobile)
   end
 
   # This removes the verifier parameters that are added to attachment links by api_user_content

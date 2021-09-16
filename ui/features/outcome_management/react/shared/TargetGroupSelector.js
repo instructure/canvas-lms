@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!MoveOutcomesModal'
 import {View} from '@instructure/ui-view'
@@ -41,12 +41,11 @@ const getAncestorsIds = (targetGroup, collections) => {
   return ids
 }
 
-const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
+const TargetGroupSelector = ({groupId, setTargetGroup}) => {
   const {isCourse} = useCanvasContext()
   const [expanded, setExpanded] = useState(false)
   const [hasExpanded, setHasExpanded] = useState(false)
   const [labelRef, setLabelRef] = useState(null)
-  const canCallSetTargetGroupWithStarterGroup = useRef(true)
   const {
     error,
     isLoading,
@@ -56,25 +55,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
     selectedGroupId,
     loadedGroups,
     createGroup
-  } = useTargetGroupSelector({skipGroupId: groupId, initialGroupId: starterGroupId})
-
-  // When pass starterGroupId, call setTargetGroup with the group and it ancestors
-  useEffect(() => {
-    // only call setTargetGroup once, but only when collection object has info about the starterGroupId
-    if (
-      starterGroupId &&
-      collections[starterGroupId] &&
-      canCallSetTargetGroupWithStarterGroup.current
-    ) {
-      canCallSetTargetGroupWithStarterGroup.current = false
-      const selectedGroupObject = collections[starterGroupId]
-      setTargetGroup({
-        targetGroup: selectedGroupObject,
-        targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collections])
+  } = useTargetGroupSelector(groupId)
 
   useEffect(() => {
     if (expanded) {
@@ -87,7 +68,6 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
   const onCreateGroupHandler = async (groupName, parentId) => {
     const newGroup = await createGroup(groupName, parentId)
     if (newGroup) {
-      canCallSetTargetGroupWithStarterGroup.current = false
       queryCollections({id: newGroup.id, parentGroupId: parentId, shouldLoad: false})
       setTargetGroup({
         targetGroup: newGroup,
@@ -97,7 +77,6 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
   }
 
   const onCollectionClick = (_, selectedCollection) => {
-    canCallSetTargetGroupWithStarterGroup.current = false
     queryCollections(selectedCollection)
     const selectedGroupObject = collections[selectedCollection.id]
     setTargetGroup({
@@ -161,7 +140,6 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
 
 TargetGroupSelector.propTypes = {
   groupId: PropTypes.string,
-  starterGroupId: PropTypes.string,
   setTargetGroup: PropTypes.func.isRequired
 }
 

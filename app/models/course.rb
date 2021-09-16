@@ -241,7 +241,6 @@ class Course < ActiveRecord::Base
   has_many :comment_bank_items, inverse_of: :course
 
   has_many :pace_plans
-  has_many :blackout_dates, as: :context, inverse_of: :context
 
   prepend Profile::Association
 
@@ -1772,9 +1771,17 @@ class Course < ActiveRecord::Base
     end
     can :reset_content
 
-    # delete or undelete a given course
+    # delete and undelete manually created course
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
+        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
+    end
+    can :delete
+
+    # delete course managed by SIS
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        self.sis_source_id && self.account_membership_allows(user, :manage_sis) && !template? &&
         self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
@@ -2073,8 +2080,6 @@ class Course < ActiveRecord::Base
   end
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, { user: :pseudonyms })
-
     enrollment_ids = []
 
     res = CSV.generate do |csv|
@@ -2108,9 +2113,8 @@ class Course < ActiveRecord::Base
           score = enrollment.computed_final_score
         end
 
-        sis_pseudonyms =
-          SisPseudonym.for(enrollment.user, self.root_account, include_all_pseudonyms: true)
-        pseudonym_sis_ids = sis_pseudonyms ? sis_pseudonyms.map(&:sis_user_id) : [nil]
+        pseudonym_sis_ids = enrollment.user.pseudonyms.active.where(account_id: self.root_account_id).pluck(:sis_user_id)
+        pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
 
         pseudonym_sis_ids.each do |pseudonym_sis_id|
           row = [
@@ -2774,17 +2778,21 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # returns :all or an array of section ids
+  # returns :all, :none, or an array of section ids
   def course_section_visibility(user, opts={})
     visibilities = section_visibilities_for(user, opts)
-    visibility = enrollment_visibility_level_for(user, visibilities, check_full: false)
-    enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
-    if [:restricted, :sections].include?(visibility) || (
-        visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
-      )
-      visibilities.map { |s| s[:course_section_id] }.sort # rubocop:disable Rails/Pluck
+    visibility = enrollment_visibility_level_for(user, visibilities)
+    if [:full, :limited, :restricted, :sections, :sections_limited].include?(visibility)
+      enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
+      if [:restricted, :sections].include?(visibility) || (
+          visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
+        )
+        visibilities.map{ |s| s[:course_section_id] }.sort
+      else
+        :all
+      end
     else
-      :all
+      :none
     end
   end
 
@@ -2802,43 +2810,29 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # check_full is a hint that we don't care about the difference between :full and :limited,
-  # so don't bother with an extra permission check to see if they have :full. Just return :limited.
-  def enrollment_visibility_level_for(user,
-                                      visibilities = section_visibilities_for(user),
-                                      require_message_permission: false,
-                                      check_full: true)
+  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
     manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
       :allow_course_admin_actions
     else
       :manage_admin_users
     end
 
-    return :restricted if require_message_permission && !grants_right?(user, :send_messages)
-
-    has_read_roster = grants_right?(user, :read_roster) unless require_message_permission
-
-    visibility_limited_to_section = visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
-    if require_message_permission
-      has_admin = true
-    elsif visibility_limited_to_section || check_full || !has_read_roster
-      has_admin = grants_any_right?(user,
-                                    :read_as_admin,
-                                    :view_all_grades,
-                                    :manage_grades,
-                                    :manage_students,
-                                    manage_perm)
-    end
-
-    # e.g. observer, can only see admins in the course
-    return :restricted unless has_read_roster || has_admin
- 
-    if visibility_limited_to_section
-      has_admin ? :sections : :sections_limited
-    elsif has_admin
-      :full
-    else
+    permissions = require_message_permission ?
+      [:send_messages] :
+      [:manage_grades, :manage_students, manage_perm, :read_roster, :view_all_grades, :read_as_admin]
+    granted_permissions = self.granted_rights(user, *permissions)
+    if granted_permissions.empty?
+      :restricted # e.g. observer, can only see admins in the course
+    elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
+      if granted_permissions.eql? [:read_roster]
+        :sections_limited
+      else
+        :sections
+      end
+    elsif granted_permissions.eql? [:read_roster]
       :limited
+    else
+      :full
     end
   end
 
@@ -2887,7 +2881,7 @@ class Course < ActiveRecord::Base
   TAB_PACE_PLANS = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
-  COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
+  COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES].freeze
 
   def self.default_tabs
     [{
@@ -2997,17 +2991,12 @@ class Course < ActiveRecord::Base
 
   def self.course_subject_tabs
     course_tabs = Course.default_tabs.select { |tab| COURSE_SUBJECT_TAB_IDS.include?(tab[:id]) }
-    # Add the unique TAB_SCHEDULE and TAB_GROUPS
+    # Add the unique TAB_SCHEDULE
     course_tabs.insert(1, {
       :id => TAB_SCHEDULE,
       :label => t('#tabs.schedule', "Schedule"),
       :css_class => 'schedule',
       :href => :course_path
-    }, {
-      :id => TAB_GROUPS,
-      :label => t('#tabs.groups', "Groups"),
-      :css_class => 'groups',
-      :href => :course_groups_path,
     })
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
   end
@@ -3110,13 +3099,10 @@ class Course < ActiveRecord::Base
 
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings, ensure that all external tools are at the bottom (with the exception of Groups, which
-        # should stick to the end unless it has been re-ordered)
+        # Don't show Settings, ensure that all external tools are at the bottom
         lti_tabs = tabs.filter { |t| t[:external] }
         tabs -= lti_tabs
-        groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
         tabs += lti_tabs
-        tabs << groups_tab if groups_tab
       else
         # Ensure that Settings is always at the bottom
         tabs << settings_tab if settings_tab
@@ -3156,14 +3142,9 @@ class Course < ActiveRecord::Base
         {id: TAB_DISCUSSIONS, relation: :discussions, additional_check: -> { allow_student_discussion_topics }}
       ].select{ |hidable_tab| tabs.any?{ |t| t[:id] == hidable_tab[:id] } }
 
+      # Show modules tab in k5 even if there's no modules (but not if its hidden)
       if course_subject_tabs
-        # Show modules tab in k5 even if there's no modules (but not if its hidden)
         tabs_that_can_be_marked_hidden_unused.reject!{ |t| t[:id] == TAB_MODULES }
-
-        # Hide Groups tab for students if there are no groups
-        unless self.grants_right?(user, :read_as_admin) || self.active_groups.exists?
-          tabs.delete_if { |t| t[:id] == TAB_GROUPS }
-        end
       end
 
       if tabs_that_can_be_marked_hidden_unused.present?

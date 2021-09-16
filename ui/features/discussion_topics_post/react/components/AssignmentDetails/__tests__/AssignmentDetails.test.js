@@ -17,16 +17,16 @@
  */
 
 import {AssignmentDetails} from '../AssignmentDetails'
-import {Assignment} from '../../../../graphql/Assignment'
 
 import {responsiveQuerySizes} from '../../../utils/index'
 
 import React from 'react'
+
 import {fireEvent, render} from '@testing-library/react'
 
 jest.mock('../../../utils')
 
-const mockOverrides = [
+const overrides = [
   {
     id: 'QXNzaWdebTVubC0x',
     _id: '1',
@@ -71,12 +71,13 @@ beforeEach(() => {
   }))
 })
 
-const setup = (props, overrides = []) => {
+const setup = props => {
   return render(
     <AssignmentDetails
       pointsPossible={7}
-      assignment={Assignment.mock({assignmentOverrides: {nodes: overrides}})}
-      isAdmin
+      dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
+      assignmentOverrides={[]}
+      canSeeMultipleDueDates={false}
       {...props}
     />
   )
@@ -96,31 +97,35 @@ describe('AssignmentDetails', () => {
 
     it('displays due date when there are no overrides', () => {
       const {queryByText} = setup()
-      expect(queryByText('Everyone')).toBeTruthy()
-      expect(queryByText('Due Mar 31 5:59am')).toBeTruthy()
-      expect(queryByText('Available from Mar 24 until Apr 4')).toBeTruthy()
+      expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
     })
 
     it('displays "Show due dates" button when there are overrides', () => {
-      const {getByText} = setup({}, mockOverrides)
-      expect(getByText('Show Due Dates (4)')).toBeTruthy()
+      const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
     })
 
     it('displays tray and correctly formatted dates', async () => {
-      const {queryByText, findByText, findByTestId} = setup({}, mockOverrides)
-      expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-      fireEvent.click(queryByText('Show Due Dates (4)'))
+      const {queryByText, findByText, findByTestId} = setup({
+        assignmentOverrides: overrides,
+        canSeeMultipleDueDates: true
+      })
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+      fireEvent.click(queryByText('Show Due Dates (3)'))
       expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
       expect(await findByText('Sep 4 5:59am')).toBeTruthy()
     })
 
     it('correct text is shown when a date is not set', async () => {
-      mockOverrides[2].dueAt = null
-      mockOverrides[2].unlockAt = null
-      mockOverrides[2].lockAt = null
-      const {queryByText, findByText} = setup({}, mockOverrides)
-      expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-      fireEvent.click(queryByText('Show Due Dates (4)'))
+      overrides[2].dueAt = null
+      overrides[2].unlockAt = null
+      overrides[2].lockAt = null
+      const {queryByText, findByText} = setup({
+        assignmentOverrides: overrides,
+        canSeeMultipleDueDates: true
+      })
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+      fireEvent.click(queryByText('Show Due Dates (3)'))
       expect(await findByText('No Due Date')).toBeTruthy()
       expect(await findByText('No Start Date')).toBeTruthy()
       expect(await findByText('No End Date')).toBeTruthy()
@@ -145,8 +150,8 @@ describe('AssignmentDetails', () => {
     })
 
     it('displays "Show due dates" button when there are overrides', () => {
-      const {queryByText} = setup({}, mockOverrides)
-      expect(queryByText('Due Dates (4)')).toBeTruthy()
+      const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
+      expect(queryByText('Due Dates (3)')).toBeTruthy()
     })
   })
 })

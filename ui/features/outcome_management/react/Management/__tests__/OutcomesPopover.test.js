@@ -53,15 +53,15 @@ describe('OutcomesPopover', () => {
   })
 
   it('renders the OutcomesPopover component', () => {
-    const {getByText} = render(<OutcomesPopover {...defaultProps(2)} />)
+    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps(2)} />)
     expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
-    expect(getByText('2 Outcomes Selected').closest('button')).toBeEnabled()
+    expect(getByRole('button').hasAttribute('aria-disabled')).toBe(false)
   })
 
   it('renders the OutcomesPopover component with 0 outcomes selected', () => {
-    const {getByText} = render(<OutcomesPopover {...defaultProps(0)} />)
+    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps(0)} />)
     expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-    expect(getByText('0 Outcomes Selected').closest('button')).toBeDisabled()
+    expect(getByRole('button').hasAttribute('aria-disabled')).toBe(true)
   })
 
   it('shows details on click', () => {

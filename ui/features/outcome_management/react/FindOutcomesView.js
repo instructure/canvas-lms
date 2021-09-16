@@ -100,8 +100,9 @@ const FindOutcomesView = ({
           </Text>
         </Flex.Item>
         {searchString.length === 0 && !isRootGroup && (
-          <Flex.Item size="10rem" alignSelf="end">
+          <Flex.Item>
             <Button
+              margin="x-small 0"
               interaction={
                 enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
               }
@@ -170,13 +171,7 @@ const FindOutcomesView = ({
         style={
           isMobileView
             ? {}
-            : {
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'auto',
-                padding: '0 0.25rem'
-              }
+            : {height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}
         }
       >
         {!isMobileView && searchAndSelectContainer}

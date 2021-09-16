@@ -142,11 +142,11 @@ export const DiscussionThreadContainer = props => {
 
   const updateDiscussionEntryParticipantCache = (cache, result) => {
     if (
-      props.discussionEntry.entryParticipant?.read !==
-      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
+      props.discussionEntry.read !==
+      result.data.updateDiscussionEntryParticipant.discussionEntry.read
     ) {
       const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
-        .discussionEntry.entryParticipant?.read
+        .discussionEntry.read
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
@@ -172,7 +172,7 @@ export const DiscussionThreadContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        rating: props.discussionEntry.entryParticipant?.rating ? 'not_liked' : 'liked'
+        rating: props.discussionEntry.rating ? 'not_liked' : 'liked'
       }
     })
   }
@@ -181,8 +181,8 @@ export const DiscussionThreadContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        read: !props.discussionEntry.entryParticipant?.read,
-        forcedReadState: props.discussionEntry.entryParticipant?.forcedReadState || null
+        read: !props.discussionEntry.read,
+        forcedReadState: props.discussionEntry.read || null
       }
     })
   }
@@ -222,7 +222,7 @@ export const DiscussionThreadContainer = props => {
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.entryParticipant?.rating}
+        isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
@@ -295,8 +295,8 @@ export const DiscussionThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
-      !props.discussionEntry.entryParticipant?.read &&
-      !props.discussionEntry?.entryParticipant?.forcedReadState
+      !props.discussionEntry.read &&
+      !props.discussionEntry?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
         ([entry]) => entry.isIntersecting && props.markAsRead(props.discussionEntry._id),
@@ -313,7 +313,7 @@ export const DiscussionThreadContainer = props => {
         if (threadRefCurrent) observer.unobserve(threadRefCurrent)
       }
     }
-  }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
+  }, [threadRefCurrent, props.discussionEntry.read, props])
 
   const onReplySubmit = text => {
     createDiscussionEntry({
@@ -350,7 +350,7 @@ export const DiscussionThreadContainer = props => {
                       !props.discussionEntry.deleted ? (
                         <ThreadActions
                           id={props.discussionEntry._id}
-                          isUnread={!props.discussionEntry.entryParticipant?.read}
+                          isUnread={!props.discussionEntry.read}
                           onToggleUnread={toggleUnread}
                           onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
                           onEdit={
@@ -385,10 +385,10 @@ export const DiscussionThreadContainer = props => {
                     isIsolatedView={false}
                     editor={props.discussionEntry.editor}
                     isUnread={
-                      !props.discussionEntry.entryParticipant?.read ||
+                      !props.discussionEntry.read ||
                       !!props.discussionEntry?.rootEntryParticipantCounts?.unreadCount
                     }
-                    isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
+                    isForcedRead={props.discussionEntry.forcedReadState}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}

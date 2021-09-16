@@ -18,7 +18,6 @@
 
 import {Enrollments, Enrollment, StoreState} from '../types'
 import {createSelector} from 'reselect'
-import natcompare from '@canvas/util/natcompare'
 
 export const enrollmentsInitialState: Enrollments = (window.ENV.ENROLLMENTS || []) as Enrollments
 
@@ -30,9 +29,19 @@ export const getEnrollment = (state: StoreState, id: number): Enrollment => stat
 export const getSortedEnrollments = createSelector(
   getEnrollments,
   (enrollments: Enrollments): Enrollment[] => {
-    const sortedEnrollments = Object.values(enrollments)
-    sortedEnrollments.sort(natcompare.byKey('sortable_name'))
-    return sortedEnrollments
+    const sortedIds = Object.keys(enrollments).sort((a, b) => {
+      const enrollmentA: Enrollment = enrollments[a]
+      const enrollmentB: Enrollment = enrollments[b]
+      if (enrollmentA.sortable_name > enrollmentB.sortable_name) {
+        return 1
+      } else if (enrollmentA.sortable_name < enrollmentB.sortable_name) {
+        return -1
+      } else {
+        return 0
+      }
+    })
+
+    return sortedIds.map(id => enrollments[id])
   }
 )
 
