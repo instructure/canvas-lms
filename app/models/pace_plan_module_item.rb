@@ -27,9 +27,15 @@ class PacePlanModuleItem < ActiveRecord::Base
   resolves_root_account through: :pace_plan
 
   validates :pace_plan, presence: true
-  validates :module_item_id, presence: true
+  validate :assignable_module_item
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }
   scope :ordered, -> { joins(module_item: :context_module).
     order('context_modules.position, context_modules.id, content_tags.position, content_tags.id') }
+
+  def assignable_module_item
+    unless module_item&.can_have_assignment?
+      self.errors.add(:module_item, 'is not assignable')
+    end
+  end
 end
