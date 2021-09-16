@@ -953,7 +953,8 @@ RSpec.describe ApplicationController do
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 
-        it 'overrides the configured display_type for the quiz_lti in module context' do
+        it 'overrides the configured display_type for the quiz_lti in module context when feature flag is on' do
+          Account.site_admin.enable_feature!(:new_quizzes_in_module_progression)
           allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
           module1 = course.context_modules.create!(name: 'Module 1')
           content_tag.context.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')

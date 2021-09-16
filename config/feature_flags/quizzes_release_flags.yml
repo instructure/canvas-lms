@@ -48,6 +48,11 @@ new_quizzes_account_course_level_item_banks:
   state: hidden
 new_quizzes_skip_to_build_module_button:
   display_name: New Quizzes Build Button In Module Items
-  description: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page. 
+  description: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page.
+  applies_to: SiteAdmin
+  state: hidden
+new_quizzes_in_module_progression:
+  display_name: New Quizzes Embedded Module Progression
+  description: Improved support for taking New Quizzes from within Modules
   applies_to: SiteAdmin
   state: hidden
