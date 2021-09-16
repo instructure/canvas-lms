@@ -91,7 +91,7 @@ module Importers
                 uri.scheme = uri.host = uri.port = nil
                 new_url = uri.to_s
               end
-            rescue URI::InvalidURIError
+            rescue URI::InvalidURIError, URI::InvalidComponentError
             end
           end
         end

@@ -152,6 +152,13 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
     end
 
+    it "should leave invalid mailto addresses alone" do
+      test_string = %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
+      expect(convert_and_replace(test_string)).to eq(
+        %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
+      )
+    end
+
     it "should recognize and relative-ize absolute links outside the course but in one of the course's domains" do
       allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(['my-canvas.example.com', 'vanity.my-canvas.edu'])
       test_string = %{<a href="https://my-canvas.example.com/courses/123">Mine</a><br><a href="https://vanity.my-canvas.edu/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>}
