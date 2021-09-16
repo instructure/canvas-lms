@@ -110,7 +110,6 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
         execute(<<~SQL)
           CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
           BEGIN
-            RAISE NOTICE 'inserting job';
             IF NEW.strand IS NOT NULL THEN
               PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
               IF (SELECT COUNT(*) FROM (
@@ -120,10 +119,8 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
               END IF;
             END IF;
             IF NEW.singleton IS NOT NULL THEN
-              RAISE NOTICE 'inserting job that is a singleton';
               PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton;
               IF FOUND THEN
-                RAISE NOTICE 'and not first';
                 NEW.next_in_strand := false;
               END IF;
             END IF;
