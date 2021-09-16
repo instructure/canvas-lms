@@ -27,8 +27,9 @@ group :test do
     gem 'mime-types-data', '3.2021.0901', require: false
 
   gem 'rubocop', '1.19.1', require: false
+    gem 'unicode-display_width', '2.1.0', require: false
   gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"
-      gem 'rainbow', '3.0.0', require: false
+    gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rails', '2.11.3', require: false
   gem 'rubocop-rspec', '2.4.0', require: false
   gem 'rubocop-performance', '1.11.5', require: false
