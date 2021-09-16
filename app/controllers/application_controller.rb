@@ -1843,6 +1843,7 @@ class ApplicationController < ActionController::Base
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
             domain: HostUrl.context_host(@domain_root_account, request.host),
+            include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1950,7 +1951,7 @@ class ApplicationController < ActionController::Base
   def external_tool_redirect_display_type
     if params['display'].present?
       params['display']
-    elsif @assignment&.quiz_lti? && @module_tag
+    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
       'in_nav_context'
     else
       @tool&.extension_setting(:assignment_selection)&.dig('display_type')
