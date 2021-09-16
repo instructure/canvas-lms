@@ -212,15 +212,6 @@ module UserContent
 
       asset_types = AssetTypes.reject { |k,v| !@allowed_types.include?(k) }
 
-      # Remove any bad mailto links
-      doc = Nokogiri::HTML5.fragment(html)
-      doc.css('a[href^="mailto:"]').each do |mailto|
-        email = mailto['href'][7..]
-        next if EmailAddressValidator.valid?(email)
-
-        html = html.gsub(mailto.to_html, mailto.text)
-      end
-
       html.gsub(@toplevel_regex) do |url|
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
         next url if !@contextless_types.include?(type) && prefix != @context_prefix && url != @context_prefix

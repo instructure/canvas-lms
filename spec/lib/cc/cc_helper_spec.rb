@@ -303,18 +303,5 @@ describe CC::CCHelper do
         HTML
       }.not_to raise_error
     end
-
-    it "should remove invalid mailto links" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      html = %{
-        <a href="mailto:.">bad mailto</a>
-        <a href="mailto:good@test.test">good mailto</a>
-      }
-      translated = @exporter.html_content(html)
-      expect(translated).to eq %{
-        bad mailto
-        <a href="mailto:good@test.test">good mailto</a>
-      }
-    end
   end
 end
