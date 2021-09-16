@@ -179,6 +179,11 @@ describe Context do
       MediaObject.build_media_objects(data, Account.default.id)
       expect(Context.find_asset_by_url("/media_objects_iframe/test")).to eq mo
     end
+
+    it 'finds users' do
+      user = @course.enroll_student(User.create!).user
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/users/#{user.id}")).to eq user
+    end
   end
 
   context "self.names_by_context_types_and_ids" do

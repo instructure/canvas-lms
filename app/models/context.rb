@@ -287,6 +287,8 @@ module Context
       end
     when 'media_objects'
       object = media_obj
+    when 'context'
+      object = context.users.find(params[:id]) if params[:action] == 'roster_user' && params[:id]
     else
       object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end
