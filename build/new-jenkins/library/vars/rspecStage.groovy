@@ -262,6 +262,7 @@ def runReporter() {
 
 def useRspecQ(percentage) {
   if (configuration.isRspecqEnabled()) {
+    env.RSPECQ_ENABLED = '1'
     return true
   }
 
