@@ -2096,6 +2096,12 @@ describe ApplicationController do
           controller.params[:action] = "syllabus"
           expect(controller.send(:show_immersive_reader?)).to be true
         end
+
+        it "is true for a wiki front page" do
+          controller.params[:controller] = "wiki_pages"
+          controller.params[:action] = "front_page"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
       end
 
       context "when more_immersive_reader feature flag is disabled" do
