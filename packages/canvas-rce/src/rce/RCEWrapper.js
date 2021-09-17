@@ -1351,7 +1351,7 @@ class RCEWrapper extends React.Component {
     this.setState({KBShortcutModalOpen: false})
   }
 
-  KBShortcutModalClosed = () => {
+  KBShortcutModalExited = () => {
     if (this.state.KBShortcutFocusReturn === this.iframe) {
       // if the iframe has focus, we need to forward it on to tinymce
       this.editor.focus(false)
@@ -1359,6 +1359,8 @@ class RCEWrapper extends React.Component {
       // when the modal is opened from the showOnFocus button, focus doesn't
       // get automatically returned to the button like it should.
       this._showOnFocusButton.focus()
+    } else {
+      this._showOnFocusButton?.focus()
     }
   }
 
@@ -1825,7 +1827,7 @@ class RCEWrapper extends React.Component {
           />
         )}
         <KeyboardShortcutModal
-          onClose={this.KBShortcutModalClosed}
+          onExited={this.KBShortcutModalExited}
           onDismiss={this.closeKBShortcutModal}
           open={this.state.KBShortcutModalOpen}
         />

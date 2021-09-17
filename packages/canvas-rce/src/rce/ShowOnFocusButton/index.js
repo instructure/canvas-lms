@@ -23,18 +23,21 @@
  * among canvas' sub-packages.
  */
 import React, {Component} from 'react'
-import {func, node, object, oneOfType, string} from 'prop-types'
+import {func, node, oneOfType, string} from 'prop-types'
 
 import {IconButton} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const hideStyle = {
+  position: 'absolute',
+  left: '-9999px'
+}
 
 export default class ShowOnFocusButton extends Component {
   static propTypes = {
     children: oneOfType([node, func]).isRequired, // func === functional component
     onClick: func,
     screenReaderLabel: string.isRequired,
-    margin: string,
-    srProps: object
+    margin: string
   }
 
   state = {
@@ -42,26 +45,16 @@ export default class ShowOnFocusButton extends Component {
   }
 
   handleFocus = () => {
-    this.setState(
-      {
-        visible: true
-      },
-      () => {
-        if (!this.btnRef.focused) {
-          this.btnRef.focus()
-        }
-      }
-    )
+    this.setState({visible: true})
   }
 
   handleBlur = () => {
-    this.setState({
-      visible: false
-    })
+    this.setState({visible: false})
   }
 
   focus() {
     this.btnRef.focus()
+    this.setState({visible: true})
   }
 
   renderButton() {
@@ -86,20 +79,11 @@ export default class ShowOnFocusButton extends Component {
     )
   }
 
-  renderInvisibleButton() {
-    const {srProps} = this.props
-    return (
-      <ScreenReaderContent {...srProps} data-testid="ShowOnFocusButton__sronly">
-        {this.renderButton()}
-      </ScreenReaderContent>
-    )
-  }
-
   render() {
-    if (this.state.visible) {
-      return this.renderButton()
-    } else {
-      return this.renderInvisibleButton()
-    }
+    return (
+      <div data-testid="ShowOnFocusButton__wrapper" style={this.state.visible ? null : hideStyle}>
+        {this.renderButton()}
+      </div>
+    )
   }
 }
