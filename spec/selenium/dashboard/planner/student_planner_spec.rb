@@ -546,7 +546,7 @@ describe "student planner" do
         f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
         expect_new_page_load { fj('button:contains("Save")').click }
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
-        expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
+        expect(get_value('input[name="student_todo_at"]')).to eq format_date_for_view(Time.zone.today, "%b %d, %Y, 11:59 PM")
       end
     end
 
@@ -592,7 +592,7 @@ describe "student planner" do
         f('input[name="todo_date"]').send_keys(format_date_for_view(Time.zone.now).to_s)
         expect_new_page_load { submit_form('.form-actions') }
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
-        expect(get_value('input[name="todo_date"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
+        expect(get_value('input[name="todo_date"]')).to eq format_date_for_view(Time.zone.today, "%b %d, %Y, 11:59 PM")
       end
     end
   end

@@ -107,6 +107,10 @@ $assign-border-color: #ccc;
 
 .DueDateInput__Container {
   display: inline;
+
+  .datetime_suggest.invalid_datetime {
+    color: $ic-color-danger;
+  }
 }
 
 .Available-from-to {

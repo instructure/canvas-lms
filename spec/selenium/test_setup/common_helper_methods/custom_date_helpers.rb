@@ -43,8 +43,10 @@ module CustomDateHelpers
     time_string(time).sub(/m\z/, "").strip
   end
 
+  # this is for a datepicker that uses Intl.DateTimeFormat to format the field.
+  # Note this is somewhat sensitive to the formatting options being given to
+  # that browser-side formatter!
   def format_time_for_datepicker(time)
-    date = format_date_for_view(time.to_date, :medium)
-    "#{date}#{time_string(time)}"
+    I18n.l(time, format: '%b %-d, %Y, %-H:%M %p')
   end
 end

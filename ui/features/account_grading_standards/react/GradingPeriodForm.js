@@ -29,7 +29,7 @@ import round from 'round'
 
 function roundWeight(val) {
   const value = numberHelper.parse(val)
-  return isNaN(value) ? null : round(value, 2)
+  return Number.isNaN(value) ? null : round(value, 2)
 }
 
 function buildPeriod(attr) {
@@ -62,6 +62,7 @@ class GradingPeriodForm extends React.Component {
   constructor(props, context) {
     super(props, context)
     const period = buildPeriod(props.period || {})
+    this.titleRef = null
 
     this.state = {
       period,
@@ -71,7 +72,7 @@ class GradingPeriodForm extends React.Component {
 
   componentDidMount() {
     this.hackTheDatepickers()
-    this.refs.title.focus()
+    this.titleRef?.focus()
   }
 
   triggerSave = () => {
@@ -133,15 +134,6 @@ class GradingPeriodForm extends React.Component {
       $el.classList.add('ic-Input')
     })
 
-    const $suggests = $form.querySelectorAll('.datetime_suggest')
-    $suggests.forEach($el => {
-      if (ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
-        $el.remove()
-      } else {
-        $el.innerHTML = $el.innerHTML.replace(/Course/, 'Account')
-      }
-    })
-
     const $buttons = $form.querySelectorAll('.ui-datepicker-trigger')
     $buttons.forEach($el => {
       $el.classList.remove('btn')
@@ -151,13 +143,12 @@ class GradingPeriodForm extends React.Component {
 
   renderSaveAndCancelButtons = () => (
     <div className="ic-Form-actions below-line">
-      <Button ref="cancelButton" disabled={this.props.disabled} onClick={this.triggerCancel}>
+      <Button disabled={this.props.disabled} onClick={this.triggerCancel}>
         {I18n.t('Cancel')}
       </Button>
       &nbsp;
       <Button
         variant="primary"
-        ref="saveButton"
         aria-label={I18n.t('Save Grading Period')}
         disabled={this.props.disabled}
         onClick={this.triggerSave}
@@ -177,9 +168,6 @@ class GradingPeriodForm extends React.Component {
         <div className="input-append">
           <input
             id="weight"
-            ref={ref => {
-              this.weightInput = ref
-            }}
             type="text"
             className="span1"
             defaultValue={I18n.n(this.state.period.weight)}
@@ -192,6 +180,7 @@ class GradingPeriodForm extends React.Component {
   }
 
   render() {
+    const accountLabel = I18n.t('#helpers.account_time', 'Account')
     return (
       <div className="GradingPeriodForm">
         <div className="grid-row">
@@ -203,7 +192,9 @@ class GradingPeriodForm extends React.Component {
                 </label>
                 <input
                   id="title"
-                  ref="title"
+                  ref={ref => {
+                    this.titleRef = ref
+                  }}
                   className="ic-Input"
                   title={I18n.t('Grading Period Title')}
                   defaultValue={this.state.period.title}
@@ -220,12 +211,12 @@ class GradingPeriodForm extends React.Component {
                   disabled={false}
                   inputClasses=""
                   dateValue={this.state.period.startDate}
-                  ref="startDate"
                   dateType="due_at"
                   handleUpdate={this.changeStartDate}
                   rowKey="start-date"
                   labelledBy="start-date-label"
                   isFancyMidnight={false}
+                  contextLabel={accountLabel}
                 />
               </div>
 
@@ -237,13 +228,13 @@ class GradingPeriodForm extends React.Component {
                   disabled={false}
                   inputClasses=""
                   dateValue={this.state.period.endDate}
-                  ref="endDate"
                   dateType="due_at"
                   handleUpdate={this.changeEndDate}
                   rowKey="end-date"
                   labelledBy="end-date-label"
                   isFancyMidnight
                   defaultToEndOfMinute
+                  contextLabel={accountLabel}
                 />
               </div>
 
@@ -255,13 +246,13 @@ class GradingPeriodForm extends React.Component {
                   disabled={false}
                   inputClasses=""
                   dateValue={this.state.period.closeDate}
-                  ref="closeDate"
                   dateType="due_at"
                   handleUpdate={this.changeCloseDate}
                   rowKey="close-date"
                   labelledBy="close-date-label"
                   isFancyMidnight
                   defaultToEndOfMinute
+                  contextLabel={accountLabel}
                 />
               </div>
 

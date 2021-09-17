@@ -540,6 +540,10 @@ module CustomSeleniumActions
     end
   end
 
+  def replace_and_proceed(el, value, options = {})
+    replace_content(el, value, options.merge(tab_out: true))
+  end
+
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'

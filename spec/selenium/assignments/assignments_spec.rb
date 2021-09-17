@@ -513,7 +513,7 @@ describe "assignments" do
       it "allows editing the due date even if completely frozen", priority: "2", test_id: 649310 do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
-          replace_content(fj(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
+          replace_and_proceed(f(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
         end
 
         expect(f('.assignment_dates').text).to match(/Sep 20, 2012/)

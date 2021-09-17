@@ -175,14 +175,14 @@ describe "calendar2" do
 
         f('#use_section_dates').click
 
-        f("#section_#{section1.id}_start_date").send_keys(day1.to_s)
-        f("#section_#{section2.id}_start_date").send_keys(day2.to_s)
+        replace_and_proceed(f("#section_#{section1.id}_start_date"), day1.to_s)
+        replace_and_proceed(f("#section_#{section2.id}_start_date"), day2.to_s)
 
         ff(".date_start_end_row input.start_time").select(&:displayed?).each do |input|
-          replace_content(input, "11:30am")
+          replace_and_proceed(input, "11:30am")
         end
         ff(".date_start_end_row input.end_time").select(&:displayed?).each do |input|
-          replace_content(input, "1pm")
+          replace_and_proceed(input, "1pm")
         end
 
         f('#duplicate_event').click

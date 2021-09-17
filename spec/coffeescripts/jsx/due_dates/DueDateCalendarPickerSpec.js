@@ -20,10 +20,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 import chicago from 'timezone/America/Chicago'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import timezone from 'timezone'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
-import french from 'timezone/fr_FR'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateCalendarPicker', suiteHooks => {
@@ -90,25 +88,6 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     mountComponent()
     simulateChange('2015-08-31T00:00:00')
     equal(getEnteredDate().toUTCString(), 'Mon, 31 Aug 2015 00:00:00 GMT')
-  })
-
-  test('#formattedDate() returns a date in the same format used by DatetimeField', () => {
-    mountComponent()
-    equal(wrapper.instance().formattedDate(), 'Feb 1, 2012 7:01am')
-  })
-
-  test('#formattedDate() returns a localized Date', () => {
-    mountComponent()
-    tzInTest.configureAndRestoreLater({
-      tz: timezone(french, 'fr_FR'),
-      tzData: {},
-      momentLocale: 'fr',
-      formats: {
-        'date.formats.medium': '%-d %b %Y',
-        'time.formats.tiny': '%-k:%M'
-      }
-    })
-    equal(wrapper.instance().formattedDate(), '1 févr. 2012 7:01')
   })
 
   test('call the update prop when changed', () => {
