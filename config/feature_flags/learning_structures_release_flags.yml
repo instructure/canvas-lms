@@ -94,3 +94,14 @@ create_course_subaccount_picker:
   environments:
     beta:
       enable_at: Date.new(2021, 10, 18)
+conferencing_in_planner:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Conferencing in planner
+  description: |-
+    When enabled, this flag shows a "Join" button on Canvas calendar
+    events in the student planner
+  enable_at: Date.new(2021, 11, 20)
+  environments:
+    beta:
+      enable_at: Date.new(2021, 10, 18)
