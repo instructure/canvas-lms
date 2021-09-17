@@ -48,6 +48,7 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
               focus: false,
               plugins: []
             }}
+            renderKBShortcutModal={false}
             height={300}
             onContentChange={onChangeHandler}
             defaultContent={defaultContent}

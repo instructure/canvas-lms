@@ -246,6 +246,7 @@ class RCEWrapper extends React.Component {
     editorOptions: editorOptionsPropType,
     handleUnmount: PropTypes.func,
     editorView: PropTypes.oneOf([WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
+    renderKBShortcutModal: PropTypes.bool,
     id: PropTypes.string,
     language: PropTypes.string,
     liveRegion: PropTypes.func.isRequired,
@@ -324,6 +325,7 @@ class RCEWrapper extends React.Component {
       path: [],
       wordCount: 0,
       editorView: props.editorView || WYSIWYG_VIEW,
+      shouldShowOnFocusButton: (props.renderKBShortcutModal === undefined ? true : props.renderKBShortcutModal),
       KBShortcutModalOpen: false,
       messages: [],
       announcement: null,
@@ -1761,14 +1763,16 @@ class RCEWrapper extends React.Component {
         onFocus={this.handleFocusRCE}
         onBlur={this.handleBlurRCE}
       >
-        <ShowOnFocusButton
-          onClick={this.openKBShortcutModal}
-          margin="xx-small"
-          screenReaderLabel={formatMessage('View keyboard shortcuts')}
-          ref={el => (this._showOnFocusButton = el)}
-        >
-          <IconKeyboardShortcutsLine />
-        </ShowOnFocusButton>
+        {this.state.shouldShowOnFocusButton && (
+          <ShowOnFocusButton
+            onClick={this.openKBShortcutModal}
+            margin="xx-small"
+            screenReaderLabel={formatMessage('View keyboard shortcuts')}
+            ref={el => (this._showOnFocusButton = el)}
+          >
+            <IconKeyboardShortcutsLine />
+          </ShowOnFocusButton>
+        )}
         <AlertMessageArea
           messages={this.state.messages}
           liveRegion={this.props.liveRegion}
