@@ -32,6 +32,15 @@ const optionsList = {
     second: 'numeric',
     timeZoneName: 'short'
   },
+  'date.formats.full': {
+    // MMM D, YYYY h:mma
+    name: 'date.formats.full',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  },
   'date.formats.date_at_time': {
     // MMM D [at] h:mma
     name: 'date.formats.date_at_time',
@@ -77,7 +86,15 @@ export default function useDateTimeFormat(formatName, timeZone, locale) {
   }, [formatName, locale, timeZone])
 
   return useCallback(
-    date => formatter.format(date instanceof Date ? date : new Date(date)),
+    date => {
+      try {
+        if (date === null) return ''
+        return formatter.format(date instanceof Date ? date : new Date(date))
+      } catch (e) {
+        if (e instanceof RangeError) return ''
+        throw e
+      }
+    },
     [formatter]
   )
 }

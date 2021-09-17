@@ -20,7 +20,6 @@ import $ from 'jquery'
 import {extend, defer} from 'lodash'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 import Section from '@canvas/sections/backbone/models/Section.coffee'
 import DiscussionTopic from '@canvas/discussions/backbone/models/DiscussionTopic.coffee'
@@ -28,7 +27,6 @@ import Announcement from '@canvas/discussions/backbone/models/Announcement.coffe
 import DueDateOverrideView from '@canvas/due-dates'
 import EditView from 'ui/features/discussion_topic_edit/backbone/views/EditView.coffee'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -36,8 +34,8 @@ import 'helpers/jquery.simulate'
 
 const currentOrigin = window.location.origin
 
-const editView = function(opts = {}, discussOpts = {}) {
-  const modelClass = opts.isAnnouncement ? Announcement : DiscussionTopic
+const editView = function (opts = {}, discussOpts = {}) {
+  const ModelClass = opts.isAnnouncement ? Announcement : DiscussionTopic
   if (opts.withAssignment) {
     const assignmentOpts = extend({}, opts.assignmentOpts, {
       name: 'Test Assignment',
@@ -45,7 +43,7 @@ const editView = function(opts = {}, discussOpts = {}) {
     })
     discussOpts.assignment = assignmentOpts
   }
-  const discussion = new modelClass(discussOpts, {parse: true})
+  const discussion = new ModelClass(discussOpts, {parse: true})
   const assignment = discussion.get('assignment')
   const sectionList = new SectionCollection([Section.defaultDueDateSection()])
   const dueDateList = new DueDateList(
@@ -68,7 +66,7 @@ const editView = function(opts = {}, discussOpts = {}) {
     ENV.context_asset_string
   return app.render()
 }
-const nameLengthHelper = function(
+const nameLengthHelper = function (
   view,
   length,
   maxNameLengthRequiredForAccount,
@@ -110,31 +108,32 @@ QUnit.module('EditView', {
   }
 })
 
-test('it should be accessible', function(assert) {
+// eslint-disable-next-line qunit/resolve-async
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.editView(), done, {a11yReport: true})
 })
 
-test('renders', function() {
+test('renders', function () {
   const view = this.editView()
   ok(view)
 })
 
-test('tells RCE to manage the parent', function() {
+test('tells RCE to manage the parent', function () {
   const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView()
   view.loadNewEditor()
   ok(lne.firstCall.args[1].manageParent, 'manageParent flag should be set')
 })
 
-test('does not tell RCE to manage the parent of locked content', function() {
+test('does not tell RCE to manage the parent of locked content', function () {
   const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView({lockedItems: {content: true}})
   view.loadNewEditor()
-  ok(lne.callCount === 0, 'RCE not called')
+  strictEqual(lne.callCount, 0, 'RCE not called')
 })
 
-test('shows error message on assignment point change with submissions', function() {
+test('shows error message on assignment point change with submissions', function () {
   const view = this.editView({
     withAssignment: true,
     assignmentOpts: {has_submitted_submissions: true}
@@ -157,12 +156,12 @@ test('shows error message on assignment point change with submissions', function
   )
 })
 
-test('hides the published icon for announcements', function() {
+test('hides the published icon for announcements', function () {
   const view = this.editView({isAnnouncement: true})
   equal(view.$el.find('.published-status').length, 0)
 })
 
-test('validates the group category for non-assignment discussions', function() {
+test('validates the group category for non-assignment discussions', function () {
   const clock = sinon.useFakeTimers()
   const view = this.editView({permissions: {CAN_SET_GROUP: true}})
   clock.tick(1)
@@ -172,7 +171,7 @@ test('validates the group category for non-assignment discussions', function() {
   return clock.restore()
 })
 
-test('does not render #podcast_has_student_posts_container for non-course contexts', function() {
+test('does not render #podcast_has_student_posts_container for non-course contexts', function () {
   const view = this.editView({
     withAssignment: true,
     permissions: {CAN_MODERATE: true}
@@ -181,52 +180,54 @@ test('does not render #podcast_has_student_posts_container for non-course contex
   equal(view.$el.find('#podcast_has_student_posts_container').length, 0)
 })
 
-test('routes to discussion details normally', function() {
+test('routes to discussion details normally', function () {
   const view = this.editView({}, {html_url: currentOrigin + '/foo'})
   equal(view.locationAfterSave({}), currentOrigin + '/foo')
 })
 
-test('routes to return_to', function() {
+test('routes to return_to', function () {
   const view = this.editView({}, {html_url: currentOrigin + '/foo'})
   equal(view.locationAfterSave({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
-test('does not route to return_to with javascript protocol', function() {
+test('does not route to return_to with javascript protocol', function () {
   const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  // eslint-disable-next-line no-script-url
   equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
 })
 
-test('does not route to return_to in remote origin', function() {
+test('does not route to return_to in remote origin', function () {
   const view = this.editView({}, {html_url: currentOrigin + '/foo'})
   equal(view.locationAfterSave({return_to: 'http://evil.com'}), currentOrigin + '/foo')
 })
 
-test('cancels to env normally', function() {
+test('cancels to env normally', function () {
   ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
   equal(view.locationAfterCancel({}), currentOrigin + '/foo')
 })
 
-test('cancels to return_to', function() {
+test('cancels to return_to', function () {
   ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
   equal(view.locationAfterCancel({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
-test('does not cancel to return_to with javascript protocol', function() {
+test('does not cancel to return_to with javascript protocol', function () {
   ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
+  // eslint-disable-next-line no-script-url
   equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
 })
 
-test('shows todo checkbox', function() {
+test('shows todo checkbox', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
   equal(view.$el.find('#allow_todo_date').length, 1)
   equal(view.$el.find('#todo_date_input')[0].style.display, 'none')
 })
 
-test('shows todo input when todo checkbox is selected', function() {
+test('shows todo input when todo checkbox is selected', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
   view.$el.find('#allow_todo_date').prop('checked', true)
@@ -234,26 +235,27 @@ test('shows todo input when todo checkbox is selected', function() {
   equal(view.$el.find('#todo_date_input')[0].style.display, 'block')
 })
 
-test('shows todo input with date when given date', function() {
+test('shows todo input with date when given date', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
+  ENV.TIMEZONE = 'America/Chicago'
   const view = this.editView({}, {todo_date: '2017-01-03'})
   equal(view.$el.find('#allow_todo_date').prop('checked'), true)
-  equal(view.$el.find('input[name="todo_date"').val(), 'Jan 3, 2017 12am')
+  equal(view.$el.find('input[name="todo_date"').val(), 'Jan 2, 2017, 6:00 PM')
 })
 
-test('renders announcement page when planner enabled', function() {
+test('renders announcement page when planner enabled', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView({isAnnouncement: true})
   equal(view.$el.find('#discussion-edit-view').length, 1)
 })
 
-test('does not show todo checkbox without permission', function() {
+test('does not show todo checkbox without permission', function () {
   ENV.STUDENT_PLANNER_ENABLED = false
   const view = this.editView()
   equal(view.$el.find('#allow_todo_date').length, 0)
 })
 
-test('does not show todo date elements when grading is enabled', function() {
+test('does not show todo date elements when grading is enabled', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
   view.$el.find('#use_for_grading').prop('checked', true)
@@ -261,7 +263,7 @@ test('does not show todo date elements when grading is enabled', function() {
   equal(view.$el.find('#todo_options')[0].style.display, 'none')
 })
 
-test('does save todo date if allow_todo_date is checked and discussion is not graded', function() {
+test('does save todo date if allow_todo_date is checked and discussion is not graded', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const todo_date = new Date('2017-05-25T08:00:00-0800')
   const view = this.editView()
@@ -274,7 +276,7 @@ test('does save todo date if allow_todo_date is checked and discussion is not gr
   equal(formData.todo_date.toString(), todo_date.toString())
 })
 
-test('does not save todo date if allow_todo_date is not checked', function() {
+test('does not save todo date if allow_todo_date is not checked', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
   view.$el.find('#todo_date').val('2017-01-03')
@@ -284,7 +286,7 @@ test('does not save todo date if allow_todo_date is not checked', function() {
   equal(formData.todo_date, null)
 })
 
-test('does not save todo date if discussion is graded', function() {
+test('does not save todo date if discussion is graded', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
   view.$el.find('#todo_date').val('2017-01-03')
@@ -298,7 +300,7 @@ test('does not save todo date if discussion is graded', function() {
 
 QUnit.module(
   'EditView - Sections Specific',
-  test('allows discussion to save when section specific has errors has no section', function() {
+  test('allows discussion to save when section specific has errors has no section', function () {
     ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
     ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: false}}
     const view = this.editView({withAssignment: true})
@@ -316,7 +318,7 @@ QUnit.module(
     )
     equal(Object.keys(errors).length, 0)
   }),
-  test('allows announcement to save when section specific has a section', function() {
+  test('allows announcement to save when section specific has a section', function () {
     ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
     ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: true}}
     const view = this.editView({withAssignment: false})
@@ -332,7 +334,7 @@ QUnit.module(
     )
     equal(Object.keys(errors).length, 0)
   }),
-  test('allows group announcements to be saved without a section', function() {
+  test('allows group announcements to be saved without a section', function () {
     ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
     ENV.CONTEXT_ID = 1
     ENV.context_asset_string = 'group_1'
@@ -350,7 +352,7 @@ QUnit.module(
     )
     equal(Object.keys(errors).length, 0)
   }),
-  test('require section for course announcements if enabled', function() {
+  test('require section for course announcements if enabled', function () {
     ENV.should_log = true
     ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
     ENV.CONTEXT_ID = 1
@@ -391,7 +393,7 @@ QUnit.module('EditView - Usage Rights', {
   }
 })
 
-test('renders usage rights control', function() {
+test('renders usage rights control', function () {
   const view = this.editView({permissions: {CAN_ATTACH: true}})
   equal(view.$el.find('#usage_rights_control').length, 1)
 })
@@ -417,14 +419,14 @@ QUnit.module('EditView - ConditionalRelease', {
   }
 })
 
-test('does not show conditional release tab when feature not enabled', function() {
+test('does not show conditional release tab when feature not enabled', function () {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
   const view = this.editView()
   equal(view.$el.find('#mastery-paths-editor').length, 0)
   equal(view.$el.find('#discussion-edit-view').hasClass('ui-tabs'), false)
 })
 
-test('shows disabled conditional release tab when feature enabled, but not assignment', function() {
+test('shows disabled conditional release tab when feature enabled, but not assignment', function () {
   const view = this.editView()
   view.renderTabs()
   view.loadConditionalRelease()
@@ -433,7 +435,7 @@ test('shows disabled conditional release tab when feature enabled, but not assig
   equal(view.$discussionEditView.tabs('option', 'disabled'), true)
 })
 
-test('shows enabled conditional release tab when feature enabled, and assignment', function() {
+test('shows enabled conditional release tab when feature enabled, and assignment', function () {
   const view = this.editView({withAssignment: true})
   view.renderTabs()
   view.loadConditionalRelease()
@@ -442,7 +444,7 @@ test('shows enabled conditional release tab when feature enabled, and assignment
   equal(view.$discussionEditView.tabs('option', 'disabled'), false)
 })
 
-test('enables conditional release tab when changed to assignment', function() {
+test('enables conditional release tab when changed to assignment', function () {
   const view = this.editView()
   view.loadConditionalRelease()
   view.renderTabs()
@@ -452,7 +454,7 @@ test('enables conditional release tab when changed to assignment', function() {
   equal(view.$discussionEditView.tabs('option', 'disabled'), false)
 })
 
-test('disables conditional release tab when changed from assignment', function() {
+test('disables conditional release tab when changed from assignment', function () {
   const view = this.editView({withAssignment: true})
   view.loadConditionalRelease()
   view.renderTabs()
@@ -462,43 +464,43 @@ test('disables conditional release tab when changed from assignment', function()
   equal(view.$discussionEditView.tabs('option', 'disabled'), true)
 })
 
-test('renders conditional release tab content', function() {
+test('renders conditional release tab content', function () {
   const view = this.editView({withAssignment: true})
   view.loadConditionalRelease()
-  equal(1, view.$conditionalReleaseTarget.children().size())
+  equal(view.$conditionalReleaseTarget.children().size(), 1)
 })
 
-test('has an error when a title is 257 chars', function() {
+test('has an error when a title is 257 chars', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 257, false, 30, '1')
   equal(errors.title[0].message, 'Title is too long, must be under 257 characters')
 })
 
-test('allows dicussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function() {
+test('allows dicussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 256, false, 30, '1')
   equal(errors.length, 0)
 })
 
-test('has an error when a title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true', function() {
+test('has an error when a title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 40, true, 30, '1')
   equal(errors.title[0].message, 'Title is too long, must be under 31 characters')
 })
 
-test('allows discussion to save when title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false', function() {
+test('allows discussion to save when title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 40, true, 30, '0')
   equal(errors.length, 0)
 })
 
-test('allows discussion to save when title < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true', function() {
+test('allows discussion to save when title < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 30, true, 40, '1')
   equal(errors.length, 0)
 })
 
-test('conditional release editor is updated on tab change', function() {
+test('conditional release editor is updated on tab change', function () {
   const view = this.editView({withAssignment: true})
   view.renderTabs()
   view.renderGroupCategoryOptions()
@@ -513,27 +515,23 @@ test('conditional release editor is updated on tab change', function() {
   ok(stub.calledOnce)
 })
 
-test('validates conditional release', function(assert) {
+test('validates conditional release', function (assert) {
   const resolved = assert.async()
   const view = this.editView({withAssignment: true})
   return defer(() => {
-    const stub = sandbox.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
+    sandbox.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
     const errors = view.validateBeforeSave(view.getFormData(), {})
-    ok(errors.conditional_release === 'foo')
+    strictEqual(errors.conditional_release, 'foo')
     return resolved()
   })
 })
 
-test('calls save in conditional release', function(assert) {
+test('calls save in conditional release', function (assert) {
   const resolved = assert.async()
   const view = this.editView({withAssignment: true})
   return defer(() => {
-    const superPromise = $.Deferred()
-      .resolve({})
-      .promise()
-    const crPromise = $.Deferred()
-      .resolve({})
-      .promise()
+    const superPromise = $.Deferred().resolve({}).promise()
+    const crPromise = $.Deferred().resolve({}).promise()
     const mockSuper = sinon.mock(EditView.__super__)
     mockSuper.expects('saveFormData').returns(superPromise)
     const stub = sandbox.stub(view.conditionalReleaseEditor, 'save').returns(crPromise)
@@ -546,13 +544,11 @@ test('calls save in conditional release', function(assert) {
   })
 })
 
-test('does not call conditional release save for an announcement', function(assert) {
+test('does not call conditional release save for an announcement', function (assert) {
   const resolved = assert.async()
   const view = this.editView({isAnnouncement: true})
   return defer(() => {
-    const superPromise = $.Deferred()
-      .resolve({})
-      .promise()
+    const superPromise = $.Deferred().resolve({}).promise()
     const mockSuper = sinon.mock(EditView.__super__)
     mockSuper.expects('saveFormData').returns(superPromise)
     const savePromise = view.saveFormData()
@@ -564,7 +560,7 @@ test('does not call conditional release save for an announcement', function(asse
   })
 })
 
-test('switches to conditional tab if save error contains conditional release error', function(assert) {
+test('switches to conditional tab if save error contains conditional release error', function (assert) {
   const resolved = assert.async()
   const view = this.editView({withAssignment: true})
   return defer(() => {
@@ -573,12 +569,12 @@ test('switches to conditional tab if save error contains conditional release err
       foo: {type: 'bar'},
       conditional_release: {type: 'bat'}
     })
-    equal(1, view.$discussionEditView.tabs('option', 'active'))
+    equal(view.$discussionEditView.tabs('option', 'active'), 1)
     return resolved()
   })
 })
 
-test('switches to details tab if save error does not contain conditional release error', function(assert) {
+test('switches to details tab if save error does not contain conditional release error', function (assert) {
   const resolved = assert.async()
   const view = this.editView({withAssignment: true})
   return defer(() => {
@@ -587,14 +583,14 @@ test('switches to details tab if save error does not contain conditional release
       foo: {type: 'bar'},
       baz: {type: 'bat'}
     })
-    equal(0, view.$discussionEditView.tabs('option', 'active'))
+    equal(view.$discussionEditView.tabs('option', 'active'), 0)
     return resolved()
   })
 })
 
-test('Does not change the locked status of an existing discussion topic', function() {
+test('Does not change the locked status of an existing discussion topic', function () {
   const view = this.editView({}, {locked: true})
-  equal(true, view.model.get('locked'))
+  equal(view.model.get('locked'), true)
 })
 
 QUnit.module('EditView: Assignment External Tools', {
@@ -614,13 +610,13 @@ QUnit.module('EditView: Assignment External Tools', {
   }
 })
 
-test('it attaches assignment external tools component in course context', function() {
+test('it attaches assignment external tools component in course context', function () {
   ENV.context_asset_string = 'course_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 1)
 })
 
-test('it does not attach assignment external tools component in group context', function() {
+test('it does not attach assignment external tools component in group context', function () {
   ENV.context_asset_string = 'group_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 0)
