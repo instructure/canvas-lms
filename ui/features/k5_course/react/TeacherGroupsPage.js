@@ -38,7 +38,7 @@ const TeacherGroupsPage = props => (
     margin="x-large large"
     height="50vh"
   >
-    <Img src={EmptyGroups} />
+    <Img data-testid="empty-groups-image" src={EmptyGroups} />
     <View width="25rem" margin="x-large none small none">
       <Text size="large">{I18n.t('This is where students can see their groups.')}</Text>
     </View>

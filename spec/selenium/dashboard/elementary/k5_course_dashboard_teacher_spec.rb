@@ -246,7 +246,7 @@ describe "teacher k5 course dashboard" do
     end
   end
 
-  context 'course resources tab' do
+  context 'subject resources tab' do
     it 'shows the Important Info for subject resources tab' do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
@@ -254,6 +254,22 @@ describe "teacher k5 course dashboard" do
       get "/courses/#{@subject_course.id}#resources"
 
       expect(important_info_content).to include_text(important_info_text)
+    end
+  end
+
+  context 'subject groups tab' do
+    it 'shows the image and manage groups button for teacher' do
+      get "/courses/#{@subject_course.id}#groups"
+
+      expect(empty_groups_image).to be_displayed
+      expect(manage_groups_button).to be_displayed
+    end
+
+    it 'goes to the groups page when manage groups button is clicked' do
+      get "/courses/#{@subject_course.id}#groups"
+
+      click_manage_groups_button
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}/groups")
     end
   end
 end
