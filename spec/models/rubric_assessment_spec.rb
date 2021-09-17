@@ -327,6 +327,38 @@ describe RubricAssessment do
       expect(assessment.score).to eq(4.0)
     end
 
+    context "moderated grading" do
+      before(:once) do
+        @assignment.update!(moderated_grading: true, grader_count: 1)
+        submission = @assignment.find_or_create_submission(@student)
+        @provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 3, grade: "3")
+      end
+
+      let(:assessment_opts) do
+        {
+          user: @student,
+          assessor: @teacher,
+          artifact: @provisional_grade,
+          assessment: {
+            assessment_type: "grading",
+            criterion_crit1: { points: 5 }
+          }
+        }
+      end
+
+      it "updates provisional grades if used for grading" do
+        expect { @association.assess(assessment_opts) }.to change {
+          @provisional_grade.reload.grade
+        }.from("3").to("5")
+      end
+
+      it "updates provisional scores if used for grading" do
+        expect { @association.assess(assessment_opts) }.to change {
+          @provisional_grade.reload.score
+        }.from(3).to(5)
+      end
+    end
+
     context "outcome criterion" do
       before :once do
         assignment_model

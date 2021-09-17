@@ -196,7 +196,7 @@ class RubricAssessment < ActiveRecord::Base
       )
       artifact.reload
     when "ModeratedGrading::ProvisionalGrade"
-      artifact.update!(score: score)
+      artifact.update!(score: score, grade: nil)
     end
   end
   protected :update_artifact
