@@ -331,6 +331,7 @@ class Submission < ActiveRecord::Base
   # validation. Otherwise if we place it in any earlier (e.g.
   # before/after_initialize), every Submission.new will make database calls.
   before_validation :set_anonymous_id, if: :new_record?
+  before_save :set_late_policy_attributes
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -1425,13 +1426,6 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    self.seconds_late_override = nil unless late_policy_status == 'late'
-    if self.excused_changed? && self.excused
-      self.late_policy_status = nil
-      self.seconds_late_override = nil
-    elsif self.late_policy_status_changed? && self.late_policy_status.present?
-      self.excused = false
-    end
     self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
@@ -2836,6 +2830,17 @@ class Submission < ActiveRecord::Base
   end
 
   private
+
+  def set_late_policy_attributes
+    self.seconds_late_override = nil unless late_policy_status == 'late'
+
+    if will_save_change_to_excused?(to: true)
+      self.late_policy_status = nil
+      self.seconds_late_override = nil
+    elsif will_save_change_to_late_policy_status? && late_policy_status.present?
+      self.excused = false
+    end
+  end
 
   def reset_redo_request
     self.redo_request = false if self.redo_request && self.attempt_changed?

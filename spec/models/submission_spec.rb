@@ -1223,6 +1223,20 @@ describe Submission do
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
 
+    it "applies the missing policy to the score when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.score
+      }.from(nil).to(200)
+    end
+
+    it "applies the missing policy to the grade when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.grade
+      }.from(nil).to('200')
+    end
+
     it "applies the late policy when score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
