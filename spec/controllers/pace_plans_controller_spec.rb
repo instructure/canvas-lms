@@ -50,9 +50,9 @@ describe PacePlansController, type: :controller do
     @mod1.add_item id: @a1.id, type: 'assignment'
 
     @mod2 = @course.context_modules.create! name: 'M2'
-    @a2 = @course.assignments.create! name: 'A2', workflow_state: 'unpublished'
+    @a2 = @course.assignments.create! name: 'A2', workflow_state: 'published'
     @mod2.add_item id: @a2.id, type: 'assignment'
-    @a3 = @course.assignments.create! name: 'A3', workflow_state: 'unpublished'
+    @a3 = @course.assignments.create! name: 'A3', workflow_state: 'published'
     @mod2.add_item id: @a3.id, type: 'assignment'
 
     @course.context_module_tags.each_with_index do |tag, i|
@@ -62,6 +62,8 @@ describe PacePlansController, type: :controller do
     @course.enable_pace_plans = true
     @course.save!
     @course.account.enable_feature!(:pace_plans)
+
+    @course_section = @course.course_sections.first
 
     @valid_params = {
       start_date: 1.year.ago.strftime('%Y-%m-%d'),
@@ -222,6 +224,101 @@ describe PacePlansController, type: :controller do
         pace_plan.pace_plan_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
       ).to eq(valid_update_params[:pace_plan_module_items_attributes][1][:duration])
       expect(pace_plan.pace_plan_module_items.count).to eq(2)
+    end
+  end
+
+  describe "GET #latest_draft_for" do
+    context "course" do
+      it "returns a draft pace plan" do
+        get :latest_draft_for, { params: { course_id: @course.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
+      end
+
+      it "creates a draft if one is not already available" do
+        expect(@course.pace_plans.unpublished.count).to eq(0)
+        get :latest_draft_for, { params: { course_id: @course.id } }
+        expect(response).to be_successful
+        expect(@course.pace_plans.unpublished.count).to eq(1)
+        json_response = JSON.parse(response.body)
+        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["published_at"]).to eq(nil)
+        expect(json_response["pace_plan"]["modules"].count).to eq(2)
+        m1 = json_response["pace_plan"]["modules"].first
+        expect(m1["items"].count).to eq(1)
+        expect(m1["items"].first["duration"]).to eq(0)
+        expect(m1["items"].first["published"]).to eq(false)
+        m2 = json_response["pace_plan"]["modules"].second
+        expect(m2["items"].count).to eq(2)
+        expect(m2["items"].first["duration"]).to eq(2)
+        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].second["duration"]).to eq(4)
+        expect(m2["items"].second["published"]).to eq(true)
+      end
+    end
+
+    context "course_section" do
+      it "returns a draft pace plan" do
+        get :latest_draft_for, { params: { course_section_id: @course_section.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
+      end
+
+      it "creates a draft if one is not already available" do
+        expect(@course.pace_plans.unpublished.for_section(@course_section).count).to eq(0)
+        get :latest_draft_for, { params: { course_section_id: @course_section.id } }
+        expect(response).to be_successful
+        expect(@course.pace_plans.unpublished.for_section(@course_section).count).to eq(1)
+        json_response = JSON.parse(response.body)
+        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["published_at"]).to eq(nil)
+        expect(json_response["pace_plan"]["course_section_id"]).to eq(@course_section.id)
+        expect(json_response["pace_plan"]["modules"].count).to eq(2)
+        m1 = json_response["pace_plan"]["modules"].first
+        expect(m1["items"].count).to eq(1)
+        expect(m1["items"].first["duration"]).to eq(0)
+        expect(m1["items"].first["published"]).to eq(false)
+        m2 = json_response["pace_plan"]["modules"].second
+        expect(m2["items"].count).to eq(2)
+        expect(m2["items"].first["duration"]).to eq(2)
+        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].second["duration"]).to eq(4)
+        expect(m2["items"].second["published"]).to eq(true)
+      end
+    end
+
+    context "enrollment" do
+      it "returns a draft pace plan" do
+        get :latest_draft_for, { params: { enrollment_id: @course.student_enrollments.first.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
+        expect(JSON.parse(response.body)["pace_plan"]["user_id"]).to eq(@student.id)
+      end
+
+      it "creates a draft if one is not already available" do
+        expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(0)
+        get :latest_draft_for, { params: { enrollment_id: @course.student_enrollments.first.id } }
+        expect(response).to be_successful
+        expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(1)
+        json_response = JSON.parse(response.body)
+        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["published_at"]).to eq(nil)
+        expect(json_response["pace_plan"]["user_id"]).to eq(@student.id)
+        expect(json_response["pace_plan"]["modules"].count).to eq(2)
+        m1 = json_response["pace_plan"]["modules"].first
+        expect(m1["items"].count).to eq(1)
+        expect(m1["items"].first["duration"]).to eq(0)
+        expect(m1["items"].first["published"]).to eq(false)
+        m2 = json_response["pace_plan"]["modules"].second
+        expect(m2["items"].count).to eq(2)
+        expect(m2["items"].first["duration"]).to eq(2)
+        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].second["duration"]).to eq(4)
+        expect(m2["items"].second["published"]).to eq(true)
+      end
     end
   end
 end

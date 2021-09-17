@@ -104,4 +104,20 @@ describe PacePlan do
       expect(@pace_plan.root_account).to eq @course.root_account
     end
   end
+
+  context "duplicate" do
+    it "returns a saved duplicate of the pace plan" do
+      duplicate_pace_plan = @pace_plan.duplicate
+      expect(duplicate_pace_plan.class).to eq(PacePlan)
+      expect(duplicate_pace_plan.persisted?).to eq(true)
+      expect(duplicate_pace_plan.id).not_to eq(@pace_plan.id)
+    end
+
+    it "supports passing in options" do
+      opts = { user_id: 1 }
+      duplicate_pace_plan = @pace_plan.duplicate(opts)
+      expect(duplicate_pace_plan.user_id).to eq(opts[:user_id])
+      expect(duplicate_pace_plan.course_section_id).to eq(opts[:course_section_id])
+    end
+  end
 end

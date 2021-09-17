@@ -2359,6 +2359,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/pace_plans', action: :create
       get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
+      get 'pace_plans/latest_draft_for', action: :latest_draft_for
     end
   end
 
