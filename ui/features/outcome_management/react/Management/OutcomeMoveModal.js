@@ -43,6 +43,8 @@ const OutcomeMoveModal = ({
   const outcomeTitle = Object.values(outcomes)[0]?.title
   const [moveOutcomeLinks] = useMutation(MOVE_OUTCOME_LINKS)
 
+  const disableSaveButton =
+    !targetGroup || (count === 1 && Object.values(outcomes)[0].parentGroupId === targetGroup.id)
   const onMoveOutcomesHandler = () => {
     ;(async () => {
       try {
@@ -147,7 +149,7 @@ const OutcomeMoveModal = ({
           type="button"
           color="primary"
           margin="0 x-small 0 0"
-          disabled={!targetGroup}
+          disabled={disableSaveButton}
           onClick={onMoveOutcomesHandler}
         >
           {I18n.t('Move')}
