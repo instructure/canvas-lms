@@ -7713,6 +7713,22 @@ mi:
       start_at: "Rā tīmata"
       titles: 
         copy_course: "Tārua akoranga"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "E tino hiahia ana koe ki te tango uru i roto i tēnei akoranga? E kore ano e waiho e koe e taea ki te kite i te rārangi akoranga rānei te kōrero hāngai ki te kaiako, a heoi ano to koutou e kite i ngā akoranga i roto i to koutou awa, me te rite ki whakamōhiotanga."
+      headers: 
+        course_status: "Tūnga akoranga"
+      headings: 
+        confirm_unenroll: "Whakaū kaore e whakauru"
+      links: 
+        course_setup: "Akoranga Arowhai Tatūnga"
+        drop_course: "Maturuturu tēnei akoranga"
+        import: "Kawemai Tīariari Ihirangi"
+        join_course: "Hono tēnei akoranga"
+        new_announcement: "Pānuitanga Hou"
+        view_course_calendar: "Titiro Akoranga Maramataka"
+        view_course_notification_settings: "Tirohia ngā Akoranga Whakamōhiotanga"
+        view_course_stream: "Tirohia Akoranga Awa"
     description: 
       links: 
         join_course: "Hono tēnei akoranga"
