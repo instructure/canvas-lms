@@ -7733,6 +7733,22 @@ zh-Hans:
       start_at: 开始日期
       titles: 
         copy_course: 复制课程
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: 是否确定要取消注册此课程?您将不再能够看到课程清单或与教师直接沟通，并且在您的通信流和通知中不再看到课程事件。
+      headers: 
+        course_status: 课程状态
+      headings: 
+        confirm_unenroll: 确认取消注册
+      links: 
+        course_setup: 课程设置清单
+        drop_course: 放弃此课程
+        import: 导入现有内容
+        join_course: 参加此课程
+        new_announcement: 新公告
+        view_course_calendar: 查看课程日历
+        view_course_notification_settings: 查看课程通知
+        view_course_stream: 查看课程流
     description: 
       links: 
         join_course: 参加此课程
