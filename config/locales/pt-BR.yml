@@ -7736,6 +7736,22 @@ pt-BR:
       start_at: "Data de início"
       titles: 
         copy_course: "Copiar curso"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Tem certeza de que deseja cancelar a matrícula no curso? Você não poderá mais ver a lista do curso ou se comunicar diretamente com os professores e ver os eventos do curso em seu fluxo e como notificações."
+      headers: 
+        course_status: "Status do curso"
+      headings: 
+        confirm_unenroll: "Confirmar cancelamento de matrícula"
+      links: 
+        course_setup: "Lista de verificação da configuração do curso"
+        drop_course: "Desistir deste curso"
+        import: "Importar conteúdo existente"
+        join_course: "Participar deste Curso"
+        new_announcement: "Novo aviso"
+        view_course_calendar: "Visualizar calendário do curso"
+        view_course_notification_settings: "Visualizar notificações do curso"
+        view_course_stream: "Visualizar fluxo do curso"
     description: 
       links: 
         join_course: "Participar deste Curso"
