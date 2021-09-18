@@ -7744,6 +7744,22 @@ nb:
       start_at: Startdato
       titles: 
         copy_course: "Kopier emne"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikke lenger se emnedeltagere eller kommunisere direkte med foreleserne, og vil ikke kunne se hendelsene fra emnet i strømmen din og som varslinger."
+      headers: 
+        course_status: Emnestatus
+      headings: 
+        confirm_unenroll: "Bekreft avmelding"
+      links: 
+        course_setup: "Sjekkliste for emneetablering"
+        drop_course: "Meld deg av emnet"
+        import: "Importer eksisterende innhold"
+        join_course: "Bli med på dette emnet"
+        new_announcement: "Ny kunngjøring"
+        view_course_calendar: "Vis emnekalender"
+        view_course_notification_settings: "Vis varsler for emneinnhold"
+        view_course_stream: "Se emnestrøm"
     description: 
       links: 
         join_course: "Bli med på dette emnet"
