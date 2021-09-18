@@ -7349,6 +7349,22 @@ ht:
       start_at: "Dat Kòmansman"
       titles: 
         copy_course: "Kopi Kou"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Èske w vle dezenskri nan kou sa a tout bon? Ou pa p ka wè lis kou yo oswa kominike dirèkteman avèk pwofesè yo ankò, ou pa p ka wè aktivite kou yo ankò ni nan flux yo ni kòm avètisman."
+      headers: 
+        course_status: "Estati Kou"
+      headings: 
+        confirm_unenroll: "Konfime Dezenskripsyon"
+      links: 
+        course_setup: "Lis Kontwòl Konfigirasyon Kou"
+        drop_course: "Abandone Kou sa a"
+        import: "Enpòte Kontni ki Egziste"
+        join_course: "Fèk antre nan Kou sa a"
+        new_announcement: "Nouvo Anons"
+        view_course_calendar: "Afiche Kalandriye Kou"
+        view_course_notification_settings: "Afiche Avètisman Kou"
+        view_course_stream: "Afiche Flux Kou"
     description: 
       links: 
         join_course: "Fèk antre nan Kou sa a"
