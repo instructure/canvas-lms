@@ -7744,6 +7744,22 @@ es:
       start_at: "Fecha de inicio"
       titles: 
         copy_course: "Copiar el curso"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "¿Está seguro de que desea anular la inscripción en este curso? Ya no podrá ver la lista del curso o comunicarse directamente con profesores y ya no podrá ver los eventos del curso en su flujo de comunicación y como notificaciones."
+      headers: 
+        course_status: "Estado del curso"
+      headings: 
+        confirm_unenroll: "Confirmar cancelación de la inscripción"
+      links: 
+        course_setup: "Lista de comprobación de la configuración del curso"
+        drop_course: "Dejar este curso"
+        import: "Importar contenido existente"
+        join_course: "Unirse al curso"
+        new_announcement: "Nuevo anuncio"
+        view_course_calendar: "Consultar el calendario de cursos"
+        view_course_notification_settings: "Ver notificaciones del curso"
+        view_course_stream: "Ver flujo de información del curso"
     description: 
       links: 
         join_course: "Unirse al curso"
