@@ -7697,6 +7697,22 @@ de:
       start_at: Startdatum
       titles: 
         copy_course: "Kurs kopieren"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Möchten Sie die Einschreibung für diesen Kurs widerrufen? Sie können dann nicht länger die Kursübersicht aufrufen, mit Dozenten direkt kommunizieren und Sie werden Kursevents im Kommunikationsstream und als Benachrichtigungen sehen können."
+      headers: 
+        course_status: Kursstatus
+      headings: 
+        confirm_unenroll: "Widerruf der Einschreibung bestätigen"
+      links: 
+        course_setup: "Checkliste für Kurseinstellungen"
+        drop_course: "Diesen Kurs verwerfen"
+        import: "Vorhandenen Inhalt importieren"
+        join_course: "An diesem Kurs teilnehmen"
+        new_announcement: "Neue Ankündigung"
+        view_course_calendar: "Kurskalender anzeigen"
+        view_course_notification_settings: "Kursbenachrichtigungen anzeigen"
+        view_course_stream: "Kurs-Stream anzeigen"
     description: 
       links: 
         join_course: "An diesem Kurs teilnehmen"
