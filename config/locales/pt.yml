@@ -7752,6 +7752,22 @@ pt:
       start_at: "Data de início"
       titles: 
         copy_course: "Copiar disciplina"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Tem a certeza de que pretende cancelar a inscrição na disciplina? Deixará de poder ver o rol da disciplina ou comunicar diretamente com os professores e não poderá ver os eventos da disciplina no seu mural e como notificações."
+      headers: 
+        course_status: "Estado da disciplina"
+      headings: 
+        confirm_unenroll: "Confirmar cancelamento de inscrição"
+      links: 
+        course_setup: "Lista de verificação da configuração da disciplina"
+        drop_course: "Desistir desta disciplina"
+        import: "Importar Conteúdo Existente"
+        join_course: "Aderir a esta disciplina"
+        new_announcement: "Novo anúncio"
+        view_course_calendar: "Visualizar calendário do curso"
+        view_course_notification_settings: "Ver notificações da disciplina"
+        view_course_stream: "Ver fluxo da disciplina"
     description: 
       links: 
         join_course: "Aderir a esta disciplina"
