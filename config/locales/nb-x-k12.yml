@@ -7018,6 +7018,22 @@ nb-x-k12:
       start_at: Startdato
       titles: 
         copy_course: "Kopier fag"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Er du sikker på at du vil melde deg av dette faget? Du vil ikke lenger se fagdeltagere eller kommunisere direkte med foreleserne, og vil ikke kunne se hendelsene fra faget i strømmen din og som varslinger."
+      headers: 
+        course_status: Fagstatus
+      headings: 
+        confirm_unenroll: "Bekreft avmelding"
+      links: 
+        course_setup: "Sjekkliste for fagetablering"
+        drop_course: "Meld deg av faget"
+        import: "Importer eksisterende innhold"
+        join_course: "Bli med på dette faget"
+        new_announcement: "Ny beskjed"
+        view_course_calendar: "Vis fagkalender"
+        view_course_notification_settings: "Vis varsler for faginnhold"
+        view_course_stream: "Se fagstrøm"
     description: 
       links: 
         join_course: "Bli med på dette faget"
