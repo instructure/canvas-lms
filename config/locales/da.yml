@@ -7739,6 +7739,22 @@ da:
       start_at: Startdato
       titles: 
         copy_course: "Kopiér fag"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Er du sikker på, at du vil afmelde dig dette fag? Du vil ikke længere være i stand til at se faglisten eller kommunikere direkte med lærerne, og du vil ikke længere se fagbegivenheder i din aktivitetsstrøm som notifikationer."
+      headers: 
+        course_status: "Fagets status"
+      headings: 
+        confirm_unenroll: "Bekræft afmelding"
+      links: 
+        course_setup: "Tjekliste til oprettelse af kursus"
+        drop_course: "Drop dette fag"
+        import: "Importer eksisterende indhold"
+        join_course: "Deltag i dette fag"
+        new_announcement: "Ny besked"
+        view_course_calendar: "Se fagkalender"
+        view_course_notification_settings: "Vis fagmeddelelser"
+        view_course_stream: "Vis fagets seneste aktiviteter"
     description: 
       links: 
         join_course: "Deltag i dette fag"
