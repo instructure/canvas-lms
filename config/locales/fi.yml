@@ -6186,6 +6186,22 @@ fi:
       start_at: Alkamispäivä
       titles: 
         copy_course: "Kopioi kurssi"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Haluatko varmasti kumota ilmoittautumisen tälle kurssille? Et pysty enää näkemään kurssin osallistujaluetteloa tai kommunikoida suoraan opettajien kanssa, etkä enää näe kurssin tapahtumia etusivulla ja ilmoituksina."
+      headers: 
+        course_status: "Kurssin tila"
+      headings: 
+        confirm_unenroll: "Vahvista ilmoittautumisen kumoaminen"
+      links: 
+        course_setup: "Kurssiasetusten tarkistusluettelo"
+        drop_course: "Pudota tämä kurssi"
+        import: "Tuo olemassa oleva sisältö"
+        join_course: "Liity tälle kurssille"
+        new_announcement: "Uusi ilmoitus"
+        view_course_calendar: "Näytä kurssikalenteri"
+        view_course_notification_settings: "Näytä kurssin ilmoituksia"
+        view_course_stream: "Näytä uusimmat tapahtumat"
     description: 
       links: 
         join_course: "Liity tälle kurssille"
