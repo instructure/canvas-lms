@@ -7940,6 +7940,22 @@ ru:
       start_at: "Дата начала"
       titles: 
         copy_course: "Копировать курс"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Действительно хотите отменить регистрацию на этот курс? Вы больше не сможете просматривать список курсов или связываться непосредственно с учителями, и вы больше не будете видеть события курса в потоке и как уведомления."
+      headers: 
+        course_status: "Состояние курса"
+      headings: 
+        confirm_unenroll: "Подтвердить отмену регистрации"
+      links: 
+        course_setup: "Контрольный список настройки курса"
+        drop_course: "Переместить этот курс"
+        import: "Импортировать существующий контент"
+        join_course: "Присоединиться к этому курсу"
+        new_announcement: "Новое объявление"
+        view_course_calendar: "Просмотреть календарь курса"
+        view_course_notification_settings: "Просмотр уведомлений по курсу"
+        view_course_stream: "Просмотреть поток курса"
     description: 
       links: 
         join_course: "Присоединиться к этому курсу"
