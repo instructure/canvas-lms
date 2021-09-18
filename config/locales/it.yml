@@ -7140,6 +7140,22 @@ it:
       start_at: "Data di inizio"
       titles: 
         copy_course: "Copia corso"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Vuoi annullare l'iscrizione a questo corso? Non sarai più in grado di vedere l'elenco dei membri del corso o comunicare direttamente con gli insegnanti e non vedrai più gli eventi del corso nel tuo stream e sotto forma di notifiche."
+      headers: 
+        course_status: "Stato del corso"
+      headings: 
+        confirm_unenroll: "Conferma annullamento iscrizione"
+      links: 
+        course_setup: "Elenco di controllo configurazione corso"
+        drop_course: "Rilascia questo corso"
+        import: "Importa contenuto esistente"
+        join_course: "Partecipa a questo corso"
+        new_announcement: "Nuovo annuncio"
+        view_course_calendar: "Visualizza calendario corsi"
+        view_course_notification_settings: "Visualizza notifiche corso"
+        view_course_stream: "Visualizza stream corso"
     description: 
       links: 
         join_course: "Partecipa a questo corso"
