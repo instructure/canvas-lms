@@ -8127,6 +8127,22 @@ ar:
       start_at: "تاريخ البدء"
       titles: 
         copy_course: "نسخ المساق"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "هل ترغب بالتأكيد في إلغاء التسجيل في هذا المساق؟ لن يعود بإمكانك مشاهدة كشف المساق أو الاتصال مباشرة بالمعلمين، ولن تعود قادرًا على مشاهدة أحداث المساق في التدفق وكإعلامات."
+      headers: 
+        course_status: "حالة المساق"
+      headings: 
+        confirm_unenroll: "تأكيد إلغاء التسجيل"
+      links: 
+        course_setup: "قائمة اختيار إعداد المساق"
+        drop_course: "إسقاط هذا المساق"
+        import: "استيراد المحتوى الحالي"
+        join_course: "الانضمام لهذا المساق"
+        new_announcement: "إعلان جديد"
+        view_course_calendar: "عرض تقويم المساق"
+        view_course_notification_settings: "عرض إعلامات المساق"
+        view_course_stream: "عرض تدفق المساق"
     description: 
       links: 
         join_course: "الانضمام لهذا المساق"
