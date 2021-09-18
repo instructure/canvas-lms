@@ -7744,6 +7744,22 @@ zh-Hant:
       start_at: 開始日期
       titles: 
         copy_course: 複製課程
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: 是否確定要取消本課程註冊？您將無法再看到課程名冊，也無法直接與教師溝通，並且，您將無法在您的資料流中看到課程事件以及通知。
+      headers: 
+        course_status: 課程狀態
+      headings: 
+        confirm_unenroll: 確認取消註冊
+      links: 
+        course_setup: 課程設置清單
+        drop_course: 放棄本課程
+        import: 匯入現有內容
+        join_course: 加入本課程
+        new_announcement: 新通告
+        view_course_calendar: 檢視課程行事曆
+        view_course_notification_settings: 檢視課程通知
+        view_course_stream: 檢視課程流
     description: 
       links: 
         join_course: 加入本課程
