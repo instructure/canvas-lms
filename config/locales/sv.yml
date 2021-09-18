@@ -7756,6 +7756,22 @@ sv:
       start_at: Startdatum
       titles: 
         copy_course: "Kopiera kurs"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Vill du verkligen avregistrera dig från kursen? Du kommer inte längre kunna se kursens studentlista eller kunna kommunicera direkt med lärarna. Du kommer inte heller kunna se kurshändelser i ditt flöde och/eller som aviseringar."
+      headers: 
+        course_status: Kursstatus
+      headings: 
+        confirm_unenroll: "Bekräfta avregistrering"
+      links: 
+        course_setup: "Checklista för kursinställningar"
+        drop_course: "Hoppa av kursen"
+        import: "Importera befintligt innehåll"
+        join_course: "Gå med i kursen"
+        new_announcement: "Nytt anslag"
+        view_course_calendar: "Visa kurskalender"
+        view_course_notification_settings: "Visa kursaviseringar"
+        view_course_stream: "Visa kursflöde"
     description: 
       links: 
         join_course: "Gå med i kursen"
