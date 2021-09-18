@@ -7757,6 +7757,22 @@ en-GB:
       start_at: "Start date"
       titles: 
         copy_course: "Copy course"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Are you sure you want to unenrol in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
+      headers: 
+        course_status: "Course status"
+      headings: 
+        confirm_unenroll: "Confirm unenrolment"
+      links: 
+        course_setup: "Course setup checklist"
+        drop_course: "Drop this course"
+        import: "Import Existing Content"
+        join_course: "Join this Course"
+        new_announcement: "New Announcement"
+        view_course_calendar: "View Course Calendar"
+        view_course_notification_settings: "View Course Notifications"
+        view_course_stream: "View Course Stream"
     description: 
       links: 
         join_course: "Join this Course"
