@@ -5718,6 +5718,22 @@ ca:
       start_at: "Data d'inici"
       titles: 
         copy_course: "Copia el curs"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Segur que us voleu desinscriure d'aquest curs? Ja no podreu veure la llista de participants del curs ni comunicar-vos directament amb els professors, i tampoc veureu els esdeveniments del curs a la vostra seqüència, ni com a notificacions."
+      headers: 
+        course_status: "Estat del curs"
+      headings: 
+        confirm_unenroll: "Confirma la desinscripció"
+      links: 
+        course_setup: "Llista de comprovació de la configuració del curs"
+        drop_course: "Deixa aquest curs"
+        import: "Importa el contingut existent"
+        join_course: "Uneix-te al curs"
+        new_announcement: "Anunci nou"
+        view_course_calendar: "Veure el calendari del curs"
+        view_course_notification_settings: "Visualitza les notificacions del curs"
+        view_course_stream: "Activitat recent"
     description: 
       links: 
         join_course: "Uneix-te al curs"
