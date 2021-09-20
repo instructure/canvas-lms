@@ -685,13 +685,19 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.link_settings = params[:link_settings]
       if content.is_a?(ContextExternalTool) && content.use_1_3? && content.id != 0
-        # Note: using 'new' here instead of 'ResourceLink.create_with' so if validation
-        # of the added item fails, no orphaned resource link is created
-        added_item.associated_asset = context.lti_resource_links.new(
-          custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
-          context_external_tool: content,
-          lookup_uuid: params[:lti_resource_link_lookup_uuid]
-        )
+        # This method is called both to create a module item and to update one
+        # (e.g. in a blueprint course sync.)
+        #
+        # For new module items (or old module items that don't have a resource
+        # link), we create a new ResourceLink if one cannot be found for the
+        # lookup_uuid, or if lookup_uuid is not given.
+        added_item.associated_asset ||=
+          Lti::ResourceLink.find_or_initialize_for_context_and_lookup_uuid(
+            context: context,
+            lookup_uuid: params[:lti_resource_link_lookup_uuid].presence,
+            custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
+            context_external_tool: content
+          )
       end
       added_item.save
       added_item

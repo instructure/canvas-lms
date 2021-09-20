@@ -428,6 +428,45 @@ describe ContextModule do
         expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
         expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
       end
+
+      context 'when a lti_resource_link_lookup_uuid is provided' do
+        let!(:existing_resource_link) do
+          Lti::ResourceLink.create!(context: @course, context_external_tool: tool)
+        end
+
+        context 'when Lti::ResourceLink with the lookup_uuid already exists' do
+          it 'uses the existing link for the associated_asset' do
+            expect(Lti::ResourceLink).to receive(:find_or_initialize_for_context_and_lookup_uuid)
+              .and_call_original
+            extra_params = {
+              custom_params: '{"foo":"bar"}',
+              lti_resource_link_lookup_uuid: existing_resource_link.lookup_uuid
+            }
+            tag = @module.add_item(args.merge(extra_params))
+            expect(tag.associated_asset).to eq(existing_resource_link)
+          end
+        end
+
+        context 'when Lti::ResourceLink with the lookup_uuid does not exist' do
+          it 'creates a new link for the associated_asset' do
+            custom = '{"foo":"bar"}'
+            lookup_uuid = SecureRandom.uuid
+            expect(Lti::ResourceLink).to receive(:find_or_initialize_for_context_and_lookup_uuid)
+              .with(
+                context: @course, lookup_uuid: lookup_uuid,
+                custom: {'foo' => 'bar'}, context_external_tool: tool
+              ).and_call_original
+            tag = @module.add_item(
+              args.merge(
+                custom_params: custom, lti_resource_link_lookup_uuid: lookup_uuid
+              )
+            )
+            expect(tag.associated_asset.id).to_not eq(existing_resource_link.id)
+            expect(tag.associated_asset.lookup_uuid).to eq(lookup_uuid)
+            expect(tag.associated_asset.custom).to eq('foo' => 'bar')
+          end
+        end
+      end
     end
   end
 
