@@ -16,7 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {whitelist, ignorelist} from './messageTypes'
+import {
+  NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
+  INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
+  SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE
+} from '../../../rce/plugins/canvas_mentions/constants'
+
+const SUBJECT_ALLOW_LIST = [
+  'requestFullWindowLaunch',
+  'lti.resourceImported',
+  'toggleCourseNavigationMenu'
+]
+
+// These are handled elsewhere so ignore them
+const SUBJECT_IGNORE_LIST = [
+  'A2ExternalContentReady',
+  'LtiDeepLinkingResponse',
+  MENTIONS_NAVIGATION_MESSAGE,
+  MENTIONS_INPUT_CHANGE_MESSAGE,
+  MENTIONS_SELECTION_MESSAGE
+]
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState = {}
@@ -26,11 +45,12 @@ const handleLtiPostMessage = async e => {
   const {messageType, data} = e.data
   let handler
 
-  if (ignorelist.includes(messageType)) {
+  if (SUBJECT_IGNORE_LIST.includes(messageType)) {
     // These messages are handled elsewhere
     return false
-  } else if (!whitelist.includes(messageType)) {
-    // Enforce messageType whitelist -- unknown type
+  } else if (!SUBJECT_ALLOW_LIST.includes(messageType)) {
+    // Enforce messageType allowlist -- unknown type
+    // eslint-disable-next-line no-console
     console.error(`invalid messageType: ${messageType}`)
     return false
   }
@@ -41,6 +61,7 @@ const handleLtiPostMessage = async e => {
     handler(data)
     return true
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`Error loading or executing message handler for "${messageType}"`, error)
   }
 }
