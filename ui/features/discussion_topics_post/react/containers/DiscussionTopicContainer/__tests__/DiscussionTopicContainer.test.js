@@ -614,6 +614,28 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Available from Mar 21 6am until Sep 4 5:59am')).toBeTruthy()
   })
 
+  it('should not show discussion topic description when read permission is false', () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        permissions: DiscussionPermissions.mock({read: false}),
+        message: 'This should not show until discussion is available'
+      })
+    }
+    const container = setup(props)
+
+    expect(container.queryByText('This should not show until discussion is available')).toBeNull()
+  })
+
+  it('should show discussion topic description when read permission is true', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        message: 'This should not show until discussion is available'
+      })
+    })
+
+    expect(container.getByText('This should not show until discussion is available')).toBeTruthy()
+  })
+
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
@@ -623,18 +645,16 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Renders an alert if announcement will post in the future', () => {
-    const farInTheFuture = {
-      property: '3000-01-01T13:40:50Z',
-      expectedText: 'This announcement will not be visible until Jan 1, 3000 1:40pm.'
-    } // change values in this object on the year 3000
     const props = {
       discussionTopic: Discussion.mock({
         isAnnouncement: true,
-        delayedPostAt: farInTheFuture.property
+        delayedPostAt: '3000-01-01T13:40:50-06:00'
       })
     }
     const container = setup(props)
-    expect(container.getByText(farInTheFuture.expectedText)).toBeTruthy()
+    expect(
+      container.getByText('This announcement will not be visible until Jan 1, 3000 7:40pm.')
+    ).toBeTruthy()
   })
 
   it('should not render author if author is null', async () => {
