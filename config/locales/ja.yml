@@ -7740,6 +7740,22 @@ ja:
       start_at: 開始日
       titles: 
         copy_course: コースのコピー
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "このコースへの登録を解除してもよろしいですか?コース名簿の表示や、講師との直接の通信はできなくなります。また、コース イベントをストリームに表示したり、お知らせを受け取ったりすることもできなくなります。"
+      headers: 
+        course_status: "コース ステータス"
+      headings: 
+        confirm_unenroll: 登録解除の確認
+      links: 
+        course_setup: コース設定のためのチェックリスト
+        drop_course: このコースを中断
+        import: 既存のコンテンツをインポートする
+        join_course: このコースに参加
+        new_announcement: 新規発表
+        view_course_calendar: コース予定表を表示
+        view_course_notification_settings: コース通知を表示する
+        view_course_stream: "コース ストリームを表示"
     description: 
       links: 
         join_course: このコースに参加

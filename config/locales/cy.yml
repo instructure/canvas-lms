@@ -7073,6 +7073,22 @@ cy:
       start_at: "Dyddiad Dechrau"
       titles: 
         copy_course: "Copïo Cwrs"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Ydych chi’n siŵr eich bod am ddad-ymrestru o’r cwrs hwn? Fyddwch chi ddim yn gallu gweld cofrestr y cwrs mwyach na chyfathrebu’n uniongyrchol â’r athrawon, a fyddwch chi ddim yn gweld digwyddiadau’r cwrs yn eich ffrwd nac fel hysbysiadau mwyach."
+      headers: 
+        course_status: "Statws Cwrs"
+      headings: 
+        confirm_unenroll: "Cadarnhau’r Dad-ymrestru"
+      links: 
+        course_setup: "Rhestr Atgoffa Wrth Greu Cwrs"
+        drop_course: "Gollwng y Cwrs hwn"
+        import: "Mewngludo Cynnwys sy’n Bodoli’n Barod"
+        join_course: "Ymuno â’r Cwrs hwn"
+        new_announcement: "Cyhoeddiad Newydd"
+        view_course_calendar: "Gweld Calendr Cwrs"
+        view_course_notification_settings: "Gweld Hysbysiadau Cwrs"
+        view_course_stream: "Gweld Ffrwd Cwrs"
     description: 
       links: 
         join_course: "Ymuno â’r Cwrs hwn"

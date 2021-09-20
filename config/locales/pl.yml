@@ -7939,6 +7939,22 @@ pl:
       start_at: "Data rozpoczęcia"
       titles: 
         copy_course: "Kopiuj kurs"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Czy na pewno chcesz wypisać się z tego kursu? Stracisz możliwość wyświetlania listy kursu i komunikowania się bezpośrednio z instruktorami, i nie będziesz otrzymywać informacji o wydarzeniach związanych z kursem przesyłanych strumieniem lub w formie powiadomienia."
+      headers: 
+        course_status: "Status kursu"
+      headings: 
+        confirm_unenroll: "Potwierdź wypisanie się z kursu"
+      links: 
+        course_setup: "Lista kontrolna konfiguracji kursu"
+        drop_course: "Wypisz się z tego kursu"
+        import: "Importowanie istniejącej zawartości"
+        join_course: "Zapisz się na ten kurs"
+        new_announcement: "Nowe ogłoszenie"
+        view_course_calendar: "Wyświetl kalendarz kursu"
+        view_course_notification_settings: "Wyświetl powiadomienia o kursie"
+        view_course_stream: "Pokaż strumień kursu"
     description: 
       links: 
         join_course: "Zapisz się na ten kurs"

@@ -143,6 +143,13 @@ RCE.propTypes = {
   // tinymce configuration. See defaultTinymceConfig for all the defaults
   // and RCEWrapper.editorOptionsPropType for stuff you may want to include
   editorOptions: editorOptionsPropType,
+  // there's an open bug when RCE is rendered in a Modal form
+  // and the user navigates to the KB Shortcut Helper Button using
+  // Apple VoiceOver navigation keys (VO+arrows)
+  // as a workaround, the KB Shortcut Helper Button may be supressed
+  // setting renderKBShortcutModal to false
+  renderKBShortcutModal: bool,
+  // 
   // height of the RCE. if a number, in px
   height: oneOfType([number, string]),
   // array of URLs to high-contrast css
@@ -203,6 +210,7 @@ RCE.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
   editorOptions: {...defaultTinymceConfig},
+  renderKBShortcutModal: true,
   highContrastCSS: [],
   instRecordDisabled: false,
   language: 'en',

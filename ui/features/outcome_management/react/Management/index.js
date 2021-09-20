@@ -240,7 +240,9 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
                 showOptions={showGroupOptions}
                 setShowOutcomesView={setShowOutcomesView}
               />
-              <ManageOutcomesBillboard />
+              <View as="div" padding="small 0 0">
+                <ManageOutcomesBillboard />
+              </View>
             </>
           )}
         </View>
@@ -250,13 +252,17 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             width="33%"
             display="inline-block"
             position="relative"
-            height="60vh"
             as="div"
             overflowY="auto"
             overflowX="hidden"
             elementRef={setLeftColumnRef}
           >
-            <View as="div" padding="small x-small none x-small">
+            <View
+              as="div"
+              padding="small x-small none x-small"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
+            >
               <Text size="large" weight="light" fontStyle="normal">
                 {I18n.t('Outcome Groups')}
               </Text>
@@ -273,18 +279,21 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item as="div" position="relative" width="1%" height="60vh" display="inline-block">
+          <Flex.Item as="div" position="relative" width="1%" display="inline-block">
             {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             <div
               tabIndex="0"
               role="separator"
               aria-orientation="vertical"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
               onKeyDown={onKeyDownHandler}
               ref={setDelimiterRef}
               style={{
                 width: '1vw',
-                height: '100%',
                 cursor: 'col-resize',
+                minHeight: 'calc(720px - 10.5rem)',
+                height: 'calc(100vh - 16.35rem)',
                 background:
                   '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
               }}
@@ -296,7 +305,6 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
             width="66%"
             display="inline-block"
             position="relative"
-            height="60vh"
             overflowY="visible"
             overflowX="auto"
             elementRef={el => {
@@ -304,7 +312,12 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
               setScrollContainer(el)
             }}
           >
-            <View as="div" padding="small none none x-small">
+            <View
+              as="div"
+              padding="small none none x-small"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
+            >
               {selectedGroupId && (
                 <ManageOutcomesView
                   key={selectedGroupId}
@@ -326,7 +339,6 @@ const OutcomeManagementPanel = ({importNumber, createdOutcomeGroupIds}) => {
           </Flex.Item>
         </Flex>
       )}
-      <hr style={{margin: '0 0 7px'}} />
       {canManage && (
         <ManageOutcomesFooter
           selected={selectedOutcomes}
