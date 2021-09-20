@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ltiState} from '../messages'
+export default function enableScrollEvents({iframe}) {
+  if (iframe) {
+    let timeout
+    window.addEventListener(
+      'scroll',
+      () => {
+        // requesting animation frames effectively debounces the scroll messages being sent
+        if (timeout) {
+          window.cancelAnimationFrame(timeout)
+        }
 
-const handler = () => {
-  if (!ltiState.tray) {
-    ltiState.tray = {}
+        timeout = window.requestAnimationFrame(() => {
+          const msg = JSON.stringify({
+            subject: 'lti.scroll',
+            scrollY: window.scrollY
+          })
+          iframe.contentWindow.postMessage(msg, '*')
+        })
+      },
+      false
+    )
   }
-  ltiState.tray.refreshOnClose = true
 }
-
-export default handler

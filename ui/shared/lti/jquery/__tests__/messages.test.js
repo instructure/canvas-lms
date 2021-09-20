@@ -17,7 +17,7 @@
  */
 
 import {ltiMessageHandler} from '../messages'
-import $ from 'jquery'
+import $ from '@canvas/rails-flash-notifications'
 
 describe('ltiMessageHander', () => {
   /* eslint-disable no-console */
@@ -39,30 +39,22 @@ describe('ltiMessageHander', () => {
   })
   /* eslint-enable no-console */
 
-  it('does not log unparseable messages from window.postMessage', () => {
-    ltiMessageHandler({data: 'abcdef'})
+  it('does not log unparseable messages from window.postMessage', async () => {
+    await ltiMessageHandler({data: 'abcdef'})
     expect(logMock).not.toHaveBeenCalled()
     expect(errorMock).not.toHaveBeenCalled()
   })
 
-  it('does not log ignored messages from window.postMessage', () => {
-    ltiMessageHandler({data: JSON.stringify({a: 'b', c: 'd'})})
-    ltiMessageHandler({data: {abc: 'def'}})
+  it('does not log ignored messages from window.postMessage', async () => {
+    await ltiMessageHandler({data: JSON.stringify({a: 'b', c: 'd'})})
+    await ltiMessageHandler({data: {abc: 'def'}})
     expect(logMock).not.toHaveBeenCalled()
     expect(errorMock).not.toHaveBeenCalled()
   })
 
-  it('handles parseable messages from window.postMessage', () => {
+  it('handles parseable messages from window.postMessage', async () => {
     const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler({data: JSON.stringify({subject: 'lti.screenReaderAlert', body: 'Hi'})})
+    await ltiMessageHandler({data: JSON.stringify({subject: 'lti.screenReaderAlert', body: 'Hi'})})
     expect(flashMessage).toHaveBeenCalledWith('Hi')
-  })
-
-  it('prevents html from being passed to screenReaderFlashMessageExclusive', () => {
-    const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler({
-      data: JSON.stringify({subject: 'lti.screenReaderAlert', body: {html: 'abc'}})
-    })
-    expect(flashMessage).toHaveBeenCalledWith('{"html":"abc"}')
   })
 })

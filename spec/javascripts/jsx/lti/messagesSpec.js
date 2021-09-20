@@ -35,10 +35,6 @@ const fetchWindowSize = {
   subject: 'lti.fetchWindowSize'
 }
 
-const scrollMessage = {
-  subject: 'lti.scrollToTop'
-}
-
 const removeUnloadMessage = {
   subject: 'lti.removeUnloadMessage'
 }
@@ -81,7 +77,7 @@ QUnit.module('Messages', suiteHooks => {
     ltiToolWrapperFixture.empty()
   })
 
-  test('finds and resizes the tool content wrapper', () => {
+  test('finds and resizes the tool content wrapper', async () => {
     ltiToolWrapperFixture.append(`
       <div id="content-wrapper" class="ic-Layout-contentWrapper">
         <div id="content" class="ic-Layout-contentMain" role="main">
@@ -95,11 +91,11 @@ QUnit.module('Messages', suiteHooks => {
     const toolContentWrapper = el.find('.tool_content_wrapper')
 
     equal(toolContentWrapper.height(), 100)
-    ltiMessageHandler(postMessageEvent(resizeMessage))
+    await ltiMessageHandler(postMessageEvent(resizeMessage))
     equal(toolContentWrapper.height(), finalHeight)
   })
 
-  test('finds and resizes an iframe in embedded content', () => {
+  test('finds and resizes an iframe in embedded content', async () => {
     ltiToolWrapperFixture.append(`
       <div>
         <h1 class="page-title">LTI resize test</h1>
@@ -109,11 +105,11 @@ QUnit.module('Messages', suiteHooks => {
     const iframe = $('iframe')
 
     equal(iframe.height(), 100)
-    ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
+    await ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
     equal(iframe.height(), finalHeight)
   })
 
-  test('returns the hight and width of the page along with the iframe offset', () => {
+  test('returns the height and width of the page along with the iframe offset', async () => {
     ltiToolWrapperFixture.append(`
       <div>
         <h1 class="page-title">LTI resize test</h1>
@@ -124,11 +120,11 @@ QUnit.module('Messages', suiteHooks => {
 
     sinon.spy(iframe[0].contentWindow, 'postMessage')
     notOk(iframe[0].contentWindow.postMessage.calledOnce)
-    ltiMessageHandler(postMessageEvent(fetchWindowSize, iframe[0].contentWindow))
+    await ltiMessageHandler(postMessageEvent(fetchWindowSize, iframe[0].contentWindow))
     ok(iframe[0].contentWindow.postMessage.calledOnce)
   })
 
-  test('hides the module navigation', () => {
+  test('hides the module navigation', async () => {
     ltiToolWrapperFixture.append(`
       <div>
         <div id="module-footer" class="module-sequence-footer">Next</div>
@@ -137,28 +133,28 @@ QUnit.module('Messages', suiteHooks => {
     const moduleFooter = $('#module-footer')
 
     ok(moduleFooter.is(':visible'))
-    ltiMessageHandler(postMessageEvent(showMessage(false)))
+    await ltiMessageHandler(postMessageEvent(showMessage(false)))
     notOk(moduleFooter.is(':visible'))
   })
 
-  test('sets the unload message', () => {
+  test('sets the unload message', async () => {
     sinon.spy(window, 'addEventListener')
     notOk(window.addEventListener.calledOnce)
-    ltiMessageHandler(postMessageEvent(unloadMessage()))
+    await ltiMessageHandler(postMessageEvent(unloadMessage()))
     ok(window.addEventListener.calledOnce)
   })
 
-  test('remove the unload message', () => {
-    ltiMessageHandler(postMessageEvent(unloadMessage()))
+  test('remove the unload message', async () => {
+    await ltiMessageHandler(postMessageEvent(unloadMessage()))
     sinon.spy(window, 'removeEventListener')
     notOk(window.removeEventListener.calledOnce)
-    ltiMessageHandler(postMessageEvent(removeUnloadMessage))
+    await ltiMessageHandler(postMessageEvent(removeUnloadMessage))
     ok(window.removeEventListener.calledOnce)
   })
 
-  test('triggers a screen reader alert', () => {
+  test('triggers a screen reader alert', async () => {
     sinon.spy($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler(postMessageEvent(alertMessage()))
+    await ltiMessageHandler(postMessageEvent(alertMessage()))
     ok($.screenReaderFlashMessageExclusive.calledOnce)
   })
 })

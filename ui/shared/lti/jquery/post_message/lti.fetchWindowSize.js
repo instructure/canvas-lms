@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ltiState} from '../messages'
+import $ from 'jquery'
 
-const handler = () => {
-  if (!ltiState.tray) {
-    ltiState.tray = {}
+export default function fetchWindowSize({message, iframe}) {
+  if (iframe) {
+    message.height = window.innerHeight
+    message.width = window.innerWidth
+    message.offset = $('.tool_content_wrapper').offset()
+    message.footer = $('#fixed_bottom').height() || 0
+    message.scrollY = window.scrollY
+    const strMessage = JSON.stringify(message)
+
+    iframe.contentWindow.postMessage(strMessage, '*')
   }
-  ltiState.tray.refreshOnClose = true
 }
-
-export default handler

@@ -18,28 +18,44 @@
 
 /* eslint no-console: 0 */
 
-import $ from 'jquery'
-import '@canvas/rails-flash-notifications'
-import htmlEscape from 'html-escape'
-import ToolLaunchResizer from './tool_launch_resizer'
-import handleLtiPostMessage from './post_message/handleLtiPostMessage'
-import {setUnloadMessage, removeUnloadMessage, findDomForWindow} from './util'
+import {findDomForWindow} from './util'
+import {
+  NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
+  INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
+  SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE
+} from '../../rce/plugins/canvas_mentions/constants'
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState = {}
-export {ltiState}
 
-export function ltiMessageHandler(e) {
+const SUBJECT_ALLOW_LIST = [
+  'lti.enableScrollEvents',
+  'lti.fetchWindowSize',
+  'lti.frameResize',
+  'lti.removeUnloadMessage',
+  'lti.resourceImported',
+  'lti.screenReaderAlert',
+  'lti.scrollToTop',
+  'lti.setUnloadMessage',
+  'lti.showModuleNavigation',
+  'requestFullWindowLaunch',
+  'toggleCourseNavigationMenu'
+]
+
+// These are handled elsewhere so ignore them
+const SUBJECT_IGNORE_LIST = [
+  'A2ExternalContentReady',
+  'LtiDeepLinkingResponse',
+  MENTIONS_NAVIGATION_MESSAGE,
+  MENTIONS_INPUT_CHANGE_MESSAGE,
+  MENTIONS_SELECTION_MESSAGE
+]
+
+async function ltiMessageHandler(e) {
   if (e.data.source && e.data.source.includes('react-devtools')) {
     return
   }
 
-  if (e.data.messageType) {
-    handleLtiPostMessage(e)
-    return
-  }
-
-  // Legacy post message handlers
   let message
   try {
     message = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
@@ -48,109 +64,26 @@ export function ltiMessageHandler(e) {
     return
   }
 
+  // look at messageType for backwards compatibility
+  const subject = message.subject || message.messageType
+
+  if (SUBJECT_IGNORE_LIST.includes(subject) || !SUBJECT_ALLOW_LIST.includes(subject)) {
+    return false
+  }
+
   try {
-    switch (message.subject) {
-      case 'lti.frameResize': {
-        const toolResizer = new ToolLaunchResizer()
-        let height = message.height
-        if (height <= 0) height = 1
-
-        const container = toolResizer
-          .tool_content_wrapper(message.token || e.origin)
-          .data('height_overridden', true)
-        // If content.length is 0 then jquery didn't the tool wrapper.
-        if (container.length > 0) {
-          toolResizer.resize_tool_content_wrapper(height, container)
-        } else {
-          // Attempt to find an embedded iframe that matches the event source.
-          const iframe = findDomForWindow(e.source)
-          if (iframe) {
-            if (typeof height === 'number') {
-              height += 'px'
-            }
-            iframe.height = height
-            iframe.style.height = height
-          }
-        }
-        break
-      }
-      case 'lti.fetchWindowSize': {
-        const iframe = findDomForWindow(e.source)
-        if (iframe) {
-          message.height = window.innerHeight
-          message.width = window.innerWidth
-          message.offset = $('.tool_content_wrapper').offset()
-          message.footer = $('#fixed_bottom').height() || 0
-          message.scrollY = window.scrollY
-          const strMessage = JSON.stringify(message)
-
-          iframe.contentWindow.postMessage(strMessage, '*')
-        }
-        break
-      }
-
-      case 'lti.showModuleNavigation':
-        if (message.show === true || message.show === false) {
-          $('.module-sequence-footer').toggle(message.show)
-        }
-        break
-
-      case 'lti.scrollToTop':
-        $('html,body').animate(
-          {
-            scrollTop: $('.tool_content_wrapper').offset().top
-          },
-          'fast'
-        )
-        break
-
-      case 'lti.setUnloadMessage':
-        setUnloadMessage(htmlEscape(message.message))
-        break
-
-      case 'lti.removeUnloadMessage':
-        removeUnloadMessage()
-        break
-
-      case 'lti.screenReaderAlert':
-        $.screenReaderFlashMessageExclusive(
-          typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
-        )
-        break
-
-      case 'lti.enableScrollEvents': {
-        const iframe = findDomForWindow(e.source)
-        if (iframe) {
-          let timeout
-          window.addEventListener(
-            'scroll',
-            () => {
-              // requesting animation frames effectively debounces the scroll messages being sent
-              if (timeout) {
-                window.cancelAnimationFrame(timeout)
-              }
-
-              timeout = window.requestAnimationFrame(() => {
-                const msg = JSON.stringify({
-                  subject: 'lti.scroll',
-                  scrollY: window.scrollY
-                })
-                iframe.contentWindow.postMessage(msg, '*')
-              })
-            },
-            false
-          )
-        }
-        break
-      }
-    }
-  } catch (err) {
-    ;(console.error || console.log).call(console, 'invalid message received from')
+    const handlerModule = await import(`./post_message/${subject}.js`)
+    handlerModule.default({message, iframe: findDomForWindow(e.source), event: e})
+    return true
+  } catch (error) {
+    console.error(`Error loading or executing message handler for "${subject}"`, error)
   }
 }
 
-export function monitorLtiMessages() {
+function monitorLtiMessages() {
   window.addEventListener('message', e => {
     if (e.data !== '') ltiMessageHandler(e)
   })
 }
+
+export {ltiState, SUBJECT_ALLOW_LIST, SUBJECT_IGNORE_LIST, ltiMessageHandler, monitorLtiMessages}
