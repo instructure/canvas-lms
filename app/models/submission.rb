@@ -790,9 +790,12 @@ class Submission < ActiveRecord::Base
       hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
+        attachment_id: originality_report.attachment_id,
         report_url: originality_report.originality_report_url,
         status: originality_report.workflow_state,
-        error_message: originality_report.error_message
+        error_message: originality_report.error_message,
+        created_at: originality_report.created_at,
+        updated_at: originality_report.updated_at,
       }
     end
     turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)

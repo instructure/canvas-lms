@@ -2322,9 +2322,12 @@ describe Submission do
             attachment.asset_string => {
               similarity_score: originality_report.originality_score,
               state: originality_report.state,
+              attachment_id: originality_report.attachment_id,
               report_url: originality_report.originality_report_url,
               status: originality_report.workflow_state,
-              error_message: nil
+              error_message: nil,
+              created_at: originality_report.created_at,
+              updated_at: originality_report.updated_at
             }
           }
         )
@@ -2431,10 +2434,13 @@ describe Submission do
           {
             attachment.asset_string => {
               similarity_score: originality_report.originality_score,
+              attachment_id: attachment.id,
               state: originality_report.state,
               report_url: originality_report.originality_report_url,
               status: originality_report.workflow_state,
-              error_message: nil
+              error_message: nil,
+              created_at: originality_report.created_at,
+              updated_at: originality_report.updated_at
             }
           }
         )
@@ -2471,10 +2477,13 @@ describe Submission do
         expect(submission.originality_data).to eq({
                                                     OriginalityReport.submission_asset_key(submission) => {
                                                       similarity_score: originality_report.originality_score,
+                                                      attachment_id: nil,
                                                       state: originality_report.state,
                                                       report_url: originality_report.originality_report_url,
                                                       status: originality_report.workflow_state,
-                                                      error_message: nil
+                                                      error_message: nil,
+                                                      created_at: originality_report.created_at,
+                                                      updated_at: originality_report.updated_at,
                                                     }
                                                   })
       end
