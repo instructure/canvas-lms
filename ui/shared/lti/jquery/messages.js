@@ -72,7 +72,7 @@ async function ltiMessageHandler(e) {
   }
 
   try {
-    const handlerModule = await import(`./post_message/${subject}.js`)
+    const handlerModule = await import(`./subjects/${subject}.js`)
     handlerModule.default({message, iframe: findDomForWindow(e.source), event: e})
     return true
   } catch (error) {
