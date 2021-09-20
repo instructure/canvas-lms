@@ -683,7 +683,8 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                DISCUSSION: { GRADED_RUBRICS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil },
-               apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching)
+               apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
+               discussion_cache_key: Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
       js_bundle :discussion_topics_post
       css_bundle :discussions_index

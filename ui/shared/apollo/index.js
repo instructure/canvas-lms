@@ -29,6 +29,8 @@ import introspectionQueryResultData from './fragmentTypes.json'
 import {withClientState} from 'apollo-link-state'
 import InstAccess from './InstAccess'
 
+import EncryptedForage from '../encrypted-forage'
+
 function createConsoleErrorReportLink() {
   return onError(({graphQLErrors, networkError}) => {
     if (graphQLErrors)
@@ -82,11 +84,11 @@ function createCache() {
   })
 }
 
-async function createPersistentCache() {
+async function createPersistentCache(passphrase = null) {
   const cache = createCache()
   await persistCache({
     cache,
-    storage: window.localStorage
+    storage: new EncryptedForage(passphrase)
   })
   return cache
 }
