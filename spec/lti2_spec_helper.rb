@@ -22,7 +22,7 @@ require 'spec_helper'
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:account) { Account.create! }
   let(:course) do
-    course_with_student(account: account)
+    course_with_student(account: account, active_all: true)
     @course
   end
   let(:student) { course.student_enrollments.first.user }
