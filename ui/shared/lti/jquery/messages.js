@@ -53,7 +53,7 @@ const SUBJECT_IGNORE_LIST = [
 
 async function ltiMessageHandler(e) {
   if (e.data.source && e.data.source.includes('react-devtools')) {
-    return
+    return false
   }
 
   let message
@@ -61,7 +61,7 @@ async function ltiMessageHandler(e) {
     message = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
   } catch (err) {
     // unparseable message may not be meant for our handlers
-    return
+    return false
   }
 
   // look at messageType for backwards compatibility
@@ -77,6 +77,7 @@ async function ltiMessageHandler(e) {
     return true
   } catch (error) {
     console.error(`Error loading or executing message handler for "${subject}"`, error)
+    return false
   }
 }
 
