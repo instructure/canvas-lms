@@ -7736,6 +7736,22 @@ nl:
       start_at: Startdatum
       titles: 
         copy_course: "Cursus kopiëren"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Weet je zeker dat je wilt uitschrijven voor deze cursus? Je kunt dan niet langer het cursusrooster zien of direct met de docenten communiceren. Bovendien zul je niet langer gebeurtenissen die tijdens de cursus plaatsvinden in jouw gegevensstroom en als opmerkingen zien."
+      headers: 
+        course_status: Cursusstatus
+      headings: 
+        confirm_unenroll: "Uitschrijving bevestigen"
+      links: 
+        course_setup: "Controlelijst voor cursus-setup"
+        drop_course: "Deze cursus laten vallen"
+        import: "Bestaande inhoud importeren"
+        join_course: "Aan deze cursus deelnemen"
+        new_announcement: "Nieuwe aankondiging"
+        view_course_calendar: "Cursuskalender bekijken"
+        view_course_notification_settings: "Cursusmeldingen weergeven"
+        view_course_stream: "Gegevensstroom over de cursus"
     description: 
       links: 
         join_course: "Aan deze cursus deelnemen"

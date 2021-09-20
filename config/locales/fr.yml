@@ -7744,6 +7744,22 @@ fr:
       start_at: "Date de début"
       titles: 
         copy_course: "Copier le cours"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Voulez-vous vraiment vous désinscrire de ce cours ? Vous ne pourrez plus afficher la liste des cours ou communiquer directement avec les enseignants, et vous ne pourrez plus afficher les événements du cours dans le flux ou sous forme de notifications."
+      headers: 
+        course_status: "Statut du cours"
+      headings: 
+        confirm_unenroll: "Confirmer la désinscription"
+      links: 
+        course_setup: "Liste de vérification de la configuration du cours"
+        drop_course: "Abandonner ce cours"
+        import: "Importer contenu existant"
+        join_course: "Rejoindre ce cours"
+        new_announcement: "Nouvelle annonce"
+        view_course_calendar: "Voir le calendrier du cours"
+        view_course_notification_settings: "Afficher les notifications de cours"
+        view_course_stream: "Afficher le flux du cours"
     description: 
       links: 
         join_course: "Rejoindre ce cours"

@@ -7232,6 +7232,22 @@ is:
       start_at: Upphafsdagur
       titles: 
         copy_course: "Afrita námskeið"
+    course_show_secondary: 
+      details: 
+        confirm_unenroll: "Viltu örugglega skrá þig úr þessu námskeiði? Þú sérð þá ekki nafnalista námskeiðs og getur ekki haft beint samband við kennara og sérð ekki lengur viðburði námskeiðsins og tilkynningar í streyminu þínu."
+      headers: 
+        course_status: "Staða námskeiðs"
+      headings: 
+        confirm_unenroll: "Staðfesta afskráningu"
+      links: 
+        course_setup: "Gátlisti fyrir uppsetningu námskeiðs"
+        drop_course: "Sleppa þessu námskeiði"
+        import: "Flyttu inn núverandi efni"
+        join_course: "Taka þátt í þessu námskeiði"
+        new_announcement: "Ný tilkynning"
+        view_course_calendar: "Skoða námskeiðsdagatal"
+        view_course_notification_settings: "Skoða tilkynningar frá námskeiði"
+        view_course_stream: "Skoða námskeiðsstreymi"
     description: 
       links: 
         join_course: "Taka þátt í þessu námskeiði"
