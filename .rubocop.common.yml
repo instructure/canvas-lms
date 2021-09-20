@@ -1,0 +1,71 @@
+require:
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-performance
+  # this odd relative path is so that rubocop works when run without "bundle
+  # exec", such as from most editors/IDEs.
+  - ./gems/rubocop-canvas/lib/rubocop_canvas
+  - outrigger/cops/migration/tagged
+
+AllCops:
+  TargetRubyVersion: 2.7
+
+Bundler/OrderedGems:
+  Enabled: false # this isn't good for us because of how we pin dependencies
+
+Gemspec/OrderedDependencies:
+  Enabled: false # this isn't good for us because of how we pin dependencies
+
+Layout/IndentationConsistency:
+  Exclude:
+    - "**/Gemfile.d/*" # we purposely indent dependent gems
+
+Lint/Debugger:
+  Severity: error
+
+Metrics:
+  Enabled: false # SnR is just too low to have this enabled
+
+Migration/Tagged:
+  Severity: error
+  AllowedTags:
+    - predeploy
+    - postdeploy
+    - cassandra
+    - dynamodb
+
+Naming/FileName:
+  Exclude:
+    - "**/Gemfile.d/~after.rb"
+
+Rails:
+  Exclude:
+    - "**/Gemfile.d/*" # Rails isn't loaded yet, so can't use their helpers in the Gemfile
+
+RSpec/EmptyExampleGroup:
+  Severity: error
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/NestedGroups:
+  Max: 5
+RSpec/RepeatedDescription:
+  Severity: error
+
+Specs/EnsureSpecExtension:
+  Exclude:
+    - spec/shared_examples/**/*
+Style/AsciiComments:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Severity: error
+Style/SpecialGlobalVars:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false

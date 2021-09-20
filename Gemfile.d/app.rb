@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Note: Indented gems are meant to indicate transient dependencies of parent gems
+# NOTE: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
   gem 'rails', '6.0.4.1'
@@ -38,7 +38,7 @@ end
 gem 'academic_benchmarks', '1.1.1', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
-  github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
+    github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'activerecord-pg-extensions', '0.3.0'
 gem 'addressable', '2.7.0', require: false
 gem 'after_transaction_commit', '2.2.2'
@@ -139,7 +139,7 @@ gem 'twilio-ruby', '5.36.0', require: false
 gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'week_of_month', '1.2.5',
-  github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
+    github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
 # needs pin to satisfy varying requirements of google_drive and another gem

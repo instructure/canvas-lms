@@ -27,7 +27,8 @@ gergich capture i18nliner 'rake i18n:check'
 ruby script/brakeman
 ruby script/tatl_tael
 ruby script/stylelint
-ruby script/rlint --no-fail-on-offense
+ruby script/rlint --optional --no-fail-on-offense
+ruby script/rlint --boy-scout --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
 ruby script/lint_commit_message
 

@@ -162,6 +162,11 @@ class Linter
     end
 
     if gerrit_patchset
+      if boyscout_mode
+        processed_comments.each do |comment|
+          comment[:severity] = :error
+        end
+      end
       publish_gergich_comments(processed_comments)
     else
       publish_local_comments(processed_comments)

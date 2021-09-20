@@ -1,97 +1,109 @@
-require:
-  - rubocop-rails
-  - rubocop-rspec
-  - rubocop-performance
-  # this odd relative path is so that rubocop works when run without "bundle
-  # exec", such as from most editors/IDEs.
-  - ./gems/rubocop-canvas/lib/rubocop_canvas
-  - outrigger/cops/migration/tagged
+inherit_from: .rubocop.common.yml
 
 AllCops:
-  TargetRubyVersion: 2.7
   NewCops: enable
 
-# our style changes: disabling style rules we aren't interested in
-Layout/ParameterAlignment:
-  Enabled: false
-Layout/ElseAlignment:
-  Enabled: false
-Layout/EmptyLines:
-  Enabled: false
-Layout/EmptyLinesAroundAccessModifier:
-  Enabled: false
-Layout/EmptyLinesAroundArguments:
-  Enabled: false
-Layout/EmptyLinesAroundBlockBody:
-  Enabled: false
-Layout/EmptyLinesAroundClassBody:
-  Enabled: false
-Layout/EmptyLinesAroundMethodBody:
-  Enabled: false
-Layout/EmptyLinesAroundModuleBody:
-  Enabled: false
-Layout/FirstHashElementIndentation:
-  Enabled: false
-Layout/IndentationConsistency:
-  Enabled: false
-Layout/IndentationWidth:
-  Enabled: false
-Layout/MultilineOperationIndentation:
-  Enabled: false
-Layout/SpaceAfterColon:
-  Enabled: false
-Layout/SpaceAfterComma:
-  Enabled: false
-Layout/SpaceAroundEqualsInParameterDefault:
-  Enabled: false
-Layout/SpaceAroundOperators:
-  Enabled: false
-Layout/SpaceBeforeBlockBraces:
-  Enabled: false
-Layout/SpaceBeforeFirstArg:
-  Enabled: false
-Layout/SpaceInLambdaLiteral:
-  Enabled: false
-Layout/SpaceInsideArrayLiteralBrackets:
-  Enabled: false
-Layout/SpaceInsideBlockBraces:
-  Enabled: false
-Layout/SpaceInsideHashLiteralBraces:
-  Enabled: false
-Layout/SpaceInsideReferenceBrackets:
-  Enabled: false
-Layout/TrailingEmptyLines:
-  Enabled: false
-Layout/TrailingWhitespace:
+Gemspec/RequiredRubyVersion:
   Enabled: false
 
-Style/FormatStringToken:
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - spec/**/*
+
+Naming/VariableNumber:
   Enabled: false
-Style/StringLiterals:
+
+Rails/ApplicationRecord:
+  Enabled: false # we never bothered creating an ApplicationRecord
+Rails/HasManyOrHasOneDependent:
+  # It whines about update_all too much, which we use a lot specifically to
+  # bypass validations and any other AR-ness
   Enabled: false
-Style/SignalException:
+Rails/ReadWriteAttribute:
+  Enabled: false # accessors are often defined in terms of read_attribute
+Rails/SkipsModelValidations:
   Enabled: false
-Style/NumericLiterals:
+Rails/TimeZone:
   Enabled: false
-Style/PercentLiteralDelimiters:
+
+RSpec/ContextWording:
   Enabled: false
-Style/Documentation:
+RSpec/DescribeClass:
   Enabled: false
+RSpec/DescribedClass:
+  Enabled: false
+RSpec/ExampleWording:
+  Enabled: false
+RSpec/ExpectChange:
+  Enabled: false
+RSpec/HookArgument:
+  Enabled: false
+RSpec/MessageSpies:
+  Enabled: false
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/NotToNot:
+  Enabled: false
+RSpec/ScatteredSetup:
+  Enabled: false
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: true
+  Exclude:
+    - spec/**/*_spec.rb
+    - spec/shared_examples/**/*.rb
 Style/ClassAndModuleChildren:
   Enabled: false
-Style/RegexpLiteral:
+Style/DateTime:
   Enabled: false
-Style/GuardClause:
+Style/DoubleNegation:
   Enabled: false
-Style/RedundantSelf:
+Style/Dir:
+  Enabled: false
+Style/FormatStringToken:
   Enabled: false
 Style/IfUnlessModifier:
   Enabled: false
-Style/WordArray:
+Style/GuardClause:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false
+Style/Lambda:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  Enabled: false
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/ParallelAssignment:
+  Enabled: false
+Style/PercentLiteralDelimiters:
   Enabled: false
 Style/PercentQLiterals:
   Enabled: false
-Style/DoubleNegation:
+Style/RedundantSelf:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/RescueModifier:
+  Severity: warning
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+  Enabled: false
+Style/ReturnNil:
+  Enabled: false
+Style/SignalException:
+  Enabled: false
+Style/StderrPuts:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false
+Style/SymbolArray:
   Enabled: false
 Style/TrailingCommaInArguments:
   Enabled: false
@@ -99,156 +111,9 @@ Style/TrailingCommaInArrayLiteral:
   Enabled: false
 Style/TrailingCommaInHashLiteral:
   Enabled: false
-Style/MethodCallWithoutArgsParentheses:
-  Enabled: false
-Style/MethodCallWithArgsParentheses:
-  Enabled: false
-Layout/HashAlignment:
-  Enabled: false
-Style/Lambda:
-  Enabled: false
 Style/WhileUntilModifier:
   Enabled: false
-Style/ParallelAssignment:
+Style/WordArray:
   Enabled: false
 Style/ZeroLengthPredicate:
   Enabled: false
-Style/NumericPredicate:
-  Enabled: false
-Naming/VariableNumber:
-  Enabled: false
-Style/Dir:
-  Enabled: false
-Style/ReturnNil:
-  Enabled: false
-Style/StderrPuts:
-  Enabled: false
-Style/DateTime:
-  Enabled: false
-Style/SymbolArray:
-  Enabled: false
-Style/FrozenStringLiteralComment:
-  Severity: error
-Style/AsciiComments:
-  Enabled: false
-Style/BlockDelimiters:
-  Enabled: true
-  Exclude:
-    - spec/**/*_spec.rb
-    - spec/shared_examples/**/*.rb
-
-# RSpec cops we don't care about
-RSpec/MessageSpies:
-  Enabled: false
-RSpec/HookArgument:
-  Enabled: false
-RSpec/VerifiedDoubles:
-  Enabled: false
-RSpec/NamedSubject:
-  Enabled: false
-RSpec/NotToNot:
-  Enabled: false
-# RSpec cops we care extra about
-RSpec/EmptyExampleGroup:
-  Severity: error
-RSpec/RepeatedDescription:
-  Severity: error
-RSpec/ExpectChange:
-  Enabled: false
-
-# this isn't good for us because of how we pin dependencies
-Bundler/OrderedGems:
-  Enabled: false
-Gemspec/OrderedDependencies:
-  Enabled: false
-Gemspec/RequiredRubyVersion:
-  Enabled: false
-
-# Rails style changes
-Migration/Tagged:
-  Enabled: true
-  Severity: error
-  AllowedTags:
-    - predeploy
-    - postdeploy
-    - cassandra
-    - dynamodb
-Rails:
-  Enabled: true
-Rails/TimeZone:
-  Enabled: false
-# accessors are often defined in terms of read_attribute
-Rails/ReadWriteAttribute:
-  Enabled: false
-# we never bothered creating an ApplicationRecord
-Rails/ApplicationRecord:
-  Enabled: false
-Rails/HasManyOrHasOneDependent:
-  Enabled: false
-# It whines about update_all too much, which we use a lot specifically to
-# bypass validations and any other AR-ness
-Rails/SkipsModelValidations:
-  Enabled: false
-
-# Lint changes
-Lint/AmbiguousRegexpLiteral:
-  Severity: convention
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - spec/**/*
-Lint/UselessAssignment:
-  Severity: convention
-Lint/Debugger:
-  Severity: error
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-  Severity: convention
-
-# Performance changes
-Performance/Detect:
-  Severity: warning
-Performance/TimesMap:
-  Exclude:
-    - spec/**/*
-
-# these need better configuration than the default:
-Style/AndOr:
-  EnforcedStyle: conditionals
-Style/RescueModifier:
-  Severity: warning
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-
-# SnR is just too low to have this enabled
-Metrics:
-  Enabled: false
-
-RSpec/InstanceVariable:
-  Enabled: false
-RSpec/ExampleWording:
-  Enabled: false
-RSpec/ContextWording:
-  Enabled: false
-RSpec/ExampleLength:
-  Max: 48
-RSpec/NestedGroups:
-  Max: 5
-RSpec/DescribedClass:
-  Enabled: false
-RSpec/DescribeClass:
-  Enabled: false
-Style/HashSyntax:
-  Enabled: false
-RSpec/MultipleExpectations:
-  Enabled: false
-RSpec/ScatteredSetup:
-  Enabled: false
-Style/RescueStandardError:
-  Enabled: false
-
-Specs/EnsureSpecExtension:
-  Enabled: true
-  Exclude:
-    - spec/shared_examples/**/*
