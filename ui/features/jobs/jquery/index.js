@@ -254,6 +254,12 @@ window.Jobs = class Jobs extends FlavorGrid {
         width: 100
       },
       {
+        id: 'singleton',
+        name: I18n.t('columns.singleton', 'singleton'),
+        field: 'singleton',
+        width: 100
+      },
+      {
         id: 'run_at',
         name: I18n.t('columns.run_at', 'run at'),
         field: 'run_at',
