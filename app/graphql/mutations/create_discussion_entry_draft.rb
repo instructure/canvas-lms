@@ -40,7 +40,8 @@ class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
   argument :message, String, required: true
   argument :include_reply_preview, Boolean, required: false
 
-  field :success, Boolean, null: false
+  field :discussion_entry_draft, Types::DiscussionEntryDraftType, null: true
+
   def resolve(input:)
     topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
@@ -66,15 +67,26 @@ class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
                                                   host: context[:request].host,
                                                   port: context[:request].port)
 
-    DiscussionEntryDraft.upsert_draft(user: current_user,
-                                      message: message,
-                                      topic: topic,
-                                      entry: entry,
-                                      parent: parent_entry,
-                                      attachment: attachment,
-                                      reply_preview: include_reply_preview)
+    id = DiscussionEntryDraft.upsert_draft(user: current_user,
+                                           message: message,
+                                           topic: topic,
+                                           entry: entry,
+                                           parent: parent_entry,
+                                           attachment: attachment,
+                                           reply_preview: include_reply_preview).first
+    draft = DiscussionEntryDraft.new(
+      id: id,
+      message: message,
+      discussion_topic_id: topic.id,
+      discussion_entry_id: entry&.id,
+      parent_id: parent_entry&.id,
+      root_entry_id: parent_entry&.root_entry_id || parent_entry&.id,
+      updated_at: Time.zone.now,
+      created_at: Time.zone.now
+    )
+    draft.readonly!
 
-    { success: true }
+    { discussion_entry_draft: draft }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue InsufficientPermissionsError

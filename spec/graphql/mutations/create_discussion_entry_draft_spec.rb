@@ -49,8 +49,12 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
           #{"discussionEntryId: #{discussion_entry_id}" unless discussion_entry_id.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
-          }) {
-          success
+         }) {
+          discussionEntryDraft {
+            _id
+            message
+            parentId
+          }
           errors {
             message
             attribute
@@ -84,8 +88,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
     draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: 'hello').first
     result = run_mutation(discussion_topic_id: @topic.id, message: 'hello entry')
     expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'success')).to be true
+    expect(result.dig('data', 'createDiscussionEntryDraft', 'discussionEntryDraft', '_id')).to eq draft_id.to_s
     expect(DiscussionEntryDraft.find(draft_id).message).to eq 'hello entry'
   end
 
@@ -97,7 +100,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
     expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
 
     draft = @topic.discussion_entry_drafts.last
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'success')).to be true
+    expect(result.dig('data', 'createDiscussionEntryDraft', 'discussionEntryDraft', '_id')).to eq draft.id.to_s
     expect(draft.message).to eq 'edit in progress for entry'
     expect(draft.discussion_entry_id).to eq root.id
   end
