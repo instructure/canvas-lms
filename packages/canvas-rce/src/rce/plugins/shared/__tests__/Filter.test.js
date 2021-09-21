@@ -73,6 +73,18 @@ describe('RCE Plugins > Filter', () => {
     fireEvent.click(component.getByText(sortByLabel))
   }
 
+  it('does not render "Buttons and Icons" option when the feature is disabled', () => {
+    renderComponent({use_rce_buttons_and_icons: false})
+    fireEvent.click(getContentSubtypeField())
+    expect(component.queryByText('Buttons and Icons')).toBeNull()
+  })
+
+  it('renders "Buttons and Icons" option when the feature is enabled', () => {
+    renderComponent({use_rce_buttons_and_icons: true})
+    fireEvent.click(getContentSubtypeField())
+    expect(component.queryByText('Buttons and Icons')).toBeInTheDocument()
+  })
+
   describe('initially', () => {
     beforeEach(() => {
       renderComponent()
@@ -181,7 +193,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Content Subtype" field', () => {
     beforeEach(() => {
-      renderComponent({userContextType: 'course'})
+      renderComponent({userContextType: 'course', use_rce_buttons_and_icons: true})
       selectContentType('User Files')
     })
 
