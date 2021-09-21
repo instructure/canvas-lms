@@ -30,6 +30,8 @@ module DrDiff
 
     def relevant?(path, line_number, severe=false)
       return false unless diff[path]
+      return true if line_number == 1 # whole-file comments are addressed to line 1
+
       if campsite && severe
         diff[path][:context].any?{|range| range.include?(line_number)}
       else
