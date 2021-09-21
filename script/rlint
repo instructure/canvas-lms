@@ -8,9 +8,9 @@ require 'optparse'
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: %r{(?:\.e?rb|\.rake|\.gemspec|/[^./]+)$},
+  file_regex: %r{(?:\.rb|\.rake|\.gemspec|/[^./]+)$},
   format: "rubocop",
-  command: +"bin/rubocop",
+  command: +"bin/rubocop --force-exclusion",
   auto_correct: false,
   campsite_mode: false,
   append_files_to_command: true,
@@ -51,7 +51,7 @@ OptionParser.new do |opts|
     linter_options[:auto_correct] = true
     linter_options[:command] << " -A"
   end
-  opts.on("-x", "--fix-laout") do
+  opts.on("-x", "--fix-layout") do
     linter_options[:auto_correct] = true
     linter_options[:command] << " -x"
   end
@@ -65,7 +65,7 @@ end.parse!
 # that jenkins will warn about a larger config, but the pre-commit hook can
 # auto-correct against a much smaller config.
 unless optional
-  linter_options[:command] << " -c .rubocop.enforced.yml --force-exclusion"
+  linter_options[:command] << " -c .rubocop.enforced.yml"
 end
 
 rlint = Linter.new(linter_options)
