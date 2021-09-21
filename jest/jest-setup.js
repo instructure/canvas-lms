@@ -86,7 +86,6 @@ const ignoredErrors = [
   /Invalid prop `shares\[0\].content_export.id` of type `number` supplied to `ReceivedTable`/,
   /Invalid prop `studentID` of type `number` supplied to `StudentLastAttended`/,
   /Invalid prop `submissions\[0\].submissionDraft.submissionAttempt` of type `number` supplied to `StudentsTable`/,
-  /Invalid prop `tool.id` of type `number` supplied to `ContentTypeExternalToolTray`/,
   /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
