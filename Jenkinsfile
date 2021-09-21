@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
 final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
 final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
