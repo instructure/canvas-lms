@@ -75,7 +75,6 @@ const ignoredErrors = [
   /Invalid prop `id` of type `number` supplied to `Option`/,
   /Invalid prop `label` of type `function` supplied to `StepItem`/,
   /Invalid prop `open` of type `number` supplied to `(Modal|ModalSpinner)`/,
-  /Invalid prop `options.favoriteCourses\[0\]._id` of type `number` supplied to `CourseSelect`/,
   /Invalid prop `outcomeContextId` of type `number` supplied to `ManageOutcomeItem`/,
   /Invalid prop `outcomesGroup.contextId` of type `number` supplied to `FindOutcomesView`, expected `string`/,
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
