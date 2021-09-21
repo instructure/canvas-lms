@@ -152,7 +152,6 @@ module SpeedGrader
       ::Submission.bulk_load_versioned_attachments(submission_histories,
                                                    preloads: attachment_includes)
       ::Submission.bulk_load_versioned_originality_reports(submission_histories)
-      ::Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
       preloaded_provisional_selections =
         grading_role == :moderator ? assignment.moderated_grading_selections.index_by(&:student_id) : {}
