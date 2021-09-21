@@ -794,7 +794,7 @@ class AssignmentsController < ApplicationController
 
   # pulish a N.Q assignment from Quizzes Page
   def publish_quizzes
-    if authorized_action(@context, @current_user, :manage_assignments)
+    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
       @assignments = @context.assignments.active.where(id: params[:quizzes])
       @assignments.each(&:publish!)
 
@@ -812,7 +812,7 @@ class AssignmentsController < ApplicationController
 
   # unpulish a N.Q assignment from Quizzes Page
   def unpublish_quizzes
-    if authorized_action(@context, @current_user, :manage_assignments)
+    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
       @assignments = @context.assignments.active.where(id: params[:quizzes], workflow_state: 'published')
       @assignments.each(&:unpublish!)
 
