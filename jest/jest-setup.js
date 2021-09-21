@@ -123,7 +123,6 @@ const ignoredErrors = [
   /The prop `conferenceTypes\[0\].name` is marked as required in `(AddConference|ConferenceButton)`/,
   /The prop `containingContext.userId` is marked as required in `CanvasContentTray`/,
   /The prop `courseId` is marked as required in `(LatestAnnouncementLink|PublishButton)`/,
-  /The prop `currentUser` is marked as required in `GradesPage`/,
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,
   /The prop `dateTime` is marked as required in `FriendlyDatetime`/,
   /The prop `firstAnnouncement.id` is marked as required in `K5Announcement`/,
