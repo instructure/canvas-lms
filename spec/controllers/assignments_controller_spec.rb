@@ -2153,6 +2153,28 @@ describe AssignmentsController do
 
       expect(@assignment.reload).to be_published
     end
+
+    context "granular_permissions" do
+      before do
+        @course.root_account.enable_feature!(:granular_permissions_manage_assignments)
+      end
+
+      it "should require authorization" do
+        post 'publish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+        assert_unauthorized
+      end
+
+      it "should publish unpublished assignments" do
+        user_session(@teacher)
+        @assignment = @course.assignments.build(title: 'New quiz!', workflow_state: 'unpublished')
+        @assignment.save!
+
+        expect(@assignment).not_to be_published
+        post 'publish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+
+        expect(@assignment.reload).to be_published
+      end
+    end
   end
 
   describe "POST 'unpublish'" do
@@ -2169,6 +2191,27 @@ describe AssignmentsController do
       post 'unpublish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
 
       expect(@assignment.reload).not_to be_published
+    end
+    
+    context "granular_permissions" do
+      before do
+        @course.root_account.enable_feature!(:granular_permissions_manage_assignments)
+      end
+
+      it "should require authorization" do
+        post 'unpublish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+        assert_unauthorized
+      end
+
+      it "should unpublish published quizzes" do
+        user_session(@teacher)
+        @assignment = @course.assignments.create(title: 'New quiz!', workflow_state: 'published')
+
+        expect(@assignment).to be_published
+        post 'unpublish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+
+        expect(@assignment.reload).not_to be_published
+      end
     end
   end
 
