@@ -20,6 +20,8 @@ Gemspec/OrderedDependencies:
 Layout/IndentationConsistency:
   Exclude:
     - "**/Gemfile.d/*" # we purposely indent dependent gems
+Layout/LineLength:
+  Enabled: false
 
 Lint/Debugger:
   Severity: error

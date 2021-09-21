@@ -9,6 +9,9 @@ AllCops:
 
 <%=
 
+# if you want to see what this all evaluates to, you can run
+# `require 'erb'; puts ERB.new(File.read(".rubocop.enforced.yml")).result(binding)` from IRB
+
 # keys are cops you want to opt in for (nil being all cops)
 # values are an array of directories to opt in for (nil being all directories)
 OPT_IN = {

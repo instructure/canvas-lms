@@ -87,7 +87,6 @@ class Linter
               :campsite_mode,
               :command,
               :comment_post_processing,
-              :default_boyscout_mode,
               :custom_comment_generation,
               :env_sha,
               :file_regex,
@@ -164,7 +163,7 @@ class Linter
     if gerrit_patchset
       if boyscout_mode
         processed_comments.each do |comment|
-          comment[:severity] = :error
+          comment[:severity] = 'error'
         end
       end
       publish_gergich_comments(processed_comments)

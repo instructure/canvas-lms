@@ -15,7 +15,7 @@ linter_options = {
   campsite_mode: false,
   append_files_to_command: true,
   severe_levels: [],
-  default_boyscout_mode: false,
+  boyscout_mode: false,
   heavy_mode_proc: proc do |ruby_files|
     args = ruby_files
     args_index = ARGV.index('--')
