@@ -45,7 +45,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
         createDiscussionEntryDraft(input: {
           discussionTopicId: #{discussion_topic_id}
           message: "#{message}"
-          #{"parentEntryId: #{parent_entry_id}" unless parent_entry_id.nil?}
+          #{"parentId: #{parent_entry_id}" unless parent_entry_id.nil?}
           #{"discussionEntryId: #{discussion_entry_id}" unless discussion_entry_id.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}

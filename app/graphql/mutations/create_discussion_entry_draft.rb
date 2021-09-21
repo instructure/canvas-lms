@@ -29,7 +29,7 @@ class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
            ID,
            required: false,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
-  argument :parent_entry_id,
+  argument :parent_id,
            ID,
            required: false,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
@@ -47,8 +47,8 @@ class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
     raise InsufficientPermissionsError unless topic.grants_right?(current_user, session, :reply)
 
     entry, parent_entry, attachment = nil
-    if input[:parent_entry_id]
-      parent_entry = topic.discussion_entries.active.find(input[:parent_entry_id])
+    if input[:parent_id]
+      parent_entry = topic.discussion_entries.active.find(input[:parent_id])
     end
 
     include_reply_preview = input[:include_reply_preview].present? && parent_entry&.root_entry_id.present?
