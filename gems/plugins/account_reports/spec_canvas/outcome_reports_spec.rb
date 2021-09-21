@@ -124,10 +124,10 @@ describe "Outcome Reports" do
                            result.score
                          else
                            result.percent * outcome.points_possible
-                 end
+                         end
                  r[:points].present? && r[:points] <= score
                end&.first
-    end
+             end
     rating ||= {}
 
     hide_points = outcome_result&.hide_points
@@ -465,20 +465,19 @@ describe "Outcome Reports" do
       context 'With Account Level Mastery' do
         before(:once) do
           user1_values[:outcome_result]
-          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Account", context: @root_account,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Account", context: @root_account,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
                                                           id: 1, points: 5, color: '3ADF00', description: "High Rating",
-                                                            mastery: false, outcome_proficiency: @outcome_proficiency
+                                                          mastery: false, outcome_proficiency: @outcome_proficiency
                                                         ), OutcomeProficiencyRating.new(
                                                           id: 2, points: 3, color: 'FFFF00', description: "Mastery Rating",
-                                                            mastery: true, outcome_proficiency: @outcome_proficiency
+                                                          mastery: true, outcome_proficiency: @outcome_proficiency
                                                         ), OutcomeProficiencyRating.new(
                                                           id: 3, points: 1, color: 'FF0000', description: "Low Rating",
-                                                            mastery: false, outcome_proficiency: @outcome_proficiency
+                                                          mastery: false, outcome_proficiency: @outcome_proficiency
                                                         )])
           @root_account.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
-
         end
 
         it 'should operate as before when the feature flag is disabled' do
@@ -528,12 +527,11 @@ describe "Outcome Reports" do
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
           expect(report[2]['learning outcome rating']).to eq nil
         end
-
       end
 
       context 'With Course Level Mastery' do
         before(:once) do
-          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Course", context: @course1,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Course", context: @course1,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
                                                           id: 1, points: 5, color: '3ADF00', description: "High Rating",
                                                           mastery: false, outcome_proficiency: @outcome_proficiency
@@ -546,7 +544,6 @@ describe "Outcome Reports" do
                                                         )])
           @course1.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
-
         end
 
         it 'should run the report and use the course outcome proficiencies' do
@@ -557,9 +554,7 @@ describe "Outcome Reports" do
           expect(report[0]['learning outcome points possible']).to eq '45.0'
           expect(report[2]['learning outcome points possible']).to eq '5.0'
         end
-
       end
     end
-
   end
 end

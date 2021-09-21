@@ -48,6 +48,7 @@ module AcademicBenchmark
     empty_settings = {}.freeze
     p = Canvas::Plugin.find('academic_benchmark_importer')
     return empty_settings unless p
+
     p.settings || empty_settings
   end
 
@@ -63,6 +64,7 @@ module AcademicBenchmark
 
   def self.extract_nat_stds(api, nat_stds_guid)
     return [] if nat_stds_guid.nil?
+
     api.standards.authority_publications(nat_stds_guid)
   end
 
@@ -71,7 +73,7 @@ module AcademicBenchmark
   # National Standards are also known as Common Core and NGSS
   ##
   def self.nat_stds_guid_from_auths(authorities)
-    stds = authorities.find{|a| a.code == ISTE_AUTHORITY_CODE}
+    stds = authorities.find { |a| a.code == ISTE_AUTHORITY_CODE }
     stds.try(:guid)
   end
 
@@ -90,8 +92,8 @@ module AcademicBenchmark
   # sort national standards at the top, followed by country standards,
   # followed by the rest at the bottom in alphabetical order
   def self.sort_authorities(authorities)
-    national_stds, rest = authorities.partition{ |a| NATIONAL_STDS.include?(a.code) || NATIONAL_STDS.include?(a.description) }
-    country_stds, rest = rest.partition{ |a| COUNTRY_STDS.include?(a.description) }
+    national_stds, rest = authorities.partition { |a| NATIONAL_STDS.include?(a.code) || NATIONAL_STDS.include?(a.description) }
+    country_stds, rest = rest.partition { |a| COUNTRY_STDS.include?(a.description) }
     [
       self.sort_authorities_by_description(national_stds),
       self.sort_authorities_by_description(country_stds),
@@ -186,7 +188,7 @@ module AcademicBenchmark
     err ||= self.ensure_partner_key
     if err
       raise Canvas::Migration::Error,
-        "Not importing academic benchmark data because the Academic Benchmarks #{err}"
+            "Not importing academic benchmark data because the Academic Benchmarks #{err}"
     end
   end
 
@@ -212,7 +214,7 @@ module AcademicBenchmark
     uid = Setting.get("academic_benchmark_migration_user_id", nil)
     unless uid.present?
       raise Canvas::Migration::Error,
-        'Not importing academic benchmark data because no user id set'
+            'Not importing academic benchmark data because no user id set'
     end
     uid
   end
@@ -221,7 +223,7 @@ module AcademicBenchmark
     u = User.find_by(id: user_id)
     unless u
       raise Canvas::Migration::Error,
-        "Not importing academic benchmark data because no user found matching id '#{user_id}'"
+            "Not importing academic benchmark data because no user found matching id '#{user_id}'"
     end
     u
   end
@@ -229,8 +231,8 @@ module AcademicBenchmark
   def self.check_for_import_rights(user:)
     unless Account.site_admin.grants_right?(user, :manage_global_outcomes)
       raise Canvas::Migration::Error,
-        "Not importing academic benchmark data because user with ID " \
-        "'#{user.id}' isn't allowed to edit global outcomes"
+            "Not importing academic benchmark data because user with ID " \
+            "'#{user.id}' isn't allowed to edit global outcomes"
     end
     user
   end

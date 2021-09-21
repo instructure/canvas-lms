@@ -20,12 +20,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Moodle::Converter do
-
   before(:once) do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_2.zip')
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter = Moodle::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
 
@@ -42,7 +41,7 @@ describe Moodle::Converter do
       "Missing links found in imported content",
       "The announcement \"News forum\" could not be linked to the module"
     ]
-    expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
+    expect(@cm.old_warnings_format.all? { |w| allowed_warnings.find { |aw| w[0].start_with?(aw) } }).to eq true
   end
 
   context "discussion topics" do

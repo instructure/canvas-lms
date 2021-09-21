@@ -21,76 +21,76 @@ require 'spec_helper'
 
 describe AcademicBenchmark::Converter do
   def raw_standard
-    {"attributes"=>
-       {"status"=>"active",
-        "education_levels"=>{"grades"=>[{"code"=>"5"}]},
-        "guid"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93",
-        "statement"=>
-         {"descr"=>
-           "Identify major events of the American Revolution, including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown."},
-        "number"=>{"prefix_enhanced"=>"SOC.5.8"},
-        "label"=>"Content Standard",
-        "section"=>
-         {"guid"=>"b6a72362-7ca2-4f00-85ef-6ff44917460b",
-          "descr"=>
-           "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution"},
-        "level"=>1,
-        "disciplines"=>{"subjects"=>[{"code"=>"SOC"}]},
-        "document"=>
-         {"guid"=>"fe79c173-62e4-490b-ad02-a9ee8db932ad",
-          "adopt_year"=>"2010",
-          "descr"=>"Social Studies",
-          "publication"=>
-           {"authorities"=>
-             [{"guid"=>"912A8036-F1B9-11E5-862E-0938DC287387",
-               "descr"=>"Alabama State Department of Education",
-               "acronym"=>"ALSDE"}],
-            "guid"=>"9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
-            "descr"=>"Course of Study"}}},
-      "relationships"=>{"parent"=>{"data"=>{}}},
-      "type"=>"standards",
-      "id"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93"}
+    { "attributes" =>
+       { "status" => "active",
+         "education_levels" => { "grades" => [{ "code" => "5" }] },
+         "guid" => "e248c361-6dd7-40fe-9d3e-0a44e2710e93",
+         "statement" =>
+         { "descr" =>
+           "Identify major events of the American Revolution, including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown." },
+         "number" => { "prefix_enhanced" => "SOC.5.8" },
+         "label" => "Content Standard",
+         "section" =>
+         { "guid" => "b6a72362-7ca2-4f00-85ef-6ff44917460b",
+           "descr" =>
+           "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution" },
+         "level" => 1,
+         "disciplines" => { "subjects" => [{ "code" => "SOC" }] },
+         "document" =>
+         { "guid" => "fe79c173-62e4-490b-ad02-a9ee8db932ad",
+           "adopt_year" => "2010",
+           "descr" => "Social Studies",
+           "publication" =>
+           { "authorities" =>
+             [{ "guid" => "912A8036-F1B9-11E5-862E-0938DC287387",
+                "descr" => "Alabama State Department of Education",
+                "acronym" => "ALSDE" }],
+             "guid" => "9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
+             "descr" => "Course of Study" } } },
+      "relationships" => { "parent" => { "data" => {} } },
+      "type" => "standards",
+      "id" => "e248c361-6dd7-40fe-9d3e-0a44e2710e93" }
   end
 
   def raw_standard2
-    {"id"=>"0003631b-ca53-4985-8963-b7907320f8d9",
-      "attributes"=>
-       {"document"=>
-         {"adopt_year"=>"2010",
-          "descr"=>"Social Studies",
-          "publication"=>
-           {"guid"=>"9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
-            "descr"=>"Course of Study",
-            "authorities"=>
-             [{"acronym"=>"ALSDE",
-               "guid"=>"912A8036-F1B9-11E5-862E-0938DC287387",
-               "descr"=>"Alabama State Department of Education"}]},
-          "guid"=>"fe79c173-62e4-490b-ad02-a9ee8db932ad"},
-        "number"=>{"prefix_enhanced"=>"SOC.5.8.5"},
-        "guid"=>"0003631b-ca53-4985-8963-b7907320f8d9",
-        "level"=>2,
-        "status"=>"active",
-        "education_levels"=>{"grades"=>[{"code"=>"5"}]},
-        "section"=>
-         {"descr"=>
+    { "id" => "0003631b-ca53-4985-8963-b7907320f8d9",
+      "attributes" =>
+       { "document" =>
+         { "adopt_year" => "2010",
+           "descr" => "Social Studies",
+           "publication" =>
+           { "guid" => "9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
+             "descr" => "Course of Study",
+             "authorities" =>
+             [{ "acronym" => "ALSDE",
+                "guid" => "912A8036-F1B9-11E5-862E-0938DC287387",
+                "descr" => "Alabama State Department of Education" }] },
+           "guid" => "fe79c173-62e4-490b-ad02-a9ee8db932ad" },
+         "number" => { "prefix_enhanced" => "SOC.5.8.5" },
+         "guid" => "0003631b-ca53-4985-8963-b7907320f8d9",
+         "level" => 2,
+         "status" => "active",
+         "education_levels" => { "grades" => [{ "code" => "5" }] },
+         "section" =>
+         { "descr" =>
            "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution",
-          "guid"=>"b6a72362-7ca2-4f00-85ef-6ff44917460b"},
-        "label"=>nil,
-        "statement"=>
-         {"descr"=>
+           "guid" => "b6a72362-7ca2-4f00-85ef-6ff44917460b" },
+         "label" => nil,
+         "statement" =>
+         { "descr" =>
            "Locating on a map major battle sites of the American Revolution," \
-           " including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown"},
-        "disciplines"=>{"subjects"=>[{"code"=>"SOC"}]},
-        "utilizations"=>[{"type"=>"alignable"}]},
-      "type"=>"standards",
-      "relationships"=>
-       {"parent"=>
-         {"links"=>
-           {"related"=>
-             "https://api.abconnect.certicaconnect.com/rest/v4.1/standards/0003631b-ca53-4985-8963-b7907320f8d9/parent"},
-          "data"=>
-           {"id"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93",
-            "type"=>"standards"}}}}
+           " including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown" },
+         "disciplines" => { "subjects" => [{ "code" => "SOC" }] },
+         "utilizations" => [{ "type" => "alignable" }] },
+      "type" => "standards",
+      "relationships" =>
+       { "parent" =>
+         { "links" =>
+           { "related" =>
+             "https://api.abconnect.certicaconnect.com/rest/v4.1/standards/0003631b-ca53-4985-8963-b7907320f8d9/parent" },
+           "data" =>
+           { "id" => "e248c361-6dd7-40fe-9d3e-0a44e2710e93",
+             "type" => "standards" } } } }
   end
 
   let(:raw_authority) do
@@ -122,24 +122,24 @@ describe AcademicBenchmark::Converter do
   end
   let(:content_migration) do
     ContentMigration.create({
-      context: root_account,
-      migration_settings: migration_settings,
-      user: @user
-    })
+                              context: root_account,
+                              migration_settings: migration_settings,
+                              user: @user
+                            })
   end
   let(:converter_settings) do
     migration_settings.merge({
-      content_migration: content_migration,
-      content_migration_id: content_migration.id,
-      user_id: content_migration.user_id,
-      migration_options: {points_possible: 10,
-                          mastery_points: 6,
-                          ratings: [{:description => "Awesome", :points => 10},
-                                    {:description => "Not awesome", :points => 0}]}
-    })
+                               content_migration: content_migration,
+                               content_migration_id: content_migration.id,
+                               user_id: content_migration.user_id,
+                               migration_options: { points_possible: 10,
+                                                    mastery_points: 6,
+                                                    ratings: [{ :description => "Awesome", :points => 10 },
+                                                              { :description => "Not awesome", :points => 0 }] }
+                             })
   end
   before do
-    allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "instructure", partner_key: "key"})
+    allow(AcademicBenchmark).to receive(:config).and_return({ partner_id: "instructure", partner_key: "key" })
     standards_mock = double("standards")
     allow(standards_mock).to receive(:authority_tree).and_return(
       AcademicBenchmarks::Standards::StandardsForest.new([standard_instance, standard_instance2]).consolidate_under_root(authority_instance)
@@ -158,8 +158,8 @@ describe AcademicBenchmark::Converter do
       end
 
       it 'raises error missing content_migration settings' do
-        expect {converter.export }.to raise_error(Canvas::Migration::Error,
-          "Missing required content_migration settings")
+        expect { converter.export }.to raise_error(Canvas::Migration::Error,
+                                                   "Missing required content_migration settings")
       end
     end
 
@@ -169,8 +169,8 @@ describe AcademicBenchmark::Converter do
       end
 
       it 'raises error cannot manage global outcomes' do
-        expect {converter.export }.to raise_error(Canvas::Migration::Error,
-          "User isn't allowed to edit global outcomes")
+        expect { converter.export }.to raise_error(Canvas::Migration::Error,
+                                                   "User isn't allowed to edit global outcomes")
       end
     end
 
@@ -237,7 +237,7 @@ describe AcademicBenchmark::Converter do
       context 'clarification standards' do
         let(:standard_instance2) do
           dup_hash = raw_standard2.dup
-          dup_hash['attributes']['utilizations'] = [{"type"=>"clarification"}]
+          dup_hash['attributes']['utilizations'] = [{ "type" => "clarification" }]
           AcademicBenchmarks::Standards::Standard.new(dup_hash)
         end
 
@@ -255,4 +255,3 @@ describe AcademicBenchmark::Converter do
     end
   end
 end
-

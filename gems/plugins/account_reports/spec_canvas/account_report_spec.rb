@@ -24,7 +24,6 @@ describe "Account Reports" do
   include ReportSpecHelper
 
   before(:each) do
-
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
@@ -33,7 +32,6 @@ describe "Account Reports" do
   end
 
   describe "account report files" do
-
     it "should have different filenames for each report even when md5 matches" do
       report1 = run_report('unpublished_courses_csv')
       report2 = run_report('unpublished_courses_csv')
@@ -41,7 +39,6 @@ describe "Account Reports" do
       expect(report1.attachment.md5).to eq report2.attachment.md5
       expect(report1.attachment.filename).not_to be == report2.attachment.filename
     end
-
   end
 
   it "uses instfs if instfs is enabled" do
@@ -54,6 +51,5 @@ describe "Account Reports" do
 
     expect(report1.attachment.md5).to eq report2.attachment.md5
     expect(report1.attachment.filename).not_to be == report2.attachment.filename
-
   end
 end

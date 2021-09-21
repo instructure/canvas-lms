@@ -22,12 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'nokogiri'
 
 describe Moodle::Converter do
-
   before :once do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_1_9.zip')
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter = Moodle::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
     converter.export
 
     @course_data = converter.course.with_indifferent_access
@@ -41,9 +40,8 @@ describe Moodle::Converter do
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content",
                         "There was an error exporting an assessment question - No question type used",
-                        "The importer couldn't determine the correct answers for this question."
-    ]
-    expect(@cm.warnings.all?{|w| allowed_warnings.find{|aw| w.start_with?(aw)}}).to eq true
+                        "The importer couldn't determine the correct answers for this question."]
+    expect(@cm.warnings.all? { |w| allowed_warnings.find { |aw| w.start_with?(aw) } }).to eq true
   end
 
   it "should import files" do
@@ -52,20 +50,20 @@ describe Moodle::Converter do
   end
 
   it "should add at most 2 warnings per bank for problematic questions" do
-    converter = Moodle::Converter.new({:no_archive_file => true})
-    test_course = {:assessment_questions => {:assessment_questions => [
-      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
-      {'question_type' => 'calculated_question', 'question_bank_id' => '1'},
-      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '2'},
-      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+    converter = Moodle::Converter.new({ :no_archive_file => true })
+    test_course = { :assessment_questions => { :assessment_questions => [
+      { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1' },
+      { 'question_type' => 'calculated_question', 'question_bank_id' => '1' },
+      { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '2' },
+      { 'question_type' => 'calculated_question', 'question_bank_id' => '2' },
 
-      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
-      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
-      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
-      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
-      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+      { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1' },
+      { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1' },
+      { 'question_type' => 'calculated_question', 'question_bank_id' => '2' },
+      { 'question_type' => 'calculated_question', 'question_bank_id' => '2' },
+      { 'question_type' => 'calculated_question', 'question_bank_id' => '2' },
 
-    ]}}.with_indifferent_access
+    ] } }.with_indifferent_access
 
     converter.instance_variable_set(:@course, test_course)
     converter.add_question_warnings
@@ -110,7 +108,7 @@ describe Moodle::Converter do
       expect(assignment.description).to eq "My Workshop Description"
       expect(assignment.peer_reviews).to be_truthy
       expect(assignment.automatic_peer_reviews).to be_truthy
-      #assignment.anonymous_peer_reviews.should be_false
+      # assignment.anonymous_peer_reviews.should be_false
       expect(assignment.peer_review_count).to eq 5
     end
   end
@@ -163,9 +161,9 @@ describe Moodle::Converter do
       expect(question.question_data[:neutral_comments]).to eq 'Calculated Question General Feedback'
 
       # add warnings because these question types seem to be ambiguously structured in moodle
-      warnings = @cm.migration_issues.select{|w|
+      warnings = @cm.migration_issues.select { |w|
         w.description == "Possible answers will need to be regenerated for Formula question" &&
-            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}_question_text")
+          w.fix_issue_html_url.include?("question_#{question.assessment_question_id}_question_text")
       }
       expect(warnings.count).to eq 1
     end
@@ -313,7 +311,7 @@ describe Moodle::Converter do
       expect(question.question_data[:question_type]).to eq 'multiple_dropdowns_question'
 
       # add warnings because these question types seem to be ambiguously structured in moodle
-      warnings = @cm.migration_issues.select{|w|
+      warnings = @cm.migration_issues.select { |w|
         w.description == "Multiple Dropdowns question may have been imported incorrectly" &&
           w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
       }
