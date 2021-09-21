@@ -63,7 +63,6 @@ const ignoredErrors = [
   /Invalid prop `children` of type `array` supplied to `Transition`/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `conversation._id` of type `number` supplied to `ComposeModalManager`/,
-  /Invalid prop `courseId` of type `number` supplied to `(DirectShareUserModal|K5Announcement)`/,
   /Invalid prop `currentFolder` of type `Object` supplied to `FilePreview`/,
   /Invalid prop `currentUserId` of type `number` supplied to `AddStudentModal`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/,
