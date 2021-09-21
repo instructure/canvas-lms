@@ -24,6 +24,7 @@ describe AdheresToPolicy::InstanceMethods do
   before(:each) do
     @some_class = Class.new do
       attr_accessor :user
+
       extend AdheresToPolicy::ClassMethods
       set_policy do
         given { |user| self.user == user }
@@ -63,9 +64,9 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status(1, :read, :write)).to eq({read: true, write: true})
-    expect(actor.rights_status(2, :read, :update, :delete)).to eq({read: false, update: true, delete: true})
-    expect(actor.rights_status(3, :read, :manage, :set_permissions)).to eq({read: false, manage: true, set_permissions: true})
+    expect(actor.rights_status(1, :read, :write)).to eq({ read: true, write: true })
+    expect(actor.rights_status(2, :read, :update, :delete)).to eq({ read: false, update: true, delete: true })
+    expect(actor.rights_status(3, :read, :manage, :set_permissions)).to eq({ read: false, manage: true, set_permissions: true })
   end
 
   it 'should check parent conditions' do
@@ -117,6 +118,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "should execute all conditions when searching for all rights" do
     actor_class = Class.new do
       attr_accessor :total
+
       extend AdheresToPolicy::ClassMethods
 
       def initialize
@@ -136,13 +138,14 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status(nil)).to eq({read: true, write: true, update: true})
+    expect(actor.rights_status(nil)).to eq({ read: true, write: true, update: true })
     expect(actor.total).to eq 3
   end
 
   it "should skip duplicate conditions when searching for all rights" do
     actor_class = Class.new do
       attr_accessor :total
+
       extend AdheresToPolicy::ClassMethods
 
       def initialize
@@ -162,13 +165,14 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status(nil)).to eq({read: true, write: true, update: true})
+    expect(actor.rights_status(nil)).to eq({ read: true, write: true, update: true })
     expect(actor.total).to eq 2
   end
 
   it "should only execute relevant conditions when searching for specific rights" do
     actor_class = Class.new do
       attr_accessor :total
+
       extend AdheresToPolicy::ClassMethods
 
       def initialize
@@ -188,13 +192,14 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status(nil, :read)).to eq({read: true})
+    expect(actor.rights_status(nil, :read)).to eq({ read: true })
     expect(actor.total).to eq 1
   end
 
   it "should skip duplicate conditions when searching for specific rights" do
     actor_class = Class.new do
       attr_accessor :total
+
       extend AdheresToPolicy::ClassMethods
 
       def initialize
@@ -214,7 +219,7 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status(nil, :read, :write)).to eq({read: true, write: true})
+    expect(actor.rights_status(nil, :read, :write)).to eq({ read: true, write: true })
     expect(actor.total).to eq 2
   end
 
@@ -302,6 +307,7 @@ describe AdheresToPolicy::InstanceMethods do
     it "should run condition based on its arity" do
       actor_class = Class.new do
         attr_accessor :total
+
         extend AdheresToPolicy::ClassMethods
 
         def initialize
@@ -318,7 +324,7 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       actor = actor_class.new
-      expect(actor.rights_status(1, { count: 2 }, :read, :write)).to eq({read: true, write: true})
+      expect(actor.rights_status(1, { count: 2 }, :read, :write)).to eq({ read: true, write: true })
       expect(actor.total).to eq 4
     end
   end
@@ -358,7 +364,7 @@ describe AdheresToPolicy::InstanceMethods do
     it "should raise argument exception if anything other then one right is provided" do
       non_context = @actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
-      expect{
+      expect {
         non_context.grants_right?("allowed actor", :asdf, :read)
       }.to raise_exception ArgumentError
     end
@@ -381,6 +387,7 @@ describe AdheresToPolicy::InstanceMethods do
       it "should not nil the session argument when not caching" do
         actor_class = Class.new do
           attr_reader :session
+
           extend AdheresToPolicy::ClassMethods
           set_policy {
             given { |_, session| @session = session }

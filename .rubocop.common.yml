@@ -17,6 +17,9 @@ Bundler/OrderedGems:
 Gemspec/OrderedDependencies:
   Enabled: false # this isn't good for us because of how we pin dependencies
 
+Layout/EmptyLineAfterMagicComment:
+  Exclude:
+    - gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**/* # fixtures purposely have errors
 Layout/IndentationConsistency:
   Exclude:
     - "**/Gemfile.d/*" # we purposely indent dependent gems

@@ -29,7 +29,6 @@ module CanvasSecurity
   # is a different domain concept from the page view
   # model itself.
   module PageViewJwt
-
     ##
     # Used to generate a packaged JWT from
     # the standard attributes for a page_view.
@@ -40,10 +39,10 @@ module CanvasSecurity
     #    - created_at [DateTime] (when the pageview happend)
     def self.generate(pv_attributes)
       CanvasSecurity.create_jwt({
-        i: pv_attributes[:request_id],
-        u: pv_attributes[:user_id],
-        c: pv_attributes[:created_at].try(:utc).try(:iso8601, 2)
-      })
+                                  i: pv_attributes[:request_id],
+                                  u: pv_attributes[:user_id],
+                                  c: pv_attributes[:created_at].try(:utc).try(:iso8601, 2)
+                                })
     end
 
     ##
@@ -54,6 +53,7 @@ module CanvasSecurity
     def self.decode(token)
       data = CanvasSecurity.decode_jwt(token)
       return nil unless data
+
       return {
         request_id: data[:i],
         user_id: data[:u],

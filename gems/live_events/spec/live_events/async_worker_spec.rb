@@ -123,8 +123,8 @@ describe LiveEvents::AsyncWorker do
     context 'with error putting to kinesis' do
       it "should write errors to logger" do
         results = OpenStruct.new(records: [
-          OpenStruct.new(error_code: 'failure', error_message: 'failure message')
-        ])
+                                   OpenStruct.new(error_code: 'failure', error_message: 'failure message')
+                                 ])
         allow(stream_client).to receive(:put_records).once.and_return(results)
         statsd_double = double
         LiveEvents.statsd = statsd_double

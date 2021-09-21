@@ -19,7 +19,6 @@
 
 module GoogleDrive
   class Client
-
     ##
     #
     # @param [Hash] client_secrets
@@ -44,7 +43,7 @@ module GoogleDrive
       client
     end
 
-    def self.auth_uri(client, state, login=nil)
+    def self.auth_uri(client, state, login = nil)
       auth_client = client.authorization
       auth_client.update!
 

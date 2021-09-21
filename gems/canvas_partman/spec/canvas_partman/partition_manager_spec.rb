@@ -72,17 +72,17 @@ describe CanvasPartman::PartitionManager do
       it "should prune the proper number of partitions" do
         expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
         expect(subject).to receive(:partition_tables).and_return(%w{
-          partman_animals_2014_9
-          partman_animals_2014_10
-          partman_animals_2014_11
-          partman_animals_2014_12
-          partman_animals_2015_1
-          partman_animals_2015_2
-          partman_animals_2015_3
-          partman_animals_2015_4
-          partman_animals_2015_5
-          partman_animals_2015_6
-        })
+                                                                   partman_animals_2014_9
+                                                                   partman_animals_2014_10
+                                                                   partman_animals_2014_11
+                                                                   partman_animals_2014_12
+                                                                   partman_animals_2015_1
+                                                                   partman_animals_2015_2
+                                                                   partman_animals_2015_3
+                                                                   partman_animals_2015_4
+                                                                   partman_animals_2015_5
+                                                                   partman_animals_2015_6
+                                                                 })
 
         expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_9')
         expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_10')
@@ -93,13 +93,13 @@ describe CanvasPartman::PartitionManager do
         expect(Time).to receive(:now).and_return(Time.utc(2015, 02, 05))
         allow(Animal).to receive(:partitioning_interval).and_return(:weeks)
         expect(subject).to receive(:partition_tables).and_return(%w{
-          partman_animals_2015_01
-          partman_animals_2015_02
-          partman_animals_2015_03
-          partman_animals_2015_04
-          partman_animals_2015_05
-          partman_animals_2015_06
-        })
+                                                                   partman_animals_2015_01
+                                                                   partman_animals_2015_02
+                                                                   partman_animals_2015_03
+                                                                   partman_animals_2015_04
+                                                                   partman_animals_2015_05
+                                                                   partman_animals_2015_06
+                                                                 })
 
         expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_01')
         expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_02')

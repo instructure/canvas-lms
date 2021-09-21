@@ -60,7 +60,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message do |*values|
         yielded_values << values
       end
-      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"],]
     end
 
     it "iterates with stride and offset" do
@@ -81,7 +81,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message(stride: 2, offset: 0) do |*values|
         yielded_values << values
       end
-      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"],]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |*values|
@@ -98,7 +98,6 @@ describe IncomingMailProcessor::DirectoryMailbox do
   end
 
   context "with simple foo file" do
-
     before do
       expect(@mailbox).to receive(:file?).and_return(true)
       expect(@mailbox).to receive(:read_file).and_return("foo body")
@@ -133,6 +132,5 @@ describe IncomingMailProcessor::DirectoryMailbox do
         @mailbox.move_message(id, "aside")
       end
     end
-
   end
 end

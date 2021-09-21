@@ -31,73 +31,73 @@ describe CanvasQuizStatistics::Util do
 
     it 'should symbolize top-level keys' do
       expect(Util.deep_symbolize_keys({ 'a' => 'b', c: 'd' })).to eq({
-        a: 'b',
-        c: 'd'
-      })
+                                                                       a: 'b',
+                                                                       c: 'd'
+                                                                     })
     end
 
     it 'should symbolize keys of nested hashes' do
       expect(Util.deep_symbolize_keys({
-        'e' => {
-          'f' => 'g',
-          h: 'i'
-        }
-      })).to eq({
-        e: {
-          f: 'g',
-          h: 'i'
-        }
-      })
+                                        'e' => {
+                                          'f' => 'g',
+                                          h: 'i'
+                                        }
+                                      })).to eq({
+                                                  e: {
+                                                    f: 'g',
+                                                    h: 'i'
+                                                  }
+                                                })
     end
 
     it 'should symbolize keys of hashes inside arrays' do
       expect(Util.deep_symbolize_keys({
-        'e' => [{
-          'f' => 'g',
-          h: 'i'
-        }]
-      })).to eq({
-        e: [{
-          f: 'g',
-          h: 'i'
-        }]
-      })
+                                        'e' => [{
+                                          'f' => 'g',
+                                          h: 'i'
+                                        }]
+                                      })).to eq({
+                                                  e: [{
+                                                    f: 'g',
+                                                    h: 'i'
+                                                  }]
+                                                })
     end
 
     it 'should symbolize all sorts of things' do
       expect(Util.deep_symbolize_keys({
-        item1: 'value1',
-        "item2" => 'value2',
-        hash: {
-          item3: 'value3',
-          "item4" => 'value4'
-        },
-        'array' => [{
-          "item5" => 'value5',
-          item6: 'value6'
-        }]
-      })).to eq({
-        item1: 'value1',
-        item2: 'value2',
-        hash: {
-          item3: 'value3',
-          item4: 'value4'
-        },
-        array: [{
-          item5: 'value5',
-          item6: 'value6'
-        }]
-      })
+                                        item1: 'value1',
+                                        "item2" => 'value2',
+                                        hash: {
+                                          item3: 'value3',
+                                          "item4" => 'value4'
+                                        },
+                                        'array' => [{
+                                          "item5" => 'value5',
+                                          item6: 'value6'
+                                        }]
+                                      })).to eq({
+                                                  item1: 'value1',
+                                                  item2: 'value2',
+                                                  hash: {
+                                                    item3: 'value3',
+                                                    item4: 'value4'
+                                                  },
+                                                  array: [{
+                                                    item5: 'value5',
+                                                    item6: 'value6'
+                                                  }]
+                                                })
     end
 
     it 'should work with numbers for keys' do
       expect(Util.deep_symbolize_keys({
-        "1" => "first",
-        "2" => "second"
-      })).to eq({
-        :"1" => "first",
-        :"2" => "second"
-      })
+                                        "1" => "first",
+                                        "2" => "second"
+                                      })).to eq({
+                                                  :"1" => "first",
+                                                  :"2" => "second"
+                                                })
     end
 
     it 'should skip nils and items that cant be symbolized' do

@@ -26,7 +26,7 @@ describe Multipart::Post do
   end
 
   it "should prepare_query with a File" do
-    file = Tempfile.new(["test","txt"])
+    file = Tempfile.new(["test", "txt"])
     file.write("file on disk")
     file.rewind
     query, header = subject.prepare_query(:a => "string", :b => file)
@@ -45,7 +45,7 @@ describe Multipart::Post do
   end
 
   it "should prepare_query_stream with a File" do
-    file = Tempfile.new(["test","txt"])
+    file = Tempfile.new(["test", "txt"])
     file.write("file on disk")
     file.rewind
     stream, header = subject.prepare_query_stream(:a => "string", 'test.txt' => file)
@@ -57,7 +57,7 @@ describe Multipart::Post do
   end
 
   it "should prepare_query_stream with a StringIO" do
-    file = Tempfile.new(["test","txt"])
+    file = Tempfile.new(["test", "txt"])
     file.write("file in mem")
     file.rewind
     stream, header = subject.prepare_query_stream(:a => "string", :b => file)

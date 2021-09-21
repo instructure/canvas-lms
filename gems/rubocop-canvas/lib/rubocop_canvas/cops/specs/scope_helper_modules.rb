@@ -36,6 +36,7 @@ module RuboCop
 
         def on_def(node)
           return unless top_level_def?(node)
+
           add_offense node, message: MSG, severity: :warning
         end
 
@@ -45,9 +46,10 @@ module RuboCop
           return false unless node.def_type?
           return false if node.ancestors.any? do |ancestor|
             ancestor.module_type? || ancestor.class_type? ||
-              ancestor.type == :block &&
-                WHITELISTED_BLOCKS.include?(ancestor.method_name)
+            ancestor.type == :block &&
+            WHITELISTED_BLOCKS.include?(ancestor.method_name)
           end
+
           true
         end
       end

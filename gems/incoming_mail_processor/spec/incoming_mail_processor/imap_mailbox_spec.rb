@@ -33,16 +33,16 @@ describe IncomingMailProcessor::ImapMailbox do
 
   def mock_net_imap
     @imap_mock = Object.new
-    class <<@imap_mock
+    class << @imap_mock
       IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
         define_method(method_name) { |*args, &block| }
       end
     end
 
-    expect(Net::IMAP).to receive(:new).
-      with("mail.example.com", {:port => 993, :ssl => true}).
-      at_most(:once). # allow simple tests to not call #connect
-      and_return(@imap_mock)
+    expect(Net::IMAP).to receive(:new)
+      .with("mail.example.com", { :port => 993, :ssl => true })
+      .at_most(:once) # allow simple tests to not call #connect
+      .and_return(@imap_mock)
   end
 
   before do
@@ -53,13 +53,13 @@ describe IncomingMailProcessor::ImapMailbox do
   describe "#initialize" do
     it "should accept existing mailman imap configuration" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new({
-        :server => "imap.server.com",
-        :port => 1234,
-        :ssl => "truthy-value",
-        :filter => ["ALL"],
-        :username => "user@server.com",
-        :password => "secret-user-password",
-      })
+                                                          :server => "imap.server.com",
+                                                          :port => 1234,
+                                                          :ssl => "truthy-value",
+                                                          :filter => ["ALL"],
+                                                          :username => "user@server.com",
+                                                          :password => "secret-user-password",
+                                                        })
 
       expect(@mailbox.server).to eql "imap.server.com"
       expect(@mailbox.port).to eql 1234
@@ -79,7 +79,6 @@ describe IncomingMailProcessor::ImapMailbox do
       @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
       expect(@mailbox.folder).to eql "inbox"
     end
-
   end
 
   describe "connect" do
@@ -96,7 +95,7 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     it 'returns the number of messages if there are any' do
-      expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1,2,3,58,42])
+      expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1, 2, 3, 58, 42])
       expect(@mailbox.unprocessed_message_count).to eql 5
     end
   end
@@ -108,7 +107,7 @@ describe IncomingMailProcessor::ImapMailbox do
 
     def mock_fetch_response(body)
       result = double()
-      expect(result).to receive(:attr).and_return({"RFC822" => body})
+      expect(result).to receive(:attr).and_return({ "RFC822" => body })
       [result]
     end
 
@@ -195,7 +194,6 @@ describe IncomingMailProcessor::ImapMailbox do
         @mailbox.move_message(id, "other_folder")
       end
     end
-      
   end
 
   describe "#disconnect" do
@@ -218,7 +216,7 @@ describe IncomingMailProcessor::ImapMailbox do
     it "should use timeout method on disconnect call" do
       @mailbox.connect
       @mailbox.set_timeout_method { raise Timeout::Error }
-      @mailbox.disconnect #.should_not raise_error
+      @mailbox.disconnect # .should_not raise_error
       @mailbox.set_timeout_method { raise SyntaxError }
 
       # rspec .should raise_error doesn't catch outside of StandardError hierarchy

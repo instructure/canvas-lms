@@ -40,10 +40,13 @@ module RuboCop
 
           _receiver, method_name, *args = *node
           return unless method_name == METHOD
+
           first_arg = args.to_a.first
           return unless first_arg
+
           reason = first_arg.children.first
           return if refs_ticket?(reason)
+
           add_offense node, message: MSG, severity: :warning
         end
 

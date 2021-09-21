@@ -108,7 +108,7 @@ module CanvasPartman::Concerns
       #   potential record of the current class type
       #
       def attrs_in_partition_groups(attrs_list)
-        attrs_list.group_by{|a| infer_partition_table_name(a) }.each do |name, group|
+        attrs_list.group_by { |a| infer_partition_table_name(a) }.each do |name, group|
           yield name, group
         end
       end
@@ -188,15 +188,15 @@ module CanvasPartman::Concerns
           case partitioning_interval
           when :weeks
             date = date.to_date
-            [ table_name, date.cwyear, ("%02d" % date.cweek) ].join('_')
+            [table_name, date.cwyear, ("%02d" % date.cweek)].join('_')
           when :months
-            [ table_name, date.year, date.month ].join('_')
+            [table_name, date.year, date.month].join('_')
           when :years
-            [ table_name, date.year ].join('_')
+            [table_name, date.year].join('_')
           end
         else
           id = attr[1]
-          [ table_name, id / partition_size ].join('_')
+          [table_name, id / partition_size].join('_')
         end
       end
     end

@@ -23,17 +23,17 @@ module DrDiff
     attr_reader :campsite
 
     # campsite = true: consider relevant the severe linter errors near lines changed
-    def initialize(input, raw = true, campsite=true)
+    def initialize(input, raw = true, campsite = true)
       @diff = (raw ? parse_raw_diff(input) : input)
       @campsite = campsite
     end
 
-    def relevant?(path, line_number, severe=false)
+    def relevant?(path, line_number, severe = false)
       return false unless diff[path]
       return true if line_number == 1 # whole-file comments are addressed to line 1
 
       if campsite && severe
-        diff[path][:context].any?{|range| range.include?(line_number)}
+        diff[path][:context].any? { |range| range.include?(line_number) }
       else
         diff[path][:change].include?(line_number)
       end
@@ -43,12 +43,12 @@ module DrDiff
 
     def parse_raw_diff(raw_diff)
       key = "GLOBAL"
-      parsed = {key => {context: [], change: []}}
+      parsed = { key => { context: [], change: [] } }
       cur_line_number = 0
       raw_diff.each_line.map(&:strip).each do |line|
         if file_line?(line)
           key = path_from_file_line(line)
-          parsed[key] ||= {context: [], change: []}
+          parsed[key] ||= { context: [], change: [] }
         end
 
         if line_range?(line)
@@ -74,8 +74,9 @@ module DrDiff
       return false if file_line?(line)
       return false if line_range?(line)
       return false if line =~ /^\-\-\- a\/.*\./
-      return false if line =~/^index .*\d\d\d$/
-      return false if line =~/^diff \-\-git/
+      return false if line =~ /^index .*\d\d\d$/
+      return false if line =~ /^diff \-\-git/
+
       true
     end
 

@@ -29,7 +29,7 @@ describe 'A file with a know extension' do
   end
 
   it 'should have a mime type' do
-   expect(File.mime_type?(@file)).to eq("image/jpeg")
+    expect(File.mime_type?(@file)).to eq("image/jpeg")
   end
 
   it 'find a extension from mime_typee' do
@@ -50,7 +50,7 @@ describe 'A file with anunknow extension' do
   end
 
   it 'should have an unkwown  mime type' do
-   expect(File.mime_type?(@file)).to eq("unknown/unknown")
+    expect(File.mime_type?(@file)).to eq("unknown/unknown")
   end
 end
 

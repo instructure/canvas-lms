@@ -85,7 +85,7 @@ describe ConfigFile do
 
     describe "deep freezing" do
       it "can deep freeze arrays" do
-        array = ["asdf","sdfg","dfgh","fghj"]
+        array = ["asdf", "sdfg", "dfgh", "fghj"]
         out = ConfigFile.deep_freeze_cached_value(array)
         expect(out).to be_frozen
         expect(out.class).to eq(Array)
@@ -94,7 +94,7 @@ describe ConfigFile do
       end
 
       it "can deep freeze hashes" do
-        hash = { "asdf" => "sdfg","dfgh" => "fghj" }
+        hash = { "asdf" => "sdfg", "dfgh" => "fghj" }
         out = ConfigFile.deep_freeze_cached_value(hash)
         expect(out).to be_frozen
         expect(out.class).to eq(Hash)
@@ -103,7 +103,7 @@ describe ConfigFile do
       end
 
       it "handles integers ok" do
-        array = [1,2,3,4]
+        array = [1, 2, 3, 4]
         out = ConfigFile.deep_freeze_cached_value(array)
         expect(out).to be_frozen
         expect(out.class).to eq(Array)

@@ -34,10 +34,10 @@
 require 'i18n'
 require 'cgi'
 
-I18n.load_path += Dir.glob(File.join(File.dirname(__FILE__),  '../config/locales/*.yml'))
+I18n.load_path += Dir.glob(File.join(File.dirname(__FILE__), '../config/locales/*.yml'))
 
 module CanvasTextHelper
-  def self.truncate_text(text, options={})
+  def self.truncate_text(text, options = {})
     truncated = text || ""
 
     # truncate words
@@ -58,7 +58,7 @@ module CanvasTextHelper
     truncated + ellipsis
   end
 
-  def self.indent(text, spaces=2)
+  def self.indent(text, spaces = 2)
     text = text.to_s rescue ""
     indentation = " " * spaces
     text.gsub(/\n/, "\n#{indentation}")
@@ -70,10 +70,9 @@ module CanvasTextHelper
     string.chars do |char|
       escape_seq = CGI::escape(char)
       break if retval.length + escape_seq.length > max_len
+
       retval << escape_seq
     end
     retval
   end
-
 end
-

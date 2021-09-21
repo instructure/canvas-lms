@@ -63,7 +63,7 @@ describe "BookmarkedCollection" do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
-      3.times{ example_class.create! }
+      3.times { example_class.create! }
       @scope = example_class
     end
 
@@ -278,8 +278,8 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-          ['created', created_collection],
-          ['deleted', @deleted_collection]
+        ['created', created_collection],
+        ['deleted', @deleted_collection]
       )
       expect(created_collection.paginate(per_page: 3)).to eq([@created_course1])
       expect(@collection.paginate(per_page: 3)).to eq([@created_course1, @created_course2, @deleted_course1])
@@ -297,15 +297,13 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-          ['created', created_collection],
-          ['deleted', @deleted_collection]
+        ['created', created_collection],
+        ['deleted', @deleted_collection]
       )
 
       expect(@deleted_collection).to receive(:execute_pager).never
       expect(@collection.paginate(per_page: 1).next_page).not_to be_nil
     end
-
-
   end
 
   describe "nested compositions" do
@@ -388,11 +386,13 @@ describe "BookmarkedCollection" do
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],
-        ['deleted', @deleted_collection])
+        ['deleted', @deleted_collection]
+      )
 
       @collection = BookmarkedCollection.concat(
         ['users', @user_collection],
-        ['courses', @course_collection])
+        ['courses', @course_collection]
+      )
 
       page = @collection.paginate(:per_page => 3)
       expect(page).to eq([@user1, @user2, @created_course1])
@@ -410,12 +410,14 @@ describe "BookmarkedCollection" do
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],
-        ['deleted', @deleted_collection])
+        ['deleted', @deleted_collection]
+      )
 
-      expect{
+      expect {
         @collection = BookmarkedCollection.merge(
           ['users', @user_collection],
-          ['courses', @course_collection])
+          ['courses', @course_collection]
+        )
       }.to raise_exception ArgumentError
     end
   end

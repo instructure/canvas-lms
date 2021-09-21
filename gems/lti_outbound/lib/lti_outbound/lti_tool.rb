@@ -73,24 +73,25 @@ module LtiOutbound
 
     private
 
-    #Duplicated in ContextExternalTool
+    # Duplicated in ContextExternalTool
     def extension_setting(type, property = nil)
       type = type.to_sym
       return settings[type] unless property
+
       (settings[type] && settings[type][property]) || settings[property] || extension_default_value(property)
     end
 
-    #Duplicated in ContextExternalTool
+    # Duplicated in ContextExternalTool
     def extension_default_value(property)
       case property
-        when :url
-          url
-        when :selection_width
-          800
-        when :selection_height
-          400
-        else
-          nil
+      when :url
+        url
+      when :selection_width
+        800
+      when :selection_height
+        400
+      else
+        nil
       end
     end
   end

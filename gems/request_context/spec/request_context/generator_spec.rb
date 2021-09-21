@@ -31,7 +31,7 @@ describe "RequestContext::Generator" do
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.add_meta_header("a2", "test2")
       RequestContext::Generator.add_meta_header("a3", "")
-      [ 200, {}, [] ]
+      [200, {}, []]
     }).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;a2=test2;"
   end
@@ -40,7 +40,7 @@ describe "RequestContext::Generator" do
     _, headers, _ = RequestContext::Generator.new(->(env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, nil)
-      [ 200, {}, [] ]
+      [200, {}, []]
     }).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;"
   end
@@ -49,7 +49,7 @@ describe "RequestContext::Generator" do
     _, headers, _ = RequestContext::Generator.new(->(env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, context)
-      [ 200, {}, [] ]
+      [200, {}, []]
     }).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;t=Course;i=15;"
   end
@@ -76,11 +76,11 @@ describe "RequestContext::Generator" do
         @attrs[:created_at]
       end
     end
-    pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false})
+    pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false })
     _, headers, _ = RequestContext::Generator.new(->(_env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_page_view_meta(pv)
-      [ 200, {}, [] ]
+      [200, {}, []]
     }).call(env)
     f = pv.created_at.try(:utc).try(:iso8601, 2)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5.0;p=f;f=#{f};"
@@ -88,7 +88,7 @@ describe "RequestContext::Generator" do
 
   it "should generate a request_id and store it in Thread.current" do
     Thread.current[:context] = nil
-    _, _, _ = RequestContext::Generator.new(->(env) {[200, {}, []]}).call(env)
+    _, _, _ = RequestContext::Generator.new(->(env) { [200, {}, []] }).call(env)
     expect(Thread.current[:context][:request_id]).to be_present
   end
 
@@ -103,7 +103,7 @@ describe "RequestContext::Generator" do
   it "should find the session_id in a cookie and store it in Thread.current" do
     Thread.current[:context] = nil
     env['action_dispatch.cookies'] = { log_session_id: 'abc' }
-    _, _, _ = RequestContext::Generator.new(->(env) {[200, {}, []]}).call(env)
+    _, _, _ = RequestContext::Generator.new(->(env) { [200, {}, []] }).call(env)
     expect(Thread.current[:context][:session_id]).to eq 'abc'
   end
 
@@ -129,8 +129,8 @@ describe "RequestContext::Generator" do
   end
 
   context "when request provides an override context id" do
-    let(:shared_secret){ 'sup3rs3cr3t!!' }
-    let(:remote_request_context_id){ '1234-5678-9012-3456-7890-1234-5678' }
+    let(:shared_secret) { 'sup3rs3cr3t!!' }
+    let(:remote_request_context_id) { '1234-5678-9012-3456-7890-1234-5678' }
 
     let(:remote_signature) do
       CanvasSecurity.sign_hmac_sha512(remote_request_context_id, shared_secret)
@@ -155,10 +155,10 @@ describe "RequestContext::Generator" do
       env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = CanvasSecurity.base64_encode(remote_signature)
     end
 
-    after(:each){ DynamicSettings.fallback_data = {} }
+    after(:each) { DynamicSettings.fallback_data = {} }
 
     def run_middleware
-      _, headers, _msg = RequestContext::Generator.new(->(_){ [200, {}, []] }).call(env)
+      _, headers, _msg = RequestContext::Generator.new(->(_) { [200, {}, []] }).call(env)
       headers
     end
 

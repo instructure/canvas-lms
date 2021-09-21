@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module BroadcastPolicy
-
   class NotificationPolicy
     attr_accessor :dispatch, :to, :whenever, :data, :recipient_filter
 
@@ -72,5 +71,4 @@ module BroadcastPolicy
       end
     end
   end
-
 end

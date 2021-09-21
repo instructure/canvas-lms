@@ -103,7 +103,7 @@ describe CanvasSanitize do
     expect(res).not_to match(/alert/)
     expect(res).not_to match(/height/)
     expect(res).to match(/width/)
-    
+
     str = "<div style=\"width: 200px; background:url('&#106;avascript:alert(5)'); height: 10px;\"></div>"
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).not_to match(/background/)
@@ -111,7 +111,7 @@ describe CanvasSanitize do
     expect(res).to match(/height/)
     expect(res).to match(/width/)
   end
-  
+
   it "should sanitize style attributes with invalid methods" do
     str = "<div style=\"width: 200px; background:expression(); height: 10px;\"></div>"
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
@@ -120,7 +120,7 @@ describe CanvasSanitize do
     expect(res).to match(/height/)
     expect(res).to match(/width/)
   end
-  
+
   it "should allow negative values" do
     str = "<div style='margin: -18px;height: 10px;'></div>"
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
@@ -140,7 +140,7 @@ describe CanvasSanitize do
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).to eq str
   end
-  
+
   it "should allow font tags with valid attributes" do
     str = %{<font face="Comic Sans MS" color="blue" size="3" bacon="yes">hello</font>}
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)

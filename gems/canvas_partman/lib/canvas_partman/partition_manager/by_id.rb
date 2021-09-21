@@ -24,18 +24,19 @@ module CanvasPartman
         max_id = base_class.maximum(base_class.partitioning_field)
         return ensure_partitions(advance_partitions) if max_id.nil?
 
-        (0..max_id/base_class.partition_size + advance_partitions).each do |index|
+        (0..max_id / base_class.partition_size + advance_partitions).each do |index|
           create_partition(index * base_class.partition_size, graceful: true)
         end
       end
 
       def migrate_data_to_partitions(batch_size: 1000)
         loop do
-          ids = base_class.from("ONLY #{base_class.quoted_table_name}").
-              order(base_class.partitioning_field).
-              limit(batch_size).
-              pluck(:id, base_class.partitioning_field)
+          ids = base_class.from("ONLY #{base_class.quoted_table_name}")
+                          .order(base_class.partitioning_field)
+                          .limit(batch_size)
+                          .pluck(:id, base_class.partitioning_field)
           break if ids.empty?
+
           partition = ids.first.last / base_class.partition_size
           partition_table = [base_class.table_name, partition].join('_')
           # make sure we're only moving rows for one partition at a time
@@ -46,15 +47,15 @@ module CanvasPartman
               WHERE id IN (#{ids.map(&:first).join(', ')})
               RETURNING *
             ) INSERT INTO #{base_class.connection.quote_table_name(partition_table)} SELECT * FROM x
-SQL
+          SQL
         end
       end
 
-      def ensure_partitions(advance=1)
+      def ensure_partitions(advance = 1)
         ensure_or_check_partitions(advance, true)
       end
 
-      def partitions_created?(advance=1)
+      def partitions_created?(advance = 1)
         ensure_or_check_partitions(advance, false)
       end
 
@@ -72,6 +73,7 @@ SQL
           partitions.reverse_each do |partition|
             break if empties >= advance
             break if base_class.from(base_class.connection.quote_table_name(partition)).exists?
+
             empties += 1
           end
         else
@@ -109,7 +111,7 @@ SQL
           if reflection.polymorphic?
             reflection.options[:polymorphic].map do |type|
               if type.is_a?(Hash)
-                type.values.map{|v| v.constantize rescue nil}
+                type.values.map { |v| v.constantize rescue nil }
               else
                 type.to_s.classify.constantize rescue nil
               end
@@ -117,7 +119,7 @@ SQL
           else
             [reflection.klass]
           end
-        klasses.map{|klass| klass.maximum(klass.primary_key)}.compact.max
+        klasses.map { |klass| klass.maximum(klass.primary_key) }.compact.max
       end
 
       def table_regex

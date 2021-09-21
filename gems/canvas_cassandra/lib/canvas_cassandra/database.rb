@@ -17,7 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasCassandra
-
   class Database
     CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}
 
@@ -82,20 +81,20 @@ module CanvasCassandra
         statements = send("#{field}statements")
         args = send("#{field}args")
         case statements.size
-          when 0
-            raise "Cannot execute an empty batch"
-          when 1
-            statements + args
-          else
-            # http://www.datastax.com/docs/1.1/references/cql/BATCH
-            # note there's no semicolons between statements in the batch
-            cql = []
-            cql << "BEGIN #{'COUNTER ' if field == 'counter_'}BATCH"
-            cql.concat statements
-            cql << "APPLY BATCH"
-            # join with spaces rather than newlines, because cassandra doesn't care
-            # and syslog doesn't like newlines
-            [cql.join(" ")] + args
+        when 0
+          raise "Cannot execute an empty batch"
+        when 1
+          statements + args
+        else
+          # http://www.datastax.com/docs/1.1/references/cql/BATCH
+          # note there's no semicolons between statements in the batch
+          cql = []
+          cql << "BEGIN #{'COUNTER ' if field == 'counter_'}BATCH"
+          cql.concat statements
+          cql << "APPLY BATCH"
+          # join with spaces rather than newlines, because cassandra doesn't care
+          # and syslog doesn't like newlines
+          [cql.join(" ")] + args
         end
       end
     end
@@ -117,6 +116,7 @@ module CanvasCassandra
 
     def update_counter(query, *args)
       return update(query, *args) unless db.use_cql3?
+
       if in_batch?
         @batch.counter_statements << query
         @batch.counter_args.concat args
@@ -165,7 +165,7 @@ module CanvasCassandra
     # in other words, changes is a hash in either of these formats (mixing is ok):
     #   { "colname" => newvalue }
     #   { "colname" => [oldvalue, newvalue] }
-    def update_record(table_name, primary_key_attrs, changes, ttl_seconds=nil, execute_options: {})
+    def update_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
       batch do
         do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
       end
@@ -174,8 +174,8 @@ module CanvasCassandra
     # same as update_record, but preferred when doing inserts -- it skips
     # updating columns with nil values, rather than creating tombstone delete
     # records for them
-    def insert_record(table_name, primary_key_attrs, changes, ttl_seconds=nil, execute_options: {})
-      changes = changes.reject { |k,v| v.is_a?(Array) ? v.last.nil? : v.nil? }
+    def insert_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
+      changes = changes.reject { |k, v| v.is_a?(Array) ? v.last.nil? : v.nil? }
       update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
     end
 
@@ -204,7 +204,7 @@ module CanvasCassandra
     # => ["name = ? AND state = ?", ["foo", "ut"]]
     def build_where_conditions(conditions)
       where_args = []
-      where_clause = conditions.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
+      where_clause = conditions.sort_by { |k, v| k.to_s }.map { |k, v| where_args << v; "#{k} = ?" }.join(" AND ")
       return where_clause, where_args
     end
 
@@ -230,21 +230,21 @@ module CanvasCassandra
       changes = stringify_hash(changes)
       where_clause, where_args = build_where_conditions(primary_key_attrs)
 
-      primary_key_attrs.each do |key,value|
+      primary_key_attrs.each do |key, value|
         if changes[key].is_a?(Array) && !changes[key].first.nil?
           raise ArgumentError, "Cannot change the primary key of a record, attempted to change #{key} #{changes[key].inspect}"
         end
       end
 
       deletes, updates = changes.
-          # normalize the values since we accept two formats
-          map { |key,val| [key, val.is_a?(Array) ? val.last : val] }.
-          # reject values that are part of the primary key, since those are in the where clause
-          reject { |key,val| primary_key_attrs.key?(key) }.
-          # sort, just so the generated cql is deterministic
-          sort_by(&:first).
-          # split changes into updates and deletes
-          partition { |key,val| val.nil? }
+                         # normalize the values since we accept two formats
+                         map { |key, val| [key, val.is_a?(Array) ? val.last : val] }.
+                         # reject values that are part of the primary key, since those are in the where clause
+                         reject { |key, val| primary_key_attrs.key?(key) }.
+                         # sort, just so the generated cql is deterministic
+                         sort_by(&:first).
+                         # split changes into updates and deletes
+                         partition { |key, val| val.nil? }
 
       # inserts and updates in cassandra are equivalent,
       # so no need to differentiate here
@@ -255,7 +255,7 @@ module CanvasCassandra
           args << ttl_seconds
           statement << " USING TTL ?"
         end
-        update_cql = updates.map { |key,val| args << val; "#{key} = ?" }.join(", ")
+        update_cql = updates.map { |key, val| args << val; "#{key} = ?" }.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
         args.concat [execute_options]

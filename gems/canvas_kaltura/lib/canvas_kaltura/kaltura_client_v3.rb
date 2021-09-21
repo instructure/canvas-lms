@@ -25,11 +25,9 @@ require 'uri'
 require 'nokogiri'
 require 'multipart'
 
-
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
-
   class SessionType
     USER = 0;
     ADMIN = 2;
@@ -103,7 +101,7 @@ module CanvasKaltura
         assets&.each do |asset|
           if ASSET_STATUSES[asset[:status]] == :READY
             keys = [:containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal]
-            hash = asset.select{|k| keys.member?(k)}
+            hash = asset.select { |k| keys.member?(k) }
 
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
             if hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
@@ -124,7 +122,6 @@ module CanvasKaltura
             # don't mark it as needing conversion.
             all_assets_are_done_converting = false unless [:NOT_APPLICABLE, :DELETED].include? ASSET_STATUSES[asset[:status]]
           end
-
         end
         sources = sort_source_list(sources)
         # only cache if all the sources are done converting
@@ -146,7 +143,7 @@ module CanvasKaltura
     # and sorting by descending bitrate for identical file types, discounting
     # suspiciously high bitrates.
     def sort_source_list(sources)
-      original_source = sources.detect{ |s| s[:isOriginal].to_i != 0 }
+      original_source = sources.detect { |s| s[:isOriginal].to_i != 0 }
       # CNVS-11227 features broken conversions at 20x+ the original source's bitrate
       # (in addition to working conversions at bitrates comparable to the original)
       suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
@@ -159,7 +156,7 @@ module CanvasKaltura
          0 - a[:bitrate].to_i]
       end
 
-      sources.each{|a| a.delete(:hasWarnings)}
+      sources.each { |a| a.delete(:hasWarnings) }
       sources
     end
 
@@ -172,7 +169,7 @@ module CanvasKaltura
         :type => "2",
       }.merge(opts)
 
-        "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
+      "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
         "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, '')}" +
         "/width/#{opts[:width].to_i}" +
         "/height/#{opts[:height].to_i}" +
@@ -185,18 +182,19 @@ module CanvasKaltura
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
       result = getRequest(:session, :start,
-                           :secret => secret,
-                           :partnerId => partnerId,
-                           :userId => userId,
-                           :type => type)
+                          :secret => secret,
+                          :partnerId => partnerId,
+                          :userId => userId,
+                          :type => type)
       @ks = result.content
     end
 
     def mediaGet(entryId)
       result = getRequest(:media, :get,
-                            :ks => @ks,
-                            :entryId => entryId)
+                          :ks => @ks,
+                          :entryId => entryId)
       return nil unless result
+
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -214,6 +212,7 @@ module CanvasKaltura
       end
       result = getRequest(:media, :update, hash)
       return nil unless result
+
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -244,10 +243,10 @@ module CanvasKaltura
 
     def bulkUploadGet(id)
       result = getRequest(:bulkUpload, :get,
-                           :ks => @ks,
-                           :id => id
-                          )
+                          :ks => @ks,
+                          :id => id)
       return nil unless result
+
       parseBulkUpload(result)
     end
 
@@ -274,8 +273,7 @@ module CanvasKaltura
       result = postRequest(:bulkUpload, :add,
                            :ks => @ks,
                            :conversionProfileId => -1,
-                           :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv")
-                       )
+                           :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv"))
       unless result.css('logFileUrl').any?
         code = result.css('error > code').first.try(:content)
         message = result.css('error > message').first.try(:content)
@@ -292,7 +290,7 @@ module CanvasKaltura
         filename = (file[:name] || "Media File").gsub(/,/, "")
         description = (file[:description] || "no description").gsub(/,/, "")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:partner_data] || ''] if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '', '', '', '', file[:partner_data] || ''] if file[:url]
       end
       res = CSV.generate do |csv|
         rows.each do |row|
@@ -304,9 +302,10 @@ module CanvasKaltura
 
     def flavorAssetGetByEntryId(entryId)
       result = getRequest(:flavorAsset, :getByEntryId,
-                           :ks => @ks,
-                           :entryId => entryId)
+                          :ks => @ks,
+                          :entryId => entryId)
       return nil unless result
+
       items = []
       result.css('item').each do |node|
         item = {}
@@ -327,8 +326,8 @@ module CanvasKaltura
 
     def flavorAssetGetDownloadUrl(assetId)
       result = getRequest(:flavorAsset, :getDownloadUrl,
-                           :ks => @ks,
-                           :id => assetId)
+                          :ks => @ks,
+                          :id => assetId)
       return result.content if result
     end
 
@@ -350,6 +349,7 @@ module CanvasKaltura
     def assetSwfUrl(assetId)
       config = CanvasKaltura::ClientV3.config
       return nil unless config
+
       "https://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
 
@@ -369,6 +369,7 @@ module CanvasKaltura
       requestParams = "service=#{service}&action=#{action}"
       params.each do |key, value|
         next if value.nil?
+
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
@@ -378,7 +379,7 @@ module CanvasKaltura
     # FIXME: SSL verifification should not be turned off, but since we're just
     # turning on HTTPS everywhere for kaltura, we're being gentle about it in
     # the first pass
-    def sendRequest(request, body=nil)
+    def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
         http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
@@ -387,6 +388,7 @@ module CanvasKaltura
         response = http.request(request, body)
       end
       raise Timeout::Error unless response
+
       response
     end
   end

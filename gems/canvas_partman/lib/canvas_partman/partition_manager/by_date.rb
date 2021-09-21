@@ -40,13 +40,13 @@ module CanvasPartman
         loop do
           return false if timeout && (start_time + timeout) < Time.now
 
-          id_dates = base_class.from("ONLY #{base_class.quoted_table_name}").
-            order(base_class.partitioning_field).
-            limit(batch_size).
-            pluck(:id, base_class.partitioning_field)
+          id_dates = base_class.from("ONLY #{base_class.quoted_table_name}")
+                               .order(base_class.partitioning_field)
+                               .limit(batch_size)
+                               .pluck(:id, base_class.partitioning_field)
           break if id_dates.empty?
 
-          id_dates.group_by{|id, date| generate_name_for_partition(date)}.each do |partition_table, part_id_dates|
+          id_dates.group_by { |id, date| generate_name_for_partition(date) }.each do |partition_table, part_id_dates|
             base_class.connection.execute(<<-SQL)
               WITH x AS (
                 DELETE FROM ONLY #{base_class.quoted_table_name}
@@ -59,11 +59,11 @@ module CanvasPartman
         true
       end
 
-      def ensure_partitions(advance=1)
+      def ensure_partitions(advance = 1)
         ensure_or_check_partitions(advance, true)
       end
 
-      def partitions_created?(advance=1)
+      def partitions_created?(advance = 1)
         ensure_or_check_partitions(advance, false)
       end
 
@@ -119,16 +119,17 @@ module CanvasPartman
       def generate_check_constraint(date)
         constraint_range = generate_date_constraint_range(date).map { |d| d.to_s(:db) }
 
-        <<SQL
-#{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'
-AND
-#{base_class.partitioning_field} < TIMESTAMP '#{constraint_range[1]}'
-SQL
+        <<~SQL
+          #{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'
+          AND
+          #{base_class.partitioning_field} < TIMESTAMP '#{constraint_range[1]}'
+        SQL
       end
 
       def date_from_partition_name(name)
         match = table_regex.match(name)
         return nil unless match
+
         if base_class.partitioning_interval == :weeks
           Time.utc(match[:year]).beginning_of_week + (match[:week].to_i - 1).weeks
         else

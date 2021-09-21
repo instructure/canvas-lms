@@ -38,14 +38,14 @@ describe DynamicSettings do
     DynamicSettings.reset_cache!
   end
 
-  let(:parent_key){ 'rich-content-service' }
+  let(:parent_key) { 'rich-content-service' }
   let(:kv_client) { DynamicSettings.kv_client }
   let(:valid_config) do
     {
-      'host'        =>'consul',
-      'port'        => 8500,
-      'ssl'         => true,
-      'acl_token'   => 'some-long-string',
+      'host' => 'consul',
+      'port' => 8500,
+      'ssl' => true,
+      'acl_token' => 'some-long-string',
       'environment' => 'rspec',
     }
   end
@@ -58,10 +58,10 @@ describe DynamicSettings do
 
     it 'must pass through timeout settings to the underlying library' do
       DynamicSettings.config = valid_config.merge({
-        'connect_timeout' => 1,
-        'send_timeout' => 2,
-        'receive_timeout' => 3,
-      })
+                                                    'connect_timeout' => 1,
+                                                    'send_timeout' => 2,
+                                                    'receive_timeout' => 3,
+                                                  })
 
       options = Diplomat.configuration.options
       expect(options[:request][:open_timeout]).to eq 1
@@ -71,8 +71,8 @@ describe DynamicSettings do
 
     it 'must capture the environment name when supplied' do
       DynamicSettings.config = valid_config.merge({
-        'environment' => 'foobar'
-      })
+                                                    'environment' => 'foobar'
+                                                  })
 
       expect(DynamicSettings.environment).to eq 'foobar'
     end
@@ -80,14 +80,14 @@ describe DynamicSettings do
 
   describe '.fallback_data =' do
     it 'must provide indifferent access on resulting proxy' do
-      DynamicSettings.fallback_data = {foo: 'bar'}
+      DynamicSettings.fallback_data = { foo: 'bar' }
       proxy = DynamicSettings.root_fallback_proxy
       expect(proxy['foo']).to eq 'bar'
       expect(proxy[:foo]).to eq 'bar'
     end
 
     it 'must clear the fallback when passed nil' do
-      DynamicSettings.fallback_data = {foo: 'bar'}
+      DynamicSettings.fallback_data = { foo: 'bar' }
       DynamicSettings.fallback_data = nil
       proxy = DynamicSettings.root_fallback_proxy
       expect(proxy['foo']).to be_nil
@@ -110,11 +110,11 @@ describe DynamicSettings do
       let(:data) do
         {
           config: {
-            canvas: {foo: {bar: 'baz'}},
-            frobozz: {some: {thing: 'magic'}}
+            canvas: { foo: { bar: 'baz' } },
+            frobozz: { some: { thing: 'magic' } }
           },
           private: {
-            canvas: {zab: {rab: 'oof'}}
+            canvas: { zab: { rab: 'oof' } }
           }
         }
       end

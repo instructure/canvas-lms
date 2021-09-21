@@ -37,8 +37,8 @@ module QuestionHelpers
 
     unless File.exist?(path)
       raise '' <<
-        "Missing question data fixture for question of type #{question_type}" <<
-        ", expected file to be located at #{path}"
+            "Missing question data fixture for question of type #{question_type}" <<
+            ", expected file to be located at #{path}"
     end
 
     JSON.parse(File.read(path)).with_indifferent_access

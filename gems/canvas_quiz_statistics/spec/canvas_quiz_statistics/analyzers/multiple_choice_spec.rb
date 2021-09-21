@@ -51,11 +51,11 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
     describe '[:id]' do
       it 'should stringify ids' do
         expect(subject.run([])[:answers].map { |a| a[:id] }.sort).to eq(%w[
-          3023
-          5646
-          7907
-          8899
-        ])
+                                                                          3023
+                                                                          5646
+                                                                          7907
+                                                                          8899
+                                                                        ])
       end
     end
 
@@ -68,9 +68,9 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
         it 'should use a stripped version of :html if present' do
           data = question_data.clone
           data[:answers][0].merge!({
-            html: '<p>Hi.</p>',
-            text: ''
-          })
+                                     html: '<p>Hi.</p>',
+                                     text: ''
+                                   })
 
           subject = described_class.new(data)
           expect(subject.run([])[:answers][0][:text]).to eq('Hi.')

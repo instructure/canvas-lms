@@ -25,10 +25,10 @@ class File
         # INSTRUCTURE: changed to IO.popen to avoid shell injection attacks when paths include user defined content
         mime = IO.popen(['file', '--mime', '--brief', '--raw', '--', file.path], &:read).strip
       else
-        mime = extensions[File.extname(file.path).gsub('.','').downcase] rescue nil
+        mime = extensions[File.extname(file.path).gsub('.', '').downcase] rescue nil
       end
     elsif file.class == String
-      mime = extensions[(file[file.rindex('.')+1, file.size]).downcase] rescue nil
+      mime = extensions[(file[file.rindex('.') + 1, file.size]).downcase] rescue nil
     elsif file.respond_to?(:string)
       temp = File.open(Dir.tmpdir + '/upload_file.' + Process.pid.to_s, "wb")
       temp << file.string
@@ -36,9 +36,9 @@ class File
       # INSTRUCTURE: changed to IO.popen to be sane and consistent. This one shouldn't be able to contain a user
       # specified path, but that's no reason to not do things the right way.
       mime = IO.popen(['file', '--mime', '--brief', '--raw', '--', temp.path], &:read).strip
-      mime = mime.gsub(/^.*: */,"")
-      mime = mime.gsub(/;.*$/,"")
-      mime = mime.gsub(/,.*$/,"")
+      mime = mime.gsub(/^.*: */, "")
+      mime = mime.gsub(/;.*$/, "")
+      mime = mime.gsub(/,.*$/, "")
       File.delete(temp.path)
     end
 
