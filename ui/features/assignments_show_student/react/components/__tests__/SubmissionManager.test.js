@@ -159,8 +159,8 @@ describe('SubmissionManager', () => {
       beforeEach(() => {
         window.ENV = {
           CONFETTI_ENABLED: enabled,
-          ASSIGNMENT_ID: 1,
-          COURSE_ID: 1
+          ASSIGNMENT_ID: '1',
+          COURSE_ID: '1'
         }
       })
 
