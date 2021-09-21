@@ -69,7 +69,6 @@ const ignoredErrors = [
   /Invalid prop `firstAnnouncement.postedDate` of type `String` supplied to `K5Announcement`/,
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invalid prop `headingAs` of value `h4` supplied to `Billboard`/,
-  /Invalid prop `homeroomAnnouncements\[0\].courseId` of type `number` supplied to `HomeroomAnnouncementsLayout`/,
   /Invalid prop `id` of type `number` supplied to `Option`/,
   /Invalid prop `open` of type `number` supplied to `(Modal|ModalSpinner)`/,
   /Invalid prop `outcomesGroup.contextId` of type `number` supplied to `FindOutcomesView`, expected `string`/,
