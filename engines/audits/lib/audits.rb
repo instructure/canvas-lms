@@ -33,6 +33,7 @@ module Audits
 
         stream.on_error do |operation, record, exception|
           next unless Audits.configured?
+
           EventStream::Logger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
         end
       end
@@ -45,6 +46,7 @@ module Audits
     def read_stream_options(options)
       return { backend_strategy: :cassandra }.merge(options) if Audits.read_from_cassandra?
       return { backend_strategy: :active_record }.merge(options) if Audits.read_from_postgres?
+
       # Assume cassandra by default until transition complete
       { backend_strategy: :cassandra }.merge(options)
     end
@@ -62,6 +64,7 @@ module Audits
       elsif strategy == :active_record
         return Rails.configuration.database_configuration[Rails.env].present?
       end
+
       raise ArgumentError, "Unknown Audits Backend Strategy: #{strategy}"
     end
 
@@ -98,7 +101,7 @@ module Audits
       return_paths
     end
 
-    def config(shard=::Switchman::Shard.current)
+    def config(shard = ::Switchman::Shard.current)
       settings = DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
       YAML.safe_load(settings['auditors.yml'] || '{}')
     end
