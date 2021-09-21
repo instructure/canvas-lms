@@ -61,7 +61,6 @@ const ignoredErrors = [
   /invalid messageType: (notSupported|undefined)/,
   /Invalid prop `assignmentID` of type `number` supplied to `StudentFooter`/,
   /Invalid prop `background` of value `` supplied to `View`, expected one of/,
-  /Invalid prop `borderColor` of value `slate` supplied to `View`/,
   /Invalid prop `children` of type `array` supplied to `Transition`/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `conversation._id` of type `number` supplied to `ComposeModalManager`/,
