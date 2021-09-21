@@ -255,13 +255,15 @@ export default function Filter(props) {
                 {formatMessage('Media')}
               </SimpleSelect.Option>
 
-              <SimpleSelect.Option
-                id="buttons_and_icons"
-                value="buttons_and_icons"
-                renderBeforeLabel={IconImageLine}
-              >
-                {formatMessage('Buttons and Icons')}
-              </SimpleSelect.Option>
+              {props.use_rce_buttons_and_icons && (
+                <SimpleSelect.Option
+                  id="buttons_and_icons"
+                  value="buttons_and_icons"
+                  renderBeforeLabel={IconImageLine}
+                >
+                  {formatMessage('Buttons and Icons')}
+                </SimpleSelect.Option>
+              )}
 
               <SimpleSelect.Option id="all" value="all">
                 {formatMessage('All')}

@@ -1820,6 +1820,7 @@ class RCEWrapper extends React.Component {
             bridge={bridge}
             editor={this}
             onTrayClosing={this.handleContentTrayClosing}
+            use_rce_buttons_and_icons={this.props.use_rce_buttons_and_icons}
             {...trayProps}
           />
         )}
