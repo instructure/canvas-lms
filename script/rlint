@@ -31,6 +31,7 @@ optional = false
 OptionParser.new do |opts|
   # boy scout means treat everything as an error
   opts.on("--boy-scout", "Treat all comments as errors") { linter_options[:boyscout_mode] = true }
+  # heavy means inspect entire files if a file was changed
   opts.on("--heavy") { linter_options[:heavy_mode] = true }
   opts.on("--optional", "Run against the optional rubocop ruleset, instead of the default") { optional = true }
   opts.on("--plugin PLUGIN", "Inspect changes from the given plugin, instead of canvas-lms") do |v|
