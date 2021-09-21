@@ -39,6 +39,7 @@ const SUBJECT_ALLOW_LIST = [
   'lti.setUnloadMessage',
   'lti.showAlert',
   'lti.showModuleNavigation',
+  'org.imsglobal.lti.capabilities',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu'
 ]
