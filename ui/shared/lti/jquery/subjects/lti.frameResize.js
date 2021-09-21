@@ -17,8 +17,9 @@
  */
 
 import ToolLaunchResizer from '../tool_launch_resizer'
+import {findDomForWindow} from '../util'
 
-export default function frameResize({message, iframe, event}) {
+export default function frameResize({message, event}) {
   const toolResizer = new ToolLaunchResizer()
   let height = message.height
   if (height <= 0) height = 1
@@ -29,12 +30,15 @@ export default function frameResize({message, iframe, event}) {
   // If content.length is 0 then jquery didn't the tool wrapper.
   if (container.length > 0) {
     toolResizer.resize_tool_content_wrapper(height, container)
-  } else if (iframe) {
+  } else {
     // Attempt to find an embedded iframe that matches the event source.
-    if (typeof height === 'number') {
-      height += 'px'
+    const iframe = findDomForWindow(event.source)
+    if (iframe) {
+      if (typeof height === 'number') {
+        height += 'px'
+      }
+      iframe.height = height
+      iframe.style.height = height
     }
-    iframe.height = height
-    iframe.style.height = height
   }
 }
