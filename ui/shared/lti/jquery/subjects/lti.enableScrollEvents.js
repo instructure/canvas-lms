@@ -16,26 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function enableScrollEvents({iframe}) {
-  if (iframe) {
-    let timeout
-    window.addEventListener(
-      'scroll',
-      () => {
-        // requesting animation frames effectively debounces the scroll messages being sent
-        if (timeout) {
-          window.cancelAnimationFrame(timeout)
-        }
+export default function enableScrollEvents({responseMessages}) {
+  let timeout
+  window.addEventListener(
+    'scroll',
+    () => {
+      // requesting animation frames effectively debounces the scroll messages being sent
+      if (timeout) {
+        window.cancelAnimationFrame(timeout)
+      }
 
-        timeout = window.requestAnimationFrame(() => {
-          const msg = JSON.stringify({
-            subject: 'lti.scroll',
-            scrollY: window.scrollY
-          })
-          iframe.contentWindow.postMessage(msg, '*')
+      timeout = window.requestAnimationFrame(() => {
+        responseMessages.sendResponse({
+          subject: 'lti.scroll',
+          scrollY: window.scrollY
         })
-      },
-      false
-    )
-  }
+      })
+    },
+    false
+  )
+  return true
 }
