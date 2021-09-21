@@ -2672,7 +2672,7 @@ describe Submission do
       end
 
       it "returns true for text entry reports" do
-        submission = assignment.submit_homework(test_student)
+        submission = assignment.submit_homework(test_student, body: "hi")
         OriginalityReport.create!(
           submission: submission,
           originality_score: 0.5,
@@ -4264,9 +4264,39 @@ describe Submission do
 
       expect(submission.versioned_originality_reports).to eq []
     end
+
+    it "works correctly on originality reports without submission times with multiple text entry or same attachment ids" do
+      reports = []
+      submissions = (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, body: "body #{i}")
+        report = OriginalityReport.create!(attachment: nil, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+      attachment = attachment_model(filename: "submission.doc", context: @student)
+      submissions += (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        report = OriginalityReport.create!(attachment: attachment, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+
+      submissions[0..2].each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to match_array reports[i..2]
+      end
+      submissions[3..].each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to match_array reports[(i + 3)..]
+      end
+    end
   end
 
   describe "#bulk_load_versioned_originality_reports" do
+    before :once do
+      student_in_course(active_all: true)
+    end
+
     it "bulk loads originality reports for many submissions at once" do
       originality_reports = []
       submissions = Array.new(3) do |i|
@@ -4290,7 +4320,6 @@ describe Submission do
     end
 
     it "avoids N+1s in the bulk load" do
-      student_in_course(active_all: true)
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
       OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
@@ -4301,7 +4330,6 @@ describe Submission do
     end
 
     it "ignores invalid attachment ids" do
-      student_in_course(active_all: true)
       s = @assignment.submit_homework(@student, submission_type: "online_url", url: "http://example.com")
       s.update_attribute(:attachment_ids, "99999999")
       Submission.bulk_load_versioned_originality_reports([s])
@@ -4309,7 +4337,6 @@ describe Submission do
     end
 
     it "loads only the originality reports that pertain to that version" do
-      student_in_course(active_all: true)
       originality_reports = []
       attachment = attachment_model(filename: "submission-a.doc", context: @student)
       Timecop.freeze(10.seconds.ago) do
@@ -4337,6 +4364,41 @@ describe Submission do
 
       submission.submission_history.each_with_index do |s, index|
         expect(s.versioned_originality_reports.first).to eq originality_reports[index]
+      end
+    end
+
+    it "works with unsubmitted submissions" do
+      submissions = @assignment.submissions.where(user: @student)
+      Submission.bulk_load_versioned_originality_reports(submissions)
+      submissions.each do |s|
+        expect(s.versioned_originality_reports).to eq []
+      end
+    end
+
+    it "works correctly on originality reports without submission times with multiple text entry or same attachment ids" do
+      reports = []
+      submissions = (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, body: "body #{i}")
+        report = OriginalityReport.create!(attachment: nil, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+      attachment = attachment_model(filename: "submission.doc", context: @student)
+      submissions += (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        report = OriginalityReport.create!(attachment: attachment, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+
+      Submission.bulk_load_versioned_originality_reports(submissions)
+      submissions[0..2].each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to match_array reports[i..2]
+      end
+      submissions[3..].each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to match_array reports[(i + 3)..]
       end
     end
   end
