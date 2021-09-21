@@ -116,12 +116,10 @@ QUnit.module('Messages', suiteHooks => {
         <p><iframe style="width: 100%; height: ${intialHeight}px;" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless" width="100%" height="${intialHeight}px" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>
       </div>
     `)
-    const iframe = $('iframe')
-
-    sinon.spy(iframe[0].contentWindow, 'postMessage')
-    notOk(iframe[0].contentWindow.postMessage.calledOnce)
-    await ltiMessageHandler(postMessageEvent(fetchWindowSize, iframe[0].contentWindow))
-    ok(iframe[0].contentWindow.postMessage.calledOnce)
+    const postMessageStub = sinon.stub()
+    notOk(postMessageStub.calledOnce)
+    await ltiMessageHandler(postMessageEvent(fetchWindowSize, {postMessage: postMessageStub}))
+    ok(postMessageStub.calledOnce)
   })
 
   test('hides the module navigation', async () => {

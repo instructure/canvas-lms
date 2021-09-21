@@ -24,6 +24,11 @@ import {
   INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
   SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE
 } from '../../rce/plugins/canvas_mentions/constants'
+import {
+  sendGenericErrorResponse,
+  sendSuccess,
+  sendUnsupportedSubjectResponse
+} from './response_messages'
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState = {}
@@ -66,17 +71,42 @@ async function ltiMessageHandler(e) {
 
   // look at messageType for backwards compatibility
   const subject = message.subject || message.messageType
+  const message_id = message.message_id
 
-  if (SUBJECT_IGNORE_LIST.includes(subject) || !SUBJECT_ALLOW_LIST.includes(subject)) {
+  if (SUBJECT_IGNORE_LIST.includes(subject)) {
+    // These messages are handled elsewhere
+    return false
+  } else if (!SUBJECT_ALLOW_LIST.includes(subject)) {
+    // Enforce subject allowlist -- unknown type
+    sendUnsupportedSubjectResponse({
+      targetWindow: e.source,
+      origin: e.origin,
+      subject,
+      message_id
+    })
     return false
   }
 
   try {
     const handlerModule = await import(`./subjects/${subject}.js`)
-    handlerModule.default({message, iframe: findDomForWindow(e.source), event: e})
+    const hasSentResponse = handlerModule.default({
+      message,
+      iframe: findDomForWindow(e.source),
+      event: e
+    })
+    if (!hasSentResponse) {
+      sendSuccess({targetWindow: e.source, origin: e.origin, subject, message_id})
+    }
     return true
   } catch (error) {
     console.error(`Error loading or executing message handler for "${subject}"`, error)
+    sendGenericErrorResponse({
+      targetWindow: e.source,
+      origin: e.origin,
+      subject,
+      message_id,
+      message: error.message
+    })
     return false
   }
 }
