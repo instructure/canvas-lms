@@ -75,6 +75,14 @@ class DiscussionEntry < ActiveRecord::Base
     state :deleted
   end
 
+  def delete_draft
+    discussion_topic.discussion_entry_drafts.where(user_id: user_id, root_entry_id: root_entry_id).delete_all
+  end
+
+  def delete_edit_draft(user_id:)
+    discussion_entry_drafts.where(user_id: user_id).delete_all
+  end
+
   def parse_and_create_mentions
     mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]')
     user_ids = mention_data.map { |l| l['data-mention'] }

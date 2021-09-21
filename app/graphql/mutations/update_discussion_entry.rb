@@ -57,6 +57,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
     entry.current_user = current_user
     entry.editor = current_user
     entry.save!
+    entry.delete_edit_draft(user_id: current_user.id)
 
     {discussion_entry: entry}
   rescue ActiveRecord::RecordNotFound

@@ -49,6 +49,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     end
 
     entry.save!
+    entry.delete_draft
 
     {discussion_entry: entry}
   rescue ActiveRecord::RecordNotFound
