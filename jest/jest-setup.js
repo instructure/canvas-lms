@@ -67,7 +67,6 @@ const ignoredErrors = [
   /Invalid prop `courseID` of type `number` supplied to `StudentLastAttended`/,
   /Invalid prop `currentFolder` of type `Object` supplied to `FilePreview`/,
   /Invalid prop `currentUserId` of type `number` supplied to `AddStudentModal`/,
-  /Invalid prop `disabled` of type `object` supplied to `(Checkbox|ToggleFacade)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/,
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/,
   /Invalid prop `firstAnnouncement.postedDate` of type `String` supplied to `K5Announcement`/,
