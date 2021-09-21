@@ -73,7 +73,6 @@ const ignoredErrors = [
   /Invalid prop `headingAs` of value `h4` supplied to `Billboard`/,
   /Invalid prop `homeroomAnnouncements\[0\].courseId` of type `number` supplied to `HomeroomAnnouncementsLayout`/,
   /Invalid prop `id` of type `number` supplied to `Option`/,
-  /Invalid prop `label` of type `function` supplied to `StepItem`/,
   /Invalid prop `open` of type `number` supplied to `(Modal|ModalSpinner)`/,
   /Invalid prop `outcomeContextId` of type `number` supplied to `ManageOutcomeItem`/,
   /Invalid prop `outcomesGroup.contextId` of type `number` supplied to `FindOutcomesView`, expected `string`/,
