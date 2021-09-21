@@ -424,6 +424,7 @@ export default function CanvasContentTray(props) {
                     )
                   }}
                   isContentLoading={isLoading(contentProps)}
+                  use_rce_buttons_and_icons={props.use_rce_buttons_and_icons}
                 />
               </Flex.Item>
 
