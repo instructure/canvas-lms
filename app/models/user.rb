@@ -1972,6 +1972,14 @@ class User < ActiveRecord::Base
     enrollments
   end
 
+  def has_enrollment?
+    return @_has_enrollment if defined?(@_has_enrollment)
+    # don't need an expires_at here because user will be touched upon enrollment creation
+    @_has_enrollment = Rails.cache.fetch([self, 'has_enrollment', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).active.exists?
+    end
+  end
+
   def has_active_enrollment?
     return @_has_active_enrollment if defined?(@_has_active_enrollment)
     # don't need an expires_at here because user will be touched upon enrollment activation
