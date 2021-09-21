@@ -80,7 +80,6 @@ const ignoredErrors = [
   /Invalid prop `outcomeContextId` of type `number` supplied to `ManageOutcomeItem`/,
   /Invalid prop `outcomes.1._id` of type `number` supplied to `OutcomesPopover`/,
   /Invalid prop `outcomesGroup.contextId` of type `number` supplied to `FindOutcomesView`, expected `string`/,
-  /Invalid prop `rceBodyRef` supplied to `MentionDropdownPortal`/,
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invalid prop `selectedGroupId` of type `array` supplied to `GroupActionDrillDown`/,
