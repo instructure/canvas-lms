@@ -21,66 +21,57 @@ const UNSUPPORTED_SUBJECT_ERROR_CODE = 'unsupported_subject'
 const WRONG_ORIGIN_ERROR_CODE = 'wrong_origin'
 const BAD_REQUEST_ERROR_CODE = 'bad_request'
 
-function sendResponse({targetWindow, origin, subject, message_id, contents}) {
-  const message = {subject: `${subject}.response`}
-  if (message_id) {
-    message.message_id = message_id
+const buildResponseMessages = ({targetWindow, origin, subject, message_id}) => {
+  const sendResponse = (contents = {}) => {
+    const message = {subject: `${subject}.response`}
+    if (message_id) {
+      message.message_id = message_id
+    }
+    if (targetWindow) {
+      targetWindow.postMessage({...message, ...contents}, origin)
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Error sending response postMessage: target window does not exist')
+    }
   }
-  if (targetWindow) {
-    targetWindow.postMessage({...message, ...contents}, origin)
-  } else {
-    // eslint-disable-next-line no-console
-    console.error('Error sending response postMessage: target window does not exist')
+
+  const sendSuccess = () => {
+    sendResponse({})
+  }
+
+  const sendError = (code, message) => {
+    const error = {code}
+    if (message) {
+      error.message = message
+    }
+    sendResponse({error})
+  }
+
+  const sendGenericError = message => {
+    sendError(GENERIC_ERROR_CODE, message)
+  }
+
+  const sendBadRequestError = message => {
+    sendError(BAD_REQUEST_ERROR_CODE, message)
+  }
+
+  const sendWrongOriginError = () => {
+    sendError(WRONG_ORIGIN_ERROR_CODE)
+  }
+
+  const sendUnsupportedSubjectError = () => {
+    sendError(UNSUPPORTED_SUBJECT_ERROR_CODE)
+  }
+
+  return {
+    sendResponse,
+    sendSuccess,
+    sendError,
+    sendGenericError,
+    sendBadRequestError,
+    sendWrongOriginError,
+    sendUnsupportedSubjectError
   }
 }
 
-function sendSuccess({targetWindow, origin, subject, message_id}) {
-  sendResponse({targetWindow, origin, subject, message_id, contents: {}})
-}
-
-function sendErrorResponse({targetWindow, origin, subject, message_id, code, message}) {
-  const error = {code}
-  if (message) {
-    error.message = message
-  }
-  sendResponse({targetWindow, origin, subject, message_id, contents: {error}})
-}
-
-function sendGenericErrorResponse({targetWindow, origin, subject, message_id, message}) {
-  sendErrorResponse({targetWindow, origin, subject, message_id, message, code: GENERIC_ERROR_CODE})
-}
-
-function sendBadRequestResponse({targetWindow, origin, subject, message_id, message}) {
-  sendErrorResponse({
-    targetWindow,
-    origin,
-    subject,
-    message_id,
-    message,
-    code: BAD_REQUEST_ERROR_CODE
-  })
-}
-
-function sendUnsupportedSubjectResponse({targetWindow, origin, subject, message_id}) {
-  sendErrorResponse({
-    targetWindow,
-    origin,
-    subject,
-    message_id,
-    code: UNSUPPORTED_SUBJECT_ERROR_CODE
-  })
-}
-
-function sendWrongOriginResponse({targetWindow, origin, subject, message_id}) {
-  sendErrorResponse({targetWindow, origin, subject, message_id, code: WRONG_ORIGIN_ERROR_CODE})
-}
-
-export {
-  sendResponse,
-  sendSuccess,
-  sendErrorResponse,
-  sendGenericErrorResponse,
-  sendBadRequestResponse,
-  sendUnsupportedSubjectResponse,
-  sendWrongOriginResponse
-}
+export default buildResponseMessages
