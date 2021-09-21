@@ -228,7 +228,7 @@ describe "site admin jobs ui" do
       expect(ff('#running-grid .slick-row').size).to eq 2
       first_cell = f('#running-grid .slick-cell.b0.f0')
       expect(first_cell).to include_text 'my test worker 2'
-      last_cell = f('#running-grid .slick-cell.b6.f6 .super-slow')
+      last_cell = f('#running-grid .slick-cell.b7.f7 .super-slow')
       expect(last_cell).not_to be_nil
     end
 
