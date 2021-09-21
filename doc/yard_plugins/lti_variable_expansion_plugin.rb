@@ -29,6 +29,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
 
     object = register YARD::CodeObjects::MethodObject.new(namespace, variable_substitution)
     return if object.tags(:internal).any?
+
     parse_block(statement, :owner => object)
 
     deprecated_str = ''
@@ -83,6 +84,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     for i in 3..8
       param = statement.parameters[i]
       next unless param
+
       text = param.jump(:tstring_content, :ident).source.to_s
       guards.push(text) if /_GUARD$/.match text
     end
@@ -131,14 +133,12 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       when 'FILE_UPLOAD_GUARD'
         "when the tool is used to upload a file as an assignment submission"
       end
-
     end.compact
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
   end
 end
 
 module DocWriter
-
   def self.append_md(md)
     markdown_file
     File.write('doc/api/tools_variable_substitutions.md', md, File.size('doc/api/tools_variable_substitutions.md'), mode: 'a')
@@ -150,5 +150,4 @@ module DocWriter
       true
     )
   end
-
 end

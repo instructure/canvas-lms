@@ -48,6 +48,7 @@ class ResponseFieldView < HashView
     raise(ArgumentError, "param name missing:\n#{line}") unless name
 
     raise(ArgumentError, "Expected a description to be present, but it was not provided.\n#{line}") if remaining.nil?
+
     description = remaining.strip
     [name, description]
   end

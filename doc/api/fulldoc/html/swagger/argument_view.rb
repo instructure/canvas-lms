@@ -78,12 +78,12 @@ class ArgumentView < HashView
   end
 
   def metadata_parts
-    remove_outer_square_brackets(@type).
-      split(/\s*[,\|]\s*/).map{ |t| t.force_encoding('UTF-8') }
+    remove_outer_square_brackets(@type)
+      .split(/\s*[,\|]\s*/).map { |t| t.force_encoding('UTF-8') }
   end
 
   def enum_and_types
-    metadata_parts.partition{ |t| t.include? '"' }
+    metadata_parts.partition { |t| t.include? '"' }
   end
 
   def enums
@@ -126,7 +126,7 @@ class ArgumentView < HashView
   end
 
   def required?
-    types = enum_and_types.last.map{ |t| t.downcase }
+    types = enum_and_types.last.map { |t| t.downcase }
     if swagger_param_type == 'path'
       true
     elsif types.include?('required')
@@ -170,9 +170,9 @@ class ArgumentView < HashView
 
   def to_hash
     {
-      "name"     => name,
-      "desc"     => desc,
-      "types"    => types,
+      "name" => name,
+      "desc" => desc,
+      "types" => types,
       "optional" => optional?,
     }
   end

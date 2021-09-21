@@ -34,7 +34,7 @@ class ControllerListView < HashView
   end
 
   def config_domain_yaml
-    YAML.load(File.read(File.join(Rails.root,'config','domain.yml'))) if File.exist?(File.join(Rails.root,'config','domain.yml'))
+    YAML.load(File.read(File.join(Rails.root, 'config', 'domain.yml'))) if File.exist?(File.join(Rails.root, 'config', 'domain.yml'))
   end
 
   def canvas_url
@@ -106,8 +106,8 @@ class ControllerListView < HashView
       # See https://github.com/wordnik/swagger-core/wiki/Datatypes for a
       # description of the models schema we are trying to generate here.
       @controllers.each do |ctrl|
-        ctrl.objects.each{ |object| merge[object.name, object.to_model.json_schema] }
-        ctrl.models.each{ |model| merge[model.name, model.json_schema] }
+        ctrl.objects.each { |object| merge[object.name, object.to_model.json_schema] }
+        ctrl.models.each { |model| merge[model.name, model.json_schema] }
       end
     end
   end

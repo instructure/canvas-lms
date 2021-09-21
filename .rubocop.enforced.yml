@@ -16,7 +16,7 @@ AllCops:
 # values are an array of directories to opt in for (nil being all directories)
 OPT_IN = {
   nil => %w[Gemfile.d].freeze,
-  'Layout' => %w[bin config gems script].freeze
+  'Layout' => %w[bin config doc gems script].freeze
 }.freeze
 
 # this code generates a configuration that disables all cops for all files
