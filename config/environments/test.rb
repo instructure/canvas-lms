@@ -41,7 +41,7 @@ environment_configuration(defined?(config) && config) do |config|
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  #hairtrigger parallelized runtime race conditions
+  # hairtrigger parallelized runtime race conditions
   config.active_record.schema_format = :sql
 
   config.cache_store = :null_store

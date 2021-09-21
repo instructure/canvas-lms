@@ -44,7 +44,7 @@ class PeriodicJobs
     end
 
     if jitter.present?
-      run_at = rand((run_at+10.seconds)..(run_at + jitter))
+      run_at = rand((run_at + 10.seconds)..(run_at + jitter))
     end
     run_at
   end
@@ -55,6 +55,7 @@ class PeriodicJobs
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
+
       dj_params = {
         strand: strand,
         priority: 40
@@ -200,8 +201,8 @@ Rails.configuration.after_initialize do
     AuthenticationProvider::SAML::Federation.descendants.each do |federation|
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
         DatabaseServer.send_in_each_region(federation,
-                                    :refresh_providers,
-                                    singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
+                                           :refresh_providers,
+                                           singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
       end
     end
   end
@@ -285,11 +286,10 @@ Rails.configuration.after_initialize do
   if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
     Delayed::Periodic.cron 'HaStore.validate_consul_event', '5 * * * *' do
       DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
-          {
-            run_current_region_asynchronously: true,
-            singleton: 'HaStore.validate_consul_event'
-          }
-        )
+                                         {
+                                           run_current_region_asynchronously: true,
+                                           singleton: 'HaStore.validate_consul_event'
+                                         })
     end
   end
 end

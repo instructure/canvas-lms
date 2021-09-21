@@ -21,7 +21,7 @@ module JobLiveEventsContext
   def live_events_context
     ctx = {
       job_id: global_id,
-      job_tag:tag,
+      job_tag: tag,
       producer: 'canvas',
       root_account_id: Account.default.global_id,
       root_account_uuid: Account.default.uuid,

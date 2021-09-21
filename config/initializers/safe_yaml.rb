@@ -89,7 +89,7 @@ module YAMLSingletonFix
     if klass < Singleton
       klass.instance
     elsif klass == Set
-      super.tap{|s| s.instance_variable_get(:@hash).default = false}
+      super.tap { |s| s.instance_variable_get(:@hash).default = false }
     else
       super
     end

@@ -87,6 +87,7 @@ module ArbitraryStrongishParams
 
   def convert_hashes_to_parameters(key, value, *args)
     return value if @anythings.key?(key)
+
     super
   end
 
