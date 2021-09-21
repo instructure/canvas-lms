@@ -117,7 +117,6 @@ const ignoredErrors = [
   /The prop `closeTray` is marked as required in `HelpTray`/,
   /The prop `color` is marked as required in `StatusColorListItem`/,
   /The prop `colors.late` is marked as required in `StatusColorPanel`/,
-  /The prop `compose` is marked as required in `MessageActionButtons`/,
   /The prop `conferenceType.type` is marked as required in `Conference`/,
   /The prop `conferenceTypes\[0\].name` is marked as required in `(AddConference|ConferenceButton)`/,
   /The prop `containingContext.userId` is marked as required in `CanvasContentTray`/,
