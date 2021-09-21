@@ -22,6 +22,6 @@ class DeleteExtraPlaceholderSubmissions < ActiveRecord::Migration[4.2]
 
   def change
     DataFixup::DeleteExtraPlaceholderSubmissions.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup:DeleteExtraPlaceholderSubmissions:Migration").run
+                                                                     strand: "DataFixup:DeleteExtraPlaceholderSubmissions:Migration").run
   end
 end

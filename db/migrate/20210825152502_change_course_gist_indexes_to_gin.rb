@@ -22,12 +22,11 @@ class ChangeCourseGistIndexesToGin < ActiveRecord::Migration[6.0]
   tag :postdeploy
   disable_ddl_transaction!
 
-
   def redo_trgm_index(column, type, trgm)
     if index_name_exists?(:courses, "index_trgm_courses_#{column}") &&
-      # if the temp index already exists, it means the new index failed; just let
-      # the if_not_exists in the add below remove the invalid index
-      !index_name_exists?(:courses, "index_trgm_courses_#{column}_old")
+       # if the temp index already exists, it means the new index failed; just let
+       # the if_not_exists in the add below remove the invalid index
+       !index_name_exists?(:courses, "index_trgm_courses_#{column}_old")
       rename_index :courses, "index_trgm_courses_#{column}", "index_trgm_courses_#{column}_old"
     end
     add_index :courses, "LOWER(#{column}) #{trgm}.#{type}_trgm_ops", using: type, name: :index_trgm_courses_course_code, algorithm: :concurrently, if_not_exists: true

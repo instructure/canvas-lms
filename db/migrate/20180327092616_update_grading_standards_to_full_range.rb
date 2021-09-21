@@ -22,6 +22,6 @@ class UpdateGradingStandardsToFullRange < ActiveRecord::Migration[5.1]
 
   def up
     DataFixup::UpdateGradingStandardsToFullRange.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup::UpdateGradingStandardsToFullRange::Migration:#{Shard.current.database_server.id}").run
+                                                                     strand: "DataFixup::UpdateGradingStandardsToFullRange::Migration:#{Shard.current.database_server.id}").run
   end
 end

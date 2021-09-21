@@ -22,6 +22,6 @@ class FixupGroupOriginalityReports < ActiveRecord::Migration[5.0]
 
   def change
     DataFixup::FixupGroupOriginalityReports.delay_if_production(priority: Delayed::LOWER_PRIORITY,
-      n_strand: "DataFixup::FixupGroupOriginalityReports:#{Shard.current.database_server.id}").run
+                                                                n_strand: "DataFixup::FixupGroupOriginalityReports:#{Shard.current.database_server.id}").run
   end
 end

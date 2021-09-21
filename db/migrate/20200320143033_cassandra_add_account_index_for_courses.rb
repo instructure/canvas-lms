@@ -34,10 +34,10 @@ class CassandraAddAccountIndexForCourses < ActiveRecord::Migration[5.2]
     return if cassandra_table_exists?('courses_by_account')
 
     compression_params = if cassandra.db.use_cql3?
-      "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
-    else
-      "WITH compression_parameters:sstable_compression='DeflateCompressor'"
-    end
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
     cassandra.execute %{
       CREATE TABLE courses_by_account (

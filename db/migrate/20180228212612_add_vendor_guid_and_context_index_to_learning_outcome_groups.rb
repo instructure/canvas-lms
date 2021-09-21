@@ -24,8 +24,8 @@ class AddVendorGuidAndContextIndexToLearningOutcomeGroups < ActiveRecord::Migrat
 
   def change
     add_index :learning_outcome_groups,
-      %i[context_type context_id vendor_guid_2],
-      name: "index_learning_outcome_groups_on_context_and_vendor_guid",
-      algorithm: :concurrently
+              %i[context_type context_id vendor_guid_2],
+              name: "index_learning_outcome_groups_on_context_and_vendor_guid",
+              algorithm: :concurrently
   end
 end

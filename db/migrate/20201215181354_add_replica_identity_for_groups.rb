@@ -30,4 +30,3 @@ class AddReplicaIdentityForGroups < ActiveRecord::Migration[5.2]
     remove_replica_identity 'Group'
   end
 end
-

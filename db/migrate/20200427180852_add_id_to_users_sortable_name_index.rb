@@ -11,10 +11,10 @@ class AddIdToUsersSortableNameIndex < ActiveRecord::Migration[5.2]
 
     concurrently = " CONCURRENTLY" if connection.open_transactions == 0
     columns = if collkey
-        "#{collkey}.collkey(sortable_name, 'root', false, 3, true)"
-      else
-        "CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea)"
-      end
+                "#{collkey}.collkey(sortable_name, 'root', false, 3, true)"
+              else
+                "CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea)"
+              end
     columns += ", id" if dir == :up
     execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{columns})")
     remove_index :users, name: :index_users_on_sortable_name_old, if_exists: true
