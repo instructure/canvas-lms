@@ -34,7 +34,7 @@ class Linter
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     format: nil,
     file_regex: /./,
-    generate_comment_proc: proc { },
+    generate_comment_proc: proc {},
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
     heavy_mode: false,
     include_git_dir_in_output: !!!ENV['GERRIT_PATCHSET_REVISION'],
