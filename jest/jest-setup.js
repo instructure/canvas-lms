@@ -184,7 +184,6 @@ const ignoredWarnings = [
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /The `renderSortLabel` prop should be provided when Table is sortable/,
   /toBeEmpty has been deprecated/,
   /Translation for .* is missing/,
   /value provided is not in a recognized RFC2822 or ISO format/
