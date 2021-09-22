@@ -24,8 +24,11 @@ describe Api::V1::PlannerItem do
     include Api::V1::PlannerItem
 
     def submission_json(*args); end
+
     def named_context_url(*args); "named_context_url"; end
+
     def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
+
     def calendar_url_for(*args); end
   end
 

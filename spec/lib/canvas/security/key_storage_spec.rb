@@ -22,10 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 describe Canvas::Security::KeyStorage do
   before do
     @fallback_proxy = Canvas::DynamicSettings::FallbackProxy.new({
-      Canvas::Security::KeyStorage::PAST => Canvas::Security::KeyStorage.new_key,
-      Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
-      Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
-    })
+                                                                   Canvas::Security::KeyStorage::PAST => Canvas::Security::KeyStorage.new_key,
+                                                                   Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
+                                                                   Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
+                                                                 })
 
     allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(@fallback_proxy)
     @key_storage = Canvas::Security::KeyStorage.new('mocked')
@@ -38,7 +38,7 @@ describe Canvas::Security::KeyStorage do
   end
 
   describe "#rotate_keys" do
-    context 'when run more than min_rotation_period after last run' do 
+    context 'when run more than min_rotation_period after last run' do
       before do
         allow(@key_storage).to receive(:min_rotation_period).and_return(0)
       end
@@ -47,20 +47,20 @@ describe Canvas::Security::KeyStorage do
         keys_before = @key_storage.retrieve_keys
         past = keys_before[Canvas::Security::KeyStorage::PAST].to_json
         present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
-        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PAST] }.
-          from(past).to(present)
+        expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[Canvas::Security::KeyStorage::PAST] }
+          .from(past).to(present)
       end
 
       it 'rotates the present key' do
         keys_before = @key_storage.retrieve_keys
         present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
         future = keys_before[Canvas::Security::KeyStorage::FUTURE].to_json
-        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }.
-          from(present).to(future)
+        expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }
+          .from(present).to(future)
       end
 
       it 'rotates the future key' do
-        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::FUTURE] }
+        expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[Canvas::Security::KeyStorage::FUTURE] }
       end
 
       it 'initialize the keys if no keys are present' do
@@ -95,8 +95,8 @@ describe Canvas::Security::KeyStorage do
       Timecop.freeze(future_key_time + 61.minutes) do
         present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
         future = keys_before[Canvas::Security::KeyStorage::FUTURE].to_json
-        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }.
-          from(present).to(future)
+        expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }
+          .from(present).to(future)
       end
     end
   end
@@ -113,7 +113,6 @@ describe Canvas::Security::KeyStorage do
   end
 
   def select_public_claims(key)
-    key.select{|k,_| %w(kty e n kid alg use).include?(k)}
+    key.select { |k, _| %w(kty e n kid alg use).include?(k) }
   end
-
 end

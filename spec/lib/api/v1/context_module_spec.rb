@@ -43,19 +43,20 @@ describe Api::V1::ContextModule do
       if context.context_module_tags != [] && context.context_module_tags.first.url
         return context.context_module_tags.first.url
       end
+
       context.context_external_tools.first.url
     end
   end
 
   describe "#module_item_json" do
-    subject { Dummy.new(double(params: {frame_external_urls: 'http://www.instructure.com'})) }
+    subject { Dummy.new(double(params: { frame_external_urls: 'http://www.instructure.com' })) }
 
     before do
       course_with_teacher(account: Account.default)
       course_with_student(course: @course)
 
       @cm = ContextModule.new(context: @course)
-      @cm.prerequisites = {:type=>"context_module", :name=>'test', :id=>1}
+      @cm.prerequisites = { :type => "context_module", :name => 'test', :id => 1 }
       @cm.save!
 
       @tool = @course.context_external_tools.create(name: "a", domain: "instructure.com", consumer_key: '12345', shared_secret: 'secret', url: 'http://www.toolurl.com')

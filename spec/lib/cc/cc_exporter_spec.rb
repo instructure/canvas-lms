@@ -78,7 +78,7 @@ describe "Common Cartridge exporting" do
       CC::CCHelper.create_key(obj, global: true)
     end
 
-    def check_resource_node(obj, type, selected=true)
+    def check_resource_node(obj, type, selected = true)
       res = @manifest_doc.at_css("resource[identifier=#{mig_id(obj)}][type=\"#{type}\"]")
       if selected
         expect(res).not_to be_nil
@@ -98,10 +98,10 @@ describe "Common Cartridge exporting" do
       @q2 = @course.quizzes.create!(:title => 'quiz2')
       @log = @course.root_outcome_group
       @lo = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
-      @lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
+      @lo.data = { :rubric_criterion => { :mastery_points => 3, :ratings => [{ :description => "Exceeds Expectations", :points => 5 }, { :description => "Meets Expectations", :points => 3 }, { :description => "Does Not Meet Expectations", :points => 0 }], :description => "First outcome", :points_possible => 5 } }
       @lo.save
       @lo2 = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
-      @lo2.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
+      @lo2.data = { :rubric_criterion => { :mastery_points => 3, :ratings => [{ :description => "Exceeds Expectations", :points => 5 }, { :description => "Meets Expectations", :points => 3 }, { :description => "Does Not Meet Expectations", :points => 0 }], :description => "First outcome", :points_possible => 5 } }
       @lo2.save
       @log2 = @course.learning_outcome_groups.create!(:title => 'groupage', :context => @course)
       @log2.add_outcome(@lo)
@@ -115,12 +115,12 @@ describe "Common Cartridge exporting" do
       @asmnt2 = @course.assignments.create!(:title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag)
       @rubric = @course.rubrics.new
       @rubric.title = "Rubric"
-      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>@lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
+      @rubric.data = [{ :ratings => [{ :criterion_id => "309_6312", :points => 5, :description => "Full Marks", :id => "blank", :long_description => "" }], :points => 5, :description => "Description of criterion", :id => "309_6312", :long_description => "" }, { :ignore_for_scoring => false, :mastery_points => 3, :learning_outcome_id => @lo.id, :ratings => [{ :criterion_id => "309_343", :points => 5, :description => "Exceeds Expectations", :id => "309_6516", :long_description => "" }], :points => 5, :description => "Learning Outcome", :id => "309_343", :long_description => "<p>Outcome</p>" }]
       @rubric.save!
       @rubric.associate_with(@course, @course)
       @rubric2 = @course.rubrics.new
       @rubric2.title = "Rubric"
-      @rubric2.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>@lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
+      @rubric2.data = [{ :ratings => [{ :criterion_id => "309_6312", :points => 5, :description => "Full Marks", :id => "blank", :long_description => "" }], :points => 5, :description => "Description of criterion", :id => "309_6312", :long_description => "" }, { :ignore_for_scoring => false, :mastery_points => 3, :learning_outcome_id => @lo.id, :ratings => [{ :criterion_id => "309_343", :points => 5, :description => "Exceeds Expectations", :id => "309_6516", :long_description => "" }], :points => 5, :description => "Learning Outcome", :id => "309_343", :long_description => "<p>Outcome</p>" }]
       @rubric2.save!
       @rubric2.associate_with(@course, @course)
       @cm = @course.context_modules.create!(:name => "some module")
@@ -129,8 +129,8 @@ describe "Common Cartridge exporting" do
       @att2 = Attachment.create!(:filename => 'second.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
       @wiki2 = @course.wiki_pages.create!(:title => "wiki2", :body => "ohais")
-      @event = @course.calendar_events.create!(:title => "event", :start_at =>1.week.from_now)
-      @event1 = @course.calendar_events.create!(:title => "event2", :start_at =>2.weeks.from_now)
+      @event = @course.calendar_events.create!(:title => "event", :start_at => 1.week.from_now)
+      @event1 = @course.calendar_events.create!(:title => "event2", :start_at => 2.weeks.from_now)
       @bank = @course.assessment_question_banks.create!(:title => 'bank')
       @bank2 = @course.assessment_question_banks.create!(:title => 'bank2')
       @pp1 = @course.pace_plans.create! workflow_state: 'unpublished'
@@ -138,21 +138,21 @@ describe "Common Cartridge exporting" do
 
       # only select one of each type
       @ce.selected_content = {
-              :discussion_topics => {mig_id(@dt1) => "1"},
-              :announcements => {mig_id(@dt3) => "1"},
-              :context_external_tools => {mig_id(@et) => "1"},
-              :quizzes => {mig_id(@q1) => "1"},
-              :learning_outcomes => {mig_id(@lo) => "1"},
-              :learning_outcome_groups => {mig_id(@log2) => "1"},
-              :assignment_groups => {mig_id(@ag) => "1"},
-              :assignments => {mig_id(@asmnt) => "1", mig_id(@asmnt2) => "0"},
-              :rubrics => {mig_id(@rubric) => "1", mig_id(@rubric2) => "0"},
-              :context_modules => {mig_id(@cm) => "1", mig_id(@cm2) => "0"},
-              :attachments => {mig_id(@att) => "1", mig_id(@att2) => "0"},
-              :wiki_pages => {mig_id(@wiki) => "1", mig_id(@wiki2) => "0"},
-              :calendar_events => {mig_id(@event) => "1", mig_id(@event2) => "0"},
-              :assessment_question_banks => {mig_id(@bank) => "1", mig_id(@bank2) => "0"},
-              :pace_plans => {mig_id(@pp1) => "1", mig_id(@pp2) => "0"}
+        :discussion_topics => { mig_id(@dt1) => "1" },
+        :announcements => { mig_id(@dt3) => "1" },
+        :context_external_tools => { mig_id(@et) => "1" },
+        :quizzes => { mig_id(@q1) => "1" },
+        :learning_outcomes => { mig_id(@lo) => "1" },
+        :learning_outcome_groups => { mig_id(@log2) => "1" },
+        :assignment_groups => { mig_id(@ag) => "1" },
+        :assignments => { mig_id(@asmnt) => "1", mig_id(@asmnt2) => "0" },
+        :rubrics => { mig_id(@rubric) => "1", mig_id(@rubric2) => "0" },
+        :context_modules => { mig_id(@cm) => "1", mig_id(@cm2) => "0" },
+        :attachments => { mig_id(@att) => "1", mig_id(@att2) => "0" },
+        :wiki_pages => { mig_id(@wiki) => "1", mig_id(@wiki2) => "0" },
+        :calendar_events => { mig_id(@event) => "1", mig_id(@event2) => "0" },
+        :assessment_question_banks => { mig_id(@bank) => "1", mig_id(@bank2) => "0" },
+        :pace_plans => { mig_id(@pp1) => "1", mig_id(@pp2) => "0" }
       }
       @ce.save!
 
@@ -220,13 +220,12 @@ describe "Common Cartridge exporting" do
     end
 
     it "should create a quizzes-only export" do
-
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-              :all_quizzes => "1",
+        :all_quizzes => "1",
       }
       @ce.save!
 
@@ -258,8 +257,8 @@ describe "Common Cartridge exporting" do
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-              :all_quizzes => "1",
-              :all_assessment_question_banks => "1",
+        :all_quizzes => "1",
+        :all_assessment_question_banks => "1",
       }
       @ce.save!
 
@@ -274,13 +273,12 @@ describe "Common Cartridge exporting" do
     end
 
     it "should selectively create a quizzes-only export" do
-
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-              :quizzes => {mig_id(@q1) => "1"},
+        :quizzes => { mig_id(@q1) => "1" },
       }
       @ce.save!
 
@@ -318,7 +316,7 @@ describe "Common Cartridge exporting" do
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-              :all_quizzes => "1",
+        :all_quizzes => "1",
       }
       @ce.save!
 
@@ -371,9 +369,9 @@ describe "Common Cartridge exporting" do
       @ce.save!
 
       allow(CC::CCHelper).to receive(:media_object_info).and_return({
-        :asset => { :id => "some-kaltura-id", :size => 1234, :status => '2' },
-        :path => "media_objects/some-kaltura-id"
-      })
+                                                                      :asset => { :id => "some-kaltura-id", :size => 1234, :status => '2' },
+                                                                      :path => "media_objects/some-kaltura-id"
+                                                                    })
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       allow(CanvasKaltura::ClientV3).to receive(:startSession)
       allow(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("some-url")
@@ -405,25 +403,25 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
       qq = @q1.quiz_questions.create!
-      data = {:correct_comments => "",
-              :question_type => "multiple_choice_question",
-              :question_bank_name => "Quiz",
-              :assessment_question_id => "9270",
-              :migration_id => "QUE_1014",
-              :incorrect_comments => "",
-              :question_name => "test fun",
-              :name => "test fun",
-              :points_possible => 1,
-              :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
-              :answers =>
-                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
-                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      data = { :correct_comments => "",
+               :question_type => "multiple_choice_question",
+               :question_bank_name => "Quiz",
+               :assessment_question_id => "9270",
+               :migration_id => "QUE_1014",
+               :incorrect_comments => "",
+               :question_name => "test fun",
+               :name => "test fun",
+               :points_possible => 1,
+               :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+               :answers =>
+                  [{ :migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080 },
+                   { :migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279 }] }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
 
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.selected_content = {
-          :all_quizzes => "1",
+        :all_quizzes => "1",
       }
       @ce.save!
 
@@ -455,25 +453,25 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
       qq = @q1.quiz_questions.create!
-      data = {"question_text" =>
+      data = { "question_text" =>
                       "<p><span>enter three things [d], [e], [f]</span></p>",
-              "neutral_comments" => "",
-              "incorrect_comments" => "",
-              "name" => "silly question with no answers",
-              "answers" =>
-                      [{"id" => 4505, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""},
-                       {"id" => 7936, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""}],
-              "correct_comments" => "",
-              "question_type" => "fill_in_multiple_blanks_question",
-              "assessment_question_id" => nil,
-              "question_name" => "personality",
-              "points_possible" => 1}.with_indifferent_access
+               "neutral_comments" => "",
+               "incorrect_comments" => "",
+               "name" => "silly question with no answers",
+               "answers" =>
+                      [{ "id" => 4505, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => "" },
+                       { "id" => 7936, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => "" }],
+               "correct_comments" => "",
+               "question_type" => "fill_in_multiple_blanks_question",
+               "assessment_question_id" => nil,
+               "question_name" => "personality",
+               "points_possible" => 1 }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-              :all_quizzes => "1",
+        :all_quizzes => "1",
       }
       @ce.save!
 
@@ -519,7 +517,7 @@ describe "Common Cartridge exporting" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
       @ce.selected_content = {
-          :everything => "0"
+        :everything => "0"
       }
       @ce.save!
 
@@ -575,7 +573,7 @@ describe "Common Cartridge exporting" do
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return('http://www.example.com/blah.flv')
       stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: "", status: 200)
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, path: 'blah.flv'})
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({ asset: { id: 1, status: '2' }, path: 'blah.flv' })
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
       page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
@@ -614,7 +612,7 @@ describe "Common Cartridge exporting" do
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'
-      expect(assignment_xml_doc.css('submission_formats format').map{ |fmt| fmt.attribute('type').value }).to match_array %w(html file url)
+      expect(assignment_xml_doc.css('submission_formats format').map { |fmt| fmt.attribute('type').value }).to match_array %w(html file url)
 
       # validate presence of canvas extension node
       extension_node = assignment_xml_doc.at_css('extensions').elements.first
@@ -652,7 +650,7 @@ describe "Common Cartridge exporting" do
         )
       end
 
-      let(:custom_params) { { foo: 'bar '} }
+      let(:custom_params) { { foo: 'bar ' } }
       let(:version) { '1.1.0' }
       let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
       let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
@@ -898,11 +896,11 @@ describe "Common Cartridge exporting" do
       before :once do
         @ag = @course.assignment_groups.create!(:name => 'group1')
         @published = @course.assignments.create!({
-          :title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag
-        })
+                                                   :title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag
+                                                 })
         @unpublished = @course.assignments.create!({
-          :title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag
-        })
+                                                     :title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag
+                                                   })
         @unpublished.unpublish
         @ce.save!
       end
@@ -929,21 +927,21 @@ describe "Common Cartridge exporting" do
         cm1 = @course.context_modules.create!(name: "unlocked module")
         cm1.publish
         cm2 = @course.context_modules.create!({
-          name: "locked module",
-          prerequisites: [{:id=>cm1.id, :type=>"context_module", :name=>cm1.name}]
-        })
+                                                name: "locked module",
+                                                prerequisites: [{ :id => cm1.id, :type => "context_module", :name => cm1.name }]
+                                              })
         cm2.publish
         cm1link = %{<a href="/courses/#{@course.id}/modules/#{cm1.id}">Mod 1</a>}
         cm2link = %{<a href="/courses/#{@course.id}/modules/#{cm2.id}">Mod 2</a>}
         assignment = @course.assignments.create!({
-          title: 'Assignment 1',
-          description: "go to module 1 at #{cm1link} and module 2 at #{cm2link}"
-        })
-        cm1.completion_requirements = [{:id=>assignment.id, :type=>"must_mark_done"}]
+                                                   title: 'Assignment 1',
+                                                   description: "go to module 1 at #{cm1link} and module 2 at #{cm2link}"
+                                                 })
+        cm1.completion_requirements = [{ :id => assignment.id, :type => "must_mark_done" }]
         cm1.save!
 
         student_in_course(active_all: true, user_name: "a student")
-        @ce.epub_export = EpubExport.create!({course: @course})
+        @ce.epub_export = EpubExport.create!({ course: @course })
         @ce.user = @student
         @ce.save!
 
@@ -954,14 +952,13 @@ describe "Common Cartridge exporting" do
 
         expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm1)}/)).not_to be_nil
         expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm2)}/)).not_to be_nil
-
       end
     end
 
     context 'locked items' do
       it "should not export locked items for a student" do
         student_in_course(active_all: true, user_name: "a student")
-        assignment = @course.assignments.create!({title: 'assignment', unlock_at: 5.days.from_now})
+        assignment = @course.assignments.create!({ title: 'assignment', unlock_at: 5.days.from_now })
         quiz = @course.quizzes.create!(title: 'quiz', unlock_at: 5.days.from_now)
         topic = @course.discussion_topics.create!(title: 'topic', unlock_at: 5.days.from_now)
         page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
@@ -1000,22 +997,22 @@ describe "Common Cartridge exporting" do
       before do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
-          :uploaded_data => stub_png_data('visible.png'),
-          :folder => folder,
-          :context => @course
-        })
+                                        :uploaded_data => stub_png_data('visible.png'),
+                                        :folder => folder,
+                                        :context => @course
+                                      })
         @hidden = Attachment.create!({
-          :uploaded_data => stub_png_data('hidden.png'),
-          :folder => folder,
-          :context => @course,
-          :hidden => true
-        })
+                                       :uploaded_data => stub_png_data('hidden.png'),
+                                       :folder => folder,
+                                       :context => @course,
+                                       :hidden => true
+                                     })
         @locked = Attachment.create!({
-          :uploaded_data => stub_png_data('locked.png'),
-          :folder => folder,
-          :context => @course,
-          :locked => true
-        })
+                                       :uploaded_data => stub_png_data('locked.png'),
+                                       :folder => folder,
+                                       :context => @course,
+                                       :locked => true
+                                     })
         @ce.selected_content = {
           all_attachments: "1"
         }

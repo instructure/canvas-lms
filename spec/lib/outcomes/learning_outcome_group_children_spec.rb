@@ -36,18 +36,18 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:g4) { outcome_group_model(context: context, outcome_group_id: g1, title: 'Group 2.2') }
   let!(:g5) { outcome_group_model(context: context, outcome_group_id: g2, title: 'Group 3') }
   let!(:g6) { outcome_group_model(context: context, outcome_group_id: g3, title: 'Group 4') }
-  let!(:o0) { outcome_model(context: context, outcome_group: g0, title:'Outcome 1', short_description: 'Outcome 1') }
-  let!(:o1) { outcome_model(context: context, outcome_group: g1, title:'Outcome 2.1', short_description: 'Outcome 2.1') }
-  let!(:o2) { outcome_model(context: context, outcome_group: g1, title:'Outcome 2.2', short_description: 'Outcome 2.2') }
-  let!(:o3) { outcome_model(context: context, outcome_group: g2, title:'Outcome 3', short_description: 'Outcome 3') }
-  let!(:o4) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.1', short_description: 'Outcome 4.1') }
-  let!(:o5) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.2', short_description: 'Outcome 4.2') }
-  let!(:o6) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.3', short_description: 'Outcome 4.3') }
-  let!(:o7) { outcome_model(context: context, outcome_group: g4, title:'Outcome 5', short_description: 'Outcome 5') }
-  let!(:o8) { outcome_model(context: context, outcome_group: g5, title:'Outcome 6', short_description: 'Outcome 6') }
-  let!(:o9) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.1', short_description: 'Outcome 7.1') }
-  let!(:o10) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.2', short_description: 'Outcome 7.2') }
-  let!(:o11) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
+  let!(:o0) { outcome_model(context: context, outcome_group: g0, title: 'Outcome 1', short_description: 'Outcome 1') }
+  let!(:o1) { outcome_model(context: context, outcome_group: g1, title: 'Outcome 2.1', short_description: 'Outcome 2.1') }
+  let!(:o2) { outcome_model(context: context, outcome_group: g1, title: 'Outcome 2.2', short_description: 'Outcome 2.2') }
+  let!(:o3) { outcome_model(context: context, outcome_group: g2, title: 'Outcome 3', short_description: 'Outcome 3') }
+  let!(:o4) { outcome_model(context: context, outcome_group: g3, title: 'Outcome 4.1', short_description: 'Outcome 4.1') }
+  let!(:o5) { outcome_model(context: context, outcome_group: g3, title: 'Outcome 4.2', short_description: 'Outcome 4.2') }
+  let!(:o6) { outcome_model(context: context, outcome_group: g3, title: 'Outcome 4.3', short_description: 'Outcome 4.3') }
+  let!(:o7) { outcome_model(context: context, outcome_group: g4, title: 'Outcome 5', short_description: 'Outcome 5') }
+  let!(:o8) { outcome_model(context: context, outcome_group: g5, title: 'Outcome 6', short_description: 'Outcome 6') }
+  let!(:o9) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.1', short_description: 'Outcome 7.1') }
+  let!(:o10) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.2', short_description: 'Outcome 7.2') }
+  let!(:o11) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
   # rubocop:enable RSpec/LetSetup, Layout/LineLength
 
   # Outcome Structure for visual reference
@@ -152,7 +152,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   describe '#suboutcomes_by_group_id' do
     it 'returns the outcomes ordered by parent group title then outcome short_description' do
       g_outcomes = subject.suboutcomes_by_group_id(global_group.id)
-        .map(&:learning_outcome_content).map(&:short_description)
+                          .map(&:learning_outcome_content).map(&:short_description)
       expect(g_outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
       r_outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
       expect(r_outcomes).to match_array(
@@ -176,7 +176,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     context 'when g2 title is updated with a letter that will proceed others' do
-      before {g2.update!(title: 'A Group 3')}
+      before { g2.update!(title: 'A Group 3') }
 
       it 'should return the g2s outcome (o3) first' do
         outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
@@ -193,7 +193,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context 'when o5 short_description is updated with a letter that will proceed others' do
       # NOTE: when you update the short_description of a LearningOutcome it does NOT update the
       # content tag title.
-      before {o5.update!(short_description: 'A Outcome 4.2')}
+      before { o5.update!(short_description: 'A Outcome 4.2') }
 
       it 'o5 should be returned before o4 but not o2 and o3' do
         outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
@@ -228,7 +228,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it 'returns global outcomes' do
         outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content)
-          .map(&:short_description)
+                          .map(&:short_description)
         expect(outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
       end
     end
@@ -279,46 +279,46 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       it "filters title with non-alphanumerical chars" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1"})
-          .map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "LA.1" })
+                          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          "LA.1.1.1", "LA.1.1.1.1"
-        ])
+                                  "LA.1.1.1", "LA.1.1.1.1"
+                                ])
       end
 
       it "filters description with text content" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "knowledge"})
-          .map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "knowledge" })
+                          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          'FO.3', 'LA.1.1.1'
-        ])
+                                  'FO.3', 'LA.1.1.1'
+                                ])
       end
 
       it "filters description with html content" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "Pellentesque"})
-          .map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "Pellentesque" })
+                          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          'HT.ML.1.1'
-        ])
+                                  'HT.ML.1.1'
+                                ])
       end
 
       it "filters more than 1 word" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1.1 Pellentesque"})
-          .map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "LA.1.1 Pellentesque" })
+                          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          "HT.ML.1.1",
-          "LA.1.1.1",
-          "LA.1.1.1.1"
-        ])
+                                  "HT.ML.1.1",
+                                  "LA.1.1.1",
+                                  "LA.1.1.1.1"
+                                ])
       end
 
       it "filters when words aren't all completed" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "recog awe"})
-          .map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "recog awe" })
+                          .map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to eql([
-          "LA.2.2.1.2",
-          "HT.ML.1.2"
-        ])
+                                  "LA.2.2.1.2",
+                                  "HT.ML.1.2"
+                                ])
       end
 
       context 'when lang is portuguese' do
@@ -347,8 +347,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
           ).map(&:learning_outcome_content).map(&:short_description)
 
           expect(outcomes).to eql([
-            "will bring"
-          ])
+                                    "will bring"
+                                  ])
         end
 
         context 'when context is nil' do
@@ -377,8 +377,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
             ).map(&:learning_outcome_content).map(&:short_description)
 
             expect(outcomes).to eql([
-              "will bring"
-            ])
+                                      "will bring"
+                                    ])
           end
         end
       end
@@ -405,13 +405,13 @@ describe Outcomes::LearningOutcomeGroupChildren do
           )
 
           outcomes = subject.suboutcomes_by_group_id(
-            g1.id, {search_query: "Um portugues"}
+            g1.id, { search_query: "Um portugues" }
           ).map(&:learning_outcome_content).map(&:short_description)
 
           expect(outcomes).to eql([
-            "will bring",
-            "will bring too"
-          ])
+                                    "will bring",
+                                    "will bring too"
+                                  ])
         end
       end
     end

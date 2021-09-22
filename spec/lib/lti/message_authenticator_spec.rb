@@ -22,14 +22,13 @@ require_dependency "lti/message_authenticator"
 
 module Lti
   describe MessageAuthenticator do
-
-    let(:launch_url) {'http://test.com/test'}
-    let(:course) {Course.create!}
+    let(:launch_url) { 'http://test.com/test' }
+    let(:course) { Course.create! }
     let!(:tool) do
       course.context_external_tools.create!(
         {
           name: 'test tool',
-          domain:'test.com',
+          domain: 'test.com',
           consumer_key: 'key',
           shared_secret: 'secret'
         }
@@ -42,7 +41,7 @@ module Lti
           lti_message_type: 'ContentItemSelection',
           lti_version: 'LTI-1p0',
           content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
-          data: Canvas::Security.create_jwt({content_item_id: "3"}),
+          data: Canvas::Security.create_jwt({ content_item_id: "3" }),
           lti_msg: '',
           lti_log: '',
           lti_errormsg: '',
@@ -53,7 +52,7 @@ module Lti
       m.oauth_consumer_key = tool.consumer_key
       m
     end
-    subject{described_class.new(launch_url, message.signed_post_params(tool.shared_secret))}
+    subject { described_class.new(launch_url, message.signed_post_params(tool.shared_secret)) }
 
     it 'creates a message from the signed_params' do
       expect(subject.message.oauth_consumer_key).to eq tool.consumer_key
@@ -65,32 +64,32 @@ module Lti
       end
 
       context 'content-item unique json serialization' do
-        let(:launch_url) {"http://test.com/test"}
-        let(:secret) {'secret'}
+        let(:launch_url) { "http://test.com/test" }
+        let(:secret) { 'secret' }
         let(:signed_params) {
           {
-            :oauth_callback=>"about:blank",
-            :oauth_consumer_key=>"key",
-            :oauth_nonce=>"89fc77055d2a051de296fc5d99987a20",
-            :oauth_signature_method=>"HMAC-SHA1",
-            :oauth_timestamp=>"1467842103",
-            :oauth_version=>"1.0",
-            :oauth_signature=>"TL8PLA/V43D21+JkGg8i9Cj+Dqg=",
-            "lti_message_type"=>"ContentItemSelection",
-            "lti_version"=>"LTI-1p0",
-            "content_items"=>"{\"@graph\":[{\"windowTarget\":\"\",\"text\":\"Arch Linux\",\"title\":\"Its your "+
-                             "computer\",\"url\":\"http://lti-tool-provider-example.dev/messages/blti\""+
-                             ",\"thumbnail\":{\"height\":128,\"width\":128,\"@id\""+
-                             ":\"http://www.runeaudio.com/assets/img/banner-archlinux.png\"}"+
-                             ",\"placementAdvice\":{\"displayHeight\":600,\"displayWidth\":800"+
-                             ",\"presentationDocumentTarget\":\"iframe\"},\"mediaType\""+
-                             ":\"application/vnd.ims.lti.v1.ltilink\",\"@type\":\"LtiLinkItem\",\"@id\""+
-                             ":\"http://lti-tool-provider-example.dev/messages/blti\"}],\"@context\""+
-                             ":\"http://purl.imsglobal.org/ctx/lti/v1/ContentItem\"}",
-            "lti_msg"=>"",
-            "lti_log"=>"",
-            "lti_errormsg"=>"",
-            "lti_errorlog"=>""
+            :oauth_callback => "about:blank",
+            :oauth_consumer_key => "key",
+            :oauth_nonce => "89fc77055d2a051de296fc5d99987a20",
+            :oauth_signature_method => "HMAC-SHA1",
+            :oauth_timestamp => "1467842103",
+            :oauth_version => "1.0",
+            :oauth_signature => "TL8PLA/V43D21+JkGg8i9Cj+Dqg=",
+            "lti_message_type" => "ContentItemSelection",
+            "lti_version" => "LTI-1p0",
+            "content_items" => "{\"@graph\":[{\"windowTarget\":\"\",\"text\":\"Arch Linux\",\"title\":\"Its your " +
+              "computer\",\"url\":\"http://lti-tool-provider-example.dev/messages/blti\"" +
+              ",\"thumbnail\":{\"height\":128,\"width\":128,\"@id\"" +
+              ":\"http://www.runeaudio.com/assets/img/banner-archlinux.png\"}" +
+              ",\"placementAdvice\":{\"displayHeight\":600,\"displayWidth\":800" +
+              ",\"presentationDocumentTarget\":\"iframe\"},\"mediaType\"" +
+              ":\"application/vnd.ims.lti.v1.ltilink\",\"@type\":\"LtiLinkItem\",\"@id\"" +
+              ":\"http://lti-tool-provider-example.dev/messages/blti\"}],\"@context\"" +
+              ":\"http://purl.imsglobal.org/ctx/lti/v1/ContentItem\"}",
+            "lti_msg" => "",
+            "lti_log" => "",
+            "lti_errormsg" => "",
+            "lti_errorlog" => ""
           }
         }
 
@@ -140,10 +139,6 @@ module Lti
           expect(Rails.cache.exist?(validator.send(:cache_key))).to be_falsey
         end
       end
-
     end
   end
-
-
-
 end

@@ -48,7 +48,7 @@ describe Api do
     end
 
     it 'should not find a missing record' do
-      expect(lambda {@api.api_find(User, (User.all.map(&:id).max + 1))}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { @api.api_find(User, (User.all.map(&:id).max + 1)) }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should find an existing sis_id record' do
@@ -70,14 +70,14 @@ describe Api do
     it 'should not find record from other account' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(lambda {@api.api_find(User, "sis_login_id:sis_user_2@example.com")}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should find record from other root account explicitly' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
-          and_return(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
+      expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything)
+                                           .and_return(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
@@ -89,7 +89,7 @@ describe Api do
 
     it 'should not find a missing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
-      expect(lambda {@api.api_find(User, "sis_login_id:sis_user_2@example.com")}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should find user id "self" when a current user is provided' do
@@ -97,7 +97,7 @@ describe Api do
     end
 
     it 'should not find user id "self" when a current user is not provided' do
-      expect(lambda {TestApiInstance.new(Account.default, nil).api_find(User, "self")}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { TestApiInstance.new(Account.default, nil).api_find(User, "self") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should find account id "self"' do
@@ -145,9 +145,8 @@ describe Api do
       expect(TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current')).to eq term
     end
 
-
     it 'should not find a user with an invalid AR id' do
-      expect(lambda {@api.api_find(User, "a1")}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { @api.api_find(User, "a1") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should not find sis ids in other accounts" do
@@ -160,8 +159,8 @@ describe Api do
       user3 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account1
       user4 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account2
       expect(api1.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq user1
-      expect(lambda {api2.api_find(User, "sis_login_id:sis_user_1@example.com")}).to raise_error(ActiveRecord::RecordNotFound)
-      expect(lambda {api1.api_find(User, "sis_login_id:sis_user_2@example.com")}).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { api2.api_find(User, "sis_login_id:sis_user_1@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect(lambda { api1.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
       expect(api2.api_find(User, "sis_login_id:sis_user_2@example.com")).to eq user2
       expect(api1.api_find(User, "sis_login_id:sis_user_3@example.com")).to eq user3
       expect(api2.api_find(User, "sis_login_id:sis_user_3@example.com")).to eq user4
@@ -333,10 +332,10 @@ describe Api do
           @account = Account.create(name: 'new')
           @user = user_with_pseudonym username: "sis_user_1@example.com", account: @account
         end
-        expect(Api).to receive(:sis_parse_id).
-          with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
-          twice.
-          and_return(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), @account]])
+        expect(Api).to receive(:sis_parse_id)
+          .with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything)
+          .twice
+          .and_return(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), @account]])
         expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
         # works through an association, too
         account2 = Account.create!
@@ -374,9 +373,10 @@ describe Api do
       user_with_pseudonym :username => "sisuser3@example.com"
       @user3 = @user
       expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-        "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
-        "5123"], User, Account.default).sort).to eq [
-        @user1.id, @user2.id, @user3.id, 5123].sort
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
+                          "5123"], User, Account.default).sort).to eq [
+                            @user1.id, @user2.id, @user3.id, 5123
+                          ].sort
     end
 
     it 'should work when only provided sis_ids' do
@@ -389,8 +389,9 @@ describe Api do
       user_with_pseudonym :username => "sisuser3@example.com"
       @user3 = @user
       expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-        "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4"], User, Account.default).sort).to eq [
-        @user1.id, @user2.id, @user3.id].sort
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4"], User, Account.default).sort).to eq [
+                            @user1.id, @user2.id, @user3.id
+                          ].sort
     end
 
     it "should not find sis ids in other accounts" do
@@ -409,10 +410,10 @@ describe Api do
       collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
-      expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
-          and_return({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").and_return(relation_result)
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
+                                            .and_return({ "test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"] })
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
 
@@ -420,18 +421,18 @@ describe Api do
       collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
-      expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
-          and_return({"other-lookup" => ["thing2", "thing3"]})
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").and_return(relation_result)
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
+                                            .and_return({ "other-lookup" => ["thing2", "thing3"] })
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
 
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = double()
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
-      expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
-          and_return({"test-lookup" => ["thing1", "thing2"]})
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
+                                            .and_return({ "test-lookup" => ["thing1", "thing2"] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).never
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
@@ -440,13 +441,12 @@ describe Api do
       collection = double()
       object1 = double()
       object2 = double()
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
-      expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
-          and_return({})
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
+                                            .and_return({})
       expect(Api).to receive(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq []
     end
-
   end
 
   context 'sis_parse_id' do
@@ -514,27 +514,27 @@ describe Api do
     end
 
     it 'should handle a list of ar_ids' do
-      expect(Api.sis_parse_ids([1,2,3], @lookups)).to eq({ "users.id" => [1,2,3] })
-      expect(Api.sis_parse_ids(["1","2","3"], @lookups)).to eq({ "users.id" => [1,2,3] })
+      expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids(["1", "2", "3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
 
     it 'should handle a list of sis ids' do
-      expect(Api.sis_parse_ids(["sis_user_id:U1","sis_user_id:U2","sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1","U2","U3"] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
     it 'should remove duplicates' do
-      expect(Api.sis_parse_ids([1,2,3,2], @lookups)).to eq({ "users.id" => [1,2,3] })
-      expect(Api.sis_parse_ids([1,2,2,3], @lookups)).to eq({ "users.id" => [1,2,3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1","sis_user_id:U2","sis_user_id:U2","sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1","U2","U3"] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1","sis_user_id:U2","sis_user_id:U3","sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1","U2","U3"] })
+      expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
     it 'should work with mixed sis id types' do
-      expect(Api.sis_parse_ids([1,2,"sis_user_id:U1",3,"sis_user_id:U2","sis_user_id:U3","sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
+      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
     it 'should skip invalid things' do
-      expect(Api.sis_parse_ids([1,2,3,"a1","invalid","sis_nonexistent:3"], @lookups)).to eq({ "users.id" => [1,2,3] })
+      expect(Api.sis_parse_ids([1, 2, 3, "a1", "invalid", "sis_nonexistent:3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
   end
 
@@ -548,7 +548,7 @@ describe Api do
 
     it 'should raise an error otherwise' do
       [StreamItem, PluginSetting].each do |collection|
-        expect(lambda {Api.sis_find_sis_mapping_for_collection(collection)}).to raise_error("need to add support for table name: #{collection.table_name}")
+        expect(lambda { Api.sis_find_sis_mapping_for_collection(collection) }).to raise_error("need to add support for table name: #{collection.table_name}")
       end
     end
   end
@@ -556,29 +556,29 @@ describe Api do
   context 'sis_relation_for_collection' do
     it 'should pass along the sis_mapping to sis_find_params_for_sis_mapping' do
       root_account = account_model
-      expect(Api).to receive(:relation_for_sis_mapping).with(User, Api::SIS_MAPPINGS['users'], [1,2,3], root_account, anything).and_return(1234)
+      expect(Api).to receive(:relation_for_sis_mapping).with(User, Api::SIS_MAPPINGS['users'], [1, 2, 3], root_account, anything).and_return(1234)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(User).and_return(Api::SIS_MAPPINGS['users'])
-      expect(Api.sis_relation_for_collection(User, [1,2,3], root_account)).to eq 1234
+      expect(Api.sis_relation_for_collection(User, [1, 2, 3], root_account)).to eq 1234
     end
   end
 
   context 'relation_for_sis_mapping' do
     it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
-      expect(Api).to receive(:sis_parse_ids).with([1,2,3], "lookups", anything, root_account: root_account).and_return({"users.id" => [4,5,6]})
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, {"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).and_return("params")
-      expect(Api.relation_for_sis_mapping(User, {:lookups => "lookups"}, [1,2,3], root_account)).to eq "params"
+      expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account: root_account).and_return({ "users.id" => [4, 5, 6] })
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { :lookups => "lookups" }, root_account).and_return("params")
+      expect(Api.relation_for_sis_mapping(User, { :lookups => "lookups" }, [1, 2, 3], root_account)).to eq "params"
     end
   end
 
   context 'relation_for_sis_mapping_and_columns' do
     it 'should fail when not given a root account' do
       expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
-      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory)}).to raise_error("sis_root_account required for lookups")
+      expect(lambda { Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory) }).to raise_error("sis_root_account required for lookups")
     end
 
     it 'should properly generate an escaped arg string' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
     it 'should work with no columns' do
@@ -586,19 +586,19 @@ describe Api do
     end
 
     it 'should add in joins if the sis_mapping has some with columns' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope", :joins => 'some joins'}, Account.default).eager_load_values).to eq ['some joins']
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope", :joins => 'some joins' }, Account.default).eager_load_values).to eq ['some joins']
     end
 
     it 'should work with a few different column types and account scopings' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, {"id1" => [1,2,3], "id2" => ["a","b","c"], "id3" => ["s1", "s2", "s3"]}, {:scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set}, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => ["a", "b", "c"], "id3" => ["s1", "s2", "s3"] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "should scope to accounts by default if :is_not_scoped_to_account doesn't exist" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
     it "should fail if we're scoping to an account and the scope isn't provided" do
-      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {}, Account.default)}).to raise_error("missing scope for collection")
+      expect(lambda { Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, {}, Account.default) }).to raise_error("missing scope for collection")
     end
   end
 
@@ -674,29 +674,28 @@ describe Api do
 
     it 'should correctly query the course table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
-      expect(Api.relation_for_sis_mapping_and_columns(Course, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(Course, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the enrollment_term table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
-      expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the user table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
-      expect(Api.relation_for_sis_mapping_and_columns(User, {"pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
     end
 
     it 'should correctly query the account table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
-      expect(Api.relation_for_sis_mapping_and_columns(Account, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(Account, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the course_section table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
-      expect(Api.relation_for_sis_mapping_and_columns(CourseSection, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(CourseSection, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
-
   end
 
   context "map_non_sis_ids" do
@@ -797,9 +796,9 @@ describe Api do
           a = Account.create!
           student_in_course(account: a, active_all: true)
           @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
-          <<-HTML
-<img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
-<a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
+          <<~HTML
+            <img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
+            <a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
           HTML
         end
 
@@ -812,9 +811,9 @@ describe Api do
         allow(@k).to receive(:url_options).and_return({})
 
         res = @k.api_user_content(html, @course, @student)
-        expect(res).to eq <<-HTML
-<img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}">
-<a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
+        expect(res).to eq <<~HTML
+          <img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}">
+          <a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
         HTML
       end
     end
@@ -824,7 +823,7 @@ describe Api do
     class T
       extend Api
       def self.request
-        OpenStruct.new({host: 'some-host.com', port: 80})
+        OpenStruct.new({ host: 'some-host.com', port: 80 })
       end
     end
 
@@ -884,27 +883,27 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "should not raise Folio::InvalidPage for pages past the end" do
-        controller = double('controller', request: request, response: response, params: {per_page: 1})
-        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1)).
-          to eq []
+        controller = double('controller', request: request, response: response, params: { per_page: 1 })
+        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1))
+          .to eq []
       end
 
       it "should not raise Folio::InvalidPage for integer-equivalent non-Integer pages" do
-        expect(Api.paginate(collection, controller, 'example.com', page: '1')).
-          to eq collection
+        expect(Api.paginate(collection, controller, 'example.com', page: '1'))
+          .to eq collection
       end
 
       it "should raise Folio::InvalidPage for pages <= 0" do
-        expect{ Api.paginate(collection, controller, 'example.com', page: 0) }.
-          to raise_error(Folio::InvalidPage)
+        expect { Api.paginate(collection, controller, 'example.com', page: 0) }
+          .to raise_error(Folio::InvalidPage)
 
-        expect{ Api.paginate(collection, controller, 'example.com', page: -1) }.
-          to raise_error(Folio::InvalidPage)
+        expect { Api.paginate(collection, controller, 'example.com', page: -1) }
+          .to raise_error(Folio::InvalidPage)
       end
 
       it "should raise Folio::InvalidPage for non-integer pages" do
-        expect{ Api.paginate(collection, controller, 'example.com', page: 'abc') }.
-          to raise_error(Folio::InvalidPage)
+        expect { Api.paginate(collection, controller, 'example.com', page: 'abc') }
+          .to raise_error(Folio::InvalidPage)
       end
     end
 
@@ -913,33 +912,33 @@ describe Api do
 
       context "with no max_per_page argument" do
         it "should limit to the default max_per_page" do
-          controller = double('controller', request: request, response: response, params: {per_page: Api.max_per_page + 5})
-          expect(Api.paginate(collection, controller, 'example.com').size).
-            to eq Api.max_per_page
+          controller = double('controller', request: request, response: response, params: { per_page: Api.max_per_page + 5 })
+          expect(Api.paginate(collection, controller, 'example.com').size)
+            .to eq Api.max_per_page
         end
       end
 
       context "with no per_page parameter" do
         it "should limit to the default per_page" do
           controller = double('controller', request: request, response: response, params: {})
-          expect(Api.paginate(collection, controller, 'example.com').size).
-            to eq Api.per_page
+          expect(Api.paginate(collection, controller, 'example.com').size)
+            .to eq Api.per_page
         end
       end
 
       context "with per_page parameter > max_per_page argument" do
-        let(:controller) { double('controller', request: request, response: response, params: {per_page: 100}) }
+        let(:controller) { double('controller', request: request, response: response, params: { per_page: 100 }) }
         it "should take the smaller of the max_per_page arugment and the per_page param" do
-          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 75}).size).
-            to eq 75
+          expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 75 }).size)
+            .to eq 75
         end
       end
 
       context "with per_page parameter < max_per_page argument" do
-        let(:controller) { double('controller', request: request, response: response, params: {per_page: 75}) }
+        let(:controller) { double('controller', request: request, response: response, params: { per_page: 75 }) }
         it "should take the smaller of the max_per_page arugment and the per_page param" do
-          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 100}).size).
-            to eq 75
+          expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 100 }).size)
+            .to eq 75
         end
       end
     end
@@ -978,76 +977,76 @@ describe Api do
 
     it "should not build links for empty pages" do
       expect(Api.build_links("www.example.com/", {
-        :per_page => 10,
-        :current => "",
-        :next => "",
-        :prev => "",
-        :first => "",
-        :last => "",
-      })).to be_empty
+                               :per_page => 10,
+                               :current => "",
+                               :next => "",
+                               :prev => "",
+                               :first => "",
+                               :last => "",
+                             })).to be_empty
     end
 
     it "should build current, next, prev, first, and last links if provided" do
       links = Api.build_links("www.example.com/", {
-        :per_page => 10,
-        :current => 8,
-        :next => 4,
-        :prev => 2,
-        :first => 1,
-        :last => 10,
-      })
-      expect(links.all?{ |l| l =~ /www.example.com\/\?/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="current"/)}).to match /page=8&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=4&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=10&per_page=10>/
+                                :per_page => 10,
+                                :current => 8,
+                                :next => 4,
+                                :prev => 2,
+                                :first => 1,
+                                :last => 10,
+                              })
+      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="current"/) }).to match /page=8&per_page=10>/
+      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=4&per_page=10>/
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=10>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=10>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=10&per_page=10>/
     end
 
     it "should maintain query parameters" do
       links = Api.build_links("www.example.com/", {
-        :query_parameters => { :search => "hihi" },
-        :per_page => 10,
-        :next => 2,
-      })
+                                :query_parameters => { :search => "hihi" },
+                                :per_page => 10,
+                                :next => 2,
+                              })
       expect(links.first).to eq "<www.example.com/?search=hihi&page=2&per_page=10>; rel=\"next\""
     end
 
     it "should maintain array query parameters" do
       links = Api.build_links("www.example.com/", {
-        :query_parameters => { :include => ["enrollments"] },
-        :per_page => 10,
-        :next => 2,
-      })
+                                :query_parameters => { :include => ["enrollments"] },
+                                :per_page => 10,
+                                :next => 2,
+                              })
       qs = "#{CGI.escape("include[]")}=enrollments"
       expect(links.first).to eq "<www.example.com/?#{qs}&page=2&per_page=10>; rel=\"next\""
     end
 
     it "should not include certain sensitive params in the link headers" do
       links = Api.build_links("www.example.com/", {
-        :query_parameters => { :access_token => "blah", :api_key => "xxx", :page => 3, :per_page => 10 },
-        :per_page => 10,
-        :next => 4,
-      })
+                                :query_parameters => { :access_token => "blah", :api_key => "xxx", :page => 3, :per_page => 10 },
+                                :per_page => 10,
+                                :next => 4,
+                              })
       expect(links.first).to eq "<www.example.com/?page=4&per_page=10>; rel=\"next\""
     end
 
     it "prevents link headers from consuming more than 6K of header space" do
       links = Api.build_links("www.example.com/", {
-        :query_parameters => { :blah => 'a' * 2000 },
-        :per_page => 10,
-        :current => 8,
-        :next => 4,
-        :prev => 2,
-        :first => 1,
-        :last => 10,
-      })
-      expect(links.all?{ |l| l =~ /www.example.com\/\?/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="current"/)}).to be_nil
-      expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=4&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=10>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to be_nil
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=10&per_page=10>/
+                                :query_parameters => { :blah => 'a' * 2000 },
+                                :per_page => 10,
+                                :current => 8,
+                                :next => 4,
+                                :prev => 2,
+                                :first => 1,
+                                :last => 10,
+                              })
+      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="current"/) }).to be_nil
+      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=4&per_page=10>/
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=10>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to be_nil
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=10&per_page=10>/
     end
   end
 
@@ -1059,16 +1058,16 @@ describe Api do
     it "returns true when application/vnd.api+json in the Accept header" do
       controller = TestApiController.new
       allow(controller).to receive(:request).and_return double(headers: {
-        'Accept' => 'application/vnd.api+json'
-      })
+                                                                 'Accept' => 'application/vnd.api+json'
+                                                               })
       expect(controller.accepts_jsonapi?).to eq true
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
       controller = TestApiController.new
       allow(controller).to receive(:request).and_return double(headers: {
-        'Accept' => 'application/json'
-      })
+                                                                 'Accept' => 'application/json'
+                                                               })
       expect(controller.accepts_jsonapi?).to eq false
     end
   end

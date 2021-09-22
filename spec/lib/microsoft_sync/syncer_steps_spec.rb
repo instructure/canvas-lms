@@ -34,14 +34,14 @@ describe MicrosoftSync::SyncerSteps do
   let(:sync_enabled) { true }
   let(:sync_type_statsd_tag) { 'full' }
 
-  def expect_next_step(result, step, memory_state=nil)
+  def expect_next_step(result, step, memory_state = nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
     expect { syncer_steps.method(step.to_sym) }.to_not raise_error
     expect(result.step).to eq(step)
     expect(result.memory_state).to eq(memory_state)
   end
 
-  def expect_delayed_next_step(result, step, delay_amount, job_state_data=nil)
+  def expect_delayed_next_step(result, step, delay_amount, job_state_data = nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::DelayedNextStep)
     expect { syncer_steps.method(step.to_sym) }.to_not raise_error
     expect(result.step).to eq(step)
@@ -64,7 +64,7 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  def new_http_error(code, headers={})
+  def new_http_error(code, headers = {})
     MicrosoftSync::Errors::HTTPInvalidStatus.for(
       response: double(
         'response', code: code, body: '', headers: HTTParty::Response::Headers.new(headers)
@@ -109,10 +109,10 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
+  shared_examples_for 'a step that returns retry on intermittent error' do |options = {}|
     # use actual graph service instead of double and intercept calls to "request":
     let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant, {}) }
-    let(:retry_args) { {delay_amount: [15, 60, 300]}.merge(options[:retry_args] || {}) }
+    let(:retry_args) { { delay_amount: [15, 60, 300] }.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
@@ -248,7 +248,7 @@ describe MicrosoftSync::SyncerSteps do
 
     before do
       allow(graph_service_helpers).to receive(:list_education_classes_for_course)
-        .with(course).and_return(education_class_ids.map{|id| {'id' => id}})
+        .with(course).and_return(education_class_ids.map { |id| { 'id' => id } })
     end
 
     shared_examples_for 'a group record which requires a new or updated MS group' do
@@ -344,7 +344,7 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it_behaves_like 'a step that returns retry on intermittent error',
-                    retry_args: {job_state_data: 'newid'}
+                    retry_args: { job_state_data: 'newid' }
 
     context 'on success' do
       it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
@@ -360,7 +360,7 @@ describe MicrosoftSync::SyncerSteps do
       it 'bubbles up the error' do
         expect(graph_service_helpers).to \
           receive(:update_group_with_course_data).with('newid', course)
-          .and_raise(new_http_error(400))
+                                                 .and_raise(new_http_error(400))
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
@@ -405,15 +405,15 @@ describe MicrosoftSync::SyncerSteps do
           raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
           # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-          uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
+          uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
         end
       end
 
       it 'creates a mapping for each of the enrollments' do
         expect_next_step(subject, :step_generate_diff)
         expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
-          students.each_with_index.map{|student, n| [student.id, "student#{n}-mail-aad"]}.sort +
-          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-mail-aad"]}.sort
+          students.each_with_index.map { |student, n| [student.id, "student#{n}-mail-aad"] }.sort +
+          teachers.each_with_index.map { |teacher, n| [teacher.id, "teacher#{n}-mail-aad"] }.sort
         )
       end
 
@@ -471,7 +471,7 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it 'raises a UserMapping::AccountSettingsChanged error' do
-          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+          expect { subject }.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
         end
       end
 
@@ -489,7 +489,7 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it 'raises a UserMapping::AccountSettingsChanged error' do
-          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+          expect { subject }.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
         end
       end
     end
@@ -572,13 +572,13 @@ describe MicrosoftSync::SyncerSteps do
         subject
 
         expect(Rails.logger).to have_received(:warn).twice
-          .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
+                                                    .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
-          .with("microsoft_sync.syncer_steps.skipped_batches.add",
-                tags: {sync_type: sync_type_statsd_tag})
+                                                               .with("microsoft_sync.syncer_steps.skipped_batches.add",
+                                                                     tags: { sync_type: sync_type_statsd_tag })
         expect(InstStatsd::Statsd).to have_received(:count).twice
-          .with("microsoft_sync.syncer_steps.skipped_total.add", 3,
-                tags: {sync_type: sync_type_statsd_tag})
+                                                           .with("microsoft_sync.syncer_steps.skipped_total.add", 3,
+                                                                 tags: { sync_type: sync_type_statsd_tag })
       end
     end
 
@@ -595,13 +595,13 @@ describe MicrosoftSync::SyncerSteps do
         subject
 
         expect(Rails.logger).to have_received(:warn).twice
-          .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
+                                                    .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
-          .with("microsoft_sync.syncer_steps.skipped_batches.remove",
-                tags: {sync_type: sync_type_statsd_tag})
+                                                               .with("microsoft_sync.syncer_steps.skipped_batches.remove",
+                                                                     tags: { sync_type: sync_type_statsd_tag })
         expect(InstStatsd::Statsd).to have_received(:count).twice
-          .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
-                tags: {sync_type: sync_type_statsd_tag})
+                                                           .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
+                                                                 tags: { sync_type: sync_type_statsd_tag })
       end
     end
   end
@@ -612,8 +612,8 @@ describe MicrosoftSync::SyncerSteps do
     let(:diff) do
       instance_double(
         MicrosoftSync::MembershipDiff, local_owners: Set.new(%w[o3]),
-        max_enrollment_members_reached?: false, max_enrollment_owners_reached?: false,
-        additions_in_slices_of: nil, removals_in_slices_of: nil
+                                       max_enrollment_members_reached?: false, max_enrollment_owners_reached?: false,
+                                       additions_in_slices_of: nil, removals_in_slices_of: nil
       )
     end
 
@@ -621,7 +621,7 @@ describe MicrosoftSync::SyncerSteps do
 
     it_behaves_like 'a step that executes a diff' do
       it_behaves_like 'a step that returns retry on intermittent error',
-                      retry_args: {step: :step_generate_diff}
+                      retry_args: { step: :step_generate_diff }
 
       it 'goes to the step_check_team_exists on success' do
         allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
@@ -703,7 +703,7 @@ describe MicrosoftSync::SyncerSteps do
     context 'when the Microsoft API errors with "group has no owners"' do
       it "retries in (30, 90, 270 seconds)" do
         expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
-          .and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
+                                                                      .and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
         expect_retry(
           subject,
           error_class: MicrosoftSync::Errors::GroupHasNoOwners,
@@ -728,7 +728,7 @@ describe MicrosoftSync::SyncerSteps do
       it "bubbles up the error" do
         expect(graph_service).to \
           receive(:create_education_class_team).with('mygroupid')
-          .and_raise(new_http_error(400))
+                                               .and_raise(new_http_error(400))
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
@@ -748,13 +748,13 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when there are changes to process' do
       let(:n_students) { 1 }
-      let!(:students) { 1.upto(n_students).map{student_in_course(course: course).user} }
+      let!(:students) { 1.upto(n_students).map { student_in_course(course: course).user } }
       let!(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
 
       before do
         students.each_with_index do |student, index|
           communication_channel(student, path_type: "email", username: "s#{index}@example.com",
-                                active_cc: true)
+                                         active_cc: true)
         end
         communication_channel(teacher, path_type: 'email', username: 't@example.com', active_cc: true)
 
@@ -762,7 +762,7 @@ describe MicrosoftSync::SyncerSteps do
         create_partial_sync_change 'owner', teacher
       end
 
-      def create_partial_sync_change(e_type, user, course_for_psc=nil)
+      def create_partial_sync_change(e_type, user, course_for_psc = nil)
         course_for_psc ||= course
         MicrosoftSync::PartialSyncChange.create!(
           course: course_for_psc, enrollment_type: e_type, user: user
@@ -827,7 +827,7 @@ describe MicrosoftSync::SyncerSteps do
 
           allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
             # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-            uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
+            uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)

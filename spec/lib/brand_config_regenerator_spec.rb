@@ -21,10 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'delayed/testing'
 
 describe BrandConfigRegenerator do
-  let(:new_brand_config) { BrandConfig.for(variables: {"ic-brand-primary" => "green"}) }
+  let(:new_brand_config) { BrandConfig.for(variables: { "ic-brand-primary" => "green" }) }
   def setup_account_family_with_configs
     @parent_account = Account.default
-    @parent_account.brand_config = @parent_config = BrandConfig.for(variables: {"ic-brand-primary" => "red"})
+    @parent_account.brand_config = @parent_config = BrandConfig.for(variables: { "ic-brand-primary" => "red" })
     @parent_config.save!
     @parent_account.save!
     @parent_shared_config = @parent_account.shared_brand_configs.create!(
@@ -33,7 +33,7 @@ describe BrandConfigRegenerator do
     )
 
     @child_account = Account.create!(parent_account: @parent_account, name: 'child')
-    @child_account.brand_config = @child_config = BrandConfig.for(variables: {"ic-brand-global-nav-bgd" => "white"}, parent_md5: @parent_config.md5)
+    @child_account.brand_config = @child_config = BrandConfig.for(variables: { "ic-brand-global-nav-bgd" => "white" }, parent_md5: @parent_config.md5)
     @child_config.save!
     @child_account.save!
     @child_shared_config = @child_account.shared_brand_configs.create!(
@@ -42,7 +42,7 @@ describe BrandConfigRegenerator do
     )
 
     @grand_child_account = Account.create!(parent_account: @child_account, name: 'grand_child')
-    @grand_child_account.brand_config = @grand_child_config = BrandConfig.for(variables: {"ic-brand-global-nav-avatar-border" => "blue"}, parent_md5: @child_config.md5)
+    @grand_child_account.brand_config = @grand_child_config = BrandConfig.for(variables: { "ic-brand-global-nav-avatar-border" => "blue" }, parent_md5: @child_config.md5)
     @grand_child_config.save!
     @grand_child_account.save!
     @grand_child_shared_config = @grand_child_account.shared_brand_configs.create!(
@@ -54,7 +54,7 @@ describe BrandConfigRegenerator do
   it "generates the right child brand configs and SharedBrandConfigs within subaccounts" do
     setup_account_family_with_configs
 
-    second_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"}, parent_md5: @child_config.md5)
+    second_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" }, parent_md5: @child_config.md5)
     second_config.save!
     @second_shared_config = @grand_child_account.shared_brand_configs.create!(
       name: 'second theme',
@@ -85,11 +85,11 @@ describe BrandConfigRegenerator do
   it "handles orphan themes that were not decendant of @parent_account" do
     setup_account_family_with_configs
 
-    bogus_config = BrandConfig.for(variables: {"ic-brand-primary" => "brown"})
+    bogus_config = BrandConfig.for(variables: { "ic-brand-primary" => "brown" })
     bogus_config.save!
 
     @child_account.brand_config = child_config = BrandConfig.for(
-      variables: {"ic-brand-primary" => "brown"},
+      variables: { "ic-brand-primary" => "brown" },
       parent_md5: bogus_config.md5
     )
     child_config.save!
@@ -120,7 +120,7 @@ describe BrandConfigRegenerator do
 
   it "handles site_admin correctly" do
     setup_account_family_with_configs
-    site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
+    site_admin_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" })
     site_admin_config.save!
 
     BrandConfigRegenerator.process(Account.site_admin, user_factory, new_brand_config)

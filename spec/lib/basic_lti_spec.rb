@@ -41,7 +41,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
+    expect { lti.convert_blti_xml(xml) }.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should raise an error when given html" do
@@ -53,7 +53,7 @@ describe BasicLTI do
       </html>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
+    expect { lti.convert_blti_xml(xml) }.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should raise an error when given xml not using lti xmlns" do
@@ -66,7 +66,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
+    expect { lti.convert_blti_xml(xml) }.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should use raise an error when unescaped ampersands are used in custom url properties" do
@@ -96,7 +96,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
+    expect { lti.convert_blti_xml(xml) }.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should handle urls with semicolons" do
@@ -125,7 +125,7 @@ describe BasicLTI do
 
   context 'whitespace stripping' do
     let(:config_xml) do
-     <<-XML
+      <<-XML
       <?xml version="1.0" encoding="UTF-8"?>
       <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
           xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -155,7 +155,7 @@ describe BasicLTI do
             </lticm:options>
           </blti:extensions>
       </cartridge_basiclti_link>
-    XML
+      XML
     end
 
     let(:tool_hash) do

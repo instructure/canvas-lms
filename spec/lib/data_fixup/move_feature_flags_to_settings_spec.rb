@@ -41,9 +41,9 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
   def with_feature_definitions
     allow(Feature).to receive(:definitions).and_return({
-        'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
-        'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
-    })
+                                                         'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
+                                                         'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
+                                                       })
     yield
     allow(Feature).to receive(:definitions).and_call_original
   end
@@ -61,7 +61,6 @@ describe DataFixup::MoveFeatureFlagsToSettings do
   end
 
   context "RootAccount" do
-
     it "should work for root account feature flag when allowed" do
       with_feature_definitions do
         @root_account.allow_feature!(:root_account_feature_going_away)
@@ -69,7 +68,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
-      expect{ @root_account.feature_enabled?(:root_account_feature_going_away) }.to raise_error("no such feature - root_account_feature_going_away")
+      expect { @root_account.feature_enabled?(:root_account_feature_going_away) }.to raise_error("no such feature - root_account_feature_going_away")
       expect(@root_account.some_root_only_setting?).to eq(false)
       expect(@root_account.settings.key?(:some_root_only_setting)).to eq(false)
     end

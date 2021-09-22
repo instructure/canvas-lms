@@ -496,16 +496,16 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           expect(edd.to_hash).to eq({
-            @assignment1.id => {
-              @student1.id => {
-                due_at: 3.days.from_now(@now),
-                grading_period_id: nil,
-                in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: 'ADHOC'
-              }
-            }
-          })
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 3.days.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'ADHOC'
+                                        }
+                                      }
+                                    })
         end
 
         it 'does not unassign students with adhoc overrides when they are concluded' do
@@ -515,16 +515,16 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           expect(edd.to_hash).to eq({
-            @assignment1.id => {
-              @student1.id => {
-                due_at: 3.days.from_now(@now),
-                grading_period_id: nil,
-                in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: 'ADHOC'
-              }
-            }
-          })
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 3.days.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'ADHOC'
+                                        }
+                                      }
+                                    })
         end
 
         it 'ignores soft-deleted adhoc overrides' do
@@ -779,16 +779,16 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           expect(edd.to_hash).to eq({
-            @assignment1.id => {
-              @student1.id => {
-                due_at: 4.days.from_now(@now),
-                grading_period_id: nil,
-                in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: 'Group'
-              }
-            }
-          })
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 4.days.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'Group'
+                                        }
+                                      }
+                                    })
         end
 
         it 'does not unassign students in the assigned group when they are concluded' do
@@ -802,16 +802,16 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           expect(edd.to_hash).to eq({
-            @assignment1.id => {
-              @student1.id => {
-                due_at: 4.days.from_now(@now),
-                grading_period_id: nil,
-                in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: 'Group'
-              }
-            }
-          })
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 4.days.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'Group'
+                                        }
+                                      }
+                                    })
         end
       end
 
@@ -886,16 +886,16 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           expect(edd.to_hash).to eq({
-            @assignment1.id => {
-              @student1.id => {
-                due_at: 1.day.from_now(@now),
-                grading_period_id: nil,
-                in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: 'CourseSection'
-              }
-            }
-          })
+                                      @assignment1.id => {
+                                        @student1.id => {
+                                          due_at: 1.day.from_now(@now),
+                                          grading_period_id: nil,
+                                          in_closed_grading_period: false,
+                                          override_id: override.id,
+                                          override_source: 'CourseSection'
+                                        }
+                                      }
+                                    })
         end
       end
 
@@ -1007,10 +1007,10 @@ describe Course do
 
         it 'uses account grading periods if no course grading periods exist' do
           gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                     start_date: 20.days.ago(@now),
+                                                                     end_date: 15.days.ago(@now),
+                                                                     close_date: 10.days.ago(@now)
+                                                                   })
           @assignment2.due_at = 17.days.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
@@ -1047,16 +1047,16 @@ describe Course do
 
         it 'uses only course grading periods if any exist (legacy)' do
           Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                start_date: 20.days.ago(@now),
+                                                                end_date: 15.days.ago(@now),
+                                                                close_date: 10.days.ago(@now)
+                                                              })
           legacy_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@test_course)
           gp = Factories::GradingPeriodHelper.new.create_for_group(legacy_group, {
-            start_date: 10.days.ago(@now),
-            end_date: 5.days.ago(@now),
-            close_date: 1.day.ago(@now)
-          })
+                                                                     start_date: 10.days.ago(@now),
+                                                                     end_date: 5.days.ago(@now),
+                                                                     close_date: 1.day.ago(@now)
+                                                                   })
           @assignment2.due_at = 17.days.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
@@ -1097,10 +1097,10 @@ describe Course do
         it 'ignores account grading periods for unrelated enrollment terms' do
           gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account_with_term(@test_course.account, 'Term')
           Factories::GradingPeriodHelper.new.create_for_group(gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                start_date: 20.days.ago(@now),
+                                                                end_date: 15.days.ago(@now),
+                                                                close_date: 10.days.ago(@now)
+                                                              })
           @assignment2.due_at = 17.days.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
@@ -1137,10 +1137,10 @@ describe Course do
 
         it 'uses the effective due date to find a closed grading period' do
           gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                     start_date: 20.days.ago(@now),
+                                                                     end_date: 15.days.ago(@now),
+                                                                     close_date: 10.days.ago(@now)
+                                                                   })
           @assignment2.due_at = 1.day.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
@@ -1198,10 +1198,10 @@ describe Course do
 
         it 'ignores soft-deleted grading period groups' do
           Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                start_date: 20.days.ago(@now),
+                                                                end_date: 15.days.ago(@now),
+                                                                close_date: 10.days.ago(@now)
+                                                              })
           @gp_group.destroy!
           @assignment2.due_at = 17.days.ago(@now)
           @assignment2.only_visible_to_overrides = false
@@ -1239,10 +1239,10 @@ describe Course do
 
         it 'ignores soft-deleted grading periods' do
           gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-            start_date: 20.days.ago(@now),
-            end_date: 15.days.ago(@now),
-            close_date: 10.days.ago(@now)
-          })
+                                                                     start_date: 20.days.ago(@now),
+                                                                     end_date: 15.days.ago(@now),
+                                                                     close_date: 10.days.ago(@now)
+                                                                   })
           gp.destroy!
           @assignment2.due_at = 17.days.ago(@now)
           @assignment2.only_visible_to_overrides = false
@@ -1281,10 +1281,10 @@ describe Course do
         describe 'in_closed_grading_period attribute' do
           it 'is true if the associated grading period is closed' do
             gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 10.days.ago(@now)
-            })
+                                                                       start_date: 20.days.ago(@now),
+                                                                       end_date: 15.days.ago(@now),
+                                                                       close_date: 10.days.ago(@now)
+                                                                     })
             @assignment2.due_at = 17.days.ago(@now)
             @assignment2.only_visible_to_overrides = false
             @assignment2.save!
@@ -1321,10 +1321,10 @@ describe Course do
 
           it 'is false if the associated grading period is open' do
             gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 4.days.from_now(@now)
-            })
+                                                                       start_date: 20.days.ago(@now),
+                                                                       end_date: 15.days.ago(@now),
+                                                                       close_date: 4.days.from_now(@now)
+                                                                     })
             @assignment2.due_at = 17.days.ago(@now)
             @assignment2.only_visible_to_overrides = false
             @assignment2.save!
@@ -1361,10 +1361,10 @@ describe Course do
 
           it 'is false if the due date does not fall in a grading period' do
             Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 10.days.ago(@now)
-            })
+                                                                  start_date: 20.days.ago(@now),
+                                                                  end_date: 15.days.ago(@now),
+                                                                  close_date: 10.days.ago(@now)
+                                                                })
             @assignment2.due_at = 12.days.ago(@now)
             @assignment2.only_visible_to_overrides = false
             @assignment2.save!
@@ -1401,15 +1401,15 @@ describe Course do
 
           it 'is true if the due date is null and the last grading period is closed' do
             Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 50.days.ago(@now),
-              end_date: 35.days.ago(@now),
-              close_date: 30.days.from_now(@now)
-            })
+                                                                  start_date: 50.days.ago(@now),
+                                                                  end_date: 35.days.ago(@now),
+                                                                  close_date: 30.days.from_now(@now)
+                                                                })
             gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 10.days.ago(@now)
-            })
+                                                                       start_date: 20.days.ago(@now),
+                                                                       end_date: 15.days.ago(@now),
+                                                                       close_date: 10.days.ago(@now)
+                                                                     })
             @assignment2.due_at = nil
             @assignment2.only_visible_to_overrides = false
             @assignment2.save!
@@ -1446,15 +1446,15 @@ describe Course do
 
           it 'is false if the due date is null and the last grading period is open' do
             Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 50.days.ago(@now),
-              end_date: 35.days.ago(@now),
-              close_date: 30.days.ago(@now)
-            })
+                                                                  start_date: 50.days.ago(@now),
+                                                                  end_date: 35.days.ago(@now),
+                                                                  close_date: 30.days.ago(@now)
+                                                                })
             gp = Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 10.days.from_now(@now)
-            })
+                                                                       start_date: 20.days.ago(@now),
+                                                                       end_date: 15.days.ago(@now),
+                                                                       close_date: 10.days.from_now(@now)
+                                                                     })
             @assignment2.due_at = nil
             @assignment2.only_visible_to_overrides = false
             @assignment2.save!
@@ -1726,8 +1726,8 @@ describe Course do
         end
 
         it 'raises error if the specified student was filtered out of the query' do
-          expect { @edd.filter_students_to(@student1).in_closed_grading_period?(@assignment2, @student2) }.
-            to raise_error("Student #{@student2.id} was not included in this query")
+          expect { @edd.filter_students_to(@student1).in_closed_grading_period?(@assignment2, @student2) }
+            .to raise_error("Student #{@student2.id} was not included in this query")
         end
 
         it 'returns true if the specified student was included in the query and has a due date for this assignment' do

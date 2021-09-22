@@ -24,10 +24,10 @@ describe StickySisFields do
   def create_abstract_course
     AbstractCourse.process_as_sis do
       AbstractCourse.create!(:name => "1",
-        :short_name => "2",
-        :account => Account.default,
-        :root_account => Account.default,
-        :enrollment_term => Account.default.default_enrollment_term)
+                             :short_name => "2",
+                             :account => Account.default,
+                             :root_account => Account.default,
+                             :enrollment_term => Account.default.default_enrollment_term)
     end
   end
 
@@ -490,11 +490,11 @@ describe StickySisFields do
         AbstractCourse.process_as_sis do
           expect(AbstractCourse.sis_stickiness_options).to eq({})
           AbstractCourse.process_as_sis :override_sis_stickiness => true do
-            expect(AbstractCourse.sis_stickiness_options).to eq({:override_sis_stickiness => true})
+            expect(AbstractCourse.sis_stickiness_options).to eq({ :override_sis_stickiness => true })
             AbstractCourse.process_as_sis :clear_sis_stickiness => true do
-              expect(AbstractCourse.sis_stickiness_options).to eq({:clear_sis_stickiness => true})
+              expect(AbstractCourse.sis_stickiness_options).to eq({ :clear_sis_stickiness => true })
             end
-            expect(AbstractCourse.sis_stickiness_options).to eq({:override_sis_stickiness => true})
+            expect(AbstractCourse.sis_stickiness_options).to eq({ :override_sis_stickiness => true })
           end
           expect(AbstractCourse.sis_stickiness_options).to eq({})
         end
@@ -550,5 +550,4 @@ describe StickySisFields do
       end
     end
   end
-
 end

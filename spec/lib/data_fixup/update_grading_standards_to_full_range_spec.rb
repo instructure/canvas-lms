@@ -45,43 +45,43 @@ describe DataFixup::UpdateGradingStandardsToFullRange do
   end
 
   it 'does not update the good grading standard' do
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      not_to change { @good_grading_standard.reload.updated_at.to_f }
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .not_to change { @good_grading_standard.reload.updated_at.to_f }
   end
 
   it 'does not update the grading standard with negative values' do
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      not_to change { @negative_grading_standard.reload.updated_at.to_f }
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .not_to change { @negative_grading_standard.reload.updated_at.to_f }
   end
 
   it 'updates the active bad grading standard' do
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      to change { @active_bad_grading_standard.reload.updated_at.to_f }
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .to change { @active_bad_grading_standard.reload.updated_at.to_f }
   end
 
   it 'updates the data for the active bad grading standard' do
     initial_data = [["A", 0.9], ["B", 0.8], ["C", 0.7]]
     updated_data = [["A", 0.9], ["B", 0.8], ["C", 0.0]]
 
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      to change { @active_bad_grading_standard.reload.data }.from(initial_data).to(updated_data)
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .to change { @active_bad_grading_standard.reload.data }.from(initial_data).to(updated_data)
   end
 
   it 'updates the deleted bad grading standard' do
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      to change { @deleted_bad_grading_standard.reload.updated_at.to_f }
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .to change { @deleted_bad_grading_standard.reload.updated_at.to_f }
   end
 
   it 'updates the data for the deleted bad grading standard' do
     initial_data = [["A", 0.9], ["B", 0.8], ["C", 0.7]]
     updated_data = [["A", 0.9], ["B", 0.8], ["C", 0.0]]
 
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      to change { @deleted_bad_grading_standard.reload.data }.from(initial_data).to(updated_data)
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .to change { @deleted_bad_grading_standard.reload.data }.from(initial_data).to(updated_data)
   end
 
   it 'does not update the otherwise bad grading standard' do
-    expect { DataFixup::UpdateGradingStandardsToFullRange.run }.
-      not_to change { @otherwise_bad_grading_standard.reload.updated_at.to_f }
+    expect { DataFixup::UpdateGradingStandardsToFullRange.run }
+      .not_to change { @otherwise_bad_grading_standard.reload.updated_at.to_f }
   end
 end

@@ -22,7 +22,6 @@ require 'spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../../lib/data_fixup/fix_planner_overrides_marked_complete_data')
 
 describe DataFixup::FixPlannerOverridesMarkedCompleteData do
-
   subject do
     DataFixup::FixPlannerOverridesMarkedCompleteData
   end
@@ -34,9 +33,9 @@ describe DataFixup::FixPlannerOverridesMarkedCompleteData do
     student2 = @student
     assignment_model(context: @course)
     override1 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: 'Assignment',
-      marked_complete: true, user_id: student1.id)
+                                        marked_complete: true, user_id: student1.id)
     override2 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: 'Assignment',
-      marked_complete: false, user_id: student2.id)
+                                        marked_complete: false, user_id: student2.id)
     subject.run
     expect(override1.reload.marked_complete).to be false
     expect(override2.reload.marked_complete).to be true

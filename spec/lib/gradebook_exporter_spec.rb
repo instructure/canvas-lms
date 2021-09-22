@@ -118,7 +118,7 @@ describe GradebookExporter do
 
       context "when assignment column order preferences do not exist" do
         it "returns assignments ordered by assignment group position" do
-          actual_assignment_headers = headers[4,3]
+          actual_assignment_headers = headers[4, 3]
           expected_headers = format_assignment_headers @assignments
 
           expect(actual_assignment_headers).to eq(expected_headers)
@@ -127,7 +127,7 @@ describe GradebookExporter do
         it "returns assignments ordered by assignment group position when feature is disabled" do
           expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
 
-          actual_assignment_headers = headers[4,3]
+          actual_assignment_headers = headers[4, 3]
           expected_headers = format_assignment_headers @assignments
 
           expect(actual_assignment_headers).to eq(expected_headers)
@@ -145,17 +145,17 @@ describe GradebookExporter do
       before(:once) do
         first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"
         second_column = @course.custom_gradebook_columns.create! title: "Custom Column 2"
-        third_column = @course.custom_gradebook_columns.create!({title: "Custom Column 3", workflow_state: "hidden"})
+        third_column = @course.custom_gradebook_columns.create!({ title: "Custom Column 3", workflow_state: "hidden" })
 
         student1_enrollment = student_in_course(course: @course, active_all: true).user
         student2_enrollment = student_in_course(course: @course, active_all: true).user
 
-        first_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 1', user_id: student1_enrollment.id})
-        first_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 1', user_id: student2_enrollment.id})
-        second_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 2', user_id: student1_enrollment.id})
-        second_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 2', user_id: student2_enrollment.id})
-        third_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 3', user_id: student1_enrollment.id})
-        third_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 3', user_id: student2_enrollment.id})
+        first_column.custom_gradebook_column_data.create!({ content: 'Row1 Custom Column 1', user_id: student1_enrollment.id })
+        first_column.custom_gradebook_column_data.create!({ content: 'Row2 Custom Column 1', user_id: student2_enrollment.id })
+        second_column.custom_gradebook_column_data.create!({ content: 'Row1 Custom Column 2', user_id: student1_enrollment.id })
+        second_column.custom_gradebook_column_data.create!({ content: 'Row2 Custom Column 2', user_id: student2_enrollment.id })
+        third_column.custom_gradebook_column_data.create!({ content: 'Row1 Custom Column 3', user_id: student1_enrollment.id })
+        third_column.custom_gradebook_column_data.create!({ content: 'Row2 Custom Column 3', user_id: student2_enrollment.id })
       end
 
       it "have the correct custom column data in proper order" do
@@ -175,7 +175,7 @@ describe GradebookExporter do
       before(:once) do
         @course.custom_gradebook_columns.create! title: "Custom Column 1"
         @course.custom_gradebook_columns.create! title: "Custom Column 2"
-        @course.custom_gradebook_columns.create!({title: "Custom Column 3", workflow_state: "hidden"})
+        @course.custom_gradebook_columns.create!({ title: "Custom Column 3", workflow_state: "hidden" })
       end
 
       subject(:csv) { exporter.to_csv }
@@ -487,19 +487,19 @@ describe GradebookExporter do
     context "a course has assignments with due dates" do
       before(:each) do
         @no_due_date_assignment = @course.assignments.create! title: "no due date",
-          points_possible: 10
+                                                              points_possible: 10
 
         @past_assignment = @course.assignments.create! due_at: 5.weeks.ago,
-          title: "past",
-          points_possible: 10
+                                                       title: "past",
+                                                       points_possible: 10
 
         @current_assignment = @course.assignments.create! due_at: 1.weeks.from_now,
-          title: "current",
-          points_possible: 10
+                                                          title: "current",
+                                                          points_possible: 10
 
         @future_assignment = @course.assignments.create! due_at: 8.weeks.from_now,
-          title: "future",
-          points_possible: 10
+                                                         title: "future",
+                                                         points_possible: 10
 
         student_in_course active_all: true
 
@@ -528,14 +528,14 @@ describe GradebookExporter do
 
           it "exports selected grading period's assignments" do
             expect(@headers).to include @no_due_date_assignment.title_with_id,
-                                       @current_assignment.title_with_id
+                                        @current_assignment.title_with_id
             final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
 
           it "exports assignments without due dates if exporting last grading period" do
             expect(@headers).to include @current_assignment.title_with_id,
-                                       @no_due_date_assignment.title_with_id
+                                        @no_due_date_assignment.title_with_id
             final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
@@ -551,7 +551,7 @@ describe GradebookExporter do
 
           it "does not export assignments in other grading periods" do
             expect(@headers).to_not include @past_assignment.title_with_id,
-                                           @future_assignment.title_with_id
+                                            @future_assignment.title_with_id
           end
 
           it "does not export future assignments" do
@@ -565,9 +565,9 @@ describe GradebookExporter do
             @headers = @rows.headers
 
             expect(@headers).to include @past_assignment.title_with_id,
-                                       @current_assignment.title_with_id,
-                                       @future_assignment.title_with_id,
-                                       @no_due_date_assignment.title_with_id
+                                        @current_assignment.title_with_id,
+                                        @future_assignment.title_with_id,
+                                        @no_due_date_assignment.title_with_id
             expect(@headers).not_to include "Final Score"
           end
         end
@@ -590,9 +590,9 @@ describe GradebookExporter do
         student2_enrollment.deactivate
 
         @teacher.set_preference(:gradebook_settings, @course.global_id, {
-          'show_inactive_enrollments' => 'true',
-          'show_concluded_enrollments' => 'false'
-        })
+                                  'show_inactive_enrollments' => 'true',
+                                  'show_concluded_enrollments' => 'false'
+                                })
       end
 
       it "includes inactive students" do
@@ -611,9 +611,9 @@ describe GradebookExporter do
 
       it "does not include inactive students if show inactive enrollments is set to false" do
         @teacher.set_preference(:gradebook_settings, @course.global_id, {
-          'show_inactive_enrollments' => 'false',
-          'show_concluded_enrollments' => 'false'
-        })
+                                  'show_inactive_enrollments' => 'false',
+                                  'show_concluded_enrollments' => 'false'
+                                })
         csv = exporter.to_csv
         rows = CSV.parse(csv, headers: true)
         expect([rows[1], rows[2]]).to match_array([nil, nil])

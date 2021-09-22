@@ -35,7 +35,7 @@ describe Canvas::LockExplanation do
     let(:type) { 'page' }
 
     context "with a :lock_at key in the hash" do
-      let(:hash) { {lock_at: DateTime.tomorrow} }
+      let(:hash) { { lock_at: DateTime.tomorrow } }
       context "with a type of 'page'" do
         it "should return the correct explanation string" do
           expect(result).to match(/This page was locked /)
@@ -44,7 +44,7 @@ describe Canvas::LockExplanation do
     end
     context "with no :unlock_at or :lock_at in the hash" do
       context "with a context module in the hash" do
-        let(:hash) { {context_module: object, asset_string: 'course_1'} }
+        let(:hash) { { context_module: object, asset_string: 'course_1' } }
         context "with a published object" do
           let(:object) {
             cm = ContextModule.new(workflow_state: 'published', name: 'foo')
@@ -68,14 +68,14 @@ describe Canvas::LockExplanation do
               }
 
               it "should use the group's course in the link " do
-                expect(host).to receive(:course_context_modules_url).with(course, {:anchor => 'module_1'})
+                expect(host).to receive(:course_context_modules_url).with(course, { :anchor => 'module_1' })
                 result
               end
 
               context "when the group's context is an account" do
                 let(:context) { Group.new(context: Account.new) }
                 it "should raise" do
-                  expect{result}.to raise_error("Either Context or Group context must be a Course")
+                  expect { result }.to raise_error("Either Context or Group context must be a Course")
                 end
               end
             end
@@ -83,7 +83,7 @@ describe Canvas::LockExplanation do
             context "when the context is an account" do
               let(:context) { Account.new }
               it "should raise" do
-                expect{result}.to raise_error("Either Context or Group context must be a Course")
+                expect { result }.to raise_error("Either Context or Group context must be a Course")
               end
             end
           end

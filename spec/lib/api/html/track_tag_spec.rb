@@ -27,8 +27,8 @@ module Api
       describe '#to_node' do
         let(:url_helper) do
           double({
-            show_media_tracks_url: 'media/track/vtt'
-          })
+                   show_media_tracks_url: 'media/track/vtt'
+                 })
         end
 
         let(:media_track) do

@@ -96,13 +96,13 @@ describe ImportedHtmlConverter do
       # if there isn't a path->migration id map it'll be a relative course file path
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}file_contents/course%20files/test.png" alt=":("></p>}
 
-      @migration.attachment_path_id_lookup = {"test.png" => att.migration_id}
+      @migration.attachment_path_id_lookup = { "test.png" => att.migration_id }
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}files/#{att.id}/preview" alt=":("></p>}
     end
 
     it "should find an attachment by a path with a space" do
       att = make_test_att()
-      @migration.attachment_path_id_lookup = {"subfolder/with a space/test.png" => att.migration_id}
+      @migration.attachment_path_id_lookup = { "subfolder/with a space/test.png" => att.migration_id }
 
       test_string = %{<img src="subfolder/with%20a%20space/test.png" alt="nope" />}
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
@@ -113,7 +113,7 @@ describe ImportedHtmlConverter do
 
     it "should find an attachment even if the link has an extraneous folder" do
       att = make_test_att()
-      @migration.attachment_path_id_lookup = {"subfolder/test.png" => att.migration_id}
+      @migration.attachment_path_id_lookup = { "subfolder/test.png" => att.migration_id }
 
       test_string = %{<img src="anotherfolder/subfolder/test.png" alt="nope" />}
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
@@ -121,8 +121,8 @@ describe ImportedHtmlConverter do
 
     it "should find an attachment by path if capitalization is different" do
       att = make_test_att()
-      @migration.attachment_path_id_lookup = {"subfolder/withCapital/test.png" => "wrong!"}
-      @migration.attachment_path_id_lookup_lower = {"subfolder/withcapital/test.png" => att.migration_id}
+      @migration.attachment_path_id_lookup = { "subfolder/withCapital/test.png" => "wrong!" }
+      @migration.attachment_path_id_lookup_lower = { "subfolder/withcapital/test.png" => att.migration_id }
 
       test_string = %{<img src="subfolder/WithCapital/TEST.png" alt="nope" />}
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
@@ -130,7 +130,7 @@ describe ImportedHtmlConverter do
 
     it "should find an attachment with query params" do
       att = make_test_att()
-      @migration.attachment_path_id_lookup = {"test.png" => att.migration_id}
+      @migration.attachment_path_id_lookup = { "test.png" => att.migration_id }
 
       test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />}
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/customaction?customparam=1" alt="nope">}
@@ -203,27 +203,27 @@ describe ImportedHtmlConverter do
     end
 
     it "should only convert url params" do
-      test_string = <<-HTML
-<object>
-<param name="controls" value="CONSOLE" />
-<param name="controller" value="true" />
-<param name="autostart" value="false" />
-<param name="loop" value="false" />
-<param name="src" value="%24IMS_CC_FILEBASE%24/test.mp3" />
-<EMBED name="tag"  src="%24IMS_CC_FILEBASE%24/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE" >
-</EMBED>
-</object>
+      test_string = <<~HTML
+        <object>
+        <param name="controls" value="CONSOLE" />
+        <param name="controller" value="true" />
+        <param name="autostart" value="false" />
+        <param name="loop" value="false" />
+        <param name="src" value="%24IMS_CC_FILEBASE%24/test.mp3" />
+        <EMBED name="tag"  src="%24IMS_CC_FILEBASE%24/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE" >
+        </EMBED>
+        </object>
       HTML
 
-      expect(convert_and_replace(test_string)).to match_ignoring_whitespace(<<-HTML.strip)
-<object>
-<param name="controls" value="CONSOLE">
-<param name="controller" value="true">
-<param name="autostart" value="false">
-<param name="loop" value="false">
-<param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
-<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></object>
-    HTML
+      expect(convert_and_replace(test_string)).to match_ignoring_whitespace(<<~HTML.strip)
+        <object>
+        <param name="controls" value="CONSOLE">
+        <param name="controller" value="true">
+        <param name="autostart" value="false">
+        <param name="loop" value="false">
+        <param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
+        <embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></object>
+      HTML
     end
 
     it "should leave an anchor tag alone" do
@@ -240,7 +240,6 @@ describe ImportedHtmlConverter do
       expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
     end
-
   end
 
   context ".relative_url?" do
@@ -260,5 +259,4 @@ describe ImportedHtmlConverter do
       expect(ImportedHtmlConverter.relative_url?("mailto:jfarnsworth@instructure.com,")).to be_falsey
     end
   end
-
 end

@@ -60,11 +60,10 @@ describe ExternalFeedAggregator do
       expect(LiveEvents).to receive(:set_context).once
       ExternalFeedAggregator.new.process_feed(@feed)
     end
-
   end
 
-def rss_example
-%{<?xml version="1.0"?>
+  def rss_example
+    %{<?xml version="1.0"?>
 <rss version="2.0">
   <channel>
     <title>Lift Off News</title>
@@ -90,9 +89,9 @@ def rss_example
     </item>
   </channel>
 </rss>}
-end
+  end
 
-def atom_example
+  def atom_example
     %{<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
@@ -116,5 +115,5 @@ def atom_example
  </entry>
 
 </feed>}
-end
+  end
 end

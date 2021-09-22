@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe TextHelper do
-
   class TestClassForMixins
     extend TextHelper
     def self.t(*args)
@@ -63,11 +62,9 @@ describe TextHelper do
       expect(mountain).to eq " 6:21am"
       expect(central).to eq " 7:21am"
     end
-
   end
 
   context "date_string" do
-
     it "should return correct date before the year 1000" do
       old_date = Time.zone.parse("0900-01-01")
       expect(th.date_string(old_date)).to eq "Jan 1, 0900"
@@ -151,35 +148,35 @@ describe TextHelper do
     end
     context "i18n" do
       it "should automatically escape Strings" do
-        expect(th.mt(:foo, "We **do not** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h")).
-          to eq "We <strong>do not</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
+        expect(th.mt(:foo, "We **do not** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))
+          .to eq "We <strong>do not</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
       end
 
       it "should not escape MarkdownSafeBuffers" do
-        expect(th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))).
-          to eq <<-HTML.strip
-<p>We <strong>do</strong> trust the following input: <code>a</code> <strong>b</strong> <em>c</em> <img src="e" alt="d"/></p>
+        expect(th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h")))
+          .to eq <<~HTML.strip
+            <p>We <strong>do</strong> trust the following input: <code>a</code> <strong>b</strong> <em>c</em> <img src="e" alt="d"/></p>
 
-<h1>f</h1>
+            <h1>f</h1>
 
-<ul>
-<li>g</li>
-<li>h</li>
-</ul>
-        HTML
+            <ul>
+            <li>g</li>
+            <li>h</li>
+            </ul>
+          HTML
       end
 
       it "should inlinify single paragraphs by default" do
-        expect(th.mt(:foo, "**this** is a test")).
-          to eq "<strong>this</strong> is a test"
+        expect(th.mt(:foo, "**this** is a test"))
+          .to eq "<strong>this</strong> is a test"
 
-        expect(th.mt(:foo, "**this** is another test\n\nwhat will happen?")).
-          to eq "<p><strong>this</strong> is another test</p>\n\n<p>what will happen?</p>"
+        expect(th.mt(:foo, "**this** is another test\n\nwhat will happen?"))
+          .to eq "<p><strong>this</strong> is another test</p>\n\n<p>what will happen?</p>"
       end
 
       it "should not inlinify single paragraphs if :inlinify => :never" do
-        expect(th.mt(:foo, "**one** more test", :inlinify => :never)).
-          to eq "<p><strong>one</strong> more test</p>"
+        expect(th.mt(:foo, "**one** more test", :inlinify => :never))
+          .to eq "<p><strong>one</strong> more test</p>"
       end
 
       it "should allow wrapper with markdown" do
@@ -188,24 +185,24 @@ describe TextHelper do
 Commodo in ham, *short ribs %{name} pastrami* sausage elit sunt dolore eiusmod ut ea proident ribeye.
 
 Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis **eu short loin pancetta**.},
-        :name => '<b>test</b>'.html_safe,
-        :wrapper => {
-          '*' => '<span>\1</span>',
-          '**' => '<a>\1</a>',
-        })).to eq "<p>Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.</p>\n\n<p>Commodo in ham, <span>short ribs <b>test</b> pastrami</span> sausage elit sunt dolore eiusmod ut ea proident ribeye.</p>\n\n<p>Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis <a>eu short loin pancetta</a>.</p>"
+                     :name => '<b>test</b>'.html_safe,
+                     :wrapper => {
+                       '*' => '<span>\1</span>',
+                       '**' => '<a>\1</a>',
+                     })).to eq "<p>Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.</p>\n\n<p>Commodo in ham, <span>short ribs <b>test</b> pastrami</span> sausage elit sunt dolore eiusmod ut ea proident ribeye.</p>\n\n<p>Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis <a>eu short loin pancetta</a>.</p>"
       end
 
       it "should inlinify complex single paragraphs" do
-        expect(th.mt(:foo, "**this** is a *test*")).
-          to eq "<strong>this</strong> is a <em>test</em>"
+        expect(th.mt(:foo, "**this** is a *test*"))
+          .to eq "<strong>this</strong> is a <em>test</em>"
 
-        expect(th.mt(:foo, "*%{button}*", :button => '<button type="submit" />'.html_safe, :wrapper => '<span>\1</span>')).
-          to eq '<span><button type="submit" /></span>'
+        expect(th.mt(:foo, "*%{button}*", :button => '<button type="submit" />'.html_safe, :wrapper => '<span>\1</span>'))
+          .to eq '<span><button type="submit" /></span>'
       end
 
       it "should not inlinify multiple paragraphs" do
-        expect(th.mt(:foo, "para1\n\npara2")).
-          to eq "<p>para1</p>\n\n<p>para2</p>"
+        expect(th.mt(:foo, "para1\n\npara2"))
+          .to eq "<p>para1</p>\n\n<p>para2</p>"
       end
     end
   end

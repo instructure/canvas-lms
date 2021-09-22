@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::SectionImporter do
-
   before { account_model }
 
   it 'should skip bad content' do
@@ -43,10 +42,10 @@ describe SIS::CSV::SectionImporter do
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No course_id given for a section S002",
-                      "No section_id given for a section in course C001",
-                      "Improper status \"inactive\" for section S003 in course C002",
-                      "No name given for section S004 in course C002",
-                      "Section S005 references course C001 which doesn't exist"]
+                          "No section_id given for a section in course C001",
+                          "Improper status \"inactive\" for section S003 in course C002",
+                          "No name given for section S004 in course C002",
+                          "Section S005 references course C001 which doesn't exist"]
   end
 
   it 'should not die when a course is deleted' do
@@ -65,7 +64,8 @@ describe SIS::CSV::SectionImporter do
     )
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status",
-      "C001,U001,student,1B,active")
+      "C001,U001,student,1B,active"
+    )
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C002,TC 101,Test Course 101,,,deleted"
@@ -158,13 +158,14 @@ describe SIS::CSV::SectionImporter do
 
   it 'should ignore unsupported column account_id' do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "C001,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active"
     )
     before_count = CourseSection.count
     process_csv_data_cleanly(
-        "section_id,course_id,name,start_date,end_date,status,account_id",
-        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,bogus")
+      "section_id,course_id,name,start_date,end_date,status,account_id",
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,bogus"
+    )
     expect(CourseSection.count).to eq before_count + 1
     expect(CourseSection.last.name).to eq "Sec1"
   end
@@ -177,12 +178,14 @@ describe SIS::CSV::SectionImporter do
     before_count = CourseSection.count
     process_csv_data_cleanly(
       "section_id,course_id,name,start_date,end_date,status",
-      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
     expect(CourseSection.count).to eq before_count + 1
     expect(CourseSection.last.name).to eq "Sec1"
     process_csv_data_cleanly(
       "section_id,course_id,name,start_date,end_date,status",
-      "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
     expect(CourseSection.count).to eq before_count + 1
     CourseSection.last.tap do |s|
       expect(s.name).to eq "Sec2"
@@ -191,7 +194,8 @@ describe SIS::CSV::SectionImporter do
     end
     process_csv_data_cleanly(
       "section_id,course_id,name,start_date,end_date,status",
-      "S001,C001,Sec4,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      "S001,C001,Sec4,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
     expect(CourseSection.count).to eq before_count + 1
     expect(CourseSection.last.name).to eq "Sec3"
   end
@@ -224,8 +228,8 @@ describe SIS::CSV::SectionImporter do
     expect(s2.start_at).to be_nil
     expect(s2.end_at).to be_nil
 
-    expect(importer.errors.map{|r|r.last}).to eq ["Bad date format for section S002",
-                                                "Section S003 references course C002 which doesn't exist"]
+    expect(importer.errors.map { |r| r.last }).to eq ["Bad date format for section S002",
+                                                      "Section S003 references course C002 which doesn't exist"]
   end
 
   it 'should override term dates if the start or end dates are set' do
@@ -277,7 +281,6 @@ describe SIS::CSV::SectionImporter do
     end
   end
 
-
   it 'should verify xlist files' do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
@@ -286,10 +289,10 @@ describe SIS::CSV::SectionImporter do
       "X001,S001,",
       "X001,S001,baleeted"
     )
-    expect(importer.errors.map{|r|r.last}).to eq ["No xlist_course_id given for a cross-listing",
-                                                  "No section_id given for a cross-listing",
-                                                  'Improper status "" for a cross-listing',
-                                                  'Improper status "baleeted" for a cross-listing']
+    expect(importer.errors.map { |r| r.last }).to eq ["No xlist_course_id given for a cross-listing",
+                                                      "No section_id given for a cross-listing",
+                                                      'Improper status "" for a cross-listing',
+                                                      'Improper status "baleeted" for a cross-listing']
     expect(@account.courses.size).to eq 0
   end
 
@@ -884,5 +887,4 @@ describe SIS::CSV::SectionImporter do
       expect(CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A002').first.id].sort
     end
   end
-
 end

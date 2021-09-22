@@ -42,7 +42,7 @@ describe "Api::V1::CustomGradebookColumn" do
   describe "custom_gradebook_column_json" do
     it "works" do
       expect(controller.custom_gradebook_column_datum_json(@datum, @teacher, nil))
-      .to eq @datum.attributes.slice(*%w(user_id content))
+        .to eq @datum.attributes.slice(*%w(user_id content))
     end
   end
 

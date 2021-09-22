@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
 describe Canvas::Security::Recryption do
-
   describe ".execute" do
     it "keeps the same value with a different salt" do
       key_val = "abcdefg1234567"

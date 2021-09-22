@@ -33,7 +33,7 @@ module Api
         c.id = 1
         c
       end
-      let(:proxy){ UrlProxy.new(StubUrlHelper.new, context, "example.com", "http") }
+      let(:proxy) { UrlProxy.new(StubUrlHelper.new, context, "example.com", "http") }
 
       describe "url helpers" do
         it "passes through object thumbnails" do

@@ -25,27 +25,27 @@ describe SSLCommon do
     expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername", "thepassword")
     expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername:thepassword@localhost/endpoint",
-        "somedata", "application/x-jt-is-so-cool")
+                        "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with http basic auth, username and password, with encoded characters" do
     expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername@theuseremail.tld", "thepassword")
     expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost/endpoint",
-        "somedata", "application/x-jt-is-so-cool")
+                        "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with http basic auth, just username" do
     expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername", "")
     expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername@localhost/endpoint",
-        "somedata", "application/x-jt-is-so-cool")
+                        "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with no auth" do
     expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).never
     expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://localhost/endpoint",
-        "somedata", "application/x-jt-is-so-cool")
+                        "somedata", "application/x-jt-is-so-cool")
   end
 end

@@ -65,7 +65,7 @@ describe "Api::V1::Assignment" do
 
     it "returns json" do
       allow(assignment.context).to receive(:grants_right?).and_return(true)
-      json = api.assignment_json(assignment, user, session, {override_dates: false})
+      json = api.assignment_json(assignment, user, session, { override_dates: false })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to be_nil
     end
@@ -73,7 +73,7 @@ describe "Api::V1::Assignment" do
     it "includes section-based counts when grading flag is passed" do
       allow(assignment.context).to receive(:grants_right?).and_return(true)
       json = api.assignment_json(assignment, user, session,
-                                 {override_dates: false, needs_grading_count_by_section: true})
+                                 { override_dates: false, needs_grading_count_by_section: true })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to eq []
     end
@@ -81,7 +81,7 @@ describe "Api::V1::Assignment" do
     it "includes an associated planner override when flag is passed" do
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
-                                 {include_planner_override: true})
+                                 { include_planner_override: true })
       expect(json.key?('planner_override')).to be_present
       expect(json['planner_override']['id']).to eq po.id
     end
@@ -94,7 +94,7 @@ describe "Api::V1::Assignment" do
     end
 
     it "returns nil for planner override when flag is passed and there is no override" do
-      json = api.assignment_json(assignment, user, session, {include_planner_override: true})
+      json = api.assignment_json(assignment, user, session, { include_planner_override: true })
       expect(json.key?('planner_override')).to be_present
       expect(json['planner_override']).to be_nil
     end
@@ -102,23 +102,23 @@ describe "Api::V1::Assignment" do
     describe "the allowed_attempts attribute" do
       it "returns -1 if set to nil" do
         assignment.update_attribute(:allowed_attempts, nil)
-        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        json = api.assignment_json(assignment, user, session, { override_dates: false })
         expect(json["allowed_attempts"]).to eq(-1)
       end
 
       it "returns -1 if set to -1" do
         assignment.update_attribute(:allowed_attempts, -1)
-        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        json = api.assignment_json(assignment, user, session, { override_dates: false })
         expect(json["allowed_attempts"]).to eq(-1)
       end
 
       it "returns any other values as set in the databse" do
         assignment.update_attribute(:allowed_attempts, 1)
-        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        json = api.assignment_json(assignment, user, session, { override_dates: false })
         expect(json["allowed_attempts"]).to eq(1)
 
         assignment.update_attribute(:allowed_attempts, 2)
-        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        json = api.assignment_json(assignment, user, session, { override_dates: false })
         expect(json["allowed_attempts"]).to eq(2)
       end
     end
@@ -131,7 +131,7 @@ describe "Api::V1::Assignment" do
       end
 
       it "optionally includes 'grades_published' for moderated assignments" do
-        json = api.assignment_json(assignment, user, session, {include_grades_published: true})
+        json = api.assignment_json(assignment, user, session, { include_grades_published: true })
         expect(json["grades_published"]).to eq(true)
       end
 
@@ -159,27 +159,26 @@ describe "Api::V1::Assignment" do
     it "includes all assignment overrides fields when an assignment_override exists" do
       assignment.assignment_overrides.create(:workflow_state => 'active')
       overrides = assignment.assignment_overrides
-      json = api.assignment_json(assignment, user, session, {overrides: overrides})
+      json = api.assignment_json(assignment, user, session, { overrides: overrides })
       expect(json).to be_a(Hash)
-      expect(json["overrides"].first.keys.sort).to eq ["assignment_id","id", "title", "student_ids"].sort
+      expect(json["overrides"].first.keys.sort).to eq ["assignment_id", "id", "title", "student_ids"].sort
     end
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
       assignment.description = "Foobers"
       json = api.assignment_json(assignment, user, session,
-                                 {override_dates: false})
+                                 { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
       expect(json['description']).to eq(api.api_user_content("Foobers", @course, user, {}))
 
-
       json = api.assignment_json(assignment, user, session,
-                                 {override_dates: false, exclude_response_fields: ['description']})
+                                 { override_dates: false, exclude_response_fields: ['description'] })
       expect(json).to be_a(Hash)
       expect(json).not_to have_key "description"
 
       json = api.assignment_json(assignment, user, session,
-                                 {override_dates: false})
+                                 { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
       expect(json['description']).to eq(api.api_user_content("Foobers", @course, user, {}))
@@ -195,18 +194,18 @@ describe "Api::V1::Assignment" do
     context 'rubrics' do
       before do
         rubric_model({
-          context: assignment.course,
-          title: "test rubric",
-          data: [{
-            description: "Some criterion",
-            points: 10,
-            id: 'crit1',
-            ignore_for_scoring: true,
-            ratings: [
-              {description: "Good", points: 10, id: 'rat1', criterion_id: 'crit1'}
-            ]
-          }]
-        })
+                       context: assignment.course,
+                       title: "test rubric",
+                       data: [{
+                         description: "Some criterion",
+                         points: 10,
+                         id: 'crit1',
+                         ignore_for_scoring: true,
+                         ratings: [
+                           { description: "Good", points: 10, id: 'rat1', criterion_id: 'crit1' }
+                         ]
+                       }]
+                     })
         @rubric.associate_with(assignment, assignment.course, purpose: 'grading')
       end
 
@@ -242,7 +241,7 @@ describe "Api::V1::Assignment" do
       end
 
       it "excludes rubric when exclude_response_fields contains 'rubric'" do
-        opts = {exclude_response_fields: ['rubric']}
+        opts = { exclude_response_fields: ['rubric'] }
         json = api.assignment_json(assignment, user, session, opts)
         expect(json).not_to have_key 'rubric'
       end
@@ -303,9 +302,9 @@ describe "Api::V1::Assignment" do
     let(:assignment) { AssignmentApiHarness.new }
     let(:test_params) do
       ActionController::Parameters.new({
-        "turnitin_settings" => {},
-        "vericite_settings" => {}
-      })
+                                         "turnitin_settings" => {},
+                                         "vericite_settings" => {}
+                                       })
     end
 
     it "#turnitin_settings_hash returns a Hash with indifferent access" do
@@ -449,20 +448,20 @@ describe "Api::V1::Assignment" do
 
     let(:initial_lockdown_browser_params) do
       ActionController::Parameters.new({
-        'require_lockdown_browser' => 'true',
-        'require_lockdown_browser_for_results' => 'false',
-        'require_lockdown_browser_monitor' => 'true',
-        'lockdown_browser_monitor_data' => 'some monitor data',
-        'access_code' => 'magggic code'
-      })
+                                         'require_lockdown_browser' => 'true',
+                                         'require_lockdown_browser_for_results' => 'false',
+                                         'require_lockdown_browser_monitor' => 'true',
+                                         'lockdown_browser_monitor_data' => 'some monitor data',
+                                         'access_code' => 'magggic code'
+                                       })
     end
 
     let(:lockdown_browser_params) do
       ActionController::Parameters.new({
-        'require_lockdown_browser_for_results' => 'true',
-        'lockdown_browser_monitor_data' => 'some monitor data cchanges',
-        'access_code' => 'magggic coddddde'
-      })
+                                         'require_lockdown_browser_for_results' => 'true',
+                                         'lockdown_browser_monitor_data' => 'some monitor data cchanges',
+                                         'access_code' => 'magggic coddddde'
+                                       })
     end
 
     let(:assignment) do
@@ -546,7 +545,7 @@ describe "Api::V1::Assignment" do
       let(:assignment_update_params) do
         ActionController::Parameters.new(
           name: 'Edited name',
-          submission_types: ['online_url','online_upload']
+          submission_types: ['online_url', 'online_upload']
         )
       end
 

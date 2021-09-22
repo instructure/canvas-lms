@@ -21,9 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require_dependency "sis/group_membership_importer"
 
 module SIS
-
   describe GroupMembershipImporter do
-
     def create_group(opts = {})
       group = Group.new(opts)
       group.sis_source_id = "54321"
@@ -43,7 +41,7 @@ module SIS
       create_group
       create_user
       expect do
-        GroupMembershipImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process do |importer|
+        GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process do |importer|
           importer.add_group_membership(12345, 54321, 'accepted')
         end
       end.to_not raise_error
@@ -63,7 +61,7 @@ module SIS
 
         group = create_group(:group_category => group_category)
 
-        importer = GroupMembershipImporter.new(Account.default, {batch: Account.default.sis_batches.create!})
+        importer = GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! })
         expect do
           importer.process do |importer|
             importer.add_group_membership(12345, group.sis_source_id, 'accepted')

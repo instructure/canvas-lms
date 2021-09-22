@@ -153,8 +153,8 @@ describe "safe_yaml" do
   end
 
   it "should work with aliases" do
-    hash = {:a => 1}.with_indifferent_access
-    obj = {:blah => hash, :bloop => hash}.with_indifferent_access
+    hash = { :a => 1 }.with_indifferent_access
+    obj = { :blah => hash, :bloop => hash }.with_indifferent_access
     yaml = Psych.dump(obj)
     expect(YAML.load(yaml)).to eq obj
   end
@@ -169,23 +169,23 @@ describe "safe_yaml" do
   end
 
   it "should dump html-safe strings correctly" do
-    hash = {:blah => "42".html_safe}
+    hash = { :blah => "42".html_safe }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
   it "should dump strings with underscores followed by an integer" do
     # the ride never ends -_-
-    hash = {:blah => "_42"}
+    hash = { :blah => "_42" }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
   it "should also dump floaat looking strings followed by an underscore" do
-    hash = {:blah => "42._"}
+    hash = { :blah => "42._" }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
   it "should dump whatever this is too" do
-    hash = {:blah => "4,2:0."}
+    hash = { :blah => "4,2:0." }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
@@ -195,12 +195,12 @@ describe "safe_yaml" do
   end
 
   it "should be able to dump and load BigDecimals" do
-    hash = {blah: BigDecimal("1.2")}
+    hash = { blah: BigDecimal("1.2") }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
   it "should be able to dump and load these strings in stuff" do
-    hash = {:blah => "<<"}
+    hash = { :blah => "<<" }
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 

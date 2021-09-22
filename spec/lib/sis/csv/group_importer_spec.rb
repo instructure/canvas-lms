@@ -21,8 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::GroupImporter do
-
-  before {account_model}
+  before { account_model }
 
   it "should skip bad content" do
     process_csv_data_cleanly(
@@ -59,7 +58,8 @@ describe SIS::CSV::GroupImporter do
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
-      "G002,A002,Group 2,deleted")
+      "G002,A002,Group 2,deleted"
+    )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id, sub.id]
     expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
@@ -71,7 +71,8 @@ describe SIS::CSV::GroupImporter do
     account_model
     process_csv_data_cleanly(
       "group_id,name,status",
-      "G001,Group 1,available")
+      "G001,Group 1,available"
+    )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id]
     expect(groups.map(&:sis_source_id)).to eq %w(G001)
@@ -80,7 +81,7 @@ describe SIS::CSV::GroupImporter do
   end
 
   it 'should create rollback data' do
-    batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,name,status",
       "G001,Group 1,available",
@@ -96,7 +97,7 @@ describe SIS::CSV::GroupImporter do
       "G001,U001,accepted",
       batch: batch2
     )
-    batch3 = @account.sis_batches.create! {|sb| sb.data = {}}
+    batch3 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,name,status",
       "G001,Group 1,deleted",
@@ -114,13 +115,15 @@ describe SIS::CSV::GroupImporter do
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
-      "G002,,Group 2,available")
+      "G002,,Group 2,available"
+    )
     expect(Group.count).to eq 2
     Group.where(sis_source_id: 'G001').first.update_attribute(:name, 'Group 1-1')
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1-b,available",
-      "G002,A002,Group 2-b,deleted")
+      "G002,A002,Group 2-b,deleted"
+    )
     # group 1's name won't change because it was manually changed
     groups = Group.order(:id).to_a
     expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
@@ -135,11 +138,13 @@ describe SIS::CSV::GroupImporter do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
-      "Gc002,A002,Group Cat 2,active")
+      "Gc002,A002,Group Cat 2,active"
+    )
     process_csv_data_cleanly(
       "group_id,account_id,name,status,group_category_id",
       "G001,,Group 1,available,Gc001",
-      "G002,,Group 2,available,Gc002")
+      "G002,,Group 2,available,Gc002"
+    )
     group1 = Group.where(sis_source_id: 'G001').take
     group2 = Group.where(sis_source_id: 'G002').take
     groups = [group1, group2]
@@ -151,7 +156,8 @@ describe SIS::CSV::GroupImporter do
     course = course_factory(account: @account, sis_source_id: 'c001')
     process_csv_data_cleanly(
       "group_id,course_id,name,status",
-      "G001,c001,Group 1,available")
+      "G001,c001,Group 1,available"
+    )
     expect(Group.where(sis_source_id: 'G001').take.context).to eq course
   end
 
@@ -163,7 +169,8 @@ describe SIS::CSV::GroupImporter do
 
     importer = process_csv_data(
       "group_id,course_id,name,status",
-      "G001,c002,Group 1,available")
+      "G001,c002,Group 1,available"
+    )
     expect(importer.errors.last.last).to eq "Cannot move group G001 because it has group_memberships."
   end
 end

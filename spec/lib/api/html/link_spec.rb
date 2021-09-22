@@ -24,7 +24,6 @@ module Api
   module Html
     describe Link do
       describe '#to_corrected_s' do
-
         it 'returns the raw string if it isnt a link' do
           expect(Link.new("nonsense-data").to_corrected_s).to eq "nonsense-data"
         end

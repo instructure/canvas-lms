@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::GradePublishingResultsImporter do
-
   before { account_model }
 
   it 'should skip bad content' do
@@ -29,12 +28,13 @@ describe SIS::CSV::GradePublishingResultsImporter do
       "enrollment_id,grade_publishing_status",
       ",published",
       "1,published",
-      "2,asplode")
+      "2,asplode"
+    )
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No enrollment_id given",
-                      "Enrollment 1 doesn't exist",
-                      "Improper grade_publishing_status \"asplode\" for enrollment 2"]
+                          "Enrollment 1 doesn't exist",
+                          "Improper grade_publishing_status \"asplode\" for enrollment 2"]
   end
 
   it 'should properly update the db' do
@@ -45,7 +45,8 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status",
-      "#{@enrollment.id},published")
+      "#{@enrollment.id},published"
+    )
 
     @enrollment.reload
     expect(@enrollment.grade_publishing_status).to eq 'published'
@@ -61,7 +62,8 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",
-      "#{@enrollment.id},published,message1")
+      "#{@enrollment.id},published,message1"
+    )
 
     statuses = @course.reload.grade_publishing_statuses
     expect(statuses[1]).to eq "published"
@@ -77,7 +79,8 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
     importer = process_csv_data(
       "enrollment_id,grade_publishing_status,message",
-      "#{@enrollment.id},published,message1")
+      "#{@enrollment.id},published,message1"
+    )
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["Enrollment #{@enrollment.id} doesn't exist"]
   end

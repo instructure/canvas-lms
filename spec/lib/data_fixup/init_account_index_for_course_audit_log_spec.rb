@@ -22,7 +22,6 @@ require 'spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe DataFixup::InitAccountIndexForCourseAuditLog do
-
   include_examples 'cassandra audit logs'
 
   def insert_cql
@@ -64,7 +63,6 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
     @values.each do |v|
       @database.execute(insert_cql, *v)
     end
-
   end
 
   it 'populates the account_id column' do
@@ -89,5 +87,4 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
 
     expect(ids).to include(@values.first.first)
   end
-
 end

@@ -27,13 +27,13 @@ shared_examples_for "a differentiable_object" do
   describe "differentiated_assignments_applies?" do
     context "only_visible_to_overrides is true" do
       it "returns true" do
-        differentiable.update_attribute "only_visible_to_overrides",true
+        differentiable.update_attribute "only_visible_to_overrides", true
         expect(differentiable.differentiated_assignments_applies?).to be_truthy
       end
     end
     context "only_visible_to_overrides is false" do
       it "returns false" do
-        differentiable.update_attribute "only_visible_to_overrides",false
+        differentiable.update_attribute "only_visible_to_overrides", false
         expect(differentiable.differentiated_assignments_applies?).to be_falsey
       end
     end
@@ -41,7 +41,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "visible_to_user?" do
     context "student" do
-      before {student_in_course(:course => @course)}
+      before { student_in_course(:course => @course) }
       it "with a visibility it should be true" do
         allow(differentiable_view).to receive(:where).and_return([:a_record])
         expect(differentiable.visible_to_user?(@user)).to be_truthy
@@ -59,7 +59,7 @@ shared_examples_for "a differentiable_object" do
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
-        create_section_override_for_assignment(differentiable, {course_section: @section})
+        create_section_override_for_assignment(differentiable, { course_section: @section })
         @course.reload
         @observer = User.create(name: "observer")
       end
@@ -95,7 +95,7 @@ shared_examples_for "a differentiable_object" do
       context "observing two students, one with visibility" do
         before do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student1.id)
-          @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+          @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
         end
         it "should be visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_truthy
@@ -105,7 +105,7 @@ shared_examples_for "a differentiable_object" do
       context "observing two students, neither with visibility" do
         before do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student3.id)
-          @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+          @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
         end
         it "should not be visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_falsey
@@ -122,7 +122,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "filter" do
     def call_filter
-      block = lambda { |collection, users| return :filtered}
+      block = lambda { |collection, users| return :filtered }
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "should filter for students" do

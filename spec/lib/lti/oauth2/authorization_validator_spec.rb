@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 module Lti
   module Oauth2
     describe AuthorizationValidator do
-
       let(:product_family) do
         product_family_mock = double("product_family")
         allow(product_family_mock).to receive(:developer_key).and_return(dev_key)
@@ -35,7 +34,7 @@ module Lti
         tool_proxy_mock = double("tool_proxy")
         allow(tool_proxy_mock).to receive(:guid).and_return("3b7f3b02-b481-4f63-a6b0-129dee85abee")
         allow(tool_proxy_mock).to receive(:shared_secret).and_return('42')
-        allow(tool_proxy_mock).to receive(:raw_data).and_return({'enabled_capability' => ['Security.splitSecret']})
+        allow(tool_proxy_mock).to receive(:raw_data).and_return({ 'enabled_capability' => ['Security.splitSecret'] })
         allow(tool_proxy_mock).to receive(:workflow_state).and_return('active')
         allow(tool_proxy_mock).to receive(:product_family).and_return(product_family)
         tool_proxy_mock
@@ -83,7 +82,6 @@ module Lti
       end
 
       describe "#jwt" do
-
         it "returns the decoded JWT" do
           expect(auth_validator.jwt.signature).to eq raw_jwt.sign(tool_proxy.shared_secret, :HS256).signature
         end
@@ -115,7 +113,6 @@ module Lti
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the JWT has expired"
         end
 
-
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'iat' to old" do
           raw_jwt['iat'] = 10.minutes.ago.to_i
           Setting.set('lti.oauth2.authorize.max_iat_age', 5.minutes.to_s)
@@ -141,7 +138,6 @@ module Lti
           end
         end
 
-
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'aud' is not the authorization endpoint" do
           raw_jwt['aud'] = 'http://google.com/invalid'
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
@@ -159,27 +155,27 @@ module Lti
         end
 
         context "JWT signed with dev key" do
-            let(:auth_validator) do
-              AuthorizationValidator.new(
-                jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-                authorization_url: auth_url,
-                code: 'reg_key',
-                context: account
-              )
-            end
+          let(:auth_validator) do
+            AuthorizationValidator.new(
+              jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+              authorization_url: auth_url,
+              code: 'reg_key',
+              context: account
+            )
+          end
 
-            it 'throws an exception if no code is provided' do
-              auth_validator = AuthorizationValidator.new(
-                jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-                authorization_url: auth_url,
-                context: account
-              )
-              expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode
-            end
+          it 'throws an exception if no code is provided' do
+            auth_validator = AuthorizationValidator.new(
+              jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+              authorization_url: auth_url,
+              context: account
+            )
+            expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode
+          end
 
-            it "returns the decoded JWT" do
-              expect(auth_validator.jwt.signature).to eq raw_jwt_dev_key.sign(dev_key.api_key, :HS256).signature
-            end
+          it "returns the decoded JWT" do
+            expect(auth_validator.jwt.signature).to eq raw_jwt_dev_key.sign(dev_key.api_key, :HS256).signature
+          end
         end
       end
 
@@ -229,19 +225,18 @@ module Lti
       end
 
       describe "#tool_proxy" do
-
         it 'returns the tool_proxy from the uuid specified in the sub' do
           expect(auth_validator.tool_proxy).to eq tool_proxy
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the Tool Proxy is not using a split secret" do
-          allow(tool_proxy).to receive(:raw_data).and_return({'enabled_capability' => []})
+          allow(tool_proxy).to receive(:raw_data).and_return({ 'enabled_capability' => [] })
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                                                        "the Tool Proxy must be using a split secret"
         end
 
         it "accepts OAuth.splitSecret capability for backwards compatability" do
-          allow(tool_proxy).to receive(:raw_data).and_return({'enabled_capability' => ['OAuth.splitSecret']})
+          allow(tool_proxy).to receive(:raw_data).and_return({ 'enabled_capability' => ['OAuth.splitSecret'] })
           expect(auth_validator.tool_proxy).to eq tool_proxy
         end
 
@@ -257,9 +252,7 @@ module Lti
           expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                                                               "the Developer Key is not active or available in this environment"
         end
-
       end
-
     end
   end
 end

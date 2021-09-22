@@ -26,14 +26,14 @@ module Services
   describe NotificationService do
     context "message delivery" do
       before(:once) do
-          user_model
-          @au = tie_user_to_account(@user, account: account_model)
-          @account.root_account.enable_feature!(:notification_service)
-          @message = generate_message(:account_user_notification, :email, @au, user: @user)
-          @message.user.account.root_account.enable_feature!(:notification_service)
-          @message.save!
-          @message.to = "testing123"
-          @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
+        user_model
+        @au = tie_user_to_account(@user, account: account_model)
+        @account.root_account.enable_feature!(:notification_service)
+        @message = generate_message(:account_user_notification, :email, @au, user: @user)
+        @message.user.account.root_account.enable_feature!(:notification_service)
+        @message.save!
+        @message.to = "testing123"
+        @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
       end
 
       before(:each) do
@@ -45,14 +45,14 @@ module Services
       it "processes email message type" do
         expect(@queue).to receive(:send_message).once
         @message.path_type = "email"
-        expect{@message.deliver}.not_to raise_error
+        expect { @message.deliver }.not_to raise_error
       end
 
       it "processes twitter message type" do
         @user.user_services.create!(service: 'twitter', service_user_name: 'user', service_user_id: 'user', visible: true)
         expect(@queue).to receive(:send_message).once
         @message.path_type = "twitter"
-        expect{@message.deliver}.not_to raise_error
+        expect { @message.deliver }.not_to raise_error
       end
 
       it 'processes slack message type' do
@@ -63,7 +63,7 @@ module Services
         @au.reload
         expect(@queue).to receive(:send_message).once
         @message.path_type = "slack"
-        expect{@message.deliver}.not_to raise_error
+        expect { @message.deliver }.not_to raise_error
       end
 
       it 'expects slack to not call mailer create_message' do
@@ -76,7 +76,7 @@ module Services
         expect(Mailer).to receive(:create_message).never
         @message.path_type = "slack"
         @message.to = "test@email.com"
-        expect{@message.deliver}.not_to raise_error
+        expect { @message.deliver }.not_to raise_error
       end
 
       it 'expects slack to not enqueue without slack api token' do
@@ -91,19 +91,19 @@ module Services
         @at.notification_endpoints.create!(token: 'token')
         Message.where(id: @message.id).update_all(path_type: "push", notification_name: 'Assignment Created')
         @message.deliver
-        expect{@message.deliver}.not_to raise_error
+        expect { @message.deliver }.not_to raise_error
       end
 
       it "throws error if cannot connect to queue" do
         allow(@queue).to receive(:send_message).and_raise(Aws::SQS::Errors::ServiceError.new('a', 'b'))
-        expect{@message.deliver}.to raise_error(Aws::SQS::Errors::ServiceError)
+        expect { @message.deliver }.to raise_error(Aws::SQS::Errors::ServiceError)
         expect(@message.transmission_errors).to include("Aws::SQS::Errors::ServiceError")
         expect(@message.workflow_state).to eql("staged")
       end
 
       it "throws error if queue does not exist" do
         allow(@queue).to receive(:send_message).and_raise(Aws::SQS::Errors::NonExistentQueue.new('a', 'b'))
-        expect{@message.deliver}.to raise_error(Aws::SQS::Errors::NonExistentQueue)
+        expect { @message.deliver }.to raise_error(Aws::SQS::Errors::NonExistentQueue)
         expect(@message.transmission_errors).to include("Aws::SQS::Errors::NonExistentQueue")
         expect(@message.workflow_state).to eql("staged")
       end
@@ -111,7 +111,8 @@ module Services
       context 'payload contents' do
         class SendMessageSpy
           attr_accessor :sent_hash
-          def send_message(message_body: , queue_url: )
+
+          def send_message(message_body:, queue_url:)
             @sent_hash = JSON.parse(message_body)
           end
         end

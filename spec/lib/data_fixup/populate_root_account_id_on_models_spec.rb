@@ -59,8 +59,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       before { record.update_columns(root_account_id: nil) }
       before do
         # Ensure dummy account exists (done in migration but may be undone by specs)
-        Account.find_or_create_by!(id: 0).
-          update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+        Account.find_or_create_by!(id: 0)
+               .update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
       end
 
       it 'should populate the root_account_id to 0' do
@@ -788,58 +788,58 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#clean_and_filter_tables' do
     it 'should remove tables from the hash that were backfilled a while ago' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({Assignment => :course, ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ Assignment => :course, ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should remove tables from the hash that are in progress' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({ContentTag => :context, ContextModule => :course})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ ContentTag => :context, ContextModule => :course })
       DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
-          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
-          populate_root_account_ids(ContentTag, {course: :root_account_id}, 1, 2)
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+                                                     n_strand: ["root_account_id_backfill", Shard.current.database_server.id])
+                                              .populate_root_account_ids(ContentTag, { course: :root_account_id }, 1, 2)
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should replace polymorphic associations with direction associations' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({ContextModule => :context})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ ContextModule => :context })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should remove tables from the hash that have all their root account ids filled in' do
       DeveloperKey.create!(account: @course.account)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({DeveloperKey => :account, ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ DeveloperKey => :account, ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should remove tables if all the objects with given associations have root_account_ids, even if some objects do not' do
       ContentTag.create!(assignment: assignment_model, root_account_id: @assignment.root_account_id)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({ContentTag => :assignment, ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ ContentTag => :assignment, ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should filter tables whose prereqs are not filled with root_account_ids' do
       OriginalityReport.create!(submission: submission_model)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({OriginalityReport => :submission, ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ OriginalityReport => :submission, ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should filter tables whose prereqs are not direct assocations and are not filled' do
       LearningOutcome.create!(context: @course, short_description: "test")
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({LearningOutcome => :content_tag, ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ LearningOutcome => :content_tag, ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
     it 'should not filter tables whose prereqs are filled with root_account_ids' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
-        and_return({ContextModule => :course})
-      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
+        .and_return({ ContextModule => :course })
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
   end
 
@@ -850,12 +850,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it 'should only return tables that are in progress for this shard' do
         @shard1.activate do
           DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
-              n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
-              populate_root_account_ids(ContentTag, {course: :root_account_id}, 1, 2)
+                                                         n_strand: ["root_account_id_backfill", Shard.current.database_server.id])
+                                                  .populate_root_account_ids(ContentTag, { course: :root_account_id }, 1, 2)
         end
         DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
-            n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
-            populate_root_account_ids(ContextModule, {course: :root_account_id}, 1, 2)
+                                                       n_strand: ["root_account_id_backfill", Shard.current.database_server.id])
+                                                .populate_root_account_ids(ContextModule, { course: :root_account_id }, 1, 2)
         expect(DataFixup::PopulateRootAccountIdOnModels.in_progress_tables).to eq([ContextModule])
       end
     end
@@ -864,31 +864,31 @@ describe DataFixup::PopulateRootAccountIdOnModels do
   describe '#hash_association' do
     it 'should build a hash association when only given a table name' do
       expect(DataFixup::PopulateRootAccountIdOnModels.hash_association(:assignment)).to eq(
-        {assignment: :root_account_id}
+        { assignment: :root_account_id }
       )
     end
 
     it 'should build a hash association when only given a hash' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association({assignment: :id})).to eq(
-        {assignment: :id}
+      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association({ assignment: :id })).to eq(
+        { assignment: :id }
       )
     end
 
     it 'should build a hash association when given an array of strings/symbols' do
       expect(DataFixup::PopulateRootAccountIdOnModels.hash_association([:submission, :assignment])).to eq(
-        {submission: :root_account_id, assignment: :root_account_id}
+        { submission: :root_account_id, assignment: :root_account_id }
       )
     end
 
     it 'should build a hash association when given an array of hashes' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association([{submission: :id}, {assignment: :id}])).to eq(
-        {submission: :id, assignment: :id}
+      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association([{ submission: :id }, { assignment: :id }])).to eq(
+        { submission: :id, assignment: :id }
       )
     end
 
     it 'should build a hash association when given a mixed array' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association([{submission: :id}, :assignment])).to eq(
-        {submission: :id, assignment: :root_account_id}
+      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association([{ submission: :id }, :assignment])).to eq(
+        { submission: :id, assignment: :root_account_id }
       )
     end
   end
@@ -896,66 +896,66 @@ describe DataFixup::PopulateRootAccountIdOnModels do
   describe '#replace_polymorphic_associations' do
     it 'should leave non-polymorphic associations alone' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(ContextModule,
-        {course: :root_account_id})).to eq({course: :root_account_id})
+                                                                                       { course: :root_account_id })).to eq({ course: :root_account_id })
     end
 
     it 'should leave non-association dependencies alone' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(LearningOutcome,
-        {content_tag: :root_account_id})).to eq({})
+                                                                                       { content_tag: :root_account_id })).to eq({})
     end
 
     it 'should replace polymorphic associations in the hash (in original order)' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        ContentTag, {context: [:root_account_id, :id], context_module: :root_account_id}
-      )).to eq(
-        {
-          course: [:root_account_id, :id],
-          learning_outcome_group: [:root_account_id, :id],
-          assignment: [:root_account_id, :id],
-          account: Account.resolved_root_account_id_sql,
-          quiz: [:root_account_id, :id],
-          context_module: :root_account_id
-        }
-      )
+               ContentTag, { context: [:root_account_id, :id], context_module: :root_account_id }
+             )).to eq(
+               {
+                 course: [:root_account_id, :id],
+                 learning_outcome_group: [:root_account_id, :id],
+                 assignment: [:root_account_id, :id],
+                 account: Account.resolved_root_account_id_sql,
+                 quiz: [:root_account_id, :id],
+                 context_module: :root_account_id
+               }
+             )
     end
 
     it 'should allow overwriting for a previous association included in a polymorphic association' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        ContentTag, {context: :root_account_id, course: [:root_account_id, :id]}
-      )).to eq(
-        {
-          course: [:root_account_id, :id],
-          learning_outcome_group: :root_account_id,
-          assignment: :root_account_id,
-          account: Account.resolved_root_account_id_sql,
-          quiz: :root_account_id
-        }
-      )
+               ContentTag, { context: :root_account_id, course: [:root_account_id, :id] }
+             )).to eq(
+               {
+                 course: [:root_account_id, :id],
+                 learning_outcome_group: :root_account_id,
+                 assignment: :root_account_id,
+                 account: Account.resolved_root_account_id_sql,
+                 quiz: :root_account_id
+               }
+             )
     end
 
     it 'should account for associations that have a polymorphic_prefix' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        CalendarEvent, {context: :root_account_id}
-      )).to eq(
-        {
-          :context_appointment_group => :root_account_id,
-          :context_course => :root_account_id,
-          :context_course_section => :root_account_id,
-          :context_group => :root_account_id,
-          :context_user => :root_account_id,
-        }
-      )
+               CalendarEvent, { context: :root_account_id }
+             )).to eq(
+               {
+                 :context_appointment_group => :root_account_id,
+                 :context_course => :root_account_id,
+                 :context_course_section => :root_account_id,
+                 :context_group => :root_account_id,
+                 :context_user => :root_account_id,
+               }
+             )
     end
 
     it 'should replace account association with both root_account_id and id' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        ContextExternalTool, {course: :root_account_id, account: :root_account_id}
-      )).to eq(
-        {
-          :account => Account.resolved_root_account_id_sql,
-          :course => :root_account_id
-        }
-      )
+               ContextExternalTool, { course: :root_account_id, account: :root_account_id }
+             )).to eq(
+               {
+                 :account => Account.resolved_root_account_id_sql,
+                 :course => :root_account_id
+               }
+             )
     end
   end
 
@@ -975,22 +975,22 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       # User-context event doesn't have root account id so we use the user's account
       event = CalendarEvent.create!(context: user_model)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
-      )).to be true
+               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+             )).to be true
 
       # manually adding makes the check method think it does, though
       event.update_columns(root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
-      )).to be true
+               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+             )).to be true
 
       # adding another User-context event should make it return false,
       # except we are explicitly ignoring User-context events
       CalendarEvent.create(context: user_model)
       CalendarEvent.create(context: @course, root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
-      )).to be true
+               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+             )).to be true
     end
 
     it 'should return correctly for tables with root_account_ids' do
@@ -1012,14 +1012,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       cm2 = @course.context_modules.create!
       cm2.update_columns(root_account_id: nil)
 
-      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, { course: :root_account_id }, cm2.id, cm2.id)
       expect(@cm.reload.root_account_id).to be nil
       expect(cm2.reload.root_account_id).to eq @course.root_account_id
     end
 
     it 'should restart the table fixup job if there are no other root account populate delayed jobs of this type still running' do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
-      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, @cm.id, @cm.id)
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, { course: :root_account_id }, @cm.id, @cm.id)
     end
 
     it 'should not restart the table fixup job if there are items in this table that do not have root_account_id' do
@@ -1027,7 +1027,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       cm2.update_columns(root_account_id: nil)
 
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:run)
-      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, { course: :root_account_id }, cm2.id, cm2.id)
     end
   end
 

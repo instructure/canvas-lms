@@ -35,18 +35,18 @@ describe FeatureFlags do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(InstStatsd::Statsd).to receive(:increment)
     allow(Feature).to receive(:definitions).and_return({
-      'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'allowed'),
-      'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'off'),
-      'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on'),
-      'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed'),
-      'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
-      'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
-      'default_on_feature' => Feature.new(feature: 'default_on_feature', applies_to: 'Account', state: 'allowed_on'),
-      'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
-      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true),
-      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
-      'disabled_feature' => Feature::DISABLED_FEATURE
-  })
+                                                         'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'allowed'),
+                                                         'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'off'),
+                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on'),
+                                                         'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed'),
+                                                         'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
+                                                         'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
+                                                         'default_on_feature' => Feature.new(feature: 'default_on_feature', applies_to: 'Account', state: 'allowed_on'),
+                                                         'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
+                                                         'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true),
+                                                         'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
+                                                         'disabled_feature' => Feature::DISABLED_FEATURE
+                                                       })
   end
 
   describe "#feature_enabled?" do
@@ -61,15 +61,15 @@ describe FeatureFlags do
     it "should log feature enablement" do
       t_sub_account.feature_enabled?(:course_feature)
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", tags: {
-        feature: :course_feature,
-        enabled: 'false'
-      }).exactly(:once)
+                                                                     feature: :course_feature,
+                                                                     enabled: 'false'
+                                                                   }).exactly(:once)
 
       t_sub_account.feature_enabled?(:account_feature)
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", tags: {
-        feature: :account_feature,
-        enabled: 'true'
-      }).exactly(:once)
+                                                                     feature: :account_feature,
+                                                                     enabled: 'true'
+                                                                   }).exactly(:once)
     end
   end
 

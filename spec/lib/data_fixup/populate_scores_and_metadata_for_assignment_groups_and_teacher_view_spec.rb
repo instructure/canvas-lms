@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView do
-
   before(:once) do
     @active_student_enrollment = course_with_student(active_all: true)
     @active_student = @student
@@ -32,7 +31,6 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     @first_period.save!
     @second_period = period_helper.create_presets_for_group(group, :current).first
     @second_period.save!
-
 
     @concluded_student_enrollment = student_in_course(course: @course, active_all: true)
     @concluded_student = @student
@@ -137,8 +135,8 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     @course.enrollment_term.end_at = Time.now
     @course.soft_conclude!
     @course.save!
-    expect(DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView).
-      to receive(:handle_concluded_students).with(@course, a_collection_containing_exactly(@active_student.id, @concluded_student.id))
+    expect(DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView)
+      .to receive(:handle_concluded_students).with(@course, a_collection_containing_exactly(@active_student.id, @concluded_student.id))
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
   end
 end

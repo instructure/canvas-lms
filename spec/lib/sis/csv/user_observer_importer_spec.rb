@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::UserObserverImporter do
-
   before { account_model }
 
   it 'should skip bad content' do
@@ -42,12 +41,12 @@ describe SIS::CSV::UserObserverImporter do
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An observer referenced a non-existent user no_observer",
-                            "Can't observe yourself user U001",
-                            "A student referenced a non-existent user no_student",
-                            "No observer_id given for a user observer",
-                            "No user_id given for a user observer",
-                            "Improper status \"dead\" for a user_observer",
-                            "Can't delete a non-existent observer for observer: U001, student: U002"]
+                          "Can't observe yourself user U001",
+                          "A student referenced a non-existent user no_student",
+                          "No observer_id given for a user observer",
+                          "No user_id given for a user observer",
+                          "Improper status \"dead\" for a user_observer",
+                          "Can't delete a non-existent observer for observer: U001, student: U002"]
   end
 
   it "should add and remove user_observers" do

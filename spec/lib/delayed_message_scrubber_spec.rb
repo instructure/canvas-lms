@@ -21,11 +21,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DelayedMessageScrubber do
-
   # Helpers
   def delayed_message(send_at)
     message = DelayedMessage.new(notification: @notification, context: @context,
-            communication_channel: @recipient.communication_channel)
+                                 communication_channel: @recipient.communication_channel)
     message.send_at = send_at
     message.save!
     message
@@ -44,13 +43,12 @@ describe DelayedMessageScrubber do
   end
 
   describe '#scrub' do
-
     before(:each) do
       @context      = course_factory
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
       @recipient    = user_factory
 
-      communication_channel(@recipient, {username: 'user@example.com'})
+      communication_channel(@recipient, { username: 'user@example.com' })
     end
 
     it 'should delete delayed messages older than 90 days' do

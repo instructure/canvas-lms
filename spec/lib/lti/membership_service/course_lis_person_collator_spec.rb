@@ -120,7 +120,7 @@ module Lti::MembershipService
       course_with_teacher(user: @teacher)
       Lti::Asset.opaque_identifier_for(@teacher, context: @course)
       UserPastLtiId.create!(user_id: @teacher, context: @course, user_uuid: "old_uuid",
-        user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_context_id")
+                            user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_context_id")
       memberships = collator.memberships
       expect(memberships.map(&:member).map(&:user_id)).to eq([@teacher.reload.lti_context_id])
     end
@@ -141,12 +141,12 @@ module Lti::MembershipService
 
         expect(memberships.size).to eq(1)
         expect(membership.role).to match_array([
-          IMS::LIS::Roles::Context::URNs::Instructor,
-          IMS::LIS::Roles::Context::URNs::TeachingAssistant,
-          IMS::LIS::Roles::Context::URNs::ContentDeveloper,
-          IMS::LIS::Roles::Context::URNs::Learner,
-          IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
-        ])
+                                                 IMS::LIS::Roles::Context::URNs::Instructor,
+                                                 IMS::LIS::Roles::Context::URNs::TeachingAssistant,
+                                                 IMS::LIS::Roles::Context::URNs::ContentDeveloper,
+                                                 IMS::LIS::Roles::Context::URNs::Learner,
+                                                 IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
+                                               ])
       end
 
       it 'excludes membership roles for non-active enrollments' do
@@ -158,11 +158,11 @@ module Lti::MembershipService
 
         expect(memberships.size).to eq(1)
         expect(membership.role).to match_array([
-          IMS::LIS::Roles::Context::URNs::TeachingAssistant,
-          IMS::LIS::Roles::Context::URNs::ContentDeveloper,
-          IMS::LIS::Roles::Context::URNs::Learner,
-          IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
-        ])
+                                                 IMS::LIS::Roles::Context::URNs::TeachingAssistant,
+                                                 IMS::LIS::Roles::Context::URNs::ContentDeveloper,
+                                                 IMS::LIS::Roles::Context::URNs::Learner,
+                                                 IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
+                                               ])
       end
     end
 
@@ -176,8 +176,8 @@ module Lti::MembershipService
         @designer = user_model
         @course.enroll_user(@designer, 'DesignerEnrollment', enrollment_state: 'active')
         @student = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-          :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-          :sis_user_id => user_sis_id, integration_id: 'int1')
+                                               :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
+                                               :sis_user_id => user_sis_id, integration_id: 'int1')
         @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
         @observer = user_model
         @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')
@@ -241,8 +241,8 @@ module Lti::MembershipService
     context 'OAuth 1' do
       subject do
         collator_one.memberships.map(&:member).map(&:user_id) +
-        collator_two.memberships.map(&:member).map(&:user_id) +
-        collator_three.memberships.map(&:member).map(&:user_id)
+          collator_two.memberships.map(&:member).map(&:user_id) +
+          collator_three.memberships.map(&:member).map(&:user_id)
       end
 
       let(:collator_one) { CourseLisPersonCollator.new(@course, @teacher, per_page: 2, page: 1) }

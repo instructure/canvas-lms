@@ -23,14 +23,13 @@ require 'simple_oauth'
 
 describe Lti::Security do
   describe '.signed_post_params' do
-    let(:params) { {custom_a: 1, custom_b:2} }
+    let(:params) { { custom_a: 1, custom_b: 2 } }
     let(:consumer_key) { 'test' }
     let(:launch_url) { 'https://test.example/launch' }
-    let(:consumer_secret) { 'shh'}
+    let(:consumer_secret) { 'shh' }
 
     context 'disable_lti_post_only' do
       it 'generates a correct signature' do
-
         signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, true)
         nonce = signed_params['oauth_nonce']
         timestamp = signed_params['oauth_timestamp']
@@ -45,7 +44,6 @@ describe Lti::Security do
           timestamp: timestamp
         )
         expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
-
       end
 
       it "doesn't copy query params" do
@@ -65,7 +63,8 @@ describe Lti::Security do
           oauth_nonce%3D#{signed_params['oauth_nonce']}%26
           oauth_signature_method%3DHMAC-SHA1%26
           oauth_timestamp%3D#{signed_params['oauth_timestamp']}%26
-          oauth_version%3D1.0}.join)
+          oauth_version%3D1.0
+        }.join)
       end
     end
 
@@ -76,7 +75,7 @@ describe Lti::Security do
 
       it 'returns the lti assignment id if secure params are valid' do
         assignment_id = 12
-        body = {lti_assignment_id: assignment_id}
+        body = { lti_assignment_id: assignment_id }
         secure_params = Canvas::Security.create_jwt(body).to_s
         expect(Lti::Security.decoded_lti_assignment_id(secure_params)).to eq assignment_id
       end
@@ -114,7 +113,6 @@ describe Lti::Security do
         timestamp = 59.seconds.from_now
         expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be true
       end
-
     end
 
     it "generates a correct signature" do
@@ -193,7 +191,6 @@ describe Lti::Security do
         timestamp: timestamp
       )
       expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
-
     end
 
     it "logs the oauth base string" do
@@ -210,7 +207,8 @@ describe Lti::Security do
         oauth_nonce%3D#{nonce}%26oauth_nonce%3D#{nonce}%26
         oauth_signature_method%3DHMAC-SHA1%26oauth_signature_method%3DHMAC-SHA1%26
         oauth_timestamp%3D#{timestamp}%26oauth_timestamp%3D#{timestamp}%26
-        oauth_version%3D1.0%26oauth_version%3D1.0}.join)
+        oauth_version%3D1.0%26oauth_version%3D1.0
+      }.join)
     end
   end
 end

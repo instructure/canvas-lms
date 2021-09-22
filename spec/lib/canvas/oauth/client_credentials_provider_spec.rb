@@ -26,7 +26,7 @@ module Canvas::Oauth
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
     before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
     }
 
     describe 'generate_token' do
@@ -89,7 +89,7 @@ module Canvas::Oauth
     let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
     before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
     }
 
     describe 'using public jwk url' do
@@ -214,7 +214,7 @@ module Canvas::Oauth
         context 'with iat too far in future' do
           let(:iat) { 6.minutes.from_now.to_i }
 
-        it { is_expected.not_to be_empty }
+          it { is_expected.not_to be_empty }
         end
       end
 
@@ -270,7 +270,7 @@ module Canvas::Oauth
         context 'with iat too far in future' do
           let(:iat) { 6.minutes.from_now.to_i }
 
-        it { is_expected.to be false }
+          it { is_expected.to be false }
         end
       end
 
@@ -299,7 +299,7 @@ module Canvas::Oauth
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
     before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
     }
 
     context 'with valid client_id' do

@@ -20,7 +20,6 @@
 require_relative '../../sharding_spec_helper'
 
 describe Canvas::Apm do
-
   after(:each) do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
@@ -30,12 +29,12 @@ describe Canvas::Apm do
 
   def inject_apm_settings(yaml_string)
     Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "datadog_apm.yml": yaml_string
-          }
+      "private": {
+        "canvas": {
+          "datadog_apm.yml": yaml_string
         }
       }
+    }
   end
 
   describe "settings parsing" do
@@ -91,18 +90,18 @@ describe Canvas::Apm do
 
   describe "sampling at the host level" do
     def generate_hostname
-      hosttype = ["app","job"].sample
+      hosttype = ["app", "job"].sample
       tup1 = rand(256).to_s.rjust(3, '0')
       tup2 = rand(256).to_s.rjust(3, '0')
       "#{hosttype}010002#{tup1}#{tup2}"
     end
 
     it "produces approximately correct sampling ratios" do
-      hostnames = ([true] * 1000).collect{ generate_hostname }
+      hostnames = ([true] * 1000).collect { generate_hostname }
       sample_rate = 0.25
       interval = Canvas::Apm::HOST_SAMPLING_INTERVAL
-      decisions = hostnames.collect{|hn| Canvas::Apm.get_sampling_decision(hn,sample_rate, interval) }
-      samples = decisions.select{|x| x}
+      decisions = hostnames.collect { |hn| Canvas::Apm.get_sampling_decision(hn, sample_rate, interval) }
+      samples = decisions.select { |x| x }
       expect(samples.size > 50).to be_truthy
       expect(samples.size < 500).to be_truthy
     end
@@ -112,6 +111,7 @@ describe Canvas::Apm do
     class FakeSpan
       attr_reader :tags
       attr_accessor :resource, :span_type
+
       def initialize
         self.reset!
       end
@@ -131,6 +131,7 @@ describe Canvas::Apm do
 
     class FakeTracer
       attr_reader :span
+
       def initialize
         @span = FakeSpan.new
       end
@@ -149,8 +150,8 @@ describe Canvas::Apm do
       end
     end
 
-    let(:tracer){ FakeTracer.new }
-    let(:span){ tracer.span }
+    let(:tracer) { FakeTracer.new }
+    let(:span) { tracer.span }
 
     around do |example|
       Canvas::Apm.reset!
@@ -171,9 +172,9 @@ describe Canvas::Apm do
     it "adds shard and account tags to active span" do
       Canvas::Apm.hostname = "testbox"
       Canvas::Apm.tracer.trace("TESTING") do |span|
-        shard = OpenStruct.new({id: 42})
-        account = OpenStruct.new({global_id: 420000042})
-        user = OpenStruct.new({global_id: 42100000421})
+        shard = OpenStruct.new({ id: 42 })
+        account = OpenStruct.new({ global_id: 420000042 })
+        user = OpenStruct.new({ global_id: 42100000421 })
         generate_request_id = "1234567890"
         expect(tracer.active_root_span).to eq(span)
         Canvas::Apm.annotate_trace(shard, account, generate_request_id, user)

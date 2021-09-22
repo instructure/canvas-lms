@@ -20,7 +20,6 @@
 require_relative '../../sharding_spec_helper'
 
 describe Canvas::CacheRegister do
-
   before :each do
     skip("require redis") unless Canvas.redis_enabled?
     allow(Canvas::CacheRegister).to receive(:enabled?).and_return(true)
@@ -64,13 +63,13 @@ describe Canvas::CacheRegister do
 
     it "should separate keys by type" do
       Timecop.freeze(time1) { @user.cache_key(:enrollments) }
-      Timecop.freeze(time2) { expect(@user.cache_key(:account_users)).to include(to_stamp(time2))}
+      Timecop.freeze(time2) { expect(@user.cache_key(:account_users)).to include(to_stamp(time2)) }
     end
 
     it "should separate keys by user" do
       user2 = User.create!
       Timecop.freeze(time1) { @user.cache_key(:enrollments) }
-      Timecop.freeze(time2) { expect(user2.cache_key(:enrollments)).to include(to_stamp(time2))}
+      Timecop.freeze(time2) { expect(user2.cache_key(:enrollments)).to include(to_stamp(time2)) }
     end
 
     it "should check the types in dev/test" do
@@ -131,7 +130,7 @@ describe Canvas::CacheRegister do
 
     context "multiple users" do
       it "should work with an array of users" do
-        users = (0..2).map{ User.create! }
+        users = (0..2).map { User.create! }
         Timecop.freeze(time1) do
           users.each do |u|
             u.cache_key(:enrollments)
@@ -163,9 +162,9 @@ describe Canvas::CacheRegister do
       end
 
       it "should be able to touch the users as well (unless skipped)" do
-        users = (0..2).map{ User.create! }
+        users = (0..2).map { User.create! }
         Timecop.freeze(time1) do
-          users.each {|u| u.cache_key(:enrollments) }
+          users.each { |u| u.cache_key(:enrollments) }
         end
 
         Timecop.freeze(time2) do
@@ -222,7 +221,7 @@ describe Canvas::CacheRegister do
         end
 
         it "should fail trying to clear things that aren't resolvable by to a global id" do
-          weird_hash = {:what => @users.first}
+          weird_hash = { :what => @users.first }
           expect {
             User.clear_cache_keys(weird_hash, :enrollments)
           }.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::CSVBaseImporter do
-
   it 'should read file from index' do
     sis = double
     allow(sis).to receive(:batch).and_return nil
@@ -42,9 +41,9 @@ describe SIS::CSV::CSVBaseImporter do
     csv[:fullpath] = path
     rows, rows2, rows3 = [], [], []
     importer = SIS::CSV::CSVBaseImporter.new(sis)
-    importer.csv_rows(csv, 0, 3) {|row| rows << row}
-    importer.csv_rows(csv, 3, 6) {|row| rows2 << row}
-    importer.csv_rows(csv, 9, 6) {|row| rows3 << row}
+    importer.csv_rows(csv, 0, 3) { |row| rows << row }
+    importer.csv_rows(csv, 3, 6) { |row| rows2 << row }
+    importer.csv_rows(csv, 9, 6) { |row| rows3 << row }
     expect(rows.first.fields).to eq ['0', '0', '0', 2]
     expect(rows.last.fields).to eq ['2', '2', '2', 4]
     expect(rows2.first.fields).to eq ['3', '3', '3', 5]

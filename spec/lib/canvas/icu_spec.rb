@@ -24,14 +24,14 @@ describe Canvas::ICU do
   shared_examples_for "Collator" do
     describe ".collate_by" do
       it "should work" do
-        array = [{id: 2, str: 'a'}, {id:1, str: 'b'}]
+        array = [{ id: 2, str: 'a' }, { id: 1, str: 'b' }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
         expect(result.last[:id]).to eq 1
       end
 
       it "should handle CanvasSort::First" do
-        array = [{id: 2, str: CanvasSort::First}, {id:1, str: 'b'}]
+        array = [{ id: 2, str: CanvasSort::First }, { id: 1, str: 'b' }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
         expect(result.last[:id]).to eq 1
@@ -91,32 +91,38 @@ describe Canvas::ICU do
     it "sorts several examples correctly" do
       # English sorts ñ as just an n, but after regular n's
       expect(collate(["ana", "aña", "añb", "anb"])).to eq(
-                                                          ["ana", "aña", "anb", "añb"])
+        ["ana", "aña", "anb", "añb"]
+      )
 
       # Spanish sorts it as a separate letter
       begin
         original_locale, I18n.locale = I18n.locale, :es
-        expect(collate(["ana", "aña", "añb", "anb"])). to eq(
-                                                            ["ana", "anb", "aña", "añb"])
+        expect(collate(["ana", "aña", "añb", "anb"])).to eq(
+          ["ana", "anb", "aña", "añb"]
+        )
       ensure
         I18n.locale = original_locale
       end
 
       # Punctuation is not ignored (commas separating surnames)
       expect(collate(["Wall, Ball", "Wallart, Shmallart"])).to eq(
-                                                                 ["Wall, Ball", "Wallart, Shmallart"])
+        ["Wall, Ball", "Wallart, Shmallart"]
+      )
 
       # shorter words sort first
       expect(collate(["hatch", "hat"])).to eq(
-                                             ["hat", "hatch"])
+        ["hat", "hatch"]
+      )
 
       # capitalization is a secondary sort level
       expect(collate(["aba", "aBb", "abb", "aBa"])).to eq(
-                                                         ["aba", "aBa", "abb", "aBb"])
+        ["aba", "aBa", "abb", "aBb"]
+      )
 
       # numbers sort naturally
       expect(collate(["10", "1", "2", "11"])).to eq(
-                                                   ["1", "2", "10", "11"])
+        ["1", "2", "10", "11"]
+      )
 
       # hyphenated last name is not a word separator
       # I can't get this to pass, without breaking the Wallart case above. Either you ignore

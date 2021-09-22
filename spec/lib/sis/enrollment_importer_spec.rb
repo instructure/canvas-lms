@@ -42,7 +42,7 @@ module SIS
       let(:messages) { [] }
 
       before do
-        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
+        EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
           importer.add_enrollment(enrollment)
         end
       end
@@ -62,7 +62,7 @@ module SIS
         @pseudonym.sis_user_id = @student.id
         @pseudonym.save!
         Account.default.pseudonyms << @pseudonym
-        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(@messages) do |importer|
+        EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(@messages) do |importer|
           an_enrollment = SIS::Models::Enrollment.new(
             course_id: 1,
             section_id: 2,
@@ -113,7 +113,7 @@ module SIS
       it "should save without broadcasting if notify is blank" do
         expect(enrollment).to receive(:save_without_broadcasting!).once
 
-        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
+        EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
           sis_enrollment = SIS::Models::Enrollment.new(
             course_id: @course.sis_source_id,
             section_id: @section.sis_source_id,
@@ -128,7 +128,7 @@ module SIS
       it "should save with broadcasting if notify is set" do
         expect(enrollment).to receive(:save_without_broadcasting!).never
 
-        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
+        EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
           sis_enrollment = SIS::Models::Enrollment.new(
             course_id: @course.sis_source_id,
             section_id: @section.sis_source_id,

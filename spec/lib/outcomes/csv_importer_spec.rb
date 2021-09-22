@@ -206,9 +206,9 @@ describe Outcomes::CsvImporter do
     it 'properly sets mastery_points' do
       uuid = SecureRandom.uuid
       import_fake_csv([
-        headers + ['mastery_points', 'ratings'],
-        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate', '0', 'nonexistant']
-      ])
+                        headers + ['mastery_points', 'ratings'],
+                        outcome_row(vendor_guid: uuid) + ['3.14', '5.34', 'awesome', '1.2', 'adequate', '0', 'nonexistant']
+                      ])
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:mastery_points]).to eq(3.14)
@@ -217,9 +217,9 @@ describe Outcomes::CsvImporter do
     it 'can import a file with english decimal numbers' do
       uuid = SecureRandom.uuid
       import_fake_csv([
-        headers + ['ratings'],
-        outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'english number']
-      ]) { }
+                        headers + ['ratings'],
+                        outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'english number']
+                      ]) {}
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(1234.5678)
@@ -229,9 +229,9 @@ describe Outcomes::CsvImporter do
       I18n.locale = 'fr'
       uuid = SecureRandom.uuid
       import_fake_csv([
-        headers + ['ratings'],
-        outcome_row(vendor_guid: uuid) + [' 123 456,5678 ', 'bon nombre']
-      ]) { }
+                        headers + ['ratings'],
+                        outcome_row(vendor_guid: uuid) + [' 123 456,5678 ', 'bon nombre']
+                      ]) {}
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123456.5678)
@@ -311,7 +311,6 @@ describe Outcomes::CsvImporter do
   end
 
   describe 'throws user-friendly row errors' do
-
     it 'if rating tiers have points missing' do
       expect_import_error(
         [

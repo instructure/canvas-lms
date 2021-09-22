@@ -22,7 +22,7 @@ require 'spec_helper'
 require 'lti2_spec_helper'
 
 describe Canvas::LiveEvents do
-  let(:submission_event_endpoint){ 'test.com/submission' }
+  let(:submission_event_endpoint) { 'test.com/submission' }
   let(:submission_event_service) do
     {
       'endpoint' => submission_event_endpoint,
@@ -45,7 +45,7 @@ describe Canvas::LiveEvents do
 
   before do
     LiveEvents.stream_client = FakeStreamClient.new
-    allow(LiveEvents).to receive(:get_context).and_return({compact_live_events: true})
+    allow(LiveEvents).to receive(:get_context).and_return({ compact_live_events: true })
   end
 
   let(:course_context) do
@@ -57,7 +57,6 @@ describe Canvas::LiveEvents do
       context_type: 'Course'
     )
   end
-
 
   class FakeSettings
     def call
@@ -115,7 +114,7 @@ describe Canvas::LiveEvents do
       LiveEvents.set_context(nil)
       user = user_model
       amended_context = Canvas::LiveEvents.amended_context(user)
-      expect(amended_context).to eq({context_id: user.global_id, context_type: 'User', compact_live_events: true})
+      expect(amended_context).to eq({ context_id: user.global_id, context_type: 'User', compact_live_events: true })
     end
   end
 
@@ -125,9 +124,9 @@ describe Canvas::LiveEvents do
       user2 = user_model
       conversation = conversation(user1, user2)
       expect_event("conversation_created",
-        hash_including(
-          conversation_id: conversation.id.to_s
-        ))
+                   hash_including(
+                     conversation_id: conversation.id.to_s
+                   ))
       Canvas::LiveEvents.conversation_created(conversation)
     end
   end
@@ -144,9 +143,9 @@ describe Canvas::LiveEvents do
       enrollment = course_with_observer
       enrollment.associated_user = observee
       expect_event('enrollment_updated',
-        hash_including(
-          associated_user_id: observee.global_id.to_s
-        ))
+                   hash_including(
+                     associated_user_id: observee.global_id.to_s
+                   ))
       Canvas::LiveEvents.enrollment_updated(enrollment)
     end
   end
@@ -156,11 +155,11 @@ describe Canvas::LiveEvents do
       course = course_model
       group_category = group_category(context: course, group_limit: 2)
       expect_event('group_category_created',
-        hash_including(
-          context_type: 'Course',
-          context_id: course.id.to_s,
-          group_limit: 2
-        ))
+                   hash_including(
+                     context_type: 'Course',
+                     context_id: course.id.to_s,
+                     group_limit: 2
+                   ))
       Canvas::LiveEvents.group_category_created(group_category)
     end
   end
@@ -170,11 +169,11 @@ describe Canvas::LiveEvents do
       course = course_model
       group_category = group_category(context: course, group_limit: 2)
       expect_event('group_category_updated',
-        hash_including(
-          context_type: 'Course',
-          context_id: course.id.to_s,
-          group_limit: 2
-        ))
+                   hash_including(
+                     context_type: 'Course',
+                     context_id: course.id.to_s,
+                     group_limit: 2
+                   ))
       Canvas::LiveEvents.group_category_updated(group_category)
     end
   end
@@ -184,12 +183,12 @@ describe Canvas::LiveEvents do
       course = course_model
       group = group_model(context: course, max_membership: 2)
       expect_event('group_updated',
-        hash_including(
-          group_id: group.global_id.to_s,
-          context_type: 'Course',
-          context_id: course.global_id.to_s,
-          max_membership: 2
-        ))
+                   hash_including(
+                     group_id: group.global_id.to_s,
+                     context_type: 'Course',
+                     context_id: course.global_id.to_s,
+                     max_membership: 2
+                   ))
       Canvas::LiveEvents.group_updated(group)
     end
 
@@ -198,20 +197,20 @@ describe Canvas::LiveEvents do
       course = course_model(account: account)
       group = group_model(context: course)
       expect_event('group_updated',
-        hash_including(
-          group_id: group.global_id.to_s,
-          account_id: account.global_id.to_s
-        ))
+                   hash_including(
+                     group_id: group.global_id.to_s,
+                     account_id: account.global_id.to_s
+                   ))
       Canvas::LiveEvents.group_updated(group)
     end
 
     it "should include the workflow_state" do
       group = group_model
       expect_event('group_updated',
-        hash_including(
-          group_id: group.global_id.to_s,
-          workflow_state: group.workflow_state
-        ))
+                   hash_including(
+                     group_id: group.global_id.to_s,
+                     workflow_state: group.workflow_state
+                   ))
       Canvas::LiveEvents.group_updated(group)
     end
   end
@@ -223,10 +222,10 @@ describe Canvas::LiveEvents do
       membership = group_membership_model(group: group, user: user)
 
       expect_event('group_membership_updated',
-        hash_including(
-          group_membership_id: membership.global_id.to_s,
-          workflow_state: membership.workflow_state
-        ))
+                   hash_including(
+                     group_membership_id: membership.global_id.to_s,
+                     workflow_state: membership.workflow_state
+                   ))
       Canvas::LiveEvents.group_membership_updated(membership)
     end
   end
@@ -243,10 +242,10 @@ describe Canvas::LiveEvents do
 
     it "should not set old_title or old_body if they don't change" do
       expect_event('wiki_page_updated', {
-        wiki_page_id: @page.global_id.to_s,
-        title: "old title",
-        body: "old body"
-      })
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "old title",
+                     body: "old body"
+                   })
 
       wiki_page_updated
     end
@@ -255,11 +254,11 @@ describe Canvas::LiveEvents do
       @page.title = "new title"
 
       expect_event('wiki_page_updated', {
-        wiki_page_id: @page.global_id.to_s,
-        title: "new title",
-        old_title: "old title",
-        body: "old body"
-      })
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "new title",
+                     old_title: "old title",
+                     body: "old body"
+                   })
 
       wiki_page_updated
     end
@@ -268,11 +267,11 @@ describe Canvas::LiveEvents do
       @page.body = "new body"
 
       expect_event('wiki_page_updated', {
-        wiki_page_id: @page.global_id.to_s,
-        title: "old title",
-        body: "new body",
-        old_body: "old body"
-      })
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "old title",
+                     body: "new body",
+                     old_body: "old body"
+                   })
 
       wiki_page_updated
     end
@@ -290,9 +289,9 @@ describe Canvas::LiveEvents do
       @user3 = user_model
       @convo.add_participants(@user1, [@user3])
       expect_event('conversation_forwarded',
-        hash_including(
-          conversation_id: @convo.id.to_s
-        ), { compact_live_events: true }).once
+                   hash_including(
+                     conversation_id: @convo.id.to_s
+                   ), { compact_live_events: true }).once
       Canvas::LiveEvents.conversation_forwarded(@convo)
     end
   end
@@ -304,11 +303,11 @@ describe Canvas::LiveEvents do
       convo = Conversation.initiate([user1, user2], false)
       convo_message = convo.add_message(user1, 'Hi! You are doing great...')
       expect_event('conversation_message_created',
-        hash_including(
-          author_id: convo_message.author_id.to_s,
-          conversation_id: convo_message.conversation_id.to_s,
-          message_id: convo_message.id.to_s
-        )).once
+                   hash_including(
+                     author_id: convo_message.author_id.to_s,
+                     conversation_id: convo_message.conversation_id.to_s,
+                     message_id: convo_message.id.to_s
+                   )).once
       Canvas::LiveEvents.conversation_message_created(convo_message)
     end
   end
@@ -335,11 +334,11 @@ describe Canvas::LiveEvents do
       expect_event('course_grade_change', expected_body, course_context)
 
       Canvas::LiveEvents.course_grade_change(score, {
-        current_score: 1.0,
-        final_score: 2.0,
-        unposted_current_score: 3.0,
-        unposted_final_score: 4.0
-      }, score.enrollment)
+                                               current_score: 1.0,
+                                               final_score: 2.0,
+                                               unposted_current_score: 3.0,
+                                               unposted_final_score: 4.0
+                                             }, score.enrollment)
     end
   end
 
@@ -364,13 +363,13 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       expect_event('grade_change', hash_including(
-        submission_id: submission.global_id.to_s,
-        assignment_id: submission.global_assignment_id.to_s,
-        assignment_name: submission.assignment.name,
-        grader_id: @teacher.global_id.to_s,
-        student_id: @student.global_id.to_s,
-        user_id: @student.global_id.to_s
-      ), course_context)
+                                     submission_id: submission.global_id.to_s,
+                                     assignment_id: submission.global_assignment_id.to_s,
+                                     assignment_name: submission.assignment.name,
+                                     grader_id: @teacher.global_id.to_s,
+                                     student_id: @student.global_id.to_s,
+                                     user_id: @student.global_id.to_s
+                                   ), course_context)
 
       submission.grader = @teacher
       submission.grade = '10'
@@ -383,13 +382,13 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       expect_event('grade_change',
-        hash_including({
-          assignment_id: submission.global_assignment_id.to_s,
-          assignment_name: submission.assignment.name,
-          user_id: @student.global_id.to_s,
-          student_id: @student.global_id.to_s,
-          student_sis_id: nil
-        }.compact!), course_context)
+                   hash_including({
+                     assignment_id: submission.global_assignment_id.to_s,
+                     assignment_name: submission.assignment.name,
+                     user_id: @student.global_id.to_s,
+                     student_id: @student.global_id.to_s,
+                     student_sis_id: nil
+                   }.compact!), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -401,9 +400,9 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       expect_event('grade_change',
-        hash_including(
-          student_sis_id: 'sis-id-1'
-        ), course_context)
+                   hash_including(
+                     student_sis_id: 'sis-id-1'
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -413,10 +412,10 @@ describe Canvas::LiveEvents do
 
       submission.score = 9000
       expect_event('grade_change',
-        hash_including(
-          score: 9000,
-          old_score: 5
-        ), course_context)
+                   hash_including(
+                     score: 9000,
+                     old_score: 5
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
     end
 
@@ -430,22 +429,22 @@ describe Canvas::LiveEvents do
       submission.assignment.points_possible = 99
 
       expect_event('grade_change',
-        hash_including(
-          points_possible: 99,
-          old_points_possible: 5
-        ), course_context)
+                   hash_including(
+                     points_possible: 99,
+                     old_points_possible: 5
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission, assignment.versions.current.model)
     end
 
     it "includes course context even when global course context unset" do
       allow(LiveEvents).to receive(:get_context).and_return({
-        root_account_uuid: nil,
-        root_account_id: nil,
-        root_account_lti_guid: nil,
-        context_id: nil,
-        context_type: nil,
-        foo: 'bar'
-      })
+                                                              root_account_uuid: nil,
+                                                              root_account_id: nil,
+                                                              root_account_lti_guid: nil,
+                                                              context_id: nil,
+                                                              context_type: nil,
+                                                              foo: 'bar'
+                                                            })
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
@@ -471,8 +470,8 @@ describe Canvas::LiveEvents do
 
       it "is false when submission is not graded" do
         expect_event('grade_change', hash_including(
-          grading_complete: false
-        ), course_context)
+                                       grading_complete: false
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
 
@@ -481,8 +480,8 @@ describe Canvas::LiveEvents do
         submission.workflow_state = 'graded'
 
         expect_event('grade_change', hash_including(
-          grading_complete: true
-        ), course_context)
+                                       grading_complete: true
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
 
@@ -491,8 +490,8 @@ describe Canvas::LiveEvents do
         submission.workflow_state = 'pending_review'
 
         expect_event('grade_change', hash_including(
-          grading_complete: false
-        ), course_context)
+                                       grading_complete: false
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
     end
@@ -512,8 +511,8 @@ describe Canvas::LiveEvents do
 
         it "is not called when a grade is changed for a submission that is not posted" do
           expect_event('grade_change', hash_including(
-            muted: true
-          ), course_context)
+                                         muted: true
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
 
@@ -521,8 +520,8 @@ describe Canvas::LiveEvents do
           assignment.post_submissions
 
           expect_event('grade_change', hash_including(
-            muted: false
-          ), course_context)
+                                         muted: false
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
       end
@@ -531,8 +530,8 @@ describe Canvas::LiveEvents do
         it "is true when assignment is muted" do
           submission.assignment.mute!
           expect_event('grade_change', hash_including(
-            muted: true
-          ), course_context)
+                                         muted: true
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
       end
@@ -608,7 +607,7 @@ describe Canvas::LiveEvents do
           )
 
           tool_proxy = create_tool_proxy(submission.assignment.course)
-          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy[:raw_data]['tool_profile'] = { 'service_offered' => [submission_event_service] }
           tool_proxy.save!
 
           Lti::ResourceHandler.create!(
@@ -636,7 +635,7 @@ describe Canvas::LiveEvents do
           )
 
           tool_proxy = create_tool_proxy(submission.assignment.course)
-          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy[:raw_data]['tool_profile'] = { 'service_offered' => [submission_event_service] }
           tool_proxy.save!
 
           Lti::ResourceHandler.create!(
@@ -657,7 +656,7 @@ describe Canvas::LiveEvents do
 
         it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
-            tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
+                                                                              tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
           expect_event(
             event_name,
@@ -720,9 +719,9 @@ describe Canvas::LiveEvents do
 
       it "emits a submission_updated event for each passed submission" do
         expect_event('submission_updated',
-          hash_including(
-            :submission_id
-          ), course_context).exactly(3).times
+                     hash_including(
+                       :submission_id
+                     ), course_context).exactly(3).times
 
         Canvas::LiveEvents.submissions_bulk_updated(submissions)
       end
@@ -730,17 +729,17 @@ describe Canvas::LiveEvents do
       it "includes the ID of an affected submission in each event" do
         aggregate_failures do
           expect_event('submission_updated',
-            hash_including(
-              submission_id: submissions.first.global_id.to_s
-            ), course_context).ordered
+                       hash_including(
+                         submission_id: submissions.first.global_id.to_s
+                       ), course_context).ordered
           expect_event('submission_updated',
-            hash_including(
-              submission_id: submissions.second.global_id.to_s
-            ), course_context).ordered
+                       hash_including(
+                         submission_id: submissions.second.global_id.to_s
+                       ), course_context).ordered
           expect_event('submission_updated',
-            hash_including(
-              submission_id: submissions.third.global_id.to_s
-            ), course_context).ordered
+                       hash_including(
+                         submission_id: submissions.third.global_id.to_s
+                       ), course_context).ordered
 
           Canvas::LiveEvents.submissions_bulk_updated(submissions)
         end
@@ -753,14 +752,14 @@ describe Canvas::LiveEvents do
           comment: "here is a comment",
           submission_id: submission.id, author_id: @student.id
         )
-        expect_event('submission_comment_created',{
-          user_id: comment.author_id.to_s,
-          created_at: comment.created_at,
-          submission_id: comment.submission_id.to_s,
-          body: comment.comment,
-          attachment_ids: [],
-          submission_comment_id: comment.id.to_s,
-        }).once
+        expect_event('submission_comment_created', {
+                       user_id: comment.author_id.to_s,
+                       created_at: comment.created_at,
+                       submission_id: comment.submission_id.to_s,
+                       body: comment.comment,
+                       attachment_ids: [],
+                       submission_comment_id: comment.id.to_s,
+                     }).once
         Canvas::LiveEvents.submission_comment_created(comment)
       end
     end
@@ -782,7 +781,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }.compact!, {compact_live_events: true}).once
+      }.compact!, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
@@ -791,16 +790,16 @@ describe Canvas::LiveEvents do
       course_factory
 
       expect_event('asset_accessed', {
-        asset_name: "Unnamed Course",
-        asset_type: 'course',
-        asset_id: @course.global_id.to_s,
-        asset_subtype: 'assignments',
-        category: 'category',
-        role: 'role',
-        level: 'participation'
-      }, {compact_live_events: true}).once
+                     asset_name: "Unnamed Course",
+                     asset_type: 'course',
+                     asset_id: @course.global_id.to_s,
+                     asset_subtype: 'assignments',
+                     category: 'category',
+                     role: 'role',
+                     level: 'participation'
+                   }, { compact_live_events: true }).once
 
-      Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
+      Canvas::LiveEvents.asset_access(["assignments", @course], 'category', 'role', 'participation')
     end
 
     it 'asset_name is correctly accessed when title is used' do
@@ -808,13 +807,13 @@ describe Canvas::LiveEvents do
       @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
 
       expect_event('asset_accessed', {
-        asset_name: "old title",
-        asset_type: 'wiki_page',
-        asset_id: @page.global_id.to_s,
-        category: 'category',
-        role: 'role',
-        level: 'participation'
-      }, {compact_live_events: true}).once
+                     asset_name: "old title",
+                     asset_type: 'wiki_page',
+                     asset_id: @page.global_id.to_s,
+                     category: 'category',
+                     role: 'role',
+                     level: 'participation'
+                   }, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
     end
@@ -832,7 +831,7 @@ describe Canvas::LiveEvents do
         level: 'participation',
         filename: @attachment.filename,
         display_name: @attachment.display_name
-      }.compact!, {compact_live_events: true}).once
+      }.compact!, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
     end
@@ -852,12 +851,11 @@ describe Canvas::LiveEvents do
         filename: @attachment.filename,
         display_name: @attachment.display_name
       }.compact!,
-      {
-        compact_live_events: true,
-        context_type: context.class.to_s,
-        context_id: '1'
-      }
-      ).once
+                   {
+                     compact_live_events: true,
+                     context_type: context.class.to_s,
+                     context_id: '1'
+                   }).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
@@ -866,19 +864,19 @@ describe Canvas::LiveEvents do
       course_with_student
 
       expect_event('asset_accessed', {
-        asset_name: "Unnamed Course",
-        asset_type: 'course',
-        asset_id: @course.global_id.to_s,
-        asset_subtype: 'assignments',
-        category: 'category',
-        role: 'role',
-        level: 'participation',
-        enrollment_id: @enrollment.id.to_s,
-        section_id: @enrollment.course_section_id.to_s
-      }, {compact_live_events: true}).once
+                     asset_name: "Unnamed Course",
+                     asset_type: 'course',
+                     asset_id: @course.global_id.to_s,
+                     asset_subtype: 'assignments',
+                     category: 'category',
+                     role: 'role',
+                     level: 'participation',
+                     enrollment_id: @enrollment.id.to_s,
+                     section_id: @enrollment.course_section_id.to_s
+                   }, { compact_live_events: true }).once
 
-      Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation',
-        context: nil, context_membership: @enrollment)
+      Canvas::LiveEvents.asset_access(["assignments", @course], 'category', 'role', 'participation',
+                                      context: nil, context_membership: @enrollment)
     end
   end
 
@@ -890,24 +888,24 @@ describe Canvas::LiveEvents do
 
     it 'triggers a live event with assignment details' do
       expect_event('assignment_created',
-        hash_including({
-          assignment_id: @assignment.global_id.to_s,
-          context_id: @course.global_id.to_s,
-          context_uuid: @course.uuid,
-          context_type: 'Course',
-          workflow_state: @assignment.workflow_state,
-          title: @assignment.title,
-          description: @assignment.description,
-          due_at: @assignment.due_at,
-          unlock_at: @assignment.unlock_at,
-          lock_at: @assignment.lock_at,
-          points_possible: @assignment.points_possible,
-          lti_assignment_id: @assignment.lti_context_id,
-          lti_resource_link_id: @assignment.lti_resource_link_id,
-          lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
-          submission_types: @assignment.submission_types,
-          domain: @assignment.root_account.domain
-        }.compact!)).once
+                   hash_including({
+                     assignment_id: @assignment.global_id.to_s,
+                     context_id: @course.global_id.to_s,
+                     context_uuid: @course.uuid,
+                     context_type: 'Course',
+                     workflow_state: @assignment.workflow_state,
+                     title: @assignment.title,
+                     description: @assignment.description,
+                     due_at: @assignment.due_at,
+                     unlock_at: @assignment.unlock_at,
+                     lock_at: @assignment.lock_at,
+                     points_possible: @assignment.points_possible,
+                     lti_assignment_id: @assignment.lti_context_id,
+                     lti_resource_link_id: @assignment.lti_resource_link_id,
+                     lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
+                     submission_types: @assignment.submission_types,
+                     domain: @assignment.root_account.domain
+                   }.compact!)).once
 
       Canvas::LiveEvents.assignment_created(@assignment)
     end
@@ -932,7 +930,7 @@ describe Canvas::LiveEvents do
           tool_type: 'Lti::MessageHandler'
         )
         tool_proxy = create_tool_proxy(@assignment.course)
-        tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+        tool_proxy[:raw_data]['tool_profile'] = { 'service_offered' => [submission_event_service] }
         tool_proxy.save!
 
         Lti::ResourceHandler.create!(
@@ -956,7 +954,7 @@ describe Canvas::LiveEvents do
           tool_type: 'Lti::MessageHandler'
         )
         tool_proxy = create_tool_proxy(@assignment.course)
-        tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+        tool_proxy[:raw_data]['tool_profile'] = { 'service_offered' => [submission_event_service] }
         tool_proxy.save!
 
         Lti::ResourceHandler.create!(
@@ -997,24 +995,24 @@ describe Canvas::LiveEvents do
 
     it 'triggers a live event with assignment details' do
       expect_event('assignment_updated',
-        hash_including({
-          assignment_id: @assignment.global_id.to_s,
-          context_id: @course.global_id.to_s,
-          context_uuid: @course.uuid,
-          context_type: 'Course',
-          workflow_state: @assignment.workflow_state,
-          title: @assignment.title,
-          description: @assignment.description,
-          due_at: @assignment.due_at,
-          unlock_at: @assignment.unlock_at,
-          lock_at: @assignment.lock_at,
-          points_possible: @assignment.points_possible,
-          lti_assignment_id: @assignment.lti_context_id,
-          lti_resource_link_id: @assignment.lti_resource_link_id,
-          lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
-          submission_types: @assignment.submission_types,
-          domain: @assignment.root_account.domain
-        }.compact!)).once
+                   hash_including({
+                     assignment_id: @assignment.global_id.to_s,
+                     context_id: @course.global_id.to_s,
+                     context_uuid: @course.uuid,
+                     context_type: 'Course',
+                     workflow_state: @assignment.workflow_state,
+                     title: @assignment.title,
+                     description: @assignment.description,
+                     due_at: @assignment.due_at,
+                     unlock_at: @assignment.unlock_at,
+                     lock_at: @assignment.lock_at,
+                     points_possible: @assignment.points_possible,
+                     lti_assignment_id: @assignment.lti_context_id,
+                     lti_resource_link_id: @assignment.lti_resource_link_id,
+                     lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
+                     submission_types: @assignment.submission_types,
+                     domain: @assignment.root_account.domain
+                   }.compact!)).once
 
       Canvas::LiveEvents.assignment_updated(@assignment)
     end
@@ -1040,7 +1038,7 @@ describe Canvas::LiveEvents do
         )
 
         tool_proxy = create_tool_proxy(@assignment.course)
-        tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+        tool_proxy[:raw_data]['tool_profile'] = { 'service_offered' => [submission_event_service] }
         tool_proxy.save!
 
         Lti::ResourceHandler.create!(
@@ -1058,7 +1056,7 @@ describe Canvas::LiveEvents do
 
       it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
-          tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
+                                                                  tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
         expect_event(
           'assignment_updated',
@@ -1126,9 +1124,9 @@ describe Canvas::LiveEvents do
       override = create_adhoc_override_for_assignment(assignment, @student)
 
       expect_event('assignment_override_updated',
-        hash_including(base_override_hash(override).merge({
-          type: 'ADHOC',
-        }))).once
+                   hash_including(base_override_hash(override).merge({
+                                                                       type: 'ADHOC',
+                                                                     }))).once
 
       Canvas::LiveEvents.assignment_override_updated(override)
     end
@@ -1140,10 +1138,10 @@ describe Canvas::LiveEvents do
       section = override.set
 
       expect_event('assignment_override_updated',
-        hash_including(base_override_hash(override).merge({
-          type: 'CourseSection',
-          course_section_id: section.id.to_s,
-        }))).once
+                   hash_including(base_override_hash(override).merge({
+                                                                       type: 'CourseSection',
+                                                                       course_section_id: section.id.to_s,
+                                                                     }))).once
 
       Canvas::LiveEvents.assignment_override_updated(override)
     end
@@ -1154,10 +1152,10 @@ describe Canvas::LiveEvents do
       override = create_group_override_for_assignment(assignment, group: @group)
 
       expect_event('assignment_override_updated',
-        hash_including(base_override_hash(override).merge({
-          type: 'Group',
-          group_id: override.set.id.to_s,
-        }))).once
+                   hash_including(base_override_hash(override).merge({
+                                                                       type: 'Group',
+                                                                       group_id: override.set.id.to_s,
+                                                                     }))).once
 
       Canvas::LiveEvents.assignment_override_updated(override)
     end
@@ -1184,18 +1182,18 @@ describe Canvas::LiveEvents do
     let(:content_export) { FakeExport.new(course_model) }
 
     it 'triggers a live event with content export settings and amended context details' do
-      fake_export_context = {key1: 'val1', key2: 'val2'}
+      fake_export_context = { key1: 'val1', key2: 'val2' }
 
       expect_event(
         'quiz_export_complete',
         fake_export_context,
         hash_including({
-          :context_type => "Course",
-          :context_id => content_export.context.global_id.to_s,
-          :root_account_id => content_export.context.root_account.global_id.to_s,
-          :root_account_uuid => content_export.context.root_account.uuid,
-          :root_account_lti_guid => content_export.context.root_account.lti_guid.to_s,
-        })
+                         :context_type => "Course",
+                         :context_id => content_export.context.global_id.to_s,
+                         :root_account_id => content_export.context.root_account.global_id.to_s,
+                         :root_account_uuid => content_export.context.root_account.uuid,
+                         :root_account_lti_guid => content_export.context.root_account.lti_guid.to_s,
+                       })
       ).once
 
       Canvas::LiveEvents.quiz_export_complete(content_export)
@@ -1246,25 +1244,25 @@ describe Canvas::LiveEvents do
       section = @course.course_sections.first
 
       expect_event('course_section_created',
-        {
-          course_section_id: section.id.to_s,
-          sis_source_id: nil,
-          sis_batch_id: nil,
-          course_id: section.course_id.to_s,
-          root_account_id: section.root_account_id.to_s,
-          enrollment_term_id: nil,
-          name: section.name,
-          default_section: section.default_section,
-          accepting_enrollments: section.accepting_enrollments,
-          can_manually_enroll: section.can_manually_enroll,
-          start_at: section.start_at,
-          end_at: section.end_at,
-          workflow_state: section.workflow_state,
-          restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
-          nonxlist_course_id: nil,
-          stuck_sis_fields: section.stuck_sis_fields,
-          integration_id: nil
-        }.compact!).once
+                   {
+                     course_section_id: section.id.to_s,
+                     sis_source_id: nil,
+                     sis_batch_id: nil,
+                     course_id: section.course_id.to_s,
+                     root_account_id: section.root_account_id.to_s,
+                     enrollment_term_id: nil,
+                     name: section.name,
+                     default_section: section.default_section,
+                     accepting_enrollments: section.accepting_enrollments,
+                     can_manually_enroll: section.can_manually_enroll,
+                     start_at: section.start_at,
+                     end_at: section.end_at,
+                     workflow_state: section.workflow_state,
+                     restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
+                     nonxlist_course_id: nil,
+                     stuck_sis_fields: section.stuck_sis_fields,
+                     integration_id: nil
+                   }.compact!).once
       Canvas::LiveEvents.course_section_created(section)
     end
   end
@@ -1275,25 +1273,25 @@ describe Canvas::LiveEvents do
       section = @course.course_sections.first
 
       expect_event('course_section_updated',
-        {
-          course_section_id: section.id.to_s,
-          sis_source_id: nil,
-          sis_batch_id: nil,
-          course_id: section.course_id.to_s,
-          root_account_id: section.root_account_id.to_s,
-          enrollment_term_id: nil,
-          name: section.name,
-          default_section: section.default_section,
-          accepting_enrollments: section.accepting_enrollments,
-          can_manually_enroll: section.can_manually_enroll,
-          start_at: section.start_at,
-          end_at: section.end_at,
-          workflow_state: section.workflow_state,
-          restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
-          nonxlist_course_id: nil,
-          stuck_sis_fields: section.stuck_sis_fields,
-          integration_id: nil
-        }.compact!).once
+                   {
+                     course_section_id: section.id.to_s,
+                     sis_source_id: nil,
+                     sis_batch_id: nil,
+                     course_id: section.course_id.to_s,
+                     root_account_id: section.root_account_id.to_s,
+                     enrollment_term_id: nil,
+                     name: section.name,
+                     default_section: section.default_section,
+                     accepting_enrollments: section.accepting_enrollments,
+                     can_manually_enroll: section.can_manually_enroll,
+                     start_at: section.start_at,
+                     end_at: section.end_at,
+                     workflow_state: section.workflow_state,
+                     restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
+                     nonxlist_course_id: nil,
+                     stuck_sis_fields: section.stuck_sis_fields,
+                     integration_id: nil
+                   }.compact!).once
       Canvas::LiveEvents.course_section_updated(section)
     end
   end
@@ -1534,12 +1532,12 @@ describe Canvas::LiveEvents do
         )
 
         expect_event('discussion_entry_submitted', {
-          user_id: entry.user_id.to_s,
-          created_at: entry.created_at,
-          discussion_entry_id: entry.id.to_s,
-          discussion_topic_id: entry.discussion_topic_id.to_s,
-          text: entry.message
-        }).once
+                       user_id: entry.user_id.to_s,
+                       created_at: entry.created_at,
+                       discussion_entry_id: entry.id.to_s,
+                       discussion_topic_id: entry.discussion_topic_id.to_s,
+                       text: entry.message
+                     }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, nil, nil)
       end
@@ -1561,14 +1559,14 @@ describe Canvas::LiveEvents do
         )
 
         expect_event('discussion_entry_submitted', {
-          assignment_id: assignment.id.to_s,
-          submission_id: submission.id.to_s,
-          user_id: entry.user_id.to_s,
-          created_at: entry.created_at,
-          discussion_entry_id: entry.id.to_s,
-          discussion_topic_id: entry.discussion_topic_id.to_s,
-          text: entry.message
-        }).once
+                       assignment_id: assignment.id.to_s,
+                       submission_id: submission.id.to_s,
+                       user_id: entry.user_id.to_s,
+                       created_at: entry.created_at,
+                       discussion_entry_id: entry.id.to_s,
+                       discussion_topic_id: entry.discussion_topic_id.to_s,
+                       text: entry.message
+                     }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.id, submission.id)
       end
@@ -1590,10 +1588,10 @@ describe Canvas::LiveEvents do
 
       LearningOutcomeResult.new(
         alignment: ContentTag.create!({
-          title: 'content',
-          context: @course,
-          learning_outcome: outcome
-        })
+                                        title: 'content',
+                                        context: @course,
+                                        learning_outcome: outcome
+                                      })
       ).tap do |lor|
         lor.association_object = association_object
         lor.context = @course
@@ -1757,7 +1755,6 @@ describe Canvas::LiveEvents do
       it 'should trigger a learning_outcome_group_created live event' do
         outcome_group_model
 
-
         expect_event('learning_outcome_group_created', {
           learning_outcome_group_id: @outcome_group.id.to_s,
           context_id: @outcome_group.context_id.to_s,
@@ -1870,7 +1867,7 @@ describe Canvas::LiveEvents do
           context_id: @proficiency.context_id.to_s,
           context_type: @proficiency.context_type,
           workflow_state: @proficiency.workflow_state,
-          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map {|rating| rating_event(rating)}
+          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map { |rating| rating_event(rating) }
         }.compact).once
 
         Canvas::LiveEvents.outcome_proficiency_created(@proficiency)
@@ -1887,7 +1884,7 @@ describe Canvas::LiveEvents do
           context_type: @proficiency.context_type,
           workflow_state: @proficiency.workflow_state,
           updated_at: @proficiency.updated_at,
-          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map {|rating| rating_event(rating)}
+          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map { |rating| rating_event(rating) }
         }.compact).once
         Canvas::LiveEvents.outcome_proficiency_updated(@proficiency)
       end
@@ -1947,7 +1944,7 @@ describe Canvas::LiveEvents do
   describe 'outcome friendly description' do
     before do
       @context = course_model
-      outcome = @context.created_learning_outcomes.create!({:title => 'new outcome'})
+      outcome = @context.created_learning_outcomes.create!({ :title => 'new outcome' })
       description = 'A friendly description'
       @friendlyDescription = OutcomeFriendlyDescription.create!(
         learning_outcome: outcome,
@@ -1959,14 +1956,14 @@ describe Canvas::LiveEvents do
     context 'created' do
       it 'should trigger an outcome_friendly_description_created live event' do
         expect_event('outcome_friendly_description_created', {
-          outcome_friendly_description_id: @friendlyDescription.id.to_s,
-          context_type: @friendlyDescription.context_type,
-          context_id: @friendlyDescription.context_id.to_s,
-          description: @friendlyDescription.description,
-          workflow_state: @friendlyDescription.workflow_state,
-          learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
-          root_account_id: @friendlyDescription.root_account_id.to_s
-        }).once
+                       outcome_friendly_description_id: @friendlyDescription.id.to_s,
+                       context_type: @friendlyDescription.context_type,
+                       context_id: @friendlyDescription.context_id.to_s,
+                       description: @friendlyDescription.description,
+                       workflow_state: @friendlyDescription.workflow_state,
+                       learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       root_account_id: @friendlyDescription.root_account_id.to_s
+                     }).once
 
         Canvas::LiveEvents.outcome_friendly_description_created(@friendlyDescription)
       end
@@ -1978,15 +1975,15 @@ describe Canvas::LiveEvents do
         @friendlyDescription.description = new_description
         @friendlyDescription.save!
         expect_event('outcome_friendly_description_updated', {
-          outcome_friendly_description_id: @friendlyDescription.id.to_s,
-          context_type: @friendlyDescription.context_type,
-          context_id: @friendlyDescription.context_id.to_s,
-          workflow_state: @friendlyDescription.workflow_state,
-          learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
-          root_account_id: @friendlyDescription.root_account_id.to_s,
-          description: new_description,
-          updated_at: @friendlyDescription.updated_at,
-        }).once
+                       outcome_friendly_description_id: @friendlyDescription.id.to_s,
+                       context_type: @friendlyDescription.context_type,
+                       context_id: @friendlyDescription.context_id.to_s,
+                       workflow_state: @friendlyDescription.workflow_state,
+                       learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       root_account_id: @friendlyDescription.root_account_id.to_s,
+                       description: new_description,
+                       updated_at: @friendlyDescription.updated_at,
+                     }).once
 
         Canvas::LiveEvents.outcome_friendly_description_updated(@friendlyDescription)
       end

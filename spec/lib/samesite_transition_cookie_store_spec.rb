@@ -23,7 +23,7 @@ describe "SamesiteTransitionCookieStore" do
   describe "#unmarshal" do
     it "doesn't explode with malformed data" do
       app = double("SomeAppThing")
-      options = {secret: "038c3fa7b8f07362f0a79db7e717eada"} #<- fake secret
+      options = { secret: "038c3fa7b8f07362f0a79db7e717eada" } # <- fake secret
       store = SamesiteTransitionCookieStore.new(app, options)
       expect(Canvas::Errors).to receive(:capture_exception) do |type, e, level|
         expect(level).to eq(:info)

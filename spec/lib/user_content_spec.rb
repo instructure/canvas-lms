@@ -124,46 +124,46 @@ describe UserContent do
 
       it "matches relative paths" do
         expect(regex.match("<a href='/courses/#{rewriter.context.id}/assignments/5'>").to_a).to eq([
-          "/courses/#{rewriter.context.id}/assignments/5",
-          nil,
-          "/courses/#{rewriter.context.id}",
-          "assignments",
-          "5",
-          ""
-        ])
+                                                                                                     "/courses/#{rewriter.context.id}/assignments/5",
+                                                                                                     nil,
+                                                                                                     "/courses/#{rewriter.context.id}",
+                                                                                                     "assignments",
+                                                                                                     "5",
+                                                                                                     ""
+                                                                                                   ])
       end
 
       it "matches relative paths with no content prefix" do
         expect(regex.match("<a href='/files/101/download?download_frd=1'>").to_a).to eq([
-          "/files/101/download?download_frd=1",
-          nil,
-          nil,
-          "files",
-          "101",
-          "/download?download_frd=1"
-        ])
+                                                                                          "/files/101/download?download_frd=1",
+                                                                                          nil,
+                                                                                          nil,
+                                                                                          "files",
+                                                                                          "101",
+                                                                                          "/download?download_frd=1"
+                                                                                        ])
       end
 
       it "matches absolute paths with http" do
         expect(regex.match(%Q{<img src="http://localhost:3000/files/110/preview">}).to_a).to eq([
-            "http://localhost:3000/files/110/preview",
-            "http://localhost:3000",
-            nil,
-            "files",
-            "110",
-            "/preview"
-          ])
+                                                                                                  "http://localhost:3000/files/110/preview",
+                                                                                                  "http://localhost:3000",
+                                                                                                  nil,
+                                                                                                  "files",
+                                                                                                  "110",
+                                                                                                  "/preview"
+                                                                                                ])
       end
 
       it "matches absolute paths with https" do
         expect(regex.match(%Q{<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">}).to_a).to eq([
-            "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
-            "https://this-is-terrible.example.com",
-            "/courses/#{rewriter.context.id}",
-            "pages",
-            "whatever",
-            "?srsly=0"
-          ])
+                                                                                                                                                    "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
+                                                                                                                                                    "https://this-is-terrible.example.com",
+                                                                                                                                                    "/courses/#{rewriter.context.id}",
+                                                                                                                                                    "pages",
+                                                                                                                                                    "whatever",
+                                                                                                                                                    "?srsly=0"
+                                                                                                                                                  ])
       end
 
       it "doesn't match invalid hostnames" do

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::GroupCategoryImporter do
-
   before(:once) do
     account_model
     process_csv_data_cleanly(
@@ -39,7 +38,8 @@ describe SIS::CSV::GroupCategoryImporter do
       "Gc003,A001,,active",
       "Gc004,invalid,Group Cat 4,active",
       "Gc004,invalid,Group Cat 4,active,invalid",
-      ",A001,G1,active")
+      ",A001,G1,active"
+    )
     err = ["Improper status \"blerged\" for group category Gc002, skipping",
            "No name given for group category Gc003",
            "Account with id \"invalid\" didn't exist for group category Gc004",
@@ -79,7 +79,8 @@ describe SIS::CSV::GroupCategoryImporter do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
-      "Gc002,A001,Group Cat 2,active")
+      "Gc002,A001,Group Cat 2,active"
+    )
     group_category = GroupCategory.where(sis_source_id: 'Gc001').take
     expect(group_category.context_id).to eq @account.id
     group_category2 = GroupCategory.where(sis_source_id: 'Gc002').take
@@ -88,7 +89,8 @@ describe SIS::CSV::GroupCategoryImporter do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,A001,Group Cat 1,active",
-      "Gc002,,Group Cat 2,active")
+      "Gc002,,Group Cat 2,active"
+    )
     expect(group_category.reload.context_id).to eq sub.id
     expect(group_category2.reload.context_id).to eq @account.id
   end
@@ -97,7 +99,8 @@ describe SIS::CSV::GroupCategoryImporter do
     importer = process_csv_data(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
-      "Gc002,,Group Cat 1,active")
+      "Gc002,,Group Cat 1,active"
+    )
     expect(importer.errors.map(&:last)).to eq(["A group category did not pass validation (group category: Gc002, error: Name Group Cat 1 is already in use.)"])
   end
 
@@ -105,7 +108,8 @@ describe SIS::CSV::GroupCategoryImporter do
     course = course_factory(account: @account, sis_source_id: 'c01')
     process_csv_data_cleanly(
       "group_category_id,course_id,category_name,status",
-      "Gc001,c01,Group Cat 1,active")
+      "Gc001,c01,Group Cat 1,active"
+    )
     expect(GroupCategory.where(sis_source_id: 'Gc001').take.context).to eq course
   end
 
@@ -115,7 +119,8 @@ describe SIS::CSV::GroupCategoryImporter do
     course_factory(account: @account, sis_source_id: 'c01')
     importer = process_csv_data(
       "group_category_id,course_id,category_name,status",
-      "Gc001,c01,Group Cat 1,active")
+      "Gc001,c01,Group Cat 1,active"
+    )
     expect(importer.errors.last.last).to eq("Cannot move group category Gc001 because it has groups in it.")
   end
 
@@ -123,7 +128,8 @@ describe SIS::CSV::GroupCategoryImporter do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
-      "Gc002,A001,Group Cat 2,deleted")
+      "Gc002,A001,Group Cat 2,deleted"
+    )
     group_category = GroupCategory.where(sis_source_id: 'Gc001').take
     expect(group_category.deleted_at).to be_nil
     group_category2 = GroupCategory.where(sis_source_id: 'Gc002').take
@@ -132,7 +138,8 @@ describe SIS::CSV::GroupCategoryImporter do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,deleted",
-      "Gc002,A001,Group Cat 2,active")
+      "Gc002,A001,Group Cat 2,active"
+    )
     expect(group_category.reload.deleted_at).to_not be_nil
     expect(group_category2.reload.deleted_at).to be_nil
   end
@@ -146,7 +153,7 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it 'should create rollback data' do
-    batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc003,A001,Group Cat 2,active",
@@ -158,7 +165,7 @@ describe SIS::CSV::GroupCategoryImporter do
       "Gc003,A001,Group Cat 2,deleted",
       batch: batch2
     )
-    batch3 = @account.sis_batches.create! {|sb| sb.data = {}}
+    batch3 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc003,A001,Group Cat 2,active",
@@ -170,5 +177,4 @@ describe SIS::CSV::GroupCategoryImporter do
     batch3.restore_states_for_batch
     expect(@account.all_group_categories.where(sis_source_id: 'Gc003').take.deleted_at).not_to be_nil
   end
-
 end

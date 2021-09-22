@@ -38,8 +38,8 @@ describe Canvas::Migration::ExternalContent::Translator do
 
     it "should search through arrays" do
       data = [
-        {'something' => 'somethingelse'},
-        {'$canvas_quiz_id' => @quiz.id}
+        { 'something' => 'somethingelse' },
+        { '$canvas_quiz_id' => @quiz.id }
       ]
       exported_data = @translator.translate_data(data, :export)
       expect(exported_data.last['$canvas_quiz_id']).to eq @mig_id
@@ -49,7 +49,7 @@ describe Canvas::Migration::ExternalContent::Translator do
     end
 
     it "should search through nested hashes" do
-      data = {'key' => {'$canvas_quiz_id' => @quiz.id}}
+      data = { 'key' => { '$canvas_quiz_id' => @quiz.id } }
       exported_data = @translator.translate_data(data, :export)
       expect(exported_data['key']['$canvas_quiz_id']).to eq @mig_id
 
@@ -100,7 +100,7 @@ describe Canvas::Migration::ExternalContent::Translator do
       mm = template.master_migrations.create!
       @cm = @course.content_migrations.create!
       ce = ContentExport.create!(export_type: ContentExport::MASTER_COURSE_COPY, content_migration: @cm,
-        context: @course, workflow_state: 'active', settings: {master_migration_id: mm.id})
+                                 context: @course, workflow_state: 'active', settings: { master_migration_id: mm.id })
       @translator = described_class.new(content_export: ce)
     end
 

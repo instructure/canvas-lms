@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Canvas::Cdn do
-
   before :each do
     @original_config = Canvas::Cdn.config.dup
   end
@@ -46,14 +45,14 @@ describe Canvas::Cdn do
     it 'puts a /br on the front when brotli is supported' do
       Canvas::Cdn.config.merge! host: 'somehostname'
       request = double()
-      expect(request).to receive(:headers).and_return({'Accept-Encoding'=> 'gzip, deflate, br'})
+      expect(request).to receive(:headers).and_return({ 'Accept-Encoding' => 'gzip, deflate, br' })
       expect(Canvas::Cdn.add_brotli_to_host_if_supported(request)).to eq "somehostname/br"
     end
 
     it 'does not put a /br on the front when brotli is not supported' do
       Canvas::Cdn.config.merge! host: 'somehostname'
       request = double()
-      expect(request).to receive(:headers).and_return({'Accept-Encoding'=> 'gzip, deflate'})
+      expect(request).to receive(:headers).and_return({ 'Accept-Encoding' => 'gzip, deflate' })
       expect(Canvas::Cdn.add_brotli_to_host_if_supported(request)).to eq "somehostname"
     end
   end
@@ -65,19 +64,19 @@ describe Canvas::Cdn do
 
     it 'returns false if user agent doesnt accept-encoding "br"' do
       request = double()
-      expect(request).to receive(:headers).and_return({'Accept-Encoding' => 'gzip, deflate'})
+      expect(request).to receive(:headers).and_return({ 'Accept-Encoding' => 'gzip, deflate' })
       expect(Canvas::Cdn.supports_brotli?(request)).to be_falsy
     end
 
     it 'returns true when the user agent supports brotli' do
       request = double()
-      expect(request).to receive(:headers).and_return({'Accept-Encoding'=> 'gzip, deflate, br'})
+      expect(request).to receive(:headers).and_return({ 'Accept-Encoding' => 'gzip, deflate, br' })
       expect(Canvas::Cdn.supports_brotli?(request)).to be_truthy
     end
 
     it "doesn't die if there is no accept-encoding header" do
       request = double()
-      expect(request).to receive(:headers).and_return({'Accept-Encoding'=> nil})
+      expect(request).to receive(:headers).and_return({ 'Accept-Encoding' => nil })
       expect(Canvas::Cdn.supports_brotli?(request)).to be_falsy
     end
   end
