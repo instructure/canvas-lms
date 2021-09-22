@@ -36,7 +36,6 @@
 #
 
 class JwtsController < ApplicationController
-
   before_action :require_user, :require_non_jwt_auth
 
   # @API Create JWT
@@ -54,8 +53,8 @@ class JwtsController < ApplicationController
   #
   # @returns JWT
   def create
-    services_jwt = Canvas::Security::ServicesJwt.
-      for_user(request.host_with_port, @current_user, real_user: @real_current_user)
+    services_jwt = Canvas::Security::ServicesJwt
+                   .for_user(request.host_with_port, @current_user, real_user: @real_current_user)
     render json: { token: services_jwt }
   end
 
@@ -81,7 +80,7 @@ class JwtsController < ApplicationController
   def refresh
     if params[:jwt].nil?
       return render(
-        json: {errors: {jwt: "required"}},
+        json: { errors: { jwt: "required" } },
         status: 400
       )
     end
@@ -94,7 +93,7 @@ class JwtsController < ApplicationController
     render json: { token: services_jwt }
   rescue Canvas::Security::ServicesJwt::InvalidRefresh
     render(
-      json: {errors: {jwt: "invalid refresh"}},
+      json: { errors: { jwt: "invalid refresh" } },
       status: 400
     )
   end

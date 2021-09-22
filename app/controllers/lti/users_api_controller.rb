@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 module Lti
-# @API Plagiarism Detection Platform Users
-# **Plagiarism Detection Platform API for Users (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  # @API Plagiarism Detection Platform Users
+  # **Plagiarism Detection Platform API for Users (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
   class UsersApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
     include Api::V1::User
@@ -79,9 +78,9 @@ module Lti
     private
 
     def user
-      @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: {user_lti_context_id: params[:id]}).take ||
-        User.active.find_by(lti_context_id: params[:id]) ||
-        User.active.find(params[:id])
+      @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: { user_lti_context_id: params[:id] }).take ||
+                 User.active.find_by(lti_context_id: params[:id]) ||
+                 User.active.find(params[:id])
     end
 
     def group
@@ -98,13 +97,13 @@ module Lti
     def user_in_context
       tool_proxy_assignments = AssignmentConfigurationToolLookup.by_tool_proxy_scope(tool_proxy).select(:assignment_id)
       user_visible_to_proxy = user.enrollments
-        .joins(course: :assignments)
-        .where(assignments: {id: tool_proxy_assignments})
-        .where.not(
-          courses: {workflow_state: 'deleted'},
-          assignments: {workflow_state: 'deleted'}
-        )
-        .exists?
+                                  .joins(course: :assignments)
+                                  .where(assignments: { id: tool_proxy_assignments })
+                                  .where.not(
+                                    courses: { workflow_state: 'deleted' },
+                                    assignments: { workflow_state: 'deleted' }
+                                  )
+                                  .exists?
       render_unauthorized_action unless user_visible_to_proxy
     end
   end

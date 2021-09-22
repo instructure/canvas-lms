@@ -19,13 +19,14 @@
 #
 
 class DeveloperKeysController < ApplicationController
-  before_action :set_key, only: [:update, :destroy ]
+  before_action :set_key, only: [:update, :destroy]
   before_action :require_manage_developer_keys
 
   include Api::V1::DeveloperKey
 
   def index
     raise ActiveRecord::RecordNotFound unless @context.root_account?
+
     respond_to do |format|
       format.html do
         set_navigation
@@ -90,23 +91,24 @@ class DeveloperKeysController < ApplicationController
 
   def index_scope
     scope = if params[:inherited].present?
-      # Return site admin keys that have been made
-      # visible to inheriting accounts
-      return DeveloperKey.none if @context.site_admin?
-      Account.site_admin.shard.activate do
-        DeveloperKey.visible.site_admin
-      end
-    elsif @context.site_admin?
-      # Return all siteadmin keys
-      if Account.site_admin.feature_enabled?(:site_admin_keys_only)
-        DeveloperKey.site_admin
-      else
-        DeveloperKey
-      end
-    else
-      # Only return keys that belong to the current account
-      DeveloperKey.where(account_id: @context.id)
-    end
+              # Return site admin keys that have been made
+              # visible to inheriting accounts
+              return DeveloperKey.none if @context.site_admin?
+
+              Account.site_admin.shard.activate do
+                DeveloperKey.visible.site_admin
+              end
+            elsif @context.site_admin?
+              # Return all siteadmin keys
+              if Account.site_admin.feature_enabled?(:site_admin_keys_only)
+                DeveloperKey.site_admin
+              else
+                DeveloperKey
+              end
+            else
+              # Only return keys that belong to the current account
+              DeveloperKey.where(account_id: @context.id)
+            end
     scope = scope.eager_load(:tool_configuration) unless params[:inherited]
     scope.nondeleted.preload(:account).order("developer_keys.id DESC")
   end

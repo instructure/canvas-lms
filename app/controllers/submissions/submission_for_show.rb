@@ -34,11 +34,11 @@ module Submissions
     private
 
     def root_submission
-      @root_submission ||= assignment.submissions.
-        except(:preload).
-        preload(versioned? ? :versions : nil).
-        where(user_id: user).
-        first_or_initialize
+      @root_submission ||= assignment.submissions
+                                     .except(:preload)
+                                     .preload(versioned? ? :versions : nil)
+                                     .where(user_id: user)
+                                     .first_or_initialize
     end
   end
 end

@@ -61,12 +61,12 @@ module Lti
     before_action :authorized_lti2_tool, :verify_service_configured
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
-      render json: {error: 'Invalid subscription'}, status: :bad_request
+      render json: { error: 'Invalid subscription' }, status: :bad_request
     end
 
     rescue_from Lti::SubscriptionsValidator::MissingCapability,
                 Lti::SubscriptionsValidator::ToolNotInContext do
-        render json: {error: 'Unauthorized subscription'}, status: :unauthorized
+      render json: { error: 'Unauthorized subscription' }, status: :unauthorized
     end
 
     def lti2_service_name
@@ -128,7 +128,6 @@ module Lti
       forward_service_response(service_response)
     end
 
-
     # @API List all Webhook Subscription for a tool proxy
     #
     # This endpoint returns a paginated list with a default limit of 100 items per result set.
@@ -148,7 +147,7 @@ module Lti
 
     def verify_service_configured
       unless Services::LiveEventsSubscriptionService.available?
-        render json: {error: 'Subscription service not configured'}, status: :internal_server_error
+        render json: { error: 'Subscription service not configured' }, status: :internal_server_error
       end
     end
 

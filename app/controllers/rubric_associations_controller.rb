@@ -110,11 +110,11 @@ class RubricAssociationsController < ApplicationController
     association_params[:id] = @association.id if @association
     @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
     json_res = {
-      :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user,
-                                                                                                 :session => session}),
+      :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => { :user => @current_user,
+                                                                                                  :session => session }),
       :rubric_association => @association.as_json(:include_root => false,
                                                   :include => %i{rubric_assessments assessment_requests},
-                                                  :permissions => {:user => @current_user, :session => session})
+                                                  :permissions => { :user => @current_user, :session => session })
     }
     render :json => json_res
   end
@@ -147,6 +147,7 @@ class RubricAssociationsController < ApplicationController
     return true if association ||
                    @context.grants_right?(@current_user, session, :manage_rubrics) ||
                    association_object && association_object.grants_right?(@current_user, session, :update)
+
     render_unauthorized_action
     false
   end
@@ -154,5 +155,4 @@ class RubricAssociationsController < ApplicationController
   def can_update_association?(association)
     !association || authorized_action(association, @current_user, :update)
   end
-
 end

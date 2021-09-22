@@ -48,4 +48,3 @@ module Submissions
     end
   end
 end
-

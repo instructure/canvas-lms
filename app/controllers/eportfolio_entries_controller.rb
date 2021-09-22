@@ -32,7 +32,7 @@ class EportfolioEntriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
 
-      page_names = @category.eportfolio_entries.map{|c| c.name}
+      page_names = @category.eportfolio_entries.map { |c| c.name }
       @page = @portfolio.eportfolio_entries.build(eportfolio_entry_params)
       @page.eportfolio_category = @category
       @page.parse_content(params)
@@ -95,7 +95,6 @@ class EportfolioEntriesController < ApplicationController
     end
   end
 
-
   def destroy
     if authorized_action(@portfolio, @current_user, :update)
       @entry = @portfolio.eportfolio_entries.find(params[:id])
@@ -118,6 +117,7 @@ class EportfolioEntriesController < ApplicationController
       unless @attachment.present?
         return render json: { message: t('errors.not_found', "Not Found") }, status: :not_found
       end
+
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
@@ -145,6 +145,7 @@ class EportfolioEntriesController < ApplicationController
   end
 
   protected
+
   def eportfolio_entry_params
     params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
   end

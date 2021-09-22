@@ -107,7 +107,7 @@ class MicrosoftSync::GroupsController < ApplicationController
     # If a non-active group exists for the course, restore it.
     # Otherwise create a new group
     new_group = (existing_group&.restore! && existing_group) ||
-      MicrosoftSync::Group.create!(course: course)
+                MicrosoftSync::Group.create!(course: course)
 
     render json: group_json(new_group), status: :created
   end
@@ -205,10 +205,10 @@ class MicrosoftSync::GroupsController < ApplicationController
 
   def group
     @group ||= MicrosoftSync::Group.not_deleted.find_by(course: course) ||
-      (raise ActiveRecord::RecordNotFound)
+               (raise ActiveRecord::RecordNotFound)
   end
 
-  def group_json(grp=nil)
+  def group_json(grp = nil)
     excludes = [:job_state]
     unless Account.site_admin.grants_right?(@current_user, :view_error_reports)
       excludes << :last_error_report_id

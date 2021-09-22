@@ -107,10 +107,11 @@ module LiveAssessments
     #
     def create
       return unless authorized_action(@assessment.results.new, @current_user, :create)
+
       reject! 'missing required key :results' unless params[:results].is_a?(Array)
 
       @results = []
-      result_hashes_by_user_id = params[:results].group_by {|result| result[:links] and result[:links][:user]}
+      result_hashes_by_user_id = params[:results].group_by { |result| result[:links] and result[:links][:user] }
       Result.transaction do
         result_hashes_by_user_id.each do |user_id, result_hashes|
           reject! 'missing required key :user' unless user_id
@@ -148,6 +149,7 @@ module LiveAssessments
     #
     def index
       return unless authorized_action(@assessment.results.new, @current_user, :read)
+
       @results = @assessment.results
       @results = @results.for_user(params[:user_id]) if params[:user_id]
       @results, meta = Api.jsonapi_paginate(@results, self, polymorphic_url([:api_v1, @context, :live_assessment_results], assessment_id: @assessment.id))

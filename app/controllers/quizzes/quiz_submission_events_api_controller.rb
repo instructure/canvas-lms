@@ -47,8 +47,8 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
 
   before_action :require_user, only: [:index]
   before_action :require_context,
-    :require_quiz,
-    :require_active_quiz_submission
+                :require_quiz,
+                :require_active_quiz_submission
 
   # @API Submit captured events
   #
@@ -127,28 +127,28 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 
-      scope = @quiz_submission.events.
-        where('attempt = :attempt AND created_at > :started_at', {
-          attempt: @quiz_submission.attempt,
-          started_at: @quiz_submission.started_at
-        }).
-        order('created_at ASC')
+      scope = @quiz_submission.events
+                              .where('attempt = :attempt AND created_at > :started_at', {
+                                       attempt: @quiz_submission.attempt,
+                                       started_at: @quiz_submission.started_at
+                                     })
+                              .order('created_at ASC')
 
       api_route = api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission)
       events = Api.paginate(scope, self, api_route)
 
       render({
-        json: {
-          quiz_submission_events: events.map do |e|
-            {
-              id: "#{e.id}",
-              event_type: e.event_type,
-              event_data: e.event_data,
-              created_at: e.created_at
-            }
-          end
-        }
-      })
+               json: {
+                 quiz_submission_events: events.map do |e|
+                   {
+                     id: "#{e.id}",
+                     event_type: e.event_type,
+                     event_data: e.event_data,
+                     created_at: e.created_at
+                   }
+                 end
+               }
+             })
     end
   end
 end

@@ -148,6 +148,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   end
 
   private
+
   def update_column(column)
     if authorized_action? column, @current_user, :manage
       if column.save

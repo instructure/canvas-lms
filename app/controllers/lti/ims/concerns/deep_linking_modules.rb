@@ -55,17 +55,18 @@ module Lti::Ims::Concerns
         } if content_item[:iframe]
 
         tag = context_module.add_item({
-          type: 'context_external_tool',
-          id: tool.id,
-          new_tab: 0,
-          indent: 0,
-          url: content_item[:url],
-          title: content_item[:title],
-          position: 1,
-          link_settings: launch_dimensions,
-          custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
-        })
+                                        type: 'context_external_tool',
+                                        id: tool.id,
+                                        new_tab: 0,
+                                        indent: 0,
+                                        url: content_item[:url],
+                                        title: content_item[:title],
+                                        position: 1,
+                                        link_settings: launch_dimensions,
+                                        custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
+                                      })
         return render :json => tag.errors, :status => :bad_request unless tag&.valid?
+
         @context.touch
       end
     end

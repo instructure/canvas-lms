@@ -54,9 +54,10 @@ class AnnouncementsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :read)
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+
     redirect_to named_context_url(@context, :context_url) if @context.is_a?(Course) && @context.elementary_homeroom_course?
 
-    log_asset_access([ "announcements", @context ], "announcements", "other")
+    log_asset_access(["announcements", @context], "announcements", "other")
     respond_to do |format|
       format.html do
         add_crumb(t(:announcements_crumb, "Announcements"))
@@ -77,11 +78,11 @@ class AnnouncementsController < ApplicationController
         end
         if feed_key
           if @context.is_a?(Course)
-            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_course, "Course Announcements Atom Feed")})
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_course, "Course Announcements Podcast Feed")})
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_course, "Course Announcements Atom Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_course, "Course Announcements Podcast Feed") })
           elsif @context.is_a?(Group)
-            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_group, "Group Announcements Atom Feed")})
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_group, "Group Announcements Podcast Feed")})
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_group, "Group Announcements Atom Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_group, "Group Announcements Podcast Feed") })
           end
         end
       end
@@ -95,8 +96,8 @@ class AnnouncementsController < ApplicationController
   def public_feed
     return unless get_feed_context
 
-    announcements = @context.announcements.published.by_posted_at.limit(15).
-      select{|a| a.visible_for?(@current_user) }
+    announcements = @context.announcements.published.by_posted_at.limit(15)
+                            .select { |a| a.visible_for?(@current_user) }
 
     respond_to do |format|
       format.atom do

@@ -104,7 +104,6 @@ class ContentSharesController < ApplicationController
     render json: { message: "You cannot create or modify other users' content shares" }, status: :forbidden unless @user == @current_user
   end
 
-
   # @API Create a content share
   # Share content directly between two or more users
   #
@@ -131,11 +130,12 @@ class ContentSharesController < ApplicationController
     create_params = params.permit(:content_type, :content_id)
     allowed_types = ['assignment', 'attachment', 'discussion_topic', 'page', 'quiz', 'module', 'module_item']
     unless create_params[:content_type] && create_params[:content_id]
-      return render(json: { message: 'Content type and id required'}, status: :bad_request)
+      return render(json: { message: 'Content type and id required' }, status: :bad_request)
     end
     unless allowed_types.include?(create_params[:content_type])
       return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(',')}" }, status: :bad_request)
     end
+
     content_type = ContentShare::TYPE_TO_CLASS[create_params[:content_type]]
     content = content_type&.where(id: create_params[:content_id])
     content = if content_type.respond_to? :not_deleted
@@ -145,14 +145,14 @@ class ContentSharesController < ApplicationController
               end
     content = content&.where(tag_type: 'context_module') if content_type == ContentTag
     content = content&.take
-    return render(json: { message: 'Requested share content not found'}, status: :bad_request) unless content
+    return render(json: { message: 'Requested share content not found' }, status: :bad_request) unless content
 
     export_params = ActionController::Parameters.new(skip_notifications: true,
-      select: {create_params[:content_type].pluralize => [create_params[:content_id]]},
-      export_type: ContentExport::COMMON_CARTRIDGE)
+                                                     select: { create_params[:content_type].pluralize => [create_params[:content_id]] },
+                                                     export_type: ContentExport::COMMON_CARTRIDGE)
     export = create_content_export_from_api(export_params, content.context, @current_user)
     return unless export.class == ContentExport
-    return render(json: { message: 'Unable to export content'}, status: :bad_request) unless export.id
+    return render(json: { message: 'Unable to export content' }, status: :bad_request) unless export.id
 
     name = Context.asset_name(content)
     sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: 'read')

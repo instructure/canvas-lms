@@ -32,7 +32,7 @@ class WikiPagesController < ApplicationController
 
   include K5Mode
 
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
+  add_crumb(proc { t '#crumbs.wiki_pages', "Pages" }) do |c|
     context = c.instance_variable_get('@context')
     current_user = c.instance_variable_get('@current_user')
     if context.grants_right?(current_user, :read)
@@ -79,7 +79,7 @@ class WikiPagesController < ApplicationController
   def index
     GuardRail.activate(:secondary) do
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
-        log_asset_access([ "pages", @context ], "pages", "other")
+        log_asset_access(["pages", @context], "pages", "other")
         js_env((ConditionalRelease::Service.env_for(@context)))
         wiki_pages_js_env(@context)
         set_tutorial_js_env
@@ -128,7 +128,7 @@ class WikiPagesController < ApplicationController
       js_env(ConditionalRelease::Service.env_for(@context))
       wiki_pages_js_env(@context)
       if !ConditionalRelease::Service.enabled_in_context?(@context) ||
-        enforce_assignment_visible(@page)
+         enforce_assignment_visible(@page)
         add_crumb(@page.title)
         @padless = true
       end
@@ -158,7 +158,7 @@ class WikiPagesController < ApplicationController
 
   def show_redirect
     redirect_to polymorphic_url([@context, @page], :titleize => params[:titleize],
-                                :module_item_id => params[:module_item_id]), status: :moved_permanently
+                                                   :module_item_id => params[:module_item_id]), status: :moved_permanently
   end
 
   def revisions_redirect
@@ -166,13 +166,14 @@ class WikiPagesController < ApplicationController
   end
 
   private
+
   def wiki_pages_js_env(context)
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
     wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
       :wiki_index_menu_tools => wiki_index_menu_tools,
-      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}) && !@k5_details_view,
+      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, { no_render: true }) && !@k5_details_view,
       :CAN_SET_TODO_DATE => context.grants_right?(@current_user, session, :manage_content)
     }
     js_env(@wiki_pages_env)

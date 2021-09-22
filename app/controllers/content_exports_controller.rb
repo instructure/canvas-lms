@@ -40,7 +40,7 @@ class ContentExportsController < ApplicationController
     if params[:id].present? && (export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first)
       render_export(export)
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
+      render :json => { :errors => { :base => t('errors.not_found', "Export does not exist") } }, :status => :not_found
     end
   end
 
@@ -68,7 +68,7 @@ class ContentExportsController < ApplicationController
         export.export
         render_export(export)
       else
-        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create content export.")}
+        render :json => { :error_message => t('errors.couldnt_create', "Couldn't create content export.") }
       end
     else
       # an export is already running, just return it
@@ -79,9 +79,9 @@ class ContentExportsController < ApplicationController
   def destroy
     if params[:id].present? && export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first
       export.destroy
-      render :json => {:success=>'true'}
+      render :json => { :success => 'true' }
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
+      render :json => { :errors => { :base => t('errors.not_found', "Export does not exist") } }, :status => :not_found
     end
   end
 
@@ -97,7 +97,7 @@ class ContentExportsController < ApplicationController
   private
 
   def render_export(export)
-    json = export.as_json(:only => [:id, :progress, :workflow_state],:methods => [:error_message])
+    json = export.as_json(:only => [:id, :progress, :workflow_state], :methods => [:error_message])
     json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
     render :json => json
   end

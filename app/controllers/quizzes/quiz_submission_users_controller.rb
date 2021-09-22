@@ -88,6 +88,7 @@ module Quizzes
 
     def index
       return unless user_has_teacher_level_access?
+
       @users = index_users
       includes = Array(params[:include])
       @users, meta = Api.jsonapi_paginate(@users, self, index_base_url, params)
@@ -96,14 +97,14 @@ module Quizzes
       end
       UserPastLtiId.manual_preload_past_lti_ids(@users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
       users_json = Canvas::APIArraySerializer.new(@users, {
-        quiz: @quiz,
-        root: :users,
-        meta: meta,
-        quiz_submissions: quiz_submissions,
-        includes: includes,
-        controller: self,
-        each_serializer: Quizzes::QuizSubmissionUserSerializer
-      })
+                                                    quiz: @quiz,
+                                                    root: :users,
+                                                    meta: meta,
+                                                    quiz_submissions: quiz_submissions,
+                                                    includes: includes,
+                                                    controller: self,
+                                                    each_serializer: Quizzes::QuizSubmissionUserSerializer
+                                                  })
       render json: users_json.as_json
     end
 
@@ -140,6 +141,7 @@ module Quizzes
     # }
     def message
       return unless user_has_teacher_level_access?
+
       @conversation = Array(params[:conversations]).first
       if @conversation
         send_message
@@ -150,6 +152,7 @@ module Quizzes
     end
 
     private
+
     def index_base_url
       if submitted_param?
         api_v1_course_quiz_submission_users_url(

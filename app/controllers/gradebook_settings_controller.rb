@@ -59,7 +59,7 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_setting_key,
       :sort_rows_by_direction,
       :view_ungraded_as_zero,
-      { colors: [ :late, :missing, :resubmitted, :dropped, :excused ] }
+      { colors: [:late, :missing, :resubmitted, :dropped, :excused] }
     )
     gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]
     gradebook_settings_params.permit!
@@ -73,12 +73,12 @@ class GradebookSettingsController < ApplicationController
     massaged_hash = {}
     hash.each do |key, value|
       massaged_hash[key] = if value == 'null'
-        nil
-      elsif value.is_a? Hash
-        nilify_strings(value)
-      else
-        value
-      end
+                             nil
+                           elsif value.is_a? Hash
+                             nilify_strings(value)
+                           else
+                             value
+                           end
     end
     massaged_hash
   end

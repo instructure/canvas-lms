@@ -336,11 +336,11 @@ class DiscussionTopicsController < ApplicationController
 
     scope = scope.unread_for(@current_user) if params[:filter_by] == "unread"
 
-    states = params[:scope].split(',').map{|s| s.strip} if params[:scope]
+    states = params[:scope].split(',').map { |s| s.strip } if params[:scope]
     if states.present?
       if (states.include?('pinned') && states.include?('unpinned')) ||
-          (states.include?('locked') && states.include?('unlocked'))
-        render json: {errors: {scope: "scope is contradictory"}}, :status => :bad_request
+         (states.include?('locked') && states.include?('unlocked'))
+        render json: { errors: { scope: "scope is contradictory" } }, :status => :bad_request
         return
       end
 
@@ -371,7 +371,7 @@ class DiscussionTopicsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        log_asset_access([ "topics", @context ], 'topics', 'other')
+        log_asset_access(["topics", @context], 'topics', 'other')
 
         set_active_tab 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),
@@ -398,7 +398,7 @@ class DiscussionTopicsController < ApplicationController
 
         discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
         discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
-          discussion_topics_fetch_url.gsub(fetch_params[:page], (i+1).to_s)
+          discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
         end
         discussion_topics_urls_to_prefetch.each_with_index do |url, i|
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
@@ -426,8 +426,8 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin]
-        }, true)
+                 DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin]
+               }, true)
         set_tutorial_js_env
 
         if user_can_edit_course_settings?
@@ -438,7 +438,7 @@ class DiscussionTopicsController < ApplicationController
         @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
 
         feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), { :title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed") })
 
         js_bundle :discussion_topics_index
         css_bundle :discussions_index
@@ -446,21 +446,21 @@ class DiscussionTopicsController < ApplicationController
         render html: '', layout: true
       end
       format.json do
-        log_api_asset_access([ "topics", @context ], 'topics', 'other')
+        log_api_asset_access(["topics", @context], 'topics', 'other')
         if @context.grants_right?(@current_user, session, :moderate_forum)
           mc_status = setup_master_course_restrictions(@topics, @context)
         end
         root_topic_fields = [:delayed_post_at, :lock_at]
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
-          user_can_moderate: user_can_moderate,
-          plain_messages: value_to_boolean(params[:plain_messages]),
-          exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
-          include_all_dates: include_params.include?('all_dates'),
-          :include_sections => include_params.include?('sections'),
-          :include_sections_user_count => include_params.include?('sections_user_count'),
-          :include_overrides => include_params.include?('overrides'),
-          master_course_status: mc_status,
-          root_topic_fields: root_topic_fields)
+                                                user_can_moderate: user_can_moderate,
+                                                plain_messages: value_to_boolean(params[:plain_messages]),
+                                                exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
+                                                include_all_dates: include_params.include?('all_dates'),
+                                                :include_sections => include_params.include?('sections'),
+                                                :include_sections_user_count => include_params.include?('sections_user_count'),
+                                                :include_overrides => include_params.include?('overrides'),
+                                                master_course_status: mc_status,
+                                                root_topic_fields: root_topic_fields)
       end
     end
   end
@@ -474,6 +474,7 @@ class DiscussionTopicsController < ApplicationController
 
   def announcements_locked?
     return false unless @context.is_a?(Course)
+
     @context.lock_all_announcements?
   end
 
@@ -496,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
     can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
-    hash =  {
+    hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
         CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create),
@@ -519,7 +520,7 @@ class DiscussionTopicsController < ApplicationController
         @current_user,
         session,
         override_dates: false,
-        include_usage_rights:  include_usage_rights
+        include_usage_rights: include_usage_rights
       )
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
@@ -540,7 +541,7 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
         (assignment_overrides_json(
           @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
-          ))
+        ))
       hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
     end
 
@@ -557,16 +558,16 @@ class DiscussionTopicsController < ApplicationController
       elsif section_visibilities == :all
         @context.course_sections.active.to_a
       else
-        @context.course_sections.select{ |s| s.active? && section_visibilities.include?(s.id) }
+        @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
       end
 
     js_hash = {
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
-      GROUP_CATEGORIES: categories.
-         reject(&:student_organized?).
-         map { |category| { id: category.id, name: category.name } },
+      GROUP_CATEGORIES: categories
+              .reject(&:student_organized?)
+              .map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
@@ -587,7 +588,7 @@ class DiscussionTopicsController < ApplicationController
 
     if @topic.is_section_specific && @context.is_a?(Course)
       selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
-      js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
+      js_hash['SELECTED_SECTION_LIST'] = sections.select { |s| selected_section_ids.include?(s.id) }.map do |section|
         {
           id: section.id,
           name: section.name
@@ -621,7 +622,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
     end
     if context.is_a?(Course)
-      js_hash[:allow_self_signup] = true  # for group creation
+      js_hash[:allow_self_signup] = true # for group creation
       js_hash[:group_user_type] = 'student'
     end
     js_env(js_hash)
@@ -667,11 +668,11 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access(@topic, 'topics', 'topics')
 
       if @sequence_asset
-        js_env({SEQUENCE: {
-          :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
-          :ASSET_ID => @sequence_asset.id,
-          :COURSE_ID => @sequence_asset.context.id,
-        }})
+        js_env({ SEQUENCE: {
+                 :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
+                 :ASSET_ID => @sequence_asset.id,
+                 :COURSE_ID => @sequence_asset.context.id,
+               } })
       end
       js_env({
                course_id: params[:course_id],
@@ -681,7 +682,7 @@ class DiscussionTopicsController < ApplicationController
                rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
-               DISCUSSION: {GRADED_RUBRICS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil}
+               DISCUSSION: { GRADED_RUBRICS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil }
              })
       js_bundle :discussion_topics_post
       css_bundle :discussions_index
@@ -710,13 +711,12 @@ class DiscussionTopicsController < ApplicationController
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params) }
         else
           format.html do
-
             @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
 
             if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
-                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
-                group(:course_section_id).count
+                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access
+                                      .group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
                 cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
               end
@@ -732,7 +732,7 @@ class DiscussionTopicsController < ApplicationController
                 :ID => @topic.id,
                 :TITLE => @topic.title,
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
-                :IS_PUBLISHED  => @topic.published?,
+                :IS_PUBLISHED => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
                 :IS_ANNOUNCEMENT => @topic.is_announcement,
                 :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
@@ -741,18 +741,18 @@ class DiscussionTopicsController < ApplicationController
                 # Can reply
                 :CAN_REPLY =>
                   @topic.grants_right?(@current_user, session, :reply) &&
-                    !@topic.homeroom_announcement?(@context),
+                  !@topic.homeroom_announcement?(@context),
                 # Can attach files on replies
-                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
-                :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
+                :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
+                :CAN_RATE => @topic.grants_right?(@current_user, session, :rate),
                 :CAN_READ_REPLIES =>
-                  @topic.grants_right?(@current_user, :read_replies)  &&
-                    !@topic.homeroom_announcement?(@context),
+                  @topic.grants_right?(@current_user, :read_replies) &&
+                  !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
-                :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                  !@topic.locked_for?(@current_user, :check_policies => true),
+                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                                   !@topic.locked_for?(@current_user, :check_policies => true),
                 # Can moderate any topic
-                :MODERATE         => user_can_moderate
+                :MODERATE => user_can_moderate
               },
               :ROOT_URL => "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
               :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
@@ -795,18 +795,18 @@ class DiscussionTopicsController < ApplicationController
             end
             @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
             if @topic.for_assignment? && @presenter.allows_speed_grader? &&
-              @assignment_presenter.can_view_speed_grader_link?(@current_user)
+               @assignment_presenter.can_view_speed_grader_link?(@current_user)
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
                                                                       :speed_grader_context_gradebook_url,
                                                                       assignment_id: @topic.assignment.id,
                                                                       student_id: ":student_id")
             end
 
-            js_hash = {:DISCUSSION => env_hash}
+            js_hash = { :DISCUSSION => env_hash }
             if @context.is_a?(Course)
               GuardRail.activate(:secondary) do
-                js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
-                  active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
+                js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake
+                                                   .active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
               end
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
@@ -820,14 +820,14 @@ class DiscussionTopicsController < ApplicationController
             css_bundle :tinymce, :discussions, :learning_outcomes
 
             if @context_enrollment
-              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), { :title => t(:discussion_atom_feed_title, "Discussion Atom Feed") })
               if @topic.podcast_enabled
-                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), { :title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
               end
             elsif @context.available?
-              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), { :title => t(:discussion_atom_feed_title, "Discussion Atom Feed") })
               if @topic.podcast_enabled
-                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), { :title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
               end
             end
 
@@ -837,6 +837,7 @@ class DiscussionTopicsController < ApplicationController
       end
     else
       return render_unauthorized_action unless @current_user
+
       respond_to do |format|
         if @topic.is_announcement
           flash[:error] = t 'You do not have access to the requested announcement.'
@@ -1044,13 +1045,14 @@ class DiscussionTopicsController < ApplicationController
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
     if authorized_action(@topic, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@topic)
+
       @topic.destroy
       respond_to do |format|
         format.html {
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
           redirect_to named_context_url(@context, @topic.is_announcement ? :context_announcements_url : :context_discussion_topics_url)
         }
-        format.json  { render :json => @topic.as_json(:include => {:user => {:only => :name} } ), :status => :ok }
+        format.json { render :json => @topic.as_json(:include => { :user => { :only => :name } }), :status => :ok }
       end
     end
   end
@@ -1065,10 +1067,10 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics.
-      select{|dt| dt.visible_for?(@current_user) }
+    @entries.concat @context.discussion_topics
+                            .select { |dt| dt.visible_for?(@current_user) }
     @entries.concat @context.discussion_entries.active
-    @entries = @entries.sort_by{|e| e.updated_at}
+    @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
       feed.entries << entry.to_atom
     end
@@ -1094,7 +1096,7 @@ class DiscussionTopicsController < ApplicationController
       reject! "topics not found" unless topics.length == order.length
       topics[0].update_order(order)
       new_order = pinned_topics.by_position.pluck(:id).map(&:to_s)
-      render :json => {:reorder => true, :order => new_order}, :status => :ok
+      render :json => { :reorder => true, :order => new_order }, :status => :ok
     end
   end
 
@@ -1110,7 +1112,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def add_discussion_or_announcement_crumb
-    if  @topic.is_a? Announcement
+    if @topic.is_a? Announcement
       set_active_tab "announcements"
       add_crumb t('#crumbs.announcements', "Announcements"), named_context_url(@context, :context_announcements_url)
     else
@@ -1131,13 +1133,12 @@ class DiscussionTopicsController < ApplicationController
   API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w(title message discussion_type podcast_enabled pinned todo_date
                                           allow_rating only_graders_can_rate sort_by_rating).freeze
 
-
   def set_sections
     if params[:specific_sections] != "all"
       @topic.is_section_specific = true
       section_ids = params[:specific_sections]
       section_ids = section_ids.split(",") if section_ids.is_a?(String)
-      new_section_ids = section_ids.map{|id| Shard.relative_id_for(id, Shard.current, Shard.current)}.sort
+      new_section_ids = section_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) }.sort
       if @topic.course_sections.pluck(:id).sort != new_section_ids
         @topic.course_sections = CourseSection.find(new_section_ids)
         @topic.sections_changed = true
@@ -1149,6 +1150,7 @@ class DiscussionTopicsController < ApplicationController
 
   def verify_specific_section_visibilities
     return unless @topic.is_section_specific && @context.is_a?(Course)
+
     visibilities = @context.course_section_visibility(@current_user)
 
     invalid_sections =
@@ -1179,10 +1181,10 @@ class DiscussionTopicsController < ApplicationController
     @errors = {}
 
     model_type = if value_to_boolean(params[:is_announcement]) &&
-        @context.announcements.temp_record.grants_right?(@current_user, session, :create)
-                    :announcements
+                    @context.announcements.temp_record.grants_right?(@current_user, session, :create)
+                   :announcements
                  else
-                    :discussion_topics
+                   :discussion_topics
                  end
 
     if is_new
@@ -1244,7 +1246,7 @@ class DiscussionTopicsController < ApplicationController
     process_todo_parameters()
 
     if @errors.present?
-      render :json => {errors: @errors}, :status => :bad_request
+      render :json => { errors: @errors }, :status => :bad_request
     else
       @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
@@ -1289,7 +1291,7 @@ class DiscussionTopicsController < ApplicationController
                                                     {
                                                       include_sections: true,
                                                       include_sections_user_count: true,
-                                                      include_usage_rights:  include_usage_rights
+                                                      include_usage_rights: include_usage_rights
                                                     })
         else
           render :json => discussion_topic_api_json(@topic,
@@ -1304,7 +1306,7 @@ class DiscussionTopicsController < ApplicationController
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
         errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
-        render :json => {errors: errors}, :status => :bad_request
+        render :json => { errors: errors }, :status => :bad_request
       end
     end
   end
@@ -1325,9 +1327,10 @@ class DiscussionTopicsController < ApplicationController
       return
     end
     return unless params[:todo_date]
+
     if !authorized_action(@topic.context, @current_user, :manage_content)
       @errors[:todo_date] = t(:error_todo_date_unauthorized,
-        "You do not have permission to add this topic to the student to-do list.")
+                              "You do not have permission to add this topic to the student to-do list.")
     elsif (@topic.assignment || params[:assignment]) && !remove_assign
       @errors[:todo_date] = t(:error_todo_date_assignment, 'Date cannot be added if discussion topic is graded')
     end
@@ -1335,6 +1338,7 @@ class DiscussionTopicsController < ApplicationController
 
   def prefer_assignment_availability_dates(discussion_topic_hash)
     return unless params[:assignment]
+
     discussion_topic_hash['delayed_post_at'] = nil if params[:assignment].has_key?(:unlock_at)
     discussion_topic_hash['lock_at'] = nil if params[:assignment].has_key?(:lock_at)
   end
@@ -1365,6 +1369,7 @@ class DiscussionTopicsController < ApplicationController
   def save_lock_preferences
     return if @current_user.nil?
     return if !params.key?(:locked) || params[:locked].is_a?(Hash)
+
     should_lock = value_to_boolean(params[:locked])
     @current_user.create_announcements_unlocked(!should_lock)
     @current_user.save
@@ -1402,7 +1407,7 @@ class DiscussionTopicsController < ApplicationController
           @errors[:published] = t(:error_draft_state_unauthorized, "You do not have permission to set this topic to draft state.")
         end
       end
-    elsif @topic.new_record? && !@topic.is_announcement &&  user_can_moderate
+    elsif @topic.new_record? && !@topic.is_announcement && user_can_moderate
       @topic.unpublish
     end
   end
@@ -1441,8 +1446,10 @@ class DiscussionTopicsController < ApplicationController
   # check_scope will probably handle this
   def process_pin_parameters(discussion_topic_hash)
     return unless params.key?(:pinned)
+
     pinned = value_to_boolean(params[:pinned])
     return unless pinned != @topic.pinned?
+
     @topic.pinned = pinned
     @topic.position = nil
     @topic.add_to_list_bottom
@@ -1467,7 +1474,7 @@ class DiscussionTopicsController < ApplicationController
                    params[:attachment]
 
       return if attachment && attachment.size > 1.kilobytes &&
-        quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
+                quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
 
       if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
         @topic.transaction do
@@ -1496,7 +1503,7 @@ class DiscussionTopicsController < ApplicationController
     return if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
     attachment.usage_rights = @context.usage_rights.find_or_create_by(
-      use_justification:'own_copyright',
+      use_justification: 'own_copyright',
       legal_copyright: ''
     )
   end
@@ -1530,7 +1537,7 @@ class DiscussionTopicsController < ApplicationController
 
       if !hash[:assignment].nil?
         if params[:due_at]
-          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at]
+          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null" ? nil : params[:due_at]
         end
         hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
         hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]
@@ -1545,8 +1552,8 @@ class DiscussionTopicsController < ApplicationController
     if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
       override_groups = @groups.joins("INNER JOIN #{AssignmentOverride.quoted_table_name}
             ON assignment_overrides.set_type = 'Group' AND assignment_overrides.set_id = groups.id")
-        .merge(AssignmentOverride.active)
-        .where(assignment_overrides: { assignment_id: @topic.assignment_id })
+                               .merge(AssignmentOverride.active)
+                               .where(assignment_overrides: { assignment_id: @topic.assignment_id })
       @groups = override_groups if override_groups.present?
     end
     topics = @topic.child_topics

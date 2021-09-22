@@ -43,17 +43,17 @@ module Lti::Ims::Providers
       # in case response serialization should ever need it. E.g. in NRPS v1, pagination
       # links went in the response body.
       {
-          memberships: memberships,
-          context: context,
-          assignment: assignment,
-          api_metadata: api_metadata,
-          controller: controller,
-          tool: tool,
-          opts: {
-            rlid: rlid,
-            role: role,
-            limit: limit
-          }.compact
+        memberships: memberships,
+        context: context,
+        assignment: assignment,
+        api_metadata: api_metadata,
+        controller: controller,
+        tool: tool,
+        opts: {
+          rlid: rlid,
+          role: role,
+          limit: limit
+        }.compact
       }
     end
 
@@ -83,6 +83,7 @@ module Lti::Ims::Providers
 
     def validate!
       return if !rlid? || (rlid == course_rlid)
+
       validate_tool_for_assignment!
     end
 
@@ -92,6 +93,7 @@ module Lti::Ims::Providers
 
     def resource_link
       return nil unless rlid?
+
       @resource_link ||= begin
         rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
         # context here is a decorated context, we want the original
@@ -130,11 +132,12 @@ module Lti::Ims::Providers
     def assignment
       @_assignment ||= begin
         return nil unless rlid?
-        Assignment.active.for_course(course.id).
-          joins(line_items: :resource_link).
-          where(lti_resource_links: { id: resource_link&.id }).
-          distinct.
-          take
+
+        Assignment.active.for_course(course.id)
+                  .joins(line_items: :resource_link)
+                  .where(lti_resource_links: { id: resource_link&.id })
+                  .distinct
+                  .take
       end
     end
 

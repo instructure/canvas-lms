@@ -31,8 +31,9 @@ module ConditionalRelease
       rule = get_rule
       student_id = params[:student_id]
       unless student_id.present?
-        return render :json => {:message => "student_id required"}, :status => :bad_request
+        return render :json => { :message => "student_id required" }, :status => :bad_request
       end
+
       render json: Stats.student_details(rule, student_id)
     end
 
@@ -48,7 +49,7 @@ module ConditionalRelease
 
     def require_trigger_assignment
       unless params[:trigger_assignment].present?
-        return render :json => {:message => "trigger_assignment required"}, :status => :bad_request
+        return render :json => { :message => "trigger_assignment required" }, :status => :bad_request
       end
     end
   end

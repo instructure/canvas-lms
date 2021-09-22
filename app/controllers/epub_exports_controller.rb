@@ -101,7 +101,7 @@ class EpubExportsController < ApplicationController
 
   def check_feature_enabled
     if !@domain_root_account.feature_allowed?(:epub_export) ||
-      @domain_root_account.enable_offline_web_export?
+       @domain_root_account.enable_offline_web_export?
       respond_to do |format|
         format.html do
           render status: 404, template: 'shared/errors/404_message'
@@ -153,8 +153,8 @@ class EpubExportsController < ApplicationController
         format.json do
           @course.latest_epub_export = @service.offline_export
           render({
-            status: status, json: course_epub_export_json(@course)
-          })
+                   status: status, json: course_epub_export_json(@course)
+                 })
         end
       end
     end
