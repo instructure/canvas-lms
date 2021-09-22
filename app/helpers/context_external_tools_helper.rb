@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ContextExternalToolsHelper
-  def external_tools_menu_items(tools, options={})
+  def external_tools_menu_items(tools, options = {})
     markup = tools.map do |tool|
       external_tool_menu_item_tag(tool, options)
     end
     raw(markup.join(''))
   end
 
-  def external_tool_menu_item_tag(tool, options={})
+  def external_tool_menu_item_tag(tool, options = {})
     defaults = {
       show_icon: true,
       in_list: false,
@@ -45,7 +45,7 @@ module ContextExternalToolsHelper
       tool[:base_url] = parsed.to_s
     end
 
-    link_attrs =  {
+    link_attrs = {
       :href => tool[:base_url],
       "data-tool-id" => tool[:id],
       "data-tool-launch-type" => options[:settings_key]
@@ -53,7 +53,7 @@ module ContextExternalToolsHelper
 
     link_attrs[:class] = options[:link_class] if options[:link_class]
     link = content_tag(:a, link_attrs) do
-      concat(render(partial: 'external_tools/helpers/icon', locals: {tool: tool})) if options[:show_icon]
+      concat(render(partial: 'external_tools/helpers/icon', locals: { tool: tool })) if options[:show_icon]
       concat(tool[:title])
     end
 

@@ -32,7 +32,7 @@ class Mutations::DeleteCommentBankItem < Mutations::BaseMutation
     context[:deleted_models][:comment_bank_item] = record
 
     if record.destroy
-      {comment_bank_item_id: record.id}
+      { comment_bank_item_id: record.id }
     else
       raise GraphQL::ExecutionError, I18n.t('Unable to delete CommentBankItem')
     end

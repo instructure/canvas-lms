@@ -28,9 +28,9 @@ module ContentExportApiHelper
     # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
     if params[:select]
       selected_content = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
-        for_content_export: true,
-        return_asset_strings: params[:export_type] == ContentExport::ZIP,
-        global_identifiers: export.can_use_global_identifiers?)
+                                                              for_content_export: true,
+                                                              return_asset_strings: params[:export_type] == ContentExport::ZIP,
+                                                              global_identifiers: export.can_use_global_identifiers?)
     end
 
     case params[:export_type]
@@ -43,7 +43,7 @@ module ContentExportApiHelper
     when 'quizzes2'
       if params[:quiz_id].nil? || params[:quiz_id] !~ Api::ID_REGEX
         return render json: { message: 'quiz_id required and must be a valid ID' },
-          status: :bad_request
+                      status: :bad_request
       elsif !context.quizzes.exists?(params[:quiz_id])
         return render json: { message: 'Quiz could not be found' }, status: :bad_request
       else

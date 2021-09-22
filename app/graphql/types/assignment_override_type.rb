@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -78,8 +79,8 @@ module Types
     field :title, String, null: true
 
     field :set, AssignmentOverrideSetUnion,
-      "This object specifies what students this override applies to",
-      null: true
+          "This object specifies what students this override applies to",
+          null: true
     def set
       if override.set_type == "ADHOC"
         override

@@ -38,10 +38,11 @@ module StreamItemsHelper
 
     topic_types = %w{DiscussionTopic Announcement}
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select{|i| topic_types.include?(i.asset_type)}.map{|item| item.data }, :context)
+      stream_items.select { |i| topic_types.include?(i.asset_type) }.map { |item| item.data }, :context
+    )
 
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map{|item| item.data }, discussion_topic: :context
+      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map { |item| item.data }, discussion_topic: :context
     )
     topic_types << 'DiscussionEntry'
 
@@ -55,6 +56,7 @@ module StreamItemsHelper
         participant = user.conversation_participant(item.asset_id)
 
         next if participant.nil? || participant.last_message.nil? || participant.last_author?
+
         item.participant = participant
 
         # because we're cheating and just checking unread here instead of using
@@ -78,7 +80,7 @@ module StreamItemsHelper
     presenter = StreamItemPresenter.new
     # need to store stream item id relative to the user's shard, since we'll
     # use it later to look up the user's StreamItemInstances for deletion
-    presenter.stream_item_id = user.shard.activate{ item.id }
+    presenter.stream_item_id = user.shard.activate { item.id }
     presenter.updated_at = extract_updated_at(category, item, user)
     presenter.updated_at ||= item.updated_at
     presenter.unread = item.unread
@@ -101,7 +103,7 @@ module StreamItemsHelper
     case category
     when "Announcement", "DiscussionTopic"
       polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
-                       => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
+                                                                                                                                => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
     when "DiscussionEntry"
       polymorphic_path([item.context_type.underscore.to_sym, :discussion_topic],
                        :"#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id),
@@ -110,7 +112,7 @@ module StreamItemsHelper
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
       polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
-                       => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.context_id))
+                                                                                                                                => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.context_id))
     when "AssessmentRequest"
       submission = item.data.asset
       Submission::ShowPresenter.new(
@@ -158,7 +160,7 @@ module StreamItemsHelper
       # TODO I18N should use placeholders, not concatenation
       asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
     when "DiscussionEntry"
-      I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title']})
+      I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title'] })
     else
       nil
     end

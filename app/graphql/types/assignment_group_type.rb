@@ -38,9 +38,9 @@ module Types
       graphql_name "GradesEnrollmentFilter"
 
       argument :enrollment_ids, [ID],
-        "only include users with the given enrollment ids",
-        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Enrollment"),
-        required: false
+               "only include users with the given enrollment ids",
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Enrollment"),
+               required: false
     end
 
     global_id_field :id

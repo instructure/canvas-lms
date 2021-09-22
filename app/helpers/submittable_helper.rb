@@ -20,7 +20,7 @@
 module SubmittableHelper
   def check_differentiated_assignments(submittable)
     return render_unauthorized_action if submittable.for_assignment? &&
-      !submittable.assignment.visible_to_user?(@current_user)
+                                         !submittable.assignment.visible_to_user?(@current_user)
   end
 
   def enforce_assignment_visible(submittable)
@@ -39,7 +39,7 @@ module SubmittableHelper
     # handle creating/deleting assignment
     if assignment_params
       if assignment_params.key?(:set_assignment) &&
-        !value_to_boolean(assignment_params[:set_assignment])
+         !value_to_boolean(assignment_params[:set_assignment])
         if submittable.assignment && submittable.assignment.grants_right?(@current_user, session, :update)
           assignment = submittable.assignment
           submittable.assignment = nil

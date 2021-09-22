@@ -43,7 +43,7 @@ module Quizzes
       # whether any of the participants has taken the quiz more than one time
       :multiple_attempts_exist,
 
-       # the time of the generation of the analysis (the earliest one)
+      # the time of the generation of the analysis (the earliest one)
       :generated_at,
 
       # whether the statistics were based on earlier and current quiz submissions
@@ -77,11 +77,11 @@ module Quizzes
     ]
 
     def_delegators :@controller,
-      :course_quiz_statistics_url,
-      :api_v1_course_quiz_url,
-      :api_v1_course_quiz_statistics_url,
-      :speed_grader_course_gradebook_url,
-      :course_quiz_quiz_submissions_url
+                   :course_quiz_statistics_url,
+                   :api_v1_course_quiz_url,
+                   :api_v1_course_quiz_statistics_url,
+                   :speed_grader_course_gradebook_url,
+                   :course_quiz_quiz_submissions_url
 
     has_one :quiz, embed: :ids
 
@@ -138,7 +138,7 @@ module Quizzes
     end
 
     def generated_at
-      [ object[:student_analysis], object[:item_analysis] ].map(&:created_at).min
+      [object[:student_analysis], object[:item_analysis]].map(&:created_at).min
     end
 
     def multiple_attempts_exist
@@ -164,8 +164,8 @@ module Quizzes
     def speed_grader_url
       if show_speed_grader?
         speed_grader_course_gradebook_url(quiz.context, {
-          assignment_id: quiz.assignment.id
-        })
+                                            assignment_id: quiz.assignment.id
+                                          })
       end
     end
 

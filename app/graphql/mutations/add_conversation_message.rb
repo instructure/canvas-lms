@@ -75,13 +75,13 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
     )
     if conversation.should_process_immediately?
       message = conversation.process_new_message(message_args, recipients, message_ids, tags)
-      return {conversation_message: message}
+      return { conversation_message: message }
     else
-      conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").
-        process_new_message(message_args, recipients, message_ids, tags)
+      conversation.delay(strand: "add_message_#{conversation.global_conversation_id}")
+                  .process_new_message(message_args, recipients, message_ids, tags)
       # The message is delayed and will be processed later so there is nothing to return
       # right now. If there is no error, success can be assumed.
-      return {conversation_message: nil}
+      return { conversation_message: nil }
     end
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'

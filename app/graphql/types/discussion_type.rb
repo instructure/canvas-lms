@@ -211,6 +211,7 @@ module Types
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
       return [] if object.initial_post_required?(current_user, session)
+
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         search_term: search_term,

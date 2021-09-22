@@ -93,6 +93,6 @@ class PacePlanPresenter
 
   def pace_plan_module_items
     @pace_plan_module_items ||= pace_plan.pace_plan_module_items.preload(module_item: [:context_module])
-      .group_by { |ppmi| ppmi.module_item.context_module }
+                                         .group_by { |ppmi| ppmi.module_item.context_module }
   end
 end

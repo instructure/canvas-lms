@@ -35,10 +35,10 @@ class GradeSummaryAssignmentPresenter
     # The sort here ensures that statuses received are in the failed,
     # pending and success order. With that security we can just pluck
     # first one.
-    submission.attachments.
-      map { |a| AttachmentUploadStatus.upload_status(a) }.
-      sort.
-      first
+    submission.attachments
+              .map { |a| AttachmentUploadStatus.upload_status(a) }
+              .sort
+              .first
   end
 
   def originality_report?
@@ -60,6 +60,7 @@ class GradeSummaryAssignmentPresenter
 
   def graded?
     return false if submission.blank?
+
     (submission.grade || submission.excused?) && !hide_grade_from_student?
   end
 
@@ -101,11 +102,13 @@ class GradeSummaryAssignmentPresenter
 
   def has_scoring_details?
     return false unless submission&.score.present? && assignment&.points_possible.present?
+
     assignment.points_possible > 0 && !hide_grade_from_student?
   end
 
   def has_grade_distribution?
     return false if assignment&.points_possible.blank?
+
     assignment.points_possible > 0 && !hide_grade_from_student?
   end
 
@@ -205,7 +208,7 @@ class GradeSummaryAssignmentPresenter
     end
     t = if is_text_entry?
           plag_data[OriginalityReport.submission_asset_key(submission)] ||
-          plag_data[submission.asset_string]
+            plag_data[submission.asset_string]
         elsif is_online_upload? && file
           plag_data[file.asset_string]
         end
@@ -229,13 +232,13 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect{|a| plagiarism_attachment?(a) }
+    @file ||= submission.attachments.detect { |a| plagiarism_attachment?(a) }
   end
 
   def plagiarism_attachment?(a)
     @originality_reports.any? { |o| o.attachment == a } ||
-    (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
-    (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
+      (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
+      (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
   end
 
   def comments
@@ -244,6 +247,7 @@ class GradeSummaryAssignmentPresenter
 
   def rubric_assessments
     return [] unless submission
+
     submission.visible_rubric_assessments_for(@current_user)
   end
 
@@ -255,7 +259,6 @@ class GradeSummaryAssignmentPresenter
     @summary.student_enrollment.fake_student?
   end
 end
-
 
 class GradeSummaryGraph
   FULLWIDTH = 150.0
@@ -302,11 +305,12 @@ class GradeSummaryGraph
 
   def title
     I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
-      mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
-    })
+             mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
+           })
   end
 
   private
+
   def pixels_for(value)
     (value.to_f / @points_possible * FULLWIDTH).round
   end

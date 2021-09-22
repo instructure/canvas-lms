@@ -36,8 +36,9 @@ class Mutations::DeleteOutcomeProficiency < Mutations::BaseMutation
     record = OutcomeProficiency.active.find_by(id: record_id)
     raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
     raise GraphQL::ExecutionError, "insufficient permission" unless record.context.grants_right? current_user, :manage_proficiency_scales
+
     context[:deleted_models][:outcome_proficiency] = record
     record.destroy
-    {outcome_proficiency_id: record.id}
+    { outcome_proficiency_id: record.id }
   end
 end

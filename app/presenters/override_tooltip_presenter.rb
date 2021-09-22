@@ -18,10 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class OverrideTooltipPresenter < OverrideListPresenter
-
   DEFAULT_MAX_DATES = 10
 
-  def initialize(assignment=nil, user=nil, opts={})
+  def initialize(assignment = nil, user = nil, opts = {})
     super(assignment, user)
     @opts = opts
   end
@@ -40,6 +39,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
 
   def more_message
     return '' unless dates_hidden > 0
+
     I18n.t('#tooltips.vdd.more_message', 'and %{count} more...', :count => dates_hidden)
   end
 
@@ -67,18 +67,17 @@ class OverrideTooltipPresenter < OverrideListPresenter
 
   def due_date_summary
     visible_due_dates[0...dates_visible].map do |date|
-      {:due_for => date[:due_for], :due_at => date[:due_at]}
+      { :due_for => date[:due_for], :due_at => date[:due_at] }
     end
   end
 
   def as_json
     {
-      :selector  => selector,
+      :selector => selector,
       :link_text => link_text,
       :link_href => link_href,
       :due_dates => due_date_summary,
       :more_message => more_message
     }
   end
-
 end

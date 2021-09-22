@@ -25,11 +25,13 @@ module AccountsHelper
 
   def print_messages(batch)
     return '' unless batch
+
     render :partial => 'accounts/sis_batch_messages', :object => batch
   end
 
   def print_counts(batch)
     return '' unless batch.data && batch.data[:counts]
+
     render :partial => 'accounts/sis_batch_counts', :object => batch
   end
 

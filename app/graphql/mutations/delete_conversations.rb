@@ -28,7 +28,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
 
   def resolve(input:)
     errors = {}
-    context[:deleted_models] = {conversations: {}}
+    context[:deleted_models] = { conversations: {} }
     # rubocop:disable Style/BlockDelimiters
     resolved_ids = input[:ids].map { |id|
       conversation = Conversation.find_by(id: id)

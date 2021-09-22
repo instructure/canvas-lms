@@ -109,6 +109,7 @@ module GradebooksHelper
 
   def student_score_display_for(submission, show_student_view = false)
     return '-' if submission.blank?
+
     score, grade = if show_student_view
                      [submission.published_score, submission.published_grade]
                    else
@@ -177,16 +178,15 @@ module GradebooksHelper
     end
 
     override_dates = if assignment.only_visible_to_overrides?
-      assignment.active_assignment_overrides.where(due_at_overridden: true).pluck(:due_at).uniq
-    else
-      []
-    end
+                       assignment.active_assignment_overrides.where(due_at_overridden: true).pluck(:due_at).uniq
+                     else
+                       []
+                     end
 
     if override_dates.count == 1
       t('Due: %{assignment_due_date_time}', assignment_due_date_time: datetime_string(force_zone(override_dates.first)))
     else
       t('Due: No Due Date')
     end
-
   end
 end

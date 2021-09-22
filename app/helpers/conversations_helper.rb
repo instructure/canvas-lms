@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConversationsHelper
-
   def contexts_for(audience, context_tags)
-    result = {:courses => {}, :groups => {}}
+    result = { :courses => {}, :groups => {} }
     return result if audience.empty?
+
     context_tags.inject(result) do |hash, tag|
       next unless tag =~ /\A(course|group)_(\d+)\z/
+
       hash["#{$1}s".to_sym][$2.to_i] = []
       hash
     end
@@ -31,6 +32,7 @@ module ConversationsHelper
     if audience.size == 1 && include_private_conversation_enrollments
       enrollments = Shard.partition_by_shard(result[:courses].keys) do |course_ids|
         next unless audience.first.associated_shards.include?(Shard.current)
+
         Enrollment.where(course_id: course_ids, user_id: audience.first.id, workflow_state: 'active').select([:course_id, :type]).to_a
       end
       enrollments.each do |enrollment|
@@ -39,6 +41,7 @@ module ConversationsHelper
 
       memberships = Shard.partition_by_shard(result[:groups].keys) do |group_ids|
         next unless audience.first.associated_shards.include?(Shard.current)
+
         GroupMembership.where(group_id: result[:groups].keys, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).to_a
       end
       memberships.each do |membership|
@@ -113,6 +116,7 @@ module ConversationsHelper
   def valid_account_context?(account)
     return false unless account.root_account?
     return true if account.grants_right?(@current_user, session, :read_roster)
+
     user_sub_accounts = @current_user.associated_accounts.shard(@current_user).where(root_account_id: account).to_a
     user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
   end
@@ -176,7 +180,7 @@ module ConversationsHelper
 
     tags = tags.concat(recipients).concat(context_code)
     tags = SimpleTags.normalize_tags(tags)
-    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
+    tags += tags.grep(/\Agroup_(\d+)\z/) { g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
     @tags = tags.uniq
   end
 
@@ -189,9 +193,9 @@ module ConversationsHelper
     recipients_are_instructors = all_recipients_are_instructors?(context, recipients)
 
     if context.is_a?(Course) &&
-      !recipients_are_instructors &&
-      !observer_to_linked_students(recipients) &&
-      !context.grants_right?(@current_user, session, :send_messages)
+       !recipients_are_instructors &&
+       !observer_to_linked_students(recipients) &&
+       !context.grants_right?(@current_user, session, :send_messages)
 
       raise InvalidContextPermissionsError
     elsif !valid_context?(context)

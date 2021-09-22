@@ -56,7 +56,7 @@ module CoursesHelper
         icon_data = [t('#courses.recent_event.no_submissions', 'no submissions')] + event_type
       # all received submissions graded (but not all turned in)
       elsif recent_event.submitted_count < context.students.size &&
-        !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
+            !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
         icon_data = [t('#courses.recent_event.no_new_submissions', 'no new submissions')] + event_type
       # all submissions turned in and graded
       elsif !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
@@ -76,9 +76,9 @@ module CoursesHelper
       url = context_url(context, :context_assignment_url, :id => recent_event.id)
     else
       url = calendar_url_for(nil, {
-        :query => {:month => recent_event.start_at.month, :year => recent_event.start_at.year},
-        :anchor => "calendar_event_" + recent_event.id.to_s
-      })
+                               :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
+                               :anchor => "calendar_event_" + recent_event.id.to_s
+                             })
     end
 
     url
@@ -113,7 +113,7 @@ module CoursesHelper
       if submission.grading_type == 'points' and
          submission.assignment and
          submission.assignment.respond_to?(:points_possible)
-         score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
+        score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
       else
         i18n_grade(submission.grade, submission.grading_type).to_s
       end

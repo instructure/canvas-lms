@@ -59,7 +59,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
     entry.save!
     entry.delete_edit_draft(user_id: current_user.id)
 
-    {discussion_entry: entry}
+    { discussion_entry: entry }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   end

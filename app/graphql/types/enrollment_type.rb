@@ -73,17 +73,17 @@ module Types
 
     field :grades, GradesType, null: true do
       argument :grading_period_id, ID,
-        "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
-        required: false,
-        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
+               "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
     end
     DEFAULT_GRADING_PERIOD = "default_grading_period"
     def grades(grading_period_id: DEFAULT_GRADING_PERIOD)
       Promise.all([
-        load_association(:scores),
-        load_association(:user),
-        load_association(:course)
-      ]).then do
+                    load_association(:scores),
+                    load_association(:user),
+                    load_association(:course)
+                  ]).then do
         if grading_period_id == DEFAULT_GRADING_PERIOD
           Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
             load_grades(gp&.id)
@@ -103,8 +103,8 @@ module Types
       # the user has permission to read it)
       if grades.nil?
         score_attrs = grading_period_id ?
-          {enrollment: enrollment, grading_period_id: grading_period_id} :
-          {enrollment: enrollment, course_score: true}
+          { enrollment: enrollment, grading_period_id: grading_period_id } :
+          { enrollment: enrollment, course_score: true }
 
         grades = Score.new(score_attrs)
       end

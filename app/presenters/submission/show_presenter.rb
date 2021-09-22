@@ -62,10 +62,10 @@ class Submission::ShowPresenter
 
   def submission_data_url(**additional_params)
     submission_route = if anonymize_submission_owner?
-      :context_assignment_anonymous_submission_url
-    else
-      :context_assignment_submission_url
-    end
+                         :context_assignment_anonymous_submission_url
+                       else
+                         :context_assignment_submission_url
+                       end
 
     context_url(@context, submission_route, @assignment.id, anonymizable_student_id, **additional_params)
   end

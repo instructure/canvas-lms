@@ -41,6 +41,7 @@ module Types
     def submission_draft
       Loaders::IDLoader.for(Submission).load(object.id).then do |current_submission|
         next nil if object.attempt != current_submission.attempt
+
         super
       end
     end

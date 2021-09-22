@@ -51,12 +51,13 @@ class Mutations::SetModuleItemCompletion < Mutations::BaseMutation
     end
     sync_planner_completion(module_item.content, current_user, input[:done]) if planner_enabled?
 
-    {module_item: module_item}
+    { module_item: module_item }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   end
 
   private
+
   def planner_enabled?
     current_user.present? && current_user.has_student_enrollment?
   end
