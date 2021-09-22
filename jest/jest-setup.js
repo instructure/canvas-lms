@@ -189,7 +189,6 @@ const ignoredWarnings = [
   /shared_brand_configs.* not called/,
   /The `renderSortLabel` prop should be provided when Table is sortable/,
   /toBeEmpty has been deprecated/,
-  /track.label will no longer be used to uniquely identify track/,
   /Translation for .* is missing/,
   /Unmatched (GET|POST) to \/api\/v1/,
   /value provided is not in a recognized RFC2822 or ISO format/
