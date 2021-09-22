@@ -19,15 +19,10 @@
 import canvasBaseTheme from '@instructure/canvas-theme'
 import canvasHighContrastTheme from '@instructure/canvas-high-contrast-theme'
 import moment from 'moment'
-import tz from '@canvas/timezone'
-import './initializers/fakeRequireJSFallback.js'
-import {
-  up as configureDateTimeMomentParser
-} from './initializers/configureDateTimeMomentParser'
-import {
-  up as configureDateTime
-} from './initializers/configureDateTime'
-import { up as enableDTNPI } from './initializers/enableDTNPI'
+import './initializers/fakeRequireJSFallback'
+import {up as configureDateTimeMomentParser} from './initializers/configureDateTimeMomentParser'
+import {up as configureDateTime} from './initializers/configureDateTime'
+import {up as enableDTNPI} from './initializers/enableDTNPI'
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
 // on the page from rails, so this should not cause a new network request.
@@ -37,25 +32,41 @@ configureDateTimeMomentParser()
 configureDateTime()
 enableDTNPI()
 
-// This will inject and set up sentry for deprecation reporting.  It should be
-// stripped out and be a no-op in production.
-if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN) {
-  const Raven = require('raven-js')
+async function setupSentry() {
+  const Raven = await import('raven-js')
   Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
     ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
     release: process.env.GIT_COMMIT
   }).install()
 
-  const setupRavenConsoleLoggingPlugin = require('../jsx/shared/helpers/setupRavenConsoleLoggingPlugin')
-    .default
-  setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console'})
+  try {
+    const {default: setup} = await import('./initializers/setupRavenConsoleLoggingPlugin')
+    setup(Raven, {loggerName: 'console'})
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(`ERROR: could not set up Raven console logging: ${e.message}`)
+  }
 }
 
+async function setupConsoleMessageFilter() {
+  const {filterUselessConsoleMessages} = await import(
+    '@instructure/js-utils/es/filterUselessConsoleMessages'
+  )
+
+  try {
+    filterUselessConsoleMessages(console)
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(`ERROR: could not set up console log filtering: ${e.message}`)
+  }
+}
+
+// In non-prod environments only, arrange for filtering of "useless" console
+// messages, and if deprecation reporting is enabled, arrange to inject and
+// set up Sentry for it.
 if (process.env.NODE_ENV !== 'production') {
-  const {
-    filterUselessConsoleMessages
-  } = require('@instructure/js-utils/lib/filterUselessConsoleMessages')
-  filterUselessConsoleMessages(console)
+  setupConsoleMessageFilter()
+  if (process.env.DEPRECATION_SENTRY_DSN) setupSentry()
 }
 
 // setup the inst-ui default theme
@@ -97,7 +108,7 @@ if (ENV.use_high_contrast) {
   // This is for the `wait_for_ajax_requests` method in selenium
   window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__ = 0
   const send = XMLHttpRequest.prototype.send
-  XMLHttpRequest.prototype.send = function() {
+  XMLHttpRequest.prototype.send = function () {
     window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
     // 'loadend' gets fired after both successful and errored requests
     this.addEventListener('loadend', () => {
@@ -109,9 +120,10 @@ if (ENV.use_high_contrast) {
 
   // and this so it also tracks `fetch` requests
   const fetch = window.fetch
-  window.fetch = function() {
+  window.fetch = function () {
     window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
     const promise = fetch.apply(this, arguments)
+    // eslint-disable-next-line promise/catch-or-return
     promise.finally(() => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
       window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
