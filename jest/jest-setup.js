@@ -80,7 +80,6 @@ const ignoredErrors = [
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
   /modalProps.onDismiss is not a function/,
-  /Must provide id for each option via `getOptionProps`/,
   /Prop `children` should be supplied unless/,
   /props.setRCEOpen is not a function/,
   /React does not recognize the `%s` prop on a DOM element/,
