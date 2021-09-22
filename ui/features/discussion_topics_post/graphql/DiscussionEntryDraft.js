@@ -27,9 +27,7 @@ export const DiscussionEntryDraft = {
       discussionTopicId
       rootEntryId
       discussionEntryId
-      parentId
       message
-      includeReplyPreview
     }
   `,
 
@@ -39,9 +37,7 @@ export const DiscussionEntryDraft = {
     discussionTopicId: string,
     rootEntryId: string,
     discussionEntryId: string,
-    parentId: string,
     message: string,
-    includeReplyPreview: bool
   }),
 
   mock: ({
@@ -53,7 +49,6 @@ export const DiscussionEntryDraft = {
     discussionTopicId = '5',
     discussionEntryId = '8',
     rootEntryId = null,
-    parentId = null
   } = {}) => ({
     id,
     _id,
@@ -63,7 +58,6 @@ export const DiscussionEntryDraft = {
     updatedAt,
     message,
     rootEntryId,
-    parentId,
     __typename: 'DiscussionEntryDraft'
   })
 }
@@ -78,6 +72,5 @@ export const DefaultMocks = {
     discussionTopicId: '5',
     discussionEntryId: '8',
     rootEntryId: null,
-    parentId: null
   })
 }
