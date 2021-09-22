@@ -217,6 +217,18 @@ export const IsolatedViewContainer = props => {
     }
   })
 
+  const findDraftMessage = rootId => {
+    let rootEntryDraftMessage = ''
+    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
+      if (draftEntry.rootEntryId === rootId && !draftEntry.discussionEntryId) {
+        rootEntryDraftMessage = draftEntry.message
+        return false
+      }
+      return true
+    })
+    return rootEntryDraftMessage
+  }
+
   const isolatedEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
@@ -388,6 +400,7 @@ export const IsolatedViewContainer = props => {
                     .nodes,
                   props.replyFromId
                 )}
+                value={findDraftMessage(props.replyFromId)}
                 updateDraft={newDraftMessage => {
                   createDiscussionEntryDraft({
                     variables: {
