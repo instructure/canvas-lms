@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasDynamoDB
-
   class BatchGetBuilder < BatchBuilderBase
-
     def operation
       :batch_get_item
     end
@@ -34,7 +32,7 @@ module CanvasDynamoDB
     end
 
     def request_items(tables)
-      Hash[tables.map { |k,v| [k, { keys: v }] }]
+      Hash[tables.map { |k, v| [k, { keys: v }] }]
     end
 
     def execute
@@ -55,7 +53,5 @@ module CanvasDynamoDB
         dest[table_name].concat(src[table_name])
       end
     end
-
   end
-
 end

@@ -21,10 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion do
-
   it "should deserialize its json data" do
-    answers = [{'id' => 1}, {'id' => 2}]
-    qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
+    answers = [{ 'id' => 1 }, { 'id' => 2 }]
+    qd = { 'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers }
     course_factory
     bank = @course.assessment_question_banks.create!
     a = bank.assessment_questions.create!
@@ -43,14 +42,14 @@ describe Quizzes::QuizQuestion do
   end
   context "blank answers for fill_in[_multiple]_blank[s] questions" do
     before :once do
-      answers = [{"answer_text" => "True", 'id' => 1,}, {'id' => 2, "answer_text" => ""}]
+      answers = [{ "answer_text" => "True", 'id' => 1, }, { 'id' => 2, "answer_text" => "" }]
       course_with_teacher
 
       @quiz = @course.quizzes.create
-      @short_answer_data = { :question_name   => 'test question',
-                :points_possible => '1',
-                :question_type   => 'short_answer_question',
-                :answers         => answers }
+      @short_answer_data = { :question_name => 'test question',
+                             :points_possible => '1',
+                             :question_type => 'short_answer_question',
+                             :answers => answers }
       @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
     end
     it "should clear blanks before saving" do
@@ -65,13 +64,13 @@ describe Quizzes::QuizQuestion do
 
       @quiz = @course.quizzes.create
 
-      @data = {:question_name   => 'test question',
-               :points_possible => '1',
-               :question_type   => 'multiple_choice_question',
-               :answers         => [{'answer_text' => '1', 'id' => 1},
-                                    {'answer_text' => '2', 'id' => 2},
-                                    {'answer_text' => '3', 'id' => 3},
-                                    {'answer_text' => '4', 'id' => 4}]}
+      @data = { :question_name => 'test question',
+                :points_possible => '1',
+                :question_type => 'multiple_choice_question',
+                :answers => [{ 'answer_text' => '1', 'id' => 1 },
+                             { 'answer_text' => '2', 'id' => 2 },
+                             { 'answer_text' => '3', 'id' => 3 },
+                             { 'answer_text' => '4', 'id' => 4 }] }
 
       @question = @quiz.quiz_questions.create(:question_data => @data)
     end
@@ -81,7 +80,7 @@ describe Quizzes::QuizQuestion do
 
       Quizzes::QuizRegrade.create(quiz_id: @quiz.id, user_id: @user.id, quiz_version: @quiz.version_number)
       @question.question_data = @data.merge(:regrade_option => 'full_credit',
-                                            :regrade_user   => @user)
+                                            :regrade_user => @user)
       @question.save
 
       question_regrade = Quizzes::QuizQuestionRegrade.first
@@ -91,29 +90,29 @@ describe Quizzes::QuizQuestion do
 
     it "sanitizes all the html" do
       question_data = {
-        "id"=>nil,
-        "regrade_option"=>"",
-        "points_possible"=>1.0,
-        "correct_comments_html"=>"<img src=\"x\" onerror=\"alert(1)\">",
-        "incorrect_comments_html"=>"<img src=\"x\" onerror=\"alert(2)\">",
-        "neutral_comments_html"=>"<img src=\"x\" onerror=\"alert(3)\">",
-        "question_type"=>"multiple_choice_question",
-        "question_name"=>"Question",
-        "name"=>"Question",
-        "question_text"=>"<img src=\"x\" onerror=\"alert(4)\">",
-        "answers"=>
+        "id" => nil,
+        "regrade_option" => "",
+        "points_possible" => 1.0,
+        "correct_comments_html" => "<img src=\"x\" onerror=\"alert(1)\">",
+        "incorrect_comments_html" => "<img src=\"x\" onerror=\"alert(2)\">",
+        "neutral_comments_html" => "<img src=\"x\" onerror=\"alert(3)\">",
+        "question_type" => "multiple_choice_question",
+        "question_name" => "Question",
+        "name" => "Question",
+        "question_text" => "<img src=\"x\" onerror=\"alert(4)\">",
+        "answers" =>
         [
           {
-            "id"=>8206,
-            "html"=>"<img src=\"x\" onerror=\"alert(5)\">",
-            "comments_html"=>"<img src=\"x\" onerror=\"alert(6)\">",
-            "weight"=>100.0
+            "id" => 8206,
+            "html" => "<img src=\"x\" onerror=\"alert(5)\">",
+            "comments_html" => "<img src=\"x\" onerror=\"alert(6)\">",
+            "weight" => 100.0
           },
           {
-            "id"=>6973,
-            "html"=>"<img src=\"x\" onerror=\"alert(7)\">",
-            "comments_html"=>"<img src=\"x\" onerror=\"alert(8)\">",
-            "weight"=>0.0
+            "id" => 6973,
+            "html" => "<img src=\"x\" onerror=\"alert(7)\">",
+            "comments_html" => "<img src=\"x\" onerror=\"alert(8)\">",
+            "weight" => 0.0
           }
         ]
       }
@@ -131,15 +130,15 @@ describe Quizzes::QuizQuestion do
 
   describe ".update_all_positions" do
     def question_positions(object)
-      object.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      object.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
     end
 
     before :once do
       course_factory
       @quiz = @course.quizzes.create!(:title => "some quiz")
-      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
-      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
-      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}]})
+      @question1 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+      @question2 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
+      @question3 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }] })
     end
 
     it "should noop if list of items is empty" do
@@ -186,7 +185,6 @@ describe Quizzes::QuizQuestion do
   end
 
   describe "#destroy" do
-
     it "does not remove the record from the database, but changes workflow_state" do
       course_with_teacher
       course_quiz

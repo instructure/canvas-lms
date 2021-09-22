@@ -21,8 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::ChangeSisIdImporter do
-
-  before {account_model}
+  before { account_model }
 
   it 'should change values of sis ids' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -72,11 +71,11 @@ describe SIS::CSV::ChangeSisIdImporter do
     )
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed.",
-                            "No old_id or old_integration_id given for change_sis_id",
-                            "No new_id or new_integration_id given for change_sis_id",
-                            "No type given for change_sis_id",
-                            "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
-                            "Invalid type 'invalid' for change_sis_id"]
+                          "No old_id or old_integration_id given for change_sis_id",
+                          "No new_id or new_integration_id given for change_sis_id",
+                          "No type given for change_sis_id",
+                          "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
+                          "Invalid type 'invalid' for change_sis_id"]
   end
 
   it 'should allow removing user.integration_ids' do
@@ -142,7 +141,7 @@ describe SIS::CSV::ChangeSisIdImporter do
   end
 
   describe 'group categories' do
-    let!(:gc) {group_category(context: @account, sis_source_id: 'GC1')}
+    let!(:gc) { group_category(context: @account, sis_source_id: 'GC1') }
 
     it 'should change the sis id for a group category' do
       importer = process_csv_data(

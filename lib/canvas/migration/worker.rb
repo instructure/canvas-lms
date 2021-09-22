@@ -19,7 +19,6 @@
 #
 
 module Canvas::Migration::Worker
-
   class Base < Struct.new(:migration_id)
     def on_permanent_failure(error)
       if migration_id
@@ -35,7 +34,7 @@ module Canvas::Migration::Worker
 
   def self.upload_overview_file(file, content_migration)
     uploaded_data = Rack::Test::UploadedFile.new(file.path, Attachment.mimetype(file.path))
-    
+
     att = Attachment.new
     att.context = content_migration
     att.uploaded_data = uploaded_data
@@ -54,12 +53,13 @@ module Canvas::Migration::Worker
     file_name = "exported_data_cm_#{content_migration.id}.zip"
     zip_file = File.join(folder, file_name)
     att = nil
-    
+
     begin
       Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
         Dir["#{folder}/**/**"].each do |file|
           next if File.basename(file) == file_name
-          file_path = file.sub(folder+'/', '')
+
+          file_path = file.sub(folder + '/', '')
           zipfile.add(file_path, file)
         end
       end

@@ -24,7 +24,6 @@
 # This API requires a compatible image search service to be configured
 
 class InternetImageController < ApplicationController
-
   before_action :require_user
   before_action :require_config
 
@@ -87,15 +86,17 @@ class InternetImageController < ApplicationController
   # @response_field raw_url The raw URL of the photo
 
   def image_search
-    return render json: { error: 'query param is required'}, status: :bad_request unless params[:query]
+    return render json: { error: 'query param is required' }, status: :bad_request unless params[:query]
+
     search_url = "#{service_url}/search/photos"
-    send_params = {per_page: 10, page: 1, content_filter: 'high'}.with_indifferent_access.merge(
+    send_params = { per_page: 10, page: 1, content_filter: 'high' }.with_indifferent_access.merge(
       params.permit(:query, :per_page, :page, :orientation, :content_filter)
     )
     search_results = HTTParty.get("#{search_url}?#{send_params.to_query}", {
-      headers: {"Authorization" => "Client-ID #{unsplash_config[:access_key]}"}
-    })
+                                    headers: { "Authorization" => "Client-ID #{unsplash_config[:access_key]}" }
+                                  })
     raise "Unsplash: #{search_results.try(:dig, 'errors')&.join(', ') || search_results}" unless search_results.success?
+
     new_links = LinkHeader.parse(search_results.headers['Link']).links.map do |link|
       url = URI.parse(link.href)
       ["#{request.protocol}#{request.host_with_port}#{request.path}?#{url.query}", link.attr_pairs]
@@ -126,18 +127,20 @@ class InternetImageController < ApplicationController
   # @response_field message Confirmation success message or error
 
   def image_selection
-    return render json: { message: 'id param is required'}, status: :bad_request unless params[:id]
+    return render json: { message: 'id param is required' }, status: :bad_request unless params[:id]
+
     url = ''
     begin
       url = Canvas::Security.url_key_decrypt_data(params[:id])
     rescue
-      return render json: {message: 'Could not find image.  Please check the id and try again'}, status: :bad_request
+      return render json: { message: 'Could not find image.  Please check the id and try again' }, status: :bad_request
     end
-    confirm_download = HTTParty.head(url, {headers: {"Authorization" => "Client-ID #{unsplash_config[:access_key]}"}})
+    confirm_download = HTTParty.head(url, { headers: { "Authorization" => "Client-ID #{unsplash_config[:access_key]}" } })
     if confirm_download.code == 404 && confirm_download.dig('errors').present?
-      return render json: {message: confirm_download.dig('errors')&.join(', ')}, status: :not_found
+      return render json: { message: confirm_download.dig('errors')&.join(', ') }, status: :not_found
     end
-    return render json: {message: 'Confirmation success. Thank you.'} if confirm_download.success?
+    return render json: { message: 'Confirmation success. Thank you.' } if confirm_download.success?
+
     raise "Unsplash: #{confirm_download.try(:dig, 'errors')&.join(', ') || confirm_download}"
   end
 end

@@ -23,21 +23,21 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   before_action :require_user, :require_context
-  before_action :require_quiz, :only => [ :index ]
-  before_action :require_quiz_submission, :only => [ :index ]
+  before_action :require_quiz, :only => [:index]
+  before_action :require_quiz_submission, :only => [:index]
 
-  protect_from_forgery :only => [ :index ], with: :exception
+  protect_from_forgery :only => [:index], with: :exception
 
   def index
     if authorized_action(@quiz_submission, @current_user, :view_log)
 
       unless @context.feature_enabled?(:quiz_log_auditing)
         flash[:error] = t('errors.quiz_log_auditing_required',
-        "The quiz log auditing feature needs to be enabled for this course.")
+                          "The quiz log auditing feature needs to be enabled for this course.")
 
         return redirect_to named_context_url(@context, :context_quiz_history_url,
-          @quiz.id,
-          user_id: @quiz_submission.user_id)
+                                             @quiz.id,
+                                             user_id: @quiz_submission.user_id)
       end
 
       dont_show_user_name = @quiz.anonymous_submissions || (!@quiz_submission.user || @quiz_submission.user == @current_user)
@@ -46,21 +46,21 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
 
       submission_crumb = if dont_show_user_name
-        t(:default_submission_crumb, "Submission %{id}", { id: @quiz_submission.id })
-      else
-        @quiz_submission.user.name
-      end
+                           t(:default_submission_crumb, "Submission %{id}", { id: @quiz_submission.id })
+                         else
+                           @quiz_submission.user.name
+                         end
 
       add_crumb(submission_crumb, named_context_url(@context, :context_quiz_quiz_submission_url, @quiz, @quiz_submission))
       add_crumb(t(:log_crumb, "Log"), course_quiz_quiz_submission_events_url(@context, @quiz, @quiz_submission))
 
       js_env({
-        quiz_url: api_v1_course_quiz_url(@context, @quiz),
-        questions_url: api_v1_course_quiz_questions_url(@context, @quiz, quiz_submission_id: @quiz_submission.id, quiz_submission_attempt: @quiz_submission.attempt),
-        submission_url: api_v1_course_quiz_submission_url(@context, @quiz, @quiz_submission),
-        events_url: api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission),
-        can_view_answer_audits: @quiz.grants_right?(@current_user, :view_answer_audits)
-      })
+               quiz_url: api_v1_course_quiz_url(@context, @quiz),
+               questions_url: api_v1_course_quiz_questions_url(@context, @quiz, quiz_submission_id: @quiz_submission.id, quiz_submission_attempt: @quiz_submission.attempt),
+               submission_url: api_v1_course_quiz_submission_url(@context, @quiz, @quiz_submission),
+               events_url: api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission),
+               can_view_answer_audits: @quiz.grants_right?(@current_user, :view_answer_audits)
+             })
     end
   end
 end

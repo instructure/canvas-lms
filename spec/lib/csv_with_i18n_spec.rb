@@ -56,7 +56,7 @@ describe CsvWithI18n do
       it "uses comma as the column separator when not asked to autodetect" do
         @admin.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
         I18n.locale = :is
-       expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ',')
+        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ',')
       end
     end
 

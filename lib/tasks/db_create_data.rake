@@ -40,7 +40,7 @@ def create_user_task
   user_first_name = ask ( "User's first name: ")
   user_last_name = ask ("User's last name: ")
   user_login = ask ("User's login: ")
-  user_password = ask ("User's password: ")  { |q| q.default = 'useruser' }
+  user_password = ask ("User's password: ") { |q| q.default = 'useruser' }
 
   puts %Q{
 

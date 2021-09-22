@@ -110,7 +110,7 @@ describe DiscussionEntry do
     it 'should create on entry save' do
       entry = topic.discussion_entries.new(user: student)
       allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
-      expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
+      expect { entry.save! }.to change { entry.mentions.count }.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
     end
 
@@ -126,7 +126,7 @@ describe DiscussionEntry do
         it "should create a mention on save" do
           expect {
             entry.update(message: "<p>hello <span data-mention=#{student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
-          }.to change {entry.mentions.count}.by 1
+          }.to change { entry.mentions.count }.by 1
         end
       end
 
@@ -134,7 +134,7 @@ describe DiscussionEntry do
         it "should not create a new mention on save" do
           expect {
             entry.update(message: "<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude?!</p>")
-          }.to not_change {entry.mentions.count}
+          }.to not_change { entry.mentions.count }
         end
       end
     end
@@ -215,7 +215,7 @@ describe DiscussionEntry do
       course   = @course
 
       student_in_course
-      quitter  = @student
+      quitter = @student
 
       course_with_teacher
       student_in_course
@@ -256,7 +256,6 @@ describe DiscussionEntry do
       expect(mention.messages_sent[@notification_mention]).not_to be_blank
       expect(mention.messages_sent["Announcement Reply"]).to be_blank
     end
-
   end
 
   context "sub-topics" do
@@ -647,7 +646,6 @@ describe DiscussionEntry do
         expect(@student.stream_item_instances.last.workflow_state).to eq 'read'
       end
     end
-
   end
 
   describe "reply_from" do
@@ -699,8 +697,8 @@ describe DiscussionEntry do
       @empty_section = @course.course_sections.create!
       @topic = @course.discussion_topics.build(:title => "topic")
       @assignment = @course.assignments.build title: @topic.title,
-        submission_types: 'discussion_topic',
-        only_visible_to_overrides: true
+                                              submission_types: 'discussion_topic',
+                                              only_visible_to_overrides: true
       @assignment.assignment_overrides.build set: @empty_section
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment

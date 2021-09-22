@@ -37,7 +37,7 @@ describe 'quizzes observers' do
     before(:each) do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
-        :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end
 
@@ -58,4 +58,3 @@ describe 'quizzes observers' do
     expect(f(".description")).to include_text(description)
   end
 end
-

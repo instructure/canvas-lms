@@ -31,9 +31,9 @@ describe "context modules" do
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
       @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-        :submission_types => 'online_text_entry',
-        :due_at => 2.days.from_now,
-        :points_possible => 10)
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
       @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
 
       @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
@@ -118,9 +118,8 @@ describe "context modules" do
     end
 
     context "module item cog focus management", priority: "1" do
-
       before :once do
-        create_modules(1)[0].add_item({id: @assignment.id, type: 'assignment'})
+        create_modules(1)[0].add_item({ id: @assignment.id, type: 'assignment' })
         @tag = ContentTag.last
       end
 
@@ -180,9 +179,9 @@ describe "context modules" do
     context "Keyboard Accessibility", priority: "1" do
       before :once do
         modules = create_modules(2, true)
-        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-        modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
-        modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ :id => @assignment2.id, :type => 'assignment' })
+        modules[1].add_item({ :id => @assignment3.id, :type => 'assignment' })
       end
 
       before :each do
@@ -208,7 +207,6 @@ describe "context modules" do
       # o : Decrease Indent
       # n : New Module
       it "should navigate through modules and module items" do
-
         # Navigate through modules and module items
         check_element_has_focus(context_modules[0])
 
@@ -226,20 +224,16 @@ describe "context modules" do
       end
 
       it "should edit modules" do
-
         send_keys("e")
         expect(f('#add_context_module_form')).to be_displayed
       end
 
       it "should create a module" do
-
         send_keys("n")
         expect(f('#add_context_module_form')).to be_displayed
       end
 
-
       it "should indent / outdent" do
-
         send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
@@ -256,7 +250,6 @@ describe "context modules" do
       end
 
       it "should delete" do
-
         # Test Delete key
         send_keys("d")
         driver.switch_to.alert.accept

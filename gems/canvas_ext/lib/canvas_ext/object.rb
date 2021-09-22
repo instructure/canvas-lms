@@ -21,7 +21,7 @@
 class Object
   def try_rescue(method, *args)
     if block_given?
-      try(method, *args){ |*block_args| yield(*block_args) }
+      try(method, *args) { |*block_args| yield(*block_args) }
     else
       try(method, *args)
     end
@@ -29,6 +29,7 @@ class Object
     nil
   end
 end
+
 class NilClass
   def try_rescue(*args)
     self

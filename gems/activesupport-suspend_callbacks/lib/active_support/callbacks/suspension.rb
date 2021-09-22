@@ -53,6 +53,7 @@ module ActiveSupport::Callbacks
     end
 
     protected
+
     # checks whether a specific callback combination (e.g. :validate, :save,
     # :before) is currently suspended, whether by the receiver or the
     # receiver's ancestor (its class for an instance, its superclass for a
@@ -80,10 +81,10 @@ module ActiveSupport::Callbacks
     #     @student.send(:suspended_callback?, :validate, :save, :before) #=> true
     #   end
     #
-    def suspended_callback?(callback, kind, type=nil)
+    def suspended_callback?(callback, kind, type = nil)
       val = suspended_callbacks_defined? &&
-        suspended_callbacks.include?(callback, kind, type) ||
-      suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
+            suspended_callbacks.include?(callback, kind, type) ||
+            suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
 
       val
     end
@@ -133,7 +134,7 @@ module ActiveSupport::Callbacks
         return callbacks unless any_suspensions_active?(callbacks.name)
 
         filtered = ActiveSupport::Callbacks::CallbackChain.new(callbacks.name, callbacks.config)
-        callbacks.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, callbacks.name, cb.kind) }
+        callbacks.each { |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, callbacks.name, cb.kind) }
         filtered
       end
 

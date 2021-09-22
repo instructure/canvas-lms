@@ -23,11 +23,11 @@ module AcademicBenchmarks
   module Standards
     class Document
       include Common
-      def build_outcomes(ratings={}, _parent=nil)
+      def build_outcomes(ratings = {}, _parent = nil)
         build_common_outcomes(ratings).merge!({
-          title: description_with_year,
-          description: description_with_year,
-        })
+                                                title: description_with_year,
+                                                description: description_with_year,
+                                              })
       end
 
       def description_with_year

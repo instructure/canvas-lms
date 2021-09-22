@@ -23,7 +23,6 @@ require_dependency "alerts/user_note"
 
 module Alerts
   describe UserNote do
-
     # course_with_teacher(:active_all => 1)
     # @teacher = @user
     # @user = nil
@@ -31,7 +30,6 @@ module Alerts
     # UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
 
     describe '#should_not_receive_message?' do
-
       before :once do
         course_with_teacher(:active_all => 1)
         @root_account = @course.root_account
@@ -48,8 +46,8 @@ module Alerts
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-        expect(lambda {::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days }}).
-          to raise_error("Validation failed: Title is too long (maximum is 255 characters)")
+        expect(lambda { ::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days } })
+          .to raise_error("Validation failed: Title is too long (maximum is 255 characters)")
       end
 
       it 'returns true when the course root account has user notes disabled' do
@@ -86,7 +84,7 @@ module Alerts
 
       it 'handles notes from multiple students' do
         student_1 = @student
-        course_with_student({course: @course})
+        course_with_student({ course: @course })
         student_2 = @student
         ::UserNote.create!(creator: @teacher, user: student_1, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
         ::UserNote.create!(creator: @teacher, user: student_2, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
@@ -94,7 +92,6 @@ module Alerts
         ungraded_timespan = Alerts::UserNote.new(@course, [student_1.id, student_2.id], [@teacher.id])
         expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to eq false
       end
-
 
       context 'when the student has not received any notes' do
         context 'when there is a course start_at' do
@@ -113,7 +110,6 @@ module Alerts
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
             expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq false
           end
-
         end
 
         context 'when there is no course start_at' do
@@ -136,7 +132,6 @@ module Alerts
           end
         end
       end
-
     end
   end
 end

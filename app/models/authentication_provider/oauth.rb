@@ -22,8 +22,7 @@ require 'oauth2'
 require 'canvas/core_ext/oauth2'
 
 class AuthenticationProvider::Oauth < AuthenticationProvider::Delegated
-
-  SENSITIVE_PARAMS = [ :consumer_secret ].freeze
+  SENSITIVE_PARAMS = [:consumer_secret].freeze
 
   # rename DB fields to something that makes sense for OAuth2
   def consumer_key=(val)

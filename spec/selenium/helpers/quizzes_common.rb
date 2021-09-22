@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module QuizzesCommon
-
-  def create_quiz_with_due_date(opts={})
+  def create_quiz_with_due_date(opts = {})
     @context = opts.fetch(:course, @course)
     @quiz = quiz_model
     @quiz.generate_quiz_data
@@ -49,7 +48,7 @@ module QuizzesCommon
     f('.ContainerDueDate .ic-token-delete-button').click
   end
 
-  def create_multiple_choice_question(opts={})
+  def create_multiple_choice_question(opts = {})
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
@@ -70,7 +69,7 @@ module QuizzesCommon
     set_question_comment(".question_neutral_comment", "Pass or fail you are a winner!")
 
     button_locator = "//button[contains(.,'Update Question') and not(contains(.,'Create'))]"
-    update_question_button=driver.find_element(:xpath,button_locator)
+    update_question_button = driver.find_element(:xpath, button_locator)
     scroll_to(update_question_button)
     update_question_button.click
     wait_for_ajaximations
@@ -142,14 +141,14 @@ module QuizzesCommon
     click_settings_tab
   end
 
-  def quiz_with_multiple_type_questions(goto_edit=true)
+  def quiz_with_multiple_type_questions(goto_edit = true)
     @context = @course
     bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
-    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+    answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
@@ -190,7 +189,7 @@ module QuizzesCommon
     @quiz
   end
 
-  def quiz_with_essay_questions(goto_edit=true)
+  def quiz_with_essay_questions(goto_edit = true)
     # TODO: DRY this up
     @context = @course
     bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
@@ -198,7 +197,7 @@ module QuizzesCommon
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
-    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+    answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
@@ -238,14 +237,14 @@ module QuizzesCommon
     @quiz
   end
 
-  def quiz_with_new_questions(goto_edit=true, *answers)
+  def quiz_with_new_questions(goto_edit = true, *answers)
     @context = @course
     bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
 
-    answers = [ {id: 1}, {id: 2}, {id: 3} ] if answers.empty?
+    answers = [{ id: 1 }, { id: 2 }, { id: 3 }] if answers.empty?
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
@@ -381,7 +380,7 @@ module QuizzesCommon
     driver.switch_to.alert.accept if alert_present?
   end
 
-  def take_and_answer_quiz(opts={})
+  def take_and_answer_quiz(opts = {})
     @quiz = opts[:quiz] if opts.fetch(:quiz, false)
     submit = opts.fetch(:submit, true)
     access_code = opts.fetch(:access_code, nil)
@@ -390,7 +389,7 @@ module QuizzesCommon
     complete_and_submit_quiz(submit)
   end
 
-  def begin_quiz(access_code=nil, opts={})
+  def begin_quiz(access_code = nil, opts = {})
     get take_quiz_url
 
     # do this as close to submission creation as possible to avoid being locked by the time the page loads
@@ -415,7 +414,7 @@ module QuizzesCommon
     expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
   end
 
-  def preview_quiz(submit=true)
+  def preview_quiz(submit = true)
     open_quiz_show_page
 
     expect_new_page_load { f('#preview_quiz_button').click }
@@ -432,7 +431,7 @@ module QuizzesCommon
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def complete_and_submit_quiz(submit=true)
+  def complete_and_submit_quiz(submit = true)
     answer =
       if block_given?
         yield(@quiz.stored_questions[0][:answers])
@@ -447,15 +446,15 @@ module QuizzesCommon
 
   def answer_questions_and_submit(quiz, num_questions, submit = true)
     num_questions.times do |o|
-     question = quiz.stored_questions[o][:id]
-     case quiz.stored_questions[o][:question_type]
-     when "multiple_choice_question"
-       fj("input[type=radio][name= 'question_#{question}']").click
-     when "essay_question"
-       type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
-     when "numerical_question"
-       fj("input[type=text][name= 'question_#{question}']").send_keys('10')
-     end
+      question = quiz.stored_questions[o][:id]
+      case quiz.stored_questions[o][:question_type]
+      when "multiple_choice_question"
+        fj("input[type=radio][name= 'question_#{question}']").click
+      when "essay_question"
+        type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
+      when "numerical_question"
+        fj("input[type=text][name= 'question_#{question}']").send_keys('10')
+      end
     end
 
     submit_quiz if submit
@@ -498,7 +497,7 @@ module QuizzesCommon
     hover(question)
   end
 
-  def select_regrade_option(option_index=0)
+  def select_regrade_option(option_index = 0)
     visible_regrade_options[option_index].click
     fj('.ui-dialog:visible .btn-primary').click
     wait_for_ajaximations
@@ -557,7 +556,6 @@ module QuizzesCommon
     driver.execute_script "$('.answer').addClass('hover');"
     fj('.delete_answer_link:visible').click
   end
-
 
   ##
   # creates a question group through the browser
@@ -646,7 +644,6 @@ module QuizzesCommon
     driver.action.move_to(group).perform
   end
 
-
   ##
   # Drags a question with ActiveRecord id `question_id` into group with
   # ActiveRecord id `group_id`
@@ -705,7 +702,7 @@ module QuizzesCommon
     js_drag_and_drop source, target
   end
 
-  def quiz_create(opts={})
+  def quiz_create(opts = {})
     course = opts.fetch(:course, @course)
     @quiz = course.quizzes.create
 
@@ -734,7 +731,7 @@ module QuizzesCommon
     @quiz
   end
 
-  def seed_quiz_with_submission(num=1, opts={})
+  def seed_quiz_with_submission(num = 1, opts = {})
     quiz_data = opts[:question_data] || [
       {
         question_name: 'Multiple Choice',

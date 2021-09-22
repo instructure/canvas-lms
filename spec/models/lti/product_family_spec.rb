@@ -23,10 +23,9 @@ require_dependency "lti/product_family"
 
 module Lti
   describe ProductFamily do
-    let(:account){Account.new}
+    let(:account) { Account.new }
 
     describe 'validations' do
-
       before(:each) do
         subject.vendor_code = 'vendor_code'
         subject.product_code = 'product_code'
@@ -59,14 +58,12 @@ module Lti
       end
 
       it 'requires unique productcode,vendorcode,rootaccount,developerkey combo' do
-        dev_key = DeveloperKey.create(api_key:'testapikey')
+        dev_key = DeveloperKey.create(api_key: 'testapikey')
         subject.update(developer_key: dev_key, root_account: account)
         dup_subject = subject.dup
         dup_subject.save
         expect(dup_subject.errors.first).to eq [:product_code, "has already been taken"]
       end
-
     end
-
   end
 end

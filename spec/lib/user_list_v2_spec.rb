@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # coding: utf-8
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -22,7 +23,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe UserListV2 do
-
   before(:each) do
     @account = Account.default
     @account.settings = { :open_registration => true }
@@ -31,22 +31,22 @@ describe UserListV2 do
 
   it "should complain about invalid input" do
     ul = UserListV2.new "i\x01nstructure", search_type: 'unique_id'
-    expect(ul.errors).to eq [{:address => "i\x01nstructure", :details => :unparseable}]
+    expect(ul.errors).to eq [{ :address => "i\x01nstructure", :details => :unparseable }]
   end
 
   it "responds responsibly to incorrect search type" do
-    expect { UserListV2.new "instructure", search_type: 'tarnation_declaration' }.
-      to raise_error(UserListV2::ParameterError)
+    expect { UserListV2.new "instructure", search_type: 'tarnation_declaration' }
+      .to raise_error(UserListV2::ParameterError)
   end
 
   it "should not fail with unicode names" do
     ul = UserListV2.new '"senor molé" <blah@instructure.com>', search_type: 'unique_id'
-    expect(ul.missing_results.map{|x| [x[:user_name], x[:address]]}).to eq [["senor molé", "blah@instructure.com"]]
+    expect(ul.missing_results.map { |x| [x[:user_name], x[:address]] }).to eq [["senor molé", "blah@instructure.com"]]
   end
 
   it "should find by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
-    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
+    communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
     expect(ul.resolved_results.first[:address]).to eq '(801) 555-5555'
     expect(ul.resolved_results.first[:user_id]).to eq @user.id
@@ -61,24 +61,24 @@ describe UserListV2 do
   it "should find duplicates by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     @user1 = @user
-    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
+    communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
 
     user_with_pseudonym(:name => "JT2", :active_all => 1)
-    communication_channel(@user, {username: '8015555555@txt.fakeplace.net', path_type: 'sms', active_cc: true})
+    communication_channel(@user, { username: '8015555555@txt.fakeplace.net', path_type: 'sms', active_cc: true })
 
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
     expect(ul.resolved_results).to be_empty
-    expect(ul.duplicate_results.first.map{|r| r[:user_id]}).to match_array([@user1.id, @user.id])
-    expect(ul.duplicate_results.first.map{|r| r[:user_token]}).to match_array([@user1.token, @user.token])
+    expect(ul.duplicate_results.first.map { |r| r[:user_id] }).to match_array([@user1.id, @user.id])
+    expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user.token])
   end
 
   it "ignores unconfirmed emails" do
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
-    communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
+    communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
     @user1 = @user
     user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
-    communication_channel(@user, {username: 'jt+2@instructure.com'})
+    communication_channel(@user, { username: 'jt+2@instructure.com' })
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
     expect(ul.resolved_results.length).to eq 1
     expect(ul.resolved_results.first[:user_id]).to eq @user1.id
@@ -89,17 +89,17 @@ describe UserListV2 do
     Account.default.enable_feature!(:allow_unconfirmed_users_in_user_list)
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
-    communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
+    communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
     @user1 = @user
     user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
-    communication_channel(@user, {username: 'jt+2@instructure.com'})
+    communication_channel(@user, { username: 'jt+2@instructure.com' })
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
     expect(ul.duplicate_results.first.map { |r| r[:user_id] }).to match_array([@user1.id, @user.id])
     expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user.token])
   end
-  
+
   it "should not find users from untrusted accounts" do
     account = Account.create!
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
@@ -131,7 +131,7 @@ describe UserListV2 do
     allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
     ul = UserListV2.new('jt@instructure.com', :search_type => "unique_id")
-    expect(ul.resolved_results).to eq [{:address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :user_name => 'JT', :account_id => account.id, :account_name => account.name}]
+    expect(ul.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :user_name => 'JT', :account_id => account.id, :account_name => account.name }]
   end
 
   it "should show duplicates for two results from the current account and the trusted account" do
@@ -144,8 +144,8 @@ describe UserListV2 do
 
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
-    expect(ul.duplicate_results.first.map{|r| r[:user_id]}).to match_array([@user1.id, @user.id])
-    expect(ul.duplicate_results.first.map{|r| r[:user_token]}).to match_array([@user1.token, @user.token])
+    expect(ul.duplicate_results.first.map { |r| r[:user_id] }).to match_array([@user1.id, @user.id])
+    expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user.token])
   end
 
   context 'when searching by sis id' do
@@ -169,13 +169,13 @@ describe UserListV2 do
       expect(ul.resolved_results).to be_empty
       expect(ul.duplicate_results.count).to eq 1
       dup = ul.duplicate_results.first
-      expect(dup.map{|r| r[:user_id]}).to match_array([@user1.id, @user.id])
-      expect(dup.map{|r| r[:user_token]}).to match_array([@user1.token, @user.token])
+      expect(dup.map { |r| r[:user_id] }).to match_array([@user1.id, @user.id])
+      expect(dup.map { |r| r[:user_token] }).to match_array([@user1.token, @user.token])
 
       # should include additional idenfitying info on duplicates
-      expect(dup.map{|r| r[:email]}).to match_array(['jt@instructure.com', 'jt2@instructure.com'])
-      expect(dup.map{|r| r[:login_id]}).to match_array(['jt@instructure.com', 'jt2@instructure.com'])
-      expect(dup.map{|r| r[:sis_user_id]}).to match_array(['SISID', 'SISID'])
+      expect(dup.map { |r| r[:email] }).to match_array(['jt@instructure.com', 'jt2@instructure.com'])
+      expect(dup.map { |r| r[:login_id] }).to match_array(['jt@instructure.com', 'jt2@instructure.com'])
+      expect(dup.map { |r| r[:sis_user_id] }).to match_array(['SISID', 'SISID'])
     end
   end
 
@@ -192,8 +192,8 @@ describe UserListV2 do
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
     dups = ul.duplicate_results.first
-    expect(dups.map{|r| r[:account_id]}).to match_array([account1.id, account2.id])
-    expect(dups.map{|r| r[:login_id]}).to match_array(['jt@instructure.com', 'jt@instructure.com'])
+    expect(dups.map { |r| r[:account_id] }).to match_array([account1.id, account2.id])
+    expect(dups.map { |r| r[:login_id] }).to match_array(['jt@instructure.com', 'jt@instructure.com'])
     dups.each do |h|
       expect(h).to_not have_key(:sis_user_id) # only includes if can_read_sis is true
     end
@@ -215,7 +215,7 @@ describe UserListV2 do
   it "should not find a user from a different account by SMS" do
     account = Account.create!
     user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
-    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
+    communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserListV2.new('(801) 555-5555', search_type: 'cc_path')
     expect(ul.resolved_results).to eq []
     expect(ul.missing_results.first[:address]).to eq '(801) 555-5555'
@@ -231,10 +231,10 @@ describe UserListV2 do
       end
       allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
       ul1 = UserListV2.new('jt@instructure.com', search_type: 'sis_user_id', can_read_sis: true)
-      expect(ul1.missing_results.map{|r| r[:address]}).to eq ['jt@instructure.com']
+      expect(ul1.missing_results.map { |r| r[:address] }).to eq ['jt@instructure.com']
 
       ul2 = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
-      expect(ul2.resolved_results).to eq [{:address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :account_id => @account.id, :user_name => 'JT', :account_name => @account.name}]
+      expect(ul2.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :account_id => @account.id, :user_name => 'JT', :account_name => @account.name }]
     end
 
     it "should not get confused when dealing with cross-shard duplicate results that actually point to the same user" do
@@ -300,8 +300,8 @@ describe UserListV2 do
         expect(Pseudonym).to receive(:associated_shards_for_column).never
         ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
         expect(ul.resolved_results).to be_empty
-        expect(ul.duplicate_results.first.map{|r| r[:user_id]}).to match_array([@user1.id, @user2.id])
-        expect(ul.duplicate_results.first.map{|r| r[:user_token]}).to match_array([@user1.token, @user2.token])
+        expect(ul.duplicate_results.first.map { |r| r[:user_id] }).to match_array([@user1.id, @user2.id])
+        expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user2.token])
       end
 
       it "should use the global lookups to restrict searched shard if there are enough shards to look on" do
@@ -317,4 +317,3 @@ describe UserListV2 do
     end
   end
 end
-

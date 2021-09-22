@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 module AccountNotificationHelper
   # map the actual notification type to a type that we know how to handle
   def notification_icon_type(account_notification)

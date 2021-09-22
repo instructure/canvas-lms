@@ -46,10 +46,10 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
 
     completed_message_value = nil
-    progress_runner.completed_message {|completed| completed_message_value = completed; "foo"}
+    progress_runner.completed_message { |completed| completed_message_value = completed; "foo" }
 
     error_callback_called = false
-    progress_runner.error_message {|message, error_ids| error_callback_called = true; "bar"}
+    progress_runner.error_message { |message, error_ids| error_callback_called = true; "bar" }
 
     process_callback_count = 0
     ids = (0..9).to_a
@@ -104,8 +104,8 @@ describe ProgressRunner do
     expect(@progress.message).to eql "2 items processed\nprocessing error: 3, 4"
   end
   # These are also tested above
-  #it "should accumulate like errors into a single mesage line"
-  #it "should complete progress if only some records fail"
+  # it "should accumulate like errors into a single mesage line"
+  # it "should complete progress if only some records fail"
 
   it "should fail progress if all records fail" do
     @progress.extend(ProgressMessages)
@@ -130,5 +130,4 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
     progress_runner.do_batch_update(ids) {}
   end
-
 end

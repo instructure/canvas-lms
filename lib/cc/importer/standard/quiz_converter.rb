@@ -24,7 +24,7 @@ module CC::Importer::Standard
     def convert_quizzes
       quizzes = []
       questions = []
-      
+
       conversion_dir = @package_root.item_path("temp_qti_conversions")
 
       resources_by_type("imsqti").each do |res|
@@ -34,10 +34,11 @@ module CC::Importer::Standard
 
         if path.nil? # inline qti
           next unless res_node = @resource_nodes_for_flat_manifest[id]
+
           qti_node = res_node.elements.first
           path = "#{id}_qti.xml"
           full_path = get_full_path(path)
-          File.open(full_path, 'w') {|f| f << qti_node.to_xml} # write to file so we can convert with qti exporter
+          File.open(full_path, 'w') { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
         end
 
         if File.exist?(full_path)
@@ -54,9 +55,9 @@ module CC::Importer::Standard
         end
       end
 
-      [{:assessment_questions => questions}, {:assessments => quizzes}]
+      [{ :assessment_questions => questions }, { :assessments => quizzes }]
     end
-    
+
     def run_qti_converter(qti_file, out_folder, resource_id)
       # convert to 2.1
       command = Qti.get_conversion_command(out_folder, qti_file)
@@ -78,7 +79,7 @@ module CC::Importer::Standard
         questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
         ::Canvas::Migration::MigratorHelper.prepend_id_to_questions(questions, resource_id)
 
-        #try to replace relative urls
+        # try to replace relative urls
         questions.each do |question|
           question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
           question[:answers].each do |ans|
@@ -109,6 +110,5 @@ module CC::Importer::Standard
       end
       quiz
     end
-    
   end
 end

@@ -23,6 +23,7 @@ describe BroadcastPolicy do
   before(:each) do
     class PolicyHarness
       def self.before_save(r); true; end
+
       def self.after_save(r); true; end
       extend BroadcastPolicy::ClassMethods
     end
@@ -31,7 +32,7 @@ describe BroadcastPolicy do
   after(:each) do
     Object.send(:remove_const, :PolicyHarness)
   end
-  
+
   describe ".has_a_broadcast_policy" do
     it 'includes instance methods once declared to have one' do
       obj = PolicyHarness.new
@@ -47,8 +48,8 @@ describe BroadcastPolicy do
     it "handles multiple declarations" do
       class PolicyHarness
         has_a_broadcast_policy
-        set_broadcast_policy { dispatch :foo; to {}; whenever{}}
-        set_broadcast_policy { dispatch :bar; to {}; whenever{}}
+        set_broadcast_policy { dispatch :foo; to {}; whenever {} }
+        set_broadcast_policy { dispatch :bar; to {}; whenever {} }
       end
 
       policy_list = PolicyHarness.broadcast_policy_list
@@ -82,4 +83,3 @@ describe BroadcastPolicy do
     end
   end
 end
-

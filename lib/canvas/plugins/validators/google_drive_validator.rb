@@ -38,13 +38,13 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
         to_return = {
           :client_id => parsed['client_id'],
           :client_secret => parsed['client_secret'],
-          :redirect_uri => parsed['redirect_uris'][0], #we only care about the first one
+          :redirect_uri => parsed['redirect_uris'][0], # we only care about the first one
           :auth_uri => parsed['auth_uri'],
           :token_uri => parsed['token_uri'],
           :client_secret_json => ""
-         }
+        }
       else
-         to_return = settings.to_hash.with_indifferent_access
+        to_return = settings.to_hash.with_indifferent_access
       end
       to_return
     end
@@ -52,9 +52,10 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
 
   def self.check_json(settings)
     return nil if settings['client_secret_json'].blank?
+
     begin
       jayson = JSON.parse(settings['client_secret_json'])
-      if !!jayson #if is valid json
+      if !!jayson # if is valid json
         return 'Missing application type (Needs `web` somewhere in there)' unless jayson['web']
         return 'Missing `client_id`' unless jayson['web']['client_id']
         return 'Missing `client_secret`' unless jayson['web']['client_secret']
@@ -66,5 +67,4 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
       "Is not valid JSON \n (#{e.message}) \n (#{e.backtrace.inspect})"
     end
   end
-
 end

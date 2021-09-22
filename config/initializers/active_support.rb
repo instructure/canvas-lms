@@ -64,7 +64,6 @@ module ActiveSupport::Cache
   Entry.prepend(AllowMocksInStore)
 end
 
-
 module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
     return _extract_callstack(callstack) if callstack.first.is_a?(String)
@@ -79,11 +78,11 @@ module IgnoreMonkeyPatchesInDeprecations
 
   def ignored_callstack(frame)
     if frame.is_a?(String)
-        if md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/)
-          path, _, label = md.captures
-        else
-          return false
-        end
+      if md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/)
+        path, _, label = md.captures
+      else
+        return false
+      end
     else
       path, _, label = frame.absolute_path, frame.lineno, frame.label
     end
@@ -91,6 +90,7 @@ module IgnoreMonkeyPatchesInDeprecations
     return true if path&.start_with?(File.expand_path(File.dirname(__FILE__) + "/../../gems/activesupport-suspend_callbacks"))
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
+
     @switchman ||= File.expand_path(Gem.loaded_specs['switchman'].full_gem_path) + "/"
     return true if path&.start_with?(@switchman)
     return true if label == 'render' && path&.end_with?("application_controller.rb")
@@ -99,6 +99,7 @@ module IgnoreMonkeyPatchesInDeprecations
     return true if label == 'block in wrap_block_in_transaction' && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
 
     return false unless path
+
     super(path)
   end
 end

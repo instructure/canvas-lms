@@ -45,7 +45,7 @@ describe MessageBus do
       allow(client).to receive(:close) do
         raise ::Pulsar::Error::AlreadyClosed
       end
-      expect{ MessageBus.reset! }.to_not raise_error
+      expect { MessageBus.reset! }.to_not raise_error
       new_client = MessageBus.client
       expect(new_client).to_not eq(client)
     end
@@ -55,7 +55,7 @@ describe MessageBus do
     topic_name = "lazily-created-topic-#{SecureRandom.hex(16)}"
     subscription_name = "subscription-#{SecureRandom.hex(4)}"
     producer = MessageBus.producer_for(TEST_MB_NAMESPACE, topic_name)
-    log_values = {test_key: "test_val"}
+    log_values = { test_key: "test_val" }
     producer.send(log_values.to_json)
     consumer = MessageBus.consumer_for(TEST_MB_NAMESPACE, topic_name, subscription_name)
     msg = consumer.receive(1000)
@@ -73,9 +73,10 @@ describe MessageBus do
     allow(MessageBus).to receive(:producer_for) do |namespace, topic_name|
       call_count += 1
       raise(::Pulsar::Error::Timeout, "Big Ops Fail") if call_count <= 1
+
       original_producer_for.call(namespace, topic_name)
     end
-    MessageBus.send_one_message(TEST_MB_NAMESPACE, topic_name, {test_my_key: "test_my_val"}.to_json)
+    MessageBus.send_one_message(TEST_MB_NAMESPACE, topic_name, { test_my_key: "test_my_val" }.to_json)
     MessageBus.production_worker.stop! # make sure we actually get through shipping the messages
     consumer = MessageBus.consumer_for(TEST_MB_NAMESPACE, topic_name, subscription_name)
     msg = consumer.receive(1000)
@@ -92,7 +93,7 @@ describe MessageBus do
     5.times { original_config = MessageBus.config }
     # force the config to change, so we get a second yaml parse
     yaml = "NOT_THE_ORIGINAL: config"
-    allow(DynamicSettings).to receive(:find).and_return({'pulsar.yml' => yaml})
+    allow(DynamicSettings).to receive(:find).and_return({ 'pulsar.yml' => yaml })
     other_config = nil
     5.times { other_config = MessageBus.config }
     # make sure that the contents change when the dynamic settings change
@@ -127,5 +128,4 @@ describe MessageBus do
       expect(consumer1).to_not be(consumer3)
     end
   end
-
 end

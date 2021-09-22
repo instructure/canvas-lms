@@ -27,7 +27,7 @@ module Multipart
       @streams.map(&:size).sum
     end
 
-    def read(size=nil, outbuf=+"")
+    def read(size = nil, outbuf = +"")
       outbuf.replace("")
       if size.nil?
         # slurp up all remaining contents, even if that's just "" when eof at

@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class EnrollmentImporter < CSVBaseImporter
-
       def self.enrollment_csv?(row)
         (row.include?('section_id') || row.include?('course_id')) &&
           (row.include?('user_id') || row.include?('user_integration_id'))
@@ -33,7 +32,7 @@ module SIS
 
       # expected columns
       # course_id,user_id,role,section_id,status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         messages = []
         count = SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
@@ -56,6 +55,7 @@ module SIS
       end
 
       private
+
       def create_enrollment(row, messages, csv: nil)
         enrollment = SIS::Models::Enrollment.new(
           course_id: row['course_id'],

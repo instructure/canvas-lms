@@ -77,6 +77,7 @@ class Csp::Domain < ActiveRecord::Base
     base_domain ||= tool.domain
     base_domain ||= domain_from_url(tool.url)
     return [] unless base_domain
+
     base_domain = base_domain.downcase
     [base_domain, "*.#{base_domain}"]
   end

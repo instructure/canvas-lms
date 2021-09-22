@@ -31,7 +31,6 @@ describe "calendar2" do
   before(:each) do
     # or some stuff we need to click is "below the fold"
 
-
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -46,9 +45,9 @@ describe "calendar2" do
     it "should let me go to the Edit Appointment group page from the appointment group slot dialog" do
       date = Date.today.to_s
       create_appointment_group :new_appointments => [
-                                   ["#{date} 12:00:00", "#{date} 13:00:00"],
-                                   ["#{date} 13:00:00", "#{date} 14:00:00"],
-                               ]
+        ["#{date} 12:00:00", "#{date} 13:00:00"],
+        ["#{date} 13:00:00", "#{date} 14:00:00"],
+      ]
 
       get '/calendar2'
 
@@ -62,9 +61,9 @@ describe "calendar2" do
     it "should let me message students who have signed up for an appointment" do
       date = Date.today.to_s
       create_appointment_group :new_appointments => [
-                                   ["#{date} 12:00:00", "#{date} 13:00:00"],
-                                   ["#{date} 13:00:00", "#{date} 14:00:00"],
-                               ]
+        ["#{date} 12:00:00", "#{date} 13:00:00"],
+        ["#{date} 13:00:00", "#{date} 14:00:00"],
+      ]
       student1, student2 = 2.times.map do
         student_in_course :course => @course, :active_all => true
         @student
@@ -216,8 +215,8 @@ describe "calendar2" do
         local_now = @user.time_zone.now
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         @course.assignments.create!(
-            title: 'test assignment',
-            due_at: event_start,
+          title: 'test assignment',
+          due_at: event_start,
         )
         get "/calendar2"
         f('.fc-event').click
@@ -296,7 +295,7 @@ describe "calendar2" do
       create_graded_discussion
 
       # Even though graded discussion overwrites its assignment's title, less fragile to grab discussion's title
-      assert_views(@gd.title,@assignment.due_at)
+      assert_views(@gd.title, @assignment.due_at)
     end
 
     it "event appears on all calendars", priority: "1", test_id: 138846 do
@@ -306,7 +305,7 @@ describe "calendar2" do
       due_time = 5.minutes.from_now
       @course.calendar_events.create!(title: title, start_at: due_time)
 
-      assert_views(title,due_time)
+      assert_views(title, due_time)
     end
 
     it "assignment appears on all calendars", priority: "1", test_id: 238862 do
@@ -316,7 +315,7 @@ describe "calendar2" do
       due_time = 5.minutes.from_now
       @assignment = @course.assignments.create!(name: title, due_at: due_time)
 
-      assert_views(title,due_time)
+      assert_views(title, due_time)
     end
 
     it "quiz appears on all calendars", priority: "1", test_id: 238863 do
@@ -324,7 +323,7 @@ describe "calendar2" do
 
       create_quiz
 
-      assert_views(@quiz.title,@quiz.due_at)
+      assert_views(@quiz.title, @quiz.due_at)
     end
   end
 

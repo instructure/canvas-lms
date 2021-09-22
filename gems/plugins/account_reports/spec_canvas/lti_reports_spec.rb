@@ -66,55 +66,55 @@ describe 'lti report' do
   end
 
   it 'should run on a root account' do
-    parsed = read_report(@type, {order: 4})
+    parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 3
     expect(parsed[0]).to eq([
-      @t1.context_type,
-      @t1.context_id.to_s,
-      @account.name,
-      nil,
-      @t1.name,
-      @t1.tool_id,
-      @t1.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
-      @t1.privacy_level,
-      @t1.url,
-      nil
-    ])
+                              @t1.context_type,
+                              @t1.context_id.to_s,
+                              @account.name,
+                              nil,
+                              @t1.name,
+                              @t1.tool_id,
+                              @t1.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                              @t1.privacy_level,
+                              @t1.url,
+                              nil
+                            ])
   end
 
   it 'should run on a sub account' do
-    parsed = read_report(@type, {order: 4, account: @sub_account})
+    parsed = read_report(@type, { order: 4, account: @sub_account })
     expect(parsed.length).to eq 1
     expect(parsed[0]).to eq([
-      @t2.context_type,
-      @t2.context_id.to_s,
-      nil,
-      @course.name,
-      @t2.name,
-      @t2.tool_id,
-      @t2.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
-      @t2.privacy_level,
-      @t2.url,
-      nil
-    ])
+                              @t2.context_type,
+                              @t2.context_id.to_s,
+                              nil,
+                              @course.name,
+                              @t2.name,
+                              @t2.tool_id,
+                              @t2.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                              @t2.privacy_level,
+                              @t2.url,
+                              nil
+                            ])
   end
 
   it 'should not include tools from deleted courses' do
     @course.destroy
-    parsed = read_report(@type, {order: 4})
+    parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
   it 'should not include tools from courses in deleted accounts' do
     Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
-    parsed = read_report(@type, {order: 4})
+    parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
   it 'should include tools from deleted courses for include deleted objects' do
     Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
     @course.destroy
-    parsed = read_report(@type, {params: {"include_deleted" => true}, order: 4})
+    parsed = read_report(@type, { params: { "include_deleted" => true }, order: 4 })
     expect(parsed.length).to eq 3
   end
 end

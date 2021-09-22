@@ -49,25 +49,25 @@ describe GradingStandardsApiController, type: :request do
   end
   let(:account_resource_params) do
     account_resources_params.merge({
-      action: 'context_show',
-      grading_standard_id: account_standard.id
-    })
+                                     action: 'context_show',
+                                     grading_standard_id: account_standard.id
+                                   })
   end
   let(:course_resource_params) do
     course_resources_params.merge({
-      action: 'context_show',
-      grading_standard_id: course_standard.id
-    })
+                                    action: 'context_show',
+                                    grading_standard_id: course_standard.id
+                                  })
   end
   let(:account_create_params) do
     account_resources_params.merge({
-      action: 'create'
-    })
+                                     action: 'create'
+                                   })
   end
   let(:course_create_params) do
     course_resources_params.merge({
-      action: 'create'
-    })
+                                    action: 'create'
+                                  })
   end
 
   context "account admin" do
@@ -107,52 +107,52 @@ describe GradingStandardsApiController, type: :request do
       end
 
       it "returns a 404 if the grading standard does not exist" do
-        res = api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, {expected_status: 404})
+        res = api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, { expected_status: 404 })
       end
     end
 
     describe 'grading standards creation' do
       let(:grading_scheme_entry) do
         [
-          {"name"=>"A", "value"=>"90"},
-          {"name"=>"B", "value"=>"80"},
-          {"name"=>"C", "value"=>"70"},
-          {"name"=>"D", "value"=>"0"},
+          { "name" => "A", "value" => "90" },
+          { "name" => "B", "value" => "80" },
+          { "name" => "C", "value" => "70" },
+          { "name" => "D", "value" => "0" },
         ]
       end
 
       it "creates account level grading standards" do
-        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>grading_scheme_entry}
+        post_params = { "title" => "account grading standard", "grading_scheme_entry" => grading_scheme_entry }
         json = api_call(:post, account_resources_path, account_create_params, post_params)
         expect(json['title']).to eq 'account grading standard'
         expect(json['context_id']).to eq account.id
         expect(json['context_type']).to eq 'Account'
         data = json['grading_scheme']
         expect(data.count).to eq 4
-        expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
-        expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
-        expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
-        expect(data[3]).to eq({'name'=>'D', 'value'=>0.0})
+        expect(data[0]).to eq({ 'name' => 'A', 'value' => 0.9 })
+        expect(data[1]).to eq({ 'name' => 'B', 'value' => 0.8 })
+        expect(data[2]).to eq({ 'name' => 'C', 'value' => 0.7 })
+        expect(data[3]).to eq({ 'name' => 'D', 'value' => 0.0 })
       end
 
       it "creates course level grading standards" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>grading_scheme_entry}
+        post_params = { "title" => "course grading standard", "grading_scheme_entry" => grading_scheme_entry }
         json = api_call(:post, course_resources_path, course_create_params, post_params)
         expect(json['title']).to eq 'course grading standard'
         expect(json['context_id']).to eq course.id
         expect(json['context_type']).to eq 'Course'
         data = json['grading_scheme']
         expect(data.count).to eq 4
-        expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
-        expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
-        expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
-        expect(data[3]).to eq({'name'=>'D', 'value'=>0.0})
+        expect(data[0]).to eq({ 'name' => 'A', 'value' => 0.9 })
+        expect(data[1]).to eq({ 'name' => 'B', 'value' => 0.8 })
+        expect(data[2]).to eq({ 'name' => 'C', 'value' => 0.7 })
+        expect(data[3]).to eq({ 'name' => 'D', 'value' => 0.0 })
       end
 
       it "returns error if no grading scheme provided" do
-        post_params = {"title"=>"account grading standard"}
-        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
-        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"blank", "message"=>"blank"}]}})
+        post_params = { "title" => "account grading standard" }
+        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 400 })
+        expect(json).to eq({ "errors" => { "data" => [{ "attribute" => "data", "type" => "blank", "message" => "blank" }] } })
       end
 
       it "returns error if grading scheme does not contain a grade for 0%" do
@@ -161,8 +161,8 @@ describe GradingStandardsApiController, type: :request do
           { "name" => "B", "value" => "80" },
           { "name" => "C", "value" => "70" },
         ]
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> grading_standard_without_zero }
-        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
+        post_params = { "title" => "course grading standard", "grading_scheme_entry" => grading_standard_without_zero }
+        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 400 })
         expected_json = {
           "errors" => {
             "data" => [
@@ -184,8 +184,8 @@ describe GradingStandardsApiController, type: :request do
           { "name" => "C", "value" => "70" },
           { "name" => "D", "value" => "0" }
         ]
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> negative_grading_standard }
-        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
+        post_params = { "title" => "course grading standard", "grading_scheme_entry" => negative_grading_standard }
+        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 400 })
         expected_json = {
           "errors" => {
             "data" => [
@@ -207,8 +207,8 @@ describe GradingStandardsApiController, type: :request do
           { "name" => "C", "value" => "90" },
           { "name" => "D", "value" => "0" }
         ]
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=> duplicate_grading_standard }
-        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, {expected_status: 400})
+        post_params = { "title" => "course grading standard", "grading_scheme_entry" => duplicate_grading_standard }
+        json = api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 400 })
         expected_json = {
           "errors" => {
             "data" => [
@@ -228,10 +228,10 @@ describe GradingStandardsApiController, type: :request do
   context "teacher" do
     let(:grading_scheme_entry) do
       [
-        {"name"=>"A", "value"=>"90"},
-        {"name"=>"B", "value"=>"80"},
-        {"name"=>"C", "value"=>"70"},
-        {"name"=>"D", "value"=>"0"},
+        { "name" => "A", "value" => "90" },
+        { "name" => "B", "value" => "80" },
+        { "name" => "C", "value" => "70" },
+        { "name" => "D", "value" => "0" },
       ]
     end
 
@@ -243,13 +243,13 @@ describe GradingStandardsApiController, type: :request do
 
     describe "grading standard creation" do
       it "returns unauthorized for account grading standards" do
-        post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>grading_scheme_entry}
-        api_call(:post, account_resources_path, account_create_params, post_params, {}, {:expected_status => 401})
+        post_params = { "title" => "account grading standard", "grading_scheme_entry" => grading_scheme_entry }
+        api_call(:post, account_resources_path, account_create_params, post_params, {}, { :expected_status => 401 })
       end
 
       it "returns ok for course grading standards" do
-        post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>grading_scheme_entry}
-        api_call(:post, course_resources_path, course_create_params, post_params, {}, {:expected_status => 200})
+        post_params = { "title" => "course grading standard", "grading_scheme_entry" => grading_scheme_entry }
+        api_call(:post, course_resources_path, course_create_params, post_params, {}, { :expected_status => 200 })
       end
     end
 

@@ -68,7 +68,7 @@ module CC::Importer::Standard
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])
 
-      #close up shop
+      # close up shop
       save_to_file
       delete_unzipped_archive
       @course
@@ -80,7 +80,7 @@ module CC::Importer::Standard
     # After this runs all migration_ids in @resources for the variant chain
     # should point to just one object
     def process_variants
-      @resources.values.select{|r|r[:preferred_resource_id]}.each do |res|
+      @resources.values.select { |r| r[:preferred_resource_id] }.each do |res|
         preferred = @resources[res[:preferred_resource_id]]
         if preferred && preferred != res
           if preferred[:type] =~ SUPPORTED_TYPES
@@ -97,8 +97,9 @@ module CC::Importer::Standard
 
     def find_file_migration_id(path)
       return unless path.present?
+
       mig_id = @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
-        @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
+               @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
 
       unless mig_id
         full_path = @package_root.item_path(path)
@@ -106,8 +107,8 @@ module CC::Importer::Standard
         if File.exists?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
-          file = {:path_name => path, :migration_id => mig_id,
-            :file_name => File.basename(path), :type => 'FILE_TYPE'}
+          file = { :path_name => path, :migration_id => mig_id,
+                   :file_name => File.basename(path), :type => 'FILE_TYPE' }
           add_course_file(file)
         end
       end
@@ -115,7 +116,7 @@ module CC::Importer::Standard
       mig_id
     end
 
-    def get_canvas_att_replacement_url(path, resource_dir=nil)
+    def get_canvas_att_replacement_url(path, resource_dir = nil)
       if path.start_with?('../')
         if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
           return url
@@ -130,7 +131,7 @@ module CC::Importer::Standard
 
       unless mig_id
         path = path.gsub(%r{\$[^$]*\$|\.\./}, '')
-        if key = @file_path_migration_id.keys.detect{|k| k.end_with?(path)}
+        if key = @file_path_migration_id.keys.detect { |k| k.end_with?(path) }
           mig_id = @file_path_migration_id[key]
         end
       end
@@ -142,8 +143,9 @@ module CC::Importer::Standard
       @course[:file_map][file[:migration_id]] = file
     end
 
-    def add_course_file(file, overwrite=false)
+    def add_course_file(file, overwrite = false)
       return unless file[:path_name]
+
       file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
       file[:path_name] = file[:path_name][1..-1] if file[:path_name].start_with?('/')
       if @file_path_migration_id[file[:path_name]] && overwrite
@@ -156,7 +158,7 @@ module CC::Importer::Standard
     end
 
     FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
-    def replace_urls(html, resource_dir=nil)
+    def replace_urls(html, resource_dir = nil)
       return "" if html.blank?
 
       doc = Nokogiri::HTML5(html || "")
@@ -192,7 +194,7 @@ module CC::Importer::Standard
     end
 
     def find_assignment(migration_id)
-      @course[:assignments].find{|a|a[:migration_id] == migration_id}
+      @course[:assignments].find { |a| a[:migration_id] == migration_id }
     end
 
     def convert_blti_links_with_flat(lti_converter)
@@ -211,14 +213,14 @@ module CC::Importer::Standard
 
     # these types all came from https://www.imsglobal.org/cc/ccv1p3/imscc_Overview-v1p3.html#toc-7
     UNSUPPORTED_RESOURCE_TYPES = [
-      ['imsapip_zipv1p0', -> { I18n.t("This package includes APIP file(s), which are not compatible with Canvas and were not included in the import.")}],
-      ['imsiwb_iwbv1p0', -> { I18n.t("This package includes IWB file(s), which are not compatible with Canvas and were not included in the import.")}],
-      ['idpfepub_epubv3p0', -> { I18n.t("This package includes EPub3 file(s), which are not compatible with Canvas and were not included in the import.")}]
+      ['imsapip_zipv1p0', -> { I18n.t("This package includes APIP file(s), which are not compatible with Canvas and were not included in the import.") }],
+      ['imsiwb_iwbv1p0', -> { I18n.t("This package includes IWB file(s), which are not compatible with Canvas and were not included in the import.") }],
+      ['idpfepub_epubv3p0', -> { I18n.t("This package includes EPub3 file(s), which are not compatible with Canvas and were not included in the import.") }]
     ].freeze
 
     def check_for_unsupported_resources
       UNSUPPORTED_RESOURCE_TYPES.each do |type, message_proc|
-        if @resources.values.any?{|r| r[:type] == type}
+        if @resources.values.any? { |r| r[:type] == type }
           add_warning(message_proc.call)
         end
       end

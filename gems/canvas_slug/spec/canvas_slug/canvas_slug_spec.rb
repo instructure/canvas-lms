@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe CanvasSlug do
-  let(:subject) {CanvasSlug}
+  let(:subject) { CanvasSlug }
 
   describe ".generate_securish_uuid" do
     it "returns a securish uuid" do

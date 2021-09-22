@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module AvatarHelper
-
   def avatar_image_attrs(user_or_id)
     return ["/images/messages/avatar-50.png", ''] unless user_or_id
+
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
     account = @account || @domain_root_account
@@ -50,6 +50,7 @@ module AvatarHelper
 
   def avatar(user_or_id, opts = {})
     return unless service_enabled?(:avatars)
+
     # same markup as _avatar.handlebars, essentially
     avatar_url, display_name = avatar_image_attrs(user_or_id)
     context_code = opts[:context_code] if opts[:context_code]
@@ -64,7 +65,7 @@ module AvatarHelper
       end
     end
     link_opts = {}
-    link_opts[:class] = 'fs-exclude avatar '+opts[:class].to_s
+    link_opts[:class] = 'fs-exclude avatar ' + opts[:class].to_s
     link_opts[:style] = "background-image: url(#{avatar_url})"
     link_opts[:style] += ";width: #{opts[:size]}px;height: #{opts[:size]}px" if opts[:size]
     link_opts[:href] = url if url
@@ -79,7 +80,7 @@ module AvatarHelper
     if participants.size == 1
       avatar_url_for_user(participants.first)
     elsif participants.size == 2
-      avatar_url_for_user(participants.find{ |u| u.id != conversation.user_id })
+      avatar_url_for_user(participants.find { |u| u.id != conversation.user_id })
     else
       avatar_url_for_group
     end
@@ -101,14 +102,14 @@ module AvatarHelper
     use_fallback = false if Canvas::Plugin.value_to_boolean(request&.params&.[](:no_avatar_fallback))
     default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
     url = if avatars_enabled_for_user?(user, root_account: root_account)
-      user.avatar_url(nil,
-                      (root_account && root_account.settings[:avatars] || 'enabled'),
-                      default_avatar,
-                      request,
-                      use_fallback)
-    else
-      default_avatar
-    end
+            user.avatar_url(nil,
+                            (root_account && root_account.settings[:avatars] || 'enabled'),
+                            default_avatar,
+                            request,
+                            use_fallback)
+          else
+            default_avatar
+          end
 
     if url.present? && !url.match(%r{\Ahttps?://})
       # make sure that the url is not just a path
@@ -121,5 +122,4 @@ module AvatarHelper
   def avatar_url_for_user(user)
     AvatarHelper.avatar_url_for_user(user, request, root_account: @domain_root_account)
   end
-
 end

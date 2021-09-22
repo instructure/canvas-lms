@@ -23,7 +23,7 @@ class BackfillModerationGraders < ActiveRecord::Migration[5.0]
   def self.up
     Assignment.where(moderated_grading: true).where("grader_count = 0 or grader_count is null").find_ids_in_ranges do |start_at, end_at|
       DataFixup::BackfillModerationGraders.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::BackfillModerationGraders", Shard.current.database_server.id]).run(start_at, end_at)
+                                                               n_strand: ["DataFixup::BackfillModerationGraders", Shard.current.database_server.id]).run(start_at, end_at)
     end
   end
 end

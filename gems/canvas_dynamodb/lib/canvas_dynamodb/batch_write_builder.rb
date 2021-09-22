@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasDynamoDB
-
   class BatchWriteBuilder < BatchBuilderBase
-
     def operation
       :batch_write_item
     end
@@ -49,7 +47,5 @@ module CanvasDynamoDB
         true
       end
     end
-
   end
-
 end

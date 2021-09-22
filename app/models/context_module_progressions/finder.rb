@@ -24,9 +24,9 @@ module ContextModuleProgressions
       modules = context.context_modules.where(workflow_state: 'active').to_a
 
       existing_progressions = ContextModuleProgression
-        .where(user_id: user)
-        .where(context_module_id: modules)
-        .index_by(&:context_module_id)
+                              .where(user_id: user)
+                              .where(context_module_id: modules)
+                              .index_by(&:context_module_id)
 
       modules.map do |mod|
         if existing_progressions.include?(mod.id)

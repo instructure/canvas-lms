@@ -184,4 +184,3 @@ shared_examples_for "settings basic tests" do |account_type|
     end
   end
 end
-

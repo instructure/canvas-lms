@@ -39,12 +39,12 @@ module CanvasErrors
       )
     end
 
-    let(:worker){ double(name: 'workername') }
+    let(:worker) { double(name: 'workername') }
 
-    let(:info){ described_class.new(job, worker) }
+    let(:info) { described_class.new(job, worker) }
 
     describe "#to_h" do
-      subject(:hash){ info.to_h }
+      subject(:hash) { info.to_h }
 
       it "tags all exceptions as 'BackgroundJob'" do
         expect(hash[:tags][:process_type]).to eq("BackgroundJob")
@@ -68,8 +68,8 @@ module CanvasErrors
       end
 
       it 'includes the source, which has the request context id' do
-        expect(hash[:extra][:source]).
-          to match(/c5ec694d-1c0d-4744-a97a-cae44c477837/)
+        expect(hash[:extra][:source])
+          .to match(/c5ec694d-1c0d-4744-a97a-cae44c477837/)
       end
     end
 

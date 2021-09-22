@@ -33,7 +33,7 @@ module Lti
 
     let(:submission) do
       assignment.submit_homework(student, submission_type: 'online_upload',
-                                 attachments: [attachment])
+                                          attachments: [attachment])
     end
 
     let(:mock_file) do
@@ -108,12 +108,11 @@ module Lti
         tool_proxy.raw_data['security_contract'] = security_contract
         tool_proxy.save!
         token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
-        other_helpers = {Authorization: "Bearer #{token}"}
+        other_helpers = { Authorization: "Bearer #{token}" }
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
         get endpoint, headers: other_helpers
         expect(response).not_to be '401'
       end
-
     end
 
     describe "#show" do
@@ -173,7 +172,6 @@ module Lti
     end
 
     describe "#history" do
-
       let(:endpoint) { "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/history" }
       include_examples "authorization"
       it "returns the submission history as an array of JSON objects" do
@@ -183,18 +181,18 @@ module Lti
           expect(JSON.parse(response.body)).to(
             match_array(
               [{
-                 "id" => submission.id,
-                 "body" => nil,
-                 "url" => nil,
-                 "submitted_at" => now.iso8601,
-                 "assignment_id" => assignment.id,
-                 "user_id" => Lti::Asset.opaque_identifier_for(student),
-                 "submission_type" => "online_upload",
-                 "workflow_state" => "submitted",
-                 "attempt" => 1,
-                 "course_id" => assignment.context.global_id,
-                 "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
-                 "attachments" =>
+                "id" => submission.id,
+                "body" => nil,
+                "url" => nil,
+                "submitted_at" => now.iso8601,
+                "assignment_id" => assignment.id,
+                "user_id" => Lti::Asset.opaque_identifier_for(student),
+                "submission_type" => "online_upload",
+                "workflow_state" => "submitted",
+                "attempt" => 1,
+                "course_id" => assignment.context.global_id,
+                "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+                "attachments" =>
                    [
                      {
                        "id" => attachment.id,
@@ -207,7 +205,7 @@ module Lti
                        "updated_at" => now.iso8601
                      }
                    ]
-               }]
+              }]
             )
           )
         end
@@ -217,7 +215,7 @@ module Lti
         attachments = [attachment_model(filename: "submission-a.doc", :context => student)]
         Timecop.freeze(10.second.ago) do
           assignment.submit_homework(student, submission_type: 'online_upload',
-                                     attachments: [attachments[0]])
+                                              attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", :context => student)
@@ -237,7 +235,6 @@ module Lti
     end
 
     describe "#attachment" do
-
       let(:endpoint) { "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment.id}" }
       include_examples 'authorization'
 
@@ -270,7 +267,6 @@ module Lti
           end
         end
       end
-
     end
 
     describe 'service' do
@@ -284,6 +280,5 @@ module Lti
         expect(service_url).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history'
       end
     end
-
   end
 end

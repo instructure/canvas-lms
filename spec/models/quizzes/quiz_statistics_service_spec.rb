@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizStatisticsService do
-
   let_once (:course) { Course.new.tap { |course| course.id = 1 } }
   let_once :quiz do
     Quizzes::Quiz.new.tap do |quiz|
@@ -34,22 +33,22 @@ describe Quizzes::QuizStatisticsService do
   describe '#generate_aggregate_statistics' do
     let :student_analysis do
       quiz.quiz_statistics.build({
-        report_type: 'student_analysis',
-        includes_all_versions: true,
-        anonymous: false
-      })
+                                   report_type: 'student_analysis',
+                                   includes_all_versions: true,
+                                   anonymous: false
+                                 })
     end
 
     let :item_analysis do
       quiz.quiz_statistics.build({
-        report_type: 'item_analysis',
-        includes_all_versions: true,
-        anonymous: false
-      })
+                                   report_type: 'item_analysis',
+                                   includes_all_versions: true,
+                                   anonymous: false
+                                 })
     end
 
     before do
-      [ student_analysis, item_analysis ].each do |analysis|
+      [student_analysis, item_analysis].each do |analysis|
         allow(analysis).to receive(:save)
       end
     end
@@ -58,9 +57,9 @@ describe Quizzes::QuizStatisticsService do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
-        includes_all_versions: true,
-        includes_sis_ids: true
-      }).and_return(student_analysis)
+                                                              includes_all_versions: true,
+                                                              includes_sis_ids: true
+                                                            }).and_return(student_analysis)
 
       expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
 
@@ -71,9 +70,9 @@ describe Quizzes::QuizStatisticsService do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
-        includes_all_versions: false,
-        includes_sis_ids: true
-      }).and_return(student_analysis)
+                                                              includes_all_versions: false,
+                                                              includes_sis_ids: true
+                                                            }).and_return(student_analysis)
 
       expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
 

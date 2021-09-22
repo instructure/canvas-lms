@@ -48,21 +48,21 @@ describe ModelView do
   end
 
   it "generates a schema" do
-    view = ModelView.new("Example", {"name" => {"type" => "string"}})
+    view = ModelView.new("Example", { "name" => { "type" => "string" } })
     expect(view.json_schema).to eq({
-      "Example" => {
-        "id" => "Example",
-        "properties" => {
-          "name" => {
-            "type" => "string"
-          }
-        },
-        "description" => "",
-        "required" => [],
-        "deprecated" => false,
-        "deprecation_description" => ""
-      }
-    })
+                                     "Example" => {
+                                       "id" => "Example",
+                                       "properties" => {
+                                         "name" => {
+                                           "type" => "string"
+                                         }
+                                       },
+                                       "description" => "",
+                                       "required" => [],
+                                       "deprecated" => false,
+                                       "deprecation_description" => ""
+                                     }
+                                   })
   end
 
   describe '#deprecated?' do

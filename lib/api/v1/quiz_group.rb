@@ -30,7 +30,7 @@ module Api::V1::QuizGroup
       question_points
       assessment_question_bank_id
       position
-      )
+    )
   }
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
@@ -40,7 +40,7 @@ module Api::V1::QuizGroup
       question_points
       assessment_question_bank_id
       position
-      )
+    )
   }
 
   def quiz_groups_compound_json(quiz_groups, context, user, session)
@@ -67,5 +67,4 @@ module Api::V1::QuizGroup
     quiz_group.attributes = filter_params(quiz_group_params)
     quiz_group.save
   end
-
 end

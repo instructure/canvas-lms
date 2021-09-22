@@ -57,7 +57,7 @@ describe SubmissionDraftAttachment do
 
   context 'validation' do
     it 'will not let you have multiple of the same attachment to submission draft' do
-      expect{
+      expect {
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
           attachment: @attachment
@@ -66,7 +66,7 @@ describe SubmissionDraftAttachment do
     end
 
     it 'requires an attachment' do
-      expect{
+      expect {
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
           attachment: nil
@@ -75,7 +75,7 @@ describe SubmissionDraftAttachment do
     end
 
     it 'requires a submission draft' do
-      expect{
+      expect {
         SubmissionDraftAttachment.create!(
           submission_draft: nil,
           attachment: @attachment

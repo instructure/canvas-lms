@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ActiveRecord
-  module Acts #:nodoc:
-    module List #:nodoc:
+  module Acts # :nodoc:
+    module List # :nodoc:
       def self.included(base)
         base.extend(ClassMethods)
       end
@@ -74,7 +74,7 @@ module ActiveRecord
                     when Symbol
                       { scope => self }
                     when Array
-                      Hash[scope.map { |symbol| [symbol, self]}]
+                      Hash[scope.map { |symbol| [symbol, self] }]
                     when Hash
                       scope
                     else
@@ -97,7 +97,7 @@ module ActiveRecord
             scope = new_scope
 
             # build the conditions hash, using literal values or the attribute if it's self
-            conditions = Hash[scope.map { |k, v| [k, v == self ? k : v.inspect]}]
+            conditions = Hash[scope.map { |k, v| [k, v == self ? k : v.inspect] }]
             conditions = conditions.map { |c, v| "#{c}: #{v}" }.join(', ')
             # build the in_scope method, matching literals or requiring a foreign keys
             # to be non-nil
@@ -165,20 +165,22 @@ module ActiveRecord
         def insert_at(position = :top)
           return unless in_scope?
           return move_to_top if position == :top
+
           current_position = self.position
           return true if in_list? && position == current_position
+
           transaction do
             if in_list?
               if position < current_position
-                list_scope.where(self.class.position_column => position..(current_position - 1)).
-                    update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
+                list_scope.where(self.class.position_column => position..(current_position - 1))
+                          .update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
               else
-                list_scope.where(self.class.position_column => (current_position + 1)..position).
-                    update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
+                list_scope.where(self.class.position_column => (current_position + 1)..position)
+                          .update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
               end
             else
-              list_scope.where("#{self.class.position_column}>=?", position).
-                  update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
+              list_scope.where("#{self.class.position_column}>=?", position)
+                        .update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
             end
             self.update_attribute(self.class.position_column, position)
           end
@@ -188,6 +190,7 @@ module ActiveRecord
         # position adjusted accordingly.
         def move_to_bottom
           return unless in_scope?
+
           transaction do
             bottom = bottom_position
             if in_list?
@@ -202,6 +205,7 @@ module ActiveRecord
         # position adjusted accordingly.
         def move_to_top
           return unless in_scope?
+
           transaction do
             top = top_position
             insert_at(top)
@@ -212,8 +216,8 @@ module ActiveRecord
         def remove_from_list
           if in_list?
             transaction do
-              list_scope.where("#{self.class.position_column}>?", position).
-                  update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
+              list_scope.where("#{self.class.position_column}>?", position)
+                        .update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
               update_attribute self.class.position_column, nil
             end
           end
@@ -222,12 +226,14 @@ module ActiveRecord
         # Return +true+ if this object is the first in the list.
         def first?
           return false unless in_list?
+
           position == top_position
         end
 
         # Return +true+ if this object is the last in the list.
         def last?
           return false unless in_list?
+
           position == bottom_position
         end
 
@@ -235,12 +241,14 @@ module ActiveRecord
         #   bottom_position    # => 2
         def bottom_position
           return nil unless in_scope?
+
           list_scope.maximum(self.class.position_column)
         end
 
         # Returns the bottom item
         def bottom_item
           return nil unless in_scope?
+
           list_scope.last
         end
 
@@ -248,12 +256,14 @@ module ActiveRecord
         #   top_position    # => 1
         def top_position
           return nil unless in_scope?
+
           list_scope.minimum(self.class.position_column)
         end
 
         # Returns the top item
         def top_item
           return nil unless in_scope?
+
           list_scope.first
         end
 
@@ -267,15 +277,18 @@ module ActiveRecord
             id = id.to_i
             next unless id > 0
             next if done_ids.include?(id)
+
             done_ids << id.to_i
             updates << "WHEN #{id_column}=#{id} THEN #{done_ids.length}"
           end
           return if updates.empty?
+
           transaction do
             done_ids = done_ids.to_a
             moving_positions = list_scope.where(self.class.primary_key => done_ids).pluck(self.class.position_column.to_sym)
             moving_positions.each_with_index do |position, index|
               next unless position
+
               updates << "WHEN #{self.class.position_column}<=#{position} THEN #{self.class.position_column}+#{moving_positions.length - index}"
             end
             list_scope.update_all("#{self.class.position_column}=CASE #{updates.join(" ")} ELSE position END")
@@ -290,11 +303,11 @@ module ActiveRecord
             list_scope.select(self.class.primary_key).find_in_batches do |batch|
               updates = []
               batch.each_with_index do |obj, index|
-                updates << "WHEN #{obj.id} THEN #{index+offset}"
+                updates << "WHEN #{obj.id} THEN #{index + offset}"
               end
               offset += batch.length
-              list_scope.where(self.class.primary_key => batch).
-                  update_all("#{self.class.position_column}=CASE #{self.class.connection.quote_column_name(self.class.primary_key)} #{updates.join(" ")} END")
+              list_scope.where(self.class.primary_key => batch)
+                        .update_all("#{self.class.position_column}=CASE #{self.class.connection.quote_column_name(self.class.primary_key)} #{updates.join(" ")} END")
             end
           end
         end
@@ -305,15 +318,16 @@ module ActiveRecord
         def add_to_list_bottom
           return unless in_scope?
           return if in_list?
+
           self[self.class.position_column] = bottom_position.to_i + 1
         end
 
         private
 
-          def remove_from_list_for_destroy
-            list_scope.where("#{self.class.position_column}>?", position).
-                update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
-          end
+        def remove_from_list_for_destroy
+          list_scope.where("#{self.class.position_column}>?", position)
+                    .update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
+        end
       end
     end
   end

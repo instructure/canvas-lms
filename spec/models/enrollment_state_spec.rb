@@ -207,7 +207,7 @@ describe EnrollmentState do
 
   describe "access invalidation" do
     def restrict_view(account, type)
-      account.settings[type] = {:value => true, :locked => false}
+      account.settings[type] = { :value => true, :locked => false }
       account.save!
     end
 
@@ -285,7 +285,7 @@ describe EnrollmentState do
 
       expect(enroll_state.state).to eq 'pending_invited'
 
-      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once)  { |e| expect(e.course).to eq @course }
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
       @course.restrict_student_future_view = true
       @course.save!
 
@@ -309,7 +309,7 @@ describe EnrollmentState do
 
       expect(enroll_state.state).to eq 'pending_invited'
 
-      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once)  { |e| expect(e.course).to eq @course }
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
       @course.start_at = 2.days.from_now
       @course.restrict_student_future_view = true
       @course.save!

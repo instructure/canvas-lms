@@ -89,7 +89,7 @@ describe LocaleSelection do
     end
 
     it "handles aliases" do
-      expect(ls.infer_browser_locale("zh-TW, *", 'zh-TW' => 'zh-Hant', 'zh-Hant' => nil, 'en' => nil)).to  eql('zh-Hant')
+      expect(ls.infer_browser_locale("zh-TW, *", 'zh-TW' => 'zh-Hant', 'zh-Hant' => nil, 'en' => nil)).to eql('zh-Hant')
     end
   end
 

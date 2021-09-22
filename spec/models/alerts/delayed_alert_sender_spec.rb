@@ -23,7 +23,6 @@ require_dependency "alerts/delayed_alert_sender"
 
 module Alerts
   describe DelayedAlertSender do
-
     describe "scoped to unit" do
       before do
         @mock_notification = Notification.new
@@ -48,7 +47,7 @@ module Alerts
         it "should not trigger any alerts when there are no students in the class" do
           course = Account.default.courses.create!
           course.offer!
-          course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+          course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
           expect_any_instance_of(Notification).to receive(:create_message).never
 
           DelayedAlertSender.evaluate_for_course(course, nil)
@@ -56,7 +55,7 @@ module Alerts
 
         it "should not trigger any alerts when there are no teachers in the class" do
           course_with_student(:active_course => true)
-          @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+          @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
           expect_any_instance_of(Notification).to receive(:create_message).never
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -65,7 +64,7 @@ module Alerts
         it "should not trigger any alerts in subsequent courses" do
           course_with_teacher(:active_all => true)
           student_in_course(:active_all => true)
-          @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+          @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
           @course.start_at = Time.zone.now - 30.days
           account_alerts = []
 
@@ -80,7 +79,7 @@ module Alerts
           @teacher.enrollments.first.reject!
           @course.alerts.create!(
             :recipients => [:teachers],
-            :criteria => [{:criterion_type => 'Interaction', :threshold => 7}]
+            :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }]
           )
           @course.reload
           @course.start_at = Time.zone.now - 30.days
@@ -95,7 +94,7 @@ module Alerts
           @student.enrollments.first.reject!
           @course.alerts.create!(
             :recipients => [:teachers],
-            :criteria => [{:criterion_type => 'Interaction', :threshold => 7}]
+            :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }]
           )
           @course.reload
           @course.start_at = Time.zone.now - 30.days
@@ -110,7 +109,7 @@ module Alerts
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
-            @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+            @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
             @course.start_at = Time.zone.now - 30.days
             expect(@mock_notification).to receive(:create_message).with(anything, [@user.id], anything).once
 
@@ -123,7 +122,7 @@ module Alerts
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
-            @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+            @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
             @course.start_at = Time.zone.now - 30.days
             expect(@mock_notification).to receive(:create_message).with(anything, [@user.id], anything).once
 
@@ -136,7 +135,7 @@ module Alerts
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
-            alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+            alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
             @course.start_at = Time.zone.now - 30.days
 
             expect(@mock_notification).to receive(:create_message).with(anything, [@user.id], anything).twice
@@ -208,7 +207,6 @@ module Alerts
       end
 
       context 'ungraded timespan' do
-
         it "should alert" do
           course_with_teacher(:active_all => 1)
           @teacher = @user
@@ -254,7 +252,7 @@ module Alerts
           @teacher = @user
           @user = nil
           student_in_course(:active_all => 1)
-          communication_channel(@user, {username: 'a@example.com', active_cc: true})
+          communication_channel(@user, { username: 'a@example.com', active_cc: true })
           @assignment = @course.assignments.new(:title => "some assignment")
           @assignment.workflow_state = "published"
           @assignment.save
@@ -326,7 +324,7 @@ module Alerts
 
       course_with_teacher(:active_all => 1)
       student_in_course(:active_all => 1)
-      communication_channel(@student, {username: 'student@example.com', active_cc: true})
+      communication_channel(@student, { username: 'student@example.com', active_cc: true })
       alert = @course.alerts.build(:recipients => [:student])
       alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
       alert.save!

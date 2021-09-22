@@ -81,7 +81,7 @@ describe AuthenticationProvider::SAML do
   describe "download_metadata" do
     it 'requires an entity id for InCommon' do
       saml = Account.default.authentication_providers.new(auth_type: 'saml',
-        metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
+                                                          metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
       expect(saml).not_to be_valid
       expect(saml.errors.first.first).to eq :idp_entity_id
     end
@@ -212,8 +212,8 @@ describe AuthenticationProvider::SAML do
       allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
       entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
       expect(entity.roles.last.attribute_consuming_services.length).to eq 1
-      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length). to eq 1
-      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name). to eq 'name'
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length).to eq 1
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name).to eq 'name'
     end
   end
 end

@@ -55,6 +55,7 @@ class GradingStandard < ActiveRecord::Base
   before_save :trim_whitespace, if: :will_save_change_to_data?
   before_save :update_usage_count
   attr_accessor :default_standard
+
   before_create :set_root_account_id
 
   workflow do
@@ -84,20 +85,20 @@ class GradingStandard < ActiveRecord::Base
 
   def ordered_scheme
     # Convert to BigDecimal so we don't get weird float behavior: 0.545 * 100 (gives 54.50000000000001 with floats)
-    @ordered_scheme ||= grading_scheme.to_a.
-        map { |grade_letter, percent| [grade_letter, BigDecimal(percent.to_s)] }.
-        sort_by { |_, percent| -percent }
+    @ordered_scheme ||= grading_scheme.to_a
+                                      .map { |grade_letter, percent| [grade_letter, BigDecimal(percent.to_s)] }
+                                      .sort_by { |_, percent| -percent }
   end
 
   def place_in_scheme(key_name)
     # look for keys with only digits and a single '.'
     if key_name.to_s =~ (/\A(\d*[.])?\d+\Z/)
-    # compare numbers
+      # compare numbers
       # second condition to filter letters so zeros work properly ("A".to_f == 0)
-      ordered_scheme.index { |g, _| g.to_f == key_name.to_f && g.to_s.match(/\A(\d*[.])?\d+\Z/)}
+      ordered_scheme.index { |g, _| g.to_f == key_name.to_f && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
     else
-    # compare words
-      ordered_scheme.index { |g, _| g.to_s.downcase == key_name.to_s.downcase}
+      # compare words
+      ordered_scheme.index { |g, _| g.to_s.downcase == key_name.to_s.downcase }
     end
   end
 
@@ -126,7 +127,7 @@ class GradingStandard < ActiveRecord::Base
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     score = BigDecimal(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
-    ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100.0.to_d ? lower_bound : -lower_bound }[0]
+    ordered_scheme.max_by { |_, lower_bound| score >= lower_bound * 100.0.to_d ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)
@@ -135,7 +136,7 @@ class GradingStandard < ActiveRecord::Base
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
     if new_val.respond_to?(:map)
-      new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] }
+      new_val = new_val.map { |grade_name, lower_bound| [grade_name, lower_bound.round(4)] }
     end
     write_attribute(:data, new_val)
     @ordered_scheme = nil
@@ -155,8 +156,8 @@ class GradingStandard < ActiveRecord::Base
     when VERSION
       data
     when 1
-      0.upto(data.length-2) do |i|
-        data[i][1] = data[i+1][1] + 0.01
+      0.upto(data.length - 2) do |i|
+        data[i][1] = data[i + 1][1] + 0.01
       end
       data[-1][1] = 0
       data
@@ -186,7 +187,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def update_data(params)
-    self.data = params.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
+    self.data = params.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
   end
 
   def display_name
@@ -205,25 +206,25 @@ class GradingStandard < ActiveRecord::Base
 
   def grading_scheme
     res = {}
-    self.data.sort_by{|_, lower_bound| lower_bound}.reverse_each do |grade_name, lower_bound|
+    self.data.sort_by { |_, lower_bound| lower_bound }.reverse_each do |grade_name, lower_bound|
       res[grade_name] = lower_bound.to_f
     end
     res
   end
 
-  def standard_data=(params={})
+  def standard_data=(params = {})
     params ||= {}
     res = {}
     params.each do |key, row|
       res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
     end
-    self.data = res.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
+    self.data = res.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
   end
 
   def valid_grading_scheme_data
-    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.present? && self.data.any?{ |v| v[1] < 0 }
-    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.present? && self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
-    self.errors.add(:data, 'a grading scheme name is too long') if self.data.present? && self.data.any?{|v| v[0].length > self.class.maximum_string_length}
+    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.present? && self.data.any? { |v| v[1] < 0 }
+    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.present? && self.data.map { |v| v[1] } != self.data.map { |v| v[1] }.uniq
+    self.errors.add(:data, 'a grading scheme name is too long') if self.data.present? && self.data.any? { |v| v[0].length > self.class.maximum_string_length }
   end
 
   def full_range_scheme
@@ -234,7 +235,7 @@ class GradingStandard < ActiveRecord::Base
   private :full_range_scheme
 
   def self.default_grading_standard
-    default_grading_scheme.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
+    default_grading_scheme.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
   end
 
   def self.default_instance

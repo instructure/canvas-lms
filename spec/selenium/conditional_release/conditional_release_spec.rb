@@ -180,7 +180,7 @@ describe 'native canvas conditional release' do
       ConditionalReleaseObjects.assignment_options_button(assignment_for_mp.title).click
       ConditionalReleaseObjects.menu_option('Move to 70 pts - 100 pts').click
 
-      expect(ConditionalReleaseObjects.assignment_exists_in_scoring_range?(1,assignment_for_mp.title)).to be(true)
+      expect(ConditionalReleaseObjects.assignment_exists_in_scoring_range?(1, assignment_for_mp.title)).to be(true)
     end
 
     it 'should be able see errors for invalid scoring ranges' do
@@ -235,7 +235,7 @@ describe 'native canvas conditional release' do
           upper_bound: 0.4
         ),
       ]
-        @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
+      @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
     end
 
     it 'should show Mastery Path Breakdown for an Assignment' do
@@ -253,4 +253,3 @@ describe 'native canvas conditional release' do
     end
   end
 end
-

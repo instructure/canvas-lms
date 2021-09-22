@@ -19,10 +19,9 @@
 
 module Lti
   class ToolConsumerProfile < ActiveRecord::Base
-
     belongs_to :developer_key
 
-    before_validation {self.uuid ||= SecureRandom.uuid}
+    before_validation { self.uuid ||= SecureRandom.uuid }
     after_update :clear_cache
 
     serialize :services
@@ -68,7 +67,6 @@ module Lti
       *WEBHOOK_SUBSCRIPTION_CAPABILITIES.values.flatten
     ].freeze
 
-
     DEFAULT_SERVICES = [
       *Lti::Ims::ToolProxyController::SERVICE_DEFINITIONS,
       *Lti::Ims::AuthorizationController::SERVICE_DEFINITIONS,
@@ -107,13 +105,10 @@ module Lti
       WEBHOOK_GRANT_ALL_CAPABILITY
     end
 
-
     private
 
     def clear_cache
       MultiCache.delete(self.class.cache_key(developer_key_id))
     end
-
-
   end
 end

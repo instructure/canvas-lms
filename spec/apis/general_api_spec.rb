@@ -27,7 +27,7 @@ describe "API", type: :request do
       obj.extend Api::V1::Json
       course_with_teacher
       session = double()
-      expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
+      expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [:name, :sis_source_id] })
       obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
     end
   end
@@ -58,7 +58,7 @@ describe "API", type: :request do
     it "should serialize permissions if obj responds" do
       course_with_teacher
       expect(@course).to receive(:serialize_permissions).once.with(anything, @teacher, nil)
-      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => [ "update" ] }, :only => %w(name))
+      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => ["update"] }, :only => %w(name))
       expect(json.keys.sort).to eq %w(name permissions)
     end
   end
@@ -101,12 +101,14 @@ describe "API", type: :request do
       a1 = attachment_model(:context => @user)
       a2 = attachment_model(:context => @user)
       json_request = { "comment" => {
-                          "text_comment" => "yay" },
+        "text_comment" => "yay"
+      },
                        "submission" => {
-                          "submission_type" => "online_upload",
-                          "file_ids" => [a1.id, a2.id] } }
+                         "submission_type" => "online_upload",
+                         "file_ids" => [a1.id, a2.id]
+                       } }
       post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
-        params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+           params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
       expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
@@ -123,8 +125,8 @@ describe "API", type: :request do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",
-        { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' },
-        {}, { 'Accept' => 'application/json+canvas-string-ids' })
+                      { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' },
+                      {}, { 'Accept' => 'application/json+canvas-string-ids' })
       expect(json['id']).to eq account.id.to_s
       expect(json['root_account_id']).to eq Account.default.id.to_s
     end
@@ -133,7 +135,7 @@ describe "API", type: :request do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",
-        { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' })
+                      { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' })
       expect(json['id']).to eq account.id
       expect(json['root_account_id']).to eq Account.default.id
     end

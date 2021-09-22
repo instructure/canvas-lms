@@ -48,21 +48,21 @@ describe MicrosoftSync::PartialSyncChange do
       described_class.create!(course: c2, user: u2, enrollment_type: 'owner', created_at: t2)
 
       result = described_class
-        .where(enrollment_type: 'owner')
-        .with_values_in(%w[course_id user_id created_at], [
-          [c1.id, u1.id, t1], [c1.id, u2.id, t2], [c2.id, u1.id, t2], [c2.id, u2.id, t1],
-          [c2.id, u2.id, t2],
-        ])
-        .pluck(:enrollment_type, :course_id, :user_id, :created_at)
+               .where(enrollment_type: 'owner')
+               .with_values_in(%w[course_id user_id created_at], [
+                                 [c1.id, u1.id, t1], [c1.id, u2.id, t2], [c2.id, u1.id, t2], [c2.id, u2.id, t1],
+                                 [c2.id, u2.id, t2],
+                               ])
+               .pluck(:enrollment_type, :course_id, :user_id, :created_at)
       expect(result.sort).to eq([
-        ['owner', c1.id, u1.id, t1],
-        ['owner', c2.id, u2.id, t2]
-      ])
+                                  ['owner', c1.id, u1.id, t1],
+                                  ['owner', c2.id, u2.id, t2]
+                                ])
     end
 
     it 'produces the right SQL' do
       expect(
-        described_class.with_values_in(%w[id course_id user_id], [[1,2,3], [4,5,6], [7,8,9]]).to_sql
+        described_class.with_values_in(%w[id course_id user_id], [[1, 2, 3], [4, 5, 6], [7, 8, 9]]).to_sql
       ).to include(
         'WHERE (("id","course_id","user_id") IN ((1,2,3),(4,5,6),(7,8,9)))'
       )
@@ -103,7 +103,7 @@ describe MicrosoftSync::PartialSyncChange do
 
           expect { described_class.upsert_for_enrollment(enrollment) }
             .to not_change { described_class.count }.from(1)
-            .and not_change { record.reload.attributes.except('updated_at') }
+                                                    .and not_change { record.reload.attributes.except('updated_at') }
           expect(record.updated_at).to be > updated_at_before_upsert
           expect(record.updated_at.to_f).to be_within(30).of(
             described_class.connection.query('SELECT NOW()').first.first.to_f

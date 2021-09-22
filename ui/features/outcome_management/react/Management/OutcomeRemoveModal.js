@@ -68,49 +68,28 @@ const OutcomeRemoveModal = ({
         onRemoveLearningOutcomesHandler(removableLinkIds)
 
         showFlashAlert({
-          message: isCourse
-            ? I18n.t(
-                {
-                  one: 'This outcome was successfully removed from this course.',
-                  other: '%{count} outcomes were successfully removed from this course.'
-                },
-                {
-                  count: removableCount
-                }
-              )
-            : I18n.t(
-                {
-                  one: 'This outcome was successfully removed from this account.',
-                  other: '%{count} outcomes were successfully removed from this account.'
-                },
-                {
-                  count: removableCount
-                }
-              ),
+          message: I18n.t(
+            {
+              one: 'This outcome was successfully removed.',
+              other: '%{count} outcomes were successfully removed.'
+            },
+            {
+              count: removableCount
+            }
+          ),
           type: 'success'
         })
       } catch (err) {
         showFlashAlert({
-          message: err.message
-            ? I18n.t(
-                {
-                  one: 'An error occurred while removing the outcome: %{errorMessage}.',
-                  other: 'An error occurred while removing %{count} outcomes: %{errorMessage}.'
-                },
-                {
-                  errorMessage: err.message,
-                  count: removableCount
-                }
-              )
-            : I18n.t(
-                {
-                  one: 'An error occurred while removing the outcome.',
-                  other: 'An error occurred while removing %{count} outcomes.'
-                },
-                {
-                  count: removableCount
-                }
-              ),
+          message: I18n.t(
+            {
+              one: 'An error occurred while removing this outcome. Please try again.',
+              other: 'An error occurred while removing these outcomes. Please try again.'
+            },
+            {
+              count: removableCount
+            }
+          ),
           type: 'error'
         })
       }

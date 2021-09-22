@@ -27,13 +27,12 @@ describe ContentExport do
   end
 
   context "export_object?" do
-
     it "should return true for everything if there are no copy options" do
       expect(@ce.export_object?(@ce)).to eq true
     end
 
     it "should return true for everything if 'everything' is selected" do
-      @ce.selected_content = {:everything => "1"}
+      @ce.selected_content = { :everything => "1" }
       expect(@ce.export_object?(@ce)).to eq true
     end
 
@@ -42,23 +41,23 @@ describe ContentExport do
     end
 
     it "should return true for all object types if the all_ option is true" do
-      @ce.selected_content = {:all_content_exports => "1"}
+      @ce.selected_content = { :all_content_exports => "1" }
       expect(@ce.export_object?(@ce)).to eq true
     end
 
     it "should return false for objects not selected" do
       @ce.save!
-      @ce.selected_content = {:all_content_exports => "0"}
+      @ce.selected_content = { :all_content_exports => "0" }
       expect(@ce.export_object?(@ce)).to eq false
-      @ce.selected_content = {:content_exports => {}}
+      @ce.selected_content = { :content_exports => {} }
       expect(@ce.export_object?(@ce)).to eq false
-      @ce.selected_content = {:content_exports => {CC::CCHelper.create_key(@ce) => "0"}}
+      @ce.selected_content = { :content_exports => { CC::CCHelper.create_key(@ce) => "0" } }
       expect(@ce.export_object?(@ce)).to eq false
     end
 
     it "should return true for selected objects" do
       @ce.save!
-      @ce.selected_content = {:content_exports => {CC::CCHelper.create_key(@ce) => "1"}}
+      @ce.selected_content = { :content_exports => { CC::CCHelper.create_key(@ce) => "1" } }
       expect(@ce.export_object?(@ce)).to eq true
     end
   end
@@ -78,7 +77,7 @@ describe ContentExport do
         :selected_content => quiz.id,
         :user => @user
       )
-      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       @course.root_account.save!
     end
 
@@ -257,7 +256,7 @@ describe ContentExport do
     end
 
     it "should not send emails as part of a content migration (course copy)" do
-      @cm = ContentMigration.new(:user => @user, :copy_options => {:everything => "1"}, :context => @course)
+      @cm = ContentMigration.new(:user => @user, :copy_options => { :everything => "1" }, :context => @course)
       @ce.content_migration = @cm
       @ce.save!
 

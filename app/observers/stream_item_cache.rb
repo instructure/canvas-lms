@@ -40,7 +40,7 @@ class StreamItemCache < ActiveRecord::Observer
   end
 
   def self.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
-    user_ids.each {|user_id| self.invalidate_recent_stream_items(user_id, context_type, context_id)}
+    user_ids.each { |user_id| self.invalidate_recent_stream_items(user_id, context_type, context_id) }
   end
 
   def self.invalidate_context_stream_item_key(context_type, context_id)
@@ -57,9 +57,9 @@ class StreamItemCache < ActiveRecord::Observer
   # stream item cache keys for a context can later be invalidated.
   def self.context_stream_item_key(context_type, context_id)
     return unless context_type
+
     Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key, :use_new_rails => false) do
       "#{context_type.underscore}_#{context_id}-#{Time.now.to_i}"
     end
   end
-
 end

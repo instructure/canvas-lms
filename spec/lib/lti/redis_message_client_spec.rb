@@ -25,7 +25,7 @@ describe Lti::RedisMessageClient do
 
   let_once(:context) { course_model }
 
-  let(:launch) { {foo: 'bar'} }
+  let(:launch) { { foo: 'bar' } }
 
   describe '#cache_launch' do
     it 'caches the launch as JSON' do

@@ -52,7 +52,7 @@ class UserMergeData < ActiveRecord::Base
 
   def bulk_insert_merge_data(data)
     self.shard.activate do
-      data.each_slice(1000) {|batch| UserMergeDataRecord.bulk_insert_objects(batch)}
+      data.each_slice(1000) { |batch| UserMergeDataRecord.bulk_insert_objects(batch) }
     end
   end
 
@@ -61,5 +61,4 @@ class UserMergeData < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save!
   end
-
 end

@@ -160,6 +160,7 @@ class ProfileController < ApplicationController
   def show
     unless @current_user && @domain_root_account.enable_profiles?
       return unless require_password_session
+
       settings
       return
     end
@@ -197,18 +198,19 @@ class ProfileController < ApplicationController
       return unless authorized_action(@user, @current_user, :read_profile)
     else
       return unless require_password_session
+
       @user = @current_user
       @user.dismiss_bouncing_channel_message!
     end
     @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired
-    @email_channels = @channels.select{|c| c.path_type == "email"}
-    @sms_channels = @channels.select{|c| c.path_type == 'sms'}
-    @other_channels = @channels.select{|c| c.path_type != "email"}
+    @email_channels = @channels.select { |c| c.path_type == "email" }
+    @sms_channels = @channels.select { |c| c.path_type == 'sms' }
+    @other_channels = @channels.select { |c| c.path_type != "email" }
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active_only
-    @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
+    @password_pseudonyms = @pseudonyms.select { |p| !p.managed_password? }
     @context = @user.profile
     set_active_tab "profile_settings"
     js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
@@ -314,7 +316,7 @@ class ProfileController < ApplicationController
 
     email_channel_id = @current_user.email_channel.try(:id)
     if disable_inbox && !email_channel_id.nil?
-      params = {:channel_id=>email_channel_id,:frequency=>"immediately"}
+      params = { :channel_id => email_channel_id, :frequency => "immediately" }
 
       ["added_to_conversation", "conversation_message"].each do |category|
         params[:category] = category
@@ -336,9 +338,9 @@ class ProfileController < ApplicationController
     end
 
     respond_to do |format|
-      user_params = params[:user] ? params[:user].
-        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
+      user_params = params[:user] ? params[:user]
+        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
         : {}
       if !@user.user_can_edit_name?
         user_params.delete(:name)
@@ -370,7 +372,7 @@ class ProfileController < ApplicationController
             pseudonymed = true
             flash[:error] = error_msg
             format.html { redirect_to user_profile_url(@current_user) }
-            format.json { render :json => {:errors => {:old_password => error_msg}}, :status => :bad_request }
+            format.json { render :json => { :errors => { :old_password => error_msg } }, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonym_params.delete :password
@@ -388,7 +390,7 @@ class ProfileController < ApplicationController
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path], :include_root => false}, :pseudonym => {:only => [:id, :unique_id], :include_root => false} }) }
+          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => { :communication_channel => { :only => [:id, :path], :include_root => false }, :pseudonym => { :only => [:id, :unique_id], :include_root => false } }) }
         end
       else
         format.html
@@ -421,15 +423,15 @@ class ProfileController < ApplicationController
 
     if params[:link_urls] && params[:link_titles]
       @profile.links = []
-      params[:link_urls].zip(params[:link_titles]).
-        reject { |url, title| url.blank? && title.blank? }.
-        each do |url, title|
-          new_link = @profile.links.build :url => url, :title => title
-          # since every time we update links, we delete and recreate everything,
-          # deleting invalid link records will make sure the rest of the
-          # valid ones still save
-          new_link.delete unless new_link.valid?
-        end
+      params[:link_urls].zip(params[:link_titles])
+                        .reject { |url, title| url.blank? && title.blank? }
+                        .each do |url, title|
+        new_link = @profile.links.build :url => url, :title => title
+        # since every time we update links, we delete and recreate everything,
+        # deleting invalid link records will make sure the rest of the
+        # valid ones still save
+        new_link.delete unless new_link.valid?
+      end
     elsif params[:delete_links]
       @profile.links = []
     end
@@ -439,7 +441,7 @@ class ProfileController < ApplicationController
       @profile.save!
 
       if params[:user_services]
-        visible, invisible = params[:user_services].to_unsafe_h.partition { |service,bool|
+        visible, invisible = params[:user_services].to_unsafe_h.partition { |service, bool|
           value_to_boolean(bool)
         }
         @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
@@ -453,7 +455,7 @@ class ProfileController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to user_profile_path(@user) } # FIXME: need to go to edit path
-        format.json { render :json => @profile.errors, :status => :bad_request }  #NOTE: won't send back @user validation errors (i.e. short_name)
+        format.json { render :json => @profile.errors, :status => :bad_request }  # NOTE: won't send back @user validation errors (i.e. short_name)
       end
     end
   end
@@ -491,8 +493,8 @@ class ProfileController < ApplicationController
 
     ccv_settings = Canvas::DynamicSettings.find('common_cartridge_viewer') || {}
     js_env({
-      COMMON_CARTRIDGE_VIEWER_URL: ccv_settings['base_url']
-    })
+             COMMON_CARTRIDGE_VIEWER_URL: ccv_settings['base_url']
+           })
     render :content_shares
   end
 

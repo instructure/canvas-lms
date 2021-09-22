@@ -44,10 +44,10 @@ describe Submissions::AnonymousDownloadsController do
         }
         expect(assigns(:attachment)).to eq @attachment
         expect(response).to redirect_to(course_file_download_url(@context, @attachment, {
-          download_frd: true,
-          inline: nil,
-          verifier: @attachment.uuid
-        }))
+                                                                   download_frd: true,
+                                                                   inline: nil,
+                                                                   verifier: @attachment.uuid
+                                                                 }))
       end
 
       it "renders as json" do
@@ -58,7 +58,7 @@ describe Submissions::AnonymousDownloadsController do
           anonymous_id: @submission.anonymous_id,
           download: @submission.attachment_id
         },
-          format: :json
+                   format: :json
         expect(JSON.parse(response.body)['attachment']['id']).to eq @submission.attachment_id
       end
     end
@@ -105,7 +105,7 @@ describe Submissions::AnonymousDownloadsController do
         # our factory system is broken
         @original_context = @context
         @original_student = @student
-        course_with_student(active_all:true)
+        course_with_student(active_all: true)
         @course.account.enable_service(:avatars)
         submission_comment_model
         @attachment = attachment_model(context: @assignment)
@@ -126,10 +126,10 @@ describe Submissions::AnonymousDownloadsController do
         }
         expect(assigns(:attachment)).to eq @attachment
         expect(response).to redirect_to(file_download_url(@attachment, {
-          download_frd: true,
-          inline: nil,
-          verifier: @attachment.uuid
-        }))
+                                                            download_frd: true,
+                                                            inline: nil,
+                                                            verifier: @attachment.uuid
+                                                          }))
       end
     end
 
@@ -146,8 +146,9 @@ describe Submissions::AnonymousDownloadsController do
         submission_type: "online_upload",
         attachment_ids: att.id,
         attachments: [att],
-        user: @student)
-      get :show, params: {assignment_id: assignment.id, course_id: @course.id, anonymous_id: @submission.anonymous_id, download: att.id}
+        user: @student
+      )
+      get :show, params: { assignment_id: assignment.id, course_id: @course.id, anonymous_id: @submission.anonymous_id, download: att.id }
 
       expect(response).to be_redirect
       expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}

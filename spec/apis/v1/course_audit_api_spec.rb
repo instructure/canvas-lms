@@ -40,7 +40,7 @@ describe "CourseAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
@@ -90,16 +90,16 @@ describe "CourseAudit API", type: :request do
     def expect_event_for_context(context, event, **options)
       json = options.delete(:json)
       json ||= fetch_for_context(context, **options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .to include([event.id, event.event_type])
       json
     end
 
     def forbid_event_for_context(context, event, **options)
       json = options.delete(:json)
       json ||= fetch_for_context(context, **options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .not_to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .not_to include([event.id, event.event_type])
       json
     end
 

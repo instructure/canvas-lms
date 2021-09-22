@@ -21,12 +21,13 @@
 module EventStream::AttrConfig
   module ClassMethods
     CASTS = {
-        String => lambda { |name, value| value.to_s },
-        Integer => lambda { |name, value| value.to_i },
-        Proc => lambda { |name, value|
-          return value if value.nil? || value.respond_to?(:call)
-          raise(ArgumentError, "Expected attribute #{name} to be a Proc: #{value.class}")
-        }
+      String => lambda { |name, value| value.to_s },
+      Integer => lambda { |name, value| value.to_i },
+      Proc => lambda { |name, value|
+                return value if value.nil? || value.respond_to?(:call)
+
+                raise(ArgumentError, "Expected attribute #{name} to be a Proc: #{value.class}")
+              }
     }
 
     def attr_config_defaults
@@ -37,7 +38,7 @@ module EventStream::AttrConfig
       @attr_config_known ||= Set.new
     end
 
-    def attr_config(name, options={})
+    def attr_config(name, options = {})
       attr_config_known << name
       if options.has_key?(:type)
         type = options[:type]
@@ -62,6 +63,7 @@ module EventStream::AttrConfig
             end
 
             return typecast.call(name, value) if typecast
+
             return value
           end
           return value

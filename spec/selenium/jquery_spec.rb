@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "jquery" do
   include_context "in-process server selenium tests"
 
-
   # jquery keeps breaking attr() ... see http://bugs.jquery.com/ticket/10278
   # should be fixed in 1.7 (or 1.6.5?)
   it "should return the correct value for attr" do
@@ -39,7 +38,7 @@ describe "jquery" do
 
   it "should handle $.attr(method, post|delete|put|get) by adding a hidden input" do
     get('/login')
-    expect(driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase).to  eq "post"
+    expect(driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase).to eq "post"
     expect(driver.execute_script("return $('form input[name=_method]').val()")).to eq "delete"
   end
 

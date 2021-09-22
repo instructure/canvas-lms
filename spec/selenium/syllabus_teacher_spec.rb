@@ -23,7 +23,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 require File.expand_path(File.dirname(__FILE__) + '/rcs/pages/rce_next_page')
 
-
 describe "course syllabus" do
   include_context "in-process server selenium tests"
   include FilesCommon
@@ -33,12 +32,12 @@ describe "course syllabus" do
   def add_assignment(title, points)
     # assignment data
     assignment = assignment_model({
-                                      :course => @course,
-                                      :title => title,
-                                      :due_at => nil,
-                                      :points_possible => points,
-                                      :submission_types => 'online_text_entry',
-                                      :assignment_group => @group
+                                    :course => @course,
+                                    :title => title,
+                                    :due_at => nil,
+                                    :points_possible => points,
+                                    :submission_types => 'online_text_entry',
+                                    :assignment_group => @group
                                   })
     rubric_model
     @association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
@@ -46,7 +45,6 @@ describe "course syllabus" do
   end
 
   context "as a teacher" do
-
     before(:each) do
       Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
@@ -59,13 +57,13 @@ describe "course syllabus" do
       wait_for_ajaximations
     end
 
-    it "should confirm existing assignments and dates are correct", priority:"1", test_id: 237016 do
+    it "should confirm existing assignments and dates are correct", priority: "1", test_id: 237016 do
       assignment_details = ff('.name')
       expect(assignment_details[0].text.strip).to eq "Assignment\n" + @assignment_1.title
       expect(assignment_details[1].text.strip).to eq "Assignment\n" + @assignment_2.title
     end
 
-    it "should edit the description", priority:"1", test_id: 237017 do
+    it "should edit the description", priority: "1", test_id: 237017 do
       skip('weird issue where text does not show up on submit')
       # skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
 
@@ -92,14 +90,14 @@ describe "course syllabus" do
       expect(fln("text_file.txt")).to be_displayed
     end
 
-    it "should validate Jump to Today works on the mini calendar", priority:"1", test_id: 237017 do
+    it "should validate Jump to Today works on the mini calendar", priority: "1", test_id: 237017 do
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
       expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.zone.now.strftime('%Y_%m_%d')}")
     end
 
     describe "Accessibility" do
-      it "should set focus to the Jump to Today link after clicking Edit the Description", priority:"2", test_id: 237019 do
+      it "should set focus to the Jump to Today link after clicking Edit the Description", priority: "2", test_id: 237019 do
         skip('see CNVS-39931')
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))

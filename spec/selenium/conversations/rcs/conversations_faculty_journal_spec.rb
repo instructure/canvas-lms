@@ -27,8 +27,8 @@ describe "conversations new" do
 
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
-  let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
-  let(:student_user_notes_url) {"/users/#{@s1.id}/user_notes"}
+  let(:user_notes_url) { "/courses/#{@course.id}/user_notes" }
+  let(:student_user_notes_url) { "/users/#{@s1.id}/user_notes" }
 
   before do
     conversation_setup

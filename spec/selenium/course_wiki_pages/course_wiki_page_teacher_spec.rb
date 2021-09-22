@@ -66,4 +66,3 @@ describe 'course wiki pages' do
     end
   end
 end
-

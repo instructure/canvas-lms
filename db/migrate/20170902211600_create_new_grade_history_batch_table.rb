@@ -32,10 +32,10 @@ class CreateNewGradeHistoryBatchTable < ActiveRecord::Migration[4.2]
     Rails.logger.debug("InitNewGradeHistoryAuditLogIndexes: #{LAST_BATCH_TABLE} exists? => #{table_exists?(cassandra, LAST_BATCH_TABLE)}")
     unless table_exists?(cassandra, LAST_BATCH_TABLE)
       compression_params = if cassandra.db.use_cql3?
-        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
-      else
-        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
-      end
+                             "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                           else
+                             "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                           end
 
       create_table_command = %{
         CREATE TABLE #{LAST_BATCH_TABLE} (

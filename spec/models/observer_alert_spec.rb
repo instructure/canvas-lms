@@ -34,8 +34,8 @@ describe ObserverAlert do
 
     it 'can link to a threshold and observer and student' do
       alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-                        context: @assignment, alert_type: 'assignment_missing', action_date: Time.zone.now,
-                        title: 'Assignment missing')
+                                   context: @assignment, alert_type: 'assignment_missing', action_date: Time.zone.now,
+                                   title: 'Assignment missing')
 
       expect(alert.valid?).to eq true
       expect(alert.user_id).not_to be_nil
@@ -45,14 +45,14 @@ describe ObserverAlert do
 
     it 'observer must be linked to student' do
       alert = ObserverAlert.create(student: user_model, observer: @observer, observer_alert_threshold: @threshold,
-        context: @assignment, alert_type: 'assignment_missing', action_date: Time.zone.now, title: 'Assignment missing')
+                                   context: @assignment, alert_type: 'assignment_missing', action_date: Time.zone.now, title: 'Assignment missing')
 
       expect(alert.valid?).to eq false
     end
 
     it 'wont allow random alert_type' do
       alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-        context: @assignment, alert_type: 'jigglypuff', action_date: Time.zone.now, title: 'Assignment missing')
+                                   context: @assignment, alert_type: 'jigglypuff', action_date: Time.zone.now, title: 'Assignment missing')
 
       expect(alert.valid?).to eq false
     end
@@ -194,11 +194,11 @@ describe ObserverAlert do
     it 'deletes alerts older than 6 months ago but leaves newer ones' do
       observer_alert_threshold_model(alert_type: 'institution_announcement')
       a1 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                           context: @account, alert_type: 'institution_announcement', title: 'announcement',
-                           action_date: Time.zone.now, created_at: 6.months.ago)
+                                context: @account, alert_type: 'institution_announcement', title: 'announcement',
+                                action_date: Time.zone.now, created_at: 6.months.ago)
       a2 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                           context: @account, alert_type: 'institution_announcement', title: 'announcement',
-                           action_date: Time.zone.now)
+                                context: @account, alert_type: 'institution_announcement', title: 'announcement',
+                                action_date: Time.zone.now)
 
       ObserverAlert.clean_up_old_alerts
       expect(ObserverAlert.where(id: a1.id).first).to be_nil
@@ -386,7 +386,7 @@ describe ObserverAlert do
     end
 
     it 'doesnt create an alert if the roles dont include student or observer' do
-      role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id}
+      role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
       notification = account_notification(account: @account, role_ids: role_ids)
       alert = ObserverAlert.where(context: notification).first
       expect(alert).to be_nil
@@ -416,14 +416,14 @@ describe ObserverAlert do
     end
 
     it 'creates an alert if student role is selected but not observer' do
-      role_ids = ["StudentEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id}
+      role_ids = ["StudentEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
       notification = account_notification(account: @account, role_ids: role_ids)
       alert = ObserverAlert.where(context: notification).first
       expect(alert.context).to eq notification
     end
 
     it 'creates an alert if observer role is selected but not student' do
-      role_ids = ["ObserverEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id}
+      role_ids = ["ObserverEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
       notification = account_notification(account: @account, role_ids: role_ids)
       alert = ObserverAlert.where(context: notification).first
       expect(alert.context).to eq notification

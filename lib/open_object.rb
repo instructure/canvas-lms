@@ -21,14 +21,15 @@
 require 'ostruct'
 
 class OpenStruct
-  def as_json(options={})
+  def as_json(options = {})
     table
   end
 end
 
 class OpenObject < OpenStruct
   attr_accessor :object_type
-  def self.build(type, data={})
+
+  def self.build(type, data = {})
     res = OpenObject.new(data)
     res.object_type = type
     res
@@ -41,14 +42,15 @@ class OpenObject < OpenStruct
   def asset_string
     return self.table[:asset_string] if self.table[:asset_string]
     return nil unless self.type && self.id
+
     "#{self.type.underscore}_#{self.id}"
   end
 
-  def as_json(options={})
-    object_type ? {object_type => super} : super
+  def as_json(options = {})
+    object_type ? { object_type => super } : super
   end
 
-  def self.process(pre={})
+  def self.process(pre = {})
     pre = pre.dup
     if pre.is_a? Array
       new_list = []

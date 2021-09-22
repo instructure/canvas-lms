@@ -148,7 +148,6 @@ class Notification < Switchman::UnshardedRecord
     state :inactive do
       event :reactivate, :transitions_to => :active
     end
-
   end
 
   def self.all_cached
@@ -165,9 +164,9 @@ class Notification < Switchman::UnshardedRecord
     # graphql types cannot have spaces we have used underscores
     # and we don't allow editing system notification types
     @configurable_types ||= YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
-      .map(&:first).map(&:last)
-      .select { |type| !type.include?('DEPRECATED') }
-      .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
+                                .map(&:first).map(&:last)
+                                .select { |type| !type.include?('DEPRECATED') }
+                                .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end
 
   def self.find(id, options = {})
@@ -202,7 +201,7 @@ class Notification < Switchman::UnshardedRecord
   # to_list - a list of who to send the message to. the list can contain Users, User ids, or communication channels
   # options - a hash of extra options to merge with the options used to build the Message
   #
-  def create_message(asset, to_list, options={})
+  def create_message(asset, to_list, options = {})
     preload_asset_roles_if_needed(asset)
 
     NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
@@ -244,7 +243,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def self.types_to_show_in_feed
-     TYPES_TO_SHOW_IN_FEED
+    TYPES_TO_SHOW_IN_FEED
   end
 
   def self.categories_to_send_in_push
@@ -294,7 +293,7 @@ class Notification < Switchman::UnshardedRecord
         res << n if n.category && n.dashboard?
       end
     end
-    res.sort_by{|n| n.category == "Other" ? CanvasSort::Last : n.category }
+    res.sort_by { |n| n.category == "Other" ? CanvasSort::Last : n.category }
   end
 
   # Return a hash with information for a related user option if one exists.
@@ -306,7 +305,7 @@ class Notification < Switchman::UnshardedRecord
         label: t(<<-EOS),
           Include scores when alerting about grades.
           If your email is not an institution email this means sensitive content will be sent outside of the institution.
-          EOS
+        EOS
         id: "cat_#{self.id}_option",
       }
     end
@@ -314,6 +313,7 @@ class Notification < Switchman::UnshardedRecord
 
   def default_frequency(user = nil)
     return FREQ_NEVER if user&.default_notifications_disabled?
+
     case category
     when 'All Submissions'
       FREQ_NEVER
@@ -579,18 +579,18 @@ class Notification < Switchman::UnshardedRecord
     when 'Announcement'
       t(:announcement_description, 'New Announcement in your course')
     when 'Announcement Created By You'
-      mt(:announcement_created_by_you_description, <<-EOS)
-* Announcements created by you
-* Replies to announcements you've created
-EOS
+      mt(:announcement_created_by_you_description, <<~EOS)
+        * Announcements created by you
+        * Replies to announcements you've created
+      EOS
     when 'Course Content'
-        mt(:course_content_description, <<-EOS)
-Change to course content:
+      mt(:course_content_description, <<~EOS)
+        Change to course content:
 
-* Page content
-* Quiz content
-* Assignment content
-EOS
+        * Page content
+        * Quiz content
+        * Assignment content
+      EOS
     when 'Files'
       t(:files_description, 'New file added to your course')
     when 'Discussion'
@@ -602,56 +602,56 @@ EOS
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'
-      mt(:grading_description, <<-EOS)
-Includes:
+      mt(:grading_description, <<~EOS)
+        Includes:
 
-* Assignment/submission grade entered/changed
-* Grade weight changed
-EOS
+        * Assignment/submission grade entered/changed
+        * Grade weight changed
+      EOS
     when 'Late Grading'
-      mt(:late_grading_description, <<-EOS)
-*Instructor and Admin only:*
+      mt(:late_grading_description, <<~EOS)
+        *Instructor and Admin only:*
 
-Late assignment submission
-EOS
+        Late assignment submission
+      EOS
     when 'All Submissions'
-      mt(:all_submissions_description,  <<-EOS)
-*Instructor and Admin only:*
+      mt(:all_submissions_description, <<~EOS)
+        *Instructor and Admin only:*
 
-Assignment (except quizzes) submission/resubmission
-EOS
+        Assignment (except quizzes) submission/resubmission
+      EOS
     when 'Submission Comment'
       t(:submission_comment_description, "Assignment submission comment")
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
     when 'Invitation'
-      mt(:invitation_description, <<-EOS)
-Invitation for:
+      mt(:invitation_description, <<~EOS)
+        Invitation for:
 
-* Web conference
-* Group
-* Collaboration
-* Peer Review & reminder
-EOS
+        * Web conference
+        * Group
+        * Collaboration
+        * Peer Review & reminder
+      EOS
     when 'Other'
-      mt(:other_description, <<-EOS)
-*Instructor and Admin only:*
+      mt(:other_description, <<~EOS)
+        *Instructor and Admin only:*
 
-* Course enrollment
-* Report generated
-* Content export
-* Migration report
-* New account user
-* New student group
-EOS
+        * Course enrollment
+        * Report generated
+        * Content export
+        * Migration report
+        * New account user
+        * New student group
+      EOS
     when 'Calendar'
       t(:calendar_description, 'New and changed items on your course calendar')
     when 'Student Appointment Signups'
-      mt(:student_appointment_description, <<-EOS)
-*Instructor and Admin only:*
+      mt(:student_appointment_description, <<~EOS)
+        *Instructor and Admin only:*
 
-Student appointment sign-up
-EOS
+        Student appointment sign-up
+      EOS
     when 'Appointment Availability'
       t('New appointment timeslots are available for signup')
     when 'Appointment Signups'
@@ -667,28 +667,28 @@ EOS
     when 'Recording Ready'
       t(:web_conference_recording_ready, 'A conference recording is ready')
     when 'Membership Update'
-      mt(:membership_update_description, <<-EOS)
-*Admin only: pending enrollment activated*
+      mt(:membership_update_description, <<~EOS)
+        *Admin only: pending enrollment activated*
 
-* Group enrollment
-* accepted/rejected
-EOS
+        * Group enrollment
+        * accepted/rejected
+      EOS
     when 'Blueprint'
-      mt(:blueprint_description, <<-BPDESC)
-*Instructor and Admin only:*
+      mt(:blueprint_description, <<~BPDESC)
+        *Instructor and Admin only:*
 
-Content was synced from a blueprint course to associated courses
-BPDESC
+        Content was synced from a blueprint course to associated courses
+      BPDESC
     when 'Content Link Error'
-      mt(:content_link_error_description, <<-CONTLINK)
-*Instructor and Admin only:*
+      mt(:content_link_error_description, <<~CONTLINK)
+        *Instructor and Admin only:*
 
-Location and content of a failed link that a student has interacted with
-CONTLINK
+        Location and content of a failed link that a student has interacted with
+      CONTLINK
     when 'Account Notification'
-      mt(:account_notification_description, <<-EOS)
-Institution-wide announcements (also displayed on Dashboard pages)
-    EOS
+      mt(:account_notification_description, <<~EOS)
+        Institution-wide announcements (also displayed on Dashboard pages)
+      EOS
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end
@@ -696,11 +696,11 @@ Institution-wide announcements (also displayed on Dashboard pages)
 
   def display_category
     case category
-      when 'Student Appointment Signups', 'Appointment Availability',
+    when 'Student Appointment Signups', 'Appointment Availability',
            'Appointment Signups', 'Appointment Cancelations'
-        'Calendar'
-      else
-        category
+      'Calendar'
+    else
+      category
     end
   end
 

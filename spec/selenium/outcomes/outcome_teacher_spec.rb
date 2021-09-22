@@ -36,7 +36,6 @@ describe "outcomes as a teacher" do
   end
 
   context "account level outcomes" do
-
     before do
       course_with_teacher_logged_in
       @account = Account.default
@@ -219,7 +218,7 @@ describe "outcomes as a teacher" do
       # confirm move in db
       expect(LearningOutcomeGroup.where(id: @outcome_group).first.child_outcome_links.first.content.id).to eq @outcome.id
 
-      #confirm that error appears if moving into parent group it already belongs to
+      # confirm that error appears if moving into parent group it already belongs to
       f('.outcomes-sidebar .outcome-link').click
       f(".move_button").click()
 

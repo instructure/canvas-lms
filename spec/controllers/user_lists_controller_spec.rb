@@ -28,7 +28,7 @@ describe UserListsController do
     account_admin_user_with_role_changes(:role => role, :role_changes => { :manage_students => true })
     user_session(@user)
 
-    post 'create', params: {:course_id => @course.id, :user_list => ''}, format: "json"
+    post 'create', params: { :course_id => @course.id, :user_list => '' }, format: "json"
     expect(response).to be_successful
   end
 
@@ -39,7 +39,7 @@ describe UserListsController do
     account_admin_user_with_role_changes(:role => role, :role_changes => { :add_student_to_course => true })
     user_session(@user)
 
-    post 'create', params: {:course_id => @course.id, :user_list => ''}, format: "json"
+    post 'create', params: { :course_id => @course.id, :user_list => '' }, format: "json"
     expect(response).to be_successful
   end
 
@@ -48,7 +48,7 @@ describe UserListsController do
     user_session(@user)
 
     expect(UserListV2).to receive(:new).once.with('list', search_type: 'unique_id', root_account: Account.default, current_user: @user, can_read_sis: true)
-    post 'create', params: {:course_id => @course.id, :user_list => 'list', :v2 => true, :search_type => 'unique_id'}, format: "json"
+    post 'create', params: { :course_id => @course.id, :user_list => 'list', :v2 => true, :search_type => 'unique_id' }, format: "json"
     expect(response).to be_successful
   end
 end

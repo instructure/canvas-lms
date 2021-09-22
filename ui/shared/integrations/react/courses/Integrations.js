@@ -29,15 +29,8 @@ import useMicrosoftSettings from './microsoft_sync/useSettings'
 import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
 
 const Integrations = () => {
-  const [
-    msGroup,
-    msEnabled,
-    msLoading,
-    msError,
-    msToggleEnabled,
-    setMSError,
-    setMSGroup
-  ] = useMicrosoftSettings(ENV.COURSE_ID)
+  const [msGroup, msEnabled, msLoading, msError, msToggleEnabled, setMSError, setMSGroup] =
+    useMicrosoftSettings(ENV.COURSE_ID)
 
   const [msExpanded, setMSExpanded] = useState(!!msError)
   const [msInfo, setMSInfo] = useState()
@@ -51,7 +44,7 @@ const Integrations = () => {
           <View
             as="div"
             borderWidth="none none small none"
-            borderColor="slate"
+            borderColor="primary"
             padding="none small"
           >
             <Flex justifyItems="space-between">

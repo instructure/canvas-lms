@@ -30,10 +30,9 @@ module Lti
     end
     let(:resource_handler) { ResourceHandler.new }
 
-    subject(:tool_proxy) { ToolProxy.new}
+    subject(:tool_proxy) { ToolProxy.new }
 
     describe 'validations' do
-
       before(:each) do
         subject.shared_secret = 'shared_secret'
         subject.guid = 'guid'
@@ -134,7 +133,6 @@ module Lti
         let(:sub_account_1_1) { Account.create(parent_account: root_account) }
         let(:sub_account_1_2) { Account.create(parent_account: root_account) }
         let(:sub_account_2_1) { Account.create(parent_account: sub_account_1_1) }
-
 
         it 'finds a tool_proxy' do
           tool_proxy = create_tool_proxy(context: sub_account_2_1)
@@ -311,7 +309,6 @@ module Lti
             proxies = described_class.find_active_proxies_for_context_by_vendor_code_and_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abc')
             expect(proxies.count).to eq 1
           end
-
         end
 
         describe "#find_active_proxies_for_context" do
@@ -346,20 +343,18 @@ module Lti
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
           expect(proxies.count).to eq 0
         end
-
       end
-
     end
 
     def create_tool_proxy(opts = {})
       default_opts = {
-          shared_secret: 'shared_secret',
-          guid: SecureRandom.uuid,
-          product_version: '1.0beta',
-          lti_version: 'LTI-2p0',
-          product_family: product_family,
-          workflow_state: 'active',
-          raw_data: 'some raw data'
+        shared_secret: 'shared_secret',
+        guid: SecureRandom.uuid,
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
       }
 
       tp = ToolProxy.create(default_opts.merge(opts))
@@ -369,6 +364,7 @@ module Lti
 
     def create_resource_handler(tool_proxy)
       return unless tool_proxy.persisted?
+
       Lti::ResourceHandler.create!(
         tool_proxy: tool_proxy,
         name: 'resource_handler',
@@ -377,7 +373,6 @@ module Lti
     end
 
     context "singleton message handlers" do
-
       subject do
         described_class.create!(
           shared_secret: 'shared_secret',
@@ -397,7 +392,8 @@ module Lti
         ResourceHandler.create!(
           resource_type_code: 'instructure.com:default',
           name: 'resource name',
-          tool_proxy: subject)
+          tool_proxy: subject
+        )
       end
       let(:reregistration_message_handler) do
         MessageHandler.create!(
@@ -408,29 +404,24 @@ module Lti
       end
 
       describe "#reregistration_handler" do
-
         it "returns the reregistration handler" do
           reregistration_message_handler
           expect(subject.reregistration_message_handler).to eq reregistration_message_handler
         end
-
       end
 
       describe "#default_resource_handler" do
-
         it "returns the default resource handler" do
           default_resource_handler
           expect(subject.default_resource_handler).to eq default_resource_handler
         end
-
       end
-
     end
 
     describe "#enabled_capabilities" do
       it 'returns the enabled capabilities' do
         capabilities = ['a_capability']
-        subject.raw_data = {'enabled_capability' => capabilities}
+        subject.raw_data = { 'enabled_capability' => capabilities }
         expect(subject.enabled_capabilities).to eq capabilities
       end
     end
@@ -483,117 +474,117 @@ module Lti
 
       it 'returns true when there is a match' do
         expect(tool_proxy.matching_tool_profile?({
-          "product_instance" => {
-            "product_info" => {
-              "product_family" => {
-                "vendor" => {
-                  "code" => "123"
-                },
-                "code" => "abc"
-              },
-            }
-          },
-          "resource_handler" => [
-            {
-              "resource_type" => {
-                "code" => "code"
-              }
-            }
-          ]
-        })).to eq(true)
+                                                   "product_instance" => {
+                                                     "product_info" => {
+                                                       "product_family" => {
+                                                         "vendor" => {
+                                                           "code" => "123"
+                                                         },
+                                                         "code" => "abc"
+                                                       },
+                                                     }
+                                                   },
+                                                   "resource_handler" => [
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "code"
+                                                       }
+                                                     }
+                                                   ]
+                                                 })).to eq(true)
       end
 
       it "returns false when the vendor_code doesn't match" do
         expect(tool_proxy.matching_tool_profile?({
-          "product_instance" => {
-            "product_info" => {
-              "product_family" => {
-                "vendor" => {
-                  "code" => "1234"
-                },
-                "code" => "abc"
-              },
-            }
-          },
-          "resource_handler" => [
-            {
-              "resource_type" => {
-                "code" => "code"
-              }
-            }
-          ]
-        })).to eq(false)
+                                                   "product_instance" => {
+                                                     "product_info" => {
+                                                       "product_family" => {
+                                                         "vendor" => {
+                                                           "code" => "1234"
+                                                         },
+                                                         "code" => "abc"
+                                                       },
+                                                     }
+                                                   },
+                                                   "resource_handler" => [
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "code"
+                                                       }
+                                                     }
+                                                   ]
+                                                 })).to eq(false)
       end
 
       it "returns false when the product_code doesn't match" do
         expect(tool_proxy.matching_tool_profile?({
-          "product_instance" => {
-            "product_info" => {
-              "product_family" => {
-                "vendor" => {
-                  "code" => "123"
-                },
-                "code" => "abcd"
-              },
-            }
-          },
-          "resource_handler" => [
-            {
-              "resource_type" => {
-                "code" => "code"
-              }
-            }
-          ]
-        })).to eq(false)
+                                                   "product_instance" => {
+                                                     "product_info" => {
+                                                       "product_family" => {
+                                                         "vendor" => {
+                                                           "code" => "123"
+                                                         },
+                                                         "code" => "abcd"
+                                                       },
+                                                     }
+                                                   },
+                                                   "resource_handler" => [
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "code"
+                                                       }
+                                                     }
+                                                   ]
+                                                 })).to eq(false)
       end
 
       it "returns false when the resource type codes do not match" do
         expect(tool_proxy.matching_tool_profile?({
-          "product_instance" => {
-            "product_info" => {
-              "product_family" => {
-                "vendor" => {
-                  "code" => "123"
-                },
-                "code" => "abc"
-              },
-            }
-          },
-          "resource_handler" => [
-            {
-              "resource_type" => {
-                "code" => "different_code"
-              }
-            }
-          ]
-        })).to eq(false)
+                                                   "product_instance" => {
+                                                     "product_info" => {
+                                                       "product_family" => {
+                                                         "vendor" => {
+                                                           "code" => "123"
+                                                         },
+                                                         "code" => "abc"
+                                                       },
+                                                     }
+                                                   },
+                                                   "resource_handler" => [
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "different_code"
+                                                       }
+                                                     }
+                                                   ]
+                                                 })).to eq(false)
       end
 
       it "returns false when the resource handlers differ in number" do
         expect(tool_proxy.matching_tool_profile?({
-          "product_instance" => {
-            "product_info" => {
-              "product_family" => {
-                "vendor" => {
-                  "code" => "123"
-                },
-                "code" => "abc"
-              },
-            }
-          },
-          "resource_handler" => [
-            {
-              "resource_type" => {
-                "code" => "different_code"
-              }
-            },
-            {
-              "resource_type" => {
-                "code" => "code"
-              }
-            }
-          ]
-        })).to eq(false)
+                                                   "product_instance" => {
+                                                     "product_info" => {
+                                                       "product_family" => {
+                                                         "vendor" => {
+                                                           "code" => "123"
+                                                         },
+                                                         "code" => "abc"
+                                                       },
+                                                     }
+                                                   },
+                                                   "resource_handler" => [
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "different_code"
+                                                       }
+                                                     },
+                                                     {
+                                                       "resource_type" => {
+                                                         "code" => "code"
+                                                       }
+                                                     }
+                                                   ]
+                                                 })).to eq(false)
       end
     end
 
@@ -632,23 +623,23 @@ module Lti
       let(:service_two_endpoint) { "http://originality.docker/eula" }
       let(:tool_proxy) do
         create_tool_proxy(raw_data: {
-          'tool_profile' => {
-            'service_offered' => [
-              {
-                "endpoint" => service_one_endpoint,
-                "action" => ["POST", "GET"],
-                "@id" => service_one_id,
-                "@type" => "RestService"
-              },
-              {
-                "endpoint" => service_two_endpoint,
-                "action" => ["GET"],
-                "@id" => service_two_id,
-                "@type" => "RestService"
-              }
-            ]
-          }
-        })
+                            'tool_profile' => {
+                              'service_offered' => [
+                                {
+                                  "endpoint" => service_one_endpoint,
+                                  "action" => ["POST", "GET"],
+                                  "@id" => service_one_id,
+                                  "@type" => "RestService"
+                                },
+                                {
+                                  "endpoint" => service_two_endpoint,
+                                  "action" => ["GET"],
+                                  "@id" => service_two_id,
+                                  "@type" => "RestService"
+                                }
+                              ]
+                            }
+                          })
       end
 
       it 'returns the service for the specified id/action pair' do
@@ -667,11 +658,10 @@ module Lti
     describe "#ims_tool_proxy" do
       it 'gets the ims-lti gem version of the tool proxy' do
         tool_proxy_guid = '123'
-        tool_proxy.raw_data = {'tool_proxy_guid' => tool_proxy_guid}
+        tool_proxy.raw_data = { 'tool_proxy_guid' => tool_proxy_guid }
         expect(subject.ims_tool_proxy.tool_proxy_guid).to eq tool_proxy_guid
       end
     end
-
 
     describe "#security_profiles" do
       it 'gets the security profile' do
@@ -681,7 +671,7 @@ module Lti
             "digest_algorithm" => 'HS256'
           }
         ]
-        tool_proxy.raw_data = {'tool_profile' => { 'security_profile' => security_profiles }}
+        tool_proxy.raw_data = { 'tool_profile' => { 'security_profile' => security_profiles } }
         expect(subject.security_profiles.as_json).to eq security_profiles
       end
     end
@@ -690,17 +680,17 @@ module Lti
       let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
       let(:tool_proxy) do
         create_tool_proxy(raw_data: {
-          'tool_profile' => {
-            'service_offered' => [
-              {
-                "endpoint" => 'endpoint',
-                "action" => ["POST", "GET"],
-                "@id" => '#vnd.Canvas.SubmissionEvent',
-                "@type" => "RestService"
-              }
-            ]
-          }
-        }, context: account_model)
+                            'tool_profile' => {
+                              'service_offered' => [
+                                {
+                                  "endpoint" => 'endpoint',
+                                  "action" => ["POST", "GET"],
+                                  "@id" => '#vnd.Canvas.SubmissionEvent',
+                                  "@type" => "RestService"
+                                }
+                              ]
+                            }
+                          }, context: account_model)
       end
 
       it 'should create subscriptions for Plagiarism ToolProxies' do
@@ -722,7 +712,7 @@ module Lti
         ToolProxy.create!(
           raw_data: {
             'enabled_capability' => [placement],
-            'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+            'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
           },
           subscription_id: 'id',
           context: course_factory(account: account),
@@ -765,17 +755,17 @@ module Lti
 
       let(:tool_proxy) do
         create_tool_proxy(raw_data: {
-          'tool_profile' => {
-            'service_offered' => [
-              {
-                "endpoint" => 'endpoint',
-                "action" => ["POST", "GET"],
-                "@id" => 'id',
-                "@type" => "RestService"
-              }
-            ]
-          }
-        }, context: account_model)
+                            'tool_profile' => {
+                              'service_offered' => [
+                                {
+                                  "endpoint" => 'endpoint',
+                                  "action" => ["POST", "GET"],
+                                  "@id" => 'id',
+                                  "@type" => "RestService"
+                                }
+                              ]
+                            }
+                          }, context: account_model)
       end
 
       it 'should delete subscriptions' do

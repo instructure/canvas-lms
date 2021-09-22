@@ -39,7 +39,6 @@ module MessageBus
   # A catastrophic machine failure could dump events still in
   # the memory queue.
   class AsyncProducer
-
     def initialize(start_thread: true)
       Bundler.require(:pulsar)
       @queue = Queue.new
@@ -54,7 +53,7 @@ module MessageBus
         raise ::MessageBus::MemoryQueueFullError, "Pulsar throughput constrained, queue full"
       end
 
-      @queue << [ namespace, topic_name, message, Shard.current.id ]
+      @queue << [namespace, topic_name, message, Shard.current.id]
     end
 
     def queue_depth
@@ -113,6 +112,7 @@ module MessageBus
     def process_one_queue_item
       work_tuple = @queue.pop
       return :stop if work_tuple == :stop
+
       status = :none
       namespace, topic_name, message, shard_id = *work_tuple
       Shard.find(shard_id).activate do

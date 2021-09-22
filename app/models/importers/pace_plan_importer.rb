@@ -21,7 +21,6 @@ require_dependency 'importers'
 
 module Importers
   class PacePlanImporter < Importer
-
     self.item_class = PacePlan
 
     def self.process_migration(data, migration)
@@ -47,9 +46,9 @@ module Importers
       pace_plan.save!
 
       # preload mapping from content tag migration id to id
-      module_items_by_migration_id = context.context_module_tags.not_deleted.
-        select(:id, :migration_id).
-        index_by(&:migration_id)
+      module_items_by_migration_id = context.context_module_tags.not_deleted
+                                            .select(:id, :migration_id)
+                                            .index_by(&:migration_id)
 
       hash[:module_items].each do |pp_module_item|
         module_item_id = module_items_by_migration_id[pp_module_item[:module_item_migration_id]]&.id

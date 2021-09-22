@@ -48,34 +48,34 @@ module GradebookSetup
 
   def closed_attributes(now = Time.zone.now)
     {
-        title: "GP Closed",
-        start_date: 3.weeks.ago(now),
-        end_date: 2.weeks.ago(now)
+      title: "GP Closed",
+      start_date: 3.weeks.ago(now),
+      end_date: 2.weeks.ago(now)
     }
   end
 
   def ended_attributes(now = Time.zone.now)
     {
-        title: "GP Ended",
-        start_date: 2.weeks.ago(now),
-        end_date: 2.days.ago(now),
-        close_date: 2.days.from_now
+      title: "GP Ended",
+      start_date: 2.weeks.ago(now),
+      end_date: 2.days.ago(now),
+      close_date: 2.days.from_now
     }
   end
 
   def current_attributes(now = Time.zone.now)
     {
-        title: "GP Current",
-        start_date: 1.day.ago(now),
-        end_date: 2.weeks.from_now
+      title: "GP Current",
+      start_date: 1.day.ago(now),
+      end_date: 2.weeks.from_now
     }
   end
 
   def update_display_preferences(concluded, inactive)
     update_course_preferences(@teacher, {
-      'show_concluded_enrollments' => concluded.to_s,
-      'show_inactive_enrollments' => inactive.to_s
-    })
+                                'show_concluded_enrollments' => concluded.to_s,
+                                'show_inactive_enrollments' => inactive.to_s
+                              })
   end
 
   def update_course_preferences(user, preferences)

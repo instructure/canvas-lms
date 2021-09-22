@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing Rubrics" do
-
   SYSTEMS.each do |system|
     if import_data_exists? system, 'rubric'
       it "should import from #{system}" do
@@ -45,7 +44,7 @@ describe "Importing Rubrics" do
         expect(r.description).to include(data[:description]) if data[:description]
         expect(r.points_possible).to eq data[:points_possible].to_f
 
-        crit_ids = r.data.map{|rub|rub[:ratings].first[:criterion_id]}
+        crit_ids = r.data.map { |rub| rub[:ratings].first[:criterion_id] }
 
         data[:data].each do |crit|
           id = crit[:migration_id] || crit[:id]
@@ -61,7 +60,7 @@ describe "Importing Rubrics" do
       @context = get_import_context('vista')
       @migration = @context.content_migrations.create!
       outcome_proficiency_model(@context.root_account)
-      outcome_with_rubric({mastery_points: 3, context: @context})
+      outcome_with_rubric({ mastery_points: 3, context: @context })
       @data[:data] = [{ learning_outcome_id: @outcome.id, points_possible: 5, ratings: [{ description: "Rating 1" }] }]
       @data[:rubrics_to_import] = {}
       @data[:rubrics_to_import][@data[:migration_id]] = true

@@ -32,6 +32,7 @@ module Canvas
 
       def fetch(*, expires_in: nil, race_condition_ttl: nil)
         return yield if expires_in == 0
+
         super
       end
 

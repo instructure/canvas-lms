@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class UserObserverImporter < CSVBaseImporter
-
       def self.user_observer_csv?(row)
         row.include?('observer_id') && row.include?('student_id')
       end
@@ -32,7 +31,7 @@ module SIS
 
       # possible columns:
       # observer_id, student_id, status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
             begin

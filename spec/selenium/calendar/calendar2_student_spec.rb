@@ -26,7 +26,7 @@ describe "calendar2" do
 
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -134,8 +134,8 @@ describe "calendar2" do
         date = Date.today
         e1 = @course.calendar_events.build :title => "ohai",
                                            :child_event_data => [
-                                               {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string},
-                                               {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string},
+                                             { :start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string },
+                                             { :start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string },
                                            ]
         e1.updating_user = @teacher
         e1.save!

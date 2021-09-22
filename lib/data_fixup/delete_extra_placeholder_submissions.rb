@@ -21,8 +21,8 @@ module DataFixup::DeleteExtraPlaceholderSubmissions
   def self.run
     Course.find_ids_in_ranges do |min_id, max_id|
       delay_if_production(n_strand: ["DataFixup:DeleteExtraPlaceholderSubmissions", Shard.current.database_server.id],
-          priority: Delayed::MAX_PRIORITY).
-        run_for_course_range(min_id, max_id)
+                          priority: Delayed::MAX_PRIORITY)
+        .run_for_course_range(min_id, max_id)
     end
   end
 
@@ -41,9 +41,9 @@ module DataFixup::DeleteExtraPlaceholderSubmissions
         course_assignment_ids.each do |assignment_id|
           deletable_student_ids = batch_student_ids - edd.find_effective_due_dates_for_assignment(assignment_id).keys
           unless deletable_student_ids.blank?
-            Submission.active.
-              where(assignment_id: assignment_id, user_id: deletable_student_ids).
-              update_all(workflow_state: :deleted)
+            Submission.active
+                      .where(assignment_id: assignment_id, user_id: deletable_student_ids)
+                      .update_all(workflow_state: :deleted)
           end
         end
       end

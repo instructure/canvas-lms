@@ -26,7 +26,7 @@ module ReleaseNotes
       ].freeze,
       attribute_definitions: [
         { attribute_name: 'PartitionKey', attribute_type: 'S' }.freeze,
-        { attribute_name: 'RangeKey', attribute_type: 'S'}.freeze,
+        { attribute_name: 'RangeKey', attribute_type: 'S' }.freeze,
       ].freeze
     }.freeze
 

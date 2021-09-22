@@ -70,7 +70,7 @@ module LuckySneaks
       value = /([A-Za-z0-9]+|('[^']*?'|"[^"]*?"))/
       attr = /(#{name}(\s*=\s*#{value})?)/
       rx = /<[!\/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!\/?\]]+|--)?>/
-      (leave_whitespace) ?  gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
+      (leave_whitespace) ? gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
     end
 
     # Converts HTML entities into the respective non-accented letters. Examples:
@@ -195,7 +195,7 @@ module LuckySneaks
           A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
           1 2 3 4 5 6 7 8 9
         }
-        Array.new(limit, "").collect{strong_alphanumerics[rand(61)]}.join
+        Array.new(limit, "").collect { strong_alphanumerics[rand(61)] }.join
       end
     end
   end

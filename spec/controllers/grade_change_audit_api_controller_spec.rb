@@ -446,7 +446,7 @@ describe GradeChangeAuditApiController do
         end
 
         it "returns only override grade changes when an assignment ID of 'override' is specified" do
-          get :query, params: params.merge({assignment_id: "override"})
+          get :query, params: params.merge({ assignment_id: "override" })
           expect(returned_assignment_ids).to contain_exactly(nil)
         end
 
@@ -466,7 +466,7 @@ describe GradeChangeAuditApiController do
         end
 
         it "returns no results when an assignment ID of 'override' is specified" do
-          get :query, params: params.merge({assignment_id: "override"})
+          get :query, params: params.merge({ assignment_id: "override" })
           expect(returned_events).to be_empty
         end
       end

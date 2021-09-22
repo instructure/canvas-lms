@@ -32,7 +32,7 @@ describe EportfolioCategoriesController do
 
   describe "GET 'index'" do
     it "should redirect" do
-      get 'index', params: {:eportfolio_id => @portfolio.id}
+      get 'index', params: { :eportfolio_id => @portfolio.id }
       expect(response).to be_redirect
     end
   end
@@ -40,13 +40,13 @@ describe EportfolioCategoriesController do
   describe "GET 'show'" do
     before(:once) { eportfolio_category }
     it "should require authorization" do
-      get 'show', params: {:eportfolio_id => @portfolio.id, :id => 1}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :id => 1 }
       assert_unauthorized
     end
 
     it "should assign variables" do
       user_session(@user)
-      get 'show', params: {:eportfolio_id => @portfolio.id, :id => @category.id}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       expect(response).to be_successful
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio]).to eql(@portfolio)
@@ -56,7 +56,7 @@ describe EportfolioCategoriesController do
 
     it "should responsd to named category request" do
       user_session(@user)
-      get 'show', params: {:eportfolio_id => @portfolio.id, :category_name => @category.slug}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :category_name => @category.slug }
       expect(response).to be_successful
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio]).to eql(@portfolio)
@@ -67,7 +67,7 @@ describe EportfolioCategoriesController do
     describe "js_env" do
       it "sets SKIP_ENHANCING_USER_CONTENT to true" do
         user_session(@user)
-        get 'show', params: {eportfolio_id: @portfolio.id, category_name: @category.slug}
+        get 'show', params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
         expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
       end
     end
@@ -131,13 +131,13 @@ describe EportfolioCategoriesController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', params: {:eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some portfolio"}}
+      post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_category => { :name => "some portfolio" } }
       assert_unauthorized
     end
 
     it "should create eportfolio category" do
       user_session(@user)
-      post 'create', params: {:eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some category"}}
+      post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_category => { :name => "some category" } }
       expect(response).to be_redirect
       expect(assigns[:category]).not_to be_nil
       expect(assigns[:category].name).to eql("some category")
@@ -147,13 +147,13 @@ describe EportfolioCategoriesController do
   describe "PUT 'update'" do
     before(:once) { eportfolio_category }
     it "should require authorization" do
-      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }}
+      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => { :name => "new name" } }
       assert_unauthorized
     end
 
     it "should update eportfolio category" do
       user_session(@user)
-      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }}
+      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => { :name => "new name" } }
       expect(assigns[:category]).not_to be_nil
       expect(assigns[:category]).to eql(@category)
     end
@@ -162,13 +162,13 @@ describe EportfolioCategoriesController do
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_category }
     it "should require authorization" do
-      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @category.id}
+      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       assert_unauthorized
     end
 
     it "should delete eportfolio category" do
       user_session(@user)
-      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @category.id}
+      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       expect(assigns[:category]).to be_frozen
     end
   end

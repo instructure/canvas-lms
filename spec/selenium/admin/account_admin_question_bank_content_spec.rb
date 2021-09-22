@@ -35,35 +35,35 @@ describe "account admin question bank" do
   end
 
   def create_question(name = "question 1", bank = @question_bank)
-    answers = [{:text => "correct answer", :weight => 100}]
+    answers = [{ :text => "correct answer", :weight => 100 }]
     3.times do
-      answer = {:text => "incorrect answer", :weight => 0}
+      answer = { :text => "incorrect answer", :weight => 0 }
       answers.push answer
     end
-    data = {:question_text => "what is the answer to #{name}?", :question_type => 'multiple_choice_question', :answers => answers}
+    data = { :question_text => "what is the answer to #{name}?", :question_type => 'multiple_choice_question', :answers => answers }
     data[:question_name] = name
     question = AssessmentQuestion.create(:question_data => data)
     bank.assessment_questions << question
     question
   end
 
-  def create_outcome (short_description = "good student")
+  def create_outcome(short_description = "good student")
     outcome = Account.default.learning_outcomes.create!(
-        :short_description => short_description,
-        :rubric_criterion => {
-            :description => "test description",
-            :points_possible => 10,
-            :mastery_points => 9,
-            :ratings => [
-                {:description => "Exceeds Expectations", :points => 5},
-                {:description => "Meets Expectations", :points => 3},
-                {:description => "Does Not Meet Expectations", :points => 0}
-            ]
-        })
+      :short_description => short_description,
+      :rubric_criterion => {
+        :description => "test description",
+        :points_possible => 10,
+        :mastery_points => 9,
+        :ratings => [
+          { :description => "Exceeds Expectations", :points => 5 },
+          { :description => "Meets Expectations", :points => 3 },
+          { :description => "Does Not Meet Expectations", :points => 0 }
+        ]
+      }
+    )
     Account.default.root_outcome_group.add_outcome(outcome)
     outcome
   end
-
 
   def verify_added_question(name, question_text, chosen_question_type)
     question = AssessmentQuestion.where(name: name).first
@@ -101,7 +101,7 @@ describe "account admin question bank" do
     answer_inputs = ff(".form_answers .select_answer input")
     answer_inputs[0].send_keys("correct answer")
     (1..3).each do |i|
-      answer_inputs[i*2].send_keys("incorrect answer")
+      answer_inputs[i * 2].send_keys("incorrect answer")
       wait_for_ajaximations
     end
     submit_form(question_form)
@@ -189,7 +189,7 @@ describe "account admin question bank" do
       question_number = question_count + 1
       questions = []
       questions.push @question
-      question_count.times { |i| questions.push create_question("question #{question_number+i}") }
+      question_count.times { |i| questions.push create_question("question #{question_number + i}") }
       f(".move_questions_link").click
       wait_for_ajaximations
       question_list = ffj(".list_question:visible")

@@ -30,6 +30,7 @@ module CustomAlertActions
 
   def dismiss_alert
     return if driver.browser == :safari
+
     keep_trying_until do
       alert = driver.switch_to.alert
       alert.dismiss

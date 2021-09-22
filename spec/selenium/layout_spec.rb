@@ -33,6 +33,6 @@ describe "layout" do
   end
 
   it "should escape JSON injected directly into the view" do
-    expect(driver.execute_script("return ENV.current_user.display_name")).to eq  "</script><b>evil html & name</b>"
+    expect(driver.execute_script("return ENV.current_user.display_name")).to eq "</script><b>evil html & name</b>"
   end
 end

@@ -27,7 +27,6 @@ require 'time'
 require 'json/jwt'
 
 module CanvasPandaPub
-
   # Public: Used for sending pushes to PandaPub channels and generating PandaPub
   # tokens to send to clients.
 
@@ -35,7 +34,7 @@ module CanvasPandaPub
     def self.config
       res = CanvasPandaPub.plugin_settings.try(:settings)
       return nil unless res && res['base_url'] && res['application_id'] &&
-                               res['key_id'] && res['key_secret']
+                        res['key_id'] && res['key_secret']
 
       res['push_url'] = res['base_url'].chomp("/") + "/push"
       res.dup
@@ -74,8 +73,8 @@ module CanvasPandaPub
     def post_update(channel, payload)
       path = "/channel/#{@application_id}#{channel}"
       request = Net::HTTP::Post.new(path, {
-        "Content-Type" => "application/json"
-      })
+                                      "Content-Type" => "application/json"
+                                    })
       request.basic_auth @key_id, @key_secret
 
       body = JSON.dump(payload)
@@ -100,12 +99,12 @@ module CanvasPandaPub
 
     def generate_token(channel, read = false, write = false, expires = 1.hour.from_now)
       JSON::JWT.new({
-        keyId: @key_id,
-        channel: "/#{@application_id}#{channel}",
-        pub: write,
-        sub: read,
-        exp: expires.to_i
-      }).sign(@key_secret, "HS256").to_s
+                      keyId: @key_id,
+                      channel: "/#{@application_id}#{channel}",
+                      pub: write,
+                      sub: read,
+                      exp: expires.to_i
+                    }).sign(@key_secret, "HS256").to_s
     end
   end
 end

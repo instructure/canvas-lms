@@ -23,7 +23,6 @@ module Quizzes::LogAuditing
   # Operates on a single EVT_QUESTION_ANSWERED event to make sure it contains no
   # redundant data based on what had been previously recorded.
   class QuestionAnsweredEventOptimizer
-
     # Given a set of previously recorded answer events, optimize the answer
     # records recorded in this event by:
     #
@@ -61,7 +60,7 @@ module Quizzes::LogAuditing
 
     protected
 
-    def identical_records?(a,b)
+    def identical_records?(a, b)
       a['answer'].to_json == b['answer'].to_json
     end
   end

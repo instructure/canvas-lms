@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/groups_common')
 module AssignmentsCommon
   include GroupsCommon
 
-  def build_assignment_with_type(type, opts={})
+  def build_assignment_with_type(type, opts = {})
     if opts[:assignment_group_id]
       assignment_group_id = opts[:assignment_group_id]
     else
@@ -56,7 +56,7 @@ module AssignmentsCommon
     end
   end
 
-  def edit_assignment(assignment_id, opts={})
+  def edit_assignment(assignment_id, opts = {})
     f("#assignment_#{assignment_id} .al-trigger").click
     f("#assignment_#{assignment_id} .edit_assignment").click
 
@@ -88,7 +88,7 @@ module AssignmentsCommon
     wait_for_ajaximations
   end
 
-  def delete_assignment_group(assignment_group_id, opts={})
+  def delete_assignment_group(assignment_group_id, opts = {})
     f("#assignment_group_#{assignment_group_id} .al-trigger").click
     f("#assignment_group_#{assignment_group_id} .delete_group").click
     unless opts[:no_accept]
@@ -103,7 +103,7 @@ module AssignmentsCommon
 
   def stub_freezer_plugin(frozen_atts = nil)
     frozen_atts ||= {
-        "assignment_group_id" => "true"
+      "assignment_group_id" => "true"
     }
     allow(PluginSetting).to receive(:settings_for_plugin).and_return(frozen_atts)
   end
@@ -167,8 +167,8 @@ module AssignmentsCommon
   end
 
   def create_assignment_for_group(submission_type, grade_group_students_individually = false)
-    group_test_setup(2,1,2)
-    add_user_to_group(@students.first,@testgroup[0])
+    group_test_setup(2, 1, 2)
+    add_user_to_group(@students.first, @testgroup[0])
     @assignment = @course.assignments.create!(
       title: 'assignment 1',
       name: 'assignment 1',

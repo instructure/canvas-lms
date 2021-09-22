@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # coding: utf-8
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -33,17 +34,16 @@ describe "Exporter" do
     end
 
     @attachment = Attachment.create({
-      context: course_factory,
-      filename: 'exportable-test-file',
-      uploaded_data: File.open(cartridge_path)
-    })
+                                      context: course_factory,
+                                      filename: 'exportable-test-file',
+                                      uploaded_data: File.open(cartridge_path)
+                                    })
 
     @attachment_without_modules = Attachment.create({
-      context: course_factory,
-      filename: 'exportable-test-file',
-      uploaded_data: File.open(cartridge_without_modules_path)
-    })
-
+                                                      context: course_factory,
+                                                      filename: 'exportable-test-file',
+                                                      uploaded_data: File.open(cartridge_without_modules_path)
+                                                    })
   end
 
   context "create ePub default settings" do
@@ -60,7 +60,7 @@ describe "Exporter" do
       # once we have a more robust imscc we should add another test to check
       # that the keys reflect the module migration ids
       content_keys = CC::Exporter::Epub::Exporter::LINKED_RESOURCE_KEY.except("Attachment").values
-      expect(content_keys.any? {|k| exporter.templates.key?(k)}).to be_falsey
+      expect(content_keys.any? { |k| exporter.templates.key?(k) }).to be_falsey
     end
 
     it "should contain a syllabus for assignments and quizzes in modules" do

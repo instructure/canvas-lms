@@ -46,7 +46,7 @@ class ToDoListPresenter
         @needs_submitting.map(&:context) + @needs_reviewing.map(&:context)).uniq
       course_to_permissions = @user.precalculate_permissions_for_courses(deduped_courses, [:manage_grades])
 
-      @needs_grading = @needs_grading.select {|assignment|
+      @needs_grading = @needs_grading.select { |assignment|
         course_to_permissions ?
           course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false) :
           assignment.context.grants_right?(@user, :manage_grades)
@@ -61,7 +61,7 @@ class ToDoListPresenter
 
   def assignments_needing(type, opts = {})
     if @user
-      @user.send("assignments_needing_#{type}", **{contexts: @contexts, limit: ASSIGNMENT_LIMIT}.merge(opts)).map do |assignment|
+      @user.send("assignments_needing_#{type}", **{ contexts: @contexts, limit: ASSIGNMENT_LIMIT }.merge(opts)).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else
@@ -152,7 +152,7 @@ class ToDoListPresenter
       if needs_grading_count > 999
         I18n.t('More than 999 submissions need grading')
       else
-        I18n.t({one: '1 submission needs grading', other: '%{count} submissions need grading'}, count: assignment.needs_grading_count)
+        I18n.t({ one: '1 submission needs grading', other: '%{count} submissions need grading' }, count: assignment.needs_grading_count)
       end
     end
 

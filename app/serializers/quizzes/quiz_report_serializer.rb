@@ -24,9 +24,9 @@ module Quizzes
     root :quiz_report
 
     def_delegators :@controller,
-      :api_v1_course_quiz_url,
-      :api_v1_course_quiz_report_url,
-      :api_v1_progress_url
+                   :api_v1_course_quiz_url,
+                   :api_v1_course_quiz_report_url,
+                   :api_v1_progress_url
 
     def_delegators :object, :quiz
 
@@ -89,7 +89,7 @@ module Quizzes
       end
     end
 
-    def serializable_object(options={})
+    def serializable_object(options = {})
       super.tap do |hash|
         unless accepts_jsonapi?
           hash.delete('links')

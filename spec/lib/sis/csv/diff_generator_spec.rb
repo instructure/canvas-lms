@@ -47,8 +47,8 @@ describe SIS::CSV::DiffGenerator do
       }
 
       expect(subject.generate_csvs(previous, current)).to match_array([
-        { file: 'courses2.csv' },
-      ])
+                                                                        { file: 'courses2.csv' },
+                                                                      ])
 
       expect(@batch.sis_batch_errors).to be_empty
     end
@@ -63,8 +63,8 @@ describe SIS::CSV::DiffGenerator do
       }
 
       expect(subject.generate_csvs(previous, current)).to match_array([
-        { file: 'users.csv' },
-      ])
+                                                                        { file: 'users.csv' },
+                                                                      ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users.csv"
       expect(warning.message).to match(%r{diffing against more than one})
@@ -80,8 +80,8 @@ describe SIS::CSV::DiffGenerator do
       }
 
       expect(subject.generate_csvs(previous, current)).to match_array([
-        { file: 'users1.csv' }, { file: 'users2.csv' },
-      ])
+                                                                        { file: 'users1.csv' }, { file: 'users2.csv' },
+                                                                      ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users1.csv"
       expect(warning.message).to match(%r{diffing against more than one})
@@ -90,16 +90,16 @@ describe SIS::CSV::DiffGenerator do
     it 'should generate multiple diffs for different file types' do
       previous = {
         user: [{ file: 'users1.csv' }, { file: 'users2.csv' }],
-        course: [ csv("courses", "course_id,short_name,status\ncourse_1,test1,active\n") ],
-        account: [ csv("accounts", "account_id,status\naccount_1,active\n") ],
-        group: [ csv("groups", "group_id,status\ngroup_1,deleted\n") ],
+        course: [csv("courses", "course_id,short_name,status\ncourse_1,test1,active\n")],
+        account: [csv("accounts", "account_id,status\naccount_1,active\n")],
+        group: [csv("groups", "group_id,status\ngroup_1,deleted\n")],
       }
       current = {
         user: [{ file: 'users.csv' }],
-        course: [ csv("courses", "course_id,short_name,status\ncourse_2,test2,active\n") ],
+        course: [csv("courses", "course_id,short_name,status\ncourse_2,test2,active\n")],
         enrollment: [{ file: 'enrollments.csv' }],
-        account: [ csv("accounts", "account_id,status\naccount_1,active\n") ],
-        group: [ csv("groups", "group_id,status\ngroup_1,active\ngroup_2,active\n") ],
+        account: [csv("accounts", "account_id,status\naccount_1,active\n")],
+        group: [csv("groups", "group_id,status\ngroup_1,active\ngroup_2,active\n")],
       }
       csvs = subject.generate_csvs(previous, current)
       expect(csvs.size).to eq 5
@@ -114,4 +114,3 @@ describe SIS::CSV::DiffGenerator do
     end
   end
 end
-

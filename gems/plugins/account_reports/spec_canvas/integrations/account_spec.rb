@@ -20,8 +20,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../../spec/spec_helper')
 
-describe "Account Reports" , type: :request do
-
+describe "Account Reports", type: :request do
   it "should render account_reports page and show extra text if there is any" do
     # If this test is failing from a change in a different report plugin, there
     # is possibly a mis-configured engine or misnamed view. If the debugger is

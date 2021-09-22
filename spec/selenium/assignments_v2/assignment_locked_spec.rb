@@ -21,7 +21,6 @@ require_relative './page_objects/student_assignment_page_v2'
 require_relative '../common'
 require_relative '../helpers/assignments_common'
 
-
 describe 'assignments' do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
@@ -62,7 +61,7 @@ describe 'assignments' do
         @assignment = @course.assignments.create!(
           name: 'locked_assignment',
           due_at: 5.days.from_now,
-          unlock_at:3.days.from_now,
+          unlock_at: 3.days.from_now,
           lock_at: 10.days.from_now,
           points_possible: 10,
           submission_types: 'online_text_entry'
@@ -101,8 +100,8 @@ describe 'assignments' do
         )
         tag = module1.add_item(type: 'assignment', id: assignment1.id)
         module2.add_item(type: 'assignment', id: @assignment2.id)
-        module1.update!(completion_requirements: [{id: tag.id, type: 'must_submit'}])
-        module2.update!(prerequisites: [{id: module1.id, name: module1.name, type: 'context_module'}])
+        module1.update!(completion_requirements: [{ id: tag.id, type: 'must_submit' }])
+        module2.update!(prerequisites: [{ id: module1.id, name: module1.name, type: 'context_module' }])
       end
 
       before(:each) do

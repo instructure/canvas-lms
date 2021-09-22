@@ -43,7 +43,7 @@ describe "OjbectPathConverter" do
 
     it "should update assignment link href" do
       expect(doc.search("a[href*='#{ObjectPathConverterTest::OBJECT_TOKEN}']").any?).to be_truthy,
-        'precondition'
+                                                                                        'precondition'
 
       test_instance.convert_object_paths!(doc)
       expect(doc.search("a[href*='#{ObjectPathConverterTest::OBJECT_TOKEN}']").any?).to be_falsy
@@ -52,7 +52,7 @@ describe "OjbectPathConverter" do
 
     it "should update wiki link href" do
       expect(doc.search("a[href*='#{ObjectPathConverterTest::WIKI_TOKEN}']").any?).to be_truthy,
-        'precondition'
+                                                                                      'precondition'
 
       test_instance.convert_object_paths!(doc)
       expect(doc.search("a[href*='#{ObjectPathConverterTest::WIKI_TOKEN}']").any?).to be_falsy

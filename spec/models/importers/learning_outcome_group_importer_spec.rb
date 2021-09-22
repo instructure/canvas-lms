@@ -24,11 +24,11 @@ describe "Importing Learning Outcome Groups" do
   before :once do
     @context = course_model
     @migration = ContentMigration.create!(:context => @context)
-    @migration.migration_ids_to_import = {:copy=>{}}
+    @migration.migration_ids_to_import = { :copy => {} }
     @migration.outcome_to_id_map = {}
   end
 
-  def outcome_data(overrides={})
+  def outcome_data(overrides = {})
     {
       migration_id: "6a240bdc-957b-11ea-bb37-0242ac130002",
       type: "learning_outcome",
@@ -36,7 +36,7 @@ describe "Importing Learning Outcome Groups" do
     }.merge(overrides)
   end
 
-  def group_data(overrides={})
+  def group_data(overrides = {})
     {
       migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556",
       type: "learning_outcome_group",
@@ -54,13 +54,13 @@ describe "Importing Learning Outcome Groups" do
 
   it 'should import outcome group contents if skip import enabled on group' do
     log_data = group_data(outcomes: [
-      outcome_data,
-      group_data(
-        outcomes: [
-          outcome_data(migration_id: '73b696ec-957b-11ea-bb37-0242ac130002')
-        ]
-      )
-    ])
+                            outcome_data,
+                            group_data(
+                              outcomes: [
+                                outcome_data(migration_id: '73b696ec-957b-11ea-bb37-0242ac130002')
+                              ]
+                            )
+                          ])
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, nil, true)
     expect(@context.learning_outcome_groups.count).to eq 2
     expect(@context.learning_outcomes.count).to eq 2

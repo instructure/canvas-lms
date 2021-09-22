@@ -29,11 +29,11 @@ describe AssignmentUtil do
     @course.assignments.create!(assignment_valid_attributes)
   end
 
-  let(:assignment_name_length_value){ 15 }
+  let(:assignment_name_length_value) { 15 }
 
   def account_stub_helper(assignment, require_due_date, sis_syncing, new_sis_integrations)
-    allow(assignment.context.account).to receive(:sis_require_assignment_due_date).and_return({value: require_due_date})
-    allow(assignment.context.account).to receive(:sis_syncing).and_return({value: sis_syncing})
+    allow(assignment.context.account).to receive(:sis_require_assignment_due_date).and_return({ value: require_due_date })
+    allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: sis_syncing })
     allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(new_sis_integrations)
   end
 
@@ -93,7 +93,7 @@ describe AssignmentUtil do
 
   describe "assignment_max_name_length" do
     it "returns 15 when the account setting sis_assignment_name_length_input is 15" do
-      allow(assignment.context.account).to receive(:sis_assignment_name_length_input).and_return({value: 15})
+      allow(assignment.context.account).to receive(:sis_assignment_name_length_input).and_return({ value: 15 })
       expect(described_class.assignment_max_name_length(assignment.context)).to eq(15)
     end
   end
@@ -157,40 +157,40 @@ describe AssignmentUtil do
   describe "assignment_name_length_required?" do
     it "returns true when all 4 are set to true" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: true})
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: true})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
       expect(described_class.assignment_name_length_required?(assignment)).to eq(true)
     end
 
     it "returns false when sis_sycning is set to false" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: false})
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: true})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
       expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
     end
 
     it "returns false when post_to_sis is false" do
       assignment.post_to_sis = false
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: true})
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: true})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
       expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
     end
 
     it "returns false when sis_assignment_name_length is false" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: false})
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: false})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: false })
       allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
       expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
     end
 
     it "returns false when new_sis_integrations is false" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: false})
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: true})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(false)
       expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
     end
@@ -213,12 +213,12 @@ describe AssignmentUtil do
       expect(described_class).not_to receive(:alert_unaware_student)
 
       AssetUserAccess.create!({
-        asset_category: 'assignments',
-        asset_code: assignment.asset_string,
-        context: @course,
-        last_access: 1.day.ago,
-        user_id: @student,
-      })
+                                asset_category: 'assignments',
+                                asset_code: assignment.asset_string,
+                                context: @course,
+                                last_access: 1.day.ago,
+                                user_id: @student,
+                              })
 
       described_class.process_due_date_reminder('Assignment', assignment.id)
     end
@@ -227,12 +227,12 @@ describe AssignmentUtil do
       expect(described_class).to receive(:alert_unaware_student)
 
       AssetUserAccess.create!({
-        asset_category: 'assignments',
-        asset_code: assignment.asset_string,
-        context: @course,
-        last_access: 4.days.ago,
-        user_id: @student,
-      })
+                                asset_category: 'assignments',
+                                asset_code: assignment.asset_string,
+                                context: @course,
+                                last_access: 4.days.ago,
+                                user_id: @student,
+                              })
 
       described_class.process_due_date_reminder('Assignment', assignment.id)
     end
@@ -277,7 +277,7 @@ describe AssignmentUtil do
         assignment,
         notification.name,
         notification,
-        [ @student ],
+        [@student],
         hash_including(
           assignment_due_date: Submission.find_by(
             assignment_id: assignment.id,

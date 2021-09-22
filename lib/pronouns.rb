@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Pronouns
-
   DEFAULT_PRONOUNS = {
     "she_her" => -> { I18n.t('She/Her') },
     "he_him" => -> { I18n.t('He/Him') },
@@ -39,7 +38,7 @@ module Pronouns
 
   def untranslate_pronouns(pronouns)
     pronouns = clean_pronouns(pronouns)
-    DEFAULT_PRONOUNS.each do |k,v|
+    DEFAULT_PRONOUNS.each do |k, v|
       return k if pronouns == v.call
     end
     pronouns

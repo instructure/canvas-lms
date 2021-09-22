@@ -32,12 +32,12 @@ describe "admin settings tab" do
     get "/accounts/#{account.id}/settings"
   end
 
-  def set_checkbox(id,checked)
+  def set_checkbox(id, checked)
     checkbox = f(id)
     checkbox.click if is_checked(checkbox) != checked
   end
 
-  def set_checkbox_via_label(id,checked)
+  def set_checkbox_via_label(id, checked)
     # Use this method for checkboxes that are hidden by their label (ic-Checkbox)
     checkbox = f(id)
     label = f("label[for=\"#{id[1..-1]}\"]")
@@ -56,7 +56,7 @@ describe "admin settings tab" do
   end
 
   context "SIS Agent Token Authentication" do
-    let(:sis_token){ 'too much tuna' }
+    let(:sis_token) { 'too much tuna' }
 
     it "should test SIS Agent Token Authentication with post_grades feature enabled", priority: "2", test_id: 132577 do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
@@ -96,13 +96,13 @@ describe "admin settings tab" do
     let(:assignment_name_length_input) { "#account_settings_sis_assignment_name_length_input_value" }
 
     def test_checkbox_on(id)
-      set_checkbox_via_label(id,true)
+      set_checkbox_via_label(id, true)
       click_submit
       expect(get_checkbox(id)).to be_truthy
     end
 
     def test_checkbox_off(id)
-      set_checkbox_via_label(id,false)
+      set_checkbox_via_label(id, false)
       click_submit
       expect(get_checkbox(id)).to be_falsey
     end
@@ -243,28 +243,28 @@ describe "admin settings tab" do
           it { test_checkbox_on(sis_syncing_locked) }
 
           it "toggles require assignment due date on" do
-            set_checkbox_via_label(default_grade_export,true)
+            set_checkbox_via_label(default_grade_export, true)
             test_checkbox_on(require_assignment_due_date)
           end
 
           it "toggles require assignment due date off" do
-            set_checkbox_via_label(default_grade_export,true)
+            set_checkbox_via_label(default_grade_export, true)
             test_checkbox_off(require_assignment_due_date)
           end
 
           it "toggles assignment name length on" do
-            set_checkbox_via_label(default_grade_export,true)
+            set_checkbox_via_label(default_grade_export, true)
             test_checkbox_on(assignment_name_length)
           end
 
           it "toggles assignment name length off" do
-            set_checkbox_via_label(default_grade_export,true)
+            set_checkbox_via_label(default_grade_export, true)
             test_checkbox_off(assignment_name_length)
           end
 
           it "should test sis assignment name length" do
-            set_checkbox_via_label(default_grade_export,true)
-            set_checkbox_via_label(assignment_name_length,true)
+            set_checkbox_via_label(default_grade_export, true)
+            set_checkbox_via_label(assignment_name_length, true)
             name_length = 123
             f("#account_settings_sis_assignment_name_length_input_value").send_keys(name_length)
             click_submit
@@ -317,9 +317,7 @@ describe "admin settings tab" do
             expect(f(default_grade_export)).to be_disabled
           end
         end
-
       end
-
     end
   end
 end

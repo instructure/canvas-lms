@@ -51,8 +51,8 @@ describe CanvasPandaPub::Client do
 
   describe "push" do
     it "should fire an HTTP request to post a message" do
-      stub = stub_request(:post, "http://pandapub.example.com/channel/qwerty/foo").
-        with(basic_auth: ['key', 'secret'], body: '{"a":1}')
+      stub = stub_request(:post, "http://pandapub.example.com/channel/qwerty/foo")
+             .with(basic_auth: ['key', 'secret'], body: '{"a":1}')
 
       @client.post_update "/foo", { a: 1 }
 
@@ -75,4 +75,3 @@ describe CanvasPandaPub::Client do
     end
   end
 end
-

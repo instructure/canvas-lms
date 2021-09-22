@@ -39,7 +39,7 @@ describe DocviewerAuditEventsController do
     # exist, the stub with args will throw an error.
     allow(Canvas::DynamicSettings).to receive(:find).and_return({})
     allow(Canvas::DynamicSettings).to receive(:find).with(service: 'canvadoc', default_ttl: 5.minutes).and_return(
-      {'secret' => @encoded64_secret}
+      { 'secret' => @encoded64_secret }
     )
   end
 

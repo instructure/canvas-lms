@@ -62,7 +62,7 @@ describe "quizzes assignments" do
     it "should redirect to the quiz edit page and maintain parameters", priority: "2", test_id: 220309 do
       assign = @course.assignments.create!(:name => "Testy!", :submission_types => "online_quiz")
       get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { edit_assignment(assign.id, :name => "Retest!", :more_options => true)}
+      expect_new_page_load { edit_assignment(assign.id, :name => "Retest!", :more_options => true) }
       expect(f('input[name="quiz[title]"]')).to have_value "Retest!"
     end
   end

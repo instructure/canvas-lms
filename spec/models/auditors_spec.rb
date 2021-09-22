@@ -22,7 +22,6 @@ require 'spec_helper'
 # TODO: Remove this spec once Audits engine extraction is complete.
 # for now leaving it here will confirm the Auditors/Audits shim is operating as expected.
 describe Auditors do
-
   after(:each) do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
@@ -31,12 +30,12 @@ describe Auditors do
 
   def inject_auditors_settings(yaml_string)
     Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "auditors.yml": yaml_string
-          }
+      "private": {
+        "canvas": {
+          "auditors.yml": yaml_string
         }
       }
+    }
   end
 
   describe "settings parsing" do
@@ -93,11 +92,10 @@ describe Auditors do
     it "depends on AR connection for AR backend" do
       inject_auditors_settings("write_paths:\n  - active_record\nread_path: active_record")
       expect(Auditors.backend_strategy).to eq(:active_record)
-      expect(Rails.configuration).to receive(:database_configuration).and_return({'test' => {"foo" => "bar"}})
+      expect(Rails.configuration).to receive(:database_configuration).and_return({ 'test' => { "foo" => "bar" } })
       expect(Auditors.configured?).to eq(true)
       expect(Rails.configuration).to receive(:database_configuration).and_return({})
       expect(Auditors.configured?).to eq(false)
     end
   end
-
 end

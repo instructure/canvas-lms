@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # coding: utf-8
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -26,10 +27,10 @@ describe "Exportable" do
 
     def attachment
       @_attachment ||= Attachment.create({
-        context: Course.create,
-        filename: 'exortable-test-file',
-        uploaded_data: File.open(cartridge_path)
-      })
+                                           context: Course.create,
+                                           filename: 'exortable-test-file',
+                                           uploaded_data: File.open(cartridge_path)
+                                         })
     end
 
     def cartridge_path
@@ -41,7 +42,7 @@ describe "Exportable" do
     before :all do
       skip 'LS-1504 (9/30/2020)'
     end
-    
+
     before do
       @epub_export = ExportableTest.new.convert_to_epub
     end
@@ -82,5 +83,4 @@ describe "Exportable" do
       File.delete(zip_path) if File.exist?(zip_path)
     end
   end
-
 end

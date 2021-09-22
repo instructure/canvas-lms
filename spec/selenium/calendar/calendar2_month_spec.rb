@@ -48,7 +48,6 @@ describe "calendar2" do
     end
 
     describe "main month calendar" do
-
       it "should remember the selected calendar view" do
         get "/calendar2"
         expect(find("#month")).to have_class('active')
@@ -82,7 +81,6 @@ describe "calendar2" do
       end
 
       context "drag and drop" do
-
         def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
           .find('tbody td.fc-event-container').index()")
@@ -281,11 +279,11 @@ describe "calendar2" do
       end
 
       it "should not have a delete link for a frozen assignment" do
-        allow(PluginSetting).to receive(:settings_for_plugin).and_return({"assignment_group_id" => "true"})
+        allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "assignment_group_id" => "true" })
         frozen_assignment = @course.assignments.build(
-            name: "frozen assignment",
-            due_at: Time.zone.now,
-            freeze_on_copy: true,
+          name: "frozen assignment",
+          due_at: Time.zone.now,
+          freeze_on_copy: true,
         )
         frozen_assignment.copied = true
         frozen_assignment.save!
@@ -361,8 +359,8 @@ describe "calendar2" do
         date = Date.today
         e1 = @course.calendar_events.build :title => "ohai",
                                            :child_event_data => [
-                                               {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
-                                               {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
+                                             { :start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string },
+                                             { :start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string },
                                            ]
         e1.updating_user = @user
         e1.save!
@@ -404,10 +402,10 @@ describe "calendar2" do
         make_event(:location_name => location_name, :location_address => location_address)
         load_month_view
 
-        #Click calendar item to bring up event summary
+        # Click calendar item to bring up event summary
         find(".fc-event").click
 
-        #expect to find the location name and address
+        # expect to find the location name and address
         expect(find('.event-details-content')).to include_text(location_name)
         expect(find('.event-details-content')).to include_text(location_address)
       end
@@ -415,7 +413,7 @@ describe "calendar2" do
       it "should bring up a calendar date picker when clicking on the month" do
         load_month_view
 
-        #Click on the month header
+        # Click on the month header
         find('.navigation_title').click
 
         # Expect that a the event picker is present
@@ -477,7 +475,6 @@ describe "calendar2" do
   end
 
   context "as a student" do
-
     before(:each) do
       course_with_student_logged_in
     end
@@ -490,7 +487,6 @@ describe "calendar2" do
     end
 
     describe "main month calendar" do
-
       it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(

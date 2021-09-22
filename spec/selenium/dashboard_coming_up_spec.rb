@@ -29,10 +29,10 @@ describe "dashboard" do
 
     it "should display calendar events in the coming up list", priority: "1", test_id: 216392 do
       calendar_event_model({
-                               :title => "super fun party",
-                               :description => 'celebrating stuff',
-                               :start_at => 5.minutes.from_now,
-                               :end_at => 10.minutes.from_now
+                             :title => "super fun party",
+                             :description => 'celebrating stuff',
+                             :start_at => 5.minutes.from_now,
+                             :end_at => 10.minutes.from_now
                            })
       get "/"
       expect(f('.events_list .event a')).to include_text(@event.title)
@@ -69,7 +69,7 @@ describe "dashboard" do
 
     it "should display assignment in coming up list", priority: "1", test_id: 216394 do
       due_date = Time.now.utc + 2.days
-      @assignment = assignment_model({:due_at => due_date, :course => @course})
+      @assignment = assignment_model({ :due_at => due_date, :course => @course })
       get "/"
       event = f('.events_list .event a')
       expect(event).to include_text(@assignment.title)
@@ -78,15 +78,15 @@ describe "dashboard" do
     end
 
     it "should display quiz submissions with essay questions with points in coming up list", priority: "1", test_id: 216395 do
-      quiz_with_graded_submission([:question_data => {:id => 31,
-                                                      :name => "Quiz Essay Question 1",
-                                                      :question_type => 'essay_question',
-                                                      :question_text => 'qq1',
-                                                      :points_possible => 10}],
-                                  {:user => @student, :course => @course}) do
+      quiz_with_graded_submission([:question_data => { :id => 31,
+                                                       :name => "Quiz Essay Question 1",
+                                                       :question_type => 'essay_question',
+                                                       :question_text => 'qq1',
+                                                       :points_possible => 10 }],
+                                  { :user => @student, :course => @course }) do
         {
-            "question_31" => "<p>abeawebawebae</p>",
-            "question_text" => "qq1"
+          "question_31" => "<p>abeawebawebae</p>",
+          "question_text" => "qq1"
         }
       end
 

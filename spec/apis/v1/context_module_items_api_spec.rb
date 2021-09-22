@@ -44,10 +44,11 @@ describe "Module Items API", type: :request do
     @external_url_tag.publish! if @external_url_tag.unpublished?
 
     @module1.completion_requirements = {
-        @assignment_tag.id => { :type => 'must_submit' },
-        @quiz_tag.id => { :type => 'min_score', :min_score => 10 },
-        @topic_tag.id => { :type => 'must_contribute' },
-        @external_url_tag.id => { :type => 'must_view' } }
+      @assignment_tag.id => { :type => 'must_submit' },
+      @quiz_tag.id => { :type => 'min_score', :min_score => 10 },
+      @topic_tag.id => { :type => 'must_contribute' },
+      @external_url_tag.id => { :type => 'must_view' }
+    }
     @module1.save!
 
     @christmas = Time.zone.local(Time.now.year + 1, 12, 25, 7, 0)
@@ -111,72 +112,72 @@ describe "Module Items API", type: :request do
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
       expected = [
-          {
-              "type" => "Assignment",
-              "id" => @assignment_tag.id,
-              "content_id" => @assignment.id,
-              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@assignment_tag.id}",
-              "position" => 1,
-              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-              "title" => @assignment_tag.title,
-              "indent" => 0,
-              "completion_requirement" => { "type" => "must_submit" },
-              "published" => false,
-              "module_id" => @module1.id,
-              "quiz_lti" => false
-          },
-          {
-              "type" => "Quiz",
-              "id" => @quiz_tag.id,
-              "content_id" => @quiz.id,
-              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
-              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-              "position" => 2,
-              "title" => @quiz_tag.title,
-              "indent" => 0,
-              "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
-              "published" => true,
-              "module_id" => @module1.id,
-              "quiz_lti" => false
-          },
-          {
-              "type" => "Discussion",
-              "id" => @topic_tag.id,
-              "content_id" => @topic.id,
-              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@topic_tag.id}",
-              "position" => 3,
-              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-              "title" => @topic_tag.title,
-              "indent" => 0,
-              "completion_requirement" => { "type" => "must_contribute" },
-              "published" => true,
-              "module_id" => @module1.id,
-              "quiz_lti" => false
-          },
-          {
-              "type" => "SubHeader",
-              "id" => @subheader_tag.id,
-              "position" => 4,
-              "title" => @subheader_tag.title,
-              "indent" => 0,
-              "published" => true,
-              "module_id" => @module1.id,
-              "quiz_lti" => false
-          },
-          {
-              "type" => "ExternalUrl",
-              "id" => @external_url_tag.id,
-              "html_url" => "http://www.example.com/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
-              "external_url" => @external_url_tag.url,
-              "position" => 5,
-              "title" => @external_url_tag.title,
-              "indent" => 1,
-              "completion_requirement" => { "type" => "must_view" },
-              "published" => true,
-              "module_id" => @module1.id,
-              "new_tab" => nil,
-              "quiz_lti" => false
-          }
+        {
+          "type" => "Assignment",
+          "id" => @assignment_tag.id,
+          "content_id" => @assignment.id,
+          "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@assignment_tag.id}",
+          "position" => 1,
+          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          "title" => @assignment_tag.title,
+          "indent" => 0,
+          "completion_requirement" => { "type" => "must_submit" },
+          "published" => false,
+          "module_id" => @module1.id,
+          "quiz_lti" => false
+        },
+        {
+          "type" => "Quiz",
+          "id" => @quiz_tag.id,
+          "content_id" => @quiz.id,
+          "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
+          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+          "position" => 2,
+          "title" => @quiz_tag.title,
+          "indent" => 0,
+          "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
+          "published" => true,
+          "module_id" => @module1.id,
+          "quiz_lti" => false
+        },
+        {
+          "type" => "Discussion",
+          "id" => @topic_tag.id,
+          "content_id" => @topic.id,
+          "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@topic_tag.id}",
+          "position" => 3,
+          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          "title" => @topic_tag.title,
+          "indent" => 0,
+          "completion_requirement" => { "type" => "must_contribute" },
+          "published" => true,
+          "module_id" => @module1.id,
+          "quiz_lti" => false
+        },
+        {
+          "type" => "SubHeader",
+          "id" => @subheader_tag.id,
+          "position" => 4,
+          "title" => @subheader_tag.title,
+          "indent" => 0,
+          "published" => true,
+          "module_id" => @module1.id,
+          "quiz_lti" => false
+        },
+        {
+          "type" => "ExternalUrl",
+          "id" => @external_url_tag.id,
+          "html_url" => "http://www.example.com/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
+          "external_url" => @external_url_tag.url,
+          "position" => 5,
+          "title" => @external_url_tag.title,
+          "indent" => 1,
+          "completion_requirement" => { "type" => "must_view" },
+          "published" => true,
+          "module_id" => @module1.id,
+          "new_tab" => nil,
+          "quiz_lti" => false
+        }
       ]
       expect(json).to eq expected
     end
@@ -184,10 +185,10 @@ describe "Module Items API", type: :request do
     context 'index with content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
-          :controller => "context_module_items_api", :action => "index", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+                 :controller => "context_module_items_api", :action => "index", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
       end
-      let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id }['content_details'] }
+      let(:assignment_details) { json.find { |item| item['id'] == @assignment_tag.id }['content_details'] }
 
       it "should include item details" do
         expect(assignment_details).to include(
@@ -206,7 +207,7 @@ describe "Module Items API", type: :request do
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items = json.select { |item| item['type'] == 'ExternalTool' }
       expect(items.length).to eq 1
       items.each do |item|
         expect(item).to include('url')
@@ -226,7 +227,7 @@ describe "Module Items API", type: :request do
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items = json.select { |item| item['type'] == 'ExternalTool' }
       expect(items.length).to eq 1
       items.each do |item|
         expect(item).to include('url')
@@ -245,7 +246,7 @@ describe "Module Items API", type: :request do
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items = json.select { |item| item['type'] == 'ExternalTool' }
       expect(items.length).to eq 1
       items.each do |item|
         expect(item).to include('url')
@@ -262,18 +263,18 @@ describe "Module Items API", type: :request do
                       :course_id => "#{@course.id}", :module_id => "#{@module2.id}",
                       :id => "#{@wiki_page_tag.id}")
       expect(json).to eq({
-          "type" => "Page",
-          "id" => @wiki_page_tag.id,
-          "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}",
-          "position" => 1,
-          "title" => @wiki_page_tag.title,
-          "indent" => 0,
-          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-          "page_url" => @wiki_page.url,
-          "published" => true,
-          "module_id" => @module2.id,
-          "quiz_lti" => false
-      })
+                           "type" => "Page",
+                           "id" => @wiki_page_tag.id,
+                           "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}",
+                           "position" => 1,
+                           "title" => @wiki_page_tag.title,
+                           "indent" => 0,
+                           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+                           "page_url" => @wiki_page.url,
+                           "published" => true,
+                           "module_id" => @module2.id,
+                           "quiz_lti" => false
+                         })
 
       @attachment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
@@ -281,18 +282,18 @@ describe "Module Items API", type: :request do
                       :course_id => "#{@course.id}", :module_id => "#{@module2.id}",
                       :id => "#{@attachment_tag.id}")
       expect(json).to eq({
-          "type" => "File",
-          "id" => @attachment_tag.id,
-          "content_id" => @attachment.id,
-          "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@attachment_tag.id}",
-          "position" => 2,
-          "title" => @attachment_tag.title,
-          "indent" => 0,
-          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
-          "published" => false,
-          "module_id" => @module2.id,
-          "quiz_lti" => false
-      })
+                           "type" => "File",
+                           "id" => @attachment_tag.id,
+                           "content_id" => @attachment.id,
+                           "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@attachment_tag.id}",
+                           "position" => 2,
+                           "title" => @attachment_tag.title,
+                           "indent" => 0,
+                           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
+                           "published" => false,
+                           "module_id" => @module2.id,
+                           "quiz_lti" => false
+                         })
     end
 
     context 'with differentiated assignments' do
@@ -303,9 +304,9 @@ describe "Module Items API", type: :request do
 
       it "should find module items" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-          :controller => "context_module_items_api", :action => "show", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
-          :id => "#{@assignment_tag.id}")
+                        :controller => "context_module_items_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                        :id => "#{@assignment_tag.id}")
         expect(json['id']).to eq(@assignment_tag.id)
         expect(json['title']).to eq(@assignment_tag.title)
       end
@@ -314,21 +315,21 @@ describe "Module Items API", type: :request do
         @assignment.only_visible_to_overrides = true
         @assignment.save!
         @section = @course.course_sections.create!(name: "test section")
-        create_section_override_for_assignment(@assignment, {course_section: @section})
+        create_section_override_for_assignment(@assignment, { course_section: @section })
 
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-          {:controller => "context_module_items_api", :action => "show", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
-          :id => "#{@assignment_tag.id}"}, {}, {}, {:expected_status => 404})
+                 { :controller => "context_module_items_api", :action => "show", :format => "json",
+                   :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                   :id => "#{@assignment_tag.id}" }, {}, {}, { :expected_status => 404 })
       end
     end
 
     context 'show with content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
-          :controller => "context_module_items_api", :action => "show", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
-          :id => "#{@assignment_tag.id}")
+                 :controller => "context_module_items_api", :action => "show", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+                 :id => "#{@assignment_tag.id}")
       end
       let(:assignment_details) { json['content_details'] }
 
@@ -356,13 +357,13 @@ describe "Module Items API", type: :request do
                       :course_id => "#{@course.id}", :module_id => "#{module3.id}", :per_page => "2")
       expect(response.headers["Link"]).to be_present
       expect(json.size).to eq 2
-      ids = json.collect{ |tag| tag['id'] }
+      ids = json.collect { |tag| tag['id'] }
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?per_page=2&page=2",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{module3.id}", :page => "2", :per_page => "2")
       expect(json.size).to eq 2
-      ids += json.collect{ |tag| tag['id'] }
+      ids += json.collect { |tag| tag['id'] }
 
       expect(ids).to eq module3.content_tags.sort_by(&:position).collect(&:id)
     end
@@ -376,7 +377,7 @@ describe "Module Items API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?search_term=spec",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{module3.id}", :search_term => 'spec')
-      expect(json.map{ |mod| mod['id'] }.sort).to eq tags.map(&:id).sort
+      expect(json.map { |mod| mod['id'] }.sort).to eq tags.map(&:id).sort
     end
 
     describe "POST 'create'" do
@@ -385,10 +386,10 @@ describe "Module Items API", type: :request do
         new_title = 'New title'
         new_indent = 2
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => new_title, :indent => new_indent,
-                                          :type => 'Assignment', :content_id => assignment.id}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => new_title, :indent => new_indent,
+                                            :type => 'Assignment', :content_id => assignment.id } })
 
         expect(json['type']).to eq 'Assignment'
         expect(json['title']).to eq new_title
@@ -407,9 +408,9 @@ describe "Module Items API", type: :request do
         assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"],
                                                  :workflow_state => 'unpublished')
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:type => 'Assignment', :content_id => assignment.id}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :type => 'Assignment', :content_id => assignment.id } })
         tag = @module1.content_tags.where(id: json['id']).first
         expect(tag).to be_unpublished
       end
@@ -418,9 +419,9 @@ describe "Module Items API", type: :request do
         wiki_page = @course.wiki_pages.create!(:title => 'whateva i do wut i want')
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'Blah', :type => 'Page', :page_url => wiki_page.url}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'Blah', :type => 'Page', :page_url => wiki_page.url } })
 
         expect(json['page_url']).to eq wiki_page.url
 
@@ -431,16 +432,16 @@ describe "Module Items API", type: :request do
 
       it "should require valid page_url" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'Blah', :type => 'Page'}},
-                        {}, {:expected_status => 400})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'Blah', :type => 'Page' } },
+                        {}, { :expected_status => 400 })
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'Blah', :type => 'Page', :page_url => 'invalidpageurl'}},
-                        {}, {:expected_status => 400})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'Blah', :type => 'Page', :page_url => 'invalidpageurl' } },
+                        {}, { :expected_status => 400 })
       end
 
       it "should require a non-deleted page_url" do
@@ -449,20 +450,20 @@ describe "Module Items API", type: :request do
         page.save!
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'Deleted Page', :type => 'Page', :page_url => page.url}},
-                        {}, {:expected_status => 400})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'Deleted Page', :type => 'Page', :page_url => page.url } },
+                        {}, { :expected_status => 400 })
       end
 
       it "should create with new_tab for external tool items" do
         tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'Blah', :type => 'ExternalTool', :content_id => tool.id,
-                                          :external_url => tool.url, :new_tab => 'true'}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'Blah', :type => 'ExternalTool', :content_id => tool.id,
+                                            :external_url => tool.url, :new_tab => 'true' } })
 
         expect(json['new_tab']).to eq true
 
@@ -474,9 +475,9 @@ describe "Module Items API", type: :request do
         new_title = 'New title'
         new_url = 'http://example.org/new_tool'
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => new_title, :type => 'ExternalUrl', :external_url => new_url}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => new_title, :type => 'ExternalUrl', :external_url => new_url } })
 
         expect(json['type']).to eq 'ExternalUrl'
         expect(json['external_url']).to eq new_url
@@ -493,10 +494,10 @@ describe "Module Items API", type: :request do
         expect(tags.map(&:position)).to eq [1, 3, 4, 5]
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        {:controller => "context_module_items_api", :action => "create", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                        {:module_item => {:title => 'title', :type => 'ExternalUrl',
-                                          :url => 'http://example.com', :position => 3}})
+                        { :controller => "context_module_items_api", :action => "create", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                        { :module_item => { :title => 'title', :type => 'ExternalUrl',
+                                            :url => 'http://example.com', :position => 3 } })
 
         expect(json['position']).to eq 3
 
@@ -504,7 +505,7 @@ describe "Module Items API", type: :request do
         expect(tag).not_to be_nil
         expect(tag.position).to eq 3
 
-        tags.each{|t| t.reload}
+        tags.each { |t| t.reload }
         # 2 is deleted; 3 is the new one, that displaced the others to 4-6
         expect(tags.map(&:position)).to eq [1, 4, 5, 6]
       end
@@ -513,15 +514,15 @@ describe "Module Items API", type: :request do
         it "should set completion requirement on assignment to min_score" do
           assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
           json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                          {:controller => "context_module_items_api", :action => "create", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                          {:module_item => {:title => 'title', :type => 'Assignment', :content_id => assignment.id,
-                                            :completion_requirement => {:type => 'min_score', :min_score => 2}}})
+                          { :controller => "context_module_items_api", :action => "create", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                          { :module_item => { :title => 'title', :type => 'Assignment', :content_id => assignment.id,
+                                              :completion_requirement => { :type => 'min_score', :min_score => 2 } } })
 
-          expect(json['completion_requirement']).to eq({"type" => "min_score", "min_score" => 2})
+          expect(json['completion_requirement']).to eq({ "type" => "min_score", "min_score" => 2 })
 
           @module1.reload
-          req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
+          req = @module1.completion_requirements.find { |h| h[:id] == json['id'].to_i }
           expect(req[:type]).to eq 'min_score'
           expect(req[:min_score]).to eq 2
         end
@@ -529,26 +530,26 @@ describe "Module Items API", type: :request do
         it "should set completion requirement on wiki page to must_mark_done" do
           page = @course.wiki_pages.create(:title => 'New Page')
           json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                          {:controller => "context_module_items_api", :action => "create", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                          {:module_item => {:title => 'title', :type => 'wiki_page', :content_id => page.id,
-                                            :completion_requirement => {:type => 'must_mark_done'}}})
+                          { :controller => "context_module_items_api", :action => "create", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                          { :module_item => { :title => 'title', :type => 'wiki_page', :content_id => page.id,
+                                              :completion_requirement => { :type => 'must_mark_done' } } })
 
-          expect(json['completion_requirement']).to eq({"type" => "must_mark_done"})
+          expect(json['completion_requirement']).to eq({ "type" => "must_mark_done" })
 
           @module1.reload
-          req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
+          req = @module1.completion_requirements.find { |h| h[:id] == json['id'].to_i }
           expect(req[:type]).to eq 'must_mark_done'
         end
 
         it "should require valid completion requirement type" do
           assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
           json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                          {:controller => "context_module_items_api", :action => "create", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-                          {:module_item => {:title => 'title', :type => 'Assignment', :content_id => assignment.id,
-                                            :completion_requirement => {:type => 'not a valid type'}}},
-                          {}, {:expected_status => 400})
+                          { :controller => "context_module_items_api", :action => "create", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+                          { :module_item => { :title => 'title', :type => 'Assignment', :content_id => assignment.id,
+                                              :completion_requirement => { :type => 'not a valid type' } } },
+                          {}, { :expected_status => 400 })
 
           expect(json["errors"]["completion_requirement"].count).to eq 1
         end
@@ -560,9 +561,9 @@ describe "Module Items API", type: :request do
         new_title = 'New title'
         new_indent = 2
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                        :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:title => new_title, :indent => new_indent}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :title => new_title, :indent => new_indent } })
 
         expect(json['title']).to eq new_title
         expect(json['indent']).to eq new_indent
@@ -576,9 +577,9 @@ describe "Module Items API", type: :request do
       it "should update the user for a wiki page sync" do
         expect(@wiki_page.user).to be_nil
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
-          {:controller => "context_module_items_api", :action => "update", :format => "json",
-            :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
-          {:module_item => {:title => 'New title'}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}" },
+                        { :module_item => { :title => 'New title' } })
         expect(@wiki_page.reload.user).to eq(@user)
       end
 
@@ -587,9 +588,9 @@ describe "Module Items API", type: :request do
         external_tool_tag = @module1.add_item(:type => 'context_external_tool', :id => tool.id, :url => tool.url, :new_tab => false)
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{external_tool_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{external_tool_tag.id}"},
-                        {:module_item => {:new_tab => 'true'}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{external_tool_tag.id}" },
+                        { :module_item => { :new_tab => 'true' } })
 
         expect(json['new_tab']).to eq true
 
@@ -600,9 +601,9 @@ describe "Module Items API", type: :request do
       it "should update the url for an external url item" do
         new_url = 'http://example.org/new_tool'
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@external_url_tag.id}"},
-                        {:module_item => {:external_url => new_url}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@external_url_tag.id}" },
+                        { :module_item => { :external_url => new_url } })
 
         expect(json['external_url']).to eq new_url
 
@@ -612,9 +613,9 @@ describe "Module Items API", type: :request do
       it "should ignore the url for a non-applicable type" do
         new_url = 'http://example.org/new_tool'
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:external_url => new_url}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :external_url => new_url } })
 
         expect(json['external_url']).to be_nil
 
@@ -625,69 +626,69 @@ describe "Module Items API", type: :request do
         tags = @module1.content_tags.to_a
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:position => 2}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :position => 2 } })
 
         expect(json['position']).to eq 2
 
-        tags.each{|t| t.reload}
+        tags.each { |t| t.reload }
         expect(tags.map(&:position)).to eq [2, 1, 3, 4, 5]
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:position => 4}})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :position => 4 } })
 
         expect(json['position']).to eq 4
 
-        tags.each{|t| t.reload}
+        tags.each { |t| t.reload }
         expect(tags.map(&:position)).to eq [4, 1, 2, 3, 5]
       end
 
       context "set_completion_requirement" do
         it "should update completion requirement to min_score" do
           json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                          {:controller => "context_module_items_api", :action => "update", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                          {:module_item => {:title => 'title',
-                                            :completion_requirement => {:type => 'min_score', :min_score => 3}}})
+                          { :controller => "context_module_items_api", :action => "update", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                          { :module_item => { :title => 'title',
+                                              :completion_requirement => { :type => 'min_score', :min_score => 3 } } })
 
-          expect(json['completion_requirement']).to eq({"type" => "min_score", "min_score" => 3})
+          expect(json['completion_requirement']).to eq({ "type" => "min_score", "min_score" => 3 })
 
           @module1.reload
-          req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
+          req = @module1.completion_requirements.find { |h| h[:id] == json['id'].to_i }
           expect(req[:type]).to eq 'min_score'
           expect(req[:min_score]).to eq 3
         end
 
         it "should update completion requirement to must_mark_done" do
           json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                          {:controller => "context_module_items_api", :action => "update", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                          {:module_item => {:title => 'title',
-                                            :completion_requirement => {:type => 'must_mark_done'}}})
+                          { :controller => "context_module_items_api", :action => "update", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                          { :module_item => { :title => 'title',
+                                              :completion_requirement => { :type => 'must_mark_done' } } })
 
-          expect(json['completion_requirement']).to eq({"type" => "must_mark_done"})
+          expect(json['completion_requirement']).to eq({ "type" => "must_mark_done" })
 
           @module1.reload
-          req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
+          req = @module1.completion_requirements.find { |h| h[:id] == json['id'].to_i }
           expect(req[:type]).to eq 'must_mark_done'
         end
 
         it "should remove completion requirement" do
-          req = @module1.completion_requirements.find{|h| h[:id] == @assignment_tag.id}
+          req = @module1.completion_requirements.find { |h| h[:id] == @assignment_tag.id }
           expect(req).not_to be_nil
 
           json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                          {:controller => "context_module_items_api", :action => "update", :format => "json",
-                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                          {:module_item => {:title => 'title', :completion_requirement => ''}})
+                          { :controller => "context_module_items_api", :action => "update", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                          { :module_item => { :title => 'title', :completion_requirement => '' } })
 
           expect(json['completion_requirement']).to be_nil
 
           @module1.reload
-          req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
+          req = @module1.completion_requirements.find { |h| h[:id] == json['id'].to_i }
           expect(req).to be_nil
         end
       end
@@ -705,10 +706,9 @@ describe "Module Items API", type: :request do
         expect(@module1.evaluate_for(@student).workflow_state).to eq 'unlocked'
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:published => '1'}}
-        )
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :published => '1' } })
         expect(json['published']).to eq true
 
         @assignment_tag.reload
@@ -717,9 +717,9 @@ describe "Module Items API", type: :request do
 
       it "should unpublish module items" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:published => '0'}}, {}, {:expected_status => 200})
+                        { :controller => "context_module_items_api", :action => "update", :format => "json",
+                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                        { :module_item => { :published => '0' } }, {}, { :expected_status => 200 })
         expect(json['published']).to eq false
         expect(@assignment_tag.reload).to be_unpublished
         expect(@assignment.reload).to be_unpublished
@@ -729,9 +729,9 @@ describe "Module Items API", type: :request do
         student_in_course(:course => @course, :active_all => true)
         @assignment.submit_homework(@student, :body => "done!")
         api_call_as_user(@teacher, :put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                        {:controller => "context_module_items_api", :action => "update", :format => "json",
-                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:published => '0'}}, {}, {:expected_status => 403})
+                         { :controller => "context_module_items_api", :action => "update", :format => "json",
+                           :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                         { :module_item => { :published => '0' } }, {}, { :expected_status => 403 })
         expect(@assignment_tag.reload).to be_published
         expect(@assignment.reload).to be_published
       end
@@ -744,9 +744,9 @@ describe "Module Items API", type: :request do
             @module3.touch; old_updated_ats << @module3.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
-                   {:controller => "context_module_items_api", :action => "update", :format => "json",
-                    :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
-                   {:module_item => {:module_id => @module3.id}})
+                   { :controller => "context_module_items_api", :action => "update", :format => "json",
+                     :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}" },
+                   { :module_item => { :module_id => @module3.id } })
 
           expect(@module2.reload.content_tags.map(&:id)).not_to be_include @wiki_page_tag.id
           expect(@module2.updated_at).to be > old_updated_ats[0]
@@ -761,9 +761,9 @@ describe "Module Items API", type: :request do
             @module2.touch; old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-              {:controller => "context_module_items_api", :action => "update", :format => "json",
-               :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-              {:module_item => {:module_id => @module2.id}})
+                   { :controller => "context_module_items_api", :action => "update", :format => "json",
+                     :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                   { :module_item => { :module_id => @module2.id } })
 
           expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
@@ -781,9 +781,9 @@ describe "Module Items API", type: :request do
             @module2.touch; old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                   {:controller => "context_module_items_api", :action => "update", :format => "json",
-                    :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                   {:module_item => {:module_id => @module2.id, :position => 2}})
+                   { :controller => "context_module_items_api", :action => "update", :format => "json",
+                     :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                   { :module_item => { :module_id => @module2.id, :position => 2 } })
 
           expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
@@ -800,19 +800,18 @@ describe "Module Items API", type: :request do
           mod = @course.context_modules.create!
           item = mod.add_item(:type => 'context_module_sub_header', :title => 'blah')
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{mod.id}/items/#{item.id}",
-                   {:controller => "context_module_items_api", :action => "update", :format => "json",
-                    :course_id => @course.to_param, :module_id => mod.to_param, :id => item.to_param},
-                   {:module_item => {:module_id => @module1.id}}, {}, {:expected_status => 400})
+                   { :controller => "context_module_items_api", :action => "update", :format => "json",
+                     :course_id => @course.to_param, :module_id => mod.to_param, :id => item.to_param },
+                   { :module_item => { :module_id => @module1.id } }, {}, { :expected_status => 400 })
         end
       end
     end
 
     it "should delete a module item" do
       json = api_call(:delete, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-               {:controller => "context_module_items_api", :action => "destroy", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-               {}, {}
-      )
+                      { :controller => "context_module_items_api", :action => "destroy", :format => "json",
+                        :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+                      {}, {})
       expect(json['id']).to eq @assignment_tag.id
       @assignment_tag.reload
       expect(@assignment_tag.workflow_state).to eq 'deleted'
@@ -827,7 +826,7 @@ describe "Module Items API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?student_id=#{student.id}",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :student_id => "#{student.id}", :module_id => "#{@module1.id}")
-      expect(json.find{|m| m["id"] == @assignment_tag.id}["completion_requirement"]["completed"]).to eq true
+      expect(json.find { |m| m["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to eq true
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
                       :controller => "context_module_items_api", :action => "show", :format => "json",
@@ -877,7 +876,7 @@ describe "Module Items API", type: :request do
         expect(json['items'][0]['prev']['id']).to eq @topic_tag.id
         expect(json['items'][0]['current']['id']).to eq @external_url_tag.id
         expect(json['items'][0]['next']['id']).to eq @wiki_page_tag.id
-        expect(json['modules'].map {|mod| mod['id']}.sort).to eq [@module1.id, @module2.id].sort
+        expect(json['modules'].map { |mod| mod['id'] }.sort).to eq [@module1.id, @module2.id].sort
       end
 
       context "section specific discussions" do
@@ -893,8 +892,8 @@ describe "Module Items API", type: :request do
           @course.enroll_student(user_factory(:active_all => true), :section => other_section, :enrollment_state => "active")
 
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
-            :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
-            :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
           expect(json["items"].first["next"]["id"]).to eq @external_url_tag.id
         end
 
@@ -902,8 +901,8 @@ describe "Module Items API", type: :request do
           @course.enroll_student(user_factory(:active_all => true), :section => @topic_section, :enrollment_state => "active")
 
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
-            :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
-            :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
           expect(json["items"].first["next"]["id"]).to eq @topic_tag.id
         end
       end
@@ -916,7 +915,7 @@ describe "Module Items API", type: :request do
         expect(json['items'][0]['prev']['id']).to eq @external_url_tag.id
         expect(json['items'][0]['current']['id']).to eq @wiki_page_tag.id
         expect(json['items'][0]['next']['id']).to eq @attachment_tag.id
-        expect(json['modules'].map {|mod| mod['id']}.sort).to eq [@module1.id, @module2.id].sort
+        expect(json['modules'].map { |mod| mod['id'] }.sort).to eq [@module1.id, @module2.id].sort
 
         @wiki_page.workflow_state = 'deleted'
         @wiki_page.save!
@@ -936,7 +935,7 @@ describe "Module Items API", type: :request do
                         :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @external_url_tag.to_param)
         expect(json['items'].size).to eql 1
         expect(json['items'][0]['next']['id']).to eql new_tag.id
-        expect(json['modules'].map {|mod| mod['id']}.sort).to eq [@module1.id, @module3.id].sort
+        expect(json['modules'].map { |mod| mod['id'] }.sort).to eq [@module1.id, @module3.id].sort
       end
 
       it "should skip a deleted item" do
@@ -974,8 +973,8 @@ describe "Module Items API", type: :request do
       it "should deal with multiple modules having the same position" do
         @module2.update_attribute(:position, 1)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{@quiz.id}",
-                         :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
-                         :course_id => @course.to_param, :asset_type => 'quiz', :asset_id => @quiz.to_param)
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'quiz', :asset_id => @quiz.to_param)
         expect(json['items'].size).to eql 1
         expect(json['items'][0]['prev']['id']).to eql @assignment_tag.id
         expect(json['items'][0]['next']['id']).to eql @topic_tag.id
@@ -1042,11 +1041,11 @@ describe "Module Items API", type: :request do
 
       def call_select_mastery_path(item, assignment_set_id, student_id, opts = {})
         api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{item.id}/select_mastery_path",
-                        { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
-                          course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{item.id}" },
-                        { assignment_set_id: assignment_set_id, student_id: student_id },
-                        {},
-                        opts)
+                 { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
+                   course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{item.id}" },
+                 { assignment_set_id: assignment_set_id, student_id: student_id },
+                 {},
+                 opts)
       end
 
       it 'should require mastery paths to be enabled' do
@@ -1083,7 +1082,7 @@ describe "Module Items API", type: :request do
           cyoe_returns assignment_ids
           json = call_select_mastery_path @assignment_tag, 100, @student.id
           expect(json['assignments'].length).to eq 3
-          expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids
+          expect(json['assignments'].map { |a| a['id'] }).to eq assignment_ids
           expect(json['items']).to eq []
         end
 
@@ -1097,14 +1096,14 @@ describe "Module Items API", type: :request do
           json = call_select_mastery_path @assignment_tag, 100, @student.id
           items = json['items']
           expect(items.length).to eq 2
-          expect(items.map {|item| item['id']}).to match_array [@quiz_tag.id, @graded_topic_tag.id]
+          expect(items.map { |item| item['id'] }).to match_array [@quiz_tag.id, @graded_topic_tag.id]
         end
 
         it 'should return assignments in the same order as cyoe' do
           assignment_ids = create_assignments([@course.id], 5)
           cyoe_returns assignment_ids.reverse
           json = call_select_mastery_path @assignment_tag, 100, @student.id
-          expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids.reverse
+          expect(json['assignments'].map { |a| a['id'] }).to eq assignment_ids.reverse
           expect(json['items']).to eq []
         end
 
@@ -1113,7 +1112,7 @@ describe "Module Items API", type: :request do
           Assignment.find(assignment_ids.last).unpublish!
           cyoe_returns assignment_ids
           json = call_select_mastery_path @assignment_tag, 100, @student.id
-          expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids[0..-2]
+          expect(json['assignments'].map { |a| a['id'] }).to eq assignment_ids[0..-2]
         end
       end
     end
@@ -1143,20 +1142,21 @@ describe "Module Items API", type: :request do
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-      expect(json.map{|item| item['id']}.sort).to eq @module1.content_tags.active.map(&:id).sort
+      expect(json.map { |item| item['id'] }.sort).to eq @module1.content_tags.active.map(&:id).sort
 
-      #also for locked modules that have completion requirements
+      # also for locked modules that have completion requirements
       @assignment2 = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
       @assignment_tag2 = @module2.add_item(:id => @assignment2.id, :type => 'assignment')
       @module2.completion_requirements = {
-          @assignment_tag2.id => { :type => 'must_submit' }}
+        @assignment_tag2.id => { :type => 'must_submit' }
+      }
       @module2.save!
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module2.id}")
 
-      expect(json.map{|item| item['id']}.sort).to eq @module2.content_tags.map(&:id).sort
+      expect(json.map { |item| item['id'] }.sort).to eq @module2.content_tags.map(&:id).sort
     end
 
     context 'differentiated_assignments' do
@@ -1169,22 +1169,22 @@ describe "Module Items API", type: :request do
 
       context 'enabled' do
         context 'with override' do
-          before{create_section_override_for_assignment(@assignment, {course_section: @new_section})}
+          before { create_section_override_for_assignment(@assignment, { course_section: @new_section }) }
           it "should list all assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                                  :controller => "context_module_items_api", :action => "index", :format => "json",
-                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+                            :controller => "context_module_items_api", :action => "index", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-            expect(json.map{|item| item['id']}.sort).to eq @module1.content_tags.map(&:id).sort
+            expect(json.map { |item| item['id'] }.sort).to eq @module1.content_tags.map(&:id).sort
           end
         end
         context 'without override' do
           it "should exclude unassigned assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                                  :controller => "context_module_items_api", :action => "index", :format => "json",
-                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+                            :controller => "context_module_items_api", :action => "index", :format => "json",
+                            :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-            expect(json.map{|item| item['id']}.sort).not_to eq @module1.content_tags.map(&:id).sort
+            expect(json.map { |item| item['id'] }.sort).not_to eq @module1.content_tags.map(&:id).sort
           end
         end
       end
@@ -1193,11 +1193,11 @@ describe "Module Items API", type: :request do
     context 'index including content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
-          :controller => "context_module_items_api", :action => "index", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+                 :controller => "context_module_items_api", :action => "index", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
       end
-      let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id}['content_details'] }
-      let(:external_url_details) { json.find{|item| item['id'] == @external_url_tag.id}['content_details'] }
+      let(:assignment_details) { json.find { |item| item['id'] == @assignment_tag.id }['content_details'] }
+      let(:external_url_details) { json.find { |item| item['id'] == @external_url_tag.id }['content_details'] }
 
       before :once do
         override_assignment
@@ -1228,7 +1228,7 @@ describe "Module Items API", type: :request do
         expect(external_url_details).to include 'lock_explanation'
         expect(external_url_details).to include 'lock_info'
         expect(external_url_details['lock_info']).to include(
-            'asset_string' => @module1.asset_string
+          'asset_string' => @module1.asset_string
         )
       end
     end
@@ -1237,6 +1237,7 @@ describe "Module Items API", type: :request do
       def has_assignment_model?(item)
         rules = item.deep_symbolize_keys
         return false unless rules[:mastery_paths].present?
+
         rules[:mastery_paths][:assignment_sets].find do |set|
           set[:assignment_set_associations].find do |asg|
             asg.key? :model
@@ -1261,10 +1262,10 @@ describe "Module Items API", type: :request do
         end
 
         range = ConditionalRelease::ScoringRange.new(:lower_bound => 0.0, :upper_bound => 1.0, :assignment_sets => [
-          ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-            ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @assignment.id)
-          ])
-        ])
+                                                       ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
+                                                                                               ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @assignment.id)
+                                                                                             ])
+                                                     ])
         @cyoe_rule = @course.conditional_release_rules.create!(:trigger_assignment_id => @quiz.assignment_id, :scoring_ranges => [range])
         @course.enable_feature!(:conditional_release)
 
@@ -1274,8 +1275,8 @@ describe "Module Items API", type: :request do
       describe "module item list response data" do
         it "includes conditional release information from CYOE" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
-          :controller => "context_module_items_api", :action => "index", :format => "json",
-          :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
+                          :controller => "context_module_items_api", :action => "index", :format => "json",
+                          :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
           mastery_paths = json.all? { |item| item.key? 'mastery_paths' }
           expect(mastery_paths).to be_truthy
         end
@@ -1354,7 +1355,7 @@ describe "Module Items API", type: :request do
             only_visible_to_overrides: true
           )
           page.save!
-          page_tag= module_with_page.add_item(:id => page.id, :type => 'wiki_page')
+          page_tag = module_with_page.add_item(:id => page.id, :type => 'wiki_page')
           quiz = @course.quizzes.create!(:title => "some quiz")
           quiz.publish!
           module_with_page.add_item(:id => quiz.id, :type => 'quiz')
@@ -1373,8 +1374,8 @@ describe "Module Items API", type: :request do
 
         it "includes model data merge from Canvas" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
-            :controller => "context_module_items_api", :action => "index", :format => "json",
-            :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
+                          :controller => "context_module_items_api", :action => "index", :format => "json",
+                          :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
           models = json.any? { |item| has_assignment_model?(item) }
           expect(models).to be_truthy
         end
@@ -1394,9 +1395,9 @@ describe "Module Items API", type: :request do
           expect(ConditionalRelease::Service).to receive(:request_rules).never
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
-              :controller => "context_module_items_api", :action => "index", :format => "json",
-              :course_id => @course.id.to_s, :module_id => @cyoe_module3.id.to_s,
-              :include => ['mastery_paths'])
+                     :controller => "context_module_items_api", :action => "index", :format => "json",
+                     :course_id => @course.id.to_s, :module_id => @cyoe_module3.id.to_s,
+                     :include => ['mastery_paths'])
           end
         end
       end
@@ -1405,9 +1406,9 @@ describe "Module Items API", type: :request do
     context 'show including content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
-          :controller => "context_module_items_api", :action => "show", :format => "json",
-          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
-          :id => "#{@assignment_tag.id}")
+                 :controller => "context_module_items_api", :action => "show", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+                 :id => "#{@assignment_tag.id}")
       end
       let(:assignment_details) { json['content_details'] }
 
@@ -1455,9 +1456,9 @@ describe "Module Items API", type: :request do
     it "should not show unpublished items" do
       @assignment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                      {:controller => "context_module_items_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
-                      :id => "#{@assignment_tag.id}"}, {}, {}, {:expected_status => 404})
+                      { :controller => "context_module_items_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                        :id => "#{@assignment_tag.id}" }, {}, {}, { :expected_status => 404 })
     end
 
     it "should mark viewed and redirect external URLs" do
@@ -1465,35 +1466,33 @@ describe "Module Items API", type: :request do
                    :controller => "context_module_items_api", :action => "redirect",
                    :format => "json", :course_id => "#{@course.id}", :id => "#{@external_url_tag.id}")
       expect(response).to redirect_to "http://example.com/lolcats"
-      expect(@module1.evaluate_for(@user).requirements_met).to be_any {
-          |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
+      expect(@module1.evaluate_for(@user).requirements_met).to be_any { |rm|
+                                                                 rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+                                                               }
     end
 
     it "should disallow update" do
       api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-               {:controller => "context_module_items_api", :action => "update", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-               {:module_item => {:title => 'new name'}}, {},
-               {:expected_status => 401}
-      )
+               { :controller => "context_module_items_api", :action => "update", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+               { :module_item => { :title => 'new name' } }, {},
+               { :expected_status => 401 })
     end
 
     it "should disallow create" do
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-               {:controller => "context_module_items_api", :action => "create", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-               {:module_item => {:title => 'new name'}}, {},
-               {:expected_status => 401}
-      )
+               { :controller => "context_module_items_api", :action => "create", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+               { :module_item => { :title => 'new name' } }, {},
+               { :expected_status => 401 })
     end
 
     it "should disallow destroy" do
       api_call(:delete, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-               {:controller => "context_module_items_api", :action => "destroy", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+               { :controller => "context_module_items_api", :action => "destroy", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
                {}, {},
-               {:expected_status => 401}
-      )
+               { :expected_status => 401 })
     end
 
     it "should not show module item completion for other students" do
@@ -1501,17 +1500,17 @@ describe "Module Items API", type: :request do
       @course.enroll_student(student).accept!
 
       api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?student_id=#{student.id}",
-                      {:controller => "context_module_items_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}", :student_id => "#{student.id}", :module_id => "#{@module1.id}"},
-                      {}, {},
-                      {:expected_status => 401})
+               { :controller => "context_module_items_api", :action => "index", :format => "json",
+                 :course_id => "#{@course.id}", :student_id => "#{student.id}", :module_id => "#{@module1.id}" },
+               {}, {},
+               { :expected_status => 401 })
 
       api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
-                      {:controller => "context_module_items_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
-                      :id => "#{@assignment_tag.id}", :student_id => "#{student.id}"},
-                      {}, {},
-                      {:expected_status => 401})
+               { :controller => "context_module_items_api", :action => "show", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                 :id => "#{@assignment_tag.id}", :student_id => "#{student.id}" },
+               {}, {},
+               { :expected_status => 401 })
     end
 
     context 'mark_as_done' do
@@ -1531,24 +1530,22 @@ describe "Module Items API", type: :request do
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
                  :controller => "context_module_items_api",
-                 :action     => "mark_as_done",
-                 :format     => "json",
-                 :course_id  => @course.to_param,
-                 :module_id  => @module.to_param,
-                 :id => @tag.to_param,
-                )
+                 :action => "mark_as_done",
+                 :format => "json",
+                 :course_id => @course.to_param,
+                 :module_id => @module.to_param,
+                 :id => @tag.to_param,)
       end
 
       def mark_not_done_api_call
         api_call(:delete,
                  "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
                  :controller => "context_module_items_api",
-                 :action     => "mark_as_not_done",
-                 :format     => "json",
-                 :course_id  => @course.to_param,
-                 :module_id  => @module.to_param,
-                 :id => @tag.to_param,
-                )
+                 :action => "mark_as_not_done",
+                 :format => "json",
+                 :course_id => @course.to_param,
+                 :module_id => @module.to_param,
+                 :id => @tag.to_param,)
       end
 
       describe "PUT" do
@@ -1581,8 +1578,9 @@ describe "Module Items API", type: :request do
         api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}/mark_read",
                  :controller => "context_module_items_api", :action => "mark_item_read",
                  :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param)
-        expect(@module1.evaluate_for(@user).requirements_met).to be_any {
-            |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
+        expect(@module1.evaluate_for(@user).requirements_met).to be_any { |rm|
+                                                                   rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+                                                                 }
       end
 
       it "should not fulfill must-view requirement on unpublished item" do
@@ -1591,17 +1589,18 @@ describe "Module Items API", type: :request do
                  { :controller => "context_module_items_api", :action => "mark_item_read",
                    :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param },
                  {}, {}, { expected_status: 404 })
-        expect(@module1.evaluate_for(@user).requirements_met).not_to be_any {
-            |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
+        expect(@module1.evaluate_for(@user).requirements_met).not_to be_any { |rm|
+                                                                       rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+                                                                     }
       end
 
       it "should not fulfill must-view requirement on locked item" do
         @module2.completion_requirements = { @attachment_tag.id => { :type => 'must_view' } }
         @module2.save!
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}/mark_read",
-                 { :controller => "context_module_items_api", :action => "mark_item_read",
-                   :format => "json", :course_id => @course.to_param, :module_id => @module2.to_param, :id => @attachment_tag.to_param },
-                 {}, {}, { expected_status: 403 })
+                        { :controller => "context_module_items_api", :action => "mark_item_read",
+                          :format => "json", :course_id => @course.to_param, :module_id => @module2.to_param, :id => @attachment_tag.to_param },
+                        {}, {}, { expected_status: 403 })
         expect(json['message']).to eq('The module item is locked.')
         expect(@module2.evaluate_for(@user).requirements_met).to be_empty
       end
@@ -1677,8 +1676,7 @@ describe "Module Items API", type: :request do
                           course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
                         { assignment_set_id: 100 },
                         {},
-                        {:expected_status => 200})
-
+                        { :expected_status => 200 })
       end
 
       it 'should allow specifying own student id' do
@@ -1687,7 +1685,7 @@ describe "Module Items API", type: :request do
                           course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
                         { student_id: @student.id, assignment_set_id: 100 },
                         {},
-                        {:expected_status => 200})
+                        { :expected_status => 200 })
       end
 
       it 'should not allow selecting another student' do
@@ -1698,7 +1696,7 @@ describe "Module Items API", type: :request do
                           course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
                         { student_id: other_student.id, assignment_set_id: 100 },
                         {},
-                        {:expected_status => 401})
+                        { :expected_status => 401 })
       end
 
       context 'in a course that is public to auth users' do
@@ -1716,7 +1714,7 @@ describe "Module Items API", type: :request do
                    { controller: "context_module_items_api", action: 'show', format: 'json',
                      course_id: @course.id, module_id: module_with_page.id, id: item.id },
                    {}, {},
-                   {expected_status: 200})
+                   { expected_status: 200 })
         end
       end
     end
@@ -1729,18 +1727,18 @@ describe "Module Items API", type: :request do
 
     it 'should duplicate module item' do
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/items/#{@assignment_tag.id}/duplicate",
-                      { controller: "context_module_items_api", action: 'duplicate', format: 'json',
-                        course_id: "#{@course.id}", id: "#{@assignment_tag.id}" },
-                      {}, {},
-                      {:expected_status => 200})
+               { controller: "context_module_items_api", action: 'duplicate', format: 'json',
+                 course_id: "#{@course.id}", id: "#{@assignment_tag.id}" },
+               {}, {},
+               { :expected_status => 200 })
     end
 
     it 'should not duplicate invalid module item' do
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/items/#{@attachment_tag.id}/duplicate",
-                      { controller: "context_module_items_api", action: 'duplicate', format: 'json',
-                        course_id: "#{@course.id}", id: "#{@attachment_tag.id}" },
-                      {}, {},
-                      {:expected_status => 400})
+               { controller: "context_module_items_api", action: 'duplicate', format: 'json',
+                 course_id: "#{@course.id}", id: "#{@attachment_tag.id}" },
+               {}, {},
+               { :expected_status => 400 })
     end
   end
 
@@ -1752,42 +1750,38 @@ describe "Module Items API", type: :request do
     it "should check permissions" do
       api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                { :controller => "context_module_items_api", :action => "index", :format => "json",
-                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
                {}, {}, { :expected_status => 401 })
       api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
                { :controller => "context_module_items_api", :action => "show", :format => "json",
                  :course_id => "#{@course.id}", :module_id => "#{@module2.id}",
-                 :id => "#{@attachment_tag.id}"}, {}, {}, { :expected_status => 401 })
+                 :id => "#{@attachment_tag.id}" }, {}, {}, { :expected_status => 401 })
       api_call(:get, "/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
                { :controller => "context_module_items_api", :action => "redirect",
-                 :format => "json", :course_id => "#{@course.id}", :id => "#{@external_url_tag.id}"},
+                 :format => "json", :course_id => "#{@course.id}", :id => "#{@external_url_tag.id}" },
                {}, {}, { :expected_status => 401 })
       api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-               {:controller => "context_module_items_api", :action => "update", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-               {:module_item => {:title => 'new name'}}, {},
-               {:expected_status => 401}
-      )
+               { :controller => "context_module_items_api", :action => "update", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
+               { :module_item => { :title => 'new name' } }, {},
+               { :expected_status => 401 })
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-               {:controller => "context_module_items_api", :action => "create", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
-               {:module_item => {:title => 'new name'}}, {},
-               {:expected_status => 401}
-      )
+               { :controller => "context_module_items_api", :action => "create", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
+               { :module_item => { :title => 'new name' } }, {},
+               { :expected_status => 401 })
       api_call(:delete, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-               {:controller => "context_module_items_api", :action => "destroy", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+               { :controller => "context_module_items_api", :action => "destroy", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
                {}, {},
-               {:expected_status => 401}
-      )
+               { :expected_status => 401 })
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
-               {:controller => "context_module_items_api", :action => "select_mastery_path", :format => "json",
-                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+               { :controller => "context_module_items_api", :action => "select_mastery_path", :format => "json",
+                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}" },
                { assignment_set_id: 100 },
                {},
-               {:expected_status => 401}
-      )
+               { :expected_status => 401 })
     end
   end
 end

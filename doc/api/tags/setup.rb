@@ -25,6 +25,7 @@ end
 
 def see
   return unless object.has_tag?(:see)
+
   erb(:see)
 end
 
@@ -34,6 +35,7 @@ end
 
 def response_field
   return unless object.has_tag?(:response_field) || object.has_tag?(:deprecated_response_field)
+
   response_field_tags = object.tags.select { |tag| tag.tag_name == 'response_field' || tag.tag_name == 'deprecated_response_field' }
   @response_fields = response_field_tags.map do |tag|
     ResponseFieldView.new(tag)
@@ -44,6 +46,7 @@ end
 
 def argument
   return unless object.has_tag?(:argument) || object.has_tag?(:deprecated_argument)
+
   argument_tags = object.tags.select { |tag| tag.tag_name == 'argument' || tag.tag_name == 'deprecated_argument' }
   @request_parameters = argument_tags.map do |tag|
     ArgumentView.new(tag.text, deprecated: tag.tag_name == 'deprecated_argument')
@@ -54,6 +57,7 @@ end
 
 def returns
   return unless object.has_tag?(:returns)
+
   response_info = object.tag(:returns)
   case response_info.text
   when %r{\[(.*)\]}
@@ -65,11 +69,13 @@ def returns
   end
   @resource_name = options[:json_objects_map][@object_name]
   return unless @resource_name
+
   erb(:returns)
 end
 
 def generic_tag(name, opts = {})
   return unless object.has_tag?(name)
+
   @no_names = true if opts[:no_names]
   @no_types = true if opts[:no_types]
   @label = opts[:label]

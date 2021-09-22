@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "spec_helper" do
-
   context "encompass" do
     it "should check values" do
       root = { :key1 => :value1, :key2 => :value2 }
@@ -36,14 +35,14 @@ describe "spec_helper" do
               { :key1 => :value1, :key2 => :value2 },
               { :key1 => :value1, :key2 => :value2 }]
       expect(root).to encompass([{ :key1 => :value1, :key2 => :value2 },
-                             { :key1 => :value1, :key2 => :value2 },
-                             { :key1 => :value1, :key2 => :value2 }])
-      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
-                                 { :key1 => :value1, :key2 => :value2 }])
-      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
-                                 { :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 }])
+      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
+                                     { :key1 => :value1, :key2 => :value2 }])
+      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
+                                     { :key1 => :value1, :key2 => :value2 },
+                                     { :key1 => :value1, :key2 => :value2 },
+                                     { :key1 => :value1, :key2 => :value2 }])
     end
 
     it "should support comparing dictionaries with different types of things" do
@@ -91,21 +90,19 @@ describe "spec_helper" do
     end
 
     it "should support array encompassing" do
-      root = [{:key1 => :val1, :key2 => :val2}, {:key3 => :val3, :key4 => :val4}]
-      expect(root).to encompass([{:key1 => :val1}, {:key3 => :val3, :key4 => :val4}])
-      expect(root).to encompass([{:key2 => :val2}, {:key3 => :val3}])
-      expect(root).to encompass([{:key1 => :val1}, {:key4 => :val4}])
-      expect(root).to encompass([{:key2 => :val2}, {:key4 => :val4}])
-      expect(root).to encompass([{:key2 => :val2, :key1 => :val1}, {:key4 => :val4}])
-      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val4}])
-      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val3}])
-      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}])
-      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}, {:key1 => :val2}])
-      expect(root).not_to encompass([{:key4 => :val4}, {:key2 => :val2}])
-      expect(root).not_to encompass([{:key2 => :val2}])
-      expect(root).not_to encompass([{:key2 => :val2, :key3 => :val3}, {:key4 => :val4}])
+      root = [{ :key1 => :val1, :key2 => :val2 }, { :key3 => :val3, :key4 => :val4 }]
+      expect(root).to encompass([{ :key1 => :val1 }, { :key3 => :val3, :key4 => :val4 }])
+      expect(root).to encompass([{ :key2 => :val2 }, { :key3 => :val3 }])
+      expect(root).to encompass([{ :key1 => :val1 }, { :key4 => :val4 }])
+      expect(root).to encompass([{ :key2 => :val2 }, { :key4 => :val4 }])
+      expect(root).to encompass([{ :key2 => :val2, :key1 => :val1 }, { :key4 => :val4 }])
+      expect(root).not_to encompass([{ :key2 => :val1 }, { :key4 => :val4 }])
+      expect(root).not_to encompass([{ :key2 => :val1 }, { :key4 => :val3 }])
+      expect(root).not_to encompass([{ :key2 => :val2 }, { :key4 => :val3 }])
+      expect(root).not_to encompass([{ :key2 => :val2 }, { :key4 => :val3 }, { :key1 => :val2 }])
+      expect(root).not_to encompass([{ :key4 => :val4 }, { :key2 => :val2 }])
+      expect(root).not_to encompass([{ :key2 => :val2 }])
+      expect(root).not_to encompass([{ :key2 => :val2, :key3 => :val3 }, { :key4 => :val4 }])
     end
-
   end
-
 end

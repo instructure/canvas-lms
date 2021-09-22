@@ -30,6 +30,7 @@ module Submissions
       )
 
       return render_unauthorized_action if anonymize_students?
+
       super
     end
   end

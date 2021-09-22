@@ -28,7 +28,7 @@ module Lti
 
     let(:controller) { double(lti2_service_name: 'vnd.Canvas.webhooksSubscription') }
     let(:subscription_id) { 'ab342-c444-29392-e222' }
-    let(:test_subscription) { {'RootAccountId' => '1', 'Id' => subscription_id} }
+    let(:test_subscription) { { 'RootAccountId' => '1', 'Id' => subscription_id } }
 
     let(:show_endpoint) { "/api/lti/subscriptions/#{subscription_id}" }
     let(:delete_endpoint) { "/api/lti/subscriptions/#{subscription_id}" }
@@ -43,7 +43,7 @@ module Lti
     let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
     let(:subscription) do
       {
-        EventTypes:["attachment_created"],
+        EventTypes: ["attachment_created"],
         ContextType: "root_account",
         ContextId: account.uuid,
         Format: "live-event",
@@ -52,11 +52,11 @@ module Lti
       }
     end
 
-    before(:each){allow(subscription_service).to receive_messages(available?: true)}
+    before(:each) { allow(subscription_service).to receive_messages(available?: true) }
 
     describe '#create' do
-      let(:test_subscription){ {'RootAccountId' => '1', 'foo' => 'bar'} }
-      let(:stub_response){ double(code: 200, body: test_subscription.to_json) }
+      let(:test_subscription) { { 'RootAccountId' => '1', 'foo' => 'bar' } }
+      let(:stub_response) { double(code: 200, body: test_subscription.to_json) }
 
       before(:each) do
         allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
@@ -204,13 +204,13 @@ module Lti
       end
 
       it 'updates subscriptions' do
-        put update_endpoint, params: {subscription: subscription}, headers: request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_successful
       end
 
       it 'gives gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(update_tool_proxy_subscription: not_found_response)
-        put update_endpoint, params: {subscription: subscription}, headers: request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_not_found
       end
 
@@ -245,22 +245,21 @@ module Lti
       end
 
       it 'requires JWT Access token' do
-        put update_endpoint, params: {subscription: subscription}
+        put update_endpoint, params: { subscription: subscription }
         expect(response).to be_unauthorized
       end
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        put update_endpoint, params: {subscription: subscription}, headers: request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response.status).to eq 500
       end
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        put update_endpoint, params: {subscription: subscription}, headers: request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
-
     end
 
     describe '#index' do
@@ -328,8 +327,6 @@ module Lti
         get index_endpoint, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
-
     end
-
   end
 end

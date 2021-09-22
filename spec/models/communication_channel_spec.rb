@@ -239,8 +239,8 @@ describe CommunicationChannel do
 
   it 'should sort of validate emails' do
     user = User.create!
-    invalid_stuff = {username: "invalid", user: user, pseudonym_id: "1" }
-    expect{communication_channel(user, invalid_stuff)}.to raise_error(ActiveRecord::RecordInvalid)
+    invalid_stuff = { username: "invalid", user: user, pseudonym_id: "1" }
+    expect { communication_channel(user, invalid_stuff) }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it 'should limit quantity of channels a user can have' do
@@ -258,9 +258,9 @@ describe CommunicationChannel do
     @u2 = User.create!
     expect(@u1).not_to eql(@u2)
     expect(@u1.id).not_to eql(@u2.id)
-    @cc1 = communication_channel(@u1, {username: 'jt@instructure.com'})
-    @cc2 = communication_channel(@u1, {username: 'cody@instructure.com'})
-    @cc3 = communication_channel(@u2, {username: 'brianp@instructure.com'})
+    @cc1 = communication_channel(@u1, { username: 'jt@instructure.com' })
+    @cc2 = communication_channel(@u1, { username: 'cody@instructure.com' })
+    @cc3 = communication_channel(@u2, { username: 'brianp@instructure.com' })
     expect(@cc1.user).to eql(@u1)
     expect(@cc2.user).to eql(@u1)
     expect(@cc3.user).to eql(@u2)
@@ -279,16 +279,16 @@ describe CommunicationChannel do
   it "should correctly count the number of confirmations sent" do
     account = Account.create!
     @u1 = User.create!
-    @cc1 = communication_channel(@u1, {username: 'landong@instructure.com'})
+    @cc1 = communication_channel(@u1, { username: 'landong@instructure.com' })
     @cc1.send_confirmation!(account)
     @cc1.send_confirmation!(account)
     @cc1.send_confirmation!(account)
     # Note this 4th one should not count up
     @cc1.send_confirmation!(account)
-    @cc2 = communication_channel(@u1, {username: 'steveb@instructure.com'})
+    @cc2 = communication_channel(@u1, { username: 'steveb@instructure.com' })
     @cc2.send_confirmation!(account)
     @cc2.send_confirmation!(account)
-    @cc3 = communication_channel(@u1, {username: 'aaronh@instructure.com'})
+    @cc3 = communication_channel(@u1, { username: 'aaronh@instructure.com' })
     @cc3.send_confirmation!(account)
     expect(@cc1.confirmation_sent_count).to be(3)
     expect(@cc2.confirmation_sent_count).to be(2)
@@ -298,18 +298,18 @@ describe CommunicationChannel do
   describe "by_email" do
     it "should return matching ccs case-insensitively" do
       @user = User.create!
-      communication_channel(@user, {username: 'user@example.com'})
+      communication_channel(@user, { username: 'user@example.com' })
       expect(@user.communication_channels.by_path('USER@EXAMPLE.COM')).to eq [@cc]
     end
   end
 
   it "should properly validate the uniqueness of path" do
     @user = User.create!
-    communication_channel(@user, {username: 'user1@example.com'})
+    communication_channel(@user, { username: 'user1@example.com' })
     # should allow a different address
-    communication_channel(@user, {username: 'user2@example.com'})
+    communication_channel(@user, { username: 'user2@example.com' })
     # should allow a different path_type
-    communication_channel(@user, {username: 'user1@example.com', path_type: 'sms'})
+    communication_channel(@user, { username: 'user1@example.com', path_type: 'sms' })
   end
 
   context "destroy_permanently!" do
@@ -326,7 +326,7 @@ describe CommunicationChannel do
       notification = Notification.create!(:name => 'Confirm Email Communication Channel', :category => 'Registration')
       @user = User.create!
       @user.register!
-      communication_channel(@user, {username: 'user1@example.com'})
+      communication_channel(@user, { username: 'user1@example.com' })
       account = Account.create!
       allow(HostUrl).to receive(:context_host).with(account).and_return('someserver.com')
       allow(HostUrl).to receive(:context_host).with(@cc).and_return('someserver.com')
@@ -353,16 +353,16 @@ describe CommunicationChannel do
     it 'gets the diagnostic code' do
       user = User.create!
       cc = communication_channel(user, {
-        username: 'path@example.com',
-        last_bounce_details: {'bouncedRecipients' => [{'diagnosticCode' => 'stuff and things'}]}
-      })
+                                   username: 'path@example.com',
+                                   last_bounce_details: { 'bouncedRecipients' => [{ 'diagnosticCode' => 'stuff and things' }] }
+                                 })
 
       expect(cc.last_bounce_summary).to eq('stuff and things')
     end
 
     it "doesn't fail when there isn't a last bounce" do
       user = User.create!
-      cc = communication_channel(user, {username: 'path@example.com'})
+      cc = communication_channel(user, { username: 'path@example.com' })
 
       expect(cc.last_bounce_details).to be_nil
       expect(cc.last_bounce_summary).to be_nil
@@ -373,16 +373,16 @@ describe CommunicationChannel do
     it 'gets the diagnostic code' do
       user = User.create!
       cc = communication_channel(user, {
-        username: 'path@example.com',
-        last_transient_bounce_details: {'bouncedRecipients' => [{'diagnosticCode' => 'stuff and things'}]}
-      })
+                                   username: 'path@example.com',
+                                   last_transient_bounce_details: { 'bouncedRecipients' => [{ 'diagnosticCode' => 'stuff and things' }] }
+                                 })
 
       expect(cc.last_transient_bounce_summary).to eq('stuff and things')
     end
 
     it "doesn't fail when there isn't a last transient bounce" do
       user = User.create!
-      cc = communication_channel(user, {username: 'path@example.com'})
+      cc = communication_channel(user, { username: 'path@example.com' })
 
       expect(cc.last_transient_bounce_details).to be_nil
       expect(cc.last_transient_bounce_summary).to be_nil
@@ -394,7 +394,7 @@ describe CommunicationChannel do
     let_once(:cc1) { communication_channel(user1, username: 'jt@instructure.com') }
     it "should return users with a matching e-mail address" do
       user2 = User.create!
-      communication_channel(user2, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
       expect(cc1.merge_candidates).to eq [user2]
@@ -403,7 +403,7 @@ describe CommunicationChannel do
 
     it "should not return users without an active pseudonym" do
       user2 = User.create!
-      communication_channel(user2, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
 
       expect(cc1.merge_candidates).to eq []
       expect(cc1.has_merge_candidates?).to be_falsey
@@ -411,7 +411,7 @@ describe CommunicationChannel do
 
     it "should not return users that match on an unconfirmed cc" do
       user2 = User.create!
-      communication_channel(user2, {username: 'jt@instructure.com'})
+      communication_channel(user2, { username: 'jt@instructure.com' })
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
       expect(cc1.merge_candidates).to eq []
@@ -420,10 +420,10 @@ describe CommunicationChannel do
 
     it "should only check one user for boolean result" do
       user2 = User.create!
-      communication_channel(user2, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
       user3 = User.create!
-      communication_channel(user3, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(user3, { username: 'jt@instructure.com', active_cc: true })
       Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
 
       expect_any_instance_of(User).to receive(:all_active_pseudonyms).once.and_return([true])
@@ -432,10 +432,10 @@ describe CommunicationChannel do
 
     it "does not return users for push channels" do
       user2 = User.create!
-      communication_channel(user2, {username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true})
+      communication_channel(user2, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true })
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
       user3 = User.create!
-      communication_channel(user3, {username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true})
+      communication_channel(user3, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true })
       Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
 
       expect(cc1.has_merge_candidates?).to be_falsey
@@ -536,7 +536,7 @@ describe CommunicationChannel do
         CommunicationChannel.bounce_for_path(
           path: 'foo@bar.edu',
           timestamp: nil,
-          details: {'some' => 'details', 'foo' => 'bar'},
+          details: { 'some' => 'details', 'foo' => 'bar' },
           permanent_bounce: true,
           suppression_bounce: false
         )
@@ -552,7 +552,7 @@ describe CommunicationChannel do
           CommunicationChannel.bounce_for_path(
             path: cc.path,
             timestamp: Time.zone.now,
-            details: { 'some' => 'details'},
+            details: { 'some' => 'details' },
             permanent_bounce: false,
             suppression_bounce: false
           )
@@ -588,7 +588,7 @@ describe CommunicationChannel do
           set_confirmation_code
           set_root_account_ids
         )
-        expect(CommunicationChannel._save_callbacks.collect(&:filter).select {|k| k.is_a? Symbol} - accounted_for_callbacks).to eq []
+        expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end
 
       it "stores the details of the last soft bounce" do
@@ -596,7 +596,7 @@ describe CommunicationChannel do
         CommunicationChannel.bounce_for_path(
           path: 'foo@bar.edu',
           timestamp: nil,
-          details: {'some' => 'details', 'foo' => 'bar'},
+          details: { 'some' => 'details', 'foo' => 'bar' },
           permanent_bounce: false,
           suppression_bounce: false
         )
@@ -609,12 +609,12 @@ describe CommunicationChannel do
       it "does not store the details of the last suppression bounce" do
         cc = communication_channel_model(
           path: 'foo@bar.edu',
-          last_bounce_details: {'existing' => 'details'}
+          last_bounce_details: { 'existing' => 'details' }
         )
         CommunicationChannel.bounce_for_path(
           path: 'foo@bar.edu',
           timestamp: nil,
-          details: {'some' => 'details', 'foo' => 'bar'},
+          details: { 'some' => 'details', 'foo' => 'bar' },
           permanent_bounce: true,
           suppression_bounce: true
         )
@@ -661,7 +661,7 @@ describe CommunicationChannel do
         allow(Enrollment).to receive(:cross_shard_invitations?).and_return(true)
         @shard1.activate do
           @user2 = User.create!
-          communication_channel(@user2, {username: 'jt@instructure.com', active_cc: true})
+          communication_channel(@user2, { username: 'jt@instructure.com', active_cc: true })
           account = Account.create!
           account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
         end
@@ -679,7 +679,7 @@ describe CommunicationChannel do
 
         @shard1.activate do
           @user2 = User.create!
-          @cc2 = communication_channel(@user2, {username: 'jt@instructure.com', active_cc: true})
+          @cc2 = communication_channel(@user2, { username: 'jt@instructure.com', active_cc: true })
           account = Account.create!
           account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
         end
@@ -793,14 +793,14 @@ describe CommunicationChannel do
       end
 
       it 'returns true if the current number of CCs is less then the setting' do
-        communication_channel(@user, {username: 'cc1@test.com'})
+        communication_channel(@user, { username: 'cc1@test.com' })
         expect(subject).to be_truthy
       end
 
       describe 'when there are more CCs then the setting' do
         before(:each) do
-          @cc1 = communication_channel(@user, {username: 'cc1@test.com'})
-          @cc2 = communication_channel(@user, {username: 'cc2@test.com'})
+          @cc1 = communication_channel(@user, { username: 'cc1@test.com' })
+          @cc2 = communication_channel(@user, { username: 'cc2@test.com' })
         end
 
         it 'returns false if the CCs are active' do
@@ -824,7 +824,7 @@ describe CommunicationChannel do
 
   describe ".supported" do
     let(:user) { User.create! }
-    let!(:sms_channel) { communication_channel(user, {username: 'sms', path_type: CommunicationChannel::TYPE_SMS}) }
+    let!(:sms_channel) { communication_channel(user, { username: 'sms', path_type: CommunicationChannel::TYPE_SMS }) }
 
     it "filters sms channels" do
       expect(CommunicationChannel.supported).to match_array []

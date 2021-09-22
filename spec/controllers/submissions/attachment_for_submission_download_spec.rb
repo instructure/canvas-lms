@@ -25,11 +25,11 @@ describe Submissions::AttachmentForSubmissionDownload do
     course_with_student(active_all: true)
     assignment_model(course: @course)
     submission_model({
-      assignment: @assignment,
-      body: 'here my assignment',
-      submission_type: 'online_text_entry',
-      user: @student
-    })
+                       assignment: @assignment,
+                       body: 'here my assignment',
+                       submission_type: 'online_text_entry',
+                       user: @student
+                     })
     @submission.submitted_at = 3.hours.ago
     @submission.save
     @options = {}
@@ -98,7 +98,7 @@ describe Submissions::AttachmentForSubmissionDownload do
       before :once do
         @original_course = @course
         @original_student = @student
-        course_with_student(active_all:true)
+        course_with_student(active_all: true)
         submission_comment_model
         @attachment = attachment_model(context: @assignment)
         @submission_comment.attachments = [@attachment]

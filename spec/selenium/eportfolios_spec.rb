@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#bk test
+# bk test
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
@@ -42,7 +42,7 @@ describe "eportfolios" do
 
   context "eportfolio created with user" do
     before(:each) do
-      eportfolio_model({:user => @user, :name => "student content"})
+      eportfolio_model({ :user => @user, :name => "student content" })
     end
 
     it "should start the download of ePortfolio contents", priority: "1", test_id: 115980 do
@@ -110,7 +110,6 @@ describe "eportfolios" do
       move_page_to_bottom(page)
       expect(pages.last.text).to eq page.text
     end
-
 
     it "should add a section", priority: "1", test_id: 3011034 do
       get "/eportfolios/#{@eportfolio.id}"
@@ -191,7 +190,6 @@ describe "eportfolios" do
       expect(ff('#category_select option').map(&:text)).not_to include("New Section")
     end
 
-
     it "should delete the ePortfolio", priority: "2", test_id: 114350 do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
@@ -243,7 +241,7 @@ describe "eportfolios file upload" do
     @course = course_factory :active_course => true
     @course.enroll_student(@student).accept!
     @course.reload
-    eportfolio_model({:user => @user, :name => "student content"})
+    eportfolio_model({ :user => @user, :name => "student content" })
   end
 
   def test_file_upload

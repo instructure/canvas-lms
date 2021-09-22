@@ -33,7 +33,6 @@ describe "dashboard" do
   end
 
   context "as a student" do
-
     before :each do
       course_with_student_logged_in(:active_all => true)
       @course.default_view = 'feed'
@@ -42,10 +41,10 @@ describe "dashboard" do
 
     def create_announcement
       factory_with_protected_attributes(Announcement, {
-          :context => @course,
-          :title => "hey all read this k",
-          :message => "announcement"
-      })
+                                          :context => @course,
+                                          :title => "hey all read this k",
+                                          :message => "announcement"
+                                        })
     end
 
     it "should not show announcement stream items without permissions" do
@@ -59,19 +58,19 @@ describe "dashboard" do
       expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
-    def click_recent_activity_header(type='announcement')
+    def click_recent_activity_header(type = 'announcement')
       f(".stream-#{type} .stream_header").click
     end
 
-    def assert_recent_activity_category_closed(type='announcement')
+    def assert_recent_activity_category_closed(type = 'announcement')
       expect(f(".stream-#{type} .details_container")).not_to be_displayed
     end
 
-    def assert_recent_activity_category_is_open(type='announcement')
+    def assert_recent_activity_category_is_open(type = 'announcement')
       expect(f(".stream-#{type} .details_container")).to be_displayed
     end
 
-    def click_recent_activity_course_link(type='announcement')
+    def click_recent_activity_course_link(type = 'announcement')
       f(".stream-#{type} .links a").click
     end
 
@@ -124,7 +123,7 @@ describe "dashboard" do
 
     it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
       setup_notification(@student, name: 'Assignment Created')
-      assignment_model({:submission_types => ['online_text_entry'], :course => @course})
+      assignment_model({ :submission_types => ['online_text_entry'], :course => @course })
       get "/"
       f('#DashboardOptionsMenu_Container button').click
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
@@ -242,11 +241,11 @@ describe "dashboard" do
     end
 
     it "should display scheduled web conference in stream", priority: "1", test_id: 216354 do
-      PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
+      PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
 
       # NOTE: recently changed the behavior here: conferences only display on
       # the course page, and they only display when they are in progress
-      @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "Wimba", :duration => 60})
+      @conference = @course.web_conferences.build({ :title => "my Conference", :conference_type => "Wimba", :duration => 60 })
       @conference.user = @user
       @conference.save!
       @conference.restart
@@ -260,13 +259,13 @@ describe "dashboard" do
 
     it "should end conferences from stream", priority: "1", test_id: 216355 do
       skip_if_safari(:alert)
-      PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
+      PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
 
       course_with_teacher_logged_in
       @course.default_view = 'feed'
       @course.save!
 
-      @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "Wimba", :duration => nil})
+      @conference = @course.web_conferences.build({ :title => "my Conference", :conference_type => "Wimba", :duration => nil })
       @conference.user = @user
       @conference.save!
       @conference.restart
@@ -286,12 +285,12 @@ describe "dashboard" do
 
     it "should create an announcement for the first course that is not visible in the second course", priority: "1", test_id: 216356 do
       @context = @course
-      announcement_model({:title => "hey all read this k", :message => "announcement"})
+      announcement_model({ :title => "hey all read this k", :message => "announcement" })
       @second_course = Course.create!(:name => 'second course')
       @second_course.offer!
       @second_course.default_view = 'feed'
       @second_course.save!
-      #add teacher as a user
+      # add teacher as a user
       u = User.create!
       u.register!
       e = @course.enroll_teacher(u)
@@ -352,9 +351,8 @@ describe "dashboard" do
     end
 
     context "course menu customization" do
-
       it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
-        course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
+        course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
         get "/"
         f('#global_nav_courses_link').click
         expect(fj('[aria-label="Courses tray"] a:contains("All Courses")')).to be_present
@@ -363,7 +361,6 @@ describe "dashboard" do
   end
 
   context "as a teacher" do
-
     before (:each) do
       course_with_teacher_logged_in(:active_cc => true)
     end
@@ -401,7 +398,7 @@ describe "dashboard" do
 
       it "should not show restricted future courses to students on courses page if configured on account" do
         a = @c2.account
-        a.settings[:restrict_student_future_listing] = {:value => true}
+        a.settings[:restrict_student_future_listing] = { :value => true }
         a.save!
         get "/courses"
         expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
@@ -410,25 +407,25 @@ describe "dashboard" do
     end
 
     it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do
-      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+      assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
-      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
       assignment.reload
 
       User.where(:id => @teacher).update_all(:updated_at => 1.day.ago) # ensure cache refresh
       enable_cache do
         get "/"
 
-        #verify assignment is in to do list
+        # verify assignment is in to do list
         expect(f('.to-do-list > li')).to include_text('Grade ' + assignment.title)
 
         student.enrollments.first.destroy
 
         get "/"
 
-        #verify todo list is updated
+        # verify todo list is updated
         expect(f("#content")).not_to contain_css('.to-do-list > li')
       end
     end

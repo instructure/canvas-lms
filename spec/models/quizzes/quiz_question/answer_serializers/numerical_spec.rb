@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   context 'English' do
     let :inputs do
-      [ 25.3, 25e-6, '0.12', '3', '17,000', '6,200,000.13' ]
+      [25.3, 25e-6, '0.12', '3', '17,000', '6,200,000.13']
     end
 
     let :outputs do
@@ -45,7 +45,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
 
     context 'validations' do
       it 'should turn garbage into 0.0' do
-        [ 'foobar', nil, { foo: 'bar' }, "25 00012" ].each do |garbage|
+        ['foobar', nil, { foo: 'bar' }, "25 00012"].each do |garbage|
           rc = subject.serialize(garbage)
           expect(rc.error).to be_nil
           expect(rc.answer).to eq({
@@ -58,11 +58,11 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
 
   context 'Italian' do
     before { I18n.locale = 'it' }
-    
+
     after { I18n.locale = I18n.default_locale }
 
     let :inputs do
-      [ 25.3, 25e-6, '0,12', '3', '17.000', '6.200.000,13' ]
+      [25.3, 25e-6, '0,12', '3', '17.000', '6.200.000,13']
     end
 
     let :outputs do
@@ -85,7 +85,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
     after { I18n.locale = I18n.default_locale }
 
     let :inputs do
-      [ 25.3, 25e-6, '0,12', '3', '17 000', '6 200 000,13' ]
+      [25.3, 25e-6, '0,12', '3', '17 000', '6 200 000,13']
     end
 
     let :outputs do
@@ -101,7 +101,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
 
     include_examples 'Answer Serializers'
   end
-  
+
   def sanitize(value)
     if value.is_a? String
       Quizzes::QuizQuestion::AnswerSerializers::Util.i18n_to_decimal value.to_s

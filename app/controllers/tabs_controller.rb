@@ -131,6 +131,7 @@ class TabsController < ApplicationController
   # @returns Tab
   def update
     return unless authorized_action(@context, @current_user, :manage_content) && @context.is_a?(Course)
+
     css_class = params['tab_id']
     new_pos = params['position'].to_i if params['position']
     tabs = context_tabs(@context, @current_user)
@@ -144,9 +145,9 @@ class TabsController < ApplicationController
       }
     end if tab_config.blank? || tab_config.count != tabs.count
     if [@context.class::TAB_HOME, @context.class::TAB_SETTINGS].include?(tab[:id])
-      render json: {error: t(:tab_unmanagable_error, "%{css_class} is not manageable", css_class: css_class)}, status: :bad_request
+      render json: { error: t(:tab_unmanagable_error, "%{css_class} is not manageable", css_class: css_class) }, status: :bad_request
     elsif new_pos && (new_pos <= 1 || new_pos >= tab_config.count + 1)
-      render json: {error: t(:tab_location_error, 'That tab location is invalid')}, status: :bad_request
+      render json: { error: t(:tab_location_error, 'That tab location is invalid') }, status: :bad_request
     else
       pos = tab_config.index { |t| t['id'] == tab['id'] }
       if pos.nil?

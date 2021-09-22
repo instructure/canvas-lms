@@ -30,7 +30,7 @@ describe "calendar2" do
 
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -80,14 +80,14 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajax_requests
 
-        #Because it is in a past month, it should not be on the mini calendar
+        # Because it is in a past month, it should not be on the mini calendar
         expect(f("#content")).not_to contain_css(".event")
 
-        #Go back a month
+        # Go back a month
         f(".fc-prev-button").click
         wait_for_ajaximations
 
-        #look for the event on the mini calendar
+        # look for the event on the mini calendar
         expect(f(".event")['data-date']).to eq(date.strftime("%Y-%m-%d"))
       end
 
@@ -139,14 +139,14 @@ describe "calendar2" do
           make_event :context => @course, :start => Time.now, :title => title
           load_month_view
 
-          #expect event to be on the calendar
+          # expect event to be on the calendar
           expect(f('.fc-title').text).to include title
 
           # Click the toggle button. First button should be user, second should be course
           ff(".context-list-toggle-box")[1].click
           expect(f("#content")).not_to contain_css('.fc-title')
 
-          #Turn back on the calendar and verify that your item appears
+          # Turn back on the calendar and verify that your item appears
           ff(".context-list-toggle-box")[1].click
           expect(f('.fc-title').text).to include title
         end

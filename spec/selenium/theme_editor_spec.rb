@@ -27,7 +27,6 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-
     course_with_admin_logged_in
   end
 
@@ -39,7 +38,7 @@ describe 'Theme Editor' do
   end
 
   it 'theme index renders shared themes' do
-    brand_config = BrandConfig.create!(variables: {"ic-brand-primary" => "#321"})
+    brand_config = BrandConfig.create!(variables: { "ic-brand-primary" => "#321" })
     shared_themes = 2.times.map do |i|
       Account.default.shared_brand_configs.create!(
         name: "shared theme #{i}",
@@ -211,7 +210,7 @@ describe 'Theme Editor' do
       run_jobs
     end
     brand_config_md5 = driver.execute_script "return ENV.brandConfig.md5"
-    expect(BrandConfig.find(brand_config_md5).variables).to eq({"ic-brand-font-color-dark"=>"#000"})
+    expect(BrandConfig.find(brand_config_md5).variables).to eq({ "ic-brand-font-color-dark" => "#000" })
   end
 
   it 'should apply the theme to the account' do

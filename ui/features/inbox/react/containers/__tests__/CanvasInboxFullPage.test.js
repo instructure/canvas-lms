@@ -106,11 +106,12 @@ describe('CanvasInbox Full Page', () => {
     ).toBeInTheDocument()
   })
 
-  it('should change the read state of a message', async () => {
+  it.skip('should change the read state of a message', async () => {
     const container = setup()
     const conversation = await container.findByTestId('messageListItem-Checkbox')
     fireEvent.click(conversation)
     await container.findByText('Watch out for that Magneto guy')
+    expect(container.queryByTestId('unread-badge')).toBeTruthy()
     const settings = await container.findByTestId('settings')
     fireEvent.click(settings)
     const markAsReadButton = await container.findByText('Mark as read')

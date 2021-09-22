@@ -96,13 +96,13 @@ module ActiveSupport::Callbacks
       #  * a blanket for that kind and all types (e.g. update([], [:save], [])),
       #  * a blanket for all kinds and all types (e.g. update([], [], []))
       def include?(callback, kind, type)
-        [ self[kind, type],
-          self[kind, nil],
-          self[nil, type],
-          self[nil, nil] ].any? do |cbs|
-            cbs.include?(nil) ||
+        [self[kind, type],
+         self[kind, nil],
+         self[nil, type],
+         self[nil, nil]].any? do |cbs|
+          cbs.include?(nil) ||
             cbs.include?(callback)
-          end
+        end
       end
 
       def each

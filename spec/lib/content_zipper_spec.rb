@@ -98,7 +98,7 @@ describe ContentZipper do
       course_with_student(active_all: true)
       @user.update!(sortable_name: 'some_999_, _1234_guy')
       assignment_model(course: @course)
-      @assignment.submission_types="online_text_entry,media_recording"
+      @assignment.submission_types = "online_text_entry,media_recording"
       @assignment.save
       my_media_object = media_object(context: @course, user: @user)
       submission = @assignment.submit_homework(@user, {
@@ -170,7 +170,7 @@ describe ContentZipper do
       @assignment = @course.assignments.create!(anonymous_grading: true, muted: true)
       submission_model(body: "hai this is my answer", assignment: @assignment, user: @student)
       attachment = Attachment.create!(display_name: 'my_download.zip', user: @teacher,
-        workflow_state: 'to_be_zipped', context: @assignment)
+                                      workflow_state: 'to_be_zipped', context: @assignment)
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       content = nil
@@ -291,7 +291,7 @@ describe ContentZipper do
       @assignment = assignment_model(course: @course)
       submissions = 5.times.map.with_index do |i|
         attachment = attachment_model(uploaded_data: stub_png_data("file_#{i}.png"), content_type: 'image/png')
-        submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment] )
+        submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment])
       end
       @course.complete
       @course.save!
@@ -342,13 +342,13 @@ describe ContentZipper do
         @attachment.context = folder.reload
       end
 
-      def zipped_files_for_user(user=nil, check_user=true)
+      def zipped_files_for_user(user = nil, check_user = true)
         @attachment.user_id = user.id if user
         @attachment.save!
         ContentZipper.process_attachment(@attachment, user, check_user: check_user)
         names = []
         @attachment.reload
-        Zip::File.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
+        Zip::File.foreach(@attachment.full_filename) { |f| names << f.name if f.file? }
         names.sort
       end
 
@@ -463,7 +463,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @user)
       attachment.reload
       names = []
-      Zip::File.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
+      Zip::File.foreach(attachment.full_filename) { |f| names << f.name if f.file? }
       expect(names).to eq ['otherfile.png']
     end
   end
@@ -505,7 +505,7 @@ describe ContentZipper do
         eportfolio = @user.eportfolios.create!(name: 'an name')
         eportfolio.ensure_defaults
         entry = eportfolio.eportfolio_entries.first
-        entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "/files/#{@attachment.id}/download"}})
+        entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "/files/#{@attachment.id}/download" } })
         entry.save!
         eportfolio
       end
@@ -562,12 +562,11 @@ describe ContentZipper do
       eportfolio.ensure_defaults
 
       contents = ContentZipper.new.render_eportfolio_page_content(eportfolio.eportfolio_entries.first, eportfolio, nil, {})
-      expect(contents).to match("bestest_eportfolio_eva") #really just testing that this method doesn't throw an error
+      expect(contents).to match("bestest_eportfolio_eva") # really just testing that this method doesn't throw an error
     end
   end
 
   describe "mark_attachment_as_zipping!" do
-
     it "marks the workflow state as zipping" do
       attachment = Attachment.new display_name: 'jenkins.ppt'
       expect(attachment).to receive(:save!).once
@@ -577,22 +576,20 @@ describe ContentZipper do
   end
 
   describe "update_progress" do
-
     it "updates the zip attachment's state to a percentage and save!s it" do
       attachment = Attachment.new display_name: "donuts.jpg"
       expect(attachment).to receive(:save!).once
-      ContentZipper.new.update_progress(attachment,5,10)
+      ContentZipper.new.update_progress(attachment, 5, 10)
       expect(attachment.file_state.to_s).to eq '60' # accounts for zero-indexed arrays
     end
   end
 
   describe "complete_attachment" do
-
     before { @attachment = Attachment.new display_name: "I <3 testing.png" }
     context "when attachment wasn't zipped successfully" do
       it "moves the zip attachment into an error state and save!s it" do
         expect(@attachment).to receive(:save!).once
-        ContentZipper.new.complete_attachment!(@attachment,"hello")
+        ContentZipper.new.complete_attachment!(@attachment, "hello")
         expect(@attachment.workflow_state).to eq 'errored'
       end
     end
@@ -607,7 +604,7 @@ describe ContentZipper do
         expect(@attachment).to receive(:uploaded_data=).with data
         zipper = ContentZipper.new
         zipper.mark_successful!
-        zipper.complete_attachment!(@attachment,zip_path)
+        zipper.complete_attachment!(@attachment, zip_path)
         expect(@attachment).to be_zipped
         expect(@attachment.file_state).to eq 'available'
       end
@@ -626,7 +623,7 @@ describe ContentZipper do
         quiz: quiz,
         zip_attachment: attachment
       ).and_return zipper_stub
-      ContentZipper.process_attachment(attachment,quiz)
+      ContentZipper.process_attachment(attachment, quiz)
     end
   end
 end

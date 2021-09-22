@@ -20,7 +20,6 @@
 
 module SIS
   class SectionImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
@@ -72,7 +71,7 @@ module SIS
         @deleted_section_ids = Set.new
       end
 
-      def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
+      def add_section(section_id, course_id, name, status, start_date = nil, end_date = nil, integration_id = nil)
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
         raise ImportError, "No course_id given for a section #{section_id}" if course_id.blank?
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && status =~ /\Aactive/i
@@ -90,6 +89,7 @@ module SIS
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && section.new_record?
+
         section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name) && name.present?
 
         # update the course id if necessary

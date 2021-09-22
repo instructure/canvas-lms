@@ -47,7 +47,7 @@ describe TatlTael::Linters do
         end
 
         context "deleted" do
-          let(:query) { {statuses: ["deleted"]} }
+          let(:query) { { statuses: ["deleted"] } }
 
           it "returns deleted changes" do
             expect(base_linter.changes_matching(**query)).to match([deleted_change])
@@ -68,7 +68,7 @@ describe TatlTael::Linters do
         end
 
         context "includes exist" do
-          let(:query) { {include: ["**/zoo", "**/foo", "**/bar"]} }
+          let(:query) { { include: ["**/zoo", "**/foo", "**/bar"] } }
 
           it "returns the changes that match any of the includes" do
             expect(base_linter.changes_matching(**query)).to match([added_change])
@@ -89,7 +89,7 @@ describe TatlTael::Linters do
         end
 
         context "include_regexes exist" do
-          let(:query) { {allowlist: ["**/zoo", "**/foo", "**/bar"]} }
+          let(:query) { { allowlist: ["**/zoo", "**/foo", "**/bar"] } }
 
           it "returns the changes that don't match any of the allowlists" do
             expect(base_linter.changes_matching(**query)).to match([modified_change])
@@ -114,7 +114,6 @@ describe TatlTael::Linters do
           .with(hash_including(query))
           .and_return(changes)
       end
-
 
       context "changes exist matching the query" do
         before :each do
@@ -147,6 +146,7 @@ describe TatlTael::Linters do
         [[], [nil], "1"]
       end
     end
+
     class ZooLinter < TatlTael::Linters::BaseLinter
       def run
         [nil, "2", "3"]

@@ -28,10 +28,10 @@ shared_examples 'Arrange By dropdown' do |context|
     get "/courses/#{@course.id}/grades/#{@student.id}"
   end
 
-  let(:due_date_order) {[@assignment0.title, @quiz.title, @discussion.title, @assignment1.title]}
-  let(:title_order) {[@quiz.title, @assignment1.title, @assignment0.title, @discussion.title]}
-  let(:module_order) {[@quiz.title, @assignment0.title, @assignment1.title, @discussion.title]}
-  let(:assign_group_order) {[@assignment0.title, @discussion.title, @quiz.title, @assignment1.title]}
+  let(:due_date_order) { [@assignment0.title, @quiz.title, @discussion.title, @assignment1.title] }
+  let(:title_order) { [@quiz.title, @assignment1.title, @assignment0.title, @discussion.title] }
+  let(:module_order) { [@quiz.title, @assignment0.title, @assignment1.title, @discussion.title] }
+  let(:assign_group_order) { [@assignment0.title, @discussion.title, @quiz.title, @assignment1.title] }
 
   it 'should persist', test_id: pick_test_id(context, student: "591860", teacher: "592108", admin: "592119", ta: "592130"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
     click_option('#assignment_sort_order_select_menu', 'Title')
@@ -134,6 +134,6 @@ shared_examples 'Arrange By dropdown' do |context|
   end
 
   def option_values
-    INSTUI_Select_options('#assignment_sort_order_select_menu').map {|o| o.attribute('value')}
+    INSTUI_Select_options('#assignment_sort_order_select_menu').map { |o| o.attribute('value') }
   end
 end

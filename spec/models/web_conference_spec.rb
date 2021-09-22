@@ -23,14 +23,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe WebConference do
   include ExternalToolsSpecHelper
 
-  before(:each)   { stub_plugins }
+  before(:each) { stub_plugins }
 
   def stub_plugins
     allow(WebConference).to receive(:plugins).and_return(
       [
-        web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
-        web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
-        web_conference_plugin_mock("broken_plugin", {:foor => :bar})
+        web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
+        web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
+        web_conference_plugin_mock("broken_plugin", { :foor => :bar })
       ]
     )
   end
@@ -82,7 +82,7 @@ describe WebConference do
     it "should ignore invalid user settings" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course_factory)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => { :foo => :bar }, :context => course_factory)
       expect(conference.user_settings).to be_empty
     end
 
@@ -90,7 +90,7 @@ describe WebConference do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
       conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course_factory)
-      conference.settings = {:record => true, :not => :for_user}
+      conference.settings = { :record => true, :not => :for_user }
       conference.save
       conference.reload
       expect(conference.user_settings).not_to have_key(:not)
@@ -99,7 +99,7 @@ describe WebConference do
     it "should not mark object dirty if settings are unchanged" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
       user_settings = conference.user_settings.dup
       conference.user_settings = user_settings
       expect(conference).not_to be_changed
@@ -108,8 +108,8 @@ describe WebConference do
     it "should mark object dirty if  settings are changed" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
-      conference.user_settings = {record: false}
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
+      conference.user_settings = { record: false }
       expect(conference).to be_changed
     end
   end
@@ -341,7 +341,6 @@ describe WebConference do
       allow(@conference).to receive(:scheduled_date).and_return(Time.now + 10.days)
       expect(@conference.scheduled?).to be_truthy
     end
-
   end
 
   context "creation rights" do
@@ -381,7 +380,6 @@ describe WebConference do
   end
 
   context "calendar events" do
-
     it "nullifies event conference when a conference is destroyed" do
       course_with_teacher(active_all: true)
       conference = WimbaConference.create!(title: "my conference", user: @user, context: @course)

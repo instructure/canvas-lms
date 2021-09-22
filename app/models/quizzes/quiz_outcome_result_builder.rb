@@ -25,6 +25,7 @@ module Quizzes
 
     def build_outcome_results(questions, alignments)
       return unless ['complete', 'graded'].include?(@qs.workflow_state)
+
       create_quiz_outcome_results(questions, alignments)
       questions.each do |question|
         alignments.each do |alignment|
@@ -34,16 +35,17 @@ module Quizzes
         end
       end
     end
+
     private
 
     def create_outcome_question_result(question, alignment)
       # find or create the user's unique LearningOutcomeResult for this alignment
       # of the quiz question.
-      quiz_result = alignment.learning_outcome_results.
-        for_association(@qs.quiz).
-        for_associated_asset(@qs.quiz).
-        where(user_id: @qs.user.id).
-        first_or_initialize
+      quiz_result = alignment.learning_outcome_results
+                             .for_association(@qs.quiz)
+                             .for_associated_asset(@qs.quiz)
+                             .where(user_id: @qs.user.id)
+                             .first_or_initialize
 
       quiz_result.workflow_state = :active
       quiz_result.user_uuid = @qs.user.uuid
@@ -51,6 +53,7 @@ module Quizzes
       # get data from quiz submission's question result to ensure result should be generated
       cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
       raise "Could not find valid question" unless cached_question
+
       cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid answer" unless cached_answer
 
@@ -79,7 +82,7 @@ module Quizzes
       # title
       question_result.title = CanvasTextHelper.truncate_text(
         "#{@qs.user.name}, #{@qs.quiz.title}: #{cached_question[:name]}",
-        {max_length: 250}
+        { max_length: 250 }
       )
 
       question_result.submitted_at = @qs.finished_at
@@ -91,11 +94,11 @@ module Quizzes
     def create_quiz_outcome_results(questions, alignments)
       unique_alignments = alignments.uniq
       unique_alignments.map do |alignment|
-        result = alignment.learning_outcome_results.
-          for_association(@qs.quiz).
-          for_associated_asset(@qs.quiz).
-          where(user_id: @qs.user.id).
-          first_or_initialize
+        result = alignment.learning_outcome_results
+                          .for_association(@qs.quiz)
+                          .for_associated_asset(@qs.quiz)
+                          .where(user_id: @qs.user.id)
+                          .first_or_initialize
 
         next if !result.new_record? && result.attempt.to_i > @qs.attempt.to_i
 
@@ -110,14 +113,16 @@ module Quizzes
         end.map do |question|
           cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
           raise "Could not find valid question" unless cached_question
+
           cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
           raise "Could not find valid answer" unless cached_answer
+
           [cached_question, cached_answer]
         end
 
-        result.possible = cached_questions_and_answers.map(&:first).
-          map { |h| h['points_possible']}.
-          inject(:+)
+        result.possible = cached_questions_and_answers.map(&:first)
+                                                      .map { |h| h['points_possible'] }
+                                                      .inject(:+)
 
         # do not create a result if no points are possible.
         if result.possible == 0
@@ -126,16 +131,16 @@ module Quizzes
           next
         end
 
-        result.score = cached_questions_and_answers.map(&:last).
-          map { |h| h[:points] }.
-          inject(:+)
+        result.score = cached_questions_and_answers.map(&:last)
+                                                   .map { |h| h[:points] }
+                                                   .inject(:+)
 
         result.calculate_percent!
         result.mastery = determine_mastery(result, alignment)
         result.attempt = @qs.attempt
         result.title = CanvasTextHelper.truncate_text(
           "#{@qs.user.name}, #{@qs.quiz.title}",
-          {max_length: 250}
+          { max_length: 250 }
         )
         result.assessed_at = Time.zone.now
         result.submitted_at = @qs.finished_at

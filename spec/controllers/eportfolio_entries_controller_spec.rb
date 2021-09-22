@@ -26,7 +26,7 @@ describe EportfolioEntriesController do
     @category = @portfolio.eportfolio_categories.create
   end
 
-  def eportfolio_entry(category=nil)
+  def eportfolio_entry(category = nil)
     @entry = @portfolio.eportfolio_entries.new
     @entry.eportfolio_category_id = category.id if category
     @entry.save!
@@ -41,7 +41,7 @@ describe EportfolioEntriesController do
   describe "GET 'show'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      get 'show', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
@@ -50,9 +50,9 @@ describe EportfolioEntriesController do
       attachment = @portfolio.user.attachments.build(:filename => 'some_file.pdf')
       attachment.content_type = ''
       attachment.save!
-      @entry.content = [{:section_type => 'attachment', :attachment_id => attachment.id}]
+      @entry.content = [{ :section_type => 'attachment', :attachment_id => attachment.id }]
       @entry.save!
-      get 'show', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       expect(response).to be_successful
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
@@ -68,7 +68,7 @@ describe EportfolioEntriesController do
       @category.save!
       @entry.name = "some entry"
       @entry.save!
-      get 'show', params: {:eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug}
+      get 'show', params: { :eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug }
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
       expect(assigns[:entries]).not_to be_nil
@@ -82,7 +82,7 @@ describe EportfolioEntriesController do
         @category.save!
         @entry.name = "some entry"
         @entry.save!
-        get 'show', params: {eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug}
+        get 'show', params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
         expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
       end
     end
@@ -147,13 +147,13 @@ describe EportfolioEntriesController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', params: {:eportfolio_id => @portfolio.id}
+      post 'create', params: { :eportfolio_id => @portfolio.id }
       assert_unauthorized
     end
 
     it "should create entry" do
       user_session(@user)
-      post 'create', params: {:eportfolio_id => @portfolio.id, :eportfolio_entry => {:eportfolio_category_id => @category.id, :name => "some entry"}}
+      post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_entry => { :eportfolio_category_id => @category.id, :name => "some entry" } }
       expect(response).to be_redirect
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).not_to be_nil
@@ -164,13 +164,13 @@ describe EportfolioEntriesController do
   describe "PUT 'update'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
+      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
     it "should update entry" do
       user_session(@user)
-      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => {:name => "new name"}}
+      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => { :name => "new name" } }
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].name).to eql("new name")
@@ -180,13 +180,13 @@ describe EportfolioEntriesController do
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
+      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
     it "should delete entry" do
       user_session(@user)
-      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
+      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry]).to be_frozen
@@ -196,13 +196,13 @@ describe EportfolioEntriesController do
   describe "GET 'attachment'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1}
+      get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1 }
       assert_unauthorized
     end
 
     it "will 404 for bad IDs" do
       user_session(@user)
-      get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
+      get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid }
       expect(response.status).to eq(404)
     end
 
@@ -215,7 +215,7 @@ describe EportfolioEntriesController do
           @user.associate_with_shard(@shard1)
           @a1 = Attachment.create!(user: @user, context: @user, filename: "test.jpg", uploaded_data: StringIO.new("first"))
         end
-        get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => @a1.uuid}
+        get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => @a1.uuid }
       end
     end
   end
@@ -240,9 +240,9 @@ describe EportfolioEntriesController do
     it 'passes anonymize_students: false to the template if the assignment is not anonymous' do
       user_session(@student)
       expect(controller).to receive(:render).with({
-        template: 'submissions/show_preview',
-        locals: { anonymize_students: false }
-      }).and_call_original
+                                                    template: 'submissions/show_preview',
+                                                    locals: { anonymize_students: false }
+                                                  }).and_call_original
 
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
@@ -252,9 +252,9 @@ describe EportfolioEntriesController do
       @assignment.update!(anonymous_grading: true)
       @assignment.post_submissions
       expect(controller).to receive(:render).with({
-        template: 'submissions/show_preview',
-        locals: { anonymize_students: false }
-      }).and_call_original
+                                                    template: 'submissions/show_preview',
+                                                    locals: { anonymize_students: false }
+                                                  }).and_call_original
 
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
@@ -264,9 +264,9 @@ describe EportfolioEntriesController do
       @assignment.update!(anonymous_grading: true)
       @assignment.hide_submissions
       expect(controller).to receive(:render).with({
-        template: 'submissions/show_preview',
-        locals: { anonymize_students: true }
-      }).and_call_original
+                                                    template: 'submissions/show_preview',
+                                                    locals: { anonymize_students: true }
+                                                  }).and_call_original
 
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end

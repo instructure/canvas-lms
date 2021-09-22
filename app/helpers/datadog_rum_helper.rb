@@ -44,6 +44,7 @@ module DatadogRumHelper
     return false unless enabled? && complete_config?
     return @datadog_rum_config_requested if defined?(@datadog_rum_config_requested)
     return false unless @datadog_rum_config_opted_in
+
     @datadog_rum_config_requested = randomly_include?
   end
 

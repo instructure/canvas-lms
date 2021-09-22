@@ -87,6 +87,7 @@ module Services
 
       def perform
         return unless attachment
+
         homework_service.start!
         clone_url_executor.execute(attachment)
 
@@ -116,13 +117,13 @@ module Services
 
       def submit_job(attachment, progress, eula_agreement_timestamp, comment, executor, submit_assignment)
         if progress.context.is_a?(Assignment) && submit_assignment
-          SubmitWorker.
-            new(attachment.id, progress.id, eula_agreement_timestamp, comment, executor).
-            tap { |worker| enqueue_attachment_job(worker) }
+          SubmitWorker
+            .new(attachment.id, progress.id, eula_agreement_timestamp, comment, executor)
+            .tap { |worker| enqueue_attachment_job(worker) }
         else
-          CopyWorker.
-            new(attachment.id, progress.id, executor).
-            tap { |worker| enqueue_attachment_job(worker) }
+          CopyWorker
+            .new(attachment.id, progress.id, executor)
+            .tap { |worker| enqueue_attachment_job(worker) }
         end
       end
 

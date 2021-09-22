@@ -21,10 +21,10 @@ module DataFixup::ChangeImmersiveReaderAllowedOnToOn
   def self.run
     # Site Admin has the flag as STATE_DEFAULT_OFF, but just in case, ignore it here.
     root_accounts_scope = if Account.site_admin&.shard == Shard.current
-      Account.root_accounts.active.where.not(id: Account.site_admin.id)
-    else
-      Account.root_accounts.active
-    end
+                            Account.root_accounts.active.where.not(id: Account.site_admin.id)
+                          else
+                            Account.root_accounts.active
+                          end
 
     allowed_on_flags = FeatureFlag.where(
       context_id: root_accounts_scope,

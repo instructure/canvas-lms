@@ -20,10 +20,9 @@
 require 'spec_helper'
 
 describe MessageBus::MessageId do
-
   describe "parsing and serializing" do
     it "chokes on malformed data" do
-      expect{ MessageBus::MessageId.from_string("not-a-message-id") }.to raise_error(ArgumentError)
+      expect { MessageBus::MessageId.from_string("not-a-message-id") }.to raise_error(ArgumentError)
     end
 
     it "correctly slots each ID value" do
@@ -103,7 +102,7 @@ describe MessageBus::MessageId do
     it "only compares ids from the same partition" do
       mid1 = MessageBus::MessageId.from_string("(140,13,3,0)")
       mid2 = MessageBus::MessageId.from_string("(140,13,2,0)")
-      expect{ mid1 > mid2 }.to raise_error(ArgumentError)
+      expect { mid1 > mid2 }.to raise_error(ArgumentError)
     end
   end
 end

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Plugins::TicketingSystem
-
   # a decorator for ErrorReport that provides some helper
   # methods to massage data on the way out to an external ticketing
   # system.  Used by wrapping the ErrorReport as the single parameter
@@ -28,7 +27,6 @@ module Canvas::Plugins::TicketingSystem
   #
   class CustomError < DelegateClass(::ErrorReport)
     delegate :id, to: :__getobj__
-
 
     # whether sending to a web endpoint, or an email message,
     # this is the canonical way to present a Canvas ErrorReport
@@ -40,7 +38,7 @@ module Canvas::Plugins::TicketingSystem
     #
     # returns Hash
     def to_document
-     {
+      {
         subject: self.subject,
         description: self.comments,
         report_type: self.report_type,
@@ -65,7 +63,7 @@ module Canvas::Plugins::TicketingSystem
       }
     end
 
-    def sub_account_tag(asset_manager=::Context, expected_type=Course)
+    def sub_account_tag(asset_manager = ::Context, expected_type = Course)
       if context_string = self.data['context_asset_string']
         context = asset_manager.find_by_asset_string(context_string)
         if context.is_a? expected_type
@@ -78,8 +76,9 @@ module Canvas::Plugins::TicketingSystem
     # report from the "Posted as _ERROR_" portion of our
     # error report backtrace attribute, but if there's nothing
     # recognizable there it will just assume it's an ERROR
-    def report_type(default_value='ERROR')
+    def report_type(default_value = 'ERROR')
       return default_value unless self.backtrace.present?
+
       first_line = self.backtrace.split("\n").first
       match = first_line.match(/^Posted as[^_]*_([A-Z]*)_/) if first_line.present?
       (match.nil? ? nil : match[1]) || default_value
@@ -106,9 +105,9 @@ module Canvas::Plugins::TicketingSystem
         if url && user_id
           begin
             become_user_uri = URI.parse(url)
-            become_user_uri.query = (Hash[*(become_user_uri.query || '').
-                            split('&').map {|part| part.split('=') }.flatten]).
-                            merge({'become_user_id' => user_id}).to_query
+            become_user_uri.query = (Hash[*(become_user_uri.query || '')
+                            .split('&').map { |part| part.split('=') }.flatten])
+                                    .merge({ 'become_user_id' => user_id }).to_query
           rescue URI::Error => e
             become_user_uri = "unable to parse uri: #{url}"
           end
@@ -121,7 +120,7 @@ module Canvas::Plugins::TicketingSystem
 
     def pretty_http_env
       if http_env && http_env.respond_to?(:each)
-        http_env.map{ |key, val| "#{key}: #{val.inspect}" }.join("\n")
+        http_env.map { |key, val| "#{key}: #{val.inspect}" }.join("\n")
       else
         nil
       end
@@ -130,6 +129,5 @@ module Canvas::Plugins::TicketingSystem
     def raw_report
       self.__getobj__
     end
-
   end
 end

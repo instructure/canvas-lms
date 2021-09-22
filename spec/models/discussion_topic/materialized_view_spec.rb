@@ -109,8 +109,8 @@ describe DiscussionTopic::MaterializedView do
       {
         'id' => @root1.id.to_s,
         'replies' => [
-          { 'id' => @reply1.id.to_s, 'replies' => [ { 'id' => @reply_reply2.id.to_s, 'replies' => [] } ], },
-          { 'id' => @reply2.id.to_s, 'replies' => [ { 'id' => @reply_reply1.id.to_s, 'replies' => [] } ], },
+          { 'id' => @reply1.id.to_s, 'replies' => [{ 'id' => @reply_reply2.id.to_s, 'replies' => [] }], },
+          { 'id' => @reply2.id.to_s, 'replies' => [{ 'id' => @reply_reply1.id.to_s, 'replies' => [] }], },
         ],
       },
       {

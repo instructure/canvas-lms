@@ -19,8 +19,9 @@
 
 module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden,
-    :has_no_overrides, :has_too_many_overrides, :preloaded_override_students
+                :has_no_overrides, :has_too_many_overrides, :preloaded_override_students
   attr_writer :without_overrides
+
   include DifferentiableAssignment
 
   class NotOverriddenError < RuntimeError; end
@@ -45,7 +46,7 @@ module DatesOverridable
   end
 
   # All overrides, not just dates
-  def overrides_for(user, opts={})
+  def overrides_for(user, opts = {})
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, user)
     if opts[:ensure_set_not_empty]
       overrides.select(&:set_not_empty?)
@@ -86,14 +87,14 @@ module DatesOverridable
       observed_student_due_dates(user).length > 1
     elsif context.user_has_been_admin?(user)
       dates = all_dates_visible_to(user)
-      dates && dates.map{ |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
+      dates && dates.map { |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
     elsif context.user_has_no_enrollments?(user)
       all_due_dates.length > 1
     end
   end
 
   def all_due_dates
-    due_at_overrides = assignment_overrides.loaded? ? assignment_overrides.select{|ao| ao.active? && ao.due_at_overridden} : assignment_overrides.active.overriding_due_at
+    due_at_overrides = assignment_overrides.loaded? ? assignment_overrides.select { |ao| ao.active? && ao.due_at_overridden } : assignment_overrides.active.overriding_due_at
     dates = due_at_overrides.map(&:as_hash)
     dates << base_due_date_hash unless differentiated_assignments_applies?
     dates
@@ -105,20 +106,20 @@ module DatesOverridable
   # note that #include?(course_id) will work equivalently on a Hash (of observers)
   # or an array (of admins or students)
   def self.precache_enrollments_for_multiple_assignments(assignments, user)
-    courses_user_has_been_enrolled_in = { observer: {}, student: [], admin: []}
+    courses_user_has_been_enrolled_in = { observer: {}, student: [], admin: [] }
     current_shard = Shard.current
     Shard.partition_by_shard(assignments) do |shard_assignments|
-      Enrollment.where(course_id: shard_assignments.map(&:context), user_id: user).
-          active.
-          distinct.
-          # duplicate the subquery logic of ObserverEnrollment.observed_users, where it verifies the observee exists
-          where("associated_user_id IS NULL OR EXISTS (
+      Enrollment.where(course_id: shard_assignments.map(&:context), user_id: user)
+                .active
+                .distinct.
+        # duplicate the subquery logic of ObserverEnrollment.observed_users, where it verifies the observee exists
+        where("associated_user_id IS NULL OR EXISTS (
             SELECT 1 FROM #{Enrollment.quoted_table_name} e2
             WHERE e2.type IN ('StudentEnrollment', 'StudentViewEnrollment')
              AND e2.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')
              AND e2.user_id=enrollments.associated_user_id
-             AND e2.course_id=enrollments.course_id)").
-          pluck(:course_id, :type, :associated_user_id).each do |(course_id, type, associated_user_id)|
+             AND e2.course_id=enrollments.course_id)")
+                .pluck(:course_id, :type, :associated_user_id).each do |(course_id, type, associated_user_id)|
         relative_course_id = Shard.relative_id_for(course_id, Shard.current, current_shard)
         bucket = case type
                  when 'ObserverEnrollment' then :observer
@@ -144,12 +145,12 @@ module DatesOverridable
       if courses_user_has_been_enrolled_in[:observer][context_id].try(:any?)
         observed_student_due_dates(user, courses_user_has_been_enrolled_in[:observer][context_id].to_a)
       elsif courses_user_has_been_enrolled_in[:student].include?(context_id) ||
-              courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
-              courses_user_has_been_enrolled_in[:observer].include?(context_id)
+            courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
+            courses_user_has_been_enrolled_in[:observer].include?(context_id)
         overrides = overrides_for(user)
         overrides = overrides.map(&:as_hash)
         if !differentiated_assignments_applies? &&
-            (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
+           (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
           overrides << base_due_date_hash
         end
         overrides
@@ -160,8 +161,8 @@ module DatesOverridable
       if ObserverEnrollment.observed_students(context, user).any?
         observed_student_due_dates(user)
       elsif context.user_has_been_student?(user) ||
-          context.user_has_been_admin?(user) ||
-          context.user_has_been_observer?(user)
+            context.user_has_been_admin?(user) ||
+            context.user_has_been_observer?(user)
         overrides = overrides_for(user)
         overrides = overrides.map(&:as_hash)
         if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
@@ -172,14 +173,13 @@ module DatesOverridable
         all_due_dates
       end
     end
-
   end
 
   def observed_student_due_dates(user, observed_student_ids = nil)
     observed_students = if observed_student_ids
-      User.find(observed_student_ids)
+                          User.find(observed_student_ids)
                         else
-      ObserverEnrollment.observed_students(context, user).keys
+                          ObserverEnrollment.observed_students(context, user).keys
                         end
     dates = observed_students.map do |student|
       self.all_dates_visible_to(student)
@@ -192,9 +192,9 @@ module DatesOverridable
 
     if all_dates
       # remove base if all sections are set
-      overrides = all_dates.select{ |d| d[:set_type] == 'CourseSection' }
+      overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
       if overrides.count > 0 && overrides.count == context.active_section_count
-        all_dates.delete_if {|d| d[:base] }
+        all_dates.delete_if { |d| d[:base] }
       end
 
       formatted_dates_hash(all_dates)
@@ -213,7 +213,7 @@ module DatesOverridable
 
     dates = dates.sort_by do |date|
       due_at = date[:due_at]
-      [ due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First ]
+      [due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First]
     end
 
     dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id) }
@@ -224,7 +224,7 @@ module DatesOverridable
     if self.is_a?(Assignment)
       hash.merge!({ :all_day => all_day, :all_day_date => all_day_date })
     elsif self.assignment
-      hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date})
+      hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date })
     end
 
     if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
@@ -241,8 +241,9 @@ module DatesOverridable
     without_overrides.due_date_hash.merge(:base => true)
   end
 
-  def context_module_tag_info(user, context, user_is_admin: false, has_submission: )
+  def context_module_tag_info(user, context, user_is_admin: false, has_submission:)
     return {} unless user
+
     self.association(:context).target ||= context
     tag_info = Rails.cache.fetch_with_batched_keys(
       ["context_module_tag_info3", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
@@ -280,6 +281,7 @@ module DatesOverridable
     def due_date_compare_value(date)
       # due dates are considered equal if they're the same up to the minute
       return nil if date.nil?
+
       date.to_i / 60
     end
 

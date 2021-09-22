@@ -76,12 +76,12 @@ describe OutcomeResultsController do
       user_id: user_id,
       score: score,
       alignment: ContentTag.create!({
-        title: 'content',
-        context: outcome_course,
-        learning_outcome: outcome,
-        content_type: 'Assignment',
-        content_id: assignment.id
-      }),
+                                      title: 'content',
+                                      context: outcome_course,
+                                      learning_outcome: outcome,
+                                      content_type: 'Assignment',
+                                      content_id: assignment.id
+                                    }),
       **opts
     ).tap do |lor|
       lor.association_object = rubric_association
@@ -93,19 +93,19 @@ describe OutcomeResultsController do
   def find_or_create_outcome_submission(opts = {})
     student = opts[:student] || outcome_student
     assignment = opts[:assignment] ||
-      (create_outcome_assignment if opts[:new]) ||
-      outcome_assignment
+                 (create_outcome_assignment if opts[:new]) ||
+                 outcome_assignment
     assignment.find_or_create_submission(student)
   end
 
   def create_outcome_assessment(opts = {})
     association = (create_outcome_rubric_association(opts) if opts[:new]) ||
-      outcome_rubric_association
+                  outcome_rubric_association
     criterion = find_outcome_criterion(association.rubric)
     submission = opts[:submission] || find_or_create_outcome_submission(opts)
     student = submission.student
     points = opts[:points] ||
-      find_first_rating(criterion)[:points]
+             find_first_rating(criterion)[:points]
     association.assess(
       user: student,
       assessor: outcome_teacher,
@@ -137,14 +137,14 @@ describe OutcomeResultsController do
 
   def create_outcome_rubric_association(opts = {})
     rubric = (create_outcome_rubric if opts[:new]) ||
-      outcome_rubric
+             outcome_rubric
     assignment = (create_outcome_assignment if opts[:new]) ||
-      outcome_assignment
+                 outcome_assignment
     rubric.associate_with(assignment, outcome_course, purpose: 'grading', use_for_grading: true)
   end
 
   def find_outcome_criterion(rubric = outcome_rubric)
-    rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
+    rubric.criteria.find { |c| !c[:learning_outcome_id].nil? }
   end
 
   def find_first_rating(criterion = outcome_criterion)
@@ -164,25 +164,25 @@ describe OutcomeResultsController do
       )
       outcome_group.save!
       outcome_group.add_outcome(@outcome)
-      get 'rollups', params: {:context_id => @course.id,
-                      :course_id => @course.id,
-                      :context_type => "Course",
-                      :user_ids => [@student.id],
-                      :outcome_ids => [@outcome.id]},
-                      format: "json"
+      get 'rollups', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [@student.id],
+                               :outcome_ids => [@outcome.id] },
+                     format: "json"
       expect(response).to be_successful
     end
 
     it 'allows specifying both outcome_ids and include[]=outcome_links' do
       user_session(@teacher)
       context_outcome(@course)
-      get 'rollups', params: {context_id: @course.id,
-        course_id: @course.id,
-        context_type: "Course",
-        user_ids: [@student.id],
-        outcome_ids: [@outcome.id],
-        include: ['outcome_links']},
-        format: "json"
+      get 'rollups', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id],
+                               include: ['outcome_links'] },
+                     format: "json"
       expect(response).to be_successful
       json = parse_response(response)
       links = json['linked']['outcome_links']
@@ -192,12 +192,12 @@ describe OutcomeResultsController do
 
     it 'should validate aggregate_stat parameter' do
       user_session(@teacher)
-      get 'rollups', params: {:context_id => @course.id,
-                      :course_id => @course.id,
-                      :context_type => "Course",
-                      aggregate: 'course',
-                      aggregate_stat: 'powerlaw'},
-                      format: "json"
+      get 'rollups', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               aggregate: 'course',
+                               aggregate_stat: 'powerlaw' },
+                     format: "json"
       expect(response).not_to be_successful
     end
 
@@ -208,24 +208,24 @@ describe OutcomeResultsController do
 
       it 'teacher should see result' do
         user_session(@teacher)
-        get 'index', params: {:context_id => @course.id,
-                        :course_id => @course.id,
-                        :context_type => "Course",
-                        :user_ids => [@student.id],
-                        :outcome_ids => [@outcome.id]},
-                        format: "json"
+        get 'index', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [@student.id],
+                               :outcome_ids => [@outcome.id] },
+                     format: "json"
         json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
       end
 
       it 'student should not see result' do
         user_session(@student)
-        get 'index', params: {:context_id => @course.id,
-                        :course_id => @course.id,
-                        :context_type => "Course",
-                        :user_ids => [@student.id],
-                        :outcome_ids => [@outcome.id]},
-                        format: "json"
+        get 'index', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [@student.id],
+                               :outcome_ids => [@outcome.id] },
+                     format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 0
       end
@@ -238,24 +238,24 @@ describe OutcomeResultsController do
 
       it 'teacher should see result' do
         user_session(@teacher)
-        get 'index', params: {:context_id => @course.id,
-                        :course_id => @course.id,
-                        :context_type => "Course",
-                        :user_ids => [@student.id],
-                        :outcome_ids => [@outcome.id]},
-                        format: "json"
+        get 'index', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [@student.id],
+                               :outcome_ids => [@outcome.id] },
+                     format: "json"
         json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
       end
 
       it 'student should see result' do
         user_session(@student)
-        get 'index', params: {:context_id => @course.id,
-                        :course_id => @course.id,
-                        :context_type => "Course",
-                        :user_ids => [@student.id],
-                        :outcome_ids => [@outcome.id]},
-                        format: "json"
+        get 'index', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [@student.id],
+                               :outcome_ids => [@outcome.id] },
+                     format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 1
       end
@@ -267,13 +267,13 @@ describe OutcomeResultsController do
       student1 = @student
       # create a 2nd student that is saved as @student
       student_in_course(active_all: true, course: outcome_course)
-      get 'rollups', params: {:context_id => @course.id,
-                      :course_id => @course.id,
-                      :context_type => "Course",
-                      :user_ids => [student1.id, @student.id],
-                      :outcome_ids => [@outcome.id],
-                      exclude: ['missing_user_rollups']},
-                      format: "json"
+      get 'rollups', params: { :context_id => @course.id,
+                               :course_id => @course.id,
+                               :context_type => "Course",
+                               :user_ids => [student1.id, @student.id],
+                               :outcome_ids => [@outcome.id],
+                               exclude: ['missing_user_rollups'] },
+                     format: "json"
       json = parse_response(response)
       # the rollups requests for both students, but excludes the 2nd student
       # since they do not have any results, unlike the 1st student,
@@ -300,12 +300,12 @@ describe OutcomeResultsController do
 
     def get_rollups(params)
       get 'rollups', params: {
-          :context_id => @course.id,
-          :course_id => @course.id,
-          :context_type => "Course",
-          **params
-        },
-        format: "json"
+        :context_id => @course.id,
+        :course_id => @course.id,
+        :context_type => "Course",
+        **params
+      },
+                     format: "json"
     end
 
     it 'includes rating percents' do
@@ -320,7 +320,7 @@ describe OutcomeResultsController do
         end
 
         it 'uses the default outcome proficiency for points scaling if no outcome proficiency exists' do
-          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           points_possible = OutcomeProficiency.find_or_create_default!(@course.account).points_possible
           score = (2.to_f / 5.to_f) * points_possible
@@ -329,7 +329,7 @@ describe OutcomeResultsController do
 
         it 'uses resolved_outcome_proficiency for points scaling if one exists' do
           proficiency = outcome_proficiency_model(@course)
-          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           score = (2.to_f / 5.to_f) * proficiency.points_possible
           expect(json['rollups'][0]['scores'][0]['score']).to eq score
@@ -351,7 +351,7 @@ describe OutcomeResultsController do
 
         it 'ignores the outcome proficiency for points scaling' do
           proficiency = outcome_proficiency_model(@course)
-          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          res = create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
         end
@@ -362,7 +362,7 @@ describe OutcomeResultsController do
       it 'displays rollups for concluded enrollments when they are included' do
         StudentEnrollment.find_by(user_id: @student2.id).conclude
         json = parse_response(get_rollups({}))
-        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
         expect(rollups.count).to eq(1)
         expect(rollups.first['scores'][0]['score']).to eq 1.0
       end
@@ -370,7 +370,7 @@ describe OutcomeResultsController do
       it 'does not display rollups for concluded enrollments when they are not included' do
         StudentEnrollment.find_by(user_id: @student2.id).conclude
         json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
-        expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+        expect(json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }.count).to eq(0)
       end
 
       it 'displays rollups for a student who has an active and a concluded enrolllment regardless of filter' do
@@ -378,7 +378,7 @@ describe OutcomeResultsController do
         student_in_section section1, user: @student2, allow_multiple_enrollments: true
         StudentEnrollment.find_by(course_section_id: section1.id).conclude
         json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
-        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
         expect(rollups.count).to eq(2)
         expect(rollups.first['scores'][0]['score']).to eq 1.0
         expect(rollups.second['scores'][0]['score']).to eq 1.0
@@ -387,7 +387,7 @@ describe OutcomeResultsController do
       it 'displays rollups for inactive enrollments when they are included' do
         StudentEnrollment.find_by(user_id: @student2.id).deactivate
         json = parse_response(get_rollups({}))
-        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
         expect(rollups.count).to eq(1)
         expect(rollups.first['scores'][0]['score']).to eq 1.0
       end
@@ -395,7 +395,7 @@ describe OutcomeResultsController do
       it 'does not display rollups for inactive enrollments when they are not included' do
         StudentEnrollment.find_by(user_id: @student2.id).deactivate
         json = parse_response(get_rollups(exclude: 'inactive_enrollments'))
-        expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+        expect(json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }.count).to eq(0)
       end
 
       context 'users with enrollments of different enrollment states' do
@@ -408,14 +408,14 @@ describe OutcomeResultsController do
 
         it 'users whose enrollments are all excluded are not included' do
           json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
-          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
           expect(rollups.count).to eq(0)
         end
 
         it 'users whose enrollments are all excluded are not included in a specified section' do
           json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments'],
                                             section_id: @section1.id))
-          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
           expect(rollups.count).to eq(0)
         end
 
@@ -423,7 +423,7 @@ describe OutcomeResultsController do
           section3 = add_section 's3', course: outcome_course
           student_in_section section3, user: @student2, allow_multiple_enrollments: true
           json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
-          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          rollups = json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }
           expect(rollups.count).to eq(3)
           expect(rollups.first['scores'][0]['score']).to eq 1.0
           expect(rollups.second['scores'][0]['score']).to eq 1.0
@@ -456,7 +456,7 @@ describe OutcomeResultsController do
       end
 
       def expect_user_order(rollups, users)
-        rollup_user_ids = rollups.map {|r| r['links']['user'].to_i}
+        rollup_user_ids = rollups.map { |r| r['links']['user'].to_i }
         user_ids = users.map(&:id)
         expect(rollup_user_ids).to eq user_ids
       end
@@ -517,7 +517,6 @@ describe OutcomeResultsController do
           end
         end
 
-
         context 'with pagination' do
           let(:json) { parse_response(response) }
 
@@ -575,17 +574,17 @@ describe OutcomeResultsController do
             context 'should paginate by user, rather than by enrollment' do
               it 'should return student1 on first page' do
                 expect_students_in_pagination(1, [@student1], include: ['users'])
-                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student1.id.to_s]
+                expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student1.id.to_s]
               end
 
               it 'should return student2 on second page' do
                 expect_students_in_pagination(2, [@student2, @student2, @student2], include: ['users'])
-                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student2.id.to_s]
+                expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student2.id.to_s]
               end
 
               it 'should return student3 on third page' do
                 expect_students_in_pagination(3, [@student3, @student3], include: ['users'])
-                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student3.id.to_s]
+                expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student3.id.to_s]
               end
 
               it 'return no student in fourth page' do

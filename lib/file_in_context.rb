@@ -21,8 +21,7 @@
 # Attaches a file generally to another file, using the attachment_fu gateway.
 class FileInContext
   class << self
-
-    def queue_files_to_delete(queue=true)
+    def queue_files_to_delete(queue = true)
       @queue_files_to_delete = queue
     end
 
@@ -38,7 +37,7 @@ class FileInContext
         @queued_files ||= []
         @queued_files += files
       else
-        files.each{ |f| f.destroy }
+        files.each { |f| f.destroy }
       end
     end
 
@@ -76,6 +75,5 @@ class FileInContext
     ensure
       uploaded_data.close if uploaded_data
     end
-
   end
 end

@@ -23,7 +23,7 @@ describe "MediaConverter" do
   class MediaConverterTest
     include CC::Exporter::Epub::Converters::MediaConverter
 
-    def initialize(course={})
+    def initialize(course = {})
       @course = course
     end
 
@@ -106,7 +106,8 @@ describe "MediaConverter" do
 
     it "shouldn't explode with non standard file names" do
       other_doc = Nokogiri::HTML5.fragment(
-        "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>")
+        "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>"
+      )
 
       test_instance.convert_media_paths!(other_doc)
 

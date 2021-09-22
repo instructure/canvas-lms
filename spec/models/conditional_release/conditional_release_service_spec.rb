@@ -202,7 +202,7 @@ describe ConditionalRelease::Service do
         expect(rule_hash['locked']).to eq false
         expect(rule_hash['selected_set_id']).to eq nil # neither one was picked yet
         expect(rule_hash['assignment_sets'].count).to eq 2
-        expect(rule_hash['assignment_sets'].map{|s| s['assignment_set_associations'].first['model']}).to match_array([@set3a_assmt, @set3b_assmt])
+        expect(rule_hash['assignment_sets'].map { |s| s['assignment_set_associations'].first['model'] }).to match_array([@set3a_assmt, @set3b_assmt])
       end
 
       context "caching" do
@@ -243,8 +243,8 @@ describe ConditionalRelease::Service do
       it "should release mastery paths assigned assignments" do
         assmt = assignment_model(course: @course, workflow_state: 'published', only_visible_to_overrides: true)
         assignment_override_model(assignment: assmt,
-          set_type: AssignmentOverride::SET_TYPE_NOOP,
-          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
         tag = @module.add_item(:id => assmt.id, :type => "assignment")
         expect(@course.module_items_visible_to(@student).to_a).to eq []
 
@@ -255,8 +255,8 @@ describe ConditionalRelease::Service do
       it "should release mastery paths assigned ungraded quizzes" do
         quiz = quiz_model(course: @course, quiz_type: "survey", only_visible_to_overrides: true)
         assignment_override_model(quiz: quiz,
-          set_type: AssignmentOverride::SET_TYPE_NOOP,
-          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
         tag = @module.add_item(:id => quiz.id, :type => "quiz")
         expect(@course.module_items_visible_to(@student).to_a).to eq []
 

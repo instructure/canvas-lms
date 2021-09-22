@@ -32,6 +32,7 @@ module Importers
         import_item = migration.import_object?('learning_outcomes', outcome['migration_id'])
         import_item ||= migration.import_object?('learning_outcome_groups', outcome['migration_id']) if selectable_outcomes
         next unless import_item || selectable_outcomes
+
         begin
           if outcome[:type] == 'learning_outcome_group'
             Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration, nil, selectable_outcomes && !import_item)
@@ -44,7 +45,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, migration, item=nil)
+    def self.import_from_migration(hash, migration, item = nil)
       context = migration.context
       hash = hash.with_indifferent_access
       outcome = nil
@@ -92,8 +93,8 @@ module Importers
             return
           end
         else
-          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s).
-            where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s)
+                                  .where(migration_id: hash[:migration_id]).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
           item.mark_as_importing!(migration)
@@ -113,7 +114,7 @@ module Importers
 
         if hash[:ratings]
           unless assessed
-            item.data = {:rubric_criterion=>{}}
+            item.data = { :rubric_criterion => {} }
             item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
             item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
             item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
@@ -143,9 +144,10 @@ module Importers
       end
 
       if hash[:alignments] && !previously_imported
-        alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
+        alignments = hash[:alignments].sort_by { |a| a[:position].to_i }
         alignments.each do |alignment|
           next unless alignment[:content_type] && alignment[:content_id]
+
           asset = nil
 
           case alignment[:content_type]

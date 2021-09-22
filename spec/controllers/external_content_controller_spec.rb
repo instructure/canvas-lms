@@ -20,16 +20,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ExternalContentController do
-
   describe "GET success" do
     it "doesn't require a context" do
-      get :success, params: {service: 'equella'}
+      get :success, params: { service: 'equella' }
       expect(response).to be_successful
     end
 
     it "gets a context for external_tool_dialog" do
       c = course_factory
-      get :success, params: {service: 'external_tool_dialog', course_id: c.id}
+      get :success, params: { service: 'external_tool_dialog', course_id: c.id }
       expect(assigns[:context]).to_not be_nil
     end
   end
@@ -85,10 +84,10 @@ describe ExternalContentController do
       end
 
       it 'turns the messages/logs into strings to prevent HTML injection' do
-        params[:lti_msg] = {html: 'msg somehtml'}
-        params[:lti_log] = {html: 'log somehtml'}
-        params[:lti_errormsg] = {html: 'errormsg somehtml'}
-        params[:lti_errorlog] = {html: 'errorlog somehtml'}
+        params[:lti_msg] = { html: 'msg somehtml' }
+        params[:lti_log] = { html: 'log somehtml' }
+        params[:lti_errormsg] = { html: 'errormsg somehtml' }
+        params[:lti_errorlog] = { html: 'errorlog somehtml' }
 
         post(:success, params: params)
         env = controller.js_env
@@ -107,27 +106,27 @@ describe ExternalContentController do
     end
 
     context 'external_tool service_id' do
-      let(:test_course) {course_factory}
-      let(:launch_url) {'http://test.com/launch'}
+      let(:test_course) { course_factory }
+      let(:launch_url) { 'http://test.com/launch' }
       let(:tool) do
         test_course.context_external_tools.create!(
           {
             name: 'test tool',
-            domain:'test.com',
+            domain: 'test.com',
             consumer_key: oauth_consumer_key,
             shared_secret: 'secret'
           }
         )
       end
-      let(:service_id) {"3"}
-      let(:oauth_consumer_key) {"key"}
+      let(:service_id) { "3" }
+      let(:oauth_consumer_key) { "key" }
       let(:content_item_selection) do
         message = IMS::LTI::Models::Messages::ContentItemSelection.new(
           {
             lti_message_type: 'ContentItemSelection',
             lti_version: 'LTI-1p0',
             content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
-            data: Canvas::Security.create_jwt({content_item_id: service_id, oauth_consumer_key: oauth_consumer_key}),
+            data: Canvas::Security.create_jwt({ content_item_id: service_id, oauth_consumer_key: oauth_consumer_key }),
             lti_msg: '',
             lti_log: '',
             lti_errormsg: '',
@@ -171,51 +170,46 @@ describe ExternalContentController do
       end
 
       it "returns a 401 if the service_id, and data attribute don't match" do
-        params = content_item_selection.signed_post_params(tool.shared_secret).
-            merge(
-              {
-                service: 'external_tool_dialog',
-                course_id: test_course.id,
-                id: 3,
-                data: Canvas::Security.create_jwt({content_item_id: "1"})
-              }
-            )
+        params = content_item_selection.signed_post_params(tool.shared_secret)
+                                       .merge(
+                                         {
+                                           service: 'external_tool_dialog',
+                                           course_id: test_course.id,
+                                           id: 3,
+                                           data: Canvas::Security.create_jwt({ content_item_id: "1" })
+                                         }
+                                       )
         post(:success, params: params)
         expect(response).to have_http_status(:unauthorized)
       end
 
       it "returns a 401 if the consumer_key, and data attribute don't match" do
-        params = content_item_selection.signed_post_params(tool.shared_secret).
-          merge(
-            {
-              service: 'external_tool_dialog',
-              course_id: test_course.id,
-              id: service_id,
-              data: Canvas::Security.create_jwt({content_item_id: service_id, oauth_consumer_key:'invalid'})
-            }
-          )
+        params = content_item_selection.signed_post_params(tool.shared_secret)
+                                       .merge(
+                                         {
+                                           service: 'external_tool_dialog',
+                                           course_id: test_course.id,
+                                           id: service_id,
+                                           data: Canvas::Security.create_jwt({ content_item_id: service_id, oauth_consumer_key: 'invalid' })
+                                         }
+                                       )
         post(:success, params: params)
         expect(response).to have_http_status(:unauthorized)
       end
-
     end
-
-
-
   end
-
 
   describe "#content_items_for_canvas" do
     it 'sets default placement advice' do
       c = course_factory
-      post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-           lti_version: 'LTI-1p0',
-           data: '',
-           content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items_2.json')),
-           lti_msg: '',
-           lti_log: '',
-           lti_errormsg: '',
-           lti_errorlog: ''})
+      post(:success, params: { service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+                               lti_version: 'LTI-1p0',
+                               data: '',
+                               content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items_2.json')),
+                               lti_msg: '',
+                               lti_log: '',
+                               lti_errormsg: '',
+                               lti_errorlog: '' })
 
       data = controller.js_env[:retrieved_data]
       expect(data.first.placement_advice.presentation_document_target).to eq("default")
@@ -228,14 +222,14 @@ describe ExternalContentController do
       json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items_2.json')))
       json['@graph'][0].delete('url')
       launch_url = 'http://example.com/launch'
-      post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-           lti_version: 'LTI-1p0',
-           data: Canvas::Security.create_jwt({default_launch_url: launch_url}),
-           content_items: json.to_json,
-           lti_msg: '',
-           lti_log: '',
-           lti_errormsg: '',
-           lti_errorlog: ''})
+      post(:success, params: { service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+                               lti_version: 'LTI-1p0',
+                               data: Canvas::Security.create_jwt({ default_launch_url: launch_url }),
+                               content_items: json.to_json,
+                               lti_msg: '',
+                               lti_log: '',
+                               lti_errormsg: '',
+                               lti_errorlog: '' })
 
       data = controller.js_env[:retrieved_data]
       expect(data.first.canvas_url).to include "http%3A%2F%2Fexample.com%2Flaunch"
@@ -245,9 +239,9 @@ describe ExternalContentController do
       it "generates a canvas tool launch url" do
         c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
-        post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-             lti_version: 'LTI-1p0' ,
-             content_items: json.to_json})
+        post(:success, params: { service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+                                 lti_version: 'LTI-1p0',
+                                 content_items: json.to_json })
 
         data = controller.js_env[:retrieved_data]
         expect(data.first.canvas_url).to include "/external_tools/retrieve"
@@ -258,9 +252,9 @@ describe ExternalContentController do
         c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
         json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'iframe'
-        post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-             lti_version: 'LTI-1p0' ,
-             content_items: json.to_json})
+        post(:success, params: { service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+                                 lti_version: 'LTI-1p0',
+                                 content_items: json.to_json })
 
         data = controller.js_env[:retrieved_data]
         expect(data.first.canvas_url).to include "display=borderless"
@@ -270,9 +264,9 @@ describe ExternalContentController do
         c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
         json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'window'
-        post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-             lti_version: 'LTI-1p0' ,
-             content_items: json.to_json})
+        post(:success, params: { service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+                                 lti_version: 'LTI-1p0',
+                                 content_items: json.to_json })
 
         data = controller.js_env[:retrieved_data]
         expect(data.first.canvas_url).to include "display=borderless"
@@ -438,6 +432,5 @@ describe ExternalContentController do
         it { is_expected.to redirect_to '/login' }
       end
     end
-
   end
 end

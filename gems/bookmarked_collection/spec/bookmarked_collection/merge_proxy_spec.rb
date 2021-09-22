@@ -47,13 +47,13 @@ describe "BookmarkedCollection::MergeProxy" do
 
       @scope = @example_class.order(:id)
 
-      3.times{ @scope.create! }
+      3.times { @scope.create! }
       @collection = BookmarkedCollection.wrap(MyBookmarker, @scope)
       @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
     end
 
     it "should require per_page parameter" do
-      expect{ @proxy.paginate() }.to raise_error(ArgumentError)
+      expect { @proxy.paginate() }.to raise_error(ArgumentError)
     end
 
     it "should ignore total_entries parameter" do
@@ -92,7 +92,6 @@ describe "BookmarkedCollection::MergeProxy" do
 
     describe "with multiple collections" do
       before :each do
-
         @created_scope = @example_class.where(:state => 'created')
         @deleted_scope = @example_class.where(:state => 'deleted')
 
@@ -110,9 +109,9 @@ describe "BookmarkedCollection::MergeProxy" do
         @created_collection = BookmarkedCollection.wrap(MyBookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(MyBookmarker, @deleted_scope)
         @proxy = BookmarkedCollection::MergeProxy.new([
-          ['created', @created_collection],
-          ['deleted', @deleted_collection]
-        ])
+                                                        ['created', @created_collection],
+                                                        ['deleted', @deleted_collection]
+                                                      ])
       end
 
       it "should interleave" do
@@ -169,9 +168,9 @@ describe "BookmarkedCollection::MergeProxy" do
         created_collection = BookmarkedCollection.wrap(nil_bookmark, @created_scope.order('date DESC, id'))
         deleted_collection = BookmarkedCollection.wrap(nil_bookmark, @deleted_scope.order('date DESC, id'))
         proxy = BookmarkedCollection::MergeProxy.new([
-          ['created', created_collection],
-          ['deleted', deleted_collection]
-        ])
+                                                       ['created', created_collection],
+                                                       ['deleted', deleted_collection]
+                                                     ])
 
         expect(proxy.paginate(:per_page => 5)).to eq([course] + @courses[0, 4])
       end
@@ -180,7 +179,7 @@ describe "BookmarkedCollection::MergeProxy" do
     describe "with a merge proc" do
       before :each do
         @example_class.delete_all
-        @courses = 6.times.map{ @example_class.create! }
+        @courses = 6.times.map { @example_class.create! }
         @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
         @scope2 = @example_class.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 

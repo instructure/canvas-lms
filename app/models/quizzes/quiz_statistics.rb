@@ -26,7 +26,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   has_one :csv_attachment, :class_name => 'Attachment', :as => 'context',
-    :dependent => :destroy
+                           :dependent => :destroy
   has_one :progress, :as => 'context', :dependent => :destroy
 
   scope :report_type, lambda { |type| where(:report_type => type) }
@@ -52,8 +52,8 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   def self.large_quiz?(quiz)
     (quiz.active_quiz_questions.size >
       Setting.get('quiz_statistics_max_questions', DefaultMaxQuestions).to_i) ||
-    (quiz.quiz_submissions.size >
-      Setting.get('quiz_statistics_max_submissions', DefaultMaxSubmissions).to_i)
+      (quiz.quiz_submissions.size >
+        Setting.get('quiz_statistics_max_submissions', DefaultMaxSubmissions).to_i)
   end
 
   def report
@@ -68,10 +68,11 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
         content_type: 'text/csv',
         filename: "quiz_#{report_type}_report.csv",
         display_name: t("%{quiz_title} %{quiz_type} %{report_type} Report", {
-            quiz_title: quiz.title,
-            quiz_type: quiz.readable_type,
-            report_type: readable_type
-          }) + ".csv")
+                          quiz_title: quiz.title,
+                          quiz_type: quiz.readable_type,
+                          report_type: readable_type
+                        }) + ".csv"
+      )
       Attachments::Storage.store_for_attachment(attachment, StringIO.new(report.to_csv))
       attachment.save!
       attachment
@@ -91,8 +92,8 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     progress.save!
 
     progress.process_job(self, :__process_csv_job, {
-      strand: csv_job_strand_id
-    })
+                           strand: csv_job_strand_id
+                         })
   end
 
   def __process_csv_job(progress)

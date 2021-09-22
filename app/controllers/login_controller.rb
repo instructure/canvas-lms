@@ -31,10 +31,10 @@ class LoginController < ApplicationController
 
   def new
     if @current_user &&
-        !params[:force_login] &&
-        !params[:confirm] &&
-        !params[:expected_user_id] &&
-        !session[:used_remember_me_token]
+       !params[:force_login] &&
+       !params[:confirm] &&
+       !params[:expected_user_id] &&
+       !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -68,11 +68,11 @@ class LoginController < ApplicationController
     end
 
     if params[:authentication_provider]
-      auth_type = @domain_root_account.
-        authentication_providers.
-        active.
-        find(params[:authentication_provider]).
-        auth_type
+      auth_type = @domain_root_account
+                  .authentication_providers
+                  .active
+                  .find(params[:authentication_provider])
+                  .auth_type
       params[:id] = params[:authentication_provider] if params[:authentication_provider] != auth_type
     else
       auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
@@ -80,9 +80,9 @@ class LoginController < ApplicationController
     end
 
     unless flash[:delegated_message]
-      return redirect_to url_for({controller: "login/#{auth_type}", action: :new}.
-        merge(params.permit(:id).to_unsafe_h).
-        merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
+      return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
+        .merge(params.permit(:id).to_unsafe_h)
+        .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
     end
 
     # we had an error from an SSO - we need to show it
@@ -136,6 +136,7 @@ class LoginController < ApplicationController
       return render json: { error: I18n.t('Invalid redirect URL') }, status: :bad_request
     end
     return render_unauthorized_action unless return_to.absolute?
+
     host = return_to.host
     return render_unauthorized_action unless host == request.host
 

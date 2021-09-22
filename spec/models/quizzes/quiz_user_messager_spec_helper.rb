@@ -19,7 +19,6 @@
 #
 module Quizzes
   module QuizUserMessagerSpecHelper
-
     def conversation(recipients)
       {
         subject: "Do you want ants?",
@@ -28,7 +27,7 @@ module Quizzes
       }
     end
 
-    def send_message(recipients='all')
+    def send_message(recipients = 'all')
       options = {
         quiz: @quiz,
         sender: @teacher,
@@ -43,6 +42,5 @@ module Quizzes
       recipients = @finder.send("#{target_group}_students")
       recipients.map(&:all_conversations).map(&:size).reduce(:+) || 0
     end
-
   end
 end

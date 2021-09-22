@@ -21,11 +21,10 @@ require_dependency 'importers'
 
 module Importers
   class ContextExternalToolImporter < Importer
-
     self.item_class = ContextExternalTool
 
     def self.process_migration(data, migration)
-      tools = data['external_tools'] ? data['external_tools']: []
+      tools = data['external_tools'] ? data['external_tools'] : []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin
@@ -42,7 +41,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil, persist = true)
+    def self.import_from_migration(hash, context, migration, item = nil, persist = true)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 
@@ -90,11 +89,12 @@ module Importers
         settings[:vendor_extensions] ||= []
         hash[:extensions].each do |ext|
           next unless ext[:custom_fields].is_a? Hash
+
           if existing = settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] }
             existing[:custom_fields] ||= {}
             existing[:custom_fields].merge! ext[:custom_fields]
           else
-            settings[:vendor_extensions] << {:platform => ext[:platform], :custom_fields => ext[:custom_fields]}
+            settings[:vendor_extensions] << { :platform => ext[:platform], :custom_fields => ext[:custom_fields] }
           end
         end
       end
@@ -203,7 +203,7 @@ module Importers
       end
     end
 
-    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool=false)
+    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool = false)
       return if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
       return if migration.migration_type == "canvas_cartridge_importer" && hash[:title] && tool.name != hash[:title]
 
@@ -215,7 +215,7 @@ module Importers
 
       tool_settings = tool.settings.with_indifferent_access.except(:custom_fields, :vendor_extensions)
       if preexisting_tool
-        settings.all? {|k, v| tool_settings[k].presence == v.presence }
+        settings.all? { |k, v| tool_settings[k].presence == v.presence }
       else
         settings == tool_settings
       end

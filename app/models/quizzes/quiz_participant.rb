@@ -43,7 +43,7 @@ class Quizzes::QuizParticipant
   #
   # @return [QuizParticipant]
   #   Participant instance ready for use by Quiz Services.
-  def initialize(user, user_code, access_code=nil, ip_address=nil, token=nil)
+  def initialize(user, user_code, access_code = nil, ip_address = nil, token = nil)
     self.user = user
     self.user_code = user_code
     self.access_code = access_code

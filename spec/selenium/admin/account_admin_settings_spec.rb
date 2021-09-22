@@ -188,7 +188,7 @@ describe "root account basic settings" do
   end
 
   it "should be able to remove account quiz ip filters" do
-    account.ip_filters = {"name" => "192.168.217.1/24"}
+    account.ip_filters = { "name" => "192.168.217.1/24" }
     account.save!
 
     course_with_admin_logged_in
@@ -199,7 +199,7 @@ describe "root account basic settings" do
     account.reload
     expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
 
-    filter = ff('.ip_filter').detect{|fil| fil.displayed?}
+    filter = ff('.ip_filter').detect { |fil| fil.displayed? }
     filter.find_element(:css, '.delete_filter_link').click
 
     expect_new_page_load { submit_form("#account_settings") }

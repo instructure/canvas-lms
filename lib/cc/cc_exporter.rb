@@ -25,12 +25,14 @@ module CC
     ZIP_DIR = 'zip_dir'
 
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
+
     delegate :add_error, :add_item_to_export, :to => :@content_export, :allow_nil => true
 
-    def initialize(content_export, opts={})
+    def initialize(content_export, opts = {})
       @content_export = content_export
       @course = opts[:course] || @content_export.context
       raise "CCExporter supports only Courses" unless @course.is_a?(Course) # a Course is a Course, of course, of course
+
       @user = opts[:user] || @content_export.user
       @export_dir = nil
       @manifest = nil
@@ -38,7 +40,7 @@ module CC
       @zip_name = nil
       @logger = Rails.logger
       @migration_config = ConfigFile.load('external_migration')
-      @migration_config ||= {:keep_after_complete => false}
+      @migration_config ||= { :keep_after_complete => false }
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export && @content_export.qti_export?
       @manifest_opts = opts.slice(:version)
@@ -47,7 +49,7 @@ module CC
       @for_master_migration = true if @content_export && @content_export.for_master_migration?
     end
 
-    def self.export(content_export, opts={})
+    def self.export(content_export, opts = {})
       exporter = CCExporter.new(content_export, opts)
       exporter.export
     end
@@ -74,7 +76,7 @@ module CC
             # if it's selective, we have to wait until we've completed the rest of the export
             # before we really know what we exported. because magic
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
-              :selective => true, :exported_assets => @content_export.exported_assets.to_a)
+                                                                                          :selective => true, :exported_assets => @content_export.exported_assets.to_a)
           end
           external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@content_export, @pending_exports)
           write_external_content(external_content)
@@ -153,7 +155,7 @@ module CC
       @content_export ? @content_export.create_key(*args) : CCHelper.create_key(*args)
     end
 
-    def export_object?(obj, asset_type=nil)
+    def export_object?(obj, asset_type = nil)
       @content_export ? @content_export.export_object?(obj, asset_type) : true
     end
 
@@ -177,7 +179,7 @@ module CC
 
     def copy_all_to_zip
       Dir["#{@export_dir}/**/**"].each do |file|
-        file_path = file.sub(@export_dir+'/', '')
+        file_path = file.sub(@export_dir + '/', '')
         next if file_path.starts_with? ZIP_DIR
 
         @zip_file.add(file_path, file)
@@ -201,7 +203,7 @@ module CC
     end
 
     def create_zip_file
-      name = CanvasTextHelper.truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
+      name = CanvasTextHelper.truncate_text(@course.name.to_url, { :max_length => 200, :ellipsis => '' })
       if @qti_only_export
         @zip_name = "#{name}-quiz-export.zip"
       else
@@ -211,6 +213,5 @@ module CC
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
     end
-
   end
 end

@@ -27,8 +27,8 @@ describe "assignment group that can't manage assignments" do
   it "does not display the manage cog menu" do
     @domain_root_account = Account.default
     course_factory
-    account_admin_user_with_role_changes(:role_changes => {:manage_course => true,
-                                                           :manage_assignments => false})
+    account_admin_user_with_role_changes(:role_changes => { :manage_course => true,
+                                                            :manage_assignments => false })
     user_session(@user)
     @course.require_assignment_group
     @assignment_group = @course.assignment_groups.first
@@ -233,7 +233,7 @@ describe "assignment groups" do
     4.times do |i|
       ags << @course.assignment_groups.create!(name: "group_#{i}")
     end
-    expect(ags.collect(&:position)).to eq [1,2,3,4,5]
+    expect(ags.collect(&:position)).to eq [1, 2, 3, 4, 5]
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
@@ -241,15 +241,15 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     ags.each(&:reload)
-    expect(ags.collect(&:position)).to eq [1,3,2,4,5]
+    expect(ags.collect(&:position)).to eq [1, 3, 2, 4, 5]
   end
 
   context 'quick-adding an assignment to a group' do
     let(:assignment_group) { @course.assignment_groups.first }
     let(:assignment_name) { "Do this" }
     let(:assignment_points) { "13" }
-    let(:time) {Time.zone.local(2018,2,7,4,15)}
-    let(:current_time) {format_time_for_view(time, :medium)}
+    let(:time) { Time.zone.local(2018, 2, 7, 4, 15) }
+    let(:current_time) { format_time_for_view(time, :medium) }
 
     before :each do
       @course.require_assignment_group

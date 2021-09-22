@@ -23,7 +23,7 @@ require 'nokogiri'
 require 'spec_helper'
 
 class HashWithDupCheck < Hash
-  def []=(k,v)
+  def []=(k, v)
     if self.key?(k)
       raise ArgumentError, "key already exists: #{k.inspect}"
     else
@@ -117,16 +117,16 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       end
     end
     allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
-    __send__(method, path, headers: headers, params: params.reject { |k,v| route_params.keys.include?(k.to_sym) }.merge(body_params))
+    __send__(method, path, headers: headers, params: params.reject { |k, v| route_params.keys.include?(k.to_sym) }.merge(body_params))
   end
 end
 
-def follow_pagination_link(rel, params={})
+def follow_pagination_link(rel, params = {})
   links = Api.parse_pagination_links(response.headers['Link'])
-  link = links.find{ |l| l[:rel] == rel }
+  link = links.find { |l| l[:rel] == rel }
   link.delete(:rel)
   uri = link.delete(:uri).to_s
-  link.each{ |key,value| params[key.to_sym] = value }
+  link.each { |key, value| params[key.to_sym] = value }
   api_call(:get, uri, params)
 end
 
@@ -163,7 +163,7 @@ end
 
 # passes the cb a piece of user content html text. the block should return the
 # response from the api for that field, which will be verified for correctness.
-def should_translate_user_content(course, include_verifiers=true)
+def should_translate_user_content(course, include_verifiers = true)
   attachment = attachment_model(:context => course)
   content = %{
     <p>
@@ -199,7 +199,6 @@ def verify_json_error(error, field, code, message = nil)
   expect(error["code"]).to eq code
   expect(error["message"]).to eq message if message
 end
-
 
 # Assert the provided JSON hash complies with the JSON-API format specification.
 #
@@ -243,7 +242,7 @@ end
 #     }
 #
 def assert_jsonapi_compliance(json, primary_set, associations = [])
-  required_keys =  [ primary_set ]
+  required_keys = [primary_set]
 
   if associations.any?
     required_keys.concat associations.map { |s| s.pluralize }

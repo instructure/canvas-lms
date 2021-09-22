@@ -24,19 +24,19 @@ module Lti
   end
 
   class MessageController < ApplicationController
-
     before_action :require_context, :require_user
     skip_before_action :verify_authenticity_token, only: [:registration]
 
     def registration
       if authorized_action(@context, @current_user, :update)
         return head :bad_request if tool_consumer_url.blank?
+
         @lti_launch = Launch.new
         @lti_launch.resource_url = tool_consumer_url
         message = RegistrationRequestService.create_request(
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
-          -> {polymorphic_url([@context, :registration_return])},
+          -> { polymorphic_url([@context, :registration_return]) },
           tool_consumer_url,
           polymorphic_url([:create, @context, :lti_tool_proxy])
         )
@@ -84,6 +84,7 @@ module Lti
     def resource
       lti_link = Link.find_by(resource_link_id: params[:resource_link_id])
       return not_found if lti_link.blank?
+
       basic_launch_by_lti_link(lti_link)
     end
 
@@ -91,6 +92,7 @@ module Lti
       if (message_handler = MessageHandler.find(params[:message_handler_id]))
         return lti2_basic_launch(message_handler)
       end
+
       not_found
     end
 
@@ -122,7 +124,7 @@ module Lti
     end
 
     def launch_params(tool_proxy:, message:, private_key:)
-      if tool_proxy.security_profiles.find {|sp| sp.security_profile_name == 'lti_jwt_message_security'}
+      if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security' }
         message.roles = message.roles.split(',') if message.roles
         message.launch_url = Addressable::URI.escape(message.launch_url)
         { jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256) }
@@ -134,19 +136,20 @@ module Lti
 
     def assignment
       @_assignment ||= if params[:assignment_id].present?
-        @context.try(:active_assignments)&.find(params[:assignment_id])
-      elsif params[:module_item_id].present?
-        tag = ContentTag.not_deleted.find_by(id: params[:module_item_id])
-        (tag&.context_type == 'Assignment' && tag.context.context == @context) ? tag.context : nil
-      elsif params[:secure_params].present?
-        assignment = Assignment.from_secure_lti_params(params[:secure_params])
-        assignment&.root_account == @context.root_account ? assignment : nil
-      end
+                         @context.try(:active_assignments)&.find(params[:assignment_id])
+                       elsif params[:module_item_id].present?
+                         tag = ContentTag.not_deleted.find_by(id: params[:module_item_id])
+                         (tag&.context_type == 'Assignment' && tag.context.context == @context) ? tag.context : nil
+                       elsif params[:secure_params].present?
+                         assignment = Assignment.from_secure_lti_params(params[:secure_params])
+                         assignment&.root_account == @context.root_account ? assignment : nil
+                       end
     end
 
     def launch_url(resource_url, message_handler)
       if resource_url.present?
         return resource_url if message_handler.valid_resource_url?(resource_url)
+
         raise InvalidDomain, I18n.t("resource url must match the resource handler's domain")
       end
       message_handler.launch_path
@@ -157,6 +160,7 @@ module Lti
       if message_handler.present?
         return lti2_basic_launch(message_handler, lti_link)
       end
+
       not_found
     rescue InvalidDomain => e
       return render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
@@ -242,8 +246,8 @@ module Lti
       end
       account_ids = @context.account_chain.map(&:id)
       bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.each_with_object({}) {|binding, hash| hash[binding.context_id] = binding}
-      sorted_bindings = account_ids.map {|account_id| binding_lookup[account_id]}
+      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
+      sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end
 
@@ -257,8 +261,8 @@ module Lti
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
-      params = %w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url )
-      if parameters && (parameters.map {|p| p['variable']}.compact & params).any?
+      params = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
+      if parameters && (parameters.map { |p| p['variable'] }.compact & params).any?
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,
@@ -295,6 +299,5 @@ module Lti
     def find_tag
       @context.context_module_tags.not_deleted.where(id: params[:module_item_id]).first if params[:module_item_id]
     end
-
   end
 end

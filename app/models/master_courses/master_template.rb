@@ -62,7 +62,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def set_defaults
     unless self.default_restrictions.present?
-      self.default_restrictions = {:content => true}
+      self.default_restrictions = { :content => true }
     end
   end
 
@@ -81,21 +81,21 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       if self.saved_change_to_use_default_restrictions_by_type? || self.saved_change_to_default_restrictions_by_type?
         MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
           new_type_restrictions = self.default_restrictions_by_type[type] || {}
-          count = self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).
-            update_all(:restrictions => new_type_restrictions)
+          count = self.master_content_tags.where(:use_default_restrictions => true, :content_type => type)
+                      .update_all(:restrictions => new_type_restrictions)
           next unless count > 0
 
           old_type_restrictions = self.default_restrictions_by_type_before_last_save[type] || {}
-          if new_type_restrictions.any?{|setting, locked| locked && !old_type_restrictions[setting]} # tightened restrictions
+          if new_type_restrictions.any? { |setting, locked| locked && !old_type_restrictions[setting] } # tightened restrictions
             self.touch_all_content_for_tags(type)
           end
         end
       end
     else
       if self.saved_change_to_default_restrictions?
-        count = self.master_content_tags.where(:use_default_restrictions => true).
-          update_all(:restrictions => self.default_restrictions)
-        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_before_last_save[setting]} # tightened restrictions
+        count = self.master_content_tags.where(:use_default_restrictions => true)
+                    .update_all(:restrictions => self.default_restrictions)
+        if count > 0 && self.default_restrictions.any? { |setting, locked| locked && !self.default_restrictions_before_last_save[setting] } # tightened restrictions
           self.touch_all_content_for_tags
         end
       end
@@ -104,21 +104,21 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def destroy_subscriptions_later
     delay_if_production(n_strand: ["master_courses_destroy_subscriptions", self.course.global_root_account_id],
-      priority: Delayed::LOW_PRIORITY).destroy_subscriptions
+                        priority: Delayed::LOW_PRIORITY).destroy_subscriptions
   end
 
   def destroy_subscriptions
     self.child_subscriptions.active.each(&:destroy)
   end
 
-  def touch_all_content_for_tags(only_content_type=nil)
+  def touch_all_content_for_tags(only_content_type = nil)
     content_types = only_content_type ?
       [only_content_type] :
       self.master_content_tags.where(:use_default_restrictions => true).distinct.pluck(:content_type)
     content_types.each do |content_type|
       klass = content_type.constantize
       klass.where(klass.primary_key => self.master_content_tags.where(:use_default_restrictions => true,
-        :content_type => content_type).select(:content_id)).touch_all
+                                                                      :content_type => content_type).select(:content_id)).touch_all
     end
   end
 
@@ -131,7 +131,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     if self.default_restrictions_by_type_changed?
       if (self.default_restrictions_by_type.keys - MasterCourses::RESTRICTED_OBJECT_TYPES).any?
         self.errors.add(:default_restrictions_by_type, "Invalid content type")
-      elsif self.default_restrictions_by_type.values.any?{|k, v| (k.keys - MasterCourses::LOCK_TYPES).any?}
+      elsif self.default_restrictions_by_type.values.any? { |k, v| (k.keys - MasterCourses::LOCK_TYPES).any? }
         self.errors.add(:default_restrictions_by_type, "Invalid settings")
       end
     end
@@ -184,16 +184,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     course_id = course_id.id if course_id.is_a?(Course)
     mt_table = self.table_name
     cs_table = MasterCourses::ChildSubscription.table_name
-    Course.joins("INNER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} ON #{mt_table}.course_id=courses.id AND #{mt_table}.workflow_state='active'").
-      joins("INNER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} ON #{cs_table}.master_template_id=#{mt_table}.id AND #{cs_table}.workflow_state='active'").
-      where("#{cs_table}.child_course_id = ?", course_id).first
+    Course.joins("INNER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} ON #{mt_table}.course_id=courses.id AND #{mt_table}.workflow_state='active'")
+          .joins("INNER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} ON #{cs_table}.master_template_id=#{mt_table}.id AND #{cs_table}.workflow_state='active'")
+          .where("#{cs_table}.child_course_id = ?", course_id).first
   end
 
   def self.preload_index_data(templates)
-    child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).
-      joins(:child_course).where.not(:courses => {:workflow_state => "deleted"}).group(:master_template_id).count
-    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed").
-      order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at"))]
+    child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates)
+                                                   .joins(:child_course).where.not(:courses => { :workflow_state => "deleted" }).group(:master_template_id).count
+    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
+                                                           .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at"))]
 
     templates.each do |template|
       template.child_course_count = child_counts[template.id] || 0
@@ -205,7 +205,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     "#{MasterCourses::MIGRATION_ID_PREFIX}#{shard_id}_#{id}_"
   end
 
-  def migration_id_for(obj, prepend="")
+  def migration_id_for(obj, prepend = "")
     if obj.is_a?(Assignment) && submittable = obj.submittable_object
       obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
     end
@@ -271,14 +271,15 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def deletions_since_last_export
     return {} unless last_export_started_at
+
     deletions_by_type = {}
     MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
-      when 'Attachment'
-        course.attachments.where(:file_state => 'deleted')
-      else
-        klass.constantize.where(:context_id => course, :context_type => 'Course', :workflow_state => 'deleted')
-      end
+                   when 'Attachment'
+                     course.attachments.where(:file_state => 'deleted')
+                   else
+                     klass.constantize.where(:context_id => course, :context_type => 'Course', :workflow_state => 'deleted')
+                   end
       item_scope = item_scope.where('updated_at>?', last_export_started_at).select(:id)
       deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
       deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
@@ -298,14 +299,14 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def default_restrictions_by_type_for_api
-    default_restrictions_by_type.map{|k, v| [k.constantize.table_name.singularize, v] }.to_h
+    default_restrictions_by_type.map { |k, v| [k.constantize.table_name.singularize, v] }.to_h
   end
 
-  def self.create_associations_from_sis(root_account, associations, messages, migrating_user=nil)
+  def self.create_associations_from_sis(root_account, associations, messages, migrating_user = nil)
     associations.keys.each_slice(50) do |master_sis_ids|
-      templates = self.active.for_full_course.joins(:course).
-        where(:courses => {:root_account_id => root_account, :sis_source_id => master_sis_ids}).
-        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id, courses.account_id AS account_id").to_a
+      templates = self.active.for_full_course.joins(:course)
+                      .where(:courses => { :root_account_id => root_account, :sis_source_id => master_sis_ids })
+                      .select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id, courses.account_id AS account_id").to_a
       if templates.count != master_sis_ids.count
         (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
           associations[missing_id].each do |target_course_id|
@@ -314,18 +315,17 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
       end
 
-
       templates.each do |template|
         needs_migration = false
         associations[template.sis_source_id].each_slice(50) do |associated_sis_ids|
-          data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses.
-            joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").
-            joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
-              caa.course_id=courses.id AND caa.account_id = ?", template.account_id])).
-            pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
+          data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses
+                             .joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'")
+                             .joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
+              caa.course_id=courses.id AND caa.account_id = ?", template.account_id]))
+                             .pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
 
           if data.count != associated_sis_ids
-            (associated_sis_ids - data.map{|r| r[1]}).each do |invalid_id|
+            (associated_sis_ids - data.map { |r| r[1] }).each do |invalid_id|
               messages << "Cannot associate course \"#{invalid_id}\" - is a blueprint course"
             end
           end

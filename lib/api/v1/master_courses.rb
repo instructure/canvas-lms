@@ -20,17 +20,17 @@
 module Api::V1::MasterCourses
   include Api::V1::User
 
-  def master_template_json(template, user, session, opts={})
+  def master_template_json(template, user, session, opts = {})
     hash = api_json(template, user, session, :only => %w(id course_id), :methods => %w{last_export_completed_at associated_course_count})
     migration = template.active_migration
     hash[:latest_migration] = master_migration_json(migration, user, session) if migration
     hash
   end
 
-  def master_migration_json(migration, user, session, opts={})
+  def master_migration_json(migration, user, session, opts = {})
     migration.expire_if_necessary!
     hash = api_json(migration, user, session,
-      :only => %w(id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment))
+                    :only => %w(id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment))
     if opts[:subscription]
       hash['subscription_id'] = opts[:subscription].id
     else
@@ -44,21 +44,21 @@ module Api::V1::MasterCourses
   def changed_asset_json(asset, action, locked, migration_id = nil, exceptions = {})
     asset_type = asset.class_name.underscore.sub(/^.+\//, '')
     url = case asset.class_name
-    when 'Attachment'
-      course_file_url(:course_id => asset.context.id, :id => asset.id)
-    when 'Quizzes::Quiz'
-      course_quiz_url(:course_id => asset.context.id, :id => asset.id)
-    when 'AssessmentQuestionBank'
-      course_question_bank_url(:course_id => asset.context.id, :id => asset.id)
-    when 'ContextExternalTool'
-      course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
-    when 'LearningOutcome'
-      course_outcome_url(:course_id => asset.context&.id || @course.id, :id => asset.id)
-    when 'LearningOutcomeGroup'
-      course_outcome_group_url(:course_id => asset.context.id, :id => asset.id)
-    else
-      polymorphic_url([asset.context, asset])
-    end
+          when 'Attachment'
+            course_file_url(:course_id => asset.context.id, :id => asset.id)
+          when 'Quizzes::Quiz'
+            course_quiz_url(:course_id => asset.context.id, :id => asset.id)
+          when 'AssessmentQuestionBank'
+            course_question_bank_url(:course_id => asset.context.id, :id => asset.id)
+          when 'ContextExternalTool'
+            course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
+          when 'LearningOutcome'
+            course_outcome_url(:course_id => asset.context&.id || @course.id, :id => asset.id)
+          when 'LearningOutcomeGroup'
+            course_outcome_group_url(:course_id => asset.context.id, :id => asset.id)
+          else
+            polymorphic_url([asset.context, asset])
+          end
 
     asset_name = Context.asset_name(asset)
 
@@ -74,7 +74,7 @@ module Api::V1::MasterCourses
     json
   end
 
-  def changed_syllabus_json(course, exceptions=nil)
+  def changed_syllabus_json(course, exceptions = nil)
     {
       asset_id: course.id,
       asset_type: 'syllabus',
@@ -99,7 +99,7 @@ module Api::V1::MasterCourses
     }
   end
 
-  def course_summary_json(course, opts={})
+  def course_summary_json(course, opts = {})
     can_read_sis = opts[:can_read_sis] || course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
     hash = api_json(course, @current_user, session, :only => %w{id name course_code})
     hash['sis_course_id'] = course.sis_source_id if can_read_sis

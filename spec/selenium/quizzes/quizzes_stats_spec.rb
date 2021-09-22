@@ -25,7 +25,6 @@ describe 'quizzes stats' do
   include QuizzesCommon
 
   context 'as a teacher' do
-
     before do
       course_with_teacher_logged_in
     end
@@ -62,7 +61,6 @@ describe 'quizzes stats' do
 
         expect(f('ul.page-action-list')).not_to include_text('Quiz Statistics')
       end
-
     end
 
     context 'stats page' do

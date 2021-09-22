@@ -21,7 +21,6 @@
 require 'spec_helper'
 
 describe BookmarkedCollection::SimpleBookmarker do
-
   before do
     @example_class = Class.new(ActiveRecord::Base) do
       self.table_name = 'examples'
@@ -34,7 +33,7 @@ describe BookmarkedCollection::SimpleBookmarker do
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
     @date_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)
     @custom_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
-      {:unbobbed_name => {:type => :string, :null => false}}, :id)
+                                                                    { :unbobbed_name => { :type => :string, :null => false } }, :id)
 
     @bob = @example_class.create!(name: "bob")
     @bob2 = @example_class.create!(name: "Bob", date: DateTime.now.to_s)
@@ -55,13 +54,13 @@ describe BookmarkedCollection::SimpleBookmarker do
 
   context "#validate" do
     it "should validate the bookmark and its contents" do
-      expect(@bookmarker.validate({name: "bob", id: 1})).to be_falsey
+      expect(@bookmarker.validate({ name: "bob", id: 1 })).to be_falsey
       expect(@bookmarker.validate(["bob"])).to be_falsey
       expect(@bookmarker.validate(["bob", "1"])).to be_falsey
       expect(@bookmarker.validate(["bob", 1])).to be_truthy
 
       # With dates
-      expect(@date_bookmarker.validate({date: DateTime.now.to_s, id: 1})).to be_falsey
+      expect(@date_bookmarker.validate({ date: DateTime.now.to_s, id: 1 })).to be_falsey
       expect(@date_bookmarker.validate(["bob"])).to be_falsey
       expect(@date_bookmarker.validate([DateTime.now, 1])).to eq true
       expect(@date_bookmarker.validate([DateTime.now.to_s, 1])).to eq true
@@ -114,7 +113,7 @@ describe BookmarkedCollection::SimpleBookmarker do
 
     it "should skip collation if specified" do
       @non_collated_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
-        {:name => {:skip_collation => true}}, :id)
+                                                                            { :name => { :skip_collation => true } }, :id)
       pager = double(current_bookmark: nil)
       expect(BookmarkedCollection).to receive(:best_unicode_collation_key).never
       expect(@non_collated_bookmarker.restrict_scope(@example_class, pager)).to eq(
@@ -139,5 +138,4 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
   end
-
 end

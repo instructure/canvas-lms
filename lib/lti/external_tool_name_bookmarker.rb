@@ -38,10 +38,10 @@ module Lti
         scope = scope.where(
           " (#{name_collation_key} = #{placeholder_collation_key} AND context_external_tools.id #{comparison} ?) "\
           "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[0], bookmark[1], bookmark[0])
+          bookmark[0], bookmark[1], bookmark[0]
+        )
       end
       scope
     end
-
   end
 end

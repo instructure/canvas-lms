@@ -117,10 +117,11 @@ module Importers
     def resolve_module_item_query(context, query)
       return query unless query&.include?("module_item_id=")
 
-      original_param = query.sub("?", "").split("&").detect{|p| p.include?("module_item_id=")}
+      original_param = query.sub("?", "").split("&").detect { |p| p.include?("module_item_id=") }
       mig_id = original_param.split("=").last
       tag = context.context_module_tags.where(:migration_id => mig_id).first
       return query unless tag
+
       new_param = "module_item_id=#{tag.id}"
       query.sub(original_param, new_param)
     end
@@ -173,7 +174,7 @@ module Importers
           params = Rack::Utils.parse_nested_query(qs.presence || "")
           qs = []
           new_action = ""
-          params.each do |k,v|
+          params.each do |k, v|
             case k
             when /canvas_qs_(.*)/
               qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"

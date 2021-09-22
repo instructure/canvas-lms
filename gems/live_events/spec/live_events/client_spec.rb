@@ -24,11 +24,11 @@ require 'aws-sdk-kinesis'
 describe LiveEvents::Client do
   def stub_config(opts = {})
     allow(LiveEvents::Client).to receive(:config).and_return({
-      'kinesis_stream_name' => 'stream',
-      'aws_access_key_id' => 'access_key',
-      'aws_secret_access_key_dec' => 'secret_key',
-      'aws_region' => 'us-east-1'
-    })
+                                                               'kinesis_stream_name' => 'stream',
+                                                               'aws_access_key_id' => 'access_key',
+                                                               'aws_secret_access_key_dec' => 'secret_key',
+                                                               'aws_region' => 'us-east-1'
+                                                             })
   end
 
   class FakeStreamClient
@@ -84,8 +84,8 @@ describe LiveEvents::Client do
 
     it "should correctly parse the endpoint" do
       res = LiveEvents::Client.aws_config({
-        "aws_endpoint" => "http://example.com:6543/"
-      })
+                                            "aws_endpoint" => "http://example.com:6543/"
+                                          })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
       LiveEvents.worker.stop!
@@ -93,22 +93,22 @@ describe LiveEvents::Client do
 
     it "should ignore invalid endpoints" do
       res = LiveEvents::Client.aws_config({
-        "aws_endpoint" => "example.com:6543/"
-      })
+                                            "aws_endpoint" => "example.com:6543/"
+                                          })
 
       expect(res.key?(:endpoint)).to eq false
       LiveEvents.worker.stop!
     end
 
     it "should load custom creds" do
-      LiveEvents.aws_credentials = -> (settings) {
+      LiveEvents.aws_credentials = ->(settings) {
         settings['value_to_return']
       }
 
       res = LiveEvents::Client.aws_config({
-        'custom_aws_credentials' => 'true',
-        'value_to_return' => 'a_value'
-      })
+                                            'custom_aws_credentials' => 'true',
+                                            'value_to_return' => 'a_value'
+                                          })
 
       expect(res[:credentials]).to eq('a_value')
       LiveEvents.worker.stop!
@@ -170,15 +170,15 @@ describe LiveEvents::Client do
       @client.post_event('event', {}, now, {}, "123")
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3)
-          },
-          "body" => {}
-        },
-        partition_key: "123"
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3)
+                             },
+                             "body" => {}
+                           },
+                           partition_key: "123"
+                         }])
     end
 
     it "should include attributes when supplied via ctx" do
@@ -187,19 +187,19 @@ describe LiveEvents::Client do
       @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123,
-            "real_user_id" => 321,
-            "login" => 'loginname',
-            "user_agent" => 'agent'
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123,
+                               "real_user_id" => 321,
+                               "login" => 'loginname',
+                               "user_agent" => 'agent'
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
 
     it "should not send blacklisted conxted attributes" do
@@ -213,19 +213,19 @@ describe LiveEvents::Client do
       )
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123,
-            "real_user_id" => 321,
-            "login" => 'loginname',
-            "user_agent" => 'agent'
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123,
+                               "real_user_id" => 321,
+                               "login" => 'loginname',
+                               "user_agent" => 'agent'
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
   end
 
@@ -245,16 +245,16 @@ describe LiveEvents::Client do
       )
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
 
     it "should clear context on clear_context!" do

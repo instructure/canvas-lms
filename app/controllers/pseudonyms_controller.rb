@@ -61,10 +61,12 @@ class PseudonymsController < ApplicationController
 
     if @context.is_a?(Account)
       return unless context_is_root_account?
+
       scope = @context.pseudonyms.active.where(:user_id => @user)
       @pseudonyms = Api.paginate(
         scope,
-        self, api_v1_account_pseudonyms_url)
+        self, api_v1_account_pseudonyms_url
+      )
     else
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)
       @pseudonyms = ShardedBookmarkedCollection.build(bookmark, @user.pseudonyms.shard(@user).active.order(:id))
@@ -104,6 +106,7 @@ class PseudonymsController < ApplicationController
         found = false
         Shard.partition_by_shard([@domain_root_account.id] + @domain_root_account.trusted_account_ids) do |account_ids|
           next unless cc.user.associated_shards.include?(Shard.current)
+
           if Pseudonym.active.where(user_id: cc.user_id, account_id: account_ids).exists?
             found = true
             break
@@ -121,8 +124,8 @@ class PseudonymsController < ApplicationController
         cc.forgot_password!
       end
       format.html { redirect_to(canvas_login_url) }
-      format.json { render :json => {:requested => true} }
-      format.js { render :json => {:requested => true} }
+      format.json { render :json => { :requested => true } }
+      format.js { render :json => { :requested => true } }
     end
   end
 
@@ -141,16 +144,16 @@ class PseudonymsController < ApplicationController
         flash[:error] = t 'The link you used has expired. Click "Forgot Password?" to get a new reset-password link.'
         redirect_to canvas_login_url
       end
-      @password_pseudonyms = @cc.user.pseudonyms.active_only.select{|p| p.account.canvas_authentication? }
+      @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
-             :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
+             :PASSWORD_POLICIES => Hash[@password_pseudonyms.map { |p| [p.id, p.account.password_policy] }]
     end
   end
 
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce]).
-        where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first
+    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce])
+                       .where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -169,10 +172,10 @@ class PseudonymsController < ApplicationController
         @pseudonym_session = PseudonymSession.new(@pseudonym, true)
         render :json => @pseudonym, :status => :ok # -> dashboard
       else
-        render :json => {:pseudonym => @pseudonym.errors.as_json[:errors]}, :status => :bad_request
+        render :json => { :pseudonym => @pseudonym.errors.as_json[:errors] }, :status => :bad_request
       end
     else
-      render :json => {:errors => {:nonce => 'expired'}}, :status => :bad_request # -> login url
+      render :json => { :errors => { :nonce => 'expired' } }, :status => :bad_request # -> login url
     end
   end
 
@@ -228,6 +231,7 @@ class PseudonymsController < ApplicationController
 
     if api_request?
       return unless context_is_root_account?
+
       @account = @context
       params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password]
@@ -327,11 +331,13 @@ class PseudonymsController < ApplicationController
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
+
       params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]
       params[:pseudonym] = params[:login]
     else
       return unless get_user
+
       @pseudonym = Pseudonym.active.find(params[:id])
       raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     end
@@ -372,6 +378,7 @@ class PseudonymsController < ApplicationController
   #   }
   def destroy
     return unless get_user
+
     @pseudonym = Pseudonym.active.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     return unless authorized_action(@pseudonym, @current_user, :delete)
@@ -389,6 +396,7 @@ class PseudonymsController < ApplicationController
   end
 
   protected
+
   def context_is_root_account?
     if @context.root_account?
       true
@@ -400,9 +408,10 @@ class PseudonymsController < ApplicationController
 
   def find_authentication_provider
     return true unless params[:pseudonym][:authentication_provider_id]
-    params[:pseudonym][:authentication_provider] = @domain_root_account.
-      authentication_providers.active.
-      find(params[:pseudonym][:authentication_provider_id])
+
+    params[:pseudonym][:authentication_provider] = @domain_root_account
+                                                   .authentication_providers.active
+                                                   .find(params[:pseudonym][:authentication_provider_id])
   end
 
   def update_pseudonym_from_params

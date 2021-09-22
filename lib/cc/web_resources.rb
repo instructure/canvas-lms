@@ -41,6 +41,7 @@ module CC
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], :exporter => @manifest.exporter) do |file, folder_names|
         begin
           next if file.display_name.blank?
+
           if file.is_a? Folder
             dir = File.join(folder_names[1..-1])
             files_with_metadata[:folders] << [file, dir] if file_or_folder_restricted?(file)
@@ -54,9 +55,9 @@ module CC
             files_with_metadata[:files] << [file, migration_id]
           end
           @resources.resource(
-                  "type" => CCHelper::WEBCONTENT,
-                  :identifier => migration_id,
-                  :href => path
+            "type" => CCHelper::WEBCONTENT,
+            :identifier => migration_id,
+            :href => path
           ) do |res|
             if file.locked || file.usage_rights
               res.metadata do |meta_node|
@@ -85,7 +86,7 @@ module CC
                 end
               end
             end
-            res.file(:href=>path)
+            res.file(:href => path)
           end
         rescue
           title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
@@ -103,13 +104,13 @@ module CC
     def add_meta_info_for_files(files)
       files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), 'w')
       rel_path = files_meta_path
-      document = Builder::XmlMarkup.new(:target=>files_file, :indent=>2)
+      document = Builder::XmlMarkup.new(:target => files_file, :indent => 2)
 
       document.instruct!
       document.fileMeta(
-          "xmlns" => CCHelper::CANVAS_NAMESPACE,
-          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |root_node|
         if !files[:folders].empty?
           root_node.folders do |folders_node|
@@ -157,29 +158,29 @@ module CC
           stream.write mt.content
         end
         @resources.resource(
-            "type" => CCHelper::WEBCONTENT,
-            :identifier => track_id,
-            :href => mt_path
+          "type" => CCHelper::WEBCONTENT,
+          :identifier => track_id,
+          :href => mt_path
         ) do |res|
           res.file(:href => mt_path)
         end
         tracks[media_file_migration_id] ||= []
         tracks[media_file_migration_id] << {
-            kind: mt.kind,
-            locale: mt.locale,
-            identifierref: track_id
+          kind: mt.kind,
+          locale: mt.locale,
+          identifierref: track_id
         }
       end
     end
 
     def add_tracks(track_map)
       tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), 'w')
-      document = Builder::XmlMarkup.new(:target=>tracks_file, :indent=>2)
+      document = Builder::XmlMarkup.new(:target => tracks_file, :indent => 2)
       document.instruct!
       document.media_tracks(
-          "xmlns" => CCHelper::CANVAS_NAMESPACE,
-          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |root_node|
         track_map.each do |file_id, track_list|
           # <media identifierref='(media file resource id)'>
@@ -233,22 +234,23 @@ module CC
           # download from kaltura if the file wasn't already exported here in add_course_files
           if !@added_attachments || @added_attachments[obj.attachment_id] != path
             unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-              url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
+                   url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
               add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
               next
             end
 
             CanvasHttp.get(url) do |http_response|
               raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+
               @zip_file.get_output_stream(path) do |stream|
                 http_response.read_body(stream)
               end
             end
 
             @resources.resource(
-                    "type" => CCHelper::WEBCONTENT,
-                    :identifier => migration_id,
-                    :href => path
+              "type" => CCHelper::WEBCONTENT,
+              :identifier => migration_id,
+              :href => path
             ) do |res|
               res.file(:href => path)
             end

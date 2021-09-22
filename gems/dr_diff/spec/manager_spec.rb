@@ -23,7 +23,7 @@ module DrDiff
   describe Manager do
     describe ".files" do
       let(:git_files_output) do
-%{lib/dr_diff.rb
+        %{lib/dr_diff.rb
 spec/dr_diff_spec.rb}
       end
 
@@ -71,11 +71,11 @@ spec/dr_diff_spec.rb}
 
       let(:command_capture_comments) do
         [
-          {:path=>"gems/plugins/custom_reports/lib/custom_reports.rb",
-           :message=>
+          { :path => "gems/plugins/custom_reports/lib/custom_reports.rb",
+            :message =>
              "[rubocop] Avoid using sleep.\n\n       sleep 1\n       ^^^^^^^\n",
-           :position=>5,
-           :severity=>"warn"}
+            :position => 5,
+            :severity => "warn" }
         ]
       end
 

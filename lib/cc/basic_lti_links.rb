@@ -24,6 +24,7 @@ module CC
 
       @course.context_external_tools.active.each do |tool|
         next unless export_object?(tool)
+
         add_exported_asset(tool)
 
         migration_id = create_key(tool)
@@ -31,17 +32,17 @@ module CC
         lti_file_name = "#{migration_id}.xml"
         lti_path = File.join(@export_dir, lti_file_name)
         lti_file = File.new(lti_path, 'w')
-        lti_doc = Builder::XmlMarkup.new(:target=>lti_file, :indent=>2)
+        lti_doc = Builder::XmlMarkup.new(:target => lti_file, :indent => 2)
 
         create_blti_link(tool, lti_doc)
 
         lti_file.close
 
         @resources.resource(
-                :identifier => migration_id,
-                "type" => CCHelper::BASIC_LTI
+          :identifier => migration_id,
+          "type" => CCHelper::BASIC_LTI
         ) do |res|
-          res.file(:href=>lti_file_name)
+          res.file(:href => lti_file_name)
         end
       end
     end
@@ -52,12 +53,11 @@ module CC
                                       "xmlns:blti" => 'http://www.imsglobal.org/xsd/imsbasiclti_v1p0',
                                       "xmlns:lticm" => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
                                       "xmlns:lticp" => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
-                                      "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                                      "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+                                      "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                                      "xsi:schemaLocation" => "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
                           http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd
                           http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
-                          http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd"
-      ) do |blti_node|
+                          http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd") do |blti_node|
         blti_node.blti :title, tool.name
         blti_node.blti :description, tool.description
         if tool.url =~ %r{http://}
@@ -114,14 +114,13 @@ module CC
             :icon_url
           ] + Lti::ResourcePlacement::PLACEMENTS
 
-          tool.settings.keys.reject{ |i| extension_exclusions.include?(i)}.each do |key|
+          tool.settings.keys.reject { |i| extension_exclusions.include?(i) }.each do |key|
             ext_node.lticm(:property, tool.settings[key], 'name' => key.to_s) unless tool.settings[key].respond_to?(:each)
           end
 
           Lti::ResourcePlacement::PLACEMENTS.each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|
-
                 tool.settings[type].except(:labels, :custom_fields).each do |key, value|
                   type_node.lticm(:property, value, 'name' => key.to_s)
                 end
@@ -155,6 +154,5 @@ module CC
         end
       end
     end
-
   end
 end

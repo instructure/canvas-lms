@@ -24,31 +24,30 @@ describe "student groups" do
   include_context "in-process server selenium tests"
   include GroupsCommon
 
-  let(:group_name){ 'Windfury' }
-  let(:group_category_name){ 'cat1' }
+  let(:group_name) { 'Windfury' }
+  let(:group_category_name) { 'cat1' }
 
   context "As a teacher" do
-
     before(:each) do
       course_with_teacher_logged_in
     end
 
-    it "if there are no student groups, there should not be a student groups tab", priority:"2", test_id: 182050 do
+    it "if there are no student groups, there should not be a student groups tab", priority: "2", test_id: 182050 do
       get "/courses/#{@course.id}/users"
       expect(f(".ui-tabs-nav")).not_to contain_link("Student Groups")
     end
 
-    it "if there are student groups, there should be a student groups tab", priority:"2", test_id: 182051 do
+    it "if there are student groups, there should be a student groups tab", priority: "2", test_id: 182051 do
       create_student_group_as_a_teacher(group_name)
       get "/courses/#{@course.id}/users"
       expect(f(".ui-tabs-nav")).to contain_link("Student Groups")
     end
 
     context "with a student group created" do
-      let(:students_in_group){ 4 }
+      let(:students_in_group) { 4 }
 
       before(:each) do
-        create_student_group_as_a_teacher(group_name, (students_in_group-1))
+        create_student_group_as_a_teacher(group_name, (students_in_group - 1))
         get("/courses/#{@course.id}/groups")
       end
 
@@ -77,7 +76,7 @@ describe "student groups" do
         wait_for_animations
 
         # verify each student is in the group
-        expected_students = ["Test Student 1","Test Student 2","Test Student 3","Test Student 4"]
+        expected_students = ["Test Student 1", "Test Student 2", "Test Student 3", "Test Student 4"]
         users = f("[data-view=groupUsers]")
         expected_students.each do |student|
           expect(users).to include_text(student.to_s)

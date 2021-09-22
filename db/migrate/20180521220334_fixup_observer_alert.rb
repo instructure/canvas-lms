@@ -26,8 +26,8 @@ class FixupObserverAlert < ActiveRecord::Migration[5.1]
 
     change_table :observer_alerts do |t|
       t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' }
-      t.references :user, null: false, foreign_key: { to_table: 'users'}
-      t.references :observer, null: false, foreign_key: { to_table: 'users'}
+      t.references :user, null: false, foreign_key: { to_table: 'users' }
+      t.references :observer, null: false, foreign_key: { to_table: 'users' }
     end
   end
 end

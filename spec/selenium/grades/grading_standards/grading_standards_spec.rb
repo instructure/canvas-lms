@@ -55,7 +55,7 @@ describe "grading standards" do
     course_with_teacher_logged_in
 
     @assignment = @course.assignments.create!(title: "new assignment")
-    @standard = @course.grading_standards.create!(title: "some standard", standard_data: {a: {name: 'A', value: '95'}, b: {name: 'B', value: '80'}, f: {name: 'F', value: ''}})
+    @standard = @course.grading_standards.create!(title: "some standard", standard_data: { a: { name: 'A', value: '95' }, b: { name: 'B', value: '80' }, f: { name: 'F', value: '' } })
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     f("#assignment_points_possible").clear()
@@ -96,7 +96,7 @@ describe "grading standards" do
     skip_if_safari(:alert)
     course_with_teacher_logged_in
 
-    @standard = @course.grading_standards.create!(title: "some standard", standard_data: {a: {name: 'A', value: '95'}, b: {name: 'B', value: '80'}, f: {name: 'F', value: ''}})
+    @standard = @course.grading_standards.create!(title: "some standard", standard_data: { a: { name: 'A', value: '95' }, b: { name: 'B', value: '80' }, f: { name: 'F', value: '' } })
 
     get "/courses/#{@course.id}/settings"
     form = f("#course_form")

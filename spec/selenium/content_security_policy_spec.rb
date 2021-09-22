@@ -23,19 +23,19 @@ describe "content security policy" do
   include_context "in-process server selenium tests"
 
   context "with csp enabled" do
-      before(:once) do
-        @csp_account = Account.create!(name: 'csp account')
-        @csp_account.enable_feature!(:javascript_csp)
-        @csp_account.enable_csp!
-        @csp_course = @csp_account.courses.create!(name: 'csp course')
-        @csp_user = User.create!(name: 'csp user')
-        @csp_user.accept_terms
-        @csp_user.register!
-        @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
-        @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
-      end
+    before(:once) do
+      @csp_account = Account.create!(name: 'csp account')
+      @csp_account.enable_feature!(:javascript_csp)
+      @csp_account.enable_csp!
+      @csp_course = @csp_account.courses.create!(name: 'csp course')
+      @csp_user = User.create!(name: 'csp user')
+      @csp_user.accept_terms
+      @csp_user.register!
+      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
+      @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
+    end
 
-      before(:each) {create_session(@csp_pseudonym)}
+    before(:each) { create_session(@csp_pseudonym) }
 
     it "should display a flash alert for non-whitelisted iframe", ignore_js_errors: true do
       @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
@@ -59,6 +59,5 @@ describe "content security policy" do
 
       expect_no_instui_flash_message
     end
-
   end
 end

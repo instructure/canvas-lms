@@ -24,18 +24,18 @@ class CreateSubmissionDraft < ActiveRecord::Migration[5.1]
   def change
     create_table :submission_drafts do |t|
       t.references :submission, limit: 8, foreign_key: true, index: true, null: false
-      t.integer :submission_attempt, index:true, null: false
+      t.integer :submission_attempt, index: true, null: false
     end
 
     # Attachments can be cross shard, so we can't use a proper foreign key for them
     create_table :submission_draft_attachments do |t|
       t.references :submission_draft, limit: 8, foreign_key: true, index: true, null: false
-      t.integer :attachment_id, limit: 8, index:true, null: false
+      t.integer :attachment_id, limit: 8, index: true, null: false
     end
 
     add_index :submission_draft_attachments,
-      [:submission_draft_id, :attachment_id],
-      name: 'index_submission_draft_and_attachment_unique',
-      unique: true
+              [:submission_draft_id, :attachment_id],
+              name: 'index_submission_draft_and_attachment_unique',
+              unique: true
   end
 end

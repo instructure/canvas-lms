@@ -31,13 +31,13 @@ describe RoleOverridesController do
   describe "add_role" do
     it "adds the role type to the account" do
       expect(@account.available_account_roles.map(&:name)).not_to include('NewRole')
-      post 'add_role', params: {:account_id => @account.id, :role_type => 'NewRole'}
+      post 'add_role', params: { :account_id => @account.id, :role_type => 'NewRole' }
       @account.reload
       expect(@account.available_account_roles.map(&:name)).to include('NewRole')
     end
 
     it "requires a role type" do
-      post 'add_role', params: {:account_id => @account.id}
+      post 'add_role', params: { :account_id => @account.id }
       expect(flash[:error]).to eq 'Role creation failed'
     end
 
@@ -46,7 +46,7 @@ describe RoleOverridesController do
       role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       role.workflow_state = 'active'
       role.save!
-      post 'add_role', params: {:account_id => @account.id, :role_type => 'NewRole'}
+      post 'add_role', params: { :account_id => @account.id, :role_type => 'NewRole' }
       expect(flash[:error]).to eq 'Role creation failed'
     end
   end
@@ -56,7 +56,7 @@ describe RoleOverridesController do
     role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
     role.workflow_state = 'active'
     role.save!
-    delete 'remove_role', params: {:account_id => @account.id, :id => role.id}
+    delete 'remove_role', params: { :account_id => @account.id, :id => role.id }
     expect(@account.roles.where(name: 'NewRole').first).to be_inactive
   end
 
@@ -71,11 +71,11 @@ describe RoleOverridesController do
     end
 
     def update_permissions(permissions)
-      put('update', params: {account_id: @account.id, id: @role.id, permissions: permissions})
+      put('update', params: { account_id: @account.id, id: @role.id, permissions: permissions })
     end
 
     it 'should let you update a permission' do
-      update_permissions({@permission => { enabled: true, explicit: true }})
+      update_permissions({ @permission => { enabled: true, explicit: true } })
       override = RoleOverride.last
       expect(override.permission).to eq @permission
       expect(override.role_id).to eq @role.id
@@ -83,7 +83,7 @@ describe RoleOverridesController do
     end
 
     it 'should return an error if the updated permission is invalid' do
-      resp = update_permissions({@permission => { applies_to_descendants: false, applies_to_self: false }})
+      resp = update_permissions({ @permission => { applies_to_descendants: false, applies_to_self: false } })
       expect(resp.status).to eq 400
       expect(resp.body).to include("Permission must be enabled for someone")
       expect(RoleOverride.count).to eq 0
@@ -107,7 +107,7 @@ describe RoleOverridesController do
       end
 
       it 'should update all permissions in a group' do
-        update_permissions({@grouped_permission => { enabled: true, explicit: true }})
+        update_permissions({ @grouped_permission => { enabled: true, explicit: true } })
         expect(RoleOverride.count).to eq 3
         expect(RoleOverride.pluck(:permission)).to match_array @granular_permissions
         expect(RoleOverride.pluck(:role_id)).to match_array Array.new(3, @role.id)
@@ -115,7 +115,7 @@ describe RoleOverridesController do
       end
 
       it 'should allow locking all permissions in a group' do
-        update_permissions({@grouped_permission => { locked: true }})
+        update_permissions({ @grouped_permission => { locked: true } })
         expect(RoleOverride.count).to eq 3
         expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, true)
       end
@@ -127,13 +127,13 @@ describe RoleOverridesController do
         }
         update_permissions(updates)
         expect(RoleOverride.count).to eq 3
-        update_permissions({@grouped_permission => { locked: false, explicit: true }})
+        update_permissions({ @grouped_permission => { locked: false, explicit: true } })
         expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, false)
         expect(RoleOverride.pluck(:enabled)).to match_array [true, true, false]
       end
 
       it 'should allow updating an individual permissions that belongs to a group' do
-        update_permissions({@granular_permissions[0] => { enabled: true, explicit: true }})
+        update_permissions({ @granular_permissions[0] => { enabled: true, explicit: true } })
         expect(RoleOverride.count).to eq 1
 
         override = RoleOverride.last
@@ -143,7 +143,7 @@ describe RoleOverridesController do
       end
 
       it 'should not allow locking an individual permissions that belongs to a group' do
-        resp = update_permissions({@granular_permissions[0] => { locked: true }})
+        resp = update_permissions({ @granular_permissions[0] => { locked: true } })
         expect(resp.status).to eq 400
         expect(resp.body).to include("Cannot change locked status on granular permission")
         expect(RoleOverride.count).to eq 0
@@ -173,15 +173,16 @@ describe RoleOverridesController do
       @role.save!
     end
 
-    def post_with_settings(settings={})
-      post 'create', params: {:account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role.id => settings } }}
+    def post_with_settings(settings = {})
+      post 'create', params: { :account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role.id => settings } } }
     end
 
     describe "override already exists" do
       before :each do
         @existing_override = @account.role_overrides.build(
           :permission => @permission,
-          :role => @role)
+          :role => @role
+        )
         @existing_override.enabled = true
         @existing_override.locked = false
         @existing_override.save!
@@ -282,7 +283,7 @@ describe RoleOverridesController do
 
         context "for an admin" do
           it "is true" do
-            get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_catalog'}
+            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
             expect(json['granted']).to eq(true)
           end
         end
@@ -290,7 +291,7 @@ describe RoleOverridesController do
         context "for a non-admin" do
           it "is false" do
             user_session(user_factory(account: @account))
-            get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_catalog'}
+            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
             expect(json['granted']).to eq(false)
           end
         end
@@ -299,7 +300,7 @@ describe RoleOverridesController do
       context "when catalog is not enabled" do
         context "for an admin" do
           it "is false" do
-            get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_catalog'}
+            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
             expect(json['granted']).to eq(false)
           end
         end
@@ -308,7 +309,7 @@ describe RoleOverridesController do
 
     describe "other permissions" do
       it "returns 400 with an error message" do
-        get 'check_account_permission', params: {:account_id => @account.id, :permission => 'manage_content'}
+        get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_content' }
         expect(response.code.to_i).to eq(400)
         expect(json['message']).to be
       end
@@ -316,25 +317,25 @@ describe RoleOverridesController do
 
     describe "GET index" do
       it "loads new bundle for new permissions flag" do
-        get 'index', params: {:account_id => @account.id}
+        get 'index', params: { :account_id => @account.id }
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1
         expect(assigns[:js_bundles].first).to include :permissions
       end
 
       it 'does not load the manage_developer_keys role on sub account' do
-        get 'index', params: {:account_id => @account.id}
+        get 'index', params: { :account_id => @account.id }
         expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to_not include(:manage_developer_keys)
-        expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq false
+        expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq false
       end
 
       context 'in root_account' do
         let(:parent_account) { nil }
 
         it 'does load the manage_developer_keys role on root account' do
-          get 'index', params: {:account_id => @account.id}
+          get 'index', params: { :account_id => @account.id }
           expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to include(:manage_developer_keys)
-          expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq true
+          expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq true
         end
       end
 
@@ -345,7 +346,7 @@ describe RoleOverridesController do
         end
 
         it 'sets granular permissions information in the js_env' do
-          get 'index', params: {:account_id => @account.id}
+          get 'index', params: { :account_id => @account.id }
 
           wiki_permissions = []
           [:ACCOUNT_PERMISSIONS, :COURSE_PERMISSIONS].each do |js_env_key|

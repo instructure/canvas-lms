@@ -43,7 +43,7 @@ class InfoController < ApplicationController
       available_to = link[:available_to] || []
       available_to.detect do |role|
         (role == 'user' || current_user_roles.include?(role)) ||
-        (current_user_roles == ['user'] && role == 'unenrolled')
+          (current_user_roles == ['user'] && role == 'unenrolled')
       end
     end
 
@@ -54,7 +54,7 @@ class InfoController < ApplicationController
     # This action should perform checks on various subsystems, and raise an exception on failure.
     Account.connection.active?
     if Delayed::Job == Delayed::Backend::ActiveRecord::Job &&
-      Account.connection != Delayed::Job.connection
+       Account.connection != Delayed::Job.connection
       Delayed::Job.connection.active?
     end
     Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
@@ -73,11 +73,13 @@ class InfoController < ApplicationController
 
     respond_to do |format|
       format.html { render plain: 'canvas ok' }
-      format.json { render json:
+      format.json {
+        render json:
                                { status: 'canvas ok',
                                  asset_urls: asset_urls,
                                  revision: Canvas.revision,
-                                 installation_uuid: Canvas.installation_uuid } }
+                                 installation_uuid: Canvas.installation_uuid }
+      }
     end
   end
 
@@ -88,11 +90,11 @@ class InfoController < ApplicationController
       'quizzes_submission_events_partition' => Quizzes::QuizSubmissionEventPartitioner.processed?,
       'versions_partition' => Version::Partitioner.processed?,
     }
-    failed = checks.reject{|_k, v| v}.map(&:first)
+    failed = checks.reject { |_k, v| v }.map(&:first)
     if failed.any?
-      render :json => {:status => "failed upcoming health checks - #{failed.join(", ")}"}, :status => :internal_server_error
+      render :json => { :status => "failed upcoming health checks - #{failed.join(", ")}" }, :status => :internal_server_error
     else
-      render :json => {:status => "canvas will be ok, probably"}
+      render :json => { :status => "canvas will be ok, probably" }
     end
   end
 
@@ -152,15 +154,15 @@ class InfoController < ApplicationController
 
   def render_readiness_json(components, status_code)
     render json: {
-             status: status_code,
-             components:
+      status: status_code,
+      components:
                components.map do |k, v|
                  name = k
                  status = v[:status] ? 200 : 503
                  time = v[:time]
                  { 'name' => name, 'status' => status, 'response_time_ms' => time }
                end
-           },
+    },
            status: status_code
   end
 

@@ -32,7 +32,7 @@ describe 'RequestThrottle' do
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
 
   # not a let so that actual and expected aren't the same object that get modified together
-  def response; [200, {'Content-Type' => 'text/plain'}, ['Hello']]; end
+  def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
 
   let(:inner_app) { lambda { |env| response } }
   let(:throttler) { RequestThrottle.new(inner_app) }
@@ -175,10 +175,10 @@ describe 'RequestThrottle' do
 
   describe "cost throttling" do
     describe "#calculate_cost" do
-      let(:throttle){ RequestThrottle.new(nil) }
+      let(:throttle) { RequestThrottle.new(nil) }
 
       it "sums cpu and db time when extra cost is nil" do
-        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => nil})
+        cost = throttle.calculate_cost(40, 2, { 'extra-request-cost' => nil })
         expect(cost).to eq(42)
       end
 
@@ -188,17 +188,17 @@ describe 'RequestThrottle' do
       end
 
       it "adds arbitrary cost if in the env" do
-        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => 8})
+        cost = throttle.calculate_cost(40, 2, { 'extra-request-cost' => 8 })
         expect(cost).to eq(50)
       end
 
       it "doesn't bomb when the extra cost is something nonsensical" do
-        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => 'hai'})
+        cost = throttle.calculate_cost(40, 2, { 'extra-request-cost' => 'hai' })
         expect(cost).to eq(42)
       end
 
       it "sanity checks range of extra cost" do
-        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => -100})
+        cost = throttle.calculate_cost(40, 2, { 'extra-request-cost' => -100 })
         expect(cost).to eq(42)
       end
 
@@ -316,11 +316,11 @@ describe 'RequestThrottle' do
           Setting.set('request_throttle.hwm', '4.0')
           expect(bucket.full?).to eq true
           Setting.set('request_throttle.custom_settings',
-                      {test: {hwm: '6.0'}}.to_json)
+                      { test: { hwm: '6.0' } }.to_json)
           RequestThrottle::LeakyBucket.reload!
           expect(bucket.full?).to eq false
           Setting.set('request_throttle.custom_settings',
-                      {other: {hwm: '6.0'}}.to_json)
+                      { other: { hwm: '6.0' } }.to_json)
           RequestThrottle::LeakyBucket.reload!
           expect(bucket.full?).to eq true
         end
@@ -395,9 +395,11 @@ describe 'RequestThrottle' do
         it "should still decrement when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
-            expect { @bucket.reserve_capacity(20) do
-              raise "oh noes"
-            end }.to raise_error(RuntimeError)
+            expect {
+              @bucket.reserve_capacity(20) do
+                raise "oh noes"
+              end
+            }.to raise_error(RuntimeError)
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
           end
         end
@@ -418,7 +420,7 @@ describe 'RequestThrottle' do
 
         it "uses custom values if available" do
           Setting.set('request_throttle.custom_settings',
-                      {test: {up_front_cost: '20.0'}}.to_json)
+                      { test: { up_front_cost: '20.0' } }.to_json)
           RequestThrottle::LeakyBucket.reload!
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
@@ -435,7 +437,7 @@ describe 'RequestThrottle' do
             /\A\/files\/\d+\/download/ => 1,
             "equation_images\/" => 2
           }
-          expect(RequestThrottle).to receive(:dynamic_settings).and_return({'up_front_cost_by_path_regex' => hash})
+          expect(RequestThrottle).to receive(:dynamic_settings).and_return({ 'up_front_cost_by_path_regex' => hash })
 
           expect(@bucket.get_up_front_cost_for_path("/files/1/download?frd=1")).to eq 1
           expect(@bucket.get_up_front_cost_for_path("/equation_images/stuff")).to eq 2
@@ -452,7 +454,7 @@ describe 'RequestThrottle' do
           allow(RequestThrottle).to receive(:enabled?).and_return(false)
           req = request_logged_out
           allow(req).to receive(:fullpath).and_return("/")
-          allow(req).to receive(:env).and_return({'canvas.request_throttle.user_id' => ['123']})
+          allow(req).to receive(:env).and_return({ 'canvas.request_throttle.user_id' => ['123'] })
           allow(@bucket).to receive(:full?).and_return(true)
           expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
         end

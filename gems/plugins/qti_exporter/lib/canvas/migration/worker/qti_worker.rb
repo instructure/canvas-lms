@@ -20,7 +20,6 @@
 module Canvas::Migration
   module Worker
     class QtiWorker < Base
-
       def perform
         cm = ContentMigration.where(id: migration_id).first
         begin
@@ -31,6 +30,7 @@ module Canvas::Migration
           unless plugin && plugin.settings[:enabled]
             raise "Can't export QTI without the python converter tool installed."
           end
+
           settings = cm.migration_settings.clone
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
@@ -61,7 +61,7 @@ module Canvas::Migration
           end
           cm.update_conversion_progress(100)
 
-          cm.migration_settings[:migration_ids_to_import] = {:copy=>{:everything=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
+          cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
           if path = converter.course[:files_import_root_path]
             cm.migration_settings[:files_import_root_path] = path
           end

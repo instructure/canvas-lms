@@ -108,7 +108,7 @@ describe UserMerge do
     end
 
     it "should use avatar information from merged user if none exists" do
-      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.avatar_image = { 'type' => 'external', 'url' => 'https://example.com/image.png' }
       user2.save!
 
       UserMerge.from(user2).into(user1)
@@ -123,7 +123,7 @@ describe UserMerge do
     it "should not overwrite avatar information already in place" do
       user1.avatar_state = 'locked'
       user1.save!
-      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.avatar_image = { 'type' => 'external', 'url' => 'https://example.com/image.png' }
       user2.save!
 
       UserMerge.from(user2).into(user1)
@@ -237,44 +237,44 @@ describe UserMerge do
 
     it "should move ccs to the new user (but only if they don't already exist)" do
       # unconfirmed => active conflict
-      communication_channel(user1, {username: 'a@instructure.com'})
-      communication_channel(user2, {username: 'A@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'a@instructure.com' })
+      communication_channel(user2, { username: 'A@instructure.com', active_cc: true })
       # active => unconfirmed conflict
-      cc1 = communication_channel(user1, {username: 'b@instructure.com', active_cc: true})
-      communication_channel(user2, {username: 'B@instructure.com'})
+      cc1 = communication_channel(user1, { username: 'b@instructure.com', active_cc: true })
+      communication_channel(user2, { username: 'B@instructure.com' })
       # active => active conflict
-      communication_channel(user1, {username: 'c@instructure.com', active_cc: true})
-      communication_channel(user2, {username: 'C@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'c@instructure.com', active_cc: true })
+      communication_channel(user2, { username: 'C@instructure.com', active_cc: true })
       # unconfirmed => unconfirmed conflict
-      communication_channel(user1, {username: 'd@instructure.com'})
-      communication_channel(user2, {username: 'D@instructure.com'})
+      communication_channel(user1, { username: 'd@instructure.com' })
+      communication_channel(user2, { username: 'D@instructure.com' })
       # retired => unconfirmed conflict
-      communication_channel(user1, {username: 'e@instructure.com', cc_state: 'retired'})
-      communication_channel(user2, {username: 'E@instructure.com'})
+      communication_channel(user1, { username: 'e@instructure.com', cc_state: 'retired' })
+      communication_channel(user2, { username: 'E@instructure.com' })
       # unconfirmed => retired conflict
-      communication_channel(user1, {username: 'f@instructure.com'})
-      communication_channel(user2, {username: 'F@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'f@instructure.com' })
+      communication_channel(user2, { username: 'F@instructure.com', cc_state: 'retired' })
       # retired => active conflict
-      communication_channel(user1, {username: 'g@instructure.com', cc_state: 'retired'})
-      communication_channel(user2, {username: 'G@instructure.com', cc_state: 'active'})
+      communication_channel(user1, { username: 'g@instructure.com', cc_state: 'retired' })
+      communication_channel(user2, { username: 'G@instructure.com', cc_state: 'active' })
       # active => retired conflict
-      communication_channel(user1, {username: 'h@instructure.com', cc_state: 'active'})
-      communication_channel(user2, {username: 'H@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'h@instructure.com', cc_state: 'active' })
+      communication_channel(user2, { username: 'H@instructure.com', cc_state: 'retired' })
       # retired => retired conflict
-      communication_channel(user1, {username: 'i@instructure.com', cc_state: 'retired'})
-      communication_channel(user2, {username: 'I@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'i@instructure.com', cc_state: 'retired' })
+      communication_channel(user2, { username: 'I@instructure.com', cc_state: 'retired' })
       # <nothing> => active
-      communication_channel(user2, {username: 'j@instructure.com', active_cc: true})
+      communication_channel(user2, { username: 'j@instructure.com', active_cc: true })
       # active => <nothing>
-      communication_channel(user1, {username: 'k@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'k@instructure.com', active_cc: true })
       # <nothing> => unconfirmed
-      communication_channel(user2, {username: 'l@instructure.com'})
+      communication_channel(user2, { username: 'l@instructure.com' })
       # unconfirmed => <nothing>
-      communication_channel(user1, {username: 'm@instructure.com'})
+      communication_channel(user1, { username: 'm@instructure.com' })
       # <nothing> => retired
-      communication_channel(user2, {username: 'n@instructure.com', cc_state: 'retired'})
+      communication_channel(user2, { username: 'n@instructure.com', cc_state: 'retired' })
       # retired => <nothing>
-      communication_channel(user1, {username: 'o@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'o@instructure.com', cc_state: 'retired' })
 
       UserMerge.from(user1).into(user2)
       user1.reload
@@ -287,30 +287,30 @@ describe UserMerge do
       expect(record.context_type).to eq 'CommunicationChannel'
 
       expect(user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
-          ['A@instructure.com', 'active'],
-          ['C@instructure.com', 'active'],
-          ['D@instructure.com', 'unconfirmed'],
-          ['E@instructure.com', 'unconfirmed'],
-          ['G@instructure.com', 'active'],
-          ['I@instructure.com', 'retired'],
-          ['b@instructure.com', 'active'],
-          ['f@instructure.com', 'unconfirmed'],
-          ['h@instructure.com', 'active'],
-          ['j@instructure.com', 'active'],
-          ['k@instructure.com', 'active'],
-          ['l@instructure.com', 'unconfirmed'],
-          ['m@instructure.com', 'unconfirmed'],
-          ['n@instructure.com', 'retired']
-      ])
+                                                                                                           ['A@instructure.com', 'active'],
+                                                                                                           ['C@instructure.com', 'active'],
+                                                                                                           ['D@instructure.com', 'unconfirmed'],
+                                                                                                           ['E@instructure.com', 'unconfirmed'],
+                                                                                                           ['G@instructure.com', 'active'],
+                                                                                                           ['I@instructure.com', 'retired'],
+                                                                                                           ['b@instructure.com', 'active'],
+                                                                                                           ['f@instructure.com', 'unconfirmed'],
+                                                                                                           ['h@instructure.com', 'active'],
+                                                                                                           ['j@instructure.com', 'active'],
+                                                                                                           ['k@instructure.com', 'active'],
+                                                                                                           ['l@instructure.com', 'unconfirmed'],
+                                                                                                           ['m@instructure.com', 'unconfirmed'],
+                                                                                                           ['n@instructure.com', 'retired']
+                                                                                                         ])
       expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
-          ['a@instructure.com', 'retired'],
-          ['c@instructure.com', 'retired'],
-          ['d@instructure.com', 'retired'],
-          ['e@instructure.com', 'retired'],
-          ['g@instructure.com', 'retired'],
-          ['i@instructure.com', 'retired'],
-          ['o@instructure.com', 'retired']
-      ])
+                                                                                                           ['a@instructure.com', 'retired'],
+                                                                                                           ['c@instructure.com', 'retired'],
+                                                                                                           ['d@instructure.com', 'retired'],
+                                                                                                           ['e@instructure.com', 'retired'],
+                                                                                                           ['g@instructure.com', 'retired'],
+                                                                                                           ['i@instructure.com', 'retired'],
+                                                                                                           ['o@instructure.com', 'retired']
+                                                                                                         ])
       %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
         expect(CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }).to be_nil
       end
@@ -328,8 +328,8 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       merge_data = UserMergeData.where(user_id: user2).first
-      expect(merge_data.records.pluck(:context_id).sort).
-        to eq [enrollment1.id, enrollment3.id, enrollment4.id].sort
+      expect(merge_data.records.pluck(:context_id).sort)
+        .to eq [enrollment1.id, enrollment3.id, enrollment4.id].sort
       enrollment1.reload
       expect(enrollment1.user).to eq user1
       expect(enrollment1).to be_deleted
@@ -354,8 +354,8 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       merge_data = UserMergeData.where(user_id: user1).first
 
-      expect(merge_data.records.pluck(:context_id).sort).
-        to eq [enrollment1.id, enrollment2.id].sort
+      expect(merge_data.records.pluck(:context_id).sort)
+        .to eq [enrollment1.id, enrollment2.id].sort
       enrollment1.reload
       expect(enrollment1.user).to eq user1
       expect(enrollment1.workflow_state).to eq 'active'
@@ -372,34 +372,34 @@ describe UserMerge do
     end
 
     it "should remove conflicting module progressions" do
-      course1.enroll_user(user1, 'StudentEnrollment', enrollment_state:'active')
-      course1.enroll_user(user2, 'StudentEnrollment', enrollment_state:'active')
-      assignment = course1.assignments.create!(title:"some assignment")
-      assignment2 = course1.assignments.create!(title:"some second assignment")
-      context_module = course1.context_modules.create!(name:"some module")
-      context_module2 = course1.context_modules.create!(name:"some second module")
-      tag = context_module.add_item(id:assignment, type:'assignment')
-      tag2 = context_module2.add_item(id:assignment2, type:'assignment')
+      course1.enroll_user(user1, 'StudentEnrollment', enrollment_state: 'active')
+      course1.enroll_user(user2, 'StudentEnrollment', enrollment_state: 'active')
+      assignment = course1.assignments.create!(title: "some assignment")
+      assignment2 = course1.assignments.create!(title: "some second assignment")
+      context_module = course1.context_modules.create!(name: "some module")
+      context_module2 = course1.context_modules.create!(name: "some second module")
+      tag = context_module.add_item(id: assignment, type: 'assignment')
+      tag2 = context_module2.add_item(id: assignment2, type: 'assignment')
 
-      context_module.completion_requirements = {tag.id => {type:'must_view'}}
-      context_module2.completion_requirements = {tag2.id => {type:'min_score', min_score:5}}
+      context_module.completion_requirements = { tag.id => { type: 'must_view' } }
+      context_module2.completion_requirements = { tag2.id => { type: 'min_score', min_score: 5 } }
       context_module.save
       context_module2.save
 
-      #have a conflicting module_progrssion
+      # have a conflicting module_progrssion
       assignment2.grade_student(user1, :grade => "10", grader: @teacher)
       assignment2.grade_student(user2, :grade => "4", grader: @teacher)
 
-      #have a duplicate module_progression
+      # have a duplicate module_progression
       context_module.update_for(user1, :read, tag)
       context_module.update_for(user2, :read, tag)
 
-      #it should work
+      # it should work
       expect { UserMerge.from(user1).into(user2) }.to_not raise_error
 
-      #it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
-      expect(ContextModuleProgression.where(user_id:user1, context_module_id:[context_module, context_module2]).count).to eq 0
-      expect(ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count).to eq 2
+      # it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
+      expect(ContextModuleProgression.where(user_id: user1, context_module_id: [context_module, context_module2]).count).to eq 0
+      expect(ContextModuleProgression.where(user_id: user2, context_module_id: [context_module, context_module2], workflow_state: 'completed').count).to eq 2
     end
 
     it "should remove observer enrollments that observe themselves (target)" do
@@ -437,7 +437,7 @@ describe UserMerge do
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
       UserMerge.from(user1).into(user2)
-      expect(user1.observee_enrollments.size).to eql 1 #deleted
+      expect(user1.observee_enrollments.size).to eql 1 # deleted
       expect(user1.observee_enrollments.active_or_pending).to be_empty
       expect(user2.observee_enrollments.size).to eql 2
       expect(user2.observee_enrollments.active_or_pending.size).to eql 2
@@ -516,14 +516,13 @@ describe UserMerge do
       enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
       enrollment2 = course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
       ag = AppointmentGroup.create(:title => "test",
-       :contexts => [course1],
-       :participants_per_appointment => 1,
-       :min_appointments_per_participant => 1,
-       :new_appointments => [
-         ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
-         ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
-       ]
-      )
+                                   :contexts => [course1],
+                                   :participants_per_appointment => 1,
+                                   :min_appointments_per_participant => 1,
+                                   :new_appointments => [
+                                     ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                     ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
+                                   ])
       res1 = ag.appointments.first.reserve_for(user1, @teacher)
       res2 = ag.appointments.last.reserve_for(user2, @teacher)
       UserMerge.from(user1).into(user2)
@@ -543,9 +542,9 @@ describe UserMerge do
       expect(user2.attachments.count).to eq 2
       expect(user2.attachments.not_deleted.count).to eq 2
 
-      expect(user2.attachments.not_deleted.detect{|a| a.md5 == attachment1.md5}).to eq attachment3
+      expect(user2.attachments.not_deleted.detect { |a| a.md5 == attachment1.md5 }).to eq attachment3
 
-      new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
+      new_attachment = user2.attachments.not_deleted.detect { |a| a.md5 == attachment2.md5 }
       expect(new_attachment.display_name).not_to eq "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
 
@@ -597,8 +596,8 @@ describe UserMerge do
 
     UserMerge.from(user1).into(user2)
 
-    pseudo1, pseudo2 = [pseudo1, pseudo2].map{|p| Pseudonym.find(p.id)}
-    user1, user2 = [user1, user2].map{|u| User.find(u.id)}
+    pseudo1, pseudo2 = [pseudo1, pseudo2].map { |p| Pseudonym.find(p.id) }
+    user1, user2 = [user1, user2].map { |u| User.find(u.id) }
 
     expect(pseudo1.user).to eq pseudo2.user
     expect(pseudo1.user).to eq user2
@@ -617,20 +616,20 @@ describe UserMerge do
 
         a1 = assignment_model(:submission_types => 'online_text_entry')
         a1.submit_homework(user2, {
-          :submission_type => 'online_text_entry',
-          :body => 'hi'
-        })
+                             :submission_type => 'online_text_entry',
+                             :body => 'hi'
+                           })
         s1 = a1.submit_homework(user2, {
-          :submission_type => 'online_text_entry',
-          :body => 'hi again'
-        })
+                                  :submission_type => 'online_text_entry',
+                                  :body => 'hi again'
+                                })
         s_other = a1.submit_homework(other_user, {
-          :submission_type => 'online_text_entry',
-          :body => 'hi again'
-        })
+                                       :submission_type => 'online_text_entry',
+                                       :body => 'hi again'
+                                     })
 
         expect(s1.versions.count).to eql(2)
-        s1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+        s1.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
         expect(s_other.versions.first.model.user_id).to eql(other_user.id)
 
         UserMerge.from(user2).into(user1)
@@ -638,20 +637,20 @@ describe UserMerge do
         s_other.reload
 
         expect(s1.versions.count).to eql(2)
-        s1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+        s1.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
         expect(s_other.versions.first.model.user_id).to eql(other_user.id)
       end
 
       it "updates the submission_versions table" do
         assignment = assignment_model(submission_types: 'online_text_entry')
         assignment.submit_homework(user2, {
-          submission_type: 'online_text_entry',
-          body: 'submission whoo'
-        })
+                                     submission_type: 'online_text_entry',
+                                     body: 'submission whoo'
+                                   })
         submission = assignment.submit_homework(user2, {
-          submission_type: 'online_text_entry',
-          body: 'another submission!'
-        })
+                                                  submission_type: 'online_text_entry',
+                                                  body: 'another submission!'
+                                                })
 
         versions = SubmissionVersion.where(version_id: submission.versions)
 
@@ -672,18 +671,18 @@ describe UserMerge do
       qs2 = @quiz_submission
 
       expect(qs1.versions).to be_present
-      qs1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      qs1.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
       expect(qs2.versions).to be_present
-      qs2.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      qs2.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
 
       UserMerge.from(user2).into(user1)
       qs1.reload
       qs2.reload
 
       expect(qs1.versions).to be_present
-      qs1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      qs1.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
       expect(qs2.versions).to be_present
-      qs2.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      qs2.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
     end
 
     it "should update other appropriate versions" do
@@ -692,18 +691,18 @@ describe UserMerge do
       ra = rubric_assessment_model(:context => @course, :user => user2)
 
       expect(wiki_page.versions).to be_present
-      wiki_page.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      wiki_page.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
       expect(ra.versions).to be_present
-      ra.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+      ra.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
 
       UserMerge.from(user2).into(user1)
       wiki_page.reload
       ra.reload
 
       expect(wiki_page.versions).to be_present
-      wiki_page.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      wiki_page.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
       expect(ra.versions).to be_present
-      ra.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+      ra.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
     end
   end
 
@@ -734,7 +733,7 @@ describe UserMerge do
         @user2 = user_model
         account = Account.create!
         @shard_course = course_factory(account: account)
-        @user2.preferences[:custom_colors] = {"course_#{@course.id}"=>"#254284"}
+        @user2.preferences[:custom_colors] = { "course_#{@course.id}" => "#254284" }
       end
       course = course_factory
       user1 = user_model
@@ -753,10 +752,10 @@ describe UserMerge do
       course = course_factory
       user1 = user_model
       @user2.set_preference(:custom_colors,
-        {"course_#{@shard_course.local_id}" => "#254284", "course_#{course.global_id}" => "#346543"})
+                            { "course_#{@shard_course.local_id}" => "#254284", "course_#{course.global_id}" => "#346543" })
       UserMerge.from(@user2).into(user1)
       expect(user1.reload.get_preference(:custom_colors)).to eq (
-        {"course_#{@shard_course.global_id}" => "#254284", "course_#{course.local_id}" => "#346543"})
+        { "course_#{@shard_course.global_id}" => "#254284", "course_#{course.local_id}" => "#346543" })
     end
 
     it 'should move nicknames with old format' do
@@ -764,7 +763,7 @@ describe UserMerge do
         @user2 = user_model
         account = Account.create!
         @shard_course = course_factory(account: account)
-        @user2.preferences[:course_nicknames] = {@shard_course.id=>"Marketing"}
+        @user2.preferences[:course_nicknames] = { @shard_course.id => "Marketing" }
       end
       course = course_factory
       user1 = user_model
@@ -912,44 +911,44 @@ describe UserMerge do
       end
 
       # unconfirmed => active conflict
-      communication_channel(user1, {username: 'a@instructure.com'})
-      communication_channel(@user2, {username: 'A@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'a@instructure.com' })
+      communication_channel(@user2, { username: 'A@instructure.com', active_cc: true })
       # active => unconfirmed conflict
-      communication_channel(user1, {username: 'b@instructure.com', active_cc: true})
-      communication_channel(@user2, {username: 'B@instructure.com'})
+      communication_channel(user1, { username: 'b@instructure.com', active_cc: true })
+      communication_channel(@user2, { username: 'B@instructure.com' })
       # active => active conflict
-      communication_channel(user1, {username: 'c@instructure.com', active_cc: true})
-      communication_channel(@user2, {username: 'C@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'c@instructure.com', active_cc: true })
+      communication_channel(@user2, { username: 'C@instructure.com', active_cc: true })
       # unconfirmed => unconfirmed conflict
-      communication_channel(user1, {username: 'd@instructure.com'})
-      communication_channel(@user2, {username: 'D@instructure.com'})
+      communication_channel(user1, { username: 'd@instructure.com' })
+      communication_channel(@user2, { username: 'D@instructure.com' })
       # retired => unconfirmed conflict
-      communication_channel(user1, {username: 'e@instructure.com', cc_state: 'retired'})
-      communication_channel(@user2, {username: 'E@instructure.com'})
+      communication_channel(user1, { username: 'e@instructure.com', cc_state: 'retired' })
+      communication_channel(@user2, { username: 'E@instructure.com' })
       # unconfirmed => retired conflict
-      communication_channel(user1, {username: 'f@instructure.com'})
-      communication_channel(@user2, {username: 'F@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'f@instructure.com' })
+      communication_channel(@user2, { username: 'F@instructure.com', cc_state: 'retired' })
       # retired => active conflict
-      communication_channel(user1, {username: 'g@instructure.com', cc_state: 'retired'})
-      communication_channel(@user2, {username: 'G@instructure.com', cc_state: 'active'})
+      communication_channel(user1, { username: 'g@instructure.com', cc_state: 'retired' })
+      communication_channel(@user2, { username: 'G@instructure.com', cc_state: 'active' })
       # active => retired conflict
-      communication_channel(user1, {username: 'h@instructure.com', cc_state: 'active'})
-      communication_channel(@user2, {username: 'H@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'h@instructure.com', cc_state: 'active' })
+      communication_channel(@user2, { username: 'H@instructure.com', cc_state: 'retired' })
       # retired => retired conflict
-      communication_channel(user1, {username: 'i@instructure.com', cc_state: 'retired'})
-      communication_channel(@user2, {username: 'I@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'i@instructure.com', cc_state: 'retired' })
+      communication_channel(@user2, { username: 'I@instructure.com', cc_state: 'retired' })
       # <nothing> => active
-      communication_channel(@user2, {username: 'j@instructure.com', active_cc: true})
+      communication_channel(@user2, { username: 'j@instructure.com', active_cc: true })
       # active => <nothing>
-      communication_channel(user1, {username: 'k@instructure.com', active_cc: true})
+      communication_channel(user1, { username: 'k@instructure.com', active_cc: true })
       # <nothing> => unconfirmed
-      communication_channel(@user2, {username: 'l@instructure.com'})
+      communication_channel(@user2, { username: 'l@instructure.com' })
       # unconfirmed => <nothing>
-      communication_channel(user1, {username: 'm@instructure.com'})
+      communication_channel(user1, { username: 'm@instructure.com' })
       # <nothing> => retired
-      communication_channel(@user2, {username: 'n@instructure.com', cc_state: 'retired'})
+      communication_channel(@user2, { username: 'n@instructure.com', cc_state: 'retired' })
       # retired => <nothing>
-      communication_channel(user1, {username: 'o@instructure.com', cc_state: 'retired'})
+      communication_channel(user1, { username: 'o@instructure.com', cc_state: 'retired' })
 
       @shard2.activate do
         UserMerge.from(user1).into(@user2)
@@ -958,38 +957,38 @@ describe UserMerge do
       user1.reload
       @user2.reload
       expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
-          ['A@instructure.com', 'active'],
-          ['C@instructure.com', 'active'],
-          ['D@instructure.com', 'unconfirmed'],
-          ['E@instructure.com', 'unconfirmed'],
-          ['G@instructure.com', 'active'],
-          ['I@instructure.com', 'retired'],
-          ['b@instructure.com', 'active'],
-          ['f@instructure.com', 'unconfirmed'],
-          ['h@instructure.com', 'active'],
-          ['j@instructure.com', 'active'],
-          ['k@instructure.com', 'active'],
-          ['l@instructure.com', 'unconfirmed'],
-          ['m@instructure.com', 'unconfirmed'],
-          ['n@instructure.com', 'retired'],
-          ['o@instructure.com', 'retired']
-      ])
+                                                                                                            ['A@instructure.com', 'active'],
+                                                                                                            ['C@instructure.com', 'active'],
+                                                                                                            ['D@instructure.com', 'unconfirmed'],
+                                                                                                            ['E@instructure.com', 'unconfirmed'],
+                                                                                                            ['G@instructure.com', 'active'],
+                                                                                                            ['I@instructure.com', 'retired'],
+                                                                                                            ['b@instructure.com', 'active'],
+                                                                                                            ['f@instructure.com', 'unconfirmed'],
+                                                                                                            ['h@instructure.com', 'active'],
+                                                                                                            ['j@instructure.com', 'active'],
+                                                                                                            ['k@instructure.com', 'active'],
+                                                                                                            ['l@instructure.com', 'unconfirmed'],
+                                                                                                            ['m@instructure.com', 'unconfirmed'],
+                                                                                                            ['n@instructure.com', 'retired'],
+                                                                                                            ['o@instructure.com', 'retired']
+                                                                                                          ])
       # on cross shard merges, the deleted user retains all CCs (pertinent ones were
       # duplicated over to the surviving shard)
       expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
-          ['a@instructure.com', 'retired'],
-          ['b@instructure.com', 'retired'],
-          ['c@instructure.com', 'retired'],
-          ['d@instructure.com', 'retired'],
-          ['e@instructure.com', 'retired'],
-          ['f@instructure.com', 'retired'],
-          ['g@instructure.com', 'retired'],
-          ['h@instructure.com', 'retired'],
-          ['i@instructure.com', 'retired'],
-          ['k@instructure.com', 'retired'],
-          ['m@instructure.com', 'retired'],
-          ['o@instructure.com', 'retired']
-      ])
+                                                                                                           ['a@instructure.com', 'retired'],
+                                                                                                           ['b@instructure.com', 'retired'],
+                                                                                                           ['c@instructure.com', 'retired'],
+                                                                                                           ['d@instructure.com', 'retired'],
+                                                                                                           ['e@instructure.com', 'retired'],
+                                                                                                           ['f@instructure.com', 'retired'],
+                                                                                                           ['g@instructure.com', 'retired'],
+                                                                                                           ['h@instructure.com', 'retired'],
+                                                                                                           ['i@instructure.com', 'retired'],
+                                                                                                           ['k@instructure.com', 'retired'],
+                                                                                                           ['m@instructure.com', 'retired'],
+                                                                                                           ['o@instructure.com', 'retired']
+                                                                                                         ])
     end
 
     it "should not fail copying retired sms channels" do
@@ -1051,12 +1050,12 @@ describe UserMerge do
       # 3 from user1, and 3 from @user2
       expect(@user2.attachments.not_deleted.count).to eq 6
 
-      new_user2_attachment1 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id}
+      new_user2_attachment1 = @user2.attachments.not_deleted.detect { |a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id }
       expect(new_user2_attachment1.root_attachment).to eq @user2_attachment2
-      expect(new_user2_attachment1.display_name).not_to eq user1_attachment2.display_name #should rename
+      expect(new_user2_attachment1.display_name).not_to eq user1_attachment2.display_name # should rename
       expect(new_user2_attachment1.namespace).not_to eq user1_attachment1.namespace
 
-      new_user2_attachment2 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment3.md5}
+      new_user2_attachment2 = @user2.attachments.not_deleted.detect { |a| a.md5 == user1_attachment3.md5 }
       expect(new_user2_attachment2.root_attachment).to be_nil
       expect(new_user2_attachment2.content_type).to eq "text/plain"
     end
@@ -1064,7 +1063,7 @@ describe UserMerge do
     it "should mark cross-shard user submission attachments so they're still visible" do
       user1 = User.create!
       user1_attachment = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
-        :uploaded_data => StringIO.new("shared_data"))
+                                            :uploaded_data => StringIO.new("shared_data"))
       course_factory
       a1 = assignment_model(:submission_types => "online_upload")
       submission = a1.submit_homework(user1, attachments: [user1_attachment])
@@ -1132,5 +1131,4 @@ describe UserMerge do
       end
     end
   end
-
 end

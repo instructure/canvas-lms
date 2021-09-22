@@ -349,7 +349,6 @@ describe "speed grader" do
         Speedgrader.click_next_student_btn
         Speedgrader.click_next_or_prev_student :previous
 
-
         expect(Speedgrader.comments).to have_size(comment_count)
         expect(Speedgrader.draft_comments).to have_size(draft_comment_count - 1)
       end
@@ -440,11 +439,11 @@ describe "speed grader" do
       @assignment = create_assignment_for_group('online_url', true)
       @student_1 = @students.first
       @student_2 = @students.second
-      add_user_to_group(@student_2,@testgroup[0])
+      add_user_to_group(@student_2, @testgroup[0])
 
       @group_comment_1 = "group comment from student 1"
       @assignment.submit_homework(@student_1, submission_type: "online_url", url: "http://instructure.com",
-        comment: @group_comment_1, group_comment: true)
+                                              comment: @group_comment_1, group_comment: true)
 
       @private_comment_1 = "private comment from student 1"
       @assignment.submit_homework(@student_1, comment: @private_comment_1)

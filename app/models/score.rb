@@ -29,8 +29,8 @@ class Score < ActiveRecord::Base
 
   validates :enrollment, presence: true
   validates :current_score, :unposted_current_score,
-    :final_score, :unposted_final_score, :override_score,
-    numericality: true, allow_nil: true
+            :final_score, :unposted_final_score, :override_score,
+            numericality: true, allow_nil: true
 
   validate :scorable_association_check
 

@@ -52,17 +52,17 @@ describe "discussion assignments" do
     end
 
     it "should create a group discussion ungraded", priority: "1", test_id: 150517 do
-      expect_new_page_load {submit_form('.form-actions')}
+      expect_new_page_load { submit_form('.form-actions') }
       expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
                                                   " each group has its own conversation for this topic."\
                                                   " Here are the ones you have access to:\nsome group")
     end
 
-    it "should create a group discussion graded",priority: "1", test_id: 150518 do
+    it "should create a group discussion graded", priority: "1", test_id: 150518 do
       f('#use_for_grading').click
       f('#discussion_topic_assignment_points_possible').send_keys('10')
       click_option('#assignment_group_id', 'Assignment Group')
-      expect_new_page_load {submit_form('.form-actions')}
+      expect_new_page_load { submit_form('.form-actions') }
       expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
       expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
                                                   " each group has its own conversation for this topic."\
@@ -86,7 +86,7 @@ describe "discussion assignments" do
       expect(f('.new-and-total-badge .new-items').text).to include ""
       user_session(@student1)
       get "/courses/#{@course.id}/discussion_topics"
-      expect_new_page_load{f("[data-testid='discussion-link-#{@discussion_topic.id}']").click}
+      expect_new_page_load { f("[data-testid='discussion-link-#{@discussion_topic.id}']").click }
       expect(f('#breadcrumbs').text).to include('some group')
       f('.discussion-reply-action').click
       type_in_tiny 'textarea', 'something to submit'

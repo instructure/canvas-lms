@@ -57,16 +57,16 @@ module SupportHelpers
       param_keys = %w[submission_id attachment_id]
       if (params.keys & param_keys).present?
         ids = param_keys.map do |key|
-          error = {text:"Missing `#{key}` parameter", status: 400}
+          error = { text: "Missing `#{key}` parameter", status: 400 }
           render error and return unless params[key]
+
           params[key].to_i
         end
         run_fixer(SupportHelpers::Tii::LtiAttachmentFixer, *ids)
       else
-        error = {text:"Missing attachment_id and submission_id parameters", status: 400}
+        error = { text: "Missing attachment_id and submission_id parameters", status: 400 }
         render error and return
       end
     end
-
   end
 end

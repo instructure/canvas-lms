@@ -104,12 +104,13 @@ module Lti::Ims
     end
 
     def member_sourced_id(expander)
-      expanded = expander.expand_variables!({value: '$Person.sourcedId'})[:value]
+      expanded = expander.expand_variables!({ value: '$Person.sourcedId' })[:value]
       expanded == '$Person.sourcedId' ? nil : expanded
     end
 
     def message(enrollment, expander)
       return {} if page[:opts].blank? || page[:opts][:rlid].blank?
+
       orig_locale = I18n.locale
       orig_time_zone = Time.zone
       begin
@@ -123,8 +124,8 @@ module Lti::Ims
           return_url: nil,
           opts: {
             # See #variable_expander for additional constraints on custom param expansion
-            claim_group_whitelist: [ :public, :i18n, :custom_params ],
-            extension_whitelist: [ :canvas_user_id, :canvas_user_login_id ]
+            claim_group_whitelist: [:public, :i18n, :custom_params],
+            extension_whitelist: [:canvas_user_id, :canvas_user_login_id]
           }
         ).generate_post_payload_message(validate_launch: false)
       ensure
@@ -133,10 +134,10 @@ module Lti::Ims
       end
 
       # A few straggler fields we can't readily control via white/blacklists
-      launch_hash = launch.to_h.
-        except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version").
-        except!("picture")
-      { message: [ launch_hash ] }
+      launch_hash = launch.to_h
+                          .except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version")
+                          .except!("picture")
+      { message: [launch_hash] }
     end
 
     def unwrap(wrapped)

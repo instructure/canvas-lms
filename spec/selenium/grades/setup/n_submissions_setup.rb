@@ -20,30 +20,29 @@
 require_relative '../../helpers/gradebook_common'
 
 module NSubmisssionsSetup
-
   # use this to create X students and Y assignments = XY Submissions
   # Note: This can be used for 200 submissions, beyond that might not be supported on current Jenkins
 
-  def submissions_setup(number_of_students, number_of_assignments, opts={})
+  def submissions_setup(number_of_students, number_of_assignments, opts = {})
     course_with_teacher({ active_all: true }.merge(opts))
     @course.grading_standard_enabled = true
     @course.save!
 
-    @students = create_users_in_course(@course,number_of_students)
+    @students = create_users_in_course(@course, number_of_students)
 
     # assignment data
     @group = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 100)
     @assignments = []
     (1..number_of_assignments).each do |assignment_number|
       assignment = assignment_model({
-                                    course: @course,
-                                    name: "Assignment_#{assignment_number}",
-                                    due_at: nil,
-                                    points_possible: 10,
-                                    submission_types: 'online_text_entry,online_upload',
-                                    assignment_group: @group
-                                  })
-      @students[0..number_of_students].map{ |student_id| assignment.grade_student(User.find(student_id), grade: 10, grader: @teacher) }
+                                      course: @course,
+                                      name: "Assignment_#{assignment_number}",
+                                      due_at: nil,
+                                      points_possible: 10,
+                                      submission_types: 'online_text_entry,online_upload',
+                                      assignment_group: @group
+                                    })
+      @students[0..number_of_students].map { |student_id| assignment.grade_student(User.find(student_id), grade: 10, grader: @teacher) }
       @assignments.push assignment
     end
   end

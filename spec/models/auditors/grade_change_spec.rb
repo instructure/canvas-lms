@@ -54,7 +54,7 @@ describe Auditors::GradeChange do
   describe "with cassandra backend" do
     include_examples "cassandra audit logs"
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
       Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
     end
 
@@ -92,14 +92,14 @@ describe Auditors::GradeChange do
         expect(@event.created_at).to eq @event_time
         expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
         expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_root_account_student(@account, @student).
-                paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher).
-                paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_root_account_student(@account, @student)
+                .paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher)
+                .paginate(:per_page => 5)).to include(@event)
 
         test_course_and_other_contexts do |contexts|
-          expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).
-            paginate(:per_page => 5)).to include(@event)
+          expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts)
+            .paginate(:per_page => 5)).to include(@event)
         end
       end
 
@@ -111,14 +111,14 @@ describe Auditors::GradeChange do
 
         expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
         expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_root_account_student(@account, @student).
-          paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment}).
-          paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment,
-          student: @student}).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {student: @student}).
-          paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_root_account_student(@account, @student)
+          .paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment })
+          .paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment,
+                                                                               student: @student }).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { student: @student })
+          .paginate(:per_page => 5)).to include(@event)
       end
 
       it "should include event for auto grader" do
@@ -130,14 +130,14 @@ describe Auditors::GradeChange do
 
         expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
         expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_root_account_student(@account, @student).
-          paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment}).
-          paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment,
-          student: @student}).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {student: @student}).
-          paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_root_account_student(@account, @student)
+          .paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment })
+          .paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment,
+                                                                               student: @student }).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { student: @student })
+          .paginate(:per_page => 5)).to include(@event)
       end
 
       it "should set request_id" do
@@ -157,8 +157,8 @@ describe Auditors::GradeChange do
       expect(for_root_account_student.paginate(per_page: 5)).to include(@event)
 
       test_course_and_other_contexts do |contexts|
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5)).
-          to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5))
+          .to include(@event)
       end
     end
 
@@ -176,8 +176,8 @@ describe Auditors::GradeChange do
       expect(for_course.paginate(per_page: 5)).to include(@event)
       expect(for_root_account_student.paginate(per_page: 5)).to include(@event)
       test_course_and_other_contexts do |contexts|
-        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5)).
-          to include(@event)
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5))
+          .to include(@event)
       end
     end
 
@@ -340,7 +340,7 @@ describe Auditors::GradeChange do
     end
 
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     end
 
     it "inserts submission grade change records" do
@@ -470,14 +470,14 @@ describe Auditors::GradeChange do
           event_type: 'grade'
         }
         r1 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
-          uuid: 'asdf',
-          request_id: 'asdf'
-        }))
+                                                                                  uuid: 'asdf',
+                                                                                  request_id: 'asdf'
+                                                                                }))
         r2 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
-          assignment_id: nil,
-          uuid: 'fdsa',
-          request_id: 'fdsa'
-        }))
+                                                                                  assignment_id: nil,
+                                                                                  uuid: 'fdsa',
+                                                                                  request_id: 'fdsa'
+                                                                                }))
         scope1 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: @assignment.id)
         scope2 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: Auditors::GradeChange::NULL_PLACEHOLDER)
         scope1 = Auditors::GradeChange.filter_by_assignment(scope1)
@@ -493,7 +493,7 @@ describe Auditors::GradeChange do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
     end
 
     it "writes to cassandra" do

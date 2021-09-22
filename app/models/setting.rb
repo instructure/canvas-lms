@@ -39,16 +39,16 @@ class Setting < Switchman::UnshardedRecord
 
         fetch = Proc.new { Setting.pluck(:name, :value).to_h }
         all_settings = if @skip_cache
-          # we want to skip talking to redis, but it's okay to use the in-proc cache
-          @all_settings ||= fetch.call
-        elsif expires_in
-          # ignore the in-proc cache, but check redis; it will have been properly
-          # cleared by whoever set it, they just have no way to clear the in-proc cache
-          @all_settings = MultiCache.fetch("all_settings", &fetch)
-        else
-          # use both caches
-          @all_settings ||= MultiCache.fetch("all_settings", &fetch)
-        end
+                         # we want to skip talking to redis, but it's okay to use the in-proc cache
+                         @all_settings ||= fetch.call
+                       elsif expires_in
+                         # ignore the in-proc cache, but check redis; it will have been properly
+                         # cleared by whoever set it, they just have no way to clear the in-proc cache
+                         @all_settings = MultiCache.fetch("all_settings", &fetch)
+                       else
+                         # use both caches
+                         @all_settings ||= MultiCache.fetch("all_settings", &fetch)
+                       end
 
         if all_settings.key?(name)
           all_settings[name]&.to_s

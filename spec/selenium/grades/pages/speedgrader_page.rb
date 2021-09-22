@@ -332,7 +332,7 @@ class Speedgrader
 
     def status_menu_option(desired_option)
       menu_options = ff("[role='menuitemradio']")
-      menu_options.find { |option| option.text == desired_option}
+      menu_options.find { |option| option.text == desired_option }
     end
 
     def time_late_input
@@ -354,7 +354,7 @@ class Speedgrader
     def visit_section(section)
       students_dropdown_button.click
       hover(sections_menu_link)
-      wait_for_new_page_load{ section.click }
+      wait_for_new_page_load { section.click }
     end
 
     def enter_grade(grade)
@@ -471,7 +471,7 @@ class Speedgrader
 
     def select_student(student)
       click_students_dropdown
-      students_select_menu_list.find { |e| e.text == student.name}.click
+      students_select_menu_list.find { |e| e.text == student.name }.click
       wait_for_ajaximations
     end
 

@@ -57,7 +57,7 @@ module I18nTasks
         let_there_be_lols(default_thing)
       when Hash
         result = {}
-        default_thing.each do |k,v|
+        default_thing.each do |k, v|
           result[k] = let_there_be_lols(v)
         end
         result

@@ -27,13 +27,13 @@ class Ignore < ActiveRecord::Base
 
   def self.cleanup
     GuardRail.activate(:secondary) do
-      Ignore.select(:id).
-        joins("LEFT JOIN #{Assignment.quoted_table_name} AS a ON a.id = ignores.asset_id AND 'Assignment' = ignores.asset_type
+      Ignore.select(:id)
+            .joins("LEFT JOIN #{Assignment.quoted_table_name} AS a ON a.id = ignores.asset_id AND 'Assignment' = ignores.asset_type
           LEFT JOIN #{Quizzes::Quiz.quoted_table_name} AS q ON q.id = ignores.asset_id AND 'Quizzes::Quiz' = ignores.asset_type
           LEFT JOIN #{AssessmentRequest.quoted_table_name} AS ar ON ar.id = ignores.asset_id AND 'AssessmentRequest' = ignores.asset_type
           LEFT JOIN #{Submission.quoted_table_name} AS s ON ar.asset_id = s.id AND ar.asset_type = 'Submission'
-          LEFT JOIN #{Assignment.quoted_table_name} AS ara ON ara.id = s.assignment_id").
-        where("(a.id IS NULL AND q.id IS NULL AND ar.id IS NULL)
+          LEFT JOIN #{Assignment.quoted_table_name} AS ara ON ara.id = s.assignment_id")
+            .where("(a.id IS NULL AND q.id IS NULL AND ar.id IS NULL)
           OR (a.workflow_state = 'deleted' AND a.updated_at < :deletion_time)
           OR (q.workflow_state = 'deleted' AND q.updated_at < :deletion_time)
           OR (ar.workflow_state = 'deleted' AND ar.updated_at < :deletion_time)
@@ -46,7 +46,7 @@ class Ignore < ActiveRecord::Base
                  OR enrollments.course_id = ara.context_id)
                 AND (enrollments.workflow_state <> 'deleted'
                  OR enrollments.updated_at > :deletion_time)))",
-          {deletion_time: 1.month.ago}).find_in_batches do |batch|
+                   { deletion_time: 1.month.ago }).find_in_batches do |batch|
         GuardRail.activate(:primary) do
           Ignore.where(id: batch).delete_all
         end

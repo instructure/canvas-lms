@@ -44,23 +44,23 @@ describe CollaborationsController, type: :request do
       @user = @student
     end
 
-    let(:url) { "/api/v1/courses/#{@course.id}/collaborations"}
+    let(:url) { "/api/v1/courses/#{@course.id}/collaborations" }
     let(:url_options) do
       {
         :controller => 'collaborations',
-        :action     => 'api_index',
-        :course_id  => @course.id,
-        :format     => 'json'
+        :action => 'api_index',
+        :course_id => @course.id,
+        :format => 'json'
       }
     end
 
-    let(:group_url) { "/api/v1/groups/#{@group.id}/collaborations"}
+    let(:group_url) { "/api/v1/groups/#{@group.id}/collaborations" }
     let(:group_url_options) do
       {
         :controller => 'collaborations',
-        :action     => 'api_index',
-        :group_id   => @group.id,
-        :format     => 'json'
+        :action => 'api_index',
+        :group_id => @group.id,
+        :format => 'json'
       }
     end
 
@@ -124,7 +124,6 @@ describe CollaborationsController, type: :request do
       json = api_call(:get, group_url, group_url_options)
       expect(json.count).to eq 1
     end
-
   end
 
   context '/api/v1/collaborations/:id/members' do
@@ -140,10 +139,12 @@ describe CollaborationsController, type: :request do
     end
 
     let(:url) { "/api/v1/collaborations/#{@collaboration.to_param}/members.json" }
-    let(:url_options) { { :controller => 'collaborations',
-                          :action     => 'members',
-                          :id         => @collaboration.to_param,
-                          :format     => 'json' } }
+    let(:url_options) {
+      { :controller => 'collaborations',
+        :action => 'members',
+        :id => @collaboration.to_param,
+        :format => 'json' }
+    }
 
     describe 'a group member' do
       it 'should see group members' do
@@ -192,14 +193,14 @@ describe CollaborationsController, type: :request do
       user_factory
       api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
                { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param},
+                 :format => 'json', :course_id => @course.to_param },
                {}, {}, expected_status: 401)
     end
 
     it 'returns course members for course collaborations' do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :course_id => @course.to_param })
       expect(json.map { |user| user['id'] }).to match_array(@course.users.pluck(:id))
     end
 
@@ -213,8 +214,8 @@ describe CollaborationsController, type: :request do
       @course.enroll_user(student2, 'StudentEnrollment', :section => second_section)
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :course_id => @course.to_param })
 
       users_map = json.map { |user| user['id'] }
 
@@ -231,8 +232,8 @@ describe CollaborationsController, type: :request do
       @group.add_user(@user)
       gc = collaboration_model(:user => @user, :context => @group)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :group_id => @group.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :group_id => @group.to_param })
       expect(json.map { |user| user['id'] }).to match_array(@course.admins.pluck(:id) + @group.users.pluck(:id))
     end
   end

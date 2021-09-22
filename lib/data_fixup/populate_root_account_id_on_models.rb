@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup::PopulateRootAccountIdOnModels
-
   # migration_tables should be a hash of a model and the association that has access to the root_account on that model
   # migration_tables should not need to be ordered, the job will try to determine if the required association
   # backfill has been completed, and wait to run it later when the requirements have completed if necessary.
@@ -61,7 +60,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AccountUser => :account,
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
-      AssetUserAccess => [:context_course, :context_group, {context_account: Account.resolved_root_account_id_sql}],
+      AssetUserAccess => [:context_course, :context_group, { context_account: Account.resolved_root_account_id_sql }],
       AssignmentGroup => :context,
       AssignmentOverride => [:assignment, :quiz],
       AssignmentOverrideStudent => [:assignment, :quiz],
@@ -91,7 +90,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Favorite => :context,
       Folder => [:account, :course, :group],
       GradingPeriod => :grading_period_group,
-      GradingPeriodGroup => [{root_account: Account.resolved_root_account_id_sql}, :course],
+      GradingPeriodGroup => [{ root_account: Account.resolved_root_account_id_sql }, :course],
       GradingStandard => :context,
       GroupCategory => :context,
       GroupMembership => :group,
@@ -184,7 +183,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     # Arguments to where()
     @unfillable_criteria ||= {
       DeveloperKey => 'account_id IS NULL',
-    }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
+    }.transform_values { |criteria| [criteria].flatten(1) }.freeze
   end
 
   # A better alternative to the above, perhaps not possible in all cases, is to
@@ -196,10 +195,10 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.fill_with_zeros_criteria
     # Arguments to where()
     @fill_with_zeros_criteria ||= {
-      CalendarEvent => {context_type: 'User', effective_context_code: nil},
+      CalendarEvent => { context_type: 'User', effective_context_code: nil },
       LearningOutcomeGroup => 'context_id IS NULL',
-      ContentMigration => {context_type: 'User'},
-    }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
+      ContentMigration => { context_type: 'User' },
+    }.transform_values { |criteria| [criteria].flatten(1) }.freeze
   end
 
   # These must be simple associations or specific polymorphic associations ("course" not "context")
@@ -224,7 +223,7 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.send_later_backfill_strand(job, *args)
     delay_if_production(priority: Delayed::MAX_PRIORITY,
-      n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).__send__(job, *args)
+                        n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).__send__(job, *args)
   end
 
   def self.run
@@ -246,6 +245,7 @@ module DataFixup::PopulateRootAccountIdOnModels
           Array(populate_overrides[table]).each do |override_module|
             next unless override_module.respond_to?(:populate)
             next if table.where(get_column_name(table) => nil).none?
+
             send_later_backfill_strand(:populate_root_account_ids_override, table, override_module, min, max)
           end
         end
@@ -254,12 +254,12 @@ module DataFixup::PopulateRootAccountIdOnModels
       if populate_overrides.key?(table)
         Array(populate_overrides[table]).each do |override_module|
           next unless override_module.respond_to?(:populate_table) &&
-            override_module.respond_to?(:run_populate_table?)
+                      override_module.respond_to?(:run_populate_table?)
           next unless override_module.run_populate_table?
+
           send_later_backfill_strand(:populate_root_account_ids_override_table, table, override_module)
         end
       end
-
     end
   end
 
@@ -306,9 +306,9 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.in_progress_tables
     Delayed::Job.where(strand: "root_account_id_backfill/#{Shard.current.database_server.id}",
-      shard_id: Shard.current).map do |job|
-        job.payload_object&.args&.first
-      end.uniq.compact
+                       shard_id: Shard.current).map do |job|
+      job.payload_object&.args&.first
+    end.uniq.compact
   end
 
   def self.hash_association(association)
@@ -319,9 +319,9 @@ module DataFixup::PopulateRootAccountIdOnModels
         memo[assoc.to_sym] = column
       end
     when Array
-      association.reduce({}){|memo, assoc| memo.merge(hash_association(assoc))}
+      association.reduce({}) { |memo, assoc| memo.merge(hash_association(assoc)) }
     when String, Symbol
-      {association.to_sym => :root_account_id}
+      { association.to_sym => :root_account_id }
     else
       raise "Unexpected association type for root_account association: #{association.class}"
     end
@@ -460,7 +460,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # this method finds a polymorphic reflection for the given reflection,
   # if there is one
   def self.find_polymorphic_reflection(table, reflection)
-    table.reflections.values.find{|values| values.foreign_key == reflection.foreign_key && values.foreign_type}
+    table.reflections.values.find { |values| values.foreign_key == reflection.foreign_key && values.foreign_type }
   end
 
   def self.get_column_name(table)
@@ -487,11 +487,11 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.fill_with_zeros(table, min, max)
     if (criteria = fill_with_zeros_criteria[table])
       table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
-        table.
-          where(table.primary_key => batch_min..batch_max).
-          where(root_account_id: nil).
-          where(*criteria).
-          update_all('root_account_id = 0')
+        table
+          .where(table.primary_key => batch_min..batch_max)
+          .where(root_account_id: nil)
+          .where(*criteria)
+          .update_all('root_account_id = 0')
       end
     end
   end
@@ -511,19 +511,20 @@ module DataFixup::PopulateRootAccountIdOnModels
     scope = scope.where("#{join_keys.foreign_key} < #{Shard::IDS_PER_SHARD}")
 
     scope.where("NOT EXISTS (?)", foreign_table.where(
-      "#{foreign_table.quoted_table_name}.#{join_keys.key}=#{table.quoted_table_name}.#{join_keys.foreign_key}"
-    ))
+                                    "#{foreign_table.quoted_table_name}.#{join_keys.key}=#{table.quoted_table_name}.#{join_keys.foreign_key}"
+                                  ))
   end
 
   def self.fill_nonexistent_associations_with_zeros(table, min, max)
     assoc_names = nonexistent_associations_to_fill_with_zeros[table] or return
     return unless assoc_names
+
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       assoc_names.each do |assoc_name|
-        scope_for_association_does_not_exist(table, assoc_name).
-          where(id: batch_min..batch_max).
-          where(root_account_id: nil).
-          update_all('root_account_id = 0')
+        scope_for_association_does_not_exist(table, assoc_name)
+          .where(id: batch_min..batch_max)
+          .where(root_account_id: nil)
+          .update_all('root_account_id = 0')
       end
     end
   end
@@ -542,7 +543,8 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.create_column_names(assoc, columns)
     return columns if columns.is_a?(String)
-    names = Array(columns).map{|column| "#{assoc.klass.table_name}.#{column}"}
+
+    names = Array(columns).map { |column| "#{assoc.klass.table_name}.#{column}" }
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end
 
@@ -564,15 +566,15 @@ module DataFixup::PopulateRootAccountIdOnModels
         subscope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
         associated_ids = subscope.pluck(foreign_key)
         root_ids_with_foreign_keys = foreign_shard.activate do
-          reflection.klass.
-            select("#{column} AS root_id, array_agg(#{reflection.table_name}.#{reflection.klass.primary_key}) AS foreign_keys").
-            where(id: associated_ids).
-            group("root_id")
+          reflection.klass
+                    .select("#{column} AS root_id, array_agg(#{reflection.table_name}.#{reflection.klass.primary_key}) AS foreign_keys")
+                    .where(id: associated_ids)
+                    .group("root_id")
         end
         root_ids_with_foreign_keys.each do |attributes|
-          foreign_keys = attributes.foreign_keys.map{|fk| Shard.global_id_for(fk, foreign_shard)}
-          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
-            update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
+          foreign_keys = attributes.foreign_keys.map { |fk| Shard.global_id_for(fk, foreign_shard) }
+          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})")
+                  .update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
       min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
@@ -584,7 +586,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     # so it can check to see if any new tables can begin working based off of this table
     if empty_root_account_column_scope(table).none?
       delay_if_production(priority: Delayed::LOWER_PRIORITY,
-        singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
+                          singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
     end
   end
 end

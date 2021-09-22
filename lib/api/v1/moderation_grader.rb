@@ -23,12 +23,12 @@ module Api::V1::ModerationGrader
 
   def moderation_graders_json(assignment, user, session)
     states = ['inactive', 'completed', 'deleted', 'invited']
-    active_user_ids = assignment.course.instructors.where.not(enrollments: { workflow_state: states}).pluck(:id)
+    active_user_ids = assignment.course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
 
     provisional_graders = assignment.provisional_moderation_graders
     if assignment.can_view_other_grader_identities?(user)
       graders = provisional_graders.preload(:user)
-      graders_by_id = graders.each_with_object({}) {|grader, map| map[grader.id] = grader}
+      graders_by_id = graders.each_with_object({}) { |grader, map| map[grader.id] = grader }
 
       api_json(graders, user, session, only: %w(id user_id)).tap do |hash|
         hash.each do |grader_json|
@@ -37,7 +37,7 @@ module Api::V1::ModerationGrader
         end
       end
     else
-      active_user_ids.map! {|id| assignment.grader_ids_to_anonymous_ids[id.to_s] }
+      active_user_ids.map! { |id| assignment.grader_ids_to_anonymous_ids[id.to_s] }
       api_json(provisional_graders, user, session, only: %w(id anonymous_id))
         .each { |grader_json| grader_json['grader_selectable'] = active_user_ids.include?(grader_json['anonymous_id']) }
     end

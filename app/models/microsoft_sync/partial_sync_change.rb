@@ -39,9 +39,9 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
     if values_arrays.empty?
       none
     else
-      quoted_columns = columns.map{|col| connection.quote_column_name(col)}
+      quoted_columns = columns.map { |col| connection.quote_column_name(col) }
       quoted_values_arrays = values_arrays.map do |arr|
-        '(' + arr.map{|val| connection.quote(val)}.join(',') + ')'
+        '(' + arr.map { |val| connection.quote(val) }.join(',') + ')'
       end
       where("(#{quoted_columns.join(',')}) IN (#{quoted_values_arrays.join(',')})")
     end
@@ -70,14 +70,14 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
   # Deletes all records for a course which have been replicated to the secondary.
   # Assumes insertions and updates have all used `upsert_for_enrollment` above,
   # which uses the postgres server time (NOW())
-  def self.delete_all_replicated_to_secondary_for_course(course_id, batch_size=1000)
+  def self.delete_all_replicated_to_secondary_for_course(course_id, batch_size = 1000)
     last_replicated_updated_at = GuardRail.activate(:secondary) do
       where(course_id: course_id).order(updated_at: :desc).limit(1).pluck(:updated_at).first
     end
 
     while where(course_id: course_id)
-        .where('updated_at <= ?', last_replicated_updated_at)
-        .limit(batch_size).delete_all == batch_size
+          .where('updated_at <= ?', last_replicated_updated_at)
+          .limit(batch_size).delete_all == batch_size
     end
   end
 end

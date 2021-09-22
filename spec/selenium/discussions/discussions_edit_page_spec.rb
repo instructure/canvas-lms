@@ -24,16 +24,18 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:group_category) { course.group_categories.create!(name: 'group category') }
-  let(:assignment) { course.assignments.create!(
+  let(:assignment) {
+    course.assignments.create!(
       name: 'assignment',
-      #submission_types: 'discussion_topic',
+      # submission_types: 'discussion_topic',
       assignment_group: assignment_group
-  ) }
+    )
+  }
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: 'assignment topic title',
@@ -171,7 +173,7 @@ describe "discussions" do
         it "group discussions with entries should lock and display the group name", priority: "1", test_id: 270920 do
           topic.group_category = @gc
           topic.save!
-          topic.child_topics[0].reply_from({:user => @student, :text => "I feel pretty"})
+          topic.child_topics[0].reply_from({ :user => @student, :text => "I feel pretty" })
           @gc.destroy
           get url
 
@@ -193,7 +195,7 @@ describe "discussions" do
           it "should lock and display the group name", priority: "1", test_id: 270922 do
             topic.group_category = @gc
             topic.save!
-            topic.reply_from({:user => @student, :text => "I feel pretty"})
+            topic.reply_from({ :user => @student, :text => "I feel pretty" })
             @gc.destroy
             get url
 

@@ -48,9 +48,9 @@ describe "LoggingFilter" do
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-        :access_token => "[FILTERED]",
-        :api_key => "[FILTERED]"
-      })
+                                      :access_token => "[FILTERED]",
+                                      :api_key => "[FILTERED]"
+                                    })
     end
 
     it "should filter string or symbol keys" do
@@ -60,9 +60,9 @@ describe "LoggingFilter" do
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-        :access_token => "[FILTERED]",
-        "api_key" => "[FILTERED]"
-      })
+                                      :access_token => "[FILTERED]",
+                                      "api_key" => "[FILTERED]"
+                                    })
     end
 
     it "should filter keys of any case" do
@@ -71,8 +71,8 @@ describe "LoggingFilter" do
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-        "ApI_KeY" => "[FILTERED]"
-      })
+                                      "ApI_KeY" => "[FILTERED]"
+                                    })
     end
 
     it "should filter nested keys in string format" do
@@ -81,8 +81,8 @@ describe "LoggingFilter" do
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-        "pseudonym_session[password]" => "[FILTERED]"
-      })
+                                      "pseudonym_session[password]" => "[FILTERED]"
+                                    })
     end
 
     it "should filter ested keys in hash format" do
@@ -93,10 +93,10 @@ describe "LoggingFilter" do
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-        :pseudonym_session => {
-          :password => "[FILTERED]"
-        }
-      })
+                                      :pseudonym_session => {
+                                        :password => "[FILTERED]"
+                                      }
+                                    })
     end
   end
 end

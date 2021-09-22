@@ -35,7 +35,6 @@ shared_context "discussions_page_shared_context" do
   let(:discussion_reply_button) { '.discussion-reply-action.discussion-reply-box' }
 end
 
-
 module DiscussionHelpers
   module SetupContext
     def setup_student_context
@@ -92,44 +91,44 @@ module DiscussionHelpers
 
     def disable_view_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'read_forum',
-                                                  role: context_role,
-                                                  enabled: false)
+                                                 role: context_role,
+                                                 enabled: false)
     end
 
     def disable_moderate_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'moderate_forum',
-                                                  role: context_role,
-                                                  enabled: false)
+                                                 role: context_role,
+                                                 enabled: false)
     end
 
     def disable_create_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'create_forum',
-                                                  role: context_role,
-                                                  enabled: false)
+                                                 role: context_role,
+                                                 enabled: false)
     end
 
     def disable_post_to_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'post_to_forum',
-                                                  role: context_role,
-                                                  enabled: false)
+                                                 role: context_role,
+                                                 enabled: false)
     end
 
     def enable_view_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'read_forum',
-                                                  role: context_role,
-                                                  enabled: true)
+                                                 role: context_role,
+                                                 enabled: true)
     end
 
     def enable_moderate_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'moderate_forum',
-                                                  role: context_role,
-                                                  enabled: true)
+                                                 role: context_role,
+                                                 enabled: true)
     end
 
     def enable_post_to_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'post_to_forum',
-                                                  role: context_role,
-                                                  enabled: true)
+                                                 role: context_role,
+                                                 enabled: true)
     end
   end
 end

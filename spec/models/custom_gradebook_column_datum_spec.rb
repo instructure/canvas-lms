@@ -32,34 +32,34 @@ describe CustomGradebookColumnDatum do
       @second_col = @course.custom_gradebook_columns.create!(title: "cc2", position: 2)
 
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": @first_col.id.to_s,
-          "user_id": @first_student.id.to_s,
-          "content": "first column, first student"
-        },
-        {
-          "column_id": @first_col.id.to_s,
-          "user_id": @second_student.id.to_s,
-          "content": "first column, second student"
-        },
-        {
-          "column_id": @second_col.id.to_s,
-          "user_id": @first_student.id.to_s,
-          "content": "second column, first student"
-        },
-        {
-          "column_id": @second_col.id.to_s,
-          "user_id": @second_student.id.to_s,
-          "content": "second column, second student"
-        }
-      ])
+                                                                      {
+                                                                        "column_id": @first_col.id.to_s,
+                                                                        "user_id": @first_student.id.to_s,
+                                                                        "content": "first column, first student"
+                                                                      },
+                                                                      {
+                                                                        "column_id": @first_col.id.to_s,
+                                                                        "user_id": @second_student.id.to_s,
+                                                                        "content": "first column, second student"
+                                                                      },
+                                                                      {
+                                                                        "column_id": @second_col.id.to_s,
+                                                                        "user_id": @first_student.id.to_s,
+                                                                        "content": "second column, first student"
+                                                                      },
+                                                                      {
+                                                                        "column_id": @second_col.id.to_s,
+                                                                        "user_id": @second_student.id.to_s,
+                                                                        "content": "second column, second student"
+                                                                      }
+                                                                    ])
     end
 
     let(:first_student_data) do
-      @course.custom_gradebook_columns.
-        find_by!(id: @first_col.id).
-        custom_gradebook_column_data.
-        find_by(user_id: @first_student.id)
+      @course.custom_gradebook_columns
+             .find_by!(id: @first_col.id)
+             .custom_gradebook_column_data
+             .find_by(user_id: @first_student.id)
     end
 
     it "sets the root account id on the column datum" do
@@ -67,10 +67,10 @@ describe CustomGradebookColumnDatum do
     end
 
     it "adds a datum for a matching student and column" do
-      data = @course.custom_gradebook_columns.
-        find_by!(id: @first_col.id).
-        custom_gradebook_column_data.
-        where(user_id: @first_student.id)
+      data = @course.custom_gradebook_columns
+                    .find_by!(id: @first_col.id)
+                    .custom_gradebook_column_data
+                    .where(user_id: @first_student.id)
       expect(data.count).to be 1
     end
 
@@ -90,12 +90,12 @@ describe CustomGradebookColumnDatum do
 
     it "does not create new columns when column doesn't exist" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": (@second_col.id + 1001).to_s,
-          "user_id": @second_student.id.to_s,
-          "content": "first column, second student"
-        },
-      ])
+                                                                      {
+                                                                        "column_id": (@second_col.id + 1001).to_s,
+                                                                        "user_id": @second_student.id.to_s,
+                                                                        "content": "first column, second student"
+                                                                      },
+                                                                    ])
 
       data = @course.custom_gradebook_columns.where(id: @second_col.id + 1001)
       expect(data.count).to be 0
@@ -103,46 +103,46 @@ describe CustomGradebookColumnDatum do
 
     it "updates the content for existing student and column" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": @second_col.id.to_s,
-          "user_id": @second_student.id.to_s,
-          "content": "2, 2"
-        }
-      ])
+                                                                      {
+                                                                        "column_id": @second_col.id.to_s,
+                                                                        "user_id": @second_student.id.to_s,
+                                                                        "content": "2, 2"
+                                                                      }
+                                                                    ])
 
-      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id).
-        custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
+      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+                    .custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
       expect(data).to eql "2, 2"
     end
 
     it "can also pass the column ID as a number" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": @second_col.id,
-          "user_id": @second_student.id,
-          "content": "2, 2"
-        }
-      ])
+                                                                      {
+                                                                        "column_id": @second_col.id,
+                                                                        "user_id": @second_student.id,
+                                                                        "content": "2, 2"
+                                                                      }
+                                                                    ])
 
-      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id).
-        custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
+      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+                    .custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
       expect(data).to eql "2, 2"
     end
 
     it "does not update content in deleted columns" do
-      @course.custom_gradebook_columns.find_by!(id: @second_col.id).
-        custom_gradebook_column_data.find_by!(user_id: @first_student.id).delete
-      @course.custom_gradebook_columns.find_by!(id: @second_col.id).
-        custom_gradebook_column_data.find_by!(user_id: @second_student.id).delete
+      @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+             .custom_gradebook_column_data.find_by!(user_id: @first_student.id).delete
+      @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+             .custom_gradebook_column_data.find_by!(user_id: @second_student.id).delete
       @course.custom_gradebook_columns.find_by!(id: @second_col.id).delete
 
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": @second_col.id.to_s,
-          "user_id": @second_student.id.to_s,
-          "content": "3, 2"
-        },
-      ])
+                                                                      {
+                                                                        "column_id": @second_col.id.to_s,
+                                                                        "user_id": @second_student.id.to_s,
+                                                                        "content": "3, 2"
+                                                                      },
+                                                                    ])
 
       data = @course.custom_gradebook_columns.where(id: @second_col.id)
       expect(data.count).to be 0
@@ -150,12 +150,12 @@ describe CustomGradebookColumnDatum do
 
     it "destroys data when uploading empty string" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
-        {
-          "column_id": @first_col.id.to_s,
-          "user_id": @first_student.id.to_s,
-          "content": ""
-        },
-      ])
+                                                                      {
+                                                                        "column_id": @first_col.id.to_s,
+                                                                        "user_id": @first_student.id.to_s,
+                                                                        "content": ""
+                                                                      },
+                                                                    ])
 
       expect(first_student_data).to be_nil
     end

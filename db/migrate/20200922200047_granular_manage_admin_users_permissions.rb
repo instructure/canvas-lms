@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -32,5 +33,4 @@ class GranularManageAdminUsersPermissions < ActiveRecord::Migration[5.2]
   def down
     raise ActiveRecord::IrreversibleMigration
   end
-
 end

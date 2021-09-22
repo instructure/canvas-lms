@@ -108,13 +108,13 @@ describe MicrosoftSync::PartialMembershipDiff do
     actions = Hash.new { |hash, key| hash[key] = [] }
 
     diff.additions_in_slices_of(slice_size) do |additions|
-      additions[:owners]&.each{ |aad| actions[aad] << :add_owner }
-      additions[:members]&.each{ |aad| actions[aad] << :add_member }
+      additions[:owners]&.each { |aad| actions[aad] << :add_owner }
+      additions[:members]&.each { |aad| actions[aad] << :add_member }
     end
 
     diff.removals_in_slices_of(slice_size) do |removals|
-      removals[:owners]&.each{ |aad| actions[aad] << :remove_owner }
-      removals[:members]&.each{ |aad| actions[aad] << :remove_member }
+      removals[:owners]&.each { |aad| actions[aad] << :remove_owner }
+      removals[:members]&.each { |aad| actions[aad] << :remove_member }
     end
 
     actions
@@ -135,20 +135,19 @@ describe MicrosoftSync::PartialMembershipDiff do
   end
 
   EXPECTED_ACTIONS = {
-    m_X:    %i[remove_member],
-    m_M:    %i[add_member],
-    m_O:    [],
-    m_MO:   %i[add_member],
-    o_X:    %i[remove_member remove_owner],
-    o_M:    %i[remove_owner add_member],
-    o_O:    %i[add_member add_owner],
-    o_MO:   %i[add_member add_owner],
-    mo_X:   %i[remove_member remove_owner],
-    mo_M:   %i[remove_owner add_member],
-    mo_O:   %i[add_member add_owner],
-    mo_MO:  %i[add_member add_owner],
+    m_X: %i[remove_member],
+    m_M: %i[add_member],
+    m_O: [],
+    m_MO: %i[add_member],
+    o_X: %i[remove_member remove_owner],
+    o_M: %i[remove_owner add_member],
+    o_O: %i[add_member add_owner],
+    o_MO: %i[add_member add_owner],
+    mo_X: %i[remove_member remove_owner],
+    mo_M: %i[remove_owner add_member],
+    mo_O: %i[add_member add_owner],
+    mo_MO: %i[add_member add_owner],
   }.transform_values(&:freeze).freeze
-
 
   [20, 4].each do |slice_len|
     context "with a slice size of #{slice_len}" do
@@ -217,20 +216,20 @@ describe MicrosoftSync::PartialMembershipDiff do
     before { allow(MicrosoftSync::MembershipDiff).to receive(:in_slices_of).and_call_original }
 
     it 'batches additions in slices, owners first' do
-      expect(additions_slices.map{|slice| slice.transform_values(&:count)}).to eq([
-        {members: 0, owners: 3},
-        {members: 2, owners: 1},
-        {members: 3},
-        {members: 3},
-      ])
+      expect(additions_slices.map { |slice| slice.transform_values(&:count) }).to eq([
+                                                                                       { members: 0, owners: 3 },
+                                                                                       { members: 2, owners: 1 },
+                                                                                       { members: 3 },
+                                                                                       { members: 3 },
+                                                                                     ])
     end
 
     it 'batches removals in slices, owners first' do
-      expect(removals_slices.map{|slice| slice.transform_values(&:count)}).to eq([
-        {members: 0, owners: 3},
-        {members: 2, owners: 1},
-        {members: 1},
-      ])
+      expect(removals_slices.map { |slice| slice.transform_values(&:count) }).to eq([
+                                                                                      { members: 0, owners: 3 },
+                                                                                      { members: 2, owners: 1 },
+                                                                                      { members: 1 },
+                                                                                    ])
     end
 
     it 'uses MembershipDiff.in_slices_of for additions' do
@@ -253,7 +252,7 @@ describe MicrosoftSync::PartialMembershipDiff do
 
       subject.log_all_actions
 
-      logs = logs.map{|l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, '')}.compact.sort
+      logs = logs.map { |l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, '') }.compact.sort
 
       expect(logs.join("\n")).to eq([
         'User 101 (m_X): change ["member"], enrolls [] -> [:remove_member]',

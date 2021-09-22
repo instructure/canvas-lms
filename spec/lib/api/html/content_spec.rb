@@ -76,7 +76,6 @@ module Api
       end
 
       describe "#rewritten_html" do
-
         it "stuffs mathml into a data attribute on equation images" do
           string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
                  "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
@@ -110,10 +109,9 @@ module Api
           html = Content.new(string, rewrite_api_urls: false).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"/blah\"></a></p>")
         end
-    end
+      end
 
       describe "#add_css_and_js_overrides" do
-
         it "does nothing if :include_mobile is false" do
           string = "<div>stuff</div>"
           html = Content.new(string).add_css_and_js_overrides.to_s
@@ -130,18 +128,18 @@ module Api
           string = "<div>stuff</div>"
 
           root_bc = BrandConfig.create!({
-            mobile_css_overrides: 'https://example.com/root/account.css',
-            mobile_js_overrides: 'https://example.com/root/account.js'
-          })
+                                          mobile_css_overrides: 'https://example.com/root/account.css',
+                                          mobile_js_overrides: 'https://example.com/root/account.js'
+                                        })
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
           child_account.root_account.settings[:sub_account_includes] = true
           child_account.root_account.save!
 
           bc = child_account.build_brand_config({
-            mobile_css_overrides: 'https://example.com/child/account.css',
-            mobile_js_overrides: 'https://example.com/child/account.js'
-          })
+                                                  mobile_css_overrides: 'https://example.com/child/account.css',
+                                                  mobile_js_overrides: 'https://example.com/child/account.js'
+                                                })
           bc.parent = root_bc
           bc.save!
           child_account.save!
@@ -158,9 +156,9 @@ module Api
           string = "<div>stuff</div>"
 
           site_admin_bc = Account.site_admin.create_brand_config!({
-            mobile_css_overrides: 'https://example.com/site_admin/account.css',
-            mobile_js_overrides: 'https://example.com/site_admin/account.js'
-          })
+                                                                    mobile_css_overrides: 'https://example.com/site_admin/account.css',
+                                                                    mobile_js_overrides: 'https://example.com/site_admin/account.js'
+                                                                  })
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
           child_account.save!
@@ -170,8 +168,6 @@ module Api
                                   '<div>stuff</div>' \
                                   '<script src="https://example.com/site_admin/account.js"></script>'
         end
-
-
       end
     end
   end

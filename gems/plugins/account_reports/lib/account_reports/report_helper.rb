@@ -34,7 +34,7 @@ module AccountReports::ReportHelper
   # This function will take a datetime or a datetime string and convert into
   # iso8601 for the root_account's timezone
   # A string datetime needs to be in UTC
-  def default_timezone_format(datetime, account=root_account)
+  def default_timezone_format(datetime, account = root_account)
     datetime = parse_utc_string(datetime)
     if datetime
       datetime.in_time_zone(account.default_time_zone).iso8601
@@ -46,7 +46,7 @@ module AccountReports::ReportHelper
   # This function will take a datetime or a datetime string and convert into
   # strftime for the root_account's timezone
   # it will then format the datetime using the given format string
-  def timezone_strftime(datetime, format, account=root_account)
+  def timezone_strftime(datetime, format, account = root_account)
     if (datetime = parse_utc_string(datetime))
       (datetime.in_time_zone(account.default_time_zone)).strftime(format)
     end
@@ -54,7 +54,7 @@ module AccountReports::ReportHelper
 
   # This function will take a datetime string and parse into UTC from the
   # root_account's timezone
-  def account_time_parse(datetime, account=root_account)
+  def account_time_parse(datetime, account = root_account)
     Time.use_zone(account.default_time_zone) do
       Time.zone.parse datetime.to_s rescue nil
     end
@@ -84,6 +84,7 @@ module AccountReports::ReportHelper
     time = datetime_from_param(param)
     return fallback if time.nil? && fallback
     return unless time
+
     time = earliest if earliest&.> time
     time = latest if latest&.< time
     time
@@ -118,7 +119,7 @@ module AccountReports::ReportHelper
 
   def add_term_scope(scope, table = 'courses')
     if term
-      scope.where(table => {:enrollment_term_id => term})
+      scope.where(table => { :enrollment_term_id => term })
     else
       scope
     end
@@ -126,7 +127,7 @@ module AccountReports::ReportHelper
 
   def add_course_scope(scope, table = 'courses')
     if course
-      scope.where(table => {:id => course.id})
+      scope.where(table => { :id => course.id })
     else
       scope
     end
@@ -146,7 +147,7 @@ module AccountReports::ReportHelper
 
   def add_course_enrollments_scope(scope, table = 'enrollments')
     if course
-      scope.where(table => {:course_id => course})
+      scope.where(table => { :course_id => course })
     else
       scope
     end
@@ -172,9 +173,9 @@ module AccountReports::ReportHelper
   def extra_text_term(account_report = @account_report)
     account_report.parameters ||= {}
     add_extra_text(I18n.t(
-      'account_reports.default.extra_text_term', "Term: %{term_name};",
-      :term_name => term_name
-    ))
+                     'account_reports.default.extra_text_term', "Term: %{term_name};",
+                     :term_name => term_name
+                   ))
   end
 
   def check_report_key(key)
@@ -219,7 +220,7 @@ module AccountReports::ReportHelper
   end
 
   def preload_logins_for_users(users, include_deleted: false)
-    shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
+    shards = root_account.trusted_account_ids.map { |id| Shard.shard_for(id) }
     shards << root_account.shard
     User.preload_shard_associations(users)
     shards = shards & users.map(&:associated_shards).flatten
@@ -228,20 +229,20 @@ module AccountReports::ReportHelper
     pseudonyms.each do |p|
       p.account = root_account if p.account_id == root_account.id
     end
-    preloads = Account.reflections['role_links'] ? {account: :role_links} : :account
+    preloads = Account.reflections['role_links'] ? { account: :role_links } : :account
     ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
     pseudonyms.group_by(&:user_id)
   end
 
   def emails_by_user_id(user_ids)
     Shard.partition_by_shard(user_ids) do |user_ids|
-      CommunicationChannel.
-        email.
-        unretired.
-        select([:user_id, :path]).
-        where(user_id: user_ids).
-        order('user_id, position ASC').
-        distinct_on(:user_id)
+      CommunicationChannel
+        .email
+        .unretired
+        .select([:user_id, :path])
+        .where(user_id: user_ids)
+        .order('user_id, position ASC')
+        .distinct_on(:user_id)
     end.index_by(&:user_id)
   end
 
@@ -292,7 +293,8 @@ module AccountReports::ReportHelper
       I18n.t(
         'account_reports.default.message',
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
-        :type => type, :account => account.name, :options => options),
+        :type => type, :account => account.name, :options => options
+      ),
       file
     )
   end
@@ -350,7 +352,7 @@ module AccountReports::ReportHelper
 
     @account_report.update(total_lines: total_runners)
 
-    args = {priority: Delayed::LOW_PRIORITY, n_strand: ["account_report_runner", root_account.global_id]}
+    args = { priority: Delayed::LOW_PRIORITY, n_strand: ["account_report_runner", root_account.global_id] }
     @account_report.account_report_runners.find_each do |runner|
       delay(**args).run_account_report_runner(runner, headers, files: files)
     end
@@ -377,11 +379,12 @@ module AccountReports::ReportHelper
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
     # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
-    [[item_count/99.to_f.round(0), min].max, max].min
+    [[item_count / 99.to_f.round(0), min].max, max].min
   end
 
   def create_report_runners(ids, total, min: 25, max: 1000)
     return if ids.empty?
+
     ids_so_far = 0
     ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
       @account_report.add_report_runner(batch)
@@ -412,6 +415,7 @@ module AccountReports::ReportHelper
 
   def run_account_report_runner(report_runner, headers, files: nil)
     return if report_runner.reload.workflow_state == 'aborted'
+
     @account_report = report_runner.account_report
     begin
       if @account_report.workflow_state == 'aborted'
@@ -427,7 +431,7 @@ module AccountReports::ReportHelper
       report_runner.fail
       self.fail_with_error(e)
     ensure
-      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
+      update_parallel_progress(account_report: @account_report, report_runner: report_runner)
       compile_parallel_report(headers, files: files) if last_account_report_runner?(@account_report)
     end
   end
@@ -485,9 +489,10 @@ module AccountReports::ReportHelper
 
   def update_parallel_progress(account_report: @account_report, report_runner:)
     return if runner_aborted?(report_runner)
+
     report_runner.complete
     # let the regular report process update progress to 100 percent, cap at 99.
-    progress = [(account_report.account_report_runners.completed.count.to_f/account_report.total_lines * 100).to_i, 99].min
+    progress = [(account_report.account_report_runners.completed.count.to_f / account_report.total_lines * 100).to_i, 99].min
     current_line = account_report.account_report_rows.count
     account_report.current_line ||= 0
     account_report.progress ||= 0
@@ -503,6 +508,7 @@ module AccountReports::ReportHelper
 
   def last_account_report_runner?(account_report)
     return false if account_report.account_report_runners.incomplete.exists?
+
     AccountReport.transaction do
       @account_report.reload(lock: true)
       if @account_report.workflow_state == 'running'
@@ -559,5 +565,4 @@ module AccountReports::ReportHelper
       @account_report.save!
     end
   end
-
 end

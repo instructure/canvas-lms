@@ -19,7 +19,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/profile_common')
 
-
 describe 'profile_pics' do
   include_context "in-process server selenium tests"
   include_context "profile common"
@@ -36,6 +35,5 @@ describe 'profile_pics' do
     it_behaves_like 'user settings page change pic window', :teacher
 
     it_behaves_like 'user settings change pic cancel', :teacher
-
   end
 end

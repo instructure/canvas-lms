@@ -23,7 +23,6 @@ require 'nokogiri'
 module Api
   module Html
     class MediaTag
-
       attr_reader :tag, :doc, :node_builder
 
       def initialize(tag, html, node_builder = Nokogiri::XML::Node)
@@ -36,7 +35,7 @@ module Api
         !media_id.blank?
       end
 
-      #(outgoing) turn anchor tags with media comments into html5 elements
+      # (outgoing) turn anchor tags with media comments into html5 elements
       def as_html5_node(url_helper)
         node_builder.new(media_type, doc).tap do |n|
           n['preload'] = 'none'
@@ -58,11 +57,11 @@ module Api
         end
       end
 
-      #(incoming) turn html5 elements into anchor tags with relevant attributes
+      # (incoming) turn html5 elements into anchor tags with relevant attributes
       def as_anchor_node
         node_builder.new('a', doc).tap do |n|
           if tag_is_an_anchor?
-            tag.attributes.each{ |k,v| n[k] = v }
+            tag.attributes.each { |k, v| n[k] = v }
             unless already_has_av_comment?
               n['class'] += " #{media_object.media_type}_comment" if media_object
             end
@@ -82,6 +81,7 @@ module Api
         if tag_is_an_anchor?
           media_comment_regex = %r{^media_comment_}
           return '' unless tag['id'] && tag['id'].match(media_comment_regex)
+
           tag['id'].sub(media_comment_regex, '')
         else
           tag['data-media_comment_id']
@@ -89,6 +89,7 @@ module Api
       end
 
       private
+
       def media_object
         @_media_object ||= MediaObject.active.by_media_id(media_id).preload(:media_tracks).first
       end

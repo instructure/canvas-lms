@@ -85,4 +85,3 @@ describe "plugins ui" do
     end
   end
 end
-

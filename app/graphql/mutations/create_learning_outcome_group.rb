@@ -35,7 +35,7 @@ class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
 
     @child_outcome_group = @outcome_group.child_outcome_groups.build(attributes(input))
     if @child_outcome_group.save
-      {learning_outcome_group: @child_outcome_group}
+      { learning_outcome_group: @child_outcome_group }
     else
       errors_for(@child_outcome_group)
     end

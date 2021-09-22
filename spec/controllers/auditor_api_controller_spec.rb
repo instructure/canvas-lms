@@ -77,9 +77,9 @@ describe AuditorApiController do
       }
       allow(audits_controller).to receive(:params).and_return(params)
       expect(audits_controller.query_options).to eq({
-        oldest: start_time,
-        newest: end_time
-      })
+                                                      oldest: start_time,
+                                                      newest: end_time
+                                                    })
     end
   end
 end

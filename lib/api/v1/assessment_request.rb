@@ -40,13 +40,12 @@ module Api::V1::AssessmentRequest
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = assessment_request.asset.submission_comments.map{ |sc| submission_comment_json(sc, user) }
+      hash['submission_comments'] = assessment_request.asset.submission_comments.map { |sc| submission_comment_json(sc, user) }
     end
     hash
   end
 
   def assessment_requests_json(assessment_requests, user, session, includes = Set.new)
-    assessment_requests.map{ |assessment_request| assessment_request_json(assessment_request, user, session, includes) }
+    assessment_requests.map { |assessment_request| assessment_request_json(assessment_request, user, session, includes) }
   end
-
 end

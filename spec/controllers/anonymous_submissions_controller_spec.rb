@@ -37,13 +37,13 @@ RSpec.describe AnonymousSubmissionsController do
     let(:body) { JSON.parse(response.body)['submission'] }
 
     it "renders show template" do
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
       expect(response).to render_template('submissions/show')
     end
 
     it "renders json with scores for teachers" do
       request.accept = Mime[:json].to_s
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(body['anonymous_id']).to eq @submission.anonymous_id
       expect(body['score']).to eq 10
       expect(body['grade']).to eq '10'
@@ -54,7 +54,7 @@ RSpec.describe AnonymousSubmissionsController do
     it "renders json with scores for students" do
       user_session(@student)
       request.accept = Mime[:json].to_s
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(body['anonymous_id']).to eq @submission.anonymous_id
       expect(body['score']).to eq 10
       expect(body['grade']).to eq '10'
@@ -67,7 +67,7 @@ RSpec.describe AnonymousSubmissionsController do
       request.accept = Mime[:json].to_s
       @submission.mark_unread(@student)
       @submission.save!
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(response).to be_successful
       submission = Submission.find(@submission.id)
       expect(submission.read?(@student)).to be_truthy
@@ -79,7 +79,7 @@ RSpec.describe AnonymousSubmissionsController do
       @submission.mark_unread(@student)
       @submission.mark_unread(@teacher)
       @submission.save!
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(response).to be_successful
       submission = Submission.find(@submission.id)
       expect(submission.read?(@student)).to be_falsey
@@ -91,7 +91,7 @@ RSpec.describe AnonymousSubmissionsController do
       user_session(@teacher)
       @assignment.mute!
       request.accept = Mime[:json].to_s
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
 
       # render_user_not_found attempts to render the passed-in ID param and ignores anonymous_id
       expect(JSON.parse(response.body)['errors']).to eq "The specified user () is not a student in this course"
@@ -101,7 +101,7 @@ RSpec.describe AnonymousSubmissionsController do
       user_session(@student)
       @assignment.mute!
       request.accept = Mime[:json].to_s
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(body['anonymous_id']).to eq @submission.anonymous_id
       expect(body['score']).to be nil
       expect(body['grade']).to be nil
@@ -118,10 +118,10 @@ RSpec.describe AnonymousSubmissionsController do
       @assignment.peer_reviews = true
       @assignment.save!
       @assignment.assign_peer_review(@assessor, @submission.user)
-      @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
+      @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading' })
       user_session(@assessor)
 
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
 
       expect(response).to be_successful
       expect(assigns[:visible_rubric_assessments]).to eq [@assessment]
@@ -135,7 +135,7 @@ RSpec.describe AnonymousSubmissionsController do
 
       student1_submission = assignment.submission_for_student(student1)
       user_session(student2)
-      get :show, params: {course_id: course.id, assignment_id: assignment.id, anonymous_id: student1_submission.anonymous_id}
+      get :show, params: { course_id: course.id, assignment_id: assignment.id, anonymous_id: student1_submission.anonymous_id }
 
       expect(response).to redirect_to(course_assignment_url(course, assignment))
     end
@@ -316,7 +316,7 @@ RSpec.describe AnonymousSubmissionsController do
 
     context "when the submission's turnitin data contains a report URL" do
       before(:each) do
-        submission.update!(turnitin_data: {asset_string => {report_url: 'MY_GREAT_REPORT'}})
+        submission.update!(turnitin_data: { asset_string => { report_url: 'MY_GREAT_REPORT' } })
       end
 
       it "redirects to the course tool retrieval URL" do

@@ -34,17 +34,24 @@ module CanvasHttp
   end
 
   class TooManyRedirectsError < CanvasHttp::Error; end
+
   class InvalidResponseCodeError < CanvasHttp::Error
     attr_reader :code
+
     def initialize(code, body = nil)
       super(body)
       @code = code
     end
   end
+
   class RelativeUriError < CanvasHttp::Error; end
+
   class InsecureUriError < CanvasHttp::Error; end
+
   class UnresolvableUriError < CanvasHttp::Error; end
+
   class CircuitBreakerError < CanvasHttp::Error; end
+
   class ResponseTooLargeError < CanvasHttp::Error; end
 
   def self.put(*args, **kwargs, &block)
@@ -80,7 +87,7 @@ module CanvasHttp
   #
   # Eventually it may be expanded to optionally do cert verification as well.
   def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-    streaming: false, body: nil, content_type: nil, redirect_spy: nil, max_response_body_length: nil)
+                   streaming: false, body: nil, content_type: nil, redirect_spy: nil, max_response_body_length: nil)
     last_scheme = nil
     last_host = nil
     current_host = nil
@@ -92,6 +99,7 @@ module CanvasHttp
       _, uri = CanvasHttp.validate_url(url_str, host: last_host, scheme: last_scheme, check_host: true) # uses the last host and scheme for relative redirects
       current_host = uri.host
       raise CircuitBreakerError if CircuitBreaker.tripped?(current_host)
+
       http = CanvasHttp.connection_for_uri(uri)
 
       request = request_class.new(uri.request_uri, other_headers)
@@ -167,6 +175,7 @@ module CanvasHttp
   def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w{http https}, check_host: false)
     value = value.strip
     raise ArgumentError if value.empty?
+
     uri = nil
     begin
       uri = URI.parse(value)
@@ -198,12 +207,14 @@ module CanvasHttp
 
   def self.insecure_host?(host)
     return unless filters = self.blocked_ip_filters
+
     resolved_addrs = Resolv.getaddresses(host)
     unless resolved_addrs.any?
       # this is actually a different condition than the host being insecure,
       # and having separate telemetry is helpful for understanding transient failures.
       raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
+
     ip_addrs = resolved_addrs.map do |ip|
       ::IPAddr.new(ip)
     rescue IPAddr::InvalidAddressError
@@ -276,7 +287,7 @@ module CanvasHttp
   def self.tempfile_for_uri(uri)
     basename = File.basename(uri.path)
     basename, ext = basename.split(".", 2)
-    basename = basename.slice(0,100)
+    basename = basename.slice(0, 100)
     tmpfile = if ext
                 Tempfile.new([basename, ext])
               else

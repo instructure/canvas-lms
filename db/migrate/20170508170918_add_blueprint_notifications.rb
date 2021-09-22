@@ -22,20 +22,22 @@ class AddBlueprintNotifications < ActiveRecord::Migration[4.2]
 
   def up
     return unless Shard.current == Shard.default
+
     Canvas::MessageHelper.create_notification({
-      name: 'Blueprint Content Added',
-      delay_for: 0,
-      category: 'Blueprint'
-    })
+                                                name: 'Blueprint Content Added',
+                                                delay_for: 0,
+                                                category: 'Blueprint'
+                                              })
     Canvas::MessageHelper.create_notification({
-      name: 'Blueprint Sync Complete',
-      delay_for: 0,
-      category: 'Blueprint'
-    })
+                                                name: 'Blueprint Sync Complete',
+                                                delay_for: 0,
+                                                category: 'Blueprint'
+                                              })
   end
 
   def down
     return unless Shard.current == Shard.default
+
     Notification.where(name: 'Blueprint Content Added').delete_all
     Notification.where(name: 'Blueprint Sync Complete').delete_all
   end

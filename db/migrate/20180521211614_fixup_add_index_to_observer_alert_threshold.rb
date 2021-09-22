@@ -28,8 +28,8 @@ class FixupAddIndexToObserverAlertThreshold < ActiveRecord::Migration[5.1]
 
     change_table :observer_alert_thresholds do |t|
       t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' }
-      t.references :user, null: false, foreign_key: { to_table: 'users'}
-      t.references :observer, null: false, foreign_key: { to_table: 'users'}
+      t.references :user, null: false, foreign_key: { to_table: 'users' }
+      t.references :observer, null: false, foreign_key: { to_table: 'users' }
     end
 
     add_index :observer_alert_thresholds, [:alert_type, :user_id, :observer_id], unique: true, name: 'observer_alert_thresholds_on_alert_type_and_observer_and_user'

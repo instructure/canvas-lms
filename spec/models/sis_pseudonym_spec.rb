@@ -146,19 +146,19 @@ describe SisPseudonym do
 
   it "should find the right root account for a group" do
     @group = group :group_context => course2
-    pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc'}
+    pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
     expect(SisPseudonym.for(u, @group)).to eq(pseudonym)
   end
 
   it "should find the right root account for a non-root-account" do
     @root_account = account1
     @account = @root_account.sub_accounts.create!
-    pseudonym = @root_account.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc'}
+    pseudonym = @root_account.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
     expect(SisPseudonym.for(u, @account)).to eq(pseudonym)
   end
 
   it "should find the right root account for a root account" do
-    pseudonym = account1.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc'}
+    pseudonym = account1.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
     expect(SisPseudonym.for(u, account1)).to eq(pseudonym)
   end
 
@@ -287,9 +287,9 @@ describe SisPseudonym do
       @shard1.activate { @user = User.create! }
       @pseudonym =
         Account
-          .default
-          .pseudonyms
-          .create!(user: @user, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+        .default
+        .pseudonyms
+        .create!(user: @user, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
       @shard2.activate do
         expect(
           SisPseudonym.for(@user, Account.default, type: :implicit, include_all_pseudonyms: true)
@@ -337,5 +337,4 @@ describe SisPseudonym do
       ).to eq [p1, p2]
     end
   end
-
 end

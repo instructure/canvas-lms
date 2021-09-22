@@ -37,7 +37,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
     raise GraphQL::ExecutionError, "not found" unless discussion_entry.grants_right?(current_user, session, :read)
 
     unless input[:read].nil?
-      opt = input[:forced_read_state].nil? ? {} : {forced:input[:forced_read_state]}
+      opt = input[:forced_read_state].nil? ? {} : { forced: input[:forced_read_state] }
       input[:read] ? discussion_entry.change_read_state('read', current_user, opt) : discussion_entry.change_read_state('unread', current_user, opt)
     end
 

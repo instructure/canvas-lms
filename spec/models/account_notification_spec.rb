@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountNotification do
-
   before :once do
     account_notification
     user_factory
@@ -42,7 +41,7 @@ describe AccountNotification do
     role_ids = [teacher_role, admin_role].map(&:id)
     account_notification(:role_ids => role_ids, :message => "Announcement 1")
     @a1 = @announcement
-    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") # students not currently taking a course
     @a2 = @announcement
     account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
     @a3 = @announcement
@@ -62,7 +61,7 @@ describe AccountNotification do
 
     account_notification(:account => Account.site_admin, :role_ids => role_ids, :message => "Announcement 1")
     @a4 = @announcement
-    account_notification(:account => Account.site_admin, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => Account.site_admin, :role_ids => [nil], :message => "Announcement 2") # students not currently taking a course
     @a5 = @announcement
     account_notification(:account => Account.site_admin, :message => "Announcement 3") # no roles, should go to all
     @a6 = @announcement
@@ -111,10 +110,10 @@ describe AccountNotification do
 
   it 'should sort' do
     @announcement.destroy
-    role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name, root_account_id: Account.default.id).id}
+    role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: Account.default.id).id }
     account_notification(:role_ids => role_ids, :message => "Announcement 1")
     @a1 = @announcement
-    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") # students not currently taking a course
     @a2 = @announcement
     account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
     @announcement[:end_at] = @announcement[:end_at] + 1.month
@@ -303,7 +302,7 @@ describe AccountNotification do
       other_sub_account = Account.default.sub_accounts.create!
       course_with_student(user: @user, account: other_sub_account, active_all: true)
       other_sub_announcement = sub_account_notification(subject: 'blah', account: other_sub_account,
-        role_ids: [teacher_role.id])
+                                                        role_ids: [teacher_role.id])
       # should not show to user because they're not a teacher in this subaccount
 
       expect(AccountNotification.for_user_and_account(@user, Account.default)).to_not include(other_sub_announcement)
@@ -313,7 +312,7 @@ describe AccountNotification do
       sub_sub_account = @sub_account.sub_accounts.create!
       course_with_teacher(user: @user, account: sub_sub_account, active_all: true)
       sub_announcement = sub_account_notification(subject: 'blah', account: @sub_account,
-        role_ids: [teacher_role.id])
+                                                  role_ids: [teacher_role.id])
 
       expect(AccountNotification.for_user_and_account(@user, Account.default)).to include(sub_announcement)
     end
@@ -410,7 +409,7 @@ describe AccountNotification do
       before :once do
         @accounts = {}
         @accounts[:sub1] = Account.default.sub_accounts.create!
-        @accounts[:sub1sub] =  @accounts[:sub1].sub_accounts.create!
+        @accounts[:sub1sub] = @accounts[:sub1].sub_accounts.create!
         @accounts[:sub2] = Account.default.sub_accounts.create!
 
         @custom_admin_role = custom_account_role("customadmin")
@@ -495,7 +494,7 @@ describe AccountNotification do
 
       it "should queue a job to send_message when announcement starts" do
         an = account_notification(:account => Account.default, :send_message => true,
-          :start_at => 1.day.from_now, :end_at => 2.days.from_now)
+                                  :start_at => 1.day.from_now, :end_at => 2.days.from_now)
         job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
         expect(job.singleton).to include(an.global_id.to_s)
         expect(job.run_at.to_i).to eq an.start_at.to_i
@@ -529,7 +528,7 @@ describe AccountNotification do
       end
 
       def send_notification_args(user_ids)
-        [anything, anything, anything, user_ids.map{|id| "user_#{id}"}, anything]
+        [anything, anything, anything, user_ids.map { |id| "user_#{id}" }, anything]
       end
 
       it "should send messages out in batches" do
@@ -652,7 +651,7 @@ describe AccountNotification do
       it "should find notifications on cross-sharded sub-accounts properly" do
         # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
         id = 1
-        while [Shard.default, @shard2].any?{|s| s.activate { Account.where(:id => id).exists? }} # make sure this id is free
+        while [Shard.default, @shard2].any? { |s| s.activate { Account.where(:id => id).exists? } } # make sure this id is free
           id += 1 #
         end
 

@@ -27,16 +27,13 @@ describe EpubExports::CourseEpubExportsPresenter do
     @epub_export = @course.epub_exports.create(user: @student)
     @course_with_epub = @course
     @course_without_epub = course_with_user('StudentEnrollment',
-      active_all: true, user: @student
-    ).course
+                                            active_all: true, user: @student).course
     @course_as_obsever = course_with_user('ObserverEnrollment',
-      active_all: true,
-      user: @student
-    ).course
+                                          active_all: true,
+                                          user: @student).course
     @course_as_ta = course_with_user('TaEnrollment',
-      active_all: true,
-      user: @student
-    ).course
+                                     active_all: true,
+                                     user: @student).course
   end
 
   describe "#courses" do
@@ -46,7 +43,7 @@ describe EpubExports::CourseEpubExportsPresenter do
 
     context 'when feature is enabled' do
       before do
-        [@course_with_epub, @course_without_epub, @course_as_obsever, @course_as_ta].map {|course| course.enable_feature!(:epub_export) }
+        [@course_with_epub, @course_without_epub, @course_as_obsever, @course_as_ta].map { |course| course.enable_feature!(:epub_export) }
       end
 
       it "sets latest_epub_export for course with epub_export" do

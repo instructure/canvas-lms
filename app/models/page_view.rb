@@ -42,9 +42,9 @@ class PageView < ActiveRecord::Base
   # shard)
   validates_presence_of :user_id
 
-  def self.generate(request, attributes={})
+  def self.generate(request, attributes = {})
     self.new(attributes).tap do |p|
-      p.url = LoggingFilter.filter_uri(request.url)[0,255]
+      p.url = LoggingFilter.filter_uri(request.url)[0, 255]
       p.http_method = request.request_method.downcase
       p.controller = request.path_parameters[:controller]
       p.action = request.path_parameters[:action]
@@ -80,10 +80,10 @@ class PageView < ActiveRecord::Base
 
   def token
     CanvasSecurity::PageViewJwt.generate({
-      request_id: request_id,
-      user_id: Shard.global_id_for(user_id),
-      created_at: created_at
-    })
+                                           request_id: request_id,
+                                           user_id: Shard.global_id_for(user_id),
+                                           created_at: created_at
+                                         })
   end
 
   def url
@@ -110,6 +110,7 @@ class PageView < ActiveRecord::Base
   def self.page_view_method
     enable_page_views = Setting.get('enable_page_views', 'false')
     return false if enable_page_views == 'false'
+
     enable_page_views = 'db' if %w[true cache].include?(enable_page_views) # backwards compat
     enable_page_views.to_sym
   end
@@ -156,8 +157,8 @@ class PageView < ActiveRecord::Base
 
       # index by the page view's user, but use the user's global_asset_string
       # when writing the index
-      entry_proc lambda{ |page_view| page_view.user }
-      key_proc lambda{ |user| user.global_asset_string }
+      entry_proc lambda { |page_view| page_view.user }
+      key_proc lambda { |user| user.global_asset_string }
     end
 
     self.raise_on_error = Rails.env.test?
@@ -174,6 +175,7 @@ class PageView < ActiveRecord::Base
     when Array
       result = PageView::EventStream.fetch(ids)
       raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.length} results, but was looking for #{ids.length})" unless ids.length == result.length
+
       result
     else
       find([ids]).first
@@ -200,13 +202,13 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.from_attributes(attrs, new_record=false)
-    @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
+  def self.from_attributes(attrs, new_record = false)
+    @blank_template ||= columns.inject({}) { |h, c| h[c.name] = nil; h }
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
-        new{ |pv| pv.assign_attributes(attrs) }
+        new { |pv| pv.assign_attributes(attrs) }
       else
         instantiate(@blank_template.merge(attrs))
       end
@@ -224,14 +226,14 @@ class PageView < ActiveRecord::Base
     return false if self.is_update && !PageView.updates_enabled?
 
     result = case PageView.page_view_method
-    when :log
-      Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
-    when :db
-      self.shard = user.shard if new_record?
-      self.save
-    when :cassandra
-      self.save
-    end
+             when :log
+               Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
+             when :db
+               self.shard = user.shard if new_record?
+               self.save
+             when :cassandra
+               self.save
+             end
 
     self.store_page_view_to_user_counts
 
@@ -260,6 +262,7 @@ class PageView < ActiveRecord::Base
 
   def _create_record(*args)
     return super unless PageView.cassandra?
+
     self.created_at ||= Time.zone.now
     user.shard.activate do
       run_callbacks(:create) do
@@ -273,6 +276,7 @@ class PageView < ActiveRecord::Base
 
   def _update_record(*args)
     return super unless PageView.cassandra?
+
     user.shard.activate do
       run_callbacks(:update) do
         PageView::EventStream.update(self)
@@ -294,7 +298,7 @@ class PageView < ActiveRecord::Base
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
-  def self.for_user(user, options={})
+  def self.for_user(user, options = {})
     viewer = options.delete(:viewer)
     viewer = nil if viewer == user
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
@@ -368,6 +372,7 @@ class PageView < ActiveRecord::Base
     members.each do |uid|
       shard = Shard.shard_for(uid)
       next unless shard
+
       result[shard.id] ||= 0
       result[shard.id] += 1
     end
@@ -377,6 +382,7 @@ class PageView < ActiveRecord::Base
   def store_page_view_to_user_counts
     return unless Setting.get('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
     return unless self.created_at.present? && self.user.present?
+
     exptime = Setting.get('page_views_active_user_exptime', 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
     Canvas.redis.sadd(bucket, self.user.global_id)
@@ -430,7 +436,7 @@ class PageView < ActiveRecord::Base
     # this is the batch size per account, not the overall batch size
     # returns true if any progress was made (if it makes sense to run_once again)
     def run_once(batch_size = 3000)
-      self.migration_data.inject(false) do |progress, (account_id,_)|
+      self.migration_data.inject(false) do |progress, (account_id, _)|
         run_once_for_account(account_id, batch_size) || progress
       end
     end
@@ -443,8 +449,8 @@ class PageView < ActiveRecord::Base
 
       # this could run into problems if one account gets more than
       # batch_size page views created in the second on this boundary
-      finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at).
-          order(:created_at => :asc).limit(batch_size).to_sql
+      finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at)
+                           .order(:created_at => :asc).limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.select_all(finder_sql).to_a

@@ -31,10 +31,9 @@ describe "Student column header options" do
   before(:each) { user_session(@teacher) }
 
   context "student name sort by" do
-
     before(:each) do
       Gradebook.visit(@course)
-      @students = @course.students.sort_by{|x| x[:id]}
+      @students = @course.students.sort_by { |x| x[:id] }
     end
 
     it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
@@ -46,7 +45,7 @@ describe "Student column header options" do
   context "Display as" do
     before(:each) do
       Gradebook.visit(@course)
-      @students = @course.students.sort_by{|x| x[:id]}
+      @students = @course.students.sort_by { |x| x[:id] }
     end
 
     it "displays student names as First Last", priority: "1", test_id: 3253319 do
@@ -78,15 +77,14 @@ describe "Student column header options" do
     it "hides Secondary info for display as none", priority: "1", test_id: 3253326 do
       Gradebook.click_student_menu_secondary_info('None')
 
-      expect(Gradebook.student_column_cell_select(0,0)).not_to contain_css('secondary-info')
+      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css('secondary-info')
     end
 
     it "persists Secondary info selection", priority: "2", test_id: 3253327 do
       Gradebook.click_student_menu_secondary_info('None')
       Gradebook.visit(@course)
 
-      expect(Gradebook.student_column_cell_select(0,0)).not_to contain_css('secondary-info')
+      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css('secondary-info')
     end
-
   end
 end

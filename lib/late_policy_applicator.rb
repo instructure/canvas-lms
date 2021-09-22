@@ -22,25 +22,25 @@ class LatePolicyApplicator
     return unless course.published?
     return unless course.assignments.published.exists?
 
-    new(course).delay_if_production(singleton: "late_policy_applicator:calculator:Course:#{course.global_id}").
-      process
+    new(course).delay_if_production(singleton: "late_policy_applicator:calculator:Course:#{course.global_id}")
+               .process
   end
 
   def self.for_assignment(assignment)
     return unless assignment.published? && assignment.points_possible&.positive?
     return unless assignment.course
 
-    new(assignment.course, [assignment]).delay_if_production(singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}").
-      process
+    new(assignment.course, [assignment]).delay_if_production(singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}")
+                                        .process
   end
 
   def initialize(course, assignments = [])
     @course = course
     @assignments = if assignments.present?
-      assignments.select(&:published?)
-    else
-      @course.assignments.published
-    end
+                     assignments.select(&:published?)
+                   else
+                     @course.assignments.published
+                   end
 
     @relevant_submissions = {}
   end

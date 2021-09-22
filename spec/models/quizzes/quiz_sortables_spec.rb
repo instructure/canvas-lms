@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSortables do
-
   describe ".initialize" do
     it "should assign the quiz" do
       quiz = Quizzes::Quiz.new
@@ -40,18 +39,18 @@ describe Quizzes::QuizSortables do
     end
 
     it "should build the list of items" do
-      group  = Quizzes::QuizGroup.new
+      group = Quizzes::QuizGroup.new
       group.id = 234
       groups = [group]
 
-      question  = Quizzes::QuizQuestion.new
+      question = Quizzes::QuizQuestion.new
       question.id = 123
       questions = double(:active => [question])
 
       quiz = double(:quiz_groups => groups, :quiz_questions => questions)
 
-      order = [{"type" => "group",    "id" => "234"},
-               {"type" => "question", "id" => "123"}]
+      order = [{ "type" => "group",    "id" => "234" },
+               { "type" => "question", "id" => "123" }]
 
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => order)
       expect(sortables.items).to eq [group, question]
@@ -63,8 +62,8 @@ describe Quizzes::QuizSortables do
 
       quiz = double(:quiz_groups => groups, :quiz_questions => questions)
 
-      order = [{"type" => "group",    "id" => "234"},
-               {"type" => "question", "id" => "123"}]
+      order = [{ "type" => "group",    "id" => "234" },
+               { "type" => "question", "id" => "123" }]
 
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => order)
       expect(sortables.items).to eq []
@@ -74,20 +73,20 @@ describe Quizzes::QuizSortables do
   describe "#reorder!" do
     context "for group questions" do
       before do
-        @question1  = Quizzes::QuizQuestion.new
+        @question1 = Quizzes::QuizQuestion.new
         @question1.id = 123
 
-        @question2  = Quizzes::QuizQuestion.new
+        @question2 = Quizzes::QuizQuestion.new
         @question2.id = 234
 
-        @quiz = double(:quiz_groups    => [],
-                     :quiz_questions => double(:active => [@question1, @question2]),
-                     :mark_edited!    => true)
+        @quiz = double(:quiz_groups => [],
+                       :quiz_questions => double(:active => [@question1, @question2]),
+                       :mark_edited! => true)
         @group = Group.new
         allow(@group).to receive_messages(:quiz => @quiz, :id => 999)
 
-        @order = [{"type" => "question", "id" => "234"},
-                  {"type" => "question", "id" => "123"}]
+        @order = [{ "type" => "question", "id" => "234" },
+                  { "type" => "question", "id" => "123" }]
         @sortables = Quizzes::QuizSortables.new(:group => @group, :order => @order)
         expect(@sortables).to receive(:update_object_positions!)
       end
@@ -101,18 +100,18 @@ describe Quizzes::QuizSortables do
 
     context "for quiz items" do
       before do
-        @group  = Quizzes::QuizGroup.new
+        @group = Quizzes::QuizGroup.new
         @group.id = 234
 
-        @question  = Quizzes::QuizQuestion.new
+        @question = Quizzes::QuizQuestion.new
         @question.id = 123
 
-        @quiz = double(:quiz_groups    => [@group],
-                     :quiz_questions => double(:active => [@question]),
-                     :mark_edited!    => true)
+        @quiz = double(:quiz_groups => [@group],
+                       :quiz_questions => double(:active => [@question]),
+                       :mark_edited! => true)
 
-        @order = [{"type" => "group",    "id" => "234"},
-                  {"type" => "question", "id" => "123"}]
+        @order = [{ "type" => "group",    "id" => "234" },
+                  { "type" => "question", "id" => "123" }]
         @sortables = Quizzes::QuizSortables.new(:quiz => @quiz, :order => @order)
         expect(@sortables).to receive(:update_object_positions!)
       end
@@ -134,6 +133,5 @@ describe Quizzes::QuizSortables do
         @sortables.reorder!
       end
     end
-
   end
 end

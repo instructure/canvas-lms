@@ -37,7 +37,6 @@ require_dependency "utils/date_presenter"
 module Utils
   describe DatePresenter do
     describe "#as_string" do
-
       it 'uses the medium date in long format' do
         date = Date.parse("2010-10-1")
         string = DatePresenter.new(date).as_string(:long)

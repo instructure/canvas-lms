@@ -31,7 +31,7 @@ class EportfolioCategoriesController < ApplicationController
 
   def create
     if authorized_action(@portfolio, @current_user, :update)
-      category_names = @portfolio.eportfolio_categories.map{|c| c.name}
+      category_names = @portfolio.eportfolio_categories.map { |c| c.name }
       @category = @portfolio.eportfolio_categories.build(eportfolio_category_params)
       respond_to do |format|
         if @category.save
@@ -75,6 +75,7 @@ class EportfolioCategoriesController < ApplicationController
         @page = @category.eportfolio_entries.first
         @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
         raise ActiveRecord::RecordNotFound if !@page
+
         eportfolio_page_attributes
 
         render "eportfolios/show", stream: can_stream_template?
@@ -99,6 +100,7 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   protected
+
   def eportfolio_category_params
     params.require(:eportfolio_category).permit(:name)
   end

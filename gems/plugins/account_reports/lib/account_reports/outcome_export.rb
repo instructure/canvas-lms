@@ -29,7 +29,6 @@ module AccountReports
       include_deleted_objects
     end
 
-
     NO_SCORE_HEADERS = %w(vendor_guid object_type title description display_name parent_guids workflow_state).freeze
     OUTCOME_EXPORT_SCALAR_HEADERS = %w(vendor_guid object_type title description display_name calculation_method calculation_int parent_guids workflow_state mastery_points).freeze
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ['ratings']).freeze
@@ -118,22 +117,22 @@ module AccountReports
         JOIN #{LearningOutcomeGroup.quoted_table_name} learning_outcome_groups
         ON learning_outcome_groups.id = content_tags.associated_asset_id
       SQL
-        where("learning_outcomes.workflow_state <> 'deleted'").
-        order('learning_outcomes.id').
-        group('learning_outcomes.id').
-        group('content_tags.content_id').
-        select(<<~SQL)
-          content_tags.content_id,
-          learning_outcomes.*,
-          #{vendor_guid_field('learning_outcomes', prefix: 'canvas_outcome')} AS vendor_guid,
-          learning_outcomes.short_description AS title,
-          STRING_AGG(
-            CASE WHEN learning_outcome_groups.learning_outcome_group_id IS NULL THEN NULL
-                 ELSE #{vendor_guid_field('learning_outcome_groups')}
-                 END,
-            ' ' ORDER BY learning_outcome_groups.id
-          ) AS parent_guids
-        SQL
+        where("learning_outcomes.workflow_state <> 'deleted'")
+                          .order('learning_outcomes.id')
+                          .group('learning_outcomes.id')
+                          .group('content_tags.content_id')
+                          .select(<<~SQL)
+                            content_tags.content_id,
+                            learning_outcomes.*,
+                            #{vendor_guid_field('learning_outcomes', prefix: 'canvas_outcome')} AS vendor_guid,
+                            learning_outcomes.short_description AS title,
+                            STRING_AGG(
+                              CASE WHEN learning_outcome_groups.learning_outcome_group_id IS NULL THEN NULL
+                                   ELSE #{vendor_guid_field('learning_outcome_groups')}
+                                   END,
+                              ' ' ORDER BY learning_outcome_groups.id
+                            ) AS parent_guids
+                          SQL
     end
 
     def export_outcomes(csv, headers, include_ratings)

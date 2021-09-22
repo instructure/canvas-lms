@@ -30,6 +30,7 @@ module ConfigFile
 
     def stub(config_name, value)
       raise "config settings can only be set via config file" unless Rails.env.test?
+
       existing_cache = @yaml_cache[config_name].dup || {}
       existing_cache[Rails.env] = value
       @yaml_cache[config_name] = deep_freeze_cached_value(existing_cache)
@@ -38,6 +39,7 @@ module ConfigFile
     def load(config_name, with_rails_env = ::Rails.env)
       if @yaml_cache.key?(config_name)
         return @yaml_cache[config_name] unless with_rails_env
+
         return @yaml_cache[config_name]&.[](with_rails_env)
       end
 
@@ -59,6 +61,7 @@ module ConfigFile
     def cache_object(config_name, with_rails_env = ::Rails.env)
       object_cache = @object_cache[config_name] ||= {}
       return object_cache[with_rails_env] if object_cache.key?(with_rails_env)
+
       config = load(config_name, with_rails_env)
       object_cache[with_rails_env] = (config && yield(config))
     end
@@ -66,12 +69,14 @@ module ConfigFile
     def deep_freeze_cached_value(input)
       return nil if input.nil?
       return deep_freeze_enumerable(input) if needs_deep_freeze?(input)
+
       input.freeze
       input
     end
 
     def deep_freeze_enumerable(input)
       return nil if input.nil?
+
       input.each do |key, value|
         if input.is_a?(Array)
           needs_deep_freeze?(key) ? deep_freeze_enumerable(key) : key.freeze

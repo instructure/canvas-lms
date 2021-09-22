@@ -25,10 +25,9 @@ describe "courses" do
   include K5Common
 
   context "as a teacher" do
-
     before(:each) do
       account = Account.default
-      account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
+      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
@@ -84,7 +83,7 @@ describe "courses" do
       end
 
       it "should allow publishing even if graded submissions exist" do
-        course_with_student_submissions({submission_points: true, unpublished: true})
+        course_with_student_submissions({ submission_points: true, unpublished: true })
         @course.default_view = 'feed'
         @course.save
         get "/courses/#{@course.id}"
@@ -99,7 +98,7 @@ describe "courses" do
       end
 
       it "should not show course status if published and graded submissions exist" do
-        course_with_student_submissions({submission_points: true})
+        course_with_student_submissions({ submission_points: true })
         @course.default_view = 'feed'
         @course.save
         get "/courses/#{@course.id}"
@@ -158,7 +157,6 @@ describe "courses" do
         expect(f("#content")).not_to contain_css('#course_status_actions')
       end
     end
-
 
     it "should correctly update the course quota" do
       course_with_admin_logged_in
@@ -220,7 +218,7 @@ describe "courses" do
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
       enrollment.update(:limit_privileges_to_course_section => true,
-                                   :course_section => CourseSection.where(name: 'Two').first)
+                        :course_section => CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
@@ -297,11 +295,9 @@ describe "courses" do
         expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
     end
-
   end
 
   context "course as a student" do
-
     def enroll_student(student, accept_invitation)
       if accept_invitation
         @course.enroll_student(student).accept

@@ -39,11 +39,11 @@ module Api::V1::FeatureFlag
 
   def feature_flag_json(feature_flag, context, current_user, session)
     hash = if feature_flag.default?
-      feature_flag.as_json.slice('feature', 'state')
-    else
-      keys = %w(feature context_id context_type state)
-      api_json(feature_flag, current_user, session, only: keys)
-    end
+             feature_flag.as_json.slice('feature', 'state')
+           else
+             keys = %w(feature context_id context_type state)
+             api_json(feature_flag, current_user, session, only: keys)
+           end
     hash['locking_account_id'] = nil unless feature_flag.default?
     hash['transitions'] = Feature.transitions(feature_flag.feature, current_user, context, feature_flag.state)
     hash['locked'] = feature_flag.locked?(context)
@@ -51,7 +51,7 @@ module Api::V1::FeatureFlag
       # return 'hidden' if the feature is hidden or if this flag is the one that unhides it
       # (so removing it would re-hide the feature)
       hash['hidden'] = feature_flag.hidden? ||
-          !feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?
+                       !feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?
     end
     # To allow for determinations of when to delete vs update
     hash['parent_state'] = context.lookup_feature_flag(feature_flag.feature, skip_cache: true, inherited_only: true)&.state
@@ -59,6 +59,7 @@ module Api::V1::FeatureFlag
   end
 
   private
+
   def add_localized_attr(hash, feature, attr_name)
     if attr = feature.instance_variable_get("@#{attr_name}")
       hash[attr_name] = attr.is_a?(Proc) ? attr.call : attr.to_s

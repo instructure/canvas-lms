@@ -38,7 +38,7 @@ class ModerationSetController < ApplicationController
     render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
     scope = @assignment.shard.activate {
-       User.where(
+      User.where(
         id: @assignment.moderated_grading_selections.select(:student_id)
       ).order(:id)
     }

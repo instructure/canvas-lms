@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe SIS::UserImporter do
   context "when the unique_id is invalid the error message reported to the user" do
-
     before(:once) do
       @user_id = 'sis_id1'
       @login_id = "--*\x01(&*(&%^&*%..-"
@@ -31,7 +30,7 @@ describe SIS::UserImporter do
       Setting.set('sis_transaction_seconds', '1')
       user1 = SIS::Models::User.new(user_id: @user_id, login_id: @login_id, status: 'active',
                                     full_name: 'User One', email: 'user1@example.com')
-      SIS::UserImporter.new(@account, {batch: @account.sis_batches.create!}).process(messages) do |importer|
+      SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process(messages) do |importer|
         importer.add_user(user1)
       end
 
@@ -54,7 +53,7 @@ describe SIS::UserImporter do
   it 'should handle user_ids as integers just in case' do
     user1 = SIS::Models::User.new(user_id: 12345, login_id: 'user1', status: 'active',
                                   full_name: 'User One', email: 'user1@example.com')
-    SIS::UserImporter.new(account_model, {batch: @account.sis_batches.create!}).process([]) do |importer|
+    SIS::UserImporter.new(account_model, { batch: @account.sis_batches.create! }).process([]) do |importer|
       importer.add_user(user1)
     end
     expect(Pseudonym.last.sis_user_id).to eq '12345'

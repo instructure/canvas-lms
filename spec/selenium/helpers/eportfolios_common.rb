@@ -36,8 +36,8 @@ module EportfoliosCommon
     expect(f('#content h2')).to include_text(I18n.t('headers.welcome', "Welcome to Your ePortfolio"))
   end
 
-  def entry_verifier(opts={})
-    entry= @eportfolio.eportfolio_entries.first
+  def entry_verifier(opts = {})
+    entry = @eportfolio.eportfolio_entries.first
     if opts[:section_type]
       expect(entry.content.first[:section_type]).to eq opts[:section_type]
     end

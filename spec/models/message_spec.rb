@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper')
 
 describe Message do
-
   describe "#get_template" do
     it "should get the template with an existing file path" do
       allow(HostUrl).to receive(:protocol).and_return("https")
@@ -76,10 +75,10 @@ describe Message do
       @au = AccountUser.create(:account => account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
-        criteria: [
-          criterion_type: 'Interaction',
-          threshold: 7
-        ])
+                                     criteria: [
+                                       criterion_type: 'Interaction',
+                                       threshold: 7
+                                     ])
       mock_template = "slack template"
       expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(mock_template)
       msg = generate_message(:alert, :slack, alert)
@@ -90,10 +89,10 @@ describe Message do
       @au = AccountUser.create(:account => account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
-                                      criteria: [
-                                        criterion_type: 'Interaction',
-                                        threshold: 7
-                                      ])
+                                     criteria: [
+                                       criterion_type: 'Interaction',
+                                       threshold: 7
+                                     ])
       mock_template = "sms template"
       expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(nil)
       expect_any_instance_of(Message).to receive(:get_template).with('alert.sms.erb').and_return(mock_template)
@@ -108,7 +107,7 @@ describe Message do
     end
 
     it "should allow over 255 char in the subject" do
-      assignment_model(title: 'this is crazy ridiculous '*10)
+      assignment_model(title: 'this is crazy ridiculous ' * 10)
       msg = generate_message(:assignment_created, :email, @assignment)
       expect(msg.subject.length).to be > 255
     end
@@ -117,7 +116,7 @@ describe Message do
       allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
       assignment_model(title: 'this is a message')
       msg = generate_message(:assignment_created, :email, @assignment)
-      msg.body = msg.body + "1"* 64.kilobyte
+      msg.body = msg.body + "1" * 64.kilobyte
       expect(msg.valid?).to be_truthy
       expect(msg.body).to eq 'message preview unavailable'
       msg.save!
@@ -255,7 +254,7 @@ describe Message do
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
         message = message_model(:workflow_state => state_symbol.to_s, :user => user_factory, :to => 'nobody')
-        if state.events.any?{ |event_symbol, event| event.transitions_to == :cancelled }
+        if state.events.any? { |event_symbol, event| event.transitions_to == :cancelled }
           expect(Message.cancellable).to eq [message]
         else
           expect(Message.cancellable).to eq []
@@ -300,16 +299,16 @@ describe Message do
 
     it "completes delivery without a user" do
       message = message_model({
-        dispatch_at: Time.now,
-        to: 'somebody',
-        updated_at: Time.now.utc - 11.minutes,
-        user: nil,
-        path_type: 'email'
-      })
+                                dispatch_at: Time.now,
+                                to: 'somebody',
+                                updated_at: Time.now.utc - 11.minutes,
+                                user: nil,
+                                path_type: 'email'
+                              })
       message.workflow_state = "staged"
       allow(Mailer).to receive(:create_message).and_return(double(deliver_now: "Response!"))
       expect(message.workflow_state).to eq("staged")
-      expect{ message.deliver }.not_to raise_error
+      expect { message.deliver }.not_to raise_error
     end
 
     it "logs stats on deliver" do
@@ -329,7 +328,7 @@ describe Message do
         "message.deliver.email.my_name",
         {
           short_stat: "message.deliver",
-          tags: {path_type: "email", notification_name: 'my_name'}
+          tags: { path_type: "email", notification_name: 'my_name' }
         }
       )
 
@@ -337,7 +336,7 @@ describe Message do
         "message.deliver.email.#{@message.root_account.global_id}",
         {
           short_stat: "message.deliver_per_account",
-          tags: {path_type: "email", root_account_id: @message.root_account.global_id}
+          tags: { path_type: "email", root_account_id: @message.root_account.global_id }
         }
       )
     end
@@ -401,7 +400,6 @@ describe Message do
         end
       end
 
-
       context 'with the enable_push_notifications account setting disabled' do
         before :each do
           account = Account.default
@@ -455,9 +453,9 @@ describe Message do
   end
 
   describe 'contextual messages' do
-    let(:user1){ user_model(short_name: "David Brin") }
-    let(:user2){ user_model(short_name: "Gareth Cutestory") }
-    let(:course){ course_model }
+    let(:user1) { user_model(short_name: "David Brin") }
+    let(:user2) { user_model(short_name: "Gareth Cutestory") }
+    let(:course) { course_model }
 
     def build_conversation_message
       conversation = user1.initiate_conversation([user2])
@@ -507,8 +505,8 @@ describe Message do
       it 'pulls the reply_to_name from the asset if there is one' do
         with_reply_to_name = build_conversation_message
         without_reply_to_name = course_model
-        expect(message_model(context: without_reply_to_name).
-          reply_to_name).to be_nil
+        expect(message_model(context: without_reply_to_name)
+          .reply_to_name).to be_nil
         reply_to_message = message_model(context: with_reply_to_name,
                                          notification_name: "Conversation Message")
         expect(reply_to_message.reply_to_name).to eq "#{user1.short_name} via Canvas Notifications"
@@ -544,7 +542,7 @@ describe Message do
 
         it 'uses a course nickname if exists' do
           assign = assignment_model
-          user = user_model(preferences: { course_nicknames: { assign.context.id => 'nickname' }})
+          user = user_model(preferences: { course_nicknames: { assign.context.id => 'nickname' } })
           notification = Notification.create(:name => 'Assignment Changed')
           message = message_model(:context => assign, notification: notification, user: user)
           expect(message.from_name).to eq 'nickname'
@@ -559,7 +557,7 @@ describe Message do
           ag = appointment_group_model(:contexts => [@course], :sub_context => cat)
           assign = assignment_model
           @course.offer!
-          user = user_model(preferences: { course_nicknames: { assign.context.id => 'test_course' }})
+          user = user_model(preferences: { course_nicknames: { assign.context.id => 'test_course' } })
           user.register!
           enroll = @course.enroll_user(user)
           enroll.accept!
@@ -718,7 +716,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    expect{ msg.save! }.to_not raise_error
+    expect { msg.save! }.to_not raise_error
   end
 
   describe "#context_context" do

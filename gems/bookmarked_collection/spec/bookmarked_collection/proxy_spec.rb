@@ -26,7 +26,7 @@ describe BookmarkedCollection::Proxy do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
-      3.times{ example_class.create! }
+      3.times { example_class.create! }
       @scope = example_class.order(:id)
 
       @next_bookmark = double
@@ -40,7 +40,7 @@ describe BookmarkedCollection::Proxy do
     end
 
     it 'should require per_page parameter' do
-      expect{ @proxy.paginate() }.to raise_error(ArgumentError)
+      expect { @proxy.paginate() }.to raise_error(ArgumentError)
     end
 
     it('should ignore total_entries parameter') do

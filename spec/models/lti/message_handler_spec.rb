@@ -25,7 +25,6 @@ require_dependency "lti/message_handler"
 
 module Lti
   describe MessageHandler do
-
     let (:account) { Account.create }
     let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
 
@@ -56,7 +55,6 @@ module Lti
     end
 
     describe 'scope #message_type' do
-
       it 'returns all message_handlers for a message_type' do
         mh1 = create_message_handler
         mh2 = create_message_handler
@@ -75,12 +73,9 @@ module Lti
         message_handlers = described_class.by_message_types('basic-lti-launch-request', 'other_type')
         expect(message_handlers.count).to eq 2
       end
-
     end
 
     describe 'scope #for_context' do
-
-
       it 'returns all message_handlers for a tool proxy' do
         tp = create_tool_proxy
         tp.bindings.create(context: account)
@@ -92,7 +87,7 @@ module Lti
       end
 
       it 'returns all message_handlers for multiple tool_proxy' do
-        tool_proxies = (1..3).map {|_| create_tool_proxy}
+        tool_proxies = (1..3).map { |_| create_tool_proxy }
         message_handlers = tool_proxies.map do |tp|
           tp.bindings.create(context: account)
           rh = create_resource_handler(tp)
@@ -100,11 +95,9 @@ module Lti
         end
         expect(Set.new(described_class.for_context(account))).to eq Set.new(message_handlers)
       end
-
     end
 
     describe 'scope #has_placements' do
-
       before :once do
         tp = create_tool_proxy
         rh1 = create_resource_handler(tp, resource_type_code: 1)
@@ -133,12 +126,9 @@ module Lti
         expect(handlers).to include(@mh2)
         expect(handlers).to include(@mh3)
       end
-
-
     end
 
     describe '#lti_apps_tabs' do
-
       before :once do
         @tp = create_tool_proxy
         rh1 = create_resource_handler(@tp, resource_type_code: 1)
@@ -158,17 +148,17 @@ module Lti
 
         tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
         expect(tabs.count).to eq 2
-        tab = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
-        expect(tab).to eq( {
-          id: "lti/message_handler_#{@mh1.id}",
-          label: "resource name",
-          css_class: "lti/message_handler_#{@mh1.id}",
-          href: :account_basic_lti_launch_request_path,
-          visibility: nil,
-          external: true,
-          hidden: false,
-          args: {:message_handler_id=>@mh1.id, :resource_link_fragment=>"nav", :account_id=>account.id}
-        })
+        tab = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        expect(tab).to eq({
+                            id: "lti/message_handler_#{@mh1.id}",
+                            label: "resource name",
+                            css_class: "lti/message_handler_#{@mh1.id}",
+                            href: :account_basic_lti_launch_request_path,
+                            visibility: nil,
+                            external: true,
+                            hidden: false,
+                            args: { :message_handler_id => @mh1.id, :resource_link_fragment => "nav", :account_id => account.id }
+                          })
       end
 
       it 'returns message handlers tabs for account with account_navigation placement' do
@@ -176,8 +166,8 @@ module Lti
 
         tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
         expect(tabs.count).to eq 2
-        tab1 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
-        tab2 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh2.id}" }
+        tab1 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        tab2 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh2.id}" }
         expect(tab1).to_not be_nil
         expect(tab2).to_not be_nil
       end
@@ -188,12 +178,11 @@ module Lti
 
         tabs = described_class.lti_apps_tabs(@course, [ResourcePlacement::COURSE_NAVIGATION], {})
         expect(tabs.count).to eq 2
-        tab1 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
-        tab2 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh3.id}" }
+        tab1 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        tab2 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh3.id}" }
         expect(tab1).to_not be_nil
         expect(tab2).to_not be_nil
       end
-
     end
 
     describe '#self.by_resource_codes' do
@@ -290,7 +279,6 @@ module Lti
       end
     end
 
-
     def create_tool_proxy(opts = {})
       default_opts = {
         context: account,
@@ -306,14 +294,13 @@ module Lti
     end
 
     def create_resource_handler(tool_proxy = create_tool_proxy, opts = {})
-      default_opts = {resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy}
+      default_opts = { resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy }
       ResourceHandler.create(default_opts.merge(opts))
     end
 
     def create_message_handler(resource_handler = create_resource_handler, opts = {})
-      default_ops = {message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler}
+      default_ops = { message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler }
       MessageHandler.create!(default_ops.merge(opts))
     end
-
   end
 end

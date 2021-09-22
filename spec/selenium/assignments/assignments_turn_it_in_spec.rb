@@ -61,16 +61,16 @@ describe "assignments turn it in" do
 
   def expected_settings
     {
-        'originality_report_visibility' => 'after_due_date',
-        's_paper_check' => '0',
-        'internet_check' => '0',
-        'journal_check' => '0',
-        'exclude_biblio' => '0',
-        'exclude_quoted' => '0',
-        'exclude_type' => '1',
-        'exclude_value' => '5',
-        'submit_papers_to' => '0',
-        's_view_report' => '1'
+      'originality_report_visibility' => 'after_due_date',
+      's_paper_check' => '0',
+      'internet_check' => '0',
+      'journal_check' => '0',
+      'exclude_biblio' => '0',
+      'exclude_quoted' => '0',
+      'exclude_type' => '1',
+      'exclude_value' => '5',
+      'submit_papers_to' => '0',
+      's_view_report' => '1'
     }
   end
 
@@ -89,9 +89,9 @@ describe "assignments turn it in" do
   it "should edit turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => (Time.now.utc + 2.days),
-        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      :name => 'test assignment',
+      :due_at => (Time.now.utc + 2.days),
+      :assignment_group => @course.assignment_groups.create!(:name => "default")
     )
 
     get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"

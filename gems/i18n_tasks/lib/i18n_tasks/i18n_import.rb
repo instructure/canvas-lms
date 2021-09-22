@@ -36,19 +36,19 @@ module I18nTasks
 
     def compare_translations(&warning)
       [
-          [missing_keys, "missing translations"],
-          [unexpected_keys, "unexpected translations"]
+        [missing_keys, "missing translations"],
+        [unexpected_keys, "unexpected translations"]
       ].each do |keys, description|
         if keys.present?
           case (action = yield(keys.sort, description))
-            when :abort then
-              throw(:abort)
-            when :discard then
-              :ok # <-discard and accept are the same in this case
-            when :accept then
-              :ok # <-/
-            else
-              raise "don't know how to handle #{action}"
+          when :abort then
+            throw(:abort)
+          when :discard then
+            :ok # <-discard and accept are the same in this case
+          when :accept then
+            :ok # <-/
+          else
+            raise "don't know how to handle #{action}"
           end
         end
       end
@@ -59,21 +59,21 @@ module I18nTasks
       find_mismatches
 
       [
-          [@placeholder_mismatches, "placeholder mismatches"],
-          [@markdown_mismatches, "markdown/wrapper mismatches"],
+        [@placeholder_mismatches, "placeholder mismatches"],
+        [@markdown_mismatches, "markdown/wrapper mismatches"],
       ].each do |mismatches, description|
         if mismatches.size > 0
           case (action = yield(mismatches, description))
-            when :abort then
-              throw(:abort)
-            when :discard then
-              @new_translations.delete_if do |k, v|
-                mismatches.any? { |m| m.key == k }
-              end
-            when :accept then
-              :ok
-            else
-              raise "don't know how to handle #{action}"
+          when :abort then
+            throw(:abort)
+          when :discard then
+            @new_translations.delete_if do |k, v|
+              mismatches.any? { |m| m.key == k }
+            end
+          when :accept then
+            :ok
+          else
+            raise "don't know how to handle #{action}"
           end
         end
       end
@@ -118,6 +118,7 @@ module I18nTasks
       @markdown_mismatches = []
       new_translations.keys.each do |key|
         next unless source_translations[key]
+
         p1 = placeholders(source_translations[key].to_s)
         p2 = placeholders(new_translations[key].to_s)
         @placeholder_mismatches << MisMatch.new(key, p1, p2) if p1 != p2
@@ -140,13 +141,13 @@ module I18nTasks
       #   reference links, e.g. "[an example][id]"
       #   indented code
       matches = scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) # escaped special char
-        .concat(wrappers(dashed_str))
-        .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
+                .concat(wrappers(dashed_str))
+                .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
 
       # only do fancy markdown checks on multi-line strings
       if dashed_str =~ /\n/
         matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
-               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' }) # moar headings
+               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0] == '=' ? 'h1' : 'h2' }) # moar headings
                .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
                .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| m.first =~ /\d/ ? "1." : "*" })
       end
@@ -163,6 +164,7 @@ module I18nTasks
       result = []
       parts.each do |part|
         next if part !~ pattern
+
         if stack.last == part
           result << "#{part}-wrap"
           stack.pop
@@ -188,15 +190,19 @@ module I18nTasks
     end
 
     private
+
     def init_source(translations)
       raise "Source does not have any English strings" unless translations.keys.include?('en')
+
       translations['en'].flatten_keys
     end
 
     def init_language(translations)
       raise "Translation file contains multiple languages" if translations.size > 1
+
       language = translations.keys.first
       raise "Translation file appears to have only English strings" if language == 'en'
+
       language
     end
   end

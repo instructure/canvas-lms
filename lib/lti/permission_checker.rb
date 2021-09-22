@@ -19,7 +19,6 @@
 
 module Lti
   class PermissionChecker
-
     def self.authorized_lti2_action?(tool:, context:)
       perm_checker = new(tool: tool, context: context)
       perm_checker.tool_installed_in_context?
@@ -42,6 +41,7 @@ module Lti
 
     def matching_resource_codes?
       return false if (@tool.resource_codes.to_a - @context.tool_settings_resource_codes.to_a).present?
+
       @tool.resources.map(&:message_handlers).flatten.any? do |mh|
         mh.resource_handler.resource_type_code == @context.tool_settings_resource_codes[:resource_type_code]
       end

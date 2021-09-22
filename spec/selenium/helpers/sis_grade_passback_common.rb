@@ -112,15 +112,15 @@ module SisGradePassbackCommon
 
     @course.grading_standard_enabled = true
     @course.save!
-    GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map{ |x| getuser(x).id}, @course.id)
+    GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map { |x| getuser(x).id }, @course.id)
     @course.reload
 
     @plugin = Canvas::Plugin.find!('grade_export')
     @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
     @ps.posted_settings = @plugin.default_settings.merge({
-                                                             :format_type => "instructure_csv",
-                                                             :wait_for_success => wait_for_success ? "yes" : "no",
-                                                             :publish_endpoint => "http://localhost/endpoint"
+                                                           :format_type => "instructure_csv",
+                                                           :wait_for_success => wait_for_success ? "yes" : "no",
+                                                           :publish_endpoint => "http://localhost/endpoint"
                                                          })
     @ps.save!
 

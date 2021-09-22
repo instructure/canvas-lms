@@ -28,7 +28,6 @@ describe GradebookHistoryApiController do
     submission.graded_at.to_date.as_json
   end
 
-
   before :once do
     course_with_teacher(:active_all => true)
 
@@ -62,45 +61,43 @@ describe GradebookHistoryApiController do
   end
 
   describe 'GET days' do
-
     def graders_hash_for(submission)
-      json_body.find{|d| d['date'] == date_key(submission) }['graders']
+      json_body.find { |d| d['date'] == date_key(submission) }['graders']
     end
 
     describe 'default params' do
-
-      before { get 'days', params: {:course_id => @course.id}, :format => 'json' }
+      before { get 'days', params: { :course_id => @course.id }, :format => 'json' }
 
       it 'provides an array of the dates where there are submissions' do
-        expect(json_body.map{ |d| d['date'] }.sort).to eq [date_key(@submission1), date_key(@submission3)].sort
+        expect(json_body.map { |d| d['date'] }.sort).to eq [date_key(@submission1), date_key(@submission3)].sort
       end
 
       it 'nests all the graders for a day inside the date entry' do
-        expect(graders_hash_for(@submission1).map{|g| g['name'] }.sort).to eq ['Grader', 'SuperGrader']
-        expect(graders_hash_for(@submission3).map{|g| g['name'] }).to eq ['OtherGrader']
+        expect(graders_hash_for(@submission1).map { |g| g['name'] }.sort).to eq ['Grader', 'SuperGrader']
+        expect(graders_hash_for(@submission3).map { |g| g['name'] }).to eq ['OtherGrader']
       end
 
       it 'includes a list of assignment names for each grader' do
-        grader_hash = graders_hash_for(@submission3).find{|h| h['id'] == @other_grader.id }
-        expect(grader_hash['assignments'].map{|a| a['name'] }.sort).to eq ['some assignment', 'another assignment'].sort
+        grader_hash = graders_hash_for(@submission3).find { |h| h['id'] == @other_grader.id }
+        expect(grader_hash['assignments'].map { |a| a['name'] }.sort).to eq ['some assignment', 'another assignment'].sort
       end
     end
 
     it 'paginates' do
-      get 'days', params: {:course_id => @course.id, :page => 2, :per_page => 2}, :format => 'json'
-      expect(json_body.map{|d| d['date'] }).to eq [@submission3.graded_at.to_date.as_json]
+      get 'days', params: { :course_id => @course.id, :page => 2, :per_page => 2 }, :format => 'json'
+      expect(json_body.map { |d| d['date'] }).to eq [@submission3.graded_at.to_date.as_json]
     end
   end
 
   describe 'GET day_details' do
-    before { get 'day_details', params: {:course_id => @course.id, :date => @submission1.graded_at.strftime('%Y-%m-%d')}, format: 'json' }
+    before { get 'day_details', params: { :course_id => @course.id, :date => @submission1.graded_at.strftime('%Y-%m-%d') }, format: 'json' }
 
     it 'has the graders as the top level piece of data' do
-      expect(json_body.map{|g| g['id'] }.sort).to eq [@grader.id, @super_grader.id].sort
+      expect(json_body.map { |g| g['id'] }.sort).to eq [@grader.id, @super_grader.id].sort
     end
 
     it 'lists assignment names under the graders' do
-      expect(json_body.find{|g| g['id'] == @grader.id }['assignments'].first['name']).to eq @assignment1.title
+      expect(json_body.find { |g| g['id'] == @grader.id }['assignments'].first['name']).to eq @assignment1.title
     end
   end
 
@@ -108,7 +105,7 @@ describe GradebookHistoryApiController do
     let(:date) { @submission1.graded_at.strftime('%Y-%m-%d') }
     let(:params) { { :course_id => @course.id, :date => date, :grader_id => @grader.id, :assignment_id => @assignment1.id } }
 
-    before { get( 'submissions', params: params, format: 'json' ) }
+    before { get('submissions', params: params, format: 'json') }
 
     it 'lists submissions' do
       expect(json_body.first['submission_id']).to eq @submission1.id
@@ -120,7 +117,7 @@ describe GradebookHistoryApiController do
     context 'deleted submissions' do
       before :each do
         @submission1.destroy
-        get 'feed', params: {course_id: @course.id}, format: 'json'
+        get 'feed', params: { course_id: @course.id }, format: 'json'
       end
 
       it 'does not return an error' do

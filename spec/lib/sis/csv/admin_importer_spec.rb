@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::AdminImporter do
-
   before do
     account_model
     sis = @account.sis_batches.create
@@ -49,13 +48,13 @@ describe SIS::CSV::AdminImporter do
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["No user_id given for admin",
-                            "Invalid or unknown user_id 'invalid' for admin",
-                            "Invalid account_id given for admin",
-                            "Invalid role 'invalid role' for admin",
-                            "Invalid role_id 'invalid' for admin",
-                            "Invalid status invalid for admin",
-                            "No status given for admin",
-                            "No role_id or role given for admin"]
+                          "Invalid or unknown user_id 'invalid' for admin",
+                          "Invalid account_id given for admin",
+                          "Invalid role 'invalid role' for admin",
+                          "Invalid role_id 'invalid' for admin",
+                          "Invalid status invalid for admin",
+                          "No status given for admin",
+                          "No role_id or role given for admin"]
   end
 
   it 'should add and remove admins' do

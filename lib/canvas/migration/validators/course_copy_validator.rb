@@ -23,6 +23,7 @@ module Canvas::Migration::Validators::CourseCopyValidator
     if !options || !options[:source_course_id]
       return I18n.t :course_copy_argument_error, 'A course copy requires a source course.'
     end
+
     source = Course.where(id: options[:source_course_id]).first
     if source
       if !(source.grants_right?(user, :read_as_admin) && source.grants_right?(user, :read))

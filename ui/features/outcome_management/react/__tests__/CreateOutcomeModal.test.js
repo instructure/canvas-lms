@@ -247,7 +247,7 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'Outcome "Outcome 123" was successfully created.',
+            message: '"Outcome 123" was successfully created.',
             type: 'success'
           })
         })
@@ -273,8 +273,7 @@ describe('CreateOutcomeModal', () => {
         fireEvent.click(getByText('Create'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message:
-              'An error occurred while creating this outcome: GraphQL error: mutation failed.',
+            message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -301,7 +300,7 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while creating this outcome: mutation failed.',
+            message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -334,8 +333,7 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message:
-              'An error occurred while creating this outcome: GraphQL error: mutation failed.',
+            message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -388,7 +386,7 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'Outcome "Outcome 123" was successfully created.',
+            message: '"Outcome 123" was successfully created.',
             type: 'success'
           })
         })
@@ -427,7 +425,7 @@ describe('CreateOutcomeModal', () => {
           // if setFriendlyDescription mutation is called the expectation below will fail
           await waitFor(() => {
             expect(showFlashAlertSpy).toHaveBeenCalledWith({
-              message: 'Outcome "Outcome 123" was successfully created.',
+              message: '"Outcome 123" was successfully created.',
               type: 'success'
             })
           })

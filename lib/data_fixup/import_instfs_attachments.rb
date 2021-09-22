@@ -21,14 +21,16 @@
 # manually applied
 module DataFixup
   class ImportInstfsAttachments
-    def self.run(queue, options={})
+    def self.run(queue, options = {})
       raise ArgumentError unless InstFS.enabled?
       raise ArgumentError if queue.empty?
+
       new(options).run(queue)
     end
 
-    def initialize(options={})
+    def initialize(options = {})
       raise ArgumentError unless options[:run_at] && options[:run_duration_hours]
+
       @min_sleep_duration = options[:min_sleep_duration] || 0
       @run_until = options[:run_at].advance(hours: options[:run_duration_hours])
       @next_options = options.merge(run_at: options[:run_at].advance(days: 1))
@@ -40,6 +42,7 @@ module DataFixup
         elapsed = import_batch(shard_id, source)
         queue.shift
         break if queue.empty?
+
         sleep(sleep_duration(elapsed))
       end
       reenqueue_job(queue) unless queue.empty?
@@ -57,7 +60,7 @@ module DataFixup
         Shard.find(shard_id).activate do
           InstStatsd::Statsd.time("import_instfs_attachments.import_batch.transaction.time") do
             Attachment.transaction do
-              lines.each{ |json| import_line(json) }
+              lines.each { |json| import_line(json) }
             end
           end
         end
@@ -84,6 +87,7 @@ module DataFixup
         url = InstFS.authenticated_url(Source.new(key))
         CanvasHttp.get(url) do |response|
           raise "fetching #{url} failed: #{response.code}" unless response.code.to_i == 200
+
           response.read_body(tempfile)
         end
         tempfile.rewind
@@ -101,6 +105,7 @@ module DataFixup
     def import_line(line)
       return if line.empty?
       raise unless valid_import_json?(line)
+
       sql = "UPDATE attachments SET instfs_uuid=trim('\"' FROM batch.value::text) FROM json_each('#{line}'::json) AS batch WHERE CAST(batch.key AS BIGINT)=attachments.id"
       InstStatsd::Statsd.time("import_instfs_attachments.import_line.time") do
         Attachment.connection.execute(sql)

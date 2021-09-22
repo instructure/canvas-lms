@@ -143,10 +143,9 @@ class LtiApiController < ApplicationController
     request.body.rewind
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
     turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-        priority: Delayed::LOW_PRIORITY).process
+                             priority: Delayed::LOW_PRIORITY).process
     render json: {}, status: 200
   end
-
 
   protected
 
@@ -161,9 +160,8 @@ class LtiApiController < ApplicationController
         Lti::Logging.lti_1_api_signature_verification_failed(@signature.signature_base_string)
         raise OAuth::Unauthorized.new, request
       end
-
     rescue OAuth::Signature::UnknownSignatureMethod, OAuth::Unauthorized => e
-      Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({error_class: e.class.name}))
+      Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({ error_class: e.class.name }))
     end
 
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
@@ -181,6 +179,7 @@ class LtiApiController < ApplicationController
 
   def oauth_error_info
     return {} unless @signature
+
     {
       generated_signature: @signature.signature
     }
@@ -189,7 +188,7 @@ class LtiApiController < ApplicationController
   def check_outcome(outcome)
     return outcome, 200 unless ['unsupported', 'failure'].include? outcome.code_major
 
-    opts = {type: :grade_passback}
+    opts = { type: :grade_passback }
     error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
     error_info[:extra][:description] = outcome.description
     error_info[:extra][:message] = outcome.code_major

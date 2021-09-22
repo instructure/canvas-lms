@@ -119,6 +119,7 @@ module LiveEvents
 
     def new_client?
       return true if @old_stream_client != @stream_client
+
       @config ||= LiveEvents::Client.config
       if @config != LiveEvents::Client.config
         @config = LiveEvents::Client.config

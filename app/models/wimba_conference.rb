@@ -23,15 +23,15 @@ require 'uri'
 
 class WimbaConference < WebConference
   external_url :archive,
-               :name => lambda{ t('external_urls.archive', "Archive") },
-               :link_text => lambda{ t('external_urls.archive_link', "View archive(s)") },
-               :restricted_to => lambda{ |conf| conf.active? || conf.finished? }
+               :name => lambda { t('external_urls.archive', "Archive") },
+               :link_text => lambda { t('external_urls.archive_link', "View archive(s)") },
+               :restricted_to => lambda { |conf| conf.active? || conf.finished? }
 
   def archive_external_url(user, url_id)
     urls = []
-    if (res = send_request('listClass', {'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname'}))
+    if (res = send_request('listClass', { 'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname' }))
       res.sub(/\A100 OK\n/, '').split(/\n=END RECORD\n?/).each do |match|
-        data = match.split(/\n/).inject({}){ |hash, line| key, hash[key.to_sym] = line.split(/=/, 2); hash}
+        data = match.split(/\n/).inject({}) { |hash, line| key, hash[key.to_sym] = line.split(/=/, 2); hash }
         unless data[:longname] && data[:class_id]
           logger.error "wimba error reading archive list"
           break
@@ -47,7 +47,7 @@ class WimbaConference < WebConference
 
           data[:longname].sub!(date_info[1], new_date)
         end
-        urls << {:id => data[:class_id], :name => data[:longname]} unless url_id && data[:class_id] != url_id
+        urls << { :id => data[:class_id], :name => data[:longname] } unless url_id && data[:class_id] != url_id
       end
       urls.first[:url] = join_url(user, urls.first[:id]) if urls.size == 1 && touch_user(user)
     end
@@ -58,7 +58,7 @@ class WimbaConference < WebConference
     config[:domain]
   end
 
-  def craft_api_url(action, opts={})
+  def craft_api_url(action, opts = {})
     url = "http://#{server}/admin/api/api.pl"
     query_string = "function=#{action}"
     opts.each do |key, val|
@@ -67,15 +67,15 @@ class WimbaConference < WebConference
     url + "?" + query_string
   end
 
-  def send_request(action, opts={})
+  def send_request(action, opts = {})
     headers = {}
     if action.to_s == 'Init'
       url = craft_api_url('NoOp', {
-        'AuthType'     => 'AuthCookieHandler',
-        'AuthName'     => 'Horizon',
-        'credential_0' => config[:user],
-        'credential_1' => config[:password_dec]
-      })
+                            'AuthType' => 'AuthCookieHandler',
+                            'AuthName' => 'Horizon',
+                            'credential_0' => config[:user],
+                            'credential_1' => config[:password_dec]
+                          })
     else
       init_session or return nil
       url = craft_api_url(action, opts)
@@ -106,16 +106,16 @@ class WimbaConference < WebConference
     end
 
     case res
-      when Net::HTTPSuccess
-        api_status = res.body.to_s.split("\n").first.split(" ", 2)
-        if api_status[0] == "100"
-          logger.debug "wimba api success: #{res.body}"
-          return res.body
-        end
-        # any other status indicates an error
-        logger.error "wimba api error #{api_status[1]} (#{api_status[0]})"
-      else
-        logger.error "wimba http error #{res}"
+    when Net::HTTPSuccess
+      api_status = res.body.to_s.split("\n").first.split(" ", 2)
+      if api_status[0] == "100"
+        logger.debug "wimba api success: #{res.body}"
+        return res.body
+      end
+      # any other status indicates an error
+      logger.error "wimba api error #{api_status[1]} (#{api_status[0]})"
+    else
+      logger.error "wimba http error #{res}"
     end
     nil
   rescue
@@ -125,80 +125,84 @@ class WimbaConference < WebConference
 
   def touch_user(user)
     send_request('modifyUser', {
-      'target' => wimba_id(user.uuid),
-      'password_type' => 'A',
-      'first_name' => user.first_name,
-      'last_name' => user.last_name}) ||
-    send_request('createUser', {
-      'target' => wimba_id(user.uuid),
-      'password_type' => 'A',
-      'first_name' => user.first_name,
-      'last_name' => user.last_name})
+                   'target' => wimba_id(user.uuid),
+                   'password_type' => 'A',
+                   'first_name' => user.first_name,
+                   'last_name' => user.last_name
+                 }) ||
+      send_request('createUser', {
+                     'target' => wimba_id(user.uuid),
+                     'password_type' => 'A',
+                     'first_name' => user.first_name,
+                     'last_name' => user.last_name
+                   })
   end
 
-  def add_user_to_conference(user, role=:participant)
+  def add_user_to_conference(user, role = :participant)
     touch_user(user) &&
-    send_request('createRole', {
-      'target' => wimba_id,
-      'user_id' => wimba_id(user.uuid),
-      'role_id' => case role
-        when :presenter; 'Instructor'
-        when :admin; 'ClassAdmin'
-        else 'Student'
-      end
-    })
+      send_request('createRole', {
+                     'target' => wimba_id,
+                     'user_id' => wimba_id(user.uuid),
+                     'role_id' => case role
+                                  when :presenter; 'Instructor'
+                                  when :admin; 'ClassAdmin'
+                                  else 'Student'
+                                  end
+                   })
   end
 
   def remove_user_from_conference(user)
     send_request('deleteRole', {
-      'target' => wimba_id,
-      'user_id' => wimba_id(user.uuid)
-    })
+                   'target' => wimba_id,
+                   'user_id' => wimba_id(user.uuid)
+                 })
   end
 
-  def join_url(user, room_id=wimba_id)
+  def join_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-    "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
+      "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
   end
 
-  def settings_url(user, room_id=wimba_id)
+  def settings_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-    "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI::escape(token)}&class_id=#{CGI::escape(room_id)}"
+      "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI::escape(token)}&class_id=#{CGI::escape(room_id)}"
   end
 
   def get_auth_token(user)
     (res = send_request('getAuthToken', {
-        'target'    => wimba_id(user.uuid),
-        'nickname' => user.name.gsub(/[^a-zA-Z0-9]/, '')})) &&
-    (token = res.split("\n").detect{|s| s.match(/^authToken/) }) &&
-    token.split(/=/, 2).last.chomp
+                          'target' => wimba_id(user.uuid),
+                          'nickname' => user.name.gsub(/[^a-zA-Z0-9]/, '')
+                        })) &&
+      (token = res.split("\n").detect { |s| s.match(/^authToken/) }) &&
+      token.split(/=/, 2).last.chomp
   end
 
-  def admin_join_url(user, return_to="http://www.instructure.com")
+  def admin_join_url(user, return_to = "http://www.instructure.com")
     add_user_to_conference(user, :presenter) &&
-    join_url(user)
+      join_url(user)
   end
 
-  def admin_settings_url(user, return_to="http://www.instructure.com")
+  def admin_settings_url(user, return_to = "http://www.instructure.com")
     initiate_conference and touch or return nil
     add_user_to_conference(user, :admin) &&
-    settings_url(user)
+      settings_url(user)
   end
 
-  def participant_join_url(user, return_to="http://www.instructure.com")
+  def participant_join_url(user, return_to = "http://www.instructure.com")
     add_user_to_conference(user) &&
-    join_url(user)
+      join_url(user)
   end
 
   def initiate_conference
     return conference_key if conference_key
+
     self.conference_key = uuid
     send_request('createClass', {
-      'target' => wimba_id,
-      'longname' => title[0,50],
-      'preview' => '0', # we want the room open by default
-      'auto_open_new_archives' => '1'
-    }) or return nil
+                   'target' => wimba_id,
+                   'longname' => title[0, 50],
+                   'preview' => '0', # we want the room open by default
+                   'auto_open_new_archives' => '1'
+                 }) or return nil
     save
     conference_key
   end
@@ -207,20 +211,23 @@ class WimbaConference < WebConference
     if !@auth_cookie
       send_request('Init') or return false
     end
+
     true
   end
 
   def conference_status
     active = nil
-    if res = send_request('statusClass', {'target' => wimba_id})
+    if res = send_request('statusClass', { 'target' => wimba_id })
       res.split(/\r?\n/).each do |str|
         key, value = str.strip.split(/=/, 2)
         if key == 'num_users'
           return :closed unless value.to_i > 0
+
           active = true
         end
         if key == 'roomlock'
           return :closed if value.to_i == 1
+
           active = true
         end
       end
@@ -231,7 +238,6 @@ class WimbaConference < WebConference
   def wimba_id(id = uuid)
     # wimba ids are limited to 34 chars. assuming we are using uuids, we can put an "IN" prefix,
     # which makes distinguishing these users easier.
-    "IN" + id.delete("-")[0,32]
+    "IN" + id.delete("-")[0, 32]
   end
-
 end

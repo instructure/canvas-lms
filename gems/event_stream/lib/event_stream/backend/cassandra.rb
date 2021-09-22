@@ -80,7 +80,7 @@ module EventStream::Backend
       return if ttl_seconds < 0
 
       database.batch do
-        stream.database.send(:"#{operation}_record", stream.table, {stream.id_column => record.id}, stream.operation_payload(operation, record), ttl_seconds)
+        stream.database.send(:"#{operation}_record", stream.table, { stream.id_column => record.id }, stream.operation_payload(operation, record), ttl_seconds)
         stream.run_callbacks(operation, record)
       end
     rescue StandardError => exception

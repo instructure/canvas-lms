@@ -35,13 +35,13 @@ describe GroupsController do
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
         user_session(@teacher)
-        get 'index', params: {:course_id => @course.id}
+        get 'index', params: { :course_id => @course.id }
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
       end
 
       it "is always disabled for students" do
         user_session(@student)
-        get 'index', params: {:course_id => @course.id}
+        get 'index', params: { :course_id => @course.id }
         cards_enabled = assigns[:js_env] && assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]
         expect(cards_enabled).to be_falsey
       end
@@ -54,7 +54,7 @@ describe GroupsController do
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
       g2 = @course.groups.create(:name => "some other group", :group_category => category1)
       g3 = @course.groups.create(:name => "some third group", :group_category => category2)
-      get 'index', params: {:course_id => @course.id}
+      get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
@@ -65,11 +65,11 @@ describe GroupsController do
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
       g2 = @course.groups.create(:name => "some other group", :group_category => category1)
       g3 = @course.groups.create(:name => "some third group", :group_category => category2)
-      get 'index', params: {:course_id => @course.id}
+      get 'index', params: { :course_id => @course.id }
       expect(response).to be_successful
       expect(assigns[:groups]).not_to be_empty
       expect(assigns[:groups].length).to eql(3)
-      expect(assigns[:groups] - [g1,g2,g3]).to be_empty
+      expect(assigns[:groups] - [g1, g2, g3]).to be_empty
       expect(assigns[:categories].length).to eql(2)
     end
 
@@ -89,12 +89,12 @@ describe GroupsController do
       groups << @course.groups.create(:name => "4", :group_category => category3)
       groups << @course.groups.create(:name => "44", :group_category => category3)
       groups << @course.groups.create(:name => "4.5", :group_category => category3)
-      groups.each {|g| g.add_user @student, 'accepted' }
-      get 'index', params: {:course_id => @course.id, :per_page => 50}, format: 'json'
+      groups.each { |g| g.add_user @student, 'accepted' }
+      get 'index', params: { :course_id => @course.id, :per_page => 50 }, format: 'json'
       expect(response).to be_successful
       expect(assigns[:paginated_groups]).not_to be_empty
       expect(assigns[:paginated_groups].length).to eql(9)
-      #Check group category ordering
+      # Check group category ordering
       expect(assigns[:paginated_groups][0].group_category.name).to eql("1")
       expect(assigns[:paginated_groups][1].group_category.name).to eql("1")
       expect(assigns[:paginated_groups][2].group_category.name).to eql("1")
@@ -104,7 +104,7 @@ describe GroupsController do
       expect(assigns[:paginated_groups][6].group_category.name).to eql("11")
       expect(assigns[:paginated_groups][7].group_category.name).to eql("11")
       expect(assigns[:paginated_groups][8].group_category.name).to eql("11")
-      #Check group name ordering
+      # Check group name ordering
       expect(assigns[:paginated_groups][0].name).to eql("1")
       expect(assigns[:paginated_groups][1].name).to eql("2")
       expect(assigns[:paginated_groups][2].name).to eql("11")
@@ -126,8 +126,8 @@ describe GroupsController do
       g.add_user(student2)
       student2.enrollments.first.deactivate
       user_session(student1)
-      get 'index', params: {:course_id => @course.id, :include => 'users',
-        :include_inactive_users => true}, format: :json
+      get 'index', params: { :course_id => @course.id, :include => 'users',
+                             :include_inactive_users => true }, format: :json
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       users_json = parsed_json.first["users"]
@@ -179,7 +179,7 @@ describe GroupsController do
     end
 
     it 'should put groups in courses in terms concluded for students in "previous groups"' do
-      @course.enrollment_term.set_overrides(@course.account, 'StudentEnrollment' => {end_at: 1.week.ago})
+      @course.enrollment_term.set_overrides(@course.account, 'StudentEnrollment' => { end_at: 1.week.ago })
       group_with_user(group_context: @course, user: @student, active_all: true)
       user_session(@student)
       get 'index'
@@ -198,13 +198,13 @@ describe GroupsController do
       end
 
       it "should not paginate non-json" do
-        get 'index', params: {:per_page => 1}
+        get 'index', params: { :per_page => 1 }
         expect(assigns[:current_groups]).to eq @student.current_groups.by_name
         expect(response.headers['Link']).to be_nil
       end
 
       it "should paginate json" do
-        get 'index', params: {:per_page => 1}, format: 'json'
+        get 'index', params: { :per_page => 1 }, format: 'json'
         expect(assigns[:groups]).to eq [@student.current_groups.by_name.first]
         expect(response.headers['Link']).not_to be_nil
       end
@@ -214,7 +214,7 @@ describe GroupsController do
   describe "GET show" do
     it "should require authorization" do
       @group = Account.default.groups.create!(:name => "some group")
-      get 'show', params: {:id => @group.id}
+      get 'show', params: { :id => @group.id }
       expect(assigns[:group]).to eql(@group)
       assert_unauthorized
     end
@@ -224,7 +224,7 @@ describe GroupsController do
       @user = user_model
       user_session(@user)
       @group.add_user(@user)
-      get 'show', params: {:id => @group.id}
+      get 'show', params: { :id => @group.id }
       expect(response).to be_successful
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:context]).to eql(@group)
@@ -238,7 +238,7 @@ describe GroupsController do
       category1.save!
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
 
-      get 'show', params: {:course_id => @course.id, :id => g1.id, :join => 1}
+      get 'show', params: { :course_id => @course.id, :id => g1.id, :join => 1 }
       g1.reload
       expect(g1.users.map(&:id)).to include @student.id
     end
@@ -251,7 +251,7 @@ describe GroupsController do
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
       g1.add_user(@student)
 
-      get 'show', params: {:course_id => @course.id, :id => g1.id, :leave => 1}
+      get 'show', params: { :course_id => @course.id, :id => g1.id, :leave => 1 }
       g1.reload
       expect(g1.users.map(&:id)).not_to include @student.id
     end
@@ -261,7 +261,7 @@ describe GroupsController do
       category1 = GroupCategory.student_organized_for(@course)
       g1 = @course.groups.create!(:name => "some group", :group_category => category1, :join_level => "parent_context_auto_join")
 
-      get 'show', params: {:course_id => @course.id, :id => g1.id, :join => 1}
+      get 'show', params: { :course_id => @course.id, :id => g1.id, :join => 1 }
       g1.reload
       expect(g1.users.map(&:id)).to include @student.id
     end
@@ -272,7 +272,7 @@ describe GroupsController do
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
       g1.add_user(@student)
 
-      get 'show', params: {:course_id => @course.id, :id => g1.id, :leave => 1}
+      get 'show', params: { :course_id => @course.id, :id => g1.id, :leave => 1 }
       g1.reload
       expect(g1.users.map(&:id)).not_to include @student.id
     end
@@ -283,7 +283,7 @@ describe GroupsController do
       category = @course.group_categories.create(:name => "category")
       group = @course.groups.create(:name => "some group", :group_category => category)
 
-      get 'show', params: {:id => group.id}
+      get 'show', params: { :id => group.id }
 
       expect(response).to be_successful
       expect(assigns[:group]).to eql(group)
@@ -293,7 +293,7 @@ describe GroupsController do
   describe "GET new" do
     it "should require authorization" do
       @group = @course.groups.create!(:name => "some group")
-      get 'new', params: {:course_id => @course.id}
+      get 'new', params: { :course_id => @course.id }
       assert_unauthorized
     end
   end
@@ -301,7 +301,7 @@ describe GroupsController do
   describe "POST add_user" do
     it "should require authorization" do
       @group = Account.default.groups.create!(:name => "some group")
-      post 'add_user', params: {:group_id => @group.id}
+      post 'add_user', params: { :group_id => @group.id }
       assert_unauthorized
     end
 
@@ -309,7 +309,7 @@ describe GroupsController do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @user = user_factory(active_all: true)
-      post 'add_user', params: {:group_id => @group.id, :user_id => @user.id}
+      post 'add_user', params: { :group_id => @group.id, :user_id => @user.id }
       expect(response).to be_successful
       expect(assigns[:membership]).not_to be_nil
       expect(assigns[:membership].user).to eql(@user)
@@ -327,7 +327,7 @@ describe GroupsController do
       group = group_category.groups.create(:context => @course)
       group.add_user(user1)
 
-      post 'add_user', params: {:group_id => group.id, :user_id => user2.id}
+      post 'add_user', params: { :group_id => group.id, :user_id => user2.id }
       expect(response).not_to be_successful
       expect(assigns[:membership]).not_to be_nil
       expect(assigns[:membership].user).to eql(user2)
@@ -340,7 +340,7 @@ describe GroupsController do
       @group = Account.default.groups.create!(:name => "some group")
       @user = user_factory(active_all: true)
       @group.add_user(@user)
-      delete 'remove_user', params: {:group_id => @group.id, :user_id => @user.id, :id => @user.id}
+      delete 'remove_user', params: { :group_id => @group.id, :user_id => @user.id, :id => @user.id }
       assert_unauthorized
     end
 
@@ -348,7 +348,7 @@ describe GroupsController do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
-      delete 'remove_user', params: {:group_id => @group.id, :user_id => @user.id, :id => @user.id}
+      delete 'remove_user', params: { :group_id => @group.id, :user_id => @user.id, :id => @user.id }
       expect(response).to be_successful
       @group.reload
       expect(@group.users).to be_empty
@@ -357,13 +357,13 @@ describe GroupsController do
 
   describe "POST create" do
     it "should require authorization" do
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       assert_unauthorized
     end
 
     it "should create new group" do
       user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       expect(response).to be_redirect
       expect(assigns[:group]).not_to be_nil
       expect(assigns[:group].name).to eql("some group")
@@ -372,7 +372,7 @@ describe GroupsController do
     it "should create new group (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       expect(response).to be_redirect
       expect(assigns[:group]).not_to be_nil
       expect(assigns[:group].name).to eql("some group")
@@ -386,14 +386,14 @@ describe GroupsController do
         enabled: false
       )
       user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group"}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       assert_unauthorized
     end
 
     it "should honor group[group_category_id] when permitted" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => group_category.id } }
       expect(response).to be_redirect
       expect(assigns[:group]).not_to be_nil
       expect(assigns[:group].group_category).to eq group_category
@@ -402,7 +402,7 @@ describe GroupsController do
     it "should not honor group[group_category_id] when not permitted" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => group_category.id } }
       expect(response).to be_redirect
       expect(assigns[:group]).not_to be_nil
       expect(assigns[:group].group_category).to eq GroupCategory.student_organized_for(@course)
@@ -411,7 +411,7 @@ describe GroupsController do
     it "should fail when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', params: {:course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}}
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11235 } }
       expect(response).not_to be_successful
     end
 
@@ -426,7 +426,7 @@ describe GroupsController do
         end
 
         it "should ignore the storage_quota_mb parameter" do
-          post 'create', params: {:course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}}
+          post 'create', params: { :course_id => @course.id, :group => { :name => "a group", :storage_quota_mb => 22 } }
           expect(assigns[:group].storage_quota_mb).to eq 11
         end
       end
@@ -438,7 +438,7 @@ describe GroupsController do
         end
 
         it "should set the storage_quota_mb parameter" do
-          post 'create', params: {:course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}}
+          post 'create', params: { :course_id => @course.id, :group => { :name => "a group", :storage_quota_mb => 22 } }
           expect(assigns[:group].storage_quota_mb).to eq 22
         end
       end
@@ -448,14 +448,14 @@ describe GroupsController do
   describe "PUT update" do
     it "should require authorization" do
       @group = @course.groups.create!(:name => "some group")
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
       assert_unauthorized
     end
 
     it "should update group" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
       expect(response).to be_redirect
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group].name).to eql("new name")
@@ -465,7 +465,7 @@ describe GroupsController do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
       expect(response).to be_redirect
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group].name).to eql("new name")
@@ -480,7 +480,7 @@ describe GroupsController do
       )
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => "new name"}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
       assert_unauthorized
     end
 
@@ -488,7 +488,7 @@ describe GroupsController do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group")
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:group_category_id => group_category.id}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => group_category.id } }
       expect(response).to be_redirect
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group].group_category).to eq group_category
@@ -498,7 +498,7 @@ describe GroupsController do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => 11235 } }
       expect(response).not_to be_successful
     end
 
@@ -507,7 +507,7 @@ describe GroupsController do
       @group = @course.groups.create!(:name => "some group")
       @group.add_user(@student1)
       @group.update_attribute(:leader, @student1)
-      put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:leader => nil}}
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :leader => nil } }
       expect(@group.reload.leader).to be_nil
     end
 
@@ -524,7 +524,7 @@ describe GroupsController do
         end
 
         it "should ignore the quota parameter" do
-          put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}}
+          put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => 'the group', :storage_quota_mb => 22 } }
           @group.reload
           expect(@group.name).to eq 'the group'
           expect(@group.storage_quota_mb).to eq 11
@@ -538,7 +538,7 @@ describe GroupsController do
         end
 
         it "should update group quota" do
-          put 'update', params: {:course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}}
+          put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => 'the group', :storage_quota_mb => 22 } }
           @group.reload
           expect(@group.name).to eq 'the group'
           expect(@group.storage_quota_mb).to eq 22
@@ -550,14 +550,14 @@ describe GroupsController do
   describe "DELETE destroy" do
     it "should require authorization" do
       @group = @course.groups.create!(:name => "some group")
-      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       assert_unauthorized
     end
 
     it "should delete group" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group]).not_to be_frozen
       expect(assigns[:group]).to be_deleted
@@ -569,7 +569,7 @@ describe GroupsController do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group]).not_to be_frozen
       expect(assigns[:group]).to be_deleted
@@ -586,7 +586,7 @@ describe GroupsController do
       )
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
-      delete 'destroy', params: {:course_id => @course.id, :id => @group.id}
+      delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       assert_unauthorized
     end
   end
@@ -602,12 +602,12 @@ describe GroupsController do
       group.add_user(u1)
       group.add_user(u2)
 
-      get 'unassigned_members', params: {:course_id => @course.id, :category_id => group.group_category.id}
+      get 'unassigned_members', params: { :course_id => @course.id, :category_id => group.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data['users'].map{ |u| u['user_id'] }.sort).
-        to eq [u1, u2, u3].map{ |u| u.id }.sort
+      expect(data['users'].map { |u| u['user_id'] }.sort)
+        .to eq [u1, u2, u3].map { |u| u.id }.sort
     end
 
     it "should include only users not in a group in the category otherwise" do
@@ -629,25 +629,25 @@ describe GroupsController do
       group3.add_user(u2)
       group3.add_user(u3)
 
-      get 'unassigned_members', params: {:course_id => @course.id, :category_id => group1.group_category.id}
+      get 'unassigned_members', params: { :course_id => @course.id, :category_id => group1.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data['users'].map{ |u| u['user_id'] }.sort).
-        to eq [u2, u3].map{ |u| u.id }.sort
+      expect(data['users'].map { |u| u['user_id'] }.sort)
+        .to eq [u2, u3].map { |u| u.id }.sort
 
-      get 'unassigned_members', params: {:course_id => @course.id, :category_id => group2.group_category.id}
+      get 'unassigned_members', params: { :course_id => @course.id, :category_id => group2.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data['users'].map{ |u| u['user_id'] }.sort).
-        to eq [u1, u3].map{ |u| u.id }.sort
+      expect(data['users'].map { |u| u['user_id'] }.sort)
+        .to eq [u1, u3].map { |u| u.id }.sort
 
-      get 'unassigned_members', params: {:course_id => @course.id, :category_id => group3.group_category.id}
+      get 'unassigned_members', params: { :course_id => @course.id, :category_id => group3.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data['users'].map{ |u| u['user_id'] }).to eq [ u1.id ]
+      expect(data['users'].map { |u| u['user_id'] }).to eq [u1.id]
     end
 
     it "should include the users' sections when available" do
@@ -658,7 +658,7 @@ describe GroupsController do
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)
 
-      get 'unassigned_members', params: {:course_id => @course.id, :category_id => group.group_category.id}
+      get 'unassigned_members', params: { :course_id => @course.id, :category_id => group.group_category.id }
       data = json_parse
       expect(data['users'].first['sections'].first['section_id']).to eq @course.default_section.id
       expect(data['users'].first['sections'].first['section_code']).to eq @course.default_section.section_code
@@ -672,7 +672,7 @@ describe GroupsController do
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)
 
-      get 'context_group_members', params: {:group_id => group.id}
+      get 'context_group_members', params: { :group_id => group.id }
       data = json_parse
       expect(data.first['sections'].first['section_id']).to eq @course.default_section.id
       expect(data.first['sections'].first['section_code']).to eq @course.default_section.section_code
@@ -686,7 +686,7 @@ describe GroupsController do
 
       # u1 in the group has :read_roster permission
       user_session(u1)
-      get 'context_group_members', params: {:group_id => group.id}
+      get 'context_group_members', params: { :group_id => group.id }
       expect(response).to be_successful
 
       # u2 outside the group doesn't have :read_roster permission, since the
@@ -694,7 +694,7 @@ describe GroupsController do
       # context permission cache, though)
       controller.instance_variable_set(:@context_all_permissions, nil)
       user_session(u2)
-      get 'context_group_members', params: {:group_id => group.id}
+      get 'context_group_members', params: { :group_id => group.id }
       expect(response).not_to be_successful
     end
   end
@@ -707,12 +707,12 @@ describe GroupsController do
     end
 
     it "should require authorization" do
-      get 'public_feed', params: {:feed_code => @group.feed_code + 'x'}, format: 'atom'
+      get 'public_feed', params: { :feed_code => @group.feed_code + 'x' }, format: 'atom'
       expect(assigns[:problem]).to match /The verification code is invalid/
     end
 
     it "should include absolute path for rel='self' link" do
-      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
@@ -720,22 +720,22 @@ describe GroupsController do
     end
 
     it "should include an author for each entry" do
-      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
     end
 
     it "excludes unpublished things" do
-      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 2
 
       @wp.unpublish
       @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
 
-      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 0
     end
@@ -754,14 +754,14 @@ describe GroupsController do
     end
 
     it "should successfully create invitations" do
-      get 'accept_invitation', params: {:group_id => @group.id, :uuid => @membership.uuid}
+      get 'accept_invitation', params: { :group_id => @group.id, :uuid => @membership.uuid }
       @group.reload
       expect(@group.has_member?(@user)).to be_truthy
       expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 0
     end
 
     it "should reject an invalid invitation uuid" do
-      get 'accept_invitation', params: {:group_id => @group.id, :uuid => @membership.uuid + "x"}
+      get 'accept_invitation', params: { :group_id => @group.id, :uuid => @membership.uuid + "x" }
       @group.reload
       expect(@group.has_member?(@user)).to be_falsey
       expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 1
@@ -775,16 +775,16 @@ describe GroupsController do
       @group.add_user(@student)
 
       assignment = @course.assignments.create({
-        :name => "test assignment",
-        :group_category => category
-      })
+                                                :name => "test assignment",
+                                                :group_category => category
+                                              })
       file = Attachment.create! context: @student, filename: "homework.pdf", uploaded_data: StringIO.new("blah blah blah")
       @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
     end
 
     it "should include group submissions if param is present" do
       user_session(@teacher)
-      get 'users', params: {:group_id => @group.id, include: ['group_submissions']}
+      get 'users', params: { :group_id => @group.id, include: ['group_submissions'] }
       json = json_parse(response.body)
 
       expect(response).to be_successful
@@ -794,7 +794,7 @@ describe GroupsController do
 
     it "should not include group submissions if param is absent" do
       user_session(@teacher)
-      get 'users', params: {:group_id => @group.id}
+      get 'users', params: { :group_id => @group.id }
       json = json_parse(response.body)
 
       expect(response).to be_successful
@@ -821,9 +821,9 @@ describe GroupsController do
         get 'users', params: { :group_id => @group.id, include: ['active_status'] }
         json = json_parse(response.body)
         expect(json.length).to eq 3
-        expect(json.detect{|r| r['id'] == @student1.id}['is_inactive']).to be_falsey
-        expect(json.detect{|r| r['id'] == @student2.id}['is_inactive']).to be_truthy
-        expect(json.detect{|r| r['id'] == @student3.id}['is_inactive']).to be_falsey
+        expect(json.detect { |r| r['id'] == @student1.id }['is_inactive']).to be_falsey
+        expect(json.detect { |r| r['id'] == @student2.id }['is_inactive']).to be_truthy
+        expect(json.detect { |r| r['id'] == @student3.id }['is_inactive']).to be_falsey
       end
 
       it "don't include active status if not requested" do

@@ -36,10 +36,9 @@ describe "assignments" do
   # note: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
-
     before(:once) do
       @teacher = user_with_pseudonym
-      course_with_teacher({:user => @teacher, :active_course => true, :active_enrollment => true})
+      course_with_teacher({ :user => @teacher, :active_course => true, :active_enrollment => true })
       @course.start_at = nil
       @course.save!
       @course.require_assignment_group
@@ -77,8 +76,7 @@ describe "assignments" do
     end
 
     context "save and publish button" do
-
-      def create_assignment(publish = true, params = {name: "Test Assignment"})
+      def create_assignment(publish = true, params = { name: "Test Assignment" })
         @assignment = @course.assignments.create(params)
         @assignment.unpublish unless publish
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
@@ -89,7 +87,7 @@ describe "assignments" do
 
         expect(f("#assignment-draft-state")).to be_displayed
 
-        expect_new_page_load {f(".save_and_publish").click}
+        expect_new_page_load { f(".save_and_publish").click }
         expect(f("#assignment_publish_button.btn-published")).to be_displayed
 
         # Check that the list of quizzes is also updated
@@ -104,9 +102,8 @@ describe "assignments" do
       end
 
       context "moderated grading assignments" do
-
         before do
-          @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
+          @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
           @assignment.update_attribute(:moderated_grading, true)
           @assignment.update_attribute(:grader_count, 1)
           @assignment.update_attribute(:final_grader, @teacher)
@@ -136,10 +133,10 @@ describe "assignments" do
       group = @course.assignment_groups.create!(:name => "default")
       second_group = @course.assignment_groups.create!(:name => "second default")
       @assignment = @course.assignments.create!(
-          :name => assignment_name,
-          :due_at => due_date,
-          :assignment_group => group,
-          :unlock_at => due_date - 1.day
+        :name => assignment_name,
+        :due_at => due_date,
+        :assignment_group => group,
+        :unlock_at => due_date - 1.day
       )
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
@@ -149,13 +146,13 @@ describe "assignments" do
       click_option('#assignment_group_id', second_group.name)
       click_option('#assignment_grading_type', 'Letter Grade')
 
-      #check grading levels dialog
+      # check grading levels dialog
       f('.edit_letter_grades_link').click
       wait_for_ajaximations
       expect(f('#edit_letter_grades_form')).to be_displayed
       close_visible_dialog
 
-      #check peer reviews option
+      # check peer reviews option
       form = f("#edit_assignment_form")
       assignment_points_possible = f("#assignment_points_possible")
       replace_content(assignment_points_possible, "5")
@@ -171,7 +168,7 @@ describe "assignments" do
       wait_for_ajaximations
       f('#assignment_name').send_keys(' edit')
 
-      #save changes
+      # save changes
       submit_assignment_form
       expect(driver.title).to include(assignment_name + ' edit')
     end
@@ -179,7 +176,7 @@ describe "assignments" do
     it "should create an assignment using main add button", :xbrowser, priority: "1", test_id: 132582 do
       assignment_name = 'first assignment'
       # freeze for a certain time, so we don't get unexpected ui complications
-      time = DateTime.new(Time.now.year,1,7,2,13)
+      time = DateTime.new(Time.now.year, 1, 7, 2, 13)
       Timecop.freeze(time) do
         due_at = format_time_for_view(time)
 
@@ -206,14 +203,14 @@ describe "assignments" do
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
-           "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+       "if assignment has multiple due dates", priority: "2", test_id: 622376 do
       skip "DEMO-25 (8/21/20)"
 
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
-          :title => "VDD Test Assignment",
-          :due_at => expected_date
+        :title => "VDD Test Assignment",
+        :due_at => expected_date
       )
       section = @course.course_sections.create!(:name => "new section")
       @assignment.assignment_overrides.create! do |override|
@@ -244,7 +241,7 @@ describe "assignments" do
 
     it 'creates a simple assignment and defaults post_to_sis' do
       a = @course.account
-      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
       assignment_name = "test_assignment_thing_#{rand(10000)}"
       get "/courses/#{@course.id}/assignments"
@@ -262,7 +259,7 @@ describe "assignments" do
       enable_cache do
         expected_text = "Assignment 1"
         # freeze time to avoid ui complications
-        time = DateTime.new(2015,1,7,2,13)
+        time = DateTime.new(2015, 1, 7, 2, 13)
         Timecop.freeze(time) do
           due_at = format_time_for_datepicker(time)
           points = '25'
@@ -297,9 +294,9 @@ describe "assignments" do
         middle_number = '15'
         expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
         @assignment = @course.assignments.create!(
-            :title => "Test Assignment",
-            :points_possible => 10,
-            :due_at => expected_date
+          :title => "Test Assignment",
+          :points_possible => 10,
+          :due_at => expected_date
         )
         section = @course.course_sections.create!(:name => "new section")
         @assignment.assignment_overrides.create! do |override|
@@ -329,9 +326,9 @@ describe "assignments" do
     it "should validate that a group category is selected", priority: "1", test_id: 626905 do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-        :name => assignment_name,
-        :assignment_group => @course.assignment_groups.create!(:name => "default")
-      })
+                                                 :name => assignment_name,
+                                                 :assignment_group => @course.assignment_groups.create!(:name => "default")
+                                               })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#has_group_category').click
@@ -345,9 +342,9 @@ describe "assignments" do
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
       @teacher.enrollments.first.conclude
       @assignment = @course.assignments.create({
-        :name => "assignment after concluded",
-        :assignment_group => @course.assignment_groups.create!(:name => "default")
-      })
+                                                 :name => "assignment after concluded",
+                                                 :assignment_group => @course.assignment_groups.create!(:name => "default")
+                                               })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -373,12 +370,10 @@ describe "assignments" do
       expect(name.text).to eq "Well hello there"
     end
 
-
-
     context "group assignments" do
       before(:once) do
         ag = @course.assignment_groups.first
-        @assignment1, @assignment2 = [1,2].map do |i|
+        @assignment1, @assignment2 = [1, 2].map do |i|
           gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
           group = @course.groups.create!(:group_category => gc)
           group.users << student_in_course(:course => @course, :active_all => true).user
@@ -388,7 +383,8 @@ describe "assignments" do
             group_category: gc,
             submission_types: 'online_text_entry',
             peer_reviews: "1",
-            automatic_peer_reviews: true)
+            automatic_peer_reviews: true
+          )
         end
         submission = @assignment1.submit_homework(@student)
         submission.submission_type = "online_text_entry"
@@ -402,7 +398,7 @@ describe "assignments" do
       end
 
       it "should still show deleted group set only on an attached assignment with " +
-        "submissions", priority: "2", test_id: 627149 do
+         "submissions", priority: "2", test_id: 627149 do
         @assignment1.group_category.destroy
         @assignment2.group_category.destroy
 
@@ -445,7 +441,7 @@ describe "assignments" do
         @assignment = @course.assignments.create(name: "Student Annotation", submission_types: 'student_annotation,online_text_entry', annotatable_attachment_id: attachment.id)
       end
 
-       it "creates a student annotation assignment with annotatable attachment with usage rights" do
+      it "creates a student annotation assignment with annotatable attachment with usage rights" do
         get "/courses/#{@course.id}/assignments"
 
         wait_for_new_page_load { f(".new_assignment").click }
@@ -454,7 +450,7 @@ describe "assignments" do
         replace_content(f('#assignment_points_possible'), "10")
         click_option('#assignment_submission_type', 'Online')
 
-        ['#assignment_annotated_document','#assignment_text_entry'].each do |element|
+        ['#assignment_annotated_document', '#assignment_text_entry'].each do |element|
           f(element).click
         end
 
@@ -462,11 +458,11 @@ describe "assignments" do
 
         expect(f('#assignment_annotated_document_info')).to be_displayed
 
-        #select attachment from file explorer
+        # select attachment from file explorer
         fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
         fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
 
-        #set usage rights
+        # set usage rights
         f('#usageRightSelector').click
         fxpath('//*[@id="usageRightSelector"]/option[2]').click
         f('#copyrightHolder').send_keys('Me')
@@ -507,7 +503,7 @@ describe "assignments" do
         expect(element).to contain_css("a.delete_group.disabled")
       end
 
-      it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
+      it "should not allow deleting a frozen assignment from index page", priority: "2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} button.al-trigger").click
         wait_for_ajaximations
@@ -521,7 +517,7 @@ describe "assignments" do
         end
 
         expect(f('.assignment_dates').text).to match /Sep 20, 2012/
-        #some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
+        # some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
         expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
       end
     end
@@ -531,7 +527,7 @@ describe "assignments" do
     it "should delete assignments", priority: "1", test_id: 647609 do
       skip_if_safari(:alert)
       ag = @course.assignment_groups.first
-      as = @course.assignments.create({:assignment_group => ag})
+      as = @course.assignments.create({ :assignment_group => ag })
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
@@ -684,8 +680,8 @@ describe "assignments" do
         @assignment.grade_student(@student, grade: 14, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
-        expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").
-            text).to match "14/15 pts"
+        expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader")
+            .text).to match "14/15 pts"
       end
 
       it "should allow publishing from the show page", priority: "1", test_id: 647851 do
@@ -810,12 +806,11 @@ describe "assignments" do
   end
 
   context "moderated grading" do
-
     before do
       course_with_teacher_logged_in
       @course.start_at = nil
       @course.save!
-      @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
       @assignment.update(
         moderated_grading: true,
         grader_count: 1,
@@ -825,7 +820,7 @@ describe "assignments" do
     end
 
     it "should deny access for a regular student to the moderation page", priority: "1", test_id: 609652 do
-      course_with_student_logged_in({course: @course})
+      course_with_student_logged_in({ course: @course })
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#unauthorized_message')).to be_displayed
     end
@@ -845,7 +840,7 @@ describe "assignments" do
     end
 
     it "should default to post grades if account setting is enabled", priority: "2", test_id: 498879 do
-      @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+      @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
       @account.save!
 
       get "/courses/#{@course.id}/assignments/new"
@@ -869,7 +864,7 @@ describe "assignments" do
       fj('div.controls > input:visible').send_keys(@new_group)
     end
 
-    it "should add a new assignment group", priority: "1", test_id:525190 do
+    it "should add a new assignment group", priority: "1", test_id: 525190 do
       fj('.button_type_submit:visible').click
       wait_for_ajaximations
 

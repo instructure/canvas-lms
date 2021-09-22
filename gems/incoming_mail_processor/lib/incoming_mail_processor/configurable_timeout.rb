@@ -21,14 +21,12 @@
 require 'timeout'
 
 module IncomingMailProcessor
-
   # Internal: A helper mixin for Mailbox implementation to properly implement
   # a configurable timeout. This keeps the Mailbox classes from directly
   # depending on canvas methods. The IncomingMessageProcessor will configure
   # the Mailboxes with the appropriate timeout method to use in a Canvas
   # periodic job.
   module ConfigurableTimeout
-
     # Public: Set the method to call to implement timeouts. By default this
     # mixin will use the stdlib Timeout module.
     #
@@ -86,7 +84,7 @@ module IncomingMailProcessor
     # Returns nothing.
     def wrap_with_timeout(obj, method_names)
       timeouter = self
-      obj_eigenclass = class <<obj; self; end
+      obj_eigenclass = class << obj; self; end
       method_names.each do |method_name|
         renamed_method_name = "untimed_#{method_name}"
         obj_eigenclass.send(:alias_method, renamed_method_name, method_name)

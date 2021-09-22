@@ -74,5 +74,4 @@ module ContentNotices
       Rails.cache.read(cn_cache_key(tag)) && (notice.should_show.nil? || notice.should_show.call(self, user))
     end.values
   end
-
 end

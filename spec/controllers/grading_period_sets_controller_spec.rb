@@ -44,22 +44,22 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
       end
 
       it "fetches grading period sets" do
-        get :index, params: {account_id: root_account.to_param}, session: valid_session
+        get :index, params: { account_id: root_account.to_param }, session: valid_session
         expect(json_parse.fetch('grading_period_sets').count).to be 10
       end
 
       it "includes grading periods" do
         group = @groups.first
         period = Factories::GradingPeriodHelper.new.create_for_group(group)
-        get :index, params: {account_id: root_account.to_param}, session: valid_session
-        set = json_parse.fetch('grading_period_sets').detect {|s| s['id'] == group.id.to_s}
+        get :index, params: { account_id: root_account.to_param }, session: valid_session
+        set = json_parse.fetch('grading_period_sets').detect { |s| s['id'] == group.id.to_s }
         periods = set.fetch('grading_periods')
         expect(periods.count).to be 1
         expect(periods.first.fetch('id').to_s).to eql period.id.to_s
       end
 
       it "paginates the grading period sets" do
-        get :index, params: {account_id: root_account.to_param}, session: valid_session
+        get :index, params: { account_id: root_account.to_param }, session: valid_session
         expect(json_parse['meta']).to have_key('pagination')
       end
 
@@ -68,7 +68,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
         # natural order, which ensures the assertion can predictably fail
         @groups.take(5).map(&:destroy)
         @groups.take(5).each { |group| group.update!(workflow_state: 'active') }
-        get :index, params: {account_id: root_account.to_param}, session: valid_session
+        get :index, params: { account_id: root_account.to_param }, session: valid_session
         set_ids = json_parse.fetch('grading_period_sets').map { |set| set['id'] }
         expect(set_ids).to eql @groups.sort_by(&:id).map { |group| group.id.to_s }
       end
@@ -212,7 +212,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
         it "it fetches sets through the root account" do
           grading_period_set = group_helper.create_for_account(root_account)
 
-          get :index, params: {account_id: sub_account.to_param}, session: valid_session
+          get :index, params: { account_id: sub_account.to_param }, session: valid_session
 
           expect(json_parse.fetch('grading_period_sets').count).to eql 1
         end

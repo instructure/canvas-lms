@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
 describe Canvas::Security::LoginRegistry do
-  let(:registry){ Canvas::Security::LoginRegistry }
+  let(:registry) { Canvas::Security::LoginRegistry }
 
   describe ".audit_login" do
     before do
@@ -28,8 +28,8 @@ describe Canvas::Security::LoginRegistry do
       Setting.set('login_attempts_total', '2')
       Setting.set('login_attempts_per_ip', '1')
       u = user_with_pseudonym :active_user => true,
-        :username => "nobody@example.com",
-        :password => "asdfasdf"
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
       u.save!
       @p = u.pseudonym
     end

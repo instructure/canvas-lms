@@ -30,7 +30,7 @@ describe Multipart::SequencedStream do
   end
 
   it "should work as a source for IO.copy_stream" do
-    file = Tempfile.new(["test","txt"])
+    file = Tempfile.new(["test", "txt"])
     file.write("file on disk")
     file.rewind
     test_copy(file, "file on disk")
@@ -43,6 +43,7 @@ describe Multipart::SequencedStream do
     end
 
     def size; @source.size; end
+
     def read(*args); @reader.call(*args); end
   end
 

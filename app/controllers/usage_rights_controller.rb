@@ -153,7 +153,8 @@ class UsageRightsController < ApplicationController
     end
   end
 
-private
+  private
+
   # recursively enumerate file ids under a folder
   def enumerate_contents(folder)
     ids = folder.active_sub_folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
@@ -166,15 +167,15 @@ private
     folders = @context.folders.active.where(id: folder_ids).to_a
     file_ids = folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
-    update_attrs = {usage_rights_id: usage_rights&.id}
+    update_attrs = { usage_rights_id: usage_rights&.id }
     update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
     result.merge!({
-      message: I18n.t({one: "1 file updated", other: "%{count} files updated"}, count: count ),
-      file_ids: file_ids
-    })
+                    message: I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count),
+                    file_ids: file_ids
+                  })
     return render json: result
   end
 end

@@ -20,13 +20,14 @@ require 'bigdecimal/util'
 module Quizzes
   class SubmissionGrader
     class AlreadyGradedError < RuntimeError; end
+
     def initialize(submission)
       @submission = submission
     end
 
-    def grade_submission(opts={})
+    def grade_submission(opts = {})
       if @submission.submission_data.is_a?(Array)
-        raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class}")
+        raise(AlreadyGradedError, "Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class}")
       end
 
       @submission.manually_scored = false
@@ -71,11 +72,11 @@ module Quizzes
       # let's just write the options here in case we decide to do individual
       # submissions asynchronously later.
       options = {
-          quiz: quiz,
-          # Leave version_number out for now as we may be passing the version
-          # and we're not starting it as a delayed job
-          # version_number: quiz.version_number,
-          submissions: [@submission]
+        quiz: quiz,
+        # Leave version_number out for now as we may be passing the version
+        # and we're not starting it as a delayed job
+        # version_number: quiz.version_number,
+        submissions: [@submission]
       }
       Quizzes::QuizRegrader::Regrader.regrade!(options)
     end
@@ -123,6 +124,7 @@ module Quizzes
     def update_outcomes(question_ids, submission_id, attempt)
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
+
       submission = Quizzes::QuizSubmission.find(submission_id)
 
       versioned_submission = versioned_submission(submission, attempt)
@@ -147,6 +149,7 @@ module Quizzes
       # if the submission transitions to completed, then we need this method
       # to return true, even if the kept score isn't changing, so outcome results are generated.
       return true if original_workflow_state == 'pending_review' && @submission.workflow_state == 'complete'
+
       @submission.kept_score && @submission.kept_score > original_score
     end
 
@@ -159,9 +162,10 @@ module Quizzes
 
       # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
       return questions, ContentTag.learning_outcome_alignments.active.where(
-          :content_type => 'AssessmentQuestionBank',
-          :content_id => bank_ids).
-          preload(:learning_outcome, :context).to_a
+        :content_type => 'AssessmentQuestionBank',
+        :content_id => bank_ids
+      )
+                                  .preload(:learning_outcome, :context).to_a
     end
   end
 end

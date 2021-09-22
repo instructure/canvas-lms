@@ -29,10 +29,10 @@ describe LtiApiController, type: :request do
     @tool = @course.context_external_tools.create(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'logout service test tool', :domain => 'example.com')
     @tool.url = 'https://example.edu/tool-launch-url'
     @tool.course_navigation = {
-        :enabled => "true"
+      :enabled => "true"
     }
     @tool.custom_fields = {
-        "sub_logout_service_url" => "$Canvas.logoutService.url"
+      "sub_logout_service_url" => "$Canvas.logoutService.url"
     }
     @tool.save!
   end
@@ -40,7 +40,7 @@ describe LtiApiController, type: :request do
   def api_path(token = nil, callback = nil)
     token ||= Lti::LogoutService.create_token(@tool, @pseudonym)
     callback ||= 'http://logout.notify.example.com'
-    "/api/lti/v1/logout_service/#{token}?#{{callback: callback}.to_query}"
+    "/api/lti/v1/logout_service/#{token}?#{{ callback: callback }.to_query}"
   end
 
   def make_call(opts = {})
@@ -100,8 +100,8 @@ describe LtiApiController, type: :request do
       token2 = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token2, 'http://logout.notify.example.com/456'))
       expect(Lti::LogoutService.get_logout_callbacks(@pseudonym).values).to match_array [
-          'http://logout.notify.example.com/123',
-          'http://logout.notify.example.com/456'
+        'http://logout.notify.example.com/123',
+        'http://logout.notify.example.com/456'
       ]
     end
   end

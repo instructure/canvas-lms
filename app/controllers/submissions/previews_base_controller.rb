@@ -71,6 +71,7 @@ module Submissions
     end
 
     protected
+
     def anonymize_students?
       if current_user_is_student?
         @submission_for_show.assignment.anonymous_peer_reviews? && @submission_for_show.submission.peer_reviewer?(@current_user)
@@ -90,7 +91,7 @@ module Submissions
     end
 
     def prepare_js_env
-      hash = {CONTEXT_ACTION_SOURCE: :submissions}
+      hash = { CONTEXT_ACTION_SOURCE: :submissions }
       append_sis_data(hash)
       js_env(hash)
     end
@@ -99,10 +100,10 @@ module Submissions
       { headless: 1 }.tap do |h|
         if redirect_to_quiz_history?
           h.merge!({
-            hide_student_name: params[:hide_student_name],
-            user_id: @submission.user_id,
-            version: params[:version] || @submission.quiz_submission_version
-          })
+                     hide_student_name: params[:hide_student_name],
+                     user_id: @submission.user_id,
+                     version: params[:version] || @submission.quiz_submission_version
+                   })
         end
       end
     end

@@ -127,7 +127,7 @@ describe "student k5 course dashboard" do
     end
   end
 
-  context 'course resources tab' do
+  context 'subject resources tab' do
     it 'shows the Important Info for subject resources tab' do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
@@ -138,7 +138,54 @@ describe "student k5 course dashboard" do
     end
   end
 
-  context 'course tab navigation shared examples' do
+  context 'subject groups tab existence' do
+    it 'has no groups tab when there are no groups' do
+      get "/courses/#{@subject_course.id}"
+
+      expect(groups_tab_exists?).to be_falsey
+    end
+  end
+
+  context 'subject groups tab functions for student' do
+    before :once do
+      category = @subject_course.group_categories.create!(name: 'category', self_signup: 'enabled')
+      @group1 = @subject_course.groups.create!(name: "Test Group1", group_category: category)
+      @group2 = @subject_course.groups.create!(name: "Test Group2", group_category: category)
+    end
+
+    it 'has the groups tab available' do
+      get "/courses/#{@subject_course.id}"
+
+      expect(groups_tab_exists?).to be_truthy
+    end
+
+    it 'shows the groups the student can join' do
+      get "/courses/#{@subject_course.id}#groups"
+
+      titles_list = group_titles_text_list
+      expect(titles_list.count).to eq(2)
+      expect(titles_list.first).to match(@group1.name)
+      expect(titles_list.first).to match(@group1.category)
+    end
+
+    it 'allows student to join group' do
+      get "/courses/#{@subject_course.id}#groups"
+
+      buttons_list = group_management_buttons('Join')
+
+      click_group_join_button(buttons_list.first)
+
+      expect(group_management_buttons('Leave').count).to eq(1)
+      expect(group_management_buttons('Switch To').count).to eq(1)
+
+      click_group_join_button(group_management_buttons('Switch To').first)
+      click_group_join_button(group_management_buttons('Leave').first)
+
+      expect(group_management_buttons('Join').count).to eq(2)
+    end
+  end
+
+  context 'subject tab navigation shared examples' do
     it_behaves_like 'k5 subject navigation tabs'
   end
 end

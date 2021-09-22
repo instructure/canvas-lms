@@ -113,7 +113,7 @@ describe "Wiki Pages" do
 
     it "blocks linked page from redirecting parent page", priority: "2", test_id: 927147 do
       @course.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
-        body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
+                                 body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
       get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
       expect(f('#click_here_now').attribute("rel")).to eq "noreferrer noopener"
     end
@@ -207,7 +207,7 @@ describe "Wiki Pages" do
       mod = @course.context_modules.create! name: 'the_mod', require_sequential_progress: true
       foo_item = mod.add_item id: foo.id, type: 'wiki_page'
       bar_item = mod.add_item id: bar.id, type: 'wiki_page'
-      mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
+      mod.completion_requirements = { foo_item.id => { type: 'must_view' }, bar_item.id => { type: 'must_view' } }
       mod.save!
 
       get "/courses/#{@course.id}/pages/bar"
@@ -219,14 +219,13 @@ describe "Wiki Pages" do
     end
 
     it "should not show the show all pages link if the pages tab is disabled" do
-      @course.tab_configuration = [ { :id => Course::TAB_PAGES, :hidden => true } ]
+      @course.tab_configuration = [{ :id => Course::TAB_PAGES, :hidden => true }]
       @course.save!
 
       foo = @course.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
       expect(f("#content")).not_to contain_css('.view_all_pages')
-
     end
   end
 
@@ -236,7 +235,7 @@ describe "Wiki Pages" do
     end
 
     it "displays public content to unregistered users", priority: "1", test_id: 270035 do
-      Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
+      Canvas::Plugin.register(:kaltura, nil, :settings => { 'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1' })
 
       @course.is_public = true
       @course.workflow_state = 'available'
@@ -254,7 +253,7 @@ describe "Wiki Pages" do
     before do
       course_with_teacher_logged_in
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
+      @tool.wiki_page_menu = { :url => "http://www.example.com", :text => "Export Wiki Page" }
       @tool.save!
 
       @course.wiki.set_front_page_url!('front-page')

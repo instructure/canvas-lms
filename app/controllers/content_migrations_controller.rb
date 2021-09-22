@@ -149,15 +149,15 @@ class ContentMigrationsController < ApplicationController
 
     scope = @context.content_migrations.where(child_subscription_id: nil).order('id DESC')
     @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
-    @migrations.each{|mig| mig.check_for_pre_processing_timeout }
+    @migrations.each { |mig| mig.check_for_pre_processing_timeout }
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)]}
+      @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
 
-      options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
+      options = @plugins.map { |p| { :label => p.metadata(:select_text), :id => p.id } }
 
       external_tools = ContextExternalTool.all_tools_for(@context, :placements => :migration_selection, :root_account => @domain_root_account, :current_user => @current_user)
       options.concat(external_tools.map do |et|
@@ -368,7 +368,7 @@ class ContentMigrationsController < ApplicationController
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
       if params.dig(:pre_attachment, :name).blank? && params.dig(:settings, :file_url).blank? && params.dig(:settings, :content_export_id).blank?
-        return render(:json => {:message => t("File upload, file_url, or content_export_id is required")}, :status => :bad_request)
+        return render(:json => { :message => t("File upload, file_url, or content_export_id is required") }, :status => :bad_request)
       end
     end
     source_course = lookup_sis_source_course
@@ -417,20 +417,21 @@ class ContentMigrationsController < ApplicationController
   end
   private :lookup_sis_source_course
 
-
   # @API List Migration Systems
   #
   # Lists the currently available migration types. These values may change.
   #
   # @returns [Migrator]
   def available_migrators
-    systems = ContentMigration.migration_plugins(true).select{|sys| migration_plugin_supported?(sys)}
-    json = systems.map{|p| {
-            :type => p.id,
-            :requires_file_upload => !!p.settings[:requires_file_upload],
-            :name => p.meta['select_text'].call,
-            :required_settings => p.settings[:required_settings] || []
-    }}
+    systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
+    json = systems.map { |p|
+      {
+        :type => p.id,
+        :requires_file_upload => !!p.settings[:requires_file_upload],
+        :name => p.meta['select_text'].call,
+        :required_settings => p.settings[:required_settings] || []
+      }
+    }
 
     render :json => json
   end
@@ -499,11 +500,12 @@ class ContentMigrationsController < ApplicationController
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
     formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url,
-      global_identifiers: @content_migration.use_global_identifiers?)
+                                                                          global_identifiers: @content_migration.use_global_identifiers?)
 
     unless formatter.valid_type?(params[:type])
-      return render :json => {:message => "unsupported migration type"}, :status => :bad_request
+      return render :json => { :message => "unsupported migration type" }, :status => :bad_request
     end
+
     render :json => formatter.get_content_list(params[:type])
   end
 
@@ -516,7 +518,7 @@ class ContentMigrationsController < ApplicationController
   def find_migration_plugin(name)
     if name =~ /context_external_tool/
       plugin = Canvas::Plugin.new(name)
-      plugin.meta[:settings] = {requires_file_upload: true, worker: 'CCWorker', valid_contexts: %w{Course}}.with_indifferent_access
+      plugin.meta[:settings] = { requires_file_upload: true, worker: 'CCWorker', valid_contexts: %w{Course} }.with_indifferent_access
       plugin
     else
       Canvas::Plugin.find(name)
@@ -539,21 +541,21 @@ class ContentMigrationsController < ApplicationController
       end
     elsif params[:select] && params[:migration_type] == 'course_copy_importer'
       copy_options = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
-        global_identifiers: @content_migration.use_global_identifiers?,
-        for_content_export: true)
+                                                          global_identifiers: @content_migration.use_global_identifiers?,
+                                                          for_content_export: true)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options
     elsif params[:copy]
       copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h,
-        global_identifiers: @content_migration.use_global_identifiers?)
+                                                          global_identifiers: @content_migration.use_global_identifiers?)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options
     else
       @content_migration.migration_settings[:import_immediately] = true
-      @content_migration.copy_options = {:everything => true}
-      @content_migration.migration_settings[:migration_ids_to_import] = {:copy => {:everything => true}}
+      @content_migration.copy_options = { :everything => true }
+      @content_migration.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }
     end
 
     if @content_migration.save

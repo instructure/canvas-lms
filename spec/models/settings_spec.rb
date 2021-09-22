@@ -21,9 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Setting do
-
   context "getting" do
-
     it 'should get the default value as a string' do
       expect(Setting.get('my_new_setting', true)).to eq 'true'
     end
@@ -62,7 +60,6 @@ describe Setting do
   end
 
   context "setting" do
-
     it 'should set boolean values as strings' do
       Setting.set('my_new_setting', true)
       expect(Setting.get('my_new_setting', '1')).to eq 'true'
@@ -74,5 +71,4 @@ describe Setting do
       expect(Setting.get('my_new_setting', '1')).to eq time.to_s
     end
   end
-
 end

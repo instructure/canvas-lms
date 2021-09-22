@@ -35,7 +35,6 @@ module CanvasHttp
   # end
   #
   module CircuitBreaker
-
     DEFAULT_THRESHOLD = 10
     DEFAULT_INTERVAL = 15
     DEFAULT_WINDOW = 20
@@ -46,11 +45,13 @@ module CanvasHttp
 
       def tripped?(domain)
         return false if redis_client.nil?
+
         !redis_client.get(tripped_key(domain)).nil?
       end
 
       def trip_if_necessary(domain)
         return if redis_client.nil?
+
         key = threshold_key(domain)
         redis_client.setnx(key, 0)
         redis_client.expire(key, window(domain))

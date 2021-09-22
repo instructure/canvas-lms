@@ -72,10 +72,10 @@ describe SupportHelpers::TurnitinController do
 
       it "should create a new ShardFixer with after_time" do
         fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, '2016-05-01')
-        expect(SupportHelpers::Tii::ShardFixer).to receive(:new).
-          with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
+        expect(SupportHelpers::Tii::ShardFixer).to receive(:new)
+          .with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :shard, params: {after_time: '2016-05-01'}
+        get :shard, params: { after_time: '2016-05-01' }
         expect(response.body).to eq("Enqueued TurnItIn ShardFixer ##{fixer.job_id}...")
       end
     end
@@ -86,7 +86,7 @@ describe SupportHelpers::TurnitinController do
         fixer = SupportHelpers::Tii::AssignmentFixer.new(@user.email, nil, @assignment.id)
         expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with(@user.email, nil, @assignment.id).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :assignment, params: {id: @assignment.id}
+        get :assignment, params: { id: @assignment.id }
         expect(response.body).to eq("Enqueued TurnItIn AssignmentFixer ##{fixer.job_id}...")
       end
 
@@ -106,11 +106,10 @@ describe SupportHelpers::TurnitinController do
         expect(SupportHelpers::Tii::LtiAttachmentFixer).to receive(:new)
           .with(@user.email, nil, @submission.id, @attachment.id).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :lti_attachment, params: {submission_id: @submission.id, attachment_id: @attachment.id}
+        get :lti_attachment, params: { submission_id: @submission.id, attachment_id: @attachment.id }
         expect(response.body).to eq("Enqueued TurnItIn LtiAttachmentFixer ##{fixer.job_id}...")
       end
     end
-
 
     context 'pending' do
       it "should create a new StuckInPendingFixer" do

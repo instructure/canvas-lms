@@ -38,8 +38,8 @@ describe ExternalToolsController, type: :request do
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       et = tool_with_everything(@course, allow_membership_service_access: true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
-                    {:controller => 'external_tools', :action => 'show', :format => 'json',
-                     :course_id => @course.id.to_s, :external_tool_id => et.id.to_s})
+                      { :controller => 'external_tools', :action => 'show', :format => 'json',
+                        :course_id => @course.id.to_s, :external_tool_id => et.id.to_s })
       expect(json['allow_membership_service_access']).to eq true
     end
 
@@ -91,11 +91,10 @@ describe ExternalToolsController, type: :request do
     if Canvas.redis_enabled?
 
       describe 'sessionless launch' do
-
         let(:tool) { tool_with_everything(@course) }
 
         it 'should allow sessionless launches by url' do
-          response = sessionless_launch(@course, 'course', {url: tool.url})
+          response = sessionless_launch(@course, 'course', { url: tool.url })
           expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML5(response.body)
@@ -104,7 +103,7 @@ describe ExternalToolsController, type: :request do
         end
 
         it 'should allow sessionless launches by tool id' do
-          response = sessionless_launch(@course, 'course', {id: tool.id.to_s})
+          response = sessionless_launch(@course, 'course', { id: tool.id.to_s })
           expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML5(response.body)
@@ -114,14 +113,14 @@ describe ExternalToolsController, type: :request do
 
         it 'returns 401 if the user is not authorized for the course' do
           user_with_pseudonym
-          params = {id: tool.id.to_s}
+          params = { id: tool.id.to_s }
           code = get_raw_sessionless_launch_url(@course, 'course', params)
           expect(code).to eq 401
         end
 
         it "returns a service unavailable if redis isn't available" do
           allow(Canvas).to receive(:redis_enabled?).and_return(false)
-          params = {id: tool.id.to_s}
+          params = { id: tool.id.to_s }
           code = get_raw_sessionless_launch_url(@course, 'course', params)
           expect(code).to eq 503
           json = JSON.parse(response.body)
@@ -130,12 +129,12 @@ describe ExternalToolsController, type: :request do
 
         context 'assessment launch' do
           before do
-            allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-            allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+            allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+            allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
           end
 
           it 'returns a bad request response if there is no assignment_id' do
-            params = {id: tool.id.to_s, launch_type: 'assessment'}
+            params = { id: tool.id.to_s, launch_type: 'assessment' }
             code = get_raw_sessionless_launch_url(@course, 'course', params)
             expect(code).to eq 400
             json = JSON.parse(response.body)
@@ -143,7 +142,7 @@ describe ExternalToolsController, type: :request do
           end
 
           it 'returns a not found response if the assignment is not found in the class' do
-            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: -1}
+            params = { id: tool.id.to_s, launch_type: 'assessment', assignment_id: -1 }
             code = get_raw_sessionless_launch_url(@course, 'course', params)
             expect(code).to eq 404
             json = JSON.parse(response.body)
@@ -157,7 +156,7 @@ describe ExternalToolsController, type: :request do
             tag.save!
             @assignment.unpublish
             student_in_course(course: @course)
-            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
+            params = { id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id }
             code = get_raw_sessionless_launch_url(@course, 'course', params)
             expect(code).to eq 401
           end
@@ -165,8 +164,9 @@ describe ExternalToolsController, type: :request do
           it "returns a bad request if the assignment doesn't have an external_tool_tag" do
             assignment = @course.assignments.create!(
               :title => "published assignemnt",
-              :submission_types => "online_url")
-            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: assignment.id}
+              :submission_types => "online_url"
+            )
+            params = { id: tool.id.to_s, launch_type: 'assessment', assignment_id: assignment.id }
             code = get_raw_sessionless_launch_url(@course, 'course', params)
             expect(code).to eq 400
             json = JSON.parse(response.body)
@@ -178,7 +178,7 @@ describe ExternalToolsController, type: :request do
             tag = @assignment.build_external_tool_tag(:url => tool.url)
             tag.content_type = 'ContextExternalTool'
             tag.save!
-            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
+            params = { id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id }
             json = get_sessionless_launch_url(@course, 'course', params)
             expect(json).to include('url')
 
@@ -223,17 +223,16 @@ describe ExternalToolsController, type: :request do
               content_type: 'ContextExternalTool',
               content_id: tool.id
             )
-            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
+            params = { id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id }
             json = get_sessionless_launch_url(@course, 'course', params)
             expect(json['url']).to include(course_external_tools_sessionless_launch_url(@course))
           end
 
           it "returns a json error if there is no matching tool" do
-            params = {url: 'http://my_non_esisting_tool_domain.com', id: -1}
+            params = { url: 'http://my_non_esisting_tool_domain.com', id: -1 }
             json = get_sessionless_launch_url(@course, 'course', params)
             expect(json["errors"]["external_tool"]).to eq "Unable to find a matching external tool"
           end
-
         end
 
         it "returns a bad request response if there is no tool_id or url" do
@@ -311,7 +310,7 @@ describe ExternalToolsController, type: :request do
         let(:tool) { tool_with_everything(@account) }
 
         it 'should allow sessionless launches by url' do
-          response = sessionless_launch(@account, 'account', {url: tool.url})
+          response = sessionless_launch(@account, 'account', { url: tool.url })
           expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML5(response.body)
@@ -320,7 +319,7 @@ describe ExternalToolsController, type: :request do
         end
 
         it 'should allow sessionless launches by tool id' do
-          response = sessionless_launch(@account, 'account', {id: tool.id.to_s})
+          response = sessionless_launch(@account, 'account', { id: tool.id.to_s })
           expect(response.code).to eq '200'
 
           doc = Nokogiri::HTML5(response.body)
@@ -345,7 +344,7 @@ describe ExternalToolsController, type: :request do
         shared_secret: 'secret',
         name: 'test tool',
         url: 'http://www.tool.com/launch',
-        editor_button: {url: 'http://example.com', icon_url: 'http://example.com'}
+        editor_button: { url: 'http://example.com', icon_url: 'http://example.com' }
       )
     end
 
@@ -359,8 +358,8 @@ describe ExternalToolsController, type: :request do
 
       def add_favorite_tool(account, tool)
         json = api_call(:post, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
-          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
-            :account_id => account.id.to_s, :id => tool.id.to_s}, {}, {}, {expected_status: 200})
+                        { :controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+                          :account_id => account.id.to_s, :id => tool.id.to_s }, {}, {}, { expected_status: 200 })
         account.reload
         json
       end
@@ -369,27 +368,27 @@ describe ExternalToolsController, type: :request do
         student_in_course(:active_all => true)
         @user = @student
         api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
-            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 401})
+                 { :controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+                   :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s }, {}, {}, { :expected_status => 401 })
       end
 
       it "requires a tool in the context" do
         api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
-          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
-            :account_id => Account.default.id.to_s, :id => @sub_tool.id.to_s}, {}, {}, {:expected_status => 404})
+                 { :controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+                   :account_id => Account.default.id.to_s, :id => @sub_tool.id.to_s }, {}, {}, { :expected_status => 404 })
       end
 
       it "doesn't allow adding too many tools" do
         tool2 = create_editor_tool(Account.default)
         tool3 = create_editor_tool(Account.default)
         Account.default.tap do |ra|
-          ra.settings[:rce_favorite_tool_ids] = {value: [tool2.global_id, tool3.global_id]}
+          ra.settings[:rce_favorite_tool_ids] = { value: [tool2.global_id, tool3.global_id] }
           ra.save!
         end
 
         json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
-            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 400})
+                        { :controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+                          :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s }, {}, {}, { :expected_status => 400 })
         expect(json['message']).to eq "Cannot have more than 2 favorited tools"
       end
 
@@ -397,7 +396,7 @@ describe ExternalToolsController, type: :request do
         tool2 = create_editor_tool(Account.default)
         tool3 = create_editor_tool(Account.default)
         Account.default.tap do |ra|
-          ra.settings[:rce_favorite_tool_ids] = {value: [tool2.global_id, tool3.global_id]}
+          ra.settings[:rce_favorite_tool_ids] = { value: [tool2.global_id, tool3.global_id] }
           ra.save!
         end
         tool3.destroy
@@ -444,8 +443,8 @@ describe ExternalToolsController, type: :request do
 
       def remove_favorite_tool(account, tool)
         json = api_call(:delete, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
-          {:controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
-            :account_id => account.id.to_s, :id => tool.id.to_s}, {}, {}, {expected_status: 200})
+                        { :controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
+                          :account_id => account.id.to_s, :id => tool.id.to_s }, {}, {}, { expected_status: 200 })
         account.reload
         json
       end
@@ -454,8 +453,8 @@ describe ExternalToolsController, type: :request do
         student_in_course(:active_all => true)
         @user = @student
         api_call(:delete, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-          {:controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
-            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 401})
+                 { :controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
+                   :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s }, {}, {}, { :expected_status => 401 })
       end
 
       it "works with existing favorites configured with old column if not specified on account" do
@@ -469,7 +468,7 @@ describe ExternalToolsController, type: :request do
       it "removes from sub-account favorites inherited from a root account" do
         root_tool2 = create_editor_tool(Account.default)
         Account.default.tap do |ra|
-          ra.settings[:rce_favorite_tool_ids] = {value: [@root_tool.global_id, root_tool2.global_id]}
+          ra.settings[:rce_favorite_tool_ids] = { value: [@root_tool.global_id, root_tool2.global_id] }
           ra.save!
         end
 
@@ -479,18 +478,18 @@ describe ExternalToolsController, type: :request do
     end
   end
 
-  def show_call(context, type="course")
+  def show_call(context, type = "course")
     et = tool_with_everything(context)
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
-                    {:controller => 'external_tools', :action => 'show', :format => 'json',
-                     :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
+                    { :controller => 'external_tools', :action => 'show', :format => 'json',
+                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s })
     expect(json).to eq example_json(et)
   end
 
-  def not_found_call(context, type="course")
+  def not_found_call(context, type = "course")
     raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/0.json",
-                 {:controller => 'external_tools', :action => 'show', :format => 'json',
-                  :"#{type}_id" => context.id.to_s, :external_tool_id => "0"})
+                 { :controller => 'external_tools', :action => 'show', :format => 'json',
+                   :"#{type}_id" => context.id.to_s, :external_tool_id => "0" })
     assert_status(404)
   end
 
@@ -498,8 +497,8 @@ describe ExternalToolsController, type: :request do
     et = tool_with_everything(group.context)
 
     json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools?include_parents=true",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :group_id => group.id.to_s, :include_parents => true})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :group_id => group.id.to_s, :include_parents => true })
 
     expect(json.size).to eq 1
     expect(json.first).to eq example_json(et)
@@ -509,112 +508,112 @@ describe ExternalToolsController, type: :request do
     7.times { tool_with_everything(group.context) }
 
     json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :group_id => group.id.to_s, :include_parents => true, :per_page => '3'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :group_id => group.id.to_s, :include_parents => true, :per_page => '3' })
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match(/page=2/)
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
 
     # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :group_id => group.id.to_s, :include_parents => true, :per_page => '3', :page => '3'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :group_id => group.id.to_s, :include_parents => true, :per_page => '3', :page => '3' })
 
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match(/page=2/)
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
   end
 
-  def index_call(context, type="course")
+  def index_call(context, type = "course")
     et = tool_with_everything(context)
 
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :"#{type}_id" => context.id.to_s})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :"#{type}_id" => context.id.to_s })
 
     expect(json.size).to eq 1
     expect(json.first).to eq example_json(et)
   end
 
-  def index_call_with_placment(context, placement, type="course")
+  def index_call_with_placment(context, placement, type = "course")
     tool_with_everything(context)
-    et_with_placement = tool_with_everything(context, {:placement => placement})
+    et_with_placement = tool_with_everything(context, { :placement => placement })
 
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json', :placement => placement,
-                     :"#{type}_id" => context.id.to_s})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json', :placement => placement,
+                      :"#{type}_id" => context.id.to_s })
 
     expect(json.size).to eq 1
     expect(json.first).to eq example_json(et_with_placement)
   end
 
-  def search_call(context, type="course")
+  def search_call(context, type = "course")
     2.times { |i| context.context_external_tools.create!(:name => "first_#{i}", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti") }
     ids = context.context_external_tools.map(&:id)
 
     2.times { |i| context.context_external_tools.create!(:name => "second_#{i}", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti") }
 
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?search_term=fir",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :"#{type}_id" => context.id.to_s, :search_term => 'fir'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :"#{type}_id" => context.id.to_s, :search_term => 'fir' })
 
-    expect(json.map{|h| h['id']}.sort).to eq ids.sort
+    expect(json.map { |h| h['id'] }.sort).to eq ids.sort
   end
 
-  def only_selectables(context, type="course")
+  def only_selectables(context, type = "course")
     context.context_external_tools.create!(:name => "first", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti", :not_selectable => true)
     not_selectable = context.context_external_tools.create!(:name => "second", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti")
 
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?selectable=true",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json',
-                     :"#{type}_id" => context.id.to_s, :selectable => 'true'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json',
+                      :"#{type}_id" => context.id.to_s, :selectable => 'true' })
 
     expect(json.length).to eq 1
     expect(json.first['id']).to eq not_selectable.id
   end
 
-  def create_call(context, type="course")
+  def create_call(context, type = "course")
     json = api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                    {:controller => 'external_tools', :action => 'create', :format => 'json',
-                     :"#{type}_id" => context.id.to_s}, post_hash)
+                    { :controller => 'external_tools', :action => 'create', :format => 'json',
+                      :"#{type}_id" => context.id.to_s }, post_hash)
     expect(context.context_external_tools.count).to eq 1
 
     et = context.context_external_tools.last
     expect(json).to eq example_json(et)
   end
 
-  def update_call(context, type="course")
+  def update_call(context, type = "course")
     et = context.context_external_tools.create!(:name => "test", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti")
 
     json = api_call(:put, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
-                    {:controller => 'external_tools', :action => 'update', :format => 'json',
-                     :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
+                    { :controller => 'external_tools', :action => 'update', :format => 'json',
+                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s }, post_hash)
     et.reload
     expect(json).to eq example_json(et)
   end
 
-  def destroy_call(context, type="course")
+  def destroy_call(context, type = "course")
     et = context.context_external_tools.create!(:name => "test", :consumer_key => "fakefake", :shared_secret => "sofakefake", :domain => "example.com")
     api_call(:delete, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
-                    {:controller => 'external_tools', :action => 'destroy', :format => 'json',
-                     :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
+             { :controller => 'external_tools', :action => 'destroy', :format => 'json',
+               :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s })
 
     et.reload
     expect(et.workflow_state).to eq 'deleted'
     expect(context.context_external_tools.active.count).to eq 0
   end
 
-  def error_call(context, type="course")
+  def error_call(context, type = "course")
     raw_api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                 {:controller => 'external_tools', :action => 'create', :format => 'json',
-                  :"#{type}_id" => context.id.to_s},
+                 { :controller => 'external_tools', :action => 'create', :format => 'json',
+                   :"#{type}_id" => context.id.to_s },
                  {})
     json = JSON.parse response.body
     expect(response.code).to eq "400"
@@ -625,45 +624,45 @@ describe ExternalToolsController, type: :request do
     expect(json["errors"]["domain"].first["message"]).to eq "Either the url or domain should be set."
   end
 
-  def unauthorized_call(context, type="course")
+  def unauthorized_call(context, type = "course")
     raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                    {:controller => 'external_tools', :action => 'index',
-                     :format => 'json', :"#{type}_id" => context.id.to_s})
+                 { :controller => 'external_tools', :action => 'index',
+                   :format => 'json', :"#{type}_id" => context.id.to_s })
     expect(response.code).to eq "401"
   end
 
-  def authorized_call(context, type="course")
+  def authorized_call(context, type = "course")
     raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                    {:controller => 'external_tools', :action => 'index',
-                     :format => 'json', :"#{type}_id" => context.id.to_s})
+                 { :controller => 'external_tools', :action => 'index',
+                   :format => 'json', :"#{type}_id" => context.id.to_s })
     expect(response.code).to eq "200"
   end
 
-  def paginate_call(context, type="course")
+  def paginate_call(context, type = "course")
     7.times { |i| context.context_external_tools.create!(:name => "test_#{i}", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti") }
     expect(context.context_external_tools.count).to eq 7
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?per_page=3",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3' })
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3/
 
     # get the last page
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?page=3&per_page=3",
-                    {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3', :page => '3'})
+                    { :controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3', :page => '3' })
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3/
   end
 
-  def tool_with_everything(context, opts={})
+  def tool_with_everything(context, opts = {})
     et = context.context_external_tools.new
     et.name = opts[:name] || "External Tool Eh"
     et.description = "For testing stuff"
@@ -672,39 +671,39 @@ describe ExternalToolsController, type: :request do
     et.not_selectable = true
     et.url = "http://www.example.com/ims/lti"
     et.workflow_state = 'public'
-    et.custom_fields = {:key1 => 'val1', :key2 => 'val2'}
-    et.course_navigation = {:url=>"http://www.example.com/ims/lti/course", :visibility=>"admins", :text=>"Course nav", "default"=>"disabled"}
-    et.account_navigation = {:url=>"http://www.example.com/ims/lti/account", :text=>"Account nav", :custom_fields=>{"key"=>"value"}}
-    et.user_navigation = {:url=>"http://www.example.com/ims/lti/user", :text=>"User nav"}
-    et.editor_button = {:url=>"http://www.example.com/ims/lti/editor", :icon_url=>"/images/delete.png", :selection_width=>50, :selection_height=>50, :text=>"editor button"}
-    et.homework_submission = {:url=>"http://www.example.com/ims/lti/editor", :selection_width=>50, :selection_height=>50, :text=>"homework submission"}
-    et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
-    et.migration_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "migration selection", :selection_width=>42, :selection_height=>24}
-    et.course_home_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins'}
-    et.course_settings_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course settings sub navigation", display_type: 'full_width', visibility: 'admins'}
-    et.global_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "global navigation", display_type: 'full_width', visibility: 'admins'}
-    et.assignment_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment menu", display_type: 'full_width', visibility: 'admins'}
-    et.assignment_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment index menu", display_type: 'full_width', visibility: 'admins'}
-    et.assignment_group_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment group menu", display_type: 'full_width', visibility: 'admins'}
-    et.discussion_topic_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic menu", display_type: 'full_width', visibility: 'admins'}
-    et.discussion_topic_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic index menu", display_type: 'full_width', visibility: 'admins'}
-    et.file_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "file menu", display_type: 'full_width', visibility: 'admins'}
-    et.file_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "file index menu", display_type: 'full_width', visibility: 'admins'}
-    et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
-    et.module_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules index menu", display_type: 'full_width', visibility: 'admins'}
-    et.module_group_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules group menu", display_type: 'full_width', visibility: 'admins'}
-    et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
-    et.quiz_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz index menu", display_type: 'full_width', visibility: 'admins'}
-    et.submission_type_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "submission type selection", display_type: 'full_width', visibility: 'admins'}
-    et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
-    et.wiki_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki index menu", display_type: 'full_width', visibility: 'admins'}
-    et.student_context_card = {:url=>"http://www.example.com/ims/lti/resource", :text => "context card link", display_type: 'full_width', visibility: 'admins'}
+    et.custom_fields = { :key1 => 'val1', :key2 => 'val2' }
+    et.course_navigation = { :url => "http://www.example.com/ims/lti/course", :visibility => "admins", :text => "Course nav", "default" => "disabled" }
+    et.account_navigation = { :url => "http://www.example.com/ims/lti/account", :text => "Account nav", :custom_fields => { "key" => "value" } }
+    et.user_navigation = { :url => "http://www.example.com/ims/lti/user", :text => "User nav" }
+    et.editor_button = { :url => "http://www.example.com/ims/lti/editor", :icon_url => "/images/delete.png", :selection_width => 50, :selection_height => 50, :text => "editor button" }
+    et.homework_submission = { :url => "http://www.example.com/ims/lti/editor", :selection_width => 50, :selection_height => 50, :text => "homework submission" }
+    et.resource_selection = { :url => "http://www.example.com/ims/lti/resource", :text => "", :selection_width => 50, :selection_height => 50 }
+    et.migration_selection = { :url => "http://www.example.com/ims/lti/resource", :text => "migration selection", :selection_width => 42, :selection_height => 24 }
+    et.course_home_sub_navigation = { :url => "http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins' }
+    et.course_settings_sub_navigation = { :url => "http://www.example.com/ims/lti/resource", :text => "course settings sub navigation", display_type: 'full_width', visibility: 'admins' }
+    et.global_navigation = { :url => "http://www.example.com/ims/lti/resource", :text => "global navigation", display_type: 'full_width', visibility: 'admins' }
+    et.assignment_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "assignment menu", display_type: 'full_width', visibility: 'admins' }
+    et.assignment_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "assignment index menu", display_type: 'full_width', visibility: 'admins' }
+    et.assignment_group_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "assignment group menu", display_type: 'full_width', visibility: 'admins' }
+    et.discussion_topic_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "discussion topic menu", display_type: 'full_width', visibility: 'admins' }
+    et.discussion_topic_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "discussion topic index menu", display_type: 'full_width', visibility: 'admins' }
+    et.file_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "file menu", display_type: 'full_width', visibility: 'admins' }
+    et.file_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "file index menu", display_type: 'full_width', visibility: 'admins' }
+    et.module_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins' }
+    et.module_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "modules index menu", display_type: 'full_width', visibility: 'admins' }
+    et.module_group_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "modules group menu", display_type: 'full_width', visibility: 'admins' }
+    et.quiz_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins' }
+    et.quiz_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "quiz index menu", display_type: 'full_width', visibility: 'admins' }
+    et.submission_type_selection = { :url => "http://www.example.com/ims/lti/resource", :text => "submission type selection", display_type: 'full_width', visibility: 'admins' }
+    et.wiki_page_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins' }
+    et.wiki_index_menu = { :url => "http://www.example.com/ims/lti/resource", :text => "wiki index menu", display_type: 'full_width', visibility: 'admins' }
+    et.student_context_card = { :url => "http://www.example.com/ims/lti/resource", :text => "context card link", display_type: 'full_width', visibility: 'admins' }
     if context.is_a? Course
       et.course_assignments_menu = { url: 'http://www.example.com/ims/lti/resource', text: 'course assignments menu' }
     end
     et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
-    et.conference_selection = {:url=>"http://www.example.com/ims/lti/conference", :icon_url=>"/images/delete.png", :text=>"conference selection"}
+    et.conference_selection = { :url => "http://www.example.com/ims/lti/conference", :icon_url => "/images/delete.png", :text => "conference selection" }
     et.save!
     et
   end
@@ -718,6 +717,7 @@ describe ExternalToolsController, type: :request do
     hash.keys.each do |key|
       val = hash[key]
       next unless val.is_a?(Hash)
+
       val.each_pair do |sub_key, sub_val|
         hash["#{key}[#{sub_key}]"] = sub_val
       end
@@ -742,8 +742,8 @@ describe ExternalToolsController, type: :request do
   def get_sessionless_launch_url(context, type, params)
     api_call(
       :get,
-      "/api/v1/#{type}s/#{context.id}/external_tools/sessionless_launch?#{params.map{|k,v| "#{k}=#{v}" }.join('&')}",
-      {:controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s}.merge(params)
+      "/api/v1/#{type}s/#{context.id}/external_tools/sessionless_launch?#{params.map { |k, v| "#{k}=#{v}" }.join('&')}",
+      { :controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s }.merge(params)
     )
   end
 
@@ -751,258 +751,258 @@ describe ExternalToolsController, type: :request do
     raw_api_call(
       :get,
       "/api/v1/#{type}s/#{@course.id}/external_tools/sessionless_launch?#{params.map { |k, v| "#{k}=#{v}" }.join('&')}",
-      {:controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s}.merge(params)
+      { :controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s }.merge(params)
     )
   end
 
-  def example_json(et=nil)
+  def example_json(et = nil)
     example = {
-      "name"=>"External Tool Eh",
-      "created_at"=>et ? et.created_at.as_json : "",
-      "updated_at"=>et ? et.updated_at.as_json : "",
-      "consumer_key"=>"oi",
-      "domain"=>nil,
-      "url"=>"http://www.example.com/ims/lti",
-      "tool_configuration"=>nil,
-      "id"=>et ? et.id : nil,
-      "not_selectable"=> et ? et.not_selectable : nil,
-      "workflow_state"=>"public",
-      "vendor_help_link"=>nil,
-      "version"=>"1.1",
-      "resource_selection"=> {
-        "text"=>"",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "selection_height"=>50,
-        "selection_width"=>50,
-        "label"=>""
+      "name" => "External Tool Eh",
+      "created_at" => et ? et.created_at.as_json : "",
+      "updated_at" => et ? et.updated_at.as_json : "",
+      "consumer_key" => "oi",
+      "domain" => nil,
+      "url" => "http://www.example.com/ims/lti",
+      "tool_configuration" => nil,
+      "id" => et ? et.id : nil,
+      "not_selectable" => et ? et.not_selectable : nil,
+      "workflow_state" => "public",
+      "vendor_help_link" => nil,
+      "version" => "1.1",
+      "resource_selection" => {
+        "text" => "",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "selection_height" => 50,
+        "selection_width" => 50,
+        "label" => ""
       },
-      "privacy_level"=>"public",
-      "editor_button"=> {
-        "icon_url"=>"/images/delete.png",
-        "text"=>"editor button",
-        "url"=>"http://www.example.com/ims/lti/editor",
-        "selection_height"=>50,
-        "selection_width"=>50,
-        "label"=>"editor button"
+      "privacy_level" => "public",
+      "editor_button" => {
+        "icon_url" => "/images/delete.png",
+        "text" => "editor button",
+        "url" => "http://www.example.com/ims/lti/editor",
+        "selection_height" => 50,
+        "selection_width" => 50,
+        "label" => "editor button"
       },
-      "homework_submission"=> {
-        "text"=>"homework submission",
-        "url"=>"http://www.example.com/ims/lti/editor",
-        "selection_height"=>50,
-        "selection_width"=>50,
-        "label"=>"homework submission"
+      "homework_submission" => {
+        "text" => "homework submission",
+        "url" => "http://www.example.com/ims/lti/editor",
+        "selection_height" => 50,
+        "selection_width" => 50,
+        "label" => "homework submission"
       },
-      "custom_fields"=>{"key1"=>"val1", "key2"=>"val2"},
-      "description"=>"For testing stuff",
-      "user_navigation"=> {
-        "text"=>"User nav",
-        "url"=>"http://www.example.com/ims/lti/user",
-        "label"=>"User nav",
-        "selection_height"=>400,
-        "selection_width"=>800
+      "custom_fields" => { "key1" => "val1", "key2" => "val2" },
+      "description" => "For testing stuff",
+      "user_navigation" => {
+        "text" => "User nav",
+        "url" => "http://www.example.com/ims/lti/user",
+        "label" => "User nav",
+        "selection_height" => 400,
+        "selection_width" => 800
       },
       "course_navigation" => {
-        "text"=>"Course nav",
-        "url"=>"http://www.example.com/ims/lti/course",
-        "visibility"=>"admins",
-        "default"=> "disabled",
-        "label"=>"Course nav",
-        "selection_height"=>400,
-        "selection_width"=>800
+        "text" => "Course nav",
+        "url" => "http://www.example.com/ims/lti/course",
+        "visibility" => "admins",
+        "default" => "disabled",
+        "label" => "Course nav",
+        "selection_height" => 400,
+        "selection_width" => 800
       },
-      "account_navigation"=> {
-        "text"=>"Account nav",
-        "url"=>"http://www.example.com/ims/lti/account",
-        "custom_fields"=>{"key"=>"value"},
-        "label"=>"Account nav",
-        "selection_height"=>400,
-        "selection_width"=>800
+      "account_navigation" => {
+        "text" => "Account nav",
+        "url" => "http://www.example.com/ims/lti/account",
+        "custom_fields" => { "key" => "value" },
+        "label" => "Account nav",
+        "selection_height" => 400,
+        "selection_width" => 800
       },
-      "migration_selection"=> {
-        "text"=>"migration selection",
-        "label"=>"migration selection",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "selection_height"=>24,
-        "selection_width"=>42
+      "migration_selection" => {
+        "text" => "migration selection",
+        "label" => "migration selection",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "selection_height" => 24,
+        "selection_width" => 42
       },
-      "course_home_sub_navigation"=> {
-        "text"=>"course home sub navigation",
-        "label"=>"course home sub navigation",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "course_home_sub_navigation" => {
+        "text" => "course home sub navigation",
+        "label" => "course home sub navigation",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "course_settings_sub_navigation"=> {
-        "text"=>"course settings sub navigation",
-        "label"=>"course settings sub navigation",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "course_settings_sub_navigation" => {
+        "text" => "course settings sub navigation",
+        "label" => "course settings sub navigation",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "global_navigation"=> {
-        "text"=>"global navigation",
-        "label"=>"global navigation",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "global_navigation" => {
+        "text" => "global navigation",
+        "label" => "global navigation",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "assignment_menu"=> {
-        "text"=>"assignment menu",
-        "label"=>"assignment menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "assignment_menu" => {
+        "text" => "assignment menu",
+        "label" => "assignment menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-        "assignment_index_menu"=> {
-      "text"=>"assignment index menu",
-        "label"=>"assignment index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "assignment_index_menu" => {
+        "text" => "assignment index menu",
+        "label" => "assignment index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-        "assignment_group_menu"=> {
-      "text"=>"assignment group menu",
-        "label"=>"assignment group menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "assignment_group_menu" => {
+        "text" => "assignment group menu",
+        "label" => "assignment group menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "discussion_topic_menu"=> {
-        "text"=>"discussion topic menu",
-        "label"=>"discussion topic menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "discussion_topic_menu" => {
+        "text" => "discussion topic menu",
+        "label" => "discussion topic menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-        "discussion_topic_index_menu"=> {
-      "text"=>"discussion topic index menu",
-        "label"=>"discussion topic index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "discussion_topic_index_menu" => {
+        "text" => "discussion topic index menu",
+        "label" => "discussion topic index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "file_menu"=> {
-        "text"=>"file menu",
-        "label"=>"file menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "file_menu" => {
+        "text" => "file menu",
+        "label" => "file menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-        "file_index_menu"=> {
-        "text"=>"file index menu",
-        "label"=>"file index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "file_index_menu" => {
+        "text" => "file index menu",
+        "label" => "file index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "module_menu"=> {
-        "text"=>"module menu",
-        "label"=>"module menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "module_menu" => {
+        "text" => "module menu",
+        "label" => "module menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "module_index_menu"=> {
-        "text"=>"modules index menu",
-        "label"=>"modules index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "module_index_menu" => {
+        "text" => "modules index menu",
+        "label" => "modules index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "module_group_menu"=> {
-        "text"=>"modules group menu",
-        "label"=>"modules group menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "module_group_menu" => {
+        "text" => "modules group menu",
+        "label" => "modules group menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "quiz_menu"=> {
-        "text"=>"quiz menu",
-        "label"=>"quiz menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "quiz_menu" => {
+        "text" => "quiz menu",
+        "label" => "quiz menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "quiz_index_menu"=> {
-        "text"=>"quiz index menu",
-        "label"=>"quiz index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "quiz_index_menu" => {
+        "text" => "quiz index menu",
+        "label" => "quiz index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "submission_type_selection"=> {
-        "text"=>"submission type selection",
-        "label"=>"submission type selection",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "submission_type_selection" => {
+        "text" => "submission type selection",
+        "label" => "submission type selection",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "wiki_page_menu"=> {
-        "text"=>"wiki page menu",
-        "label"=>"wiki page menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "wiki_page_menu" => {
+        "text" => "wiki page menu",
+        "label" => "wiki page menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "student_context_card"=> {
-        "text"=>"context card link",
-        "label"=>"context card link",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "student_context_card" => {
+        "text" => "context card link",
+        "label" => "context card link",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "wiki_index_menu"=> {
-        "text"=>"wiki index menu",
-        "label"=>"wiki index menu",
-        "url"=>"http://www.example.com/ims/lti/resource",
-        "visibility"=>'admins',
-        "display_type"=>'full_width',
-        "selection_height"=>400,
-        "selection_width"=>800,
+      "wiki_index_menu" => {
+        "text" => "wiki index menu",
+        "label" => "wiki index menu",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => 'admins',
+        "display_type" => 'full_width',
+        "selection_height" => 400,
+        "selection_width" => 800,
       },
-      "link_selection"=>nil,
-      "assignment_selection"=>nil,
-      "post_grades"=>nil,
-      "collaboration"=>nil,
-      "similarity_detection"=>nil,
-      "assignment_edit"=>nil,
-      "assignment_view"=>nil,
+      "link_selection" => nil,
+      "assignment_selection" => nil,
+      "post_grades" => nil,
+      "collaboration" => nil,
+      "similarity_detection" => nil,
+      "assignment_edit" => nil,
+      "assignment_view" => nil,
       # Add when conference_selection_lti_placement FF removed
       #  "conference_selection"=>
       #   {"icon_url"=>"/images/delete.png",

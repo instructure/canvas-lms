@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe Importers::CalendarEventImporter do
-
   let_once(:migration_course) { course_factory(active_all: true) }
 
   let(:migration) { migration_course.content_migrations.create! }
@@ -63,7 +62,8 @@ describe Importers::CalendarEventImporter do
         attachment_type: type,
         attachment_value: value,
       },
-      migration_course)
+      migration_course
+    )
   end
 
   def check_paragraph_link(s, type = nil)
@@ -122,7 +122,7 @@ describe Importers::CalendarEventImporter do
     end
 
     it "handles web_links" do
-      expect(migration_course).to receive(:external_url_hash).and_return('value' => {'url' => 'http://example.com', 'name' => 'example link'})
+      expect(migration_course).to receive(:external_url_hash).and_return('value' => { 'url' => 'http://example.com', 'name' => 'example link' })
       result = attachment_suffix('web_link', 'value')
       expect(result).to include 'example link'
       expect(result).to include 'http://example.com'
@@ -139,7 +139,6 @@ describe Importers::CalendarEventImporter do
       result = attachment_suffix('invalid', '42')
       expect(result).to be_empty
     end
-
   end
 
   SYSTEMS.each do |system|

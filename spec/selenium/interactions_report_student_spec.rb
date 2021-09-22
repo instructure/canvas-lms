@@ -33,8 +33,8 @@ describe "student interactions report" do
       @sub1 = @assignment.submissions.find_by!(user: @student1)
       @sub2 = @assignment.submissions.find_by!(user: @student2)
 
-      @sub1.update!({score: 10})
-      @sub2.update!({score: 5})
+      @sub1.update!({ score: 10 })
+      @sub2.update!({ score: 5 })
 
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
     end

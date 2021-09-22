@@ -15,37 +15,37 @@ describe Rake::TaskGraph do
       task 'a'
       task 'b' => ['a']
       task 'c'
-      task 'd' => ['c','b']
+      task 'd' => ['c', 'b']
     end
 
     expect(batches).to eq([
-      ['a','c'],
-      ['b'],
-      ['d']
-    ])
+                            ['a', 'c'],
+                            ['b'],
+                            ['d']
+                          ])
   end
 
   it 'does not dupe nodes' do
     batches = described_class.draw do
       task 'a' => []
-      task 'b' => ['a','a']
+      task 'b' => ['a', 'a']
       task 'c'
-      task 'd' => ['c','b']
+      task 'd' => ['c', 'b']
       task 'e' => ['a']
     end
 
     expect(batches).to eq([
-      ['a','c'],
-      ['b','e'],
-      ['d']
-    ])
+                            ['a', 'c'],
+                            ['b', 'e'],
+                            ['d']
+                          ])
   end
 
   it 'is pure' do
     subject.task 'a'
     subject.task 'b' => ['a']
     subject.task 'c' => []
-    subject.task 'd' => ['a','b','c']
+    subject.task 'd' => ['a', 'b', 'c']
 
     expect(subject.batches).to eq(subject.batches)
   end
@@ -59,11 +59,11 @@ describe Rake::TaskGraph do
     end
 
     expect(batches).to eq([
-      ['a'],
-      ['b'],
-      ['c'],
-      ['d'],
-    ])
+                            ['a'],
+                            ['b'],
+                            ['c'],
+                            ['d'],
+                          ])
   end
 
   it 'transforms a node' do
@@ -74,7 +74,7 @@ describe Rake::TaskGraph do
       end
     end
 
-    expect(batches).to eq([ [5], ['b'] ])
+    expect(batches).to eq([[5], ['b']])
   end
 
   it 'whines on self-deps' do

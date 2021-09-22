@@ -21,7 +21,6 @@
 module Lti
   module MembershipService
     class GroupLisPersonCollator < LisPersonCollatorBase
-
       private
 
       def scope

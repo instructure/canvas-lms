@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::CourseImporter do
-
   before { account_model }
 
   it 'should skip bad content' do
@@ -38,9 +37,9 @@ describe SIS::CSV::CourseImporter do
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No course_id given for a course",
-                        "Improper status \"inactive\" for course C003",
-                        "No short_name given for course C004",
-                        "No long_name given for course C005"]
+                          "Improper status \"inactive\" for course C003",
+                          "No short_name given for course C004",
+                          "No long_name given for course C005"]
   end
 
   it "should create new courses" do
@@ -545,7 +544,8 @@ describe SIS::CSV::CourseImporter do
     @with_id_term = @account.enrollment_terms.create!(:name => "test") { |t| t.sis_source_id = "test" }
     process_csv_data_cleanly(
       "course_id,short_name,long_name,status",
-      "c1,c1,c1,active")
+      "c1,c1,c1,active"
+    )
     @course = @account.courses.where(sis_source_id: "c1").first
     expect(@course.enrollment_term).to eq @default_term
   end
@@ -592,8 +592,8 @@ describe SIS::CSV::CourseImporter do
 
   it "should make workflow_state sticky" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     course = Course.where(sis_source_id: "test_1").first
     expect(course).to be_claimed
@@ -601,8 +601,8 @@ describe SIS::CSV::CourseImporter do
     course.complete
     expect(course).to be_completed
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     course.reload
     expect(course).to be_completed
@@ -610,8 +610,8 @@ describe SIS::CSV::CourseImporter do
 
   it "should allow publishing a course" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,published"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,published"
     )
     course = Course.where(sis_source_id: "test_1").first
     expect(course).to be_available
@@ -621,28 +621,28 @@ describe SIS::CSV::CourseImporter do
     course = @account.courses.create!(sis_source_id: 'test_1', workflow_state: 'claimed')
     Course.where(id: course).update_all(stuck_sis_fields: Set.new)
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,published"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,published"
     )
     expect(course.reload).to be_available
   end
 
   it 'sets and updates course_format' do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status,course_format",
-        "test_1,TC 101,Test Course 101,,,active,online",
-        "test_2,TC 102,Test Course 102,,,active,blended",
-        "test_3,TC 103,Test Course 103,,,active,on_campus"
+      "course_id,short_name,long_name,account_id,term_id,status,course_format",
+      "test_1,TC 101,Test Course 101,,,active,online",
+      "test_2,TC 102,Test Course 102,,,active,blended",
+      "test_3,TC 103,Test Course 103,,,active,on_campus"
     )
     expect(Course.find_by_sis_source_id('test_1').course_format).to eq 'online'
     expect(Course.find_by_sis_source_id('test_2').course_format).to eq 'blended'
     expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'on_campus'
 
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status,course_format",
-        "test_1,TC 101,Test Course 101,,,active,",
-        "test_2,TC 102,Test Course 102,,,active,\"\"",
-        "test_3,TC 103,Test Course 103,,,active,blended"
+      "course_id,short_name,long_name,account_id,term_id,status,course_format",
+      "test_1,TC 101,Test Course 101,,,active,",
+      "test_2,TC 102,Test Course 102,,,active,\"\"",
+      "test_3,TC 103,Test Course 103,,,active,blended"
     )
     expect(Course.find_by_sis_source_id('test_1').course_format).not_to be_present
     expect(Course.find_by_sis_source_id('test_2').course_format).not_to be_present
@@ -657,8 +657,8 @@ describe SIS::CSV::CourseImporter do
 
   it 'rejects invalid course_format' do
     importer = process_csv_data(
-        "course_id,short_name,long_name,account_id,term_id,status,course_format",
-        "test_1,TC 101,Test Course 101,,,active,FAT32"
+      "course_id,short_name,long_name,account_id,term_id,status,course_format",
+      "test_1,TC 101,Test Course 101,,,active,FAT32"
     )
     expect(importer.errors.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
   end
@@ -758,10 +758,12 @@ describe SIS::CSV::CourseImporter do
     it "shouldn't fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
-      expect {process_csv_data_cleanly(
-        "course_id,short_name,long_name,status,blueprint_course_id",
-        "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
-      )}.not_to raise_error
+      expect {
+        process_csv_data_cleanly(
+          "course_id,short_name,long_name,status,blueprint_course_id",
+          "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
+        )
+      }.not_to raise_error
     end
 
     it "should allow destroying" do
@@ -791,11 +793,11 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "should give one warning per row" do
-      courses = (1..3).map{|x| @account.courses.create!(:sis_source_id => "acourse#{x}")}
+      courses = (1..3).map { |x| @account.courses.create!(:sis_source_id => "acourse#{x}") }
       rows = ["course_id,short_name,long_name,status,blueprint_course_id"] +
-        courses.map{|c| "#{c.sis_source_id},shortname,long name,active,missingid"}
+             courses.map { |c| "#{c.sis_source_id},shortname,long name,active,missingid" }
       importer = process_csv_data(*rows)
-      expected = courses.map{|c| "Unknown blueprint course \"missingid\" for course \"#{c.sis_source_id}\""}
+      expected = courses.map { |c| "Unknown blueprint course \"missingid\" for course \"#{c.sis_source_id}\"" }
       expect(importer.errors.map(&:last)).to match_array(expected)
     end
 
@@ -870,7 +872,7 @@ describe SIS::CSV::CourseImporter do
         "test_1,TC 101,Test Course 101,,,active,nightly_sync"
       )
       expect((course = Course.where(sis_source_id: 'test_1').take).grade_passback_setting).to eq 'nightly_sync'
-      course.grade_passback_setting=nil
+      course.grade_passback_setting = nil
       course.save!
 
       process_csv_data_cleanly(

@@ -137,10 +137,10 @@ describe AssignmentOverrideApplicator do
         override_section(@section, section_due_at)
         @assignment.update_attribute(:due_at, assignment_due_at)
 
-        @students_assignment = AssignmentOverrideApplicator.
-          assignment_overridden_for(@assignment, @student)
-        @teachers_assignment = AssignmentOverrideApplicator.
-          assignment_overridden_for(@assignment, @teacher)
+        @students_assignment = AssignmentOverrideApplicator
+                               .assignment_overridden_for(@assignment, @student)
+        @teachers_assignment = AssignmentOverrideApplicator
+                               .assignment_overridden_for(@assignment, @teacher)
       end
 
       it "assignment.due_at is more lenient" do
@@ -337,8 +337,8 @@ describe AssignmentOverrideApplicator do
 
       describe 'for observers' do
         it "works" do
-          course_with_observer({:course => @course, :active_all => true})
-          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+          course_with_observer({ :course => @course, :active_all => true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { :associated_user_id => @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override]
         end
@@ -424,8 +424,8 @@ describe AssignmentOverrideApplicator do
 
       describe 'for observers' do
         it 'works' do
-          course_with_observer({:course => @course, :active_all => true})
-          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+          course_with_observer({ :course => @course, :active_all => true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { :associated_user_id => @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override]
         end
@@ -452,7 +452,7 @@ describe AssignmentOverrideApplicator do
         @override2.set_id = @section2.id
         @override2.due_at = 7.days.from_now
         @override2.save!
-        @student2 = student_in_section(@section2, {:active_all => true})
+        @student2 = student_in_section(@section2, { :active_all => true })
       end
 
       describe 'for students' do
@@ -462,7 +462,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "should enforce lenient date" do
-
           adhoc_due_at = 10.days.from_now
 
           ao = AssignmentOverride.new()
@@ -477,8 +476,8 @@ describe AssignmentOverrideApplicator do
           override_student.save!
           @assignment.reload
 
-          students_assignment = AssignmentOverrideApplicator.
-            assignment_overridden_for(@assignment, @student2)
+          students_assignment = AssignmentOverrideApplicator
+                                .assignment_overridden_for(@assignment, @student2)
           expect(students_assignment.due_at.to_i).to eq adhoc_due_at.to_i
         end
 
@@ -555,8 +554,8 @@ describe AssignmentOverrideApplicator do
 
       describe 'for observers' do
         it 'works' do
-          course_with_observer({:course => @course, :active_all => true})
-          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student2.id})
+          course_with_observer({ :course => @course, :active_all => true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { :associated_user_id => @student2.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override2]
         end
@@ -577,8 +576,8 @@ describe AssignmentOverrideApplicator do
         @override_student = @override.assignment_override_students.build
         @override_student.user = @student
         @override_student.save!
-        course_with_observer({:course => @course, :active_all => true})
-        @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+        course_with_observer({ :course => @course, :active_all => true })
+        @course.enroll_user(@observer, "ObserverEnrollment", { :associated_user_id => @student.id })
 
         @section2 = @course.course_sections.create!(:name => "Summer session")
         @override2 = assignment_override_model(:assignment => @assignment)
@@ -586,10 +585,10 @@ describe AssignmentOverrideApplicator do
         @override2.due_at = 7.days.from_now
         @override2.save!
         @override2_student = @override2.assignment_override_students.build
-        @student2 = student_in_section(@section2, {:active_all => true})
+        @student2 = student_in_section(@section2, { :active_all => true })
         @override2_student.user = @student2
         @override2_student.save!
-        @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+        @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
         result = AssignmentOverrideApplicator::observer_overrides(@assignment, @observer)
         expect(result.length).to eq 2
       end
@@ -740,8 +739,8 @@ describe AssignmentOverrideApplicator do
             expect(override.versions[0].model.assignment_version).not_to be_nil
             # Assert that it won't call the "<=" method on nil
             expect do
-              overrides = AssignmentOverrideApplicator.
-                overrides_for_assignment_and_user(quiz.assignment, @student)
+              overrides = AssignmentOverrideApplicator
+                          .overrides_for_assignment_and_user(quiz.assignment, @student)
             end.to_not raise_error
           end
         end
@@ -772,8 +771,8 @@ describe AssignmentOverrideApplicator do
             expect(override.versions[0].model.assignment_version).not_to be_nil
             # Assert that it won't call the "<=" method on nil
             expect do
-              overrides = AssignmentOverrideApplicator.
-                overrides_for_assignment_and_user(quiz.assignment, @student)
+              overrides = AssignmentOverrideApplicator
+                          .overrides_for_assignment_and_user(quiz.assignment, @student)
             end.to_not raise_error
           end
         end
@@ -788,7 +787,8 @@ describe AssignmentOverrideApplicator do
         :due_at => 5.days.from_now,
         :unlock_at => 4.days.from_now,
         :lock_at => 6.days.from_now,
-        :title => 'Some Title')
+        :title => 'Some Title'
+      )
       @override = assignment_override_model(:assignment => @assignment)
       @override.override_due_at(7.days.from_now)
       @overridden = AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [@override])
@@ -825,7 +825,7 @@ describe AssignmentOverrideApplicator do
 
     it "should return a readonly assignment object" do
       expect(@overridden).to be_readonly
-      expect{ @overridden.save!(validate: false) }.to raise_exception ActiveRecord::ReadOnlyRecord
+      expect { @overridden.save!(validate: false) }.to raise_exception ActiveRecord::ReadOnlyRecord
     end
 
     it "should cast datetimes to the active time zone" do
@@ -946,22 +946,22 @@ describe AssignmentOverrideApplicator do
 
   describe "overrides_hash" do
     it "should be consistent for the same overrides" do
-      overrides = 5.times.map{ assignment_override_model }
+      overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides)
       expect(hash1).to eq hash2
     end
 
     it "should be unique for different overrides" do
-      overrides1 = 5.times.map{ assignment_override_model }
-      overrides2 = 5.times.map{ assignment_override_model }
+      overrides1 = 5.times.map { assignment_override_model }
+      overrides2 = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides1)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides2)
       expect(hash1).not_to eq hash2
     end
 
     it "should be unique for different versions of the same overrides" do
-      overrides = 5.times.map{ assignment_override_model }
+      overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       overrides.first.override_due_at(5.days.from_now)
       overrides.first.save!
@@ -970,14 +970,14 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should be unique for different orders of the same overrides" do
-      overrides = 5.times.map{ assignment_override_model }
+      overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides.reverse)
       expect(hash1).not_to eq hash2
     end
   end
 
-  def fancy_midnight(opts={})
+  def fancy_midnight(opts = {})
     zone = opts[:zone] || Time.zone
     Time.use_zone(zone) do
       time = opts[:time] || Time.zone.now
@@ -1185,7 +1185,7 @@ describe AssignmentOverrideApplicator do
     before do
       student_in_course
       @assignment = create_assignment(:course => @course,
-                                     :due_at => 1.week.from_now)
+                                      :due_at => 1.week.from_now)
       o = assignment_override_model(:assignment => @assignment,
                                     :due_at => 1.week.ago)
       o.assignment_override_students.create! user: @student

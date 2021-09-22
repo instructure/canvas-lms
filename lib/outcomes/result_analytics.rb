@@ -20,7 +20,6 @@
 
 module Outcomes
   module ResultAnalytics
-
     Rollup = Struct.new(:context, :scores)
     Result = Struct.new(:learning_outcome, :score, :count, :hide_points)
 
@@ -39,8 +38,8 @@ module Outcomes
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
       results = LearningOutcomeResult.active.with_active_link.where(
-        context_code:        context.asset_string,
-        user_id:             users.map(&:id),
+        context_code: context.asset_string,
+        user_id: users.map(&:id),
         learning_outcome_id: outcomes.map(&:id),
       )
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
@@ -59,9 +58,9 @@ module Outcomes
     #
     # Returns the resulting relation
     def order_results_for_rollup(relation)
-      relation.joins(:user).
-        order(User.sortable_name_order_by_clause).
-        order('users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
+      relation.joins(:user)
+              .order(User.sortable_name_order_by_clause)
+              .order('users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
     end
 
     # Public: Generates a rollup of each outcome result for each user.
@@ -102,9 +101,9 @@ module Outcomes
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
-        scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
+        scores.map { |score| Result.new(score.outcome, score.score, score.count, score.hide_points) }
       end
-      opts = {aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context)}
+      opts = { aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context) }
       aggregate_rollups = aggregate_results.map do |result|
         RollupScore.new(outcome_results: result, opts: opts)
       end
@@ -119,10 +118,10 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results, context = nil)
-      filtered_results = user_results.select{|r| !r.score.nil?}
+      filtered_results = user_results.select { |r| !r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results:outcome_results, opts: opts)
+        RollupScore.new(outcome_results: outcome_results, opts: opts)
       end
     end
 
@@ -161,8 +160,8 @@ module Outcomes
     def rating_percents(rollups, context: nil)
       counts = {}
       outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
-        context.resolved_outcome_proficiency.ratings_hash
-      end
+                                      context.resolved_outcome_proficiency.ratings_hash
+                                    end
       rollups.each do |rollup|
         rollup.scores.each do |score|
           next unless score.score
@@ -178,7 +177,7 @@ module Outcomes
           counts[outcome.id][idx] = counts[outcome.id][idx] + 1 if idx
         end
       end
-      counts.each {|k, v| counts[k] = to_percents(v)}
+      counts.each { |k, v| counts[k] = to_percents(v) }
       counts
     end
 
@@ -186,7 +185,7 @@ module Outcomes
       total = count_arr.sum
       return count_arr if total.zero?
 
-      count_arr.map {|v| (100.0 * v / total).round}
+      count_arr.map { |v| (100.0 * v / total).round }
     end
 
     class << self

@@ -37,14 +37,14 @@ module Quizzes::LogAuditing
     # @param [Array<String>] quiz_ids
     # @return [Array<QuizSubmissionEvent>] events
     def events_from_quizzes(quiz_ids)
-      quiz_submission_ids = ::Quizzes::QuizSubmission.
-        where(quiz_id: Array(quiz_ids)).
-        pluck(:id).
-        map(&:to_s)
+      quiz_submission_ids = ::Quizzes::QuizSubmission
+                            .where(quiz_id: Array(quiz_ids))
+                            .pluck(:id)
+                            .map(&:to_s)
 
-      snapshots = ::Quizzes::QuizSubmissionSnapshot.
-        where({ quiz_submission_id: quiz_submission_ids }).
-        preload(:quiz_submission)
+      snapshots = ::Quizzes::QuizSubmissionSnapshot
+                  .where({ quiz_submission_id: quiz_submission_ids })
+                  .preload(:quiz_submission)
 
       events_from_snapshots(snapshots)
     end
@@ -65,7 +65,7 @@ module Quizzes::LogAuditing
         event
       end
 
-      optimize(events).sort_by { |e| [ e.quiz_submission_id, e.created_at ] }
+      optimize(events).sort_by { |e| [e.quiz_submission_id, e.created_at] }
     end
 
     private
@@ -79,7 +79,7 @@ module Quizzes::LogAuditing
         set.sort_by!(&:created_at)
         set.each_with_index do |event, index|
           if index > 0
-            optimizer.run(event, set.slice(0, index-1))
+            optimizer.run(event, set.slice(0, index - 1))
           end
         end
       end

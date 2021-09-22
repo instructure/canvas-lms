@@ -41,22 +41,22 @@ module ConditionalRelease
     it "must have action" do
       set = create :assignment_set
       action = build :assignment_set_action, assignment_set: set
-      action.action= nil
+      action.action = nil
       expect(action.valid?).to be false
-      action.action= ''
+      action.action = ''
       expect(action.valid?).to be false
-      action.action= 'assign'
+      action.action = 'assign'
       expect(action.valid?).to be true
     end
 
     it "must have source" do
       set = create :assignment_set
       action = build :assignment_set_action, assignment_set: set
-      action.source= nil
+      action.source = nil
       expect(action.valid?).to be false
-      action.source= ''
+      action.source = ''
       expect(action.valid?).to be false
-      action.source= 'grade_change'
+      action.source = 'grade_change'
       expect(action.valid?).to be true
     end
 

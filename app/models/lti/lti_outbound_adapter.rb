@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-
   class LtiOutboundAdapter
     cattr_writer :consumer_instance_class
 
@@ -62,19 +61,19 @@ module Lti
 
       @tool_launch = LtiOutbound::ToolLaunch.new(
         {
-            url: launch_url,
-            link_code: link_code,
-            return_url: return_url,
-            resource_type: resource_type,
-            selected_html: selected_html,
-            outgoing_email_address: HostUrl.outgoing_email_address,
-            context: lti_context,
-            user: lti_user,
-            tool: lti_tool,
-            account: lti_account,
-            variable_expander: variable_expander,
-            link_params: link_params,
-            include_module_context: include_module_context
+          url: launch_url,
+          link_code: link_code,
+          return_url: return_url,
+          resource_type: resource_type,
+          selected_html: selected_html,
+          outgoing_email_address: HostUrl.outgoing_email_address,
+          context: lti_context,
+          user: lti_user,
+          tool: lti_tool,
+          account: lti_account,
+          variable_expander: variable_expander,
+          link_params: link_params,
+          include_module_context: include_module_context
         }
       )
       self
@@ -82,6 +81,7 @@ module Lti
 
     def generate_post_payload(assignment: nil, student_id: nil)
       raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
+
       hash = @tool_launch.generate(@overrides)
       hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
       hash[:ext_lti_student_id] = student_id if student_id
@@ -100,6 +100,7 @@ module Lti
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
+
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       generate_post_payload(assignment: assignment)
@@ -107,6 +108,7 @@ module Lti
 
     def generate_post_payload_for_homework_submission(assignment)
       raise('Called generate_post_payload_for_homework_submission before calling prepare_tool_launch') unless @tool_launch
+
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       @tool_launch.for_homework_submission!(lti_assignment)
       generate_post_payload
@@ -114,6 +116,7 @@ module Lti
 
     def launch_url(post_only: false)
       raise('Called launch_url before calling prepare_tool_launch') unless @tool_launch
+
       post_only && !disable_post_only? ? @tool_launch.url.split('?').first : @tool_launch.url
     end
 

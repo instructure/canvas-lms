@@ -30,5 +30,4 @@ class Loaders::MentionableUserLoader < GraphQL::Batch::Loader
       fulfill(object, calculator.search_in_context_scope(context: object, search: @search_term))
     end
   end
-
 end

@@ -50,6 +50,7 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
+      lockAt
       entryCounts {
         unreadCount
         repliesCount
@@ -101,6 +102,7 @@ export const Discussion = {
     allowRating: bool,
     onlyGradersCanRate: bool,
     delayedPostAt: string,
+    lockAt: string,
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
@@ -138,6 +140,7 @@ export const Discussion = {
     allowRating = true,
     onlyGradersCanRate = false,
     delayedPostAt = null,
+    lockAt = null,
     subscribed = true,
     published = true,
     canUnpublish = false,
@@ -178,6 +181,7 @@ export const Discussion = {
     allowRating,
     onlyGradersCanRate,
     delayedPostAt,
+    lockAt,
     subscribed,
     published,
     canUnpublish,

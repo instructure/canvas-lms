@@ -50,7 +50,7 @@ class Mutations::OutcomeCalculationMethodBase < Mutations::BaseMutation
       record = OutcomeCalculationMethod.new(context: context, **attrs(input.to_h))
     end
     if record.save
-      {outcome_calculation_method: record}
+      { outcome_calculation_method: record }
     elsif existing_record.nil? && context_taken?(record)
       upsert(input, context: context)
     else

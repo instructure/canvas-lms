@@ -142,7 +142,7 @@ describe "Gradebook - post grades to SIS" do
   end
 
   describe 'LTI' do
-    def create_post_grades_tool(opts={})
+    def create_post_grades_tool(opts = {})
       course = opts[:course] || @course
       course.context_external_tools.create!(
         name: opts[:name] || 'test tool',
@@ -205,7 +205,7 @@ describe "Gradebook - post grades to SIS" do
   end
 
   describe 'LTI with enhanced filters enabled' do
-    def create_post_grades_tool(opts={})
+    def create_post_grades_tool(opts = {})
       course = opts[:course] || @course
       course.context_external_tools.create!(
         name: opts[:name] || 'test tool',

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # frozen_string_literal: true
+
 module RuboCop
   module Cop
     module Specs
@@ -51,10 +52,10 @@ module RuboCop
         def whitelisted_ancestor?(node)
           node.ancestors.any? do |ancestor|
             ancestor.module_type? ||
-            ancestor.class_type? ||
-            ancestor.def_type? ||
-            ancestor.block_type? &&
-              WHITELISTED_BLOCKS.include?(ancestor.method_name)
+              ancestor.class_type? ||
+              ancestor.def_type? ||
+              ancestor.block_type? &&
+                WHITELISTED_BLOCKS.include?(ancestor.method_name)
           end
         end
       end

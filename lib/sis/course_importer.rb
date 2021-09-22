@@ -20,7 +20,6 @@
 
 module SIS
   class CourseImporter < BaseImporter
-
     def process(messages)
       courses_to_update_sis_batch_id = []
       course_ids_to_update_associations = [].to_set
@@ -69,6 +68,7 @@ module SIS
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished|published)/i
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
+
         valid_grade_passback_settings = (Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',') << 'not_set')
         raise ImportError, "Invalid grade_passback_setting \"#{grade_passback_setting}\" for course #{course_id}" unless grade_passback_setting.blank? || valid_grade_passback_settings.include?(grade_passback_setting.downcase.strip)
         return if @batch.skip_deletes? && status =~ /deleted/i
@@ -94,6 +94,7 @@ module SIS
           if account_id.present? && !account
             raise ImportError, "Account not found \"#{account_id}\" for course #{course_id}"
           end
+
           course_account_stuck = course.stuck_sis_fields.include?(:account_id)
           unless course_account_stuck
             course.account = account if account
@@ -223,7 +224,7 @@ module SIS
               else
                 msg = "A (templated) course did not pass validation "
                 msg += "(" + "course: #{course_id} / #{short_name}, error: " +
-                  msg += templated_course.errors.full_messages.join(",") + ")"
+                       msg += templated_course.errors.full_messages.join(",") + ")"
                 raise ImportError, msg
               end
             end
@@ -237,7 +238,7 @@ module SIS
             else
               msg = "A course did not pass validation "
               msg += "(" + "course: #{course_id} / #{short_name}, error: " +
-                msg += course.errors.full_messages.join(",") + ")"
+                     msg += course.errors.full_messages.join(",") + ")"
               raise ImportError, msg
             end
             @course_ids_to_update_associations.add(course.id) if update_account_associations

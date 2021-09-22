@@ -25,9 +25,9 @@ class AddUniqueIndexToNotificationEndpoint < ActiveRecord::Migration[5.2]
     DataFixup::DeleteDuplicateRows.run(NotificationEndpoint, :arn, :access_token_id)
     remove_index :notification_endpoints, column: [:access_token_id, :arn], if_exists: true
     add_index :notification_endpoints, [:access_token_id, :arn], algorithm: :concurrently,
-              where: "workflow_state='active'", unique: true, if_not_exists: true
+                                                                 where: "workflow_state='active'", unique: true, if_not_exists: true
   end
-  
+
   def down
     remove_index :notification_endpoints, column: [:access_token_id, :arn], if_exists: true
   end

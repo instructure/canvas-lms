@@ -81,7 +81,6 @@ describe "conversations new" do
       end
 
       context "reply and reply all" do
-
         it "should address replies to the most recent author by default from the icon at the top of the page", priority: "2", test_id: 197538 do
           go_to_inbox_and_select_message
           f('#reply-btn').click
@@ -145,4 +144,3 @@ describe "conversations new" do
     end
   end
 end
-

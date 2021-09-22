@@ -133,7 +133,7 @@ class RoleOverridesController < ApplicationController
   def api_index
     if authorized_action(@context, @current_user, :manage_role_overrides)
       route = polymorphic_url([:api, :v1, @context, :roles])
-      states = params[:state].to_a.reject{ |s| %w(active inactive).exclude?(s) }
+      states = params[:state].to_a.reject { |s| %w(active inactive).exclude?(s) }
       states = %w(active) if states.empty?
 
       roles = []
@@ -165,13 +165,13 @@ class RoleOverridesController < ApplicationController
       end
 
       js_env({
-        :ACCOUNT_ROLES => account_role_data,
-        :COURSE_ROLES => course_role_data,
-        :ACCOUNT_PERMISSIONS => account_permissions(@context),
-        :COURSE_PERMISSIONS => course_permissions(@context),
-        :IS_SITE_ADMIN => @context.site_admin?,
-        :ACCOUNT_ID => @context.id
-      })
+               :ACCOUNT_ROLES => account_role_data,
+               :COURSE_ROLES => course_role_data,
+               :ACCOUNT_PERMISSIONS => account_permissions(@context),
+               :COURSE_PERMISSIONS => course_permissions(@context),
+               :IS_SITE_ADMIN => @context.site_admin?,
+               :ACCOUNT_ID => @context.id
+             })
 
       js_bundle :permissions
       css_bundle :permissions
@@ -389,7 +389,7 @@ class RoleOverridesController < ApplicationController
 
     name = api_request? ? (params[:label].presence || params[:role]) : params[:role_type]
 
-    return render :json => {:message => "missing required parameter 'role'" }, :status => :bad_request if api_request? && name.blank?
+    return render :json => { :message => "missing required parameter 'role'" }, :status => :bad_request if api_request? && name.blank?
 
     base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
     role = @context.roles.build(:name => name)
@@ -415,13 +415,13 @@ class RoleOverridesController < ApplicationController
     begin
       set_permissions_for(role, @context, params[:permissions])
     rescue BadPermissionSettingError => e
-      return render json: {message: e}, status: :bad_request
+      return render json: { message: e }, status: :bad_request
     end
 
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
 
-    if base_role = RoleOverride.enrollment_type_labels.find{|br| br[:base_role_name] == base_role_type}
+    if base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type }
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       json["base_role_type_label"] = base_role.key?(:label_v2) ? base_role[:label_v2].call : base_role[:label].call
     end
@@ -445,9 +445,9 @@ class RoleOverridesController < ApplicationController
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
       if @role.inactive?
-        return render :json => {:message => t('cannot_deactivate_inactive_role', "Cannot deactivate an already inactive role")}, :status => :bad_request
+        return render :json => { :message => t('cannot_deactivate_inactive_role', "Cannot deactivate an already inactive role") }, :status => :bad_request
       elsif @role.built_in?
-        return render :json => {:message => t('cannot_remove_built_in_role', "Cannot remove a built-in role")}, :status => :bad_request
+        return render :json => { :message => t('cannot_remove_built_in_role', "Cannot remove a built-in role") }, :status => :bad_request
       end
       raise ActiveRecord::RecordNotFound unless @role.account == @context
 
@@ -475,7 +475,7 @@ class RoleOverridesController < ApplicationController
         @role.activate!
         render :json => role_json(@context, @role, @current_user, session)
       else
-        render :json => {:message => t('no_role_found', "Role not found")}, :status => :bad_request
+        render :json => { :message => t('no_role_found', "Role not found") }, :status => :bad_request
       end
     end
   end
@@ -527,9 +527,9 @@ class RoleOverridesController < ApplicationController
 
     if (name = params[:label].presence) && @role.label != name
       if @role.built_in?
-        return render :json => {:message => "cannot update the 'label' for a built-in role" }, :status => :bad_request
+        return render :json => { :message => "cannot update the 'label' for a built-in role" }, :status => :bad_request
       elsif @role.account != @context
-        return render :json => {:message => "cannot update the 'label' for an inherited role" }, :status => :bad_request
+        return render :json => { :message => "cannot update the 'label' for an inherited role" }, :status => :bad_request
       else
         @role.name = name
         unless @role.save
@@ -542,7 +542,7 @@ class RoleOverridesController < ApplicationController
       set_permissions_for(@role, @context, params[:permissions])
       render :json => role_json(@context, @role, @current_user, session)
     rescue BadPermissionSettingError => e
-      return render json: {message: e}, status: :bad_request
+      return render json: { message: e }, status: :bad_request
     end
   end
 
@@ -605,11 +605,12 @@ class RoleOverridesController < ApplicationController
     unless @role && !@role.deleted?
       if api_request?
         render :json => {
-          :message => "role not found" },
-          :status => 404
+          :message => "role not found"
+        },
+               :status => 404
       else
         redirect_to named_context_url(@context, :context_permissions_url,
-          :account_roles => params[:account_roles])
+                                      :account_roles => params[:account_roles])
       end
 
       return false
@@ -641,10 +642,10 @@ class RoleOverridesController < ApplicationController
     # element) so we can use the same logic for updating grouped and ungrouped permissions
     grouped_permissions = Hash.new { |h, k| h[k] = [] }.with_indifferent_access
     manageable_permissions.each do |permission_name, permission|
-      grouped_permissions[permission_name] << {name: permission_name, disable_locking: permission.key?(:group)}
+      grouped_permissions[permission_name] << { name: permission_name, disable_locking: permission.key?(:group) }
       if permission.key?(:group)
         current_override = context.role_overrides.where(:permission => permission_name, :role_id => role.id).first
-        grouped_permissions[permission[:group]] << {name: permission_name, disable_locking: false, currently: current_override&.enabled}
+        grouped_permissions[permission[:group]] << { name: permission_name, disable_locking: false, currently: current_override&.enabled }
       end
     end
 
@@ -683,7 +684,7 @@ class RoleOverridesController < ApplicationController
           perm_override = value_to_boolean(permission_updates[:explicit]) && override.nil? ? permission[:currently] : override
           RoleOverride.manage_role_override(
             context, role, permission[:name].to_s, override: perm_override, locked: locked,
-            applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
+                                                   applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
           )
         end
       end
@@ -694,14 +695,14 @@ class RoleOverridesController < ApplicationController
   private
 
   def course_permissions(context)
-    site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
-    account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
-    course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
+    site_admin = { :group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => [] }
+    account = { :group_name => t('account_permissions', "Account Permissions"), :group_permissions => [] }
+    course = { :group_name => t('course_permissions', "Course & Account Permissions"), :group_permissions => [] }
 
     RoleOverride.manageable_permissions(context).each do |p|
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = {:label =>
-             p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      hash = { :label =>
+             p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0] }
       if p[1].key?(:group)
         hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
         hash[:granular_permission_group_label] = p[1][:group_label].call
@@ -729,7 +730,7 @@ class RoleOverridesController < ApplicationController
     res.each do |pg|
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       pg[:group_permissions] =
-        pg[:group_permissions].sort_by{|p| p.key?(:label_v2) ? p[:label_v2] : p[:label]}
+        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
     end
 
     res
@@ -753,16 +754,17 @@ class RoleOverridesController < ApplicationController
   # context - the current context
   def account_permissions(context)
     # Add group_names
-    site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
-    account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
-    course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
-    admin_tools = {:group_name => t('admin_tools_permissions',  "Admin Tools"), :group_permissions => []}
+    site_admin = { :group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => [] }
+    account = { :group_name => t('account_permissions', "Account Permissions"), :group_permissions => [] }
+    course = { :group_name => t('course_permissions', "Course & Account Permissions"), :group_permissions => [] }
+    admin_tools = { :group_name => t('admin_tools_permissions', "Admin Tools"), :group_permissions => [] }
 
     # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
       next if !context.root_account? && p[0].to_s == 'manage_developer_keys'
+
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = {:label => p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      hash = { :label => p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0] }
       if p[1].key?(:group)
         hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
         hash[:granular_permission_group_label] = p[1][:group_label].call
@@ -790,7 +792,7 @@ class RoleOverridesController < ApplicationController
     res.each do |pg|
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       pg[:group_permissions] =
-        pg[:group_permissions].sort_by{|p| p.key?(:label_v2) ? p[:label_v2] : p[:label]}
+        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
     end
 
     res

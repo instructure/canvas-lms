@@ -26,7 +26,6 @@ describe "duplicate discussion" do
   include_context "discussions_page_shared_context"
 
   context 'discussion created by teacher' do
-
     context 'duplicating' do
       describe 'course context' do
         before :each do
@@ -56,7 +55,7 @@ describe "duplicate discussion" do
           course_with_teacher(:active_all => true)
           student_in_course(:active_all => true)
           @course.update(:allow_student_discussion_editing => true,
-            :allow_student_discussion_topics=>true)
+                         :allow_student_discussion_topics => true)
           @group_category = @course.group_categories.create!(:name => "Group Category")
           @group = @course.groups.create!(:group_category => @group_category, :name => "Group 1")
           @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')

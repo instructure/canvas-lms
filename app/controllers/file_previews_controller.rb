@@ -31,8 +31,8 @@ class FilePreviewsController < ApplicationController
       @headers = false
       @show_left_side = false
       return render template: 'shared/errors/404_message',
-        status: :not_found,
-        formats: [:html]
+                    status: :not_found,
+                    formats: [:html]
     end
     if read_allowed(@file, @current_user, session, params)
       unless download_allowed(@file, @current_user, session, params)

@@ -37,7 +37,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
     #   "text": "Answer text.",
     #   "correct": true // based on weight
     # }
-    def parse_answers(source=@question_data[:answers], &formatter)
+    def parse_answers(source = @question_data[:answers], &formatter)
       return [] if source.blank?
 
       source.map do |answer|
@@ -111,7 +111,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
 
     private
 
-    def build_answer(id, text, correct=false)
+    def build_answer(id, text, correct = false)
       {
         id: "#{id}",
         text: text.to_s,
@@ -124,14 +124,14 @@ module CanvasQuizStatistics::Analyzers::Concerns
 
     def generate_unknown_answer(set)
       __generate_incorrect_answer(Constants::UnknownAnswerKey,
-        Constants::UnknownAnswerText,
-        set)
+                                  Constants::UnknownAnswerText,
+                                  set)
     end
 
     def generate_missing_answer(set)
       __generate_incorrect_answer(Constants::MissingAnswerKey,
-        Constants::MissingAnswerText,
-        set)
+                                  Constants::MissingAnswerText,
+                                  set)
     end
 
     def __generate_incorrect_answer(id, text, answer_set)

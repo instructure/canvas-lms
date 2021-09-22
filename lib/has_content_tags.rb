@@ -19,7 +19,6 @@
 #
 
 module HasContentTags
-
   def update_associated_content_tags_later
     delay.update_associated_content_tags if @associated_content_tags_need_updating != false
   end
@@ -32,6 +31,7 @@ module HasContentTags
     @associated_content_tags_need_updating = false
     return if self.new_record?
     return if self.respond_to?(:context_type) && %w{SisBatch Folder}.include?(self.context_type)
+
     @associated_content_tags_need_updating = true if self.respond_to?(:title_changed?) && self.title_changed?
     @associated_content_tags_need_updating = true if self.respond_to?(:name_changed?) && self.name_changed?
     @associated_content_tags_need_updating = true if self.respond_to?(:display_name_changed?) && self.display_name_changed?
@@ -54,7 +54,7 @@ module HasContentTags
     keys
   end
 
-  def relock_modules!(relocked_modules=[], student_ids=nil)
+  def relock_modules!(relocked_modules = [], student_ids = nil)
     ContextModule.where(:id => ContentTag.where(:content_id => self, :content_type => self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
       mod.relock_progressions(relocked_modules, student_ids)
     end

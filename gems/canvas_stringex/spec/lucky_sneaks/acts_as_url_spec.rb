@@ -19,7 +19,7 @@
 
 require 'spec_helper'
 
-#require 'canvas_stringex'
+# require 'canvas_stringex'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => "spec/acts_as_url.sqlite3")
 

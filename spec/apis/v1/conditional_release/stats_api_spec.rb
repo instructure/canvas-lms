@@ -51,23 +51,23 @@ module ConditionalRelease
 
         it 'requires grade viewing rights' do
           student_in_course(:course => @course, :active_all => true)
-          api_call(:get, @url, @base_params, {}, {}, {:expected_status => 401})
+          api_call(:get, @url, @base_params, {}, {}, { :expected_status => 401 })
         end
 
         it 'shows stats for export' do
-          expect(Stats).to receive(:students_per_range).with(@rule, false).and_return [0,1,2]
-          json = api_call(:get, @url, @base_params, {}, {}, {:expected_status => 200})
-          expect(json).to eq [0,1,2]
+          expect(Stats).to receive(:students_per_range).with(@rule, false).and_return [0, 1, 2]
+          json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+          expect(json).to eq [0, 1, 2]
         end
 
         it 'includes trend if requested' do
-          expect(Stats).to receive(:students_per_range).with(@rule, true).and_return [0,1,2]
-          json = api_call(:get, @url, @base_params.merge(:include => 'trends'), {}, {}, {:expected_status => 200})
-          expect(json).to eq [0,1,2]
+          expect(Stats).to receive(:students_per_range).with(@rule, true).and_return [0, 1, 2]
+          json = api_call(:get, @url, @base_params.merge(:include => 'trends'), {}, {}, { :expected_status => 200 })
+          expect(json).to eq [0, 1, 2]
         end
 
         it 'requires trigger_assignment' do
-          json = api_call(:get, @url, @base_params.except(:trigger_assignment), {}, {}, {:expected_status => 400})
+          json = api_call(:get, @url, @base_params.except(:trigger_assignment), {}, {}, { :expected_status => 400 })
           expect(json['message']).to eq "trigger_assignment required"
         end
       end
@@ -89,23 +89,23 @@ module ConditionalRelease
 
         it 'requires grade viewing rights' do
           @user = @student
-          api_call(:get, @url, @base_params, {}, {}, {:expected_status => 401})
+          api_call(:get, @url, @base_params, {}, {}, { :expected_status => 401 })
         end
 
         it 'requires a student id' do
-          json = api_call(:get, @url, @base_params.except(:student_id), {}, {}, {:expected_status => 400})
+          json = api_call(:get, @url, @base_params.except(:student_id), {}, {}, { :expected_status => 400 })
           expect(json['message']).to eq "student_id required"
         end
 
         it 'requires trigger_assignment' do
-          json = api_call(:get, @url, @base_params.except(:trigger_assignment), {}, {}, {:expected_status => 400})
+          json = api_call(:get, @url, @base_params.except(:trigger_assignment), {}, {}, { :expected_status => 400 })
           expect(json['message']).to eq "trigger_assignment required"
         end
 
         it 'calls into stats' do
-          expect(Stats).to receive(:student_details).with(@rule, @student.id.to_s).and_return([1,2,3])
-          json = api_call(:get, @url, @base_params, {}, {}, {:expected_status => 200})
-          expect(json).to eq [1,2,3]
+          expect(Stats).to receive(:student_details).with(@rule, @student.id.to_s).and_return([1, 2, 3])
+          json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+          expect(json).to eq [1, 2, 3]
         end
       end
     end

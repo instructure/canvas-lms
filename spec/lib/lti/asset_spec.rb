@@ -21,11 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::Asset do
-
   before(:each) do
     course_model
   end
-
 
   describe "opaque_identifier_for" do
     context 'when the asset is nil' do
@@ -65,5 +63,4 @@ describe Lti::Asset do
       expect(@course.lti_context_id).to eq 'dummy_context_id'
     end
   end
-
 end

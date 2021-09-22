@@ -110,13 +110,13 @@ describe ContentMigration do
 
       asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
       wiki_body = %{<img src="/courses/%s/files/%s/preview">}
-      asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description=>(asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
+      asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description => (asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
       wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
 
       # don't mark the attachments
       @cm.copy_options = {
-              :wiki_pages => {mig_id(wiki) => "1"},
-              :assignments => {mig_id(asmnt) => "1"},
+        :wiki_pages => { mig_id(wiki) => "1" },
+        :assignments => { mig_id(asmnt) => "1" },
       }
       @cm.save!
       run_course_copy
@@ -139,7 +139,7 @@ describe ContentMigration do
 
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
 
-      @cm.copy_options = { :wiki_pages => {mig_id(page) => "1"}}
+      @cm.copy_options = { :wiki_pages => { mig_id(page) => "1" } }
       @cm.save!
 
       run_course_copy
@@ -201,7 +201,7 @@ describe ContentMigration do
       att.save!
 
       mod = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod.add_item({:id => att.id, :type => 'attachment'})
+      tag = mod.add_item({ :id => att.id, :type => 'attachment' })
 
       run_course_copy
 
@@ -232,8 +232,8 @@ describe ContentMigration do
       expect(att1_rights).to eq(att2_rights) # check de-duplication
 
       attrs = %w(use_justification legal_copyright license)
-      expect(att1_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'used_by_permission', "legal_copyright" => '(C) 2014 Incom Corp Ltd.', "license" => 'private'})
-      expect(att3_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'creative_commons', "legal_copyright" => '(C) 2014 Koensayr Manufacturing Inc.', "license" => 'cc_by_nd'})
+      expect(att1_rights.attributes.slice(*attrs)).to eq({ "use_justification" => 'used_by_permission', "legal_copyright" => '(C) 2014 Incom Corp Ltd.', "license" => 'private' })
+      expect(att3_rights.attributes.slice(*attrs)).to eq({ "use_justification" => 'creative_commons', "legal_copyright" => '(C) 2014 Koensayr Manufacturing Inc.', "license" => 'cc_by_nd' })
     end
 
     describe "usage rights required" do

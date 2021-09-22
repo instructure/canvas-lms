@@ -34,32 +34,30 @@ module Lti
     def tool_proxy
       @tool_proxy
     end
-
-
   end
 
   describe ApiServiceHelper do
     subject { TestClass.new(request) }
     let(:request) do
       m = double('request')
-      allow(m).to receive_messages(authorization:"")
+      allow(m).to receive_messages(authorization: "")
       body = StringIO.new
       body.write('abc123')
       body.rewind
       allow(m).to receive_messages(body: body)
       m
     end
-    let(:course){Course.create}
-    let(:root_account){Account.create}
+    let(:course) { Course.create }
+    let(:root_account) { Account.create }
     let(:product_family) {
-      Lti::ProductFamily.create!(vendor_code: 'a', product_code: 'b', vendor_name: 'c', root_account: root_account )
+      Lti::ProductFamily.create!(vendor_code: 'a', product_code: 'b', vendor_name: 'c', root_account: root_account)
     }
 
     before(:each) do
       @tool_proxy = ToolProxy.create!(
-          guid: 'key', shared_secret: 'secret', product_version: 1,
-          lti_version: 'LTIv2p0', workflow_state: 'active', raw_data: '{}',
-          product_family: product_family, context: course
+        guid: 'key', shared_secret: 'secret', product_version: 1,
+        lti_version: 'LTIv2p0', workflow_state: 'active', raw_data: '{}',
+        product_family: product_family, context: course
       )
       allow(OAuth::Helper).to receive_messages(parse_header: {})
     end
@@ -88,11 +86,10 @@ module Lti
       end
 
       it "rejects an invalid body_hash" do
-        allow(OAuth::Helper).to receive_messages(parse_header: {'oauth_body_hash' => 'abc'})
+        allow(OAuth::Helper).to receive_messages(parse_header: { 'oauth_body_hash' => 'abc' })
         expect(subject).to receive(:render_unauthorized_api)
         expect(subject.lti_authenticate).to be_falsey
       end
-
     end
   end
 end

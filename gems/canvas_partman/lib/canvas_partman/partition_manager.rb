@@ -26,9 +26,9 @@ module CanvasPartman
     class << self
       def create(base_class)
         unless base_class < Concerns::Partitioned
-          raise ArgumentError, <<-ERROR
-PartitionManager can only work on models that are Partitioned.
-See CanvasPartman::Concerns::Partitioned.
+          raise ArgumentError, <<~ERROR
+            PartitionManager can only work on models that are Partitioned.
+            See CanvasPartman::Concerns::Partitioned.
           ERROR
         end
 
@@ -143,6 +143,7 @@ SQL
 
     def initialize(base_class)
       raise NotImplementedError if self.class == PartitionManager
+
       @base_class = base_class
     end
 

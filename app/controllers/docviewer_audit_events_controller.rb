@@ -29,14 +29,14 @@ class DocviewerAuditEventsController < ApplicationController
     user = User.find(params[:canvas_user_id])
 
     unless assignment.moderated_grading? || assignment.anonymous_grading?
-      return render json: {message: 'Assignment is neither anonymous nor moderated'}, status: :not_acceptable
+      return render json: { message: 'Assignment is neither anonymous nor moderated' }, status: :not_acceptable
     end
 
     if assignment.moderated_grading? && !assignment.grades_published? && !admin_or_student(user, assignment.course)
       begin
         assignment.ensure_grader_can_adjudicate(grader: user, provisional: true, occupy_slot: true)
       rescue Assignment::MaxGradersReachedError
-        return render json: {message: 'Reached maximum number of graders for assignment'}, status: :forbidden
+        return render json: { message: 'Reached maximum number of graders for assignment' }, status: :forbidden
       end
     end
 
@@ -68,6 +68,7 @@ class DocviewerAuditEventsController < ApplicationController
 
   def admin_or_student(user, course)
     return true if course.account_membership_allows(user)
+
     enrollment = user.enrollments.find_by!(course: course)
     enrollment.student_or_fake_student?
   end
@@ -75,7 +76,7 @@ class DocviewerAuditEventsController < ApplicationController
   def check_jwt_token
     Canvas::Security.decode_jwt(params[:token], [Canvadoc.jwt_secret])
   rescue
-    return render json: {message: 'JWT signature invalid'}, status: :unauthorized
+    return render json: { message: 'JWT signature invalid' }, status: :unauthorized
   end
 
   def docviewer_audit_event_params

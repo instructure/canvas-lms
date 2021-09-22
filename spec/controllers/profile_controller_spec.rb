@@ -37,7 +37,7 @@ describe ProfileController do
     it "should chain to settings when it's the same user" do
       user_session(@user)
 
-      get 'show', params: {:user_id => @user.id}
+      get 'show', params: { :user_id => @user.id }
       expect(response).to render_template('profile')
     end
 
@@ -45,7 +45,7 @@ describe ProfileController do
       user_session(@user)
       session[:used_remember_me_token] = true
 
-      get 'show', params: {:user_id => @user.id}
+      get 'show', params: { :user_id => @user.id }
       expect(response).to redirect_to(login_url)
     end
 
@@ -64,7 +64,7 @@ describe ProfileController do
         group.add_user(@user, 'accepted')
         student_in_course(user: @user, active_all: true)
 
-        get 'show', params: {user_id: @user.id}
+        get 'show', params: { user_id: @user.id }
         expect(assigns(:user_data)[:common_contexts].size).to eql(2)
         expect(assigns(:user_data)[:common_contexts][0]['id']).to eql(@course.id)
         expect(assigns(:user_data)[:common_contexts][0]['roles']).to eql(['Student'])
@@ -79,9 +79,9 @@ describe ProfileController do
       user_session(@user, @pseudonym)
       cc = @cc
       expect(cc.position).to eq 1
-      cc2 = communication_channel(@user, {username: 'email2@example.com', active_cc: true})
+      cc2 = communication_channel(@user, { username: 'email2@example.com', active_cc: true })
       expect(cc2.position).to eq 2
-      put 'update', params: {:user_id => @user.id, :default_email_id => cc2.id}, format: 'json'
+      put 'update', params: { :user_id => @user.id, :default_email_id => cc2.id }, format: 'json'
       expect(response).to be_successful
       expect(cc2.reload.position).to eq 1
       expect(cc.reload.position).to eq 2
@@ -91,8 +91,8 @@ describe ProfileController do
       enable_cache do
         @user.email # prime cache
         user_session(@user, @pseudonym)
-        @cc2 = communication_channel(@user, {username: 'email2@example.com', active_cc: true})
-        put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
+        @cc2 = communication_channel(@user, { username: 'email2@example.com', active_cc: true })
+        put 'update', params: { :user_id => @user.id, :default_email_id => @cc2.id }, format: 'json'
         expect(response).to be_successful
         expect(@user.email).to eq @cc2.path
       end
@@ -107,7 +107,7 @@ describe ProfileController do
       it "should allow changing pronouns" do
         user_session(@user, @pseudonym)
         expect(@user.pronouns).to eq nil
-        put 'update', params: {:user => {:pronouns => "  He/Him "}}, format: 'json'
+        put 'update', params: { :user => { :pronouns => "  He/Him " } }, format: 'json'
         expect(response).to be_successful
         @user.reload
         expect(@user.read_attribute(:pronouns)).to eq "he_him"
@@ -119,7 +119,7 @@ describe ProfileController do
         @user.pronouns = " Dude/Guy  "
         @user.save!
         expect(@user.pronouns).to eq "Dude/Guy"
-        put 'update', params: {:user => {:pronouns => ''}}, format: 'json'
+        put 'update', params: { :user => { :pronouns => '' } }, format: 'json'
         expect(response).to be_successful
         @user.reload
         expect(@user.pronouns).to eq nil
@@ -128,7 +128,7 @@ describe ProfileController do
       it "should not allow setting pronouns not on the approved list" do
         user_session(@user, @pseudonym)
         expect(@user.pronouns).to eq nil
-        put 'update', params: {:user => {:pronouns => "Pro/Noun"}}, format: 'json'
+        put 'update', params: { :user => { :pronouns => "Pro/Noun" } }, format: 'json'
         expect(response).to be_successful
         @user.reload
         expect(@user.pronouns).to eq nil
@@ -138,7 +138,7 @@ describe ProfileController do
         @user.account.settings[:can_change_pronouns] = false
         @user.account.save!
         user_session(@user, @pseudonym)
-        put 'update', params: {:user => {:pronouns => "Pro/Noun"}}, format: 'json'
+        put 'update', params: { :user => { :pronouns => "Pro/Noun" } }, format: 'json'
         expect(response).to be_successful
         @user.reload
         expect(@user.pronouns).to eq nil
@@ -152,9 +152,9 @@ describe ProfileController do
       user_session(@user, @pseudonym)
       cc = @cc
       expect(cc.position).to eq 1
-      cc2 = communication_channel(@user, {username: 'email2@example.com', active_cc: true})
+      cc2 = communication_channel(@user, { username: 'email2@example.com', active_cc: true })
       expect(cc2.position).to eq 2
-      put 'update', params: {:user_id => @user.id, :default_email_id => cc2.id}, format: 'json'
+      put 'update', params: { :user_id => @user.id, :default_email_id => cc2.id }, format: 'json'
       expect(response).to be_successful
       expect(cc2.reload.position).to eq 1
       expect(cc.reload.position).to eq 2
@@ -163,8 +163,8 @@ describe ProfileController do
     it "should not let an unconfirmed e-mail address be set as default" do
       user_session(@user, @pseudonym)
       cc = @cc
-      cc2 = communication_channel(@user, {username: 'email2@example.com', cc_state: 'unconfirmed'})
-      put 'update', params: {:user_id => @user.id, :default_email_id => cc2.id}, format: 'json'
+      cc2 = communication_channel(@user, { username: 'email2@example.com', cc_state: 'unconfirmed' })
+      put 'update', params: { :user_id => @user.id, :default_email_id => cc2.id }, format: 'json'
       expect(@user.email).to eq cc.path
     end
 
@@ -173,7 +173,7 @@ describe ProfileController do
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
 
-      put 'update', params: {:user_id => @fake_student.id}
+      put 'update', params: { :user_id => @fake_student.id }
       assert_unauthorized
     end
   end
@@ -191,8 +191,8 @@ describe ProfileController do
 
     it "should let you change your short_name and profile information" do
       put 'update_profile',
-          params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
-          :user_profile => {:bio => '...', :title => '!!!'}},
+          params: { :user => { :short_name => 'Monsturd', :name => 'Jenkins' },
+                    :user_profile => { :bio => '...', :title => '!!!' } },
           format: 'json'
       expect(response).to be_successful
 
@@ -211,8 +211,8 @@ describe ProfileController do
       old_name = @user.short_name
       old_title = @user.profile.title
       put 'update_profile',
-          params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
-          :user_profile => {:bio => '...', :title => '!!!'}},
+          params: { :user => { :short_name => 'Monsturd', :name => 'Jenkins' },
+                    :user_profile => { :bio => '...', :title => '!!!' } },
           format: 'json'
       expect(response).to be_successful
 
@@ -228,9 +228,9 @@ describe ProfileController do
       @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => false
 
       put 'update_profile',
-        params: {:user_profile => {:bio => '...'},
-        :user_services => {:twitter => "1", :skype => "false"}},
-        format: 'json'
+          params: { :user_profile => { :bio => '...' },
+                    :user_services => { :twitter => "1", :skype => "false" } },
+          format: 'json'
       expect(response).to be_successful
 
       @user.reload
@@ -240,10 +240,10 @@ describe ProfileController do
 
     it "should let you set your profile links" do
       put 'update_profile',
-        params: {:user_profile => {:bio => '...'},
-        :link_urls => ['example.com', 'foo.com', '', '///////invalid'],
-        :link_titles => ['Example.com', 'Foo', '', 'invalid']},
-        format: 'json'
+          params: { :user_profile => { :bio => '...' },
+                    :link_urls => ['example.com', 'foo.com', '', '///////invalid'],
+                    :link_titles => ['Example.com', 'Foo', '', 'invalid'] },
+          format: 'json'
       expect(response).to be_successful
 
       @user.reload
@@ -256,7 +256,7 @@ describe ProfileController do
     it "should let you remove set pronouns" do
       @user.update(pronouns: 'he_him')
       expect {
-        put 'update_profile', params: {:pronouns => nil}, format: 'json'
+        put 'update_profile', params: { :pronouns => nil }, format: 'json'
       }.to change {
         @user.reload.pronouns
       }.from('He/Him').to(nil)
@@ -271,22 +271,22 @@ describe ProfileController do
     end
 
     it "should show if user has any non-student enrollments" do
-      allow(Canvas::DynamicSettings).to receive(:find).and_return({'base_url' => 'the_ccv_url'})
+      allow(Canvas::DynamicSettings).to receive(:find).and_return({ 'base_url' => 'the_ccv_url' })
       user_session(@teacher)
-      get 'content_shares', params: {user_id: @teacher.id}
+      get 'content_shares', params: { user_id: @teacher.id }
       expect(response).to render_template('content_shares')
       expect(assigns.dig(:js_env, :COMMON_CARTRIDGE_VIEWER_URL)).to eq('the_ccv_url')
     end
 
     it "should show if the user has an account membership" do
       user_session(account_admin_user)
-      get 'content_shares', params: {user_id: @admin.id}
+      get 'content_shares', params: { user_id: @admin.id }
       expect(response).to render_template('content_shares')
     end
 
     it "should 404 if user has only student enrollments" do
       user_session(@student)
-      get 'content_shares', params: {user_id: @student.id}
+      get 'content_shares', params: { user_id: @student.id }
       expect(response).to be_not_found
     end
   end

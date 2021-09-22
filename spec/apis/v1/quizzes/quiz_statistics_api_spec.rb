@@ -22,8 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizStatisticsController, type: :request do
-
-  def api_index(options={}, data={})
+  def api_index(options = {}, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
     params = { controller: 'quizzes/quiz_statistics',
                action: 'index',
@@ -45,8 +44,8 @@ describe Quizzes::QuizStatisticsController, type: :request do
     teacher = @user
 
     simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T},
-      :user => @user,
-      :course => @course
+                                 :user => @user,
+                                 :course => @course
 
     @user = teacher
   end
@@ -68,7 +67,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
       json1 = api_index({}, { all_versions: true })
       json2 = api_index({}, { all_versions: false })
 
-      [ json1, json2 ].each_with_index do |json, index|
+      [json1, json2].each_with_index do |json, index|
         expect(json['quiz_statistics']).to be_present
         expect(json['quiz_statistics'][0]['includes_all_versions']).to eq(index == 0)
       end
@@ -85,7 +84,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
     it "should return :no_content for large quizzes" do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return true
 
-      expect(api_index(raw:true)).to be_equal(204)
+      expect(api_index(raw: true)).to be_equal(204)
     end
 
     context 'JSON-API compliance' do

@@ -30,7 +30,7 @@ describe 'quizzes question with html answers' do
     stub_rcs_config
   end
 
-  def edit_first_html_answer(question_type=nil)
+  def edit_first_html_answer(question_type = nil)
     edit_first_question
     click_option('.question_form:visible .question_type', question_type) if question_type
     driver.execute_script "$('.answer').addClass('hover');"
@@ -68,8 +68,8 @@ describe 'quizzes question with html answers' do
     img_url = "http://invalid.nowhere.test/nothing.jpg"
     img_alt = "sample alt text"
     img_cls = "sample_image"
-    quiz_with_new_questions(true, {id: 1}, {id: 2},
-                            {id: 3, answer_html: %|<img src="#{img_url}" alt="#{img_alt}" class="#{img_cls}">|})
+    quiz_with_new_questions(true, { id: 1 }, { id: 2 },
+                            { id: 3, answer_html: %|<img src="#{img_url}" alt="#{img_alt}" class="#{img_cls}">| })
     dismiss_flash_messages rescue nil # in non-prod environments images that fail to load will cause a flash message
     click_questions_tab
     edit_first_question

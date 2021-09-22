@@ -38,14 +38,14 @@ describe CalendarEvent do
   describe "default_values" do
     before(:once) do
       course_model
-      @original_start_at =  Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
 
       # Create the initial event
       @event = calendar_event_model(
-          :start_at => @original_start_at,
-          :end_at => @original_end_at,
-          :time_zone_edited => "Mountain Time (US & Canada)"
+        :start_at => @original_start_at,
+        :end_at => @original_end_at,
+        :time_zone_edited => "Mountain Time (US & Canada)"
       )
     end
 
@@ -91,9 +91,9 @@ describe CalendarEvent do
       expect(event_2.all_day?).to be_falsey
 
       event_3 = calendar_event_model(
-          :start_at => midnight,
-          :end_at => midnight + 1.hour,
-          :time_zone_edited => "Mountain Time (US & Canada)"
+        :start_at => midnight,
+        :end_at => midnight + 1.hour,
+        :time_zone_edited => "Mountain Time (US & Canada)"
       )
       event_3.start_at = midnight
       event_3.end_at = midnight + 30.minutes
@@ -144,7 +144,6 @@ describe CalendarEvent do
       expect(@event.all_day?).to be_falsey
     end
   end
-
 
   context "ical" do
     describe "to_ics" do
@@ -236,7 +235,7 @@ describe CalendarEvent do
         <br/>
         <a href="www.example.com">link!</a>
       </p>
-      HTML
+        HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
         expect(ev.x_alt_desc.first).to eq @event.description
@@ -274,7 +273,7 @@ describe CalendarEvent do
 
         @course.media_objects.create!(:media_id => '0_12345678')
         event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
-          :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
+                                                                :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
         event.effective_context_code = @course.asset_string
         event.save!
 
@@ -349,7 +348,7 @@ describe CalendarEvent do
         :title => "test",
         :contexts => [course],
         :new_appointments => {
-            appt01: [Time.zone.now, Time.zone.now]
+          appt01: [Time.zone.now, Time.zone.now]
         }
       )
       expect(ag.appointments[0].root_account_id).to eq course.root_account_id
@@ -366,11 +365,11 @@ describe CalendarEvent do
     end
 
     it "should return events explicitly tied to the contexts" do
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id)).
-        to eql [@e1]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id))
+        .to eql [@e1]
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id)).
-        to eql [@e1, @e2]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id))
+        .to eql [@e1, @e2]
     end
 
     it "should return events implicitly tied to the contexts (via effective_context_string)" do
@@ -396,26 +395,26 @@ describe CalendarEvent do
       se.context = section
       se.save!
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@student.asset_string]).sort_by(&:id)).
-        to eql [@e2] # none of the appointments even though they technically are on the user
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@student.asset_string]).sort_by(&:id))
+        .to eql [@e2] # none of the appointments even though they technically are on the user
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [section.asset_string]).sort_by(&:id)).
-        to eql [] # none of the appointments even though they technically are on the section
+      expect(CalendarEvent.for_user_and_context_codes(@student, [section.asset_string]).sort_by(&:id))
+        .to eql [] # none of the appointments even though they technically are on the section
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id)).
-        to eql [@e1, @e2, a1, a2, pe, se]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id))
+        .to eql [@e1, @e2, a1, a2, pe, se]
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id)).
-        to eql [@e1, a1, a2, pe, se]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id))
+        .to eql [@e1, a1, a2, pe, se]
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).events_without_child_events.sort_by(&:id)).
-        to eql [@e1, a1, a2, se]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).events_without_child_events.sort_by(&:id))
+        .to eql [@e1, a1, a2, se]
 
-      expect(CalendarEvent.for_user_and_context_codes(@student, [g1.asset_string, g2.asset_string, g3.asset_string]).sort_by(&:id)).
-        to eql [ae1, ae2, ae3]
+      expect(CalendarEvent.for_user_and_context_codes(@student, [g1.asset_string, g2.asset_string, g3.asset_string]).sort_by(&:id))
+        .to eql [ae1, ae2, ae3]
 
-      expect(CalendarEvent.for_user_and_context_codes(@teacher, [g1.asset_string, g2.asset_string, g3.asset_string]).events_with_child_events.sort_by(&:id)).
-        to eql [ae1, ae2]
+      expect(CalendarEvent.for_user_and_context_codes(@teacher, [g1.asset_string, g2.asset_string, g3.asset_string]).events_with_child_events.sort_by(&:id))
+        .to eql [ae1, ae2]
     end
   end
 
@@ -426,7 +425,7 @@ describe CalendarEvent do
       course_with_student(:active_all => true)
       @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept!
-      communication_channel(@student, {username: "test_channel_email_#{user_factory.id}@test.com", active_cc: true})
+      communication_channel(@student, { username: "test_channel_email_#{user_factory.id}@test.com", active_cc: true })
     end
 
     context "with calendar event created" do
@@ -497,12 +496,12 @@ describe CalendarEvent do
 
     it "should not send notifications to participants if hidden" do
       course_with_student(:active_all => true)
-      event = @course.calendar_events.build(:title => "test", :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}])
+      event = @course.calendar_events.build(:title => "test", :child_event_data => [{ :start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string }])
       event.updating_user = @teacher
       event.save!
       expect(event.messages_sent).to be_empty
 
-      event.update_attribute(:child_event_data, [{:start_at => "2012-01-02", :end_at => "2012-01-03", :context_code => @course.default_section.asset_string}])
+      event.update_attribute(:child_event_data, [{ :start_at => "2012-01-02", :end_at => "2012-01-03", :context_code => @course.default_section.asset_string }])
       expect(event.messages_sent).to be_empty
     end
   end
@@ -542,7 +541,7 @@ describe CalendarEvent do
         course_with_observer(active_all: true, course: @course, associated_user_id: @student1.id)
 
         [@teacher, @student1, @student2, @observer].each do |user|
-          communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
+          communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
         end
 
         @expected_users = [@teacher.id, @student1.id, @student2.id, @observer.id].sort
@@ -554,7 +553,7 @@ describe CalendarEvent do
 
       it 'should include course_ids from appointment_groups' do
         reservation = @appointment2.reserve_for(@group, @student1)
-        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+        expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
       end
 
       it 'should include multiple course_ids' do
@@ -563,7 +562,7 @@ describe CalendarEvent do
         ag = AppointmentGroup.create!(title: "test", contexts: [@course, course2])
         appointment = ag.appointments.create!(start_at: '2012-01-01 12:00:00', end_at: '2012-01-01 13:00:00')
         reservation = appointment.reserve_for(@student1, @student1)
-        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+        expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
       end
 
       it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
@@ -635,8 +634,7 @@ describe CalendarEvent do
 
     it "should allow multiple participants in an appointment, up to the limit" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
-        :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       ag.publish!
       appointment = ag.appointments.first
 
@@ -717,8 +715,7 @@ describe CalendarEvent do
 
     it "should cancel existing reservations if cancel_existing = true and the appointment is in the future" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
-        :new_appointments => [[1.hour.from_now, 2.hours.from_now], [3.hours.from_now, 4.hours.from_now]]
-      )
+                                   :new_appointments => [[1.hour.from_now, 2.hours.from_now], [3.hours.from_now, 4.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
       appointment2 = ag.appointments.last
@@ -730,8 +727,7 @@ describe CalendarEvent do
 
     it "should refuse to cancel existing reservations if cancel_existing = true and the appointment is in the past" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
-        :new_appointments => [[2.hours.ago, 1.hour.ago], [1.hour.from_now, 2.hours.from_now]]
-      )
+                                   :new_appointments => [[2.hours.ago, 1.hour.ago], [1.hour.from_now, 2.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
       appointment2 = ag.appointments.last
@@ -747,9 +743,7 @@ describe CalendarEvent do
                                    :new_appointments => [['2012-01-01 12:00:00',
                                                           '2012-01-01 13:00:00'],
                                                          ['2012-01-01 13:00:00',
-                                                          '2012-01-01 14:00:00']
-                                                        ]
-                                  )
+                                                          '2012-01-01 14:00:00']])
       ag.publish!
       appointment = ag.appointments.first
       r1 = appointment.reserve_for(@student1, @student1, :comments => "my appointment notes")
@@ -759,8 +753,7 @@ describe CalendarEvent do
 
     it "should enforce the section" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course.course_sections.create],
-        :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       ag.publish!
       appointment = ag.appointments.first
 
@@ -776,8 +769,7 @@ describe CalendarEvent do
       g2 = c2.groups.create(:context => @course)
 
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :sub_context_codes => [c1.asset_string],
-        :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       appointment = ag.appointments.first
       ag.publish!
 
@@ -810,8 +802,7 @@ describe CalendarEvent do
 
     it "should unlock the appointment when the last reservation is canceled" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
-        :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       appointment = ag.appointments.first
       student_in_course(:course => @course, :active_all => true)
       @other_student = @user
@@ -828,8 +819,7 @@ describe CalendarEvent do
 
     it "should copy the group attributes to the initial appointments" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello world",
-        :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       e = ag.appointments.first
       expect(e.title).to eql 'test'
       expect(e.description).to eql "hello world"
@@ -871,8 +861,7 @@ describe CalendarEvent do
 
     it "should allow a user to re-reserve a slot after canceling" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 1,
-        :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
-      )
+                                   :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       appointment = ag.appointments.first
 
       r1 = appointment.reserve_for(@student1, @student1).reload
@@ -923,16 +912,16 @@ describe CalendarEvent do
       it "should validate child events" do
         expect {
           @course.calendar_events.create! :title => "ohai",
-            :child_event_data => [
-              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}
-            ]
+                                          :child_event_data => [
+                                            { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string }
+                                          ]
         }.to raise_error(/Can't update child events unless an updating_user is set/)
 
         expect {
           event = @course.calendar_events.build :title => "ohai",
-            :child_event_data => [
-              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => "invalid_1"}
-            ]
+                                                :child_event_data => [
+                                                  { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => "invalid_1" }
+                                                ]
           event.updating_user = @user
           event.save!
         }.to raise_error(/Invalid child event context/)
@@ -940,19 +929,19 @@ describe CalendarEvent do
         expect {
           other_section = Course.create!.default_section
           event = @course.calendar_events.build :title => "ohai",
-            :child_event_data => [
-              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => other_section.asset_string}
-            ]
+                                                :child_event_data => [
+                                                  { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => other_section.asset_string }
+                                                ]
           event.updating_user = @user
           event.save!
         }.to raise_error(/Invalid child event context/)
 
         expect {
           event = @course.calendar_events.build :title => "ohai",
-            :child_event_data => [
-              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-              {:start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string}
-            ]
+                                                :child_event_data => [
+                                                  { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+                                                  { :start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string }
+                                                ]
           event.updating_user = @user
           event.save!
         }.to raise_error(/Duplicate child event contexts/)
@@ -961,10 +950,10 @@ describe CalendarEvent do
       it "should create child events" do
         s2 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
-          :child_event_data => [
-            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
-          ]
+                                           :child_event_data => [
+                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+                                             { :start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string },
+                                           ]
         e1.updating_user = @user
         e1.save!
 
@@ -980,19 +969,19 @@ describe CalendarEvent do
         s2 = @course.course_sections.create!
         s3 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
-          :child_event_data => [
-            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
-          ]
+                                           :child_event_data => [
+                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+                                             { :start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string },
+                                           ]
         e1.updating_user = @user
         e1.save!
         e1.reload
         events1 = e1.child_events.sort_by(&:id)
 
         e1.update :child_event_data => [
-            {:start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s3.asset_string},
-          ]
+          { :start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string },
+          { :start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s3.asset_string },
+        ]
         e1.reload
         events2 = e1.child_events.sort_by(&:id)
         expect(events2.size).to eql 2
@@ -1007,14 +996,14 @@ describe CalendarEvent do
         e1 = @course.calendar_events.build :title => "ohai",
                                            :description => "<img src='/courses/#{@course.id}/files/#{@attachment.id}/preview'>",
                                            :child_event_data => [
-                                               {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-                                               {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
+                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+                                             { :start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string },
                                            ]
         e1.updating_user = @user
         e1.save!
         e1.child_event_data = [
-            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "2012-01-02 22:00:00", :end_at => "2012-01-02 23:00:00", :context_code => s2.asset_string},
+          { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+          { :start_at => "2012-01-02 22:00:00", :end_at => "2012-01-02 23:00:00", :context_code => s2.asset_string },
         ]
         expect { e1.save! }.not_to raise_error
       end
@@ -1023,10 +1012,10 @@ describe CalendarEvent do
         s2 = @course.course_sections.create!
         s3 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
-          :child_event_data => [
-            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
-          ]
+                                           :child_event_data => [
+                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
+                                             { :start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string },
+                                           ]
         e1.updating_user = @user
         e1.save!
         e1.reload
@@ -1037,21 +1026,21 @@ describe CalendarEvent do
       it "unsets all_day when deleting child events" do
         s2 = @course.course_sections.create!
         e1 = @course.calendar_events.create!({
-          title: 'foo',
-          start_at: "2020-10-29T00:00:00.000Z",
-          end_at: "2020-10-29T00:00:00.000Z",
-          updating_user: @user,
-          child_event_data: [
-            { start_at: "2020-10-27T10:00:00.000Z", end_at: "2020-10-27T11:00:00.000Z", context_code: @course.default_section.asset_string},
-            { start_at: "2020-10-27T14:00:00.000Z", end_at: "2020-10-27T15:00:00.000Z", context_code: s2.asset_string}
-          ]
-        })
+                                               title: 'foo',
+                                               start_at: "2020-10-29T00:00:00.000Z",
+                                               end_at: "2020-10-29T00:00:00.000Z",
+                                               updating_user: @user,
+                                               child_event_data: [
+                                                 { start_at: "2020-10-27T10:00:00.000Z", end_at: "2020-10-27T11:00:00.000Z", context_code: @course.default_section.asset_string },
+                                                 { start_at: "2020-10-27T14:00:00.000Z", end_at: "2020-10-27T15:00:00.000Z", context_code: s2.asset_string }
+                                               ]
+                                             })
         e1 = CalendarEvent.find(e1.id)
         e1.update({
-          start_at: "2020-10-27T10:00:00.000Z",
-          end_at: "2020-10-27T15:00:00.000Z",
-          remove_child_events: true
-        })
+                    start_at: "2020-10-27T10:00:00.000Z",
+                    end_at: "2020-10-27T15:00:00.000Z",
+                    remove_child_events: true
+                  })
         expect(e1.reload).not_to be_all_day
       end
     end

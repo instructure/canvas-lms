@@ -29,12 +29,13 @@ class RubricsController < ApplicationController
   def index
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
+
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome,
-      :PERMISSIONS => {
-        manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
-        manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
-      },
-      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
+           :PERMISSIONS => {
+             manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
+             manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+           },
+           :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
 
     mastery_scales_js_env
     set_tutorial_js_env
@@ -48,11 +49,12 @@ class RubricsController < ApplicationController
   def show
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
+
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome,
-        :PERMISSIONS => {
-          manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
-        }
+             :PERMISSIONS => {
+               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+             }
       mastery_scales_js_env
       @rubric_association = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])
       raise ActiveRecord::RecordNotFound unless @rubric_association
@@ -106,7 +108,6 @@ class RubricsController < ApplicationController
   # the old rubric and return that one instead.  If you pass it a rubric_association_id
   # parameter, then it will point the rubric_association to the new rubric
   # instead of the old one.
-
 
   # @API Update a single rubric
   #
@@ -177,13 +178,13 @@ class RubricsController < ApplicationController
         @rubric.rubric_id = original_rubric_id
         @rubric.user = @current_user
       end
-      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) #authorized_action(@rubric, @current_user, :update)
+      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) # authorized_action(@rubric, @current_user, :update)
         @association = @rubric.update_with_association(@current_user, params[:rubric], @context, association_params)
         @rubric = @association.rubric if @association
       end
       json_res = {}
-      json_res[:rubric] = @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}) if @rubric
-      json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:assessment_requests], :permissions => {:user => @current_user, :session => session}) if @association
+      json_res[:rubric] = @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => { :user => @current_user, :session => session }) if @rubric
+      json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:assessment_requests], :permissions => { :user => @current_user, :session => session }) if @association
       json_res[:rubric_association][:skip_updating_points_possible] = skip_points_update if json_res && json_res[:rubric_association]
       render :json => json_res
     end
@@ -213,6 +214,7 @@ class RubricsController < ApplicationController
                    end
 
     return nil if root_outcome.nil?
+
     outcome_group_json(root_outcome, @current_user, session)
   end
   protected :get_root_outcome
@@ -222,6 +224,7 @@ class RubricsController < ApplicationController
   def can_manage_rubrics_or_association_object?(object)
     return true if object && (can_update?(object) || can_read?(object) && can_manage_rubrics_context?) ||
                    !object && can_manage_rubrics_context?
+
     render_unauthorized_action
     false
   end

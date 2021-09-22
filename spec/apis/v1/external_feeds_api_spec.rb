@@ -30,7 +30,7 @@ describe 'ExternalFeedsController', type: :request do
       api_call_as_user(@denied_user, :get, @url_base, @url_params, {}, {}, :expected_status => 401)
       api_call_as_user(@denied_user, :post, @url_base, @url_params.merge(:action => "create"), { :url => "http://www.example.com/feed" }, {}, :expected_status => 401)
       @feed = external_feed_model(:context => @context)
-      api_call_as_user(@denied_user, :delete, @url_base+"/#{@feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => @feed.to_param), {}, {}, :expected_status => 401)
+      api_call_as_user(@denied_user, :delete, @url_base + "/#{@feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => @feed.to_param), {}, {}, :expected_status => 401)
     end
 
     def feed_json(f)
@@ -50,7 +50,7 @@ describe 'ExternalFeedsController', type: :request do
       @feeds[1].external_feed_entries.create!(user: @allowed_user)
       external_feed_model(:context => Course.create!)
       json = api_call_as_user(@allowed_user, :get, @url_base, @url_params, { :per_page => 2 })
-      expect(json).to eq @feeds[0,2].map { |f| feed_json(f) }
+      expect(json).to eq @feeds[0, 2].map { |f| feed_json(f) }
     end
 
     it "should allow creating feeds" do
@@ -101,7 +101,7 @@ describe 'ExternalFeedsController', type: :request do
 
     it "should allow deleting a feed" do
       feed = external_feed_model(:url => "http://www.example.com/feed", :context => @context, :user => @allowed_user)
-      json = api_call_as_user(@allowed_user, :delete, @url_base+"/#{feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => feed.to_param))
+      json = api_call_as_user(@allowed_user, :delete, @url_base + "/#{feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => feed.to_param))
       expect(json).to eq feed_json(feed)
     end
   end

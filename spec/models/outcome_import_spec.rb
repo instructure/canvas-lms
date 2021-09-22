@@ -123,9 +123,9 @@ describe OutcomeImport, type: :model do
 
     it 'sets proper workflow_state on successful completion' do
       mock_importer([
-        { progress: 0, errors: [] },
-        { progress: 100, errors: [] }
-      ])
+                      { progress: 0, errors: [] },
+                      { progress: 100, errors: [] }
+                    ])
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
@@ -139,9 +139,9 @@ describe OutcomeImport, type: :model do
 
     it 'emails user on successful completion' do
       mock_importer([
-        { progress: 0, errors: [] },
-        { progress: 100, errors: [] }
-      ])
+                      { progress: 0, errors: [] },
+                      { progress: 100, errors: [] }
+                    ])
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
@@ -151,30 +151,30 @@ describe OutcomeImport, type: :model do
       expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
       expect(message).to receive(:user=).with(import.user).and_call_original
       expect(Message).to receive(:new).with({
-        to: import.user.email,
-        from: "notifications@instructure.com",
-        subject: 'Outcomes Import Completed',
-        body: "Hello #{import.user.name},
+                                              to: import.user.email,
+                                              from: "notifications@instructure.com",
+                                              subject: 'Outcomes Import Completed',
+                                              body: "Hello #{import.user.name},
 
           Your outcomes were successfully imported. You can now manage them at http://localhost/accounts/#{@account.id}/outcomes
 
           Thank you,
           Instructure".gsub(/^ +/, ''),
-        delay_for: 0,
-        context: nil,
-        path_type: 'email',
-        from_name: "Instructure Canvas"
-      }).and_return(message)
+                                              delay_for: 0,
+                                              context: nil,
+                                              path_type: 'email',
+                                              from_name: "Instructure Canvas"
+                                            }).and_return(message)
       expect(message).to receive(:deliver)
       import.run
     end
 
     it 'emails user on successful completion but with warnings' do
       mock_importer([
-        { progress: 0, errors: [] },
-        { progress: 50, errors: [[2, 'The "title" field is required']] },
-        { progress: 100, errors: [] }
-      ])
+                      { progress: 0, errors: [] },
+                      { progress: 50, errors: [[2, 'The "title" field is required']] },
+                      { progress: 100, errors: [] }
+                    ])
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)
@@ -184,10 +184,10 @@ describe OutcomeImport, type: :model do
       expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
       expect(message).to receive(:user=).with(import.user).and_call_original
       expect(Message).to receive(:new).with({
-        to: import.user.email,
-        from: "notifications@instructure.com",
-        subject: 'Outcomes Import Completed',
-        body: "Hello #{import.user.name},
+                                              to: import.user.email,
+                                              from: "notifications@instructure.com",
+                                              subject: 'Outcomes Import Completed',
+                                              body: "Hello #{import.user.name},
 
           Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
 
@@ -197,11 +197,11 @@ describe OutcomeImport, type: :model do
 
           Thank you,
           Instructure".gsub(/^ +/, ''),
-        delay_for: 0,
-        context: nil,
-        path_type: 'email',
-        from_name: "Instructure Canvas"
-      }).and_return(message)
+                                              delay_for: 0,
+                                              context: nil,
+                                              path_type: 'email',
+                                              from_name: "Instructure Canvas"
+                                            }).and_return(message)
       expect(message).to receive(:deliver)
       import.run
     end
@@ -217,10 +217,10 @@ describe OutcomeImport, type: :model do
       expect(message).to receive(:communication_channel=).with(import.user.email_channel).and_call_original
       expect(message).to receive(:user=).with(import.user).and_call_original
       expect(Message).to receive(:new).with({
-        to: import.user.email,
-        from: "notifications@instructure.com",
-        subject: 'Outcomes Import Failed',
-        body: "Hello #{import.user.name},
+                                              to: import.user.email,
+                                              from: "notifications@instructure.com",
+                                              subject: 'Outcomes Import Failed',
+                                              body: "Hello #{import.user.name},
 
           Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at http://localhost/accounts/#{@account.id}/outcomes
 
@@ -231,11 +231,11 @@ describe OutcomeImport, type: :model do
 
           Thank you,
           Instructure".gsub(/^ +/, ''),
-        delay_for: 0,
-        context: nil,
-        path_type: 'email',
-        from_name: "Instructure Canvas"
-      }).and_return(message)
+                                              delay_for: 0,
+                                              context: nil,
+                                              path_type: 'email',
+                                              from_name: "Instructure Canvas"
+                                            }).and_return(message)
       expect(message).to receive(:deliver)
       import.run
     end
@@ -249,8 +249,8 @@ describe OutcomeImport, type: :model do
 
       errors = import.outcome_import_errors.all.to_a
       expect(errors.pluck(:row, :message)).to eq([
-        [1, 'Very Bad Error']
-      ])
+                                                   [1, 'Very Bad Error']
+                                                 ])
       expect(import.progress).to eq(nil)
       expect(import.workflow_state).to eq('failed')
     end

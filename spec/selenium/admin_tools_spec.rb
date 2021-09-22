@@ -55,7 +55,7 @@ describe "admin_tools" do
     setup_account_admin
   end
 
-  def setup_account_admin(permissions = {:view_notifications => true})
+  def setup_account_admin(permissions = { :view_notifications => true })
     # Setup an account admin (@account_admin) and logged in.
     account_admin_user_with_role_changes(:account => @account, :role_changes => permissions)
     @account_admin = @admin
@@ -198,7 +198,7 @@ describe "admin_tools" do
 
       context "without permissions" do
         it "should not see tab" do
-          setup_account_admin({:view_notifications => false})
+          setup_account_admin({ :view_notifications => false })
           load_admin_tools_page
           wait_for_ajaximations
           expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
@@ -269,7 +269,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map!{ |o| o.text }
+          options.map! { |o| o.text }
           expect(options).not_to include("Login / Logout Activity")
         end
 
@@ -281,7 +281,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map!{ |o| o.text }
+          options.map! { |o| o.text }
           expect(options).not_to include("Grade Change Activity")
         end
 
@@ -293,7 +293,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map!{ |o| o.text }
+          options.map! { |o| o.text }
           expect(options).not_to include("Course Activity")
         end
       end
@@ -601,7 +601,7 @@ describe "admin_tools" do
         cc.workflow_state = 'active'
         cc.bounce_count = 3
         cc.last_bounce_at = 6.days.ago
-        cc.last_bounce_details = {'bouncedRecipients' => [{'diagnosticCode' => '550 what a luser'}]}
+        cc.last_bounce_details = { 'bouncedRecipients' => [{ 'diagnosticCode' => '550 what a luser' }] }
       end
       @user = @account_admin
     end

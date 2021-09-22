@@ -23,10 +23,8 @@ require File.expand_path('../spec_helper', File.dirname(__FILE__))
 Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
 
 describe TokenScopes do
-
   describe ".named_scopes" do
-
-    let!(:user_info_scope){TokenScopes.named_scopes.find{|s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope]}}
+    let!(:user_info_scope) { TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope] } }
 
     it "includes the resource_name" do
       expect(user_info_scope[:resource_name].to_s).to eq 'oauth2'
@@ -37,7 +35,7 @@ describe TokenScopes do
     end
 
     it "includes a CD2 Peer Services scope" do
-      scope = TokenScopes.named_scopes.find{|s| s[:scope] == TokenScopes::CD2_SCOPE[:scope]}
+      scope = TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::CD2_SCOPE[:scope] }
       expect(scope).not_to be_nil
       expect(scope[:resource_name].to_s).to eq 'peer_services'
     end
@@ -48,11 +46,9 @@ describe TokenScopes do
       expect(TokenScopes.named_scopes).to eq []
       TokenScopes.instance_variable_set(:@_named_scopes, nil) # we don't want to have this version stored
     end
-
   end
 
   describe ".all_scopes" do
-
     it "includes the userinfo scope" do
       expect(TokenScopes.all_scopes).to include TokenScopes::USER_INFO_SCOPE[:scope]
     end
@@ -84,5 +80,4 @@ describe TokenScopes do
       end
     end
   end
-
 end

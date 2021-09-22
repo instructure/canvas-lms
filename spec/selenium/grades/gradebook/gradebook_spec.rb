@@ -83,7 +83,6 @@ describe "Gradebook" do
   end
 
   context 'view ungraded as 0' do
-
     before(:each) do
       @course.account.enable_feature!(:view_ungraded_as_zero)
       Gradebook.visit(@course)
@@ -233,7 +232,7 @@ describe "Gradebook" do
   context "downloading and uploading submissions" do
     it "redirects to the submissions upload page after uploading submissions" do
       # Given I have a student with an uploaded submission
-      a = attachment_model(context: @student_2, content_type:'text/plain')
+      a = attachment_model(context: @student_2, content_type: 'text/plain')
       @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
 
       # When I go to the gradebook
@@ -241,9 +240,8 @@ describe "Gradebook" do
 
       # chrome fails to find the download submissions link because it does not fit normal screen
 
-
       # And I click the download submissions button
-      Gradebook.click_assignment_header_menu_element(@first_assignment.id,"download submissions")
+      Gradebook.click_assignment_header_menu_element(@first_assignment.id, "download submissions")
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
@@ -335,7 +333,7 @@ describe "Gradebook" do
     end
     # generate submissions
     let(:essay_submission) { essay_question.generate_submission(student) }
-    let(:essay_text) { {"question_#{essay_question.id}": "Essay Response!"} }
+    let(:essay_text) { { "question_#{essay_question.id}": "Essay Response!" } }
     let(:file_submission) { file_question.generate_submission(student) }
 
     it 'displays the "needs grading" icon for essay questions', priority: "1", test_id: 229430 do

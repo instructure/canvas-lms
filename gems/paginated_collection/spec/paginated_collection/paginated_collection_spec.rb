@@ -47,7 +47,7 @@ describe PaginatedCollection do
 
     it 'uses the pager returned' do
       # using WillPaginate Array to get WillPaginate style object
-      @simple = ('a' .. 'c').to_a
+      @simple = ('a'..'c').to_a
 
       proxy = PaginatedCollection.build do |pager|
         result = @simple.paginate(page: pager.current_page, per_page: pager.per_page)

@@ -59,7 +59,7 @@ class ContextModule < ActiveRecord::Base
     if self.context.available? && self.active?
       if self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == "unpublished"
         # should trigger when publishing a prerequisite for an already active module
-        @relock_warning = true if self.context.context_modules.active.any?{|mod| self.is_prerequisite_for?(mod)}
+        @relock_warning = true if self.context.context_modules.active.any? { |mod| self.is_prerequisite_for?(mod) }
         # if any of these changed while we were unpublished, then we also need to trigger
         @relock_warning = true if self.prerequisites.any? || self.completion_requirements.any? || self.unlock_at.present?
       end
@@ -82,8 +82,9 @@ class ContextModule < ActiveRecord::Base
     @relock_warning
   end
 
-  def relock_progressions(relocked_modules=[], student_ids=nil)
+  def relock_progressions(relocked_modules = [], student_ids = nil)
     return if relocked_modules.include?(self)
+
     self.class.connection.after_transaction_commit do
       relocked_modules << self
       progression_scope = self.context_module_progressions.where(:current => true).where.not(:workflow_state => 'locked')
@@ -130,11 +131,11 @@ class ContextModule < ActiveRecord::Base
   end
 
   def check_for_stale_cache_after_unlocking!
-    GuardRail.activate(:primary) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
+    GuardRail.activate(:primary) { self.touch } if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
   end
 
   def is_prerequisite_for?(mod)
-    (mod.prerequisites || []).any? {|prereq| prereq[:type] == 'context_module' && prereq[:id] == self.id }
+    (mod.prerequisites || []).any? { |prereq| prereq[:type] == 'context_module' && prereq[:id] == self.id }
   end
 
   def self.module_positions(context)
@@ -143,7 +144,7 @@ class ContextModule < ActiveRecord::Base
     # and when generating the list of downstream modules
     Rails.cache.fetch(['module_positions', context].cache_key) do
       hash = {}
-      context.context_modules.not_deleted.each{|m| hash[m.id] = m.position || 0 }
+      context.context_modules.not_deleted.each { |m| hash[m.id] = m.position || 0 }
       hash
     end
   end
@@ -172,21 +173,21 @@ class ContextModule < ActiveRecord::Base
 
   def get_potentially_conflicting_titles(title_base)
     ContextModule.not_deleted.where(context_id: self.context_id)
-      .starting_with_name(title_base).pluck("name").to_set
+                 .starting_with_name(title_base).pluck("name").to_set
   end
 
   def duplicate_base_model(copy_title)
     ContextModule.new({
-      :context_id => self.context_id,
-      :context_type => self.context_type,
-      :name => copy_title,
-      :position => ContextModule.not_deleted.where(context_id: self.context_id).maximum(:position) + 1,
-      :completion_requirements => self.completion_requirements,
-      :workflow_state => 'unpublished',
-      :require_sequential_progress => self.require_sequential_progress,
-      :completion_events => self.completion_events,
-      :requirement_count => self.requirement_count
-    })
+                        :context_id => self.context_id,
+                        :context_type => self.context_type,
+                        :name => copy_title,
+                        :position => ContextModule.not_deleted.where(context_id: self.context_id).maximum(:position) + 1,
+                        :completion_requirements => self.completion_requirements,
+                        :workflow_state => 'unpublished',
+                        :require_sequential_progress => self.require_sequential_progress,
+                        :completion_events => self.completion_events,
+                        :requirement_count => self.requirement_count
+                      })
   end
 
   def can_be_duplicated?
@@ -205,8 +206,8 @@ class ContextModule < ActiveRecord::Base
 
   def clear_discussion_stream_items
     if self.saved_change_to_workflow_state? &&
-      ['active', nil].include?(self.workflow_state_before_last_save) &&
-      self.workflow_state == 'unpublished'
+       ['active', nil].include?(self.workflow_state_before_last_save) &&
+       self.workflow_state == 'unpublished'
       self.content_tags.where(content_type: "DiscussionTopic", workflow_state: 'active').preload(:content).each do |ct|
         ct.content.clear_stream_items
       end
@@ -297,12 +298,13 @@ class ContextModule < ActiveRecord::Base
     if self.workflow_state == 'deleted' && self.deleted_at
       # only restore tags deleted (approximately) when the module was deleted
       # (tags are currently set to exactly deleted_at but older deleted modules used the current time on each tag)
-      tags_to_restore = self.content_tags.where(:workflow_state => 'deleted').
-        where('updated_at BETWEEN ? AND ?', self.deleted_at - 5.seconds, self.deleted_at + 5.seconds).
-        preload(:content)
+      tags_to_restore = self.content_tags.where(:workflow_state => 'deleted')
+                            .where('updated_at BETWEEN ? AND ?', self.deleted_at - 5.seconds, self.deleted_at + 5.seconds)
+                            .preload(:content)
       tags_to_restore.each do |tag|
         # don't restore the item if the asset has been deleted too
         next if tag.asset_workflow_state == 'deleted'
+
         # although the module will be restored unpublished, the items should match the asset's published state
         tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
         # deal with the possibility that the asset has been renamed after the module was deleted
@@ -314,12 +316,12 @@ class ContextModule < ActiveRecord::Base
     self.save
   end
 
-  def update_downstreams(original_position=nil)
+  def update_downstreams(original_position = nil)
     original_position ||= self.position || 0
-    positions = ContextModule.module_positions(self.context).to_a.sort_by{|a| a[1] }
-    downstream_ids = positions.select{|a| a[1] > (self.position || 0)}.map{|a| a[0] }
+    positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
+    downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
-    downstreams.each {|m| m.save_without_touching_context }
+    downstreams.each { |m| m.save_without_touching_context }
   end
 
   workflow do
@@ -356,30 +358,32 @@ class ContextModule < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.context.grants_right?(user, session, :manage_content) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
     can :read and can :create and can :update and can :delete and can :read_as_admin
 
-    given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read and can :read_as_admin
 
-    given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items) }
+    given { |user, session| self.context.grants_right?(user, session, :view_unpublished_items) }
     can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :read) && self.active? }
+    given { |user, session| self.context.grants_right?(user, session, :read) && self.active? }
     can :read
   end
 
-  def low_level_locked_for?(user, opts={})
+  def low_level_locked_for?(user, opts = {})
     return false if self.grants_right?(user, :read_as_admin)
+
     available = self.available_for?(user, opts)
-    return {object: self, module: self} unless available
-    return {object: self, module: self, unlock_at: unlock_at} if to_be_unlocked
+    return { object: self, module: self } unless available
+    return { object: self, module: self, unlock_at: unlock_at } if to_be_unlocked
+
     false
   end
 
-  def available_for?(user, opts={})
+  def available_for?(user, opts = {})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? &&
-      (self.completion_requirements.empty? || !self.require_sequential_progress)
+                   (self.completion_requirements.empty? || !self.require_sequential_progress)
     if self.grants_right?(user, :read_as_admin)
       return true
     elsif !self.active?
@@ -389,8 +393,8 @@ class ContextModule < ActiveRecord::Base
     end
 
     progression = if opts[:user_context_module_progressions]
-      opts[:user_context_module_progressions][self.id]
-    end
+                    opts[:user_context_module_progressions][self.id]
+                  end
     progression ||= self.find_or_create_progression(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
@@ -406,7 +410,7 @@ class ContextModule < ActiveRecord::Base
 
   def locked_for_tag?(tag, progression)
     locked = (tag&.context_module_id == self.id && self.require_sequential_progress)
-    locked && (progression.current_position &.< tag.position)
+    locked && (progression.current_position&.< tag.position)
   end
 
   def self.module_names(context)
@@ -438,7 +442,8 @@ class ContextModule < ActiveRecord::Base
   def gather_prerequisites(module_names)
     all_prereqs = read_attribute(:prerequisites)
     return [] unless all_prereqs&.any?
-    all_prereqs.select{|pre| module_names.key?(pre[:id])}.map{|pre| pre.merge(:name => module_names[pre[:id]])}
+
+    all_prereqs.select { |pre| module_names.key?(pre[:id]) }.map { |pre| pre.merge(:name => module_names[pre[:id]]) }
   end
 
   def prerequisites=(prereqs)
@@ -455,9 +460,10 @@ class ContextModule < ActiveRecord::Base
       pre_regex = /module_(\d+)/
       pres.each do |pre|
         next unless match = pre_regex.match(pre)
+
         id = match[1].to_i
         if module_names.has_key?(id)
-          res << {:id => id, :type => 'context_module', :name => module_names[id]}
+          res << { :id => id, :type => 'context_module', :name => module_names[id] }
         end
       end
       prereqs = res
@@ -472,7 +478,7 @@ class ContextModule < ActiveRecord::Base
   def completion_requirements=(val)
     if val.is_a?(Array)
       hash = {}
-      val.each{|i| hash[i[:id]] = i }
+      val.each { |i| hash[i[:id]] = i }
       val = hash
     end
     if val.is_a?(Hash)
@@ -515,7 +521,7 @@ class ContextModule < ActiveRecord::Base
     unless self.new_record?
       old_requirements = self.completion_requirements || []
       validated_reqs.each do |req|
-        if req[:type] == 'must_contribute' && !old_requirements.detect{|r| r[:id] == req[:id] && r[:type] == req[:type]} # new requirement
+        if req[:type] == 'must_contribute' && !old_requirements.detect { |r| r[:id] == req[:id] && r[:type] == req[:type] } # new requirement
           tag = tags[req[:id]]
           if tag.content_type == "DiscussionTopic"
             @discussion_topics_to_recalculate ||= []
@@ -528,12 +534,12 @@ class ContextModule < ActiveRecord::Base
     validated_reqs
   end
 
-  def completion_requirements_visible_to(user, opts={})
+  def completion_requirements_visible_to(user, opts = {})
     valid_ids = content_tags_visible_to(user, opts).map(&:id)
-    completion_requirements.select { |cr| valid_ids.include? cr[:id]  }
+    completion_requirements.select { |cr| valid_ids.include? cr[:id] }
   end
 
-  def content_tags_visible_to(user, opts={})
+  def content_tags_visible_to(user, opts = {})
     @content_tags_visible_to ||= {}
     @content_tags_visible_to[user.try(:id)] ||= begin
       is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :read_as_admin)
@@ -549,7 +555,7 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def visibility_for_user(user, session=nil)
+  def visibility_for_user(user, session = nil)
     opts = {}
     opts[:can_read] = self.context.grants_right?(user, session, :read)
     if opts[:can_read]
@@ -558,7 +564,7 @@ class ContextModule < ActiveRecord::Base
     opts
   end
 
-  def filter_tags_for_da(tags, user, opts={})
+  def filter_tags_for_da(tags, user, opts = {})
     filter = Proc.new do |tags, user_ids, course_id, opts|
       visible_item_ids = {}
       tags.select do |tag|
@@ -608,7 +614,7 @@ class ContextModule < ActiveRecord::Base
     @cached_active_tags ||= begin
       if self.content_tags.loaded?
         # don't reload the preloaded content
-        self.content_tags.select{|tag| tag.active?}
+        self.content_tags.select { |tag| tag.active? }
       else
         self.content_tags.active.to_a
       end
@@ -619,14 +625,14 @@ class ContextModule < ActiveRecord::Base
     @cached_not_deleted_tags ||= begin
       if self.content_tags.loaded?
         # don't reload the preloaded content
-        self.content_tags.select{|tag| !tag.deleted?}
+        self.content_tags.select { |tag| !tag.deleted? }
       else
         self.content_tags.not_deleted.to_a
       end
     end
   end
 
-  def add_item(params, added_item=nil, opts={})
+  def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
     position = [position, params[:position].to_i].max if params[:position]
@@ -719,6 +725,7 @@ class ContextModule < ActiveRecord::Base
       added_item
     else
       return nil unless item
+
       title = params[:title] || (item.title rescue item.name)
       added_item ||= self.content_tags.build(:context => context)
       added_item.attributes = {
@@ -751,8 +758,10 @@ class ContextModule < ActiveRecord::Base
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
       next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
+
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
+
       state = item.respond_to?(:published?) && !item.published? ? 'unpublished' : 'active'
       new_tags << self.content_tags.create!(context: self.context, title: Context.asset_name(item), content: item,
                                             tag_type: 'context_module', indent: 0,
@@ -778,7 +787,7 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def update_for(user, action, tag, points=nil)
+  def update_for(user, action, tag, points = nil)
     retry_count = 0
     return nil unless self.context.grants_right?(user, :participate_as_student)
     return nil unless progression = self.evaluate_for(user)
@@ -827,8 +836,9 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def confirm_valid_requirements(do_save=false)
+  def confirm_valid_requirements(do_save = false)
     return if @already_confirmed_valid_requirements
+
     @already_confirmed_valid_requirements = true
     # the write accessor validates for us
     self.completion_requirements = self.completion_requirements || []
@@ -839,18 +849,19 @@ class ContextModule < ActiveRecord::Base
   def find_or_create_progressions(users)
     users = Array(users)
     users_hash = {}
-    users.each{|u| users_hash[u.id] = u }
+    users.each { |u| users_hash[u.id] = u }
     progressions = self.context_module_progressions.where(user_id: users)
     progressions_hash = {}
-    progressions.each{|p| progressions_hash[p.user_id] = p }
-    newbies = users.select{|u| !progressions_hash[u.id] }
-    progressions += newbies.map{|u| find_or_create_progression(u) }
-    progressions.each{|p| p.user = users_hash[p.user_id] }
+    progressions.each { |p| progressions_hash[p.user_id] = p }
+    newbies = users.select { |u| !progressions_hash[u.id] }
+    progressions += newbies.map { |u| find_or_create_progression(u) }
+    progressions.each { |p| p.user = users_hash[p.user_id] }
     progressions.uniq
   end
 
   def find_or_create_progression(user)
     return nil unless user
+
     progression = nil
     self.shard.activate do
       GuardRail.activate(:primary) do
@@ -899,6 +910,7 @@ class ContextModule < ActiveRecord::Base
 
   def completion_events=(value)
     return write_attribute(:completion_events, nil) unless value
+
     write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
   end
 

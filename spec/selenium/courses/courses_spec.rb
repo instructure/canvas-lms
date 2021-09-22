@@ -27,7 +27,7 @@ describe "courses" do
   context "as a teacher" do
     before(:each) do
       account = Account.default
-      account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
+      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
@@ -43,7 +43,7 @@ describe "courses" do
       it "should allow unpublishing of the course if submissions have no score or grade" do
         visit_course(@course)
         unpublish_btn.click
-        
+
         wait_for(method: nil, timeout: 5) {
           assert_flash_notice_message('successfully updated')
         }
@@ -56,7 +56,7 @@ describe "courses" do
         @course.enroll_user(user_factory, 'TaEnrollment')
         visit_course_people(@course)
         wait_for_ajaximations
-        
+
         expect_no_flash_message :error
         expect(course_user_list.length).to eq 50
       end
@@ -66,9 +66,9 @@ describe "courses" do
   context "as a student" do
     before (:each) do
       course_with_teacher(:active_all => true, :name => 'discussion course')
-      @student = User.create!(:name => "First Student")  
+      @student = User.create!(:name => "First Student")
       en = @course.enroll_student(@student)
-      user_session(@student)  
+      user_session(@student)
     end
 
     it "should auto-accept the course invitation if previews are not allowed", custom_timeout: 20 do

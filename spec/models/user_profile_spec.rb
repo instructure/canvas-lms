@@ -26,21 +26,21 @@ describe UserProfile do
 
     it "should show the profile tab when profiles are enabled" do
       student_in_course(:active_all => true)
-      tabs = @student.profile.
-        tabs_available(@user, :root_account => account)
+      tabs = @student.profile
+                     .tabs_available(@user, :root_account => account)
       expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_PROFILE
 
       account.update_attribute :settings, :enable_profiles => true
-      tabs = @student.reload.profile.
-        tabs_available(@user, :root_account => account)
+      tabs = @student.reload.profile
+                     .tabs_available(@user, :root_account => account)
       expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PROFILE
     end
 
     describe "shared content tab" do
       it "should show shared content tab when user has any non-student enrollment" do
         teacher_in_course(:active_all => true)
-        tabs = @teacher.profile.
-          tabs_available(@teacher, :root_account => account)
+        tabs = @teacher.profile
+                       .tabs_available(@teacher, :root_account => account)
         expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
       end
 
@@ -52,8 +52,8 @@ describe UserProfile do
 
       it "should not show shared content tab when user has only student enrollments" do
         student_in_course(:active_all => true)
-        tabs = @student.profile.
-          tabs_available(@student, :root_account => account)
+        tabs = @student.profile
+                       .tabs_available(@student, :root_account => account)
         expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_CONTENT_SHARES
       end
     end
@@ -62,7 +62,7 @@ describe UserProfile do
       student_in_course(:active_all => true)
       I18n.locale = :es
       tabs = @student.profile.tabs_available(@user, :root_account => account)
-      expect(tabs.detect{|t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+      expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
     end
 
     context 'with lti tabs' do
@@ -71,10 +71,10 @@ describe UserProfile do
         {
           user_navigation:
             {
-              "enabled"=> "true",
-              "default"=> "enabled",
-              "text"=> "LTI or die",
-              "visibility"=> visibility
+              "enabled" => "true",
+              "default" => "enabled",
+              "text" => "LTI or die",
+              "visibility" => visibility
             }
         }.with_indifferent_access
       end
@@ -86,8 +86,8 @@ describe UserProfile do
             context: account,
             opts: { settings: additional_settings }
           )
-          tabs = @student.reload.profile.
-            tabs_available(@user, :root_account => account)
+          tabs = @student.reload.profile
+                         .tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).to include(
             account.context_external_tools.first.asset_string
           )
@@ -98,10 +98,10 @@ describe UserProfile do
             {
               user_navigation:
                 {
-                  "enabled"=> "true",
-                  "default"=> "enabled",
-                  "text"=> "LTI or die",
-                  "visibility"=> visibility,
+                  "enabled" => "true",
+                  "default" => "enabled",
+                  "text" => "LTI or die",
+                  "visibility" => visibility,
                   'required_permissions': 'manage_data_services'
                 }
             }.with_indifferent_access
@@ -113,8 +113,8 @@ describe UserProfile do
               context: account,
               opts: { settings: additional_settings }
             )
-            tabs = @student.reload.profile.
-              tabs_available(@user, :root_account => account)
+            tabs = @student.reload.profile
+                           .tabs_available(@user, :root_account => account)
             expect(tabs.map { |t| t[:id] }).not_to include(
               account.context_external_tools.first.asset_string
             )
@@ -129,8 +129,8 @@ describe UserProfile do
             context: account,
             opts: { settings: additional_settings }
           )
-          tabs = @admin.reload.profile.
-            tabs_available(@user, :root_account => account)
+          tabs = @admin.reload.profile
+                       .tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).to include(
             account.context_external_tools.first.asset_string
           )
@@ -147,8 +147,8 @@ describe UserProfile do
               context: account,
               opts: { settings: additional_settings }
             )
-            tabs = @student.reload.profile.
-              tabs_available(@user, :root_account => account)
+            tabs = @student.reload.profile
+                           .tabs_available(@user, :root_account => account)
             expect(tabs.map { |t| t[:id] }).not_to include(
               account.context_external_tools.first.asset_string
             )
@@ -162,8 +162,8 @@ describe UserProfile do
               context: account,
               opts: { settings: additional_settings }
             )
-            tabs = @admin.reload.profile.
-              tabs_available(@user, :root_account => account)
+            tabs = @admin.reload.profile
+                         .tabs_available(@user, :root_account => account)
             expect(tabs.map { |t| t[:id] }).to include(
               account.context_external_tools.first.asset_string
             )
@@ -176,10 +176,10 @@ describe UserProfile do
           {
             user_navigation:
               {
-                "enabled"=> "true",
-                "default"=> "enabled",
-                "text"=> "LTI or die",
-                "visibility"=> visibility,
+                "enabled" => "true",
+                "default" => "enabled",
+                "text" => "LTI or die",
+                "visibility" => visibility,
                 'required_permissions': 'manage_data_services'
               }
           }.with_indifferent_access
@@ -191,8 +191,8 @@ describe UserProfile do
             context: account,
             opts: { settings: additional_settings }
           )
-          tabs = @admin.reload.profile.
-            tabs_available(@user, :root_account => account)
+          tabs = @admin.reload.profile
+                       .tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).to include(
             account.context_external_tools.first.asset_string
           )
@@ -202,8 +202,8 @@ describe UserProfile do
 
     it "should show announcements tab" do
       student_in_course(active_all: true)
-      tabs = @student.profile.
-        tabs_available(@student, root_account: account)
+      tabs = @student.profile
+                     .tabs_available(@student, root_account: account)
       expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PAST_GLOBAL_ANNOUNCEMENTS
     end
 

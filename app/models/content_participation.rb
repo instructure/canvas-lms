@@ -36,7 +36,7 @@ class ContentParticipation < ActiveRecord::Base
     state :read
   end
 
-  def self.create_or_update(opts={})
+  def self.create_or_update(opts = {})
     opts = opts.with_indifferent_access
     content = opts.delete(:content)
     user = opts.delete(:user)
@@ -54,12 +54,13 @@ class ContentParticipation < ActiveRecord::Base
 
   def update_participation_count
     return unless saved_change_to_workflow_state?
+
     ContentParticipationCount.create_or_update({
-      :context => content.context,
-      :user => user,
-      :content_type => content_type,
-      :offset => (workflow_state == "unread" ? 1 : -1),
-    })
+                                                 :context => content.context,
+                                                 :user => user,
+                                                 :content_type => content_type,
+                                                 :offset => (workflow_state == "unread" ? 1 : -1),
+                                               })
   end
 
   def set_root_account_id

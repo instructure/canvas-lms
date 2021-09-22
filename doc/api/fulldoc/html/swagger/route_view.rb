@@ -48,15 +48,14 @@ class RouteView < HashView
     str.gsub(/\([^\)]+\)/, '')
   end
 
-
   def path_variables
-    api_path.scan(%r{:(\w+)}).map{ |v| v.first }
+    api_path.scan(%r{:(\w+)}).map { |v| v.first }
   end
 
   def swagger_path
-    api_path.
-      gsub(%r{^/api}, '').
-      gsub(%r{:(\w+)}, '{\1}')
+    api_path
+      .gsub(%r{^/api}, '')
+      .gsub(%r{:(\w+)}, '{\1}')
   end
 
   def verb
@@ -70,7 +69,7 @@ class RouteView < HashView
   end
 
   def query_arg_names
-    query_args.map{ |arg| arg.name }
+    query_args.map { |arg| arg.name }
   end
 
   def path_args

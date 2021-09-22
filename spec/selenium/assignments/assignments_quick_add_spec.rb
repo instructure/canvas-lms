@@ -33,7 +33,6 @@ describe 'assignments' do
   end
 
   context 'quick add' do
-
     def fill_out_quick_add_modal(type)
       get "/courses/#{@course.id}/assignments"
       f('.add_assignment').click
@@ -42,14 +41,14 @@ describe 'assignments' do
       @assignment_date = '2015-07-31'
       @assignment_points = '3'
 
-      click_option(f('[name="submission_types"]'),type)
+      click_option(f('[name="submission_types"]'), type)
 
       f('div.form-dialog-content.create_assignment_dialog > div.form-horizontal > div:nth-of-type(2) > div.controls > input').send_keys(@assignment_name)
       f('.datetime_field').send_keys(@assignment_date)
       f('input[name="points_possible"]').send_keys(@assignment_points)
     end
 
-    it 'should open quick add modal ', priority:"1", test_id: 238872 do
+    it 'should open quick add modal ', priority: "1", test_id: 238872 do
       get "/courses/#{@course.id}/assignments"
 
       f('.add_assignment').click
@@ -59,7 +58,7 @@ describe 'assignments' do
     end
 
     context 'more options button' do
-      it 'should work for assignments and transfer values', priority:"1", test_id: 56009 do
+      it 'should work for assignments and transfer values', priority: "1", test_id: 56009 do
         fill_out_quick_add_modal('Assignment')
         f('.more_options').click
 
@@ -69,7 +68,7 @@ describe 'assignments' do
         expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include('Jul 31')
       end
 
-      it 'should work for discussions and transfer values', priority:"1", test_id: 58760 do
+      it 'should work for discussions and transfer values', priority: "1", test_id: 58760 do
         fill_out_quick_add_modal('Discussion')
         f('.more_options').click
 
@@ -79,7 +78,7 @@ describe 'assignments' do
         expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include('Jul 31')
       end
 
-      it 'should work for quizzes and transfer values', priority:"1", test_id: 238873 do
+      it 'should work for quizzes and transfer values', priority: "1", test_id: 238873 do
         fill_out_quick_add_modal('Quiz')
         f('.more_options').click
 
@@ -95,15 +94,15 @@ describe 'assignments' do
       @title = 'zoidberg'
     end
 
-    it 'should work with an assignment', priority:"1", test_id: 112794 do
-      assignment = @course.assignments.create!(title: 'test assignment', name:@title, workflow_state: "published")
+    it 'should work with an assignment', priority: "1", test_id: 112794 do
+      assignment = @course.assignments.create!(title: 'test assignment', name: @title, workflow_state: "published")
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
 
       expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
     end
 
-    it 'should work with a quiz', priority:"1", test_id: 269809 do
+    it 'should work with a quiz', priority: "1", test_id: 269809 do
       assignment = @course.assignments.create(title: @title, submission_types: "online_quiz", workflow_state: "published")
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
@@ -111,8 +110,8 @@ describe 'assignments' do
       expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
     end
 
-    it 'should work with a graded discussion', priority:"1", test_id: 269810 do
-      assignment = @course.assignments.create!(name:  @title, submission_types: 'discussion_topic')
+    it 'should work with a graded discussion', priority: "1", test_id: 269810 do
+      assignment = @course.assignments.create!(name: @title, submission_types: 'discussion_topic')
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
       expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)

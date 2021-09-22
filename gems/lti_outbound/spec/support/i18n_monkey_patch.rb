@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#Any including Application will need to perform the override in order for this gem to function as expected.
+# Any including Application will need to perform the override in order for this gem to function as expected.
 
 module I18n
   class << self

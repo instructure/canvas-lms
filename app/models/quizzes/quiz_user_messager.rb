@@ -25,9 +25,9 @@ module Quizzes
     attr_reader :root_account_id, :context_id
 
     def_delegators :@user_finder,
-      :submitted_students,
-      :all_students,
-      :unsubmitted_students
+                   :submitted_students,
+                   :all_students,
+                   :unsubmitted_students
 
     def initialize(options)
       @quiz = options.fetch(:quiz)

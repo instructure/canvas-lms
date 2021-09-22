@@ -19,7 +19,6 @@
 #
 
 module Api::V1::Conferences
-
   API_CONFERENCE_JSON_OPTS = {
     :only => %w(
       id title conference_type description
@@ -30,8 +29,8 @@ module Api::V1::Conferences
   }.freeze
 
   def api_conferences_json(conferences, user, session)
-    json = conferences.map {|c| api_conference_json(c, user, session)}
-    {'conferences' => json}
+    json = conferences.map { |c| api_conference_json(c, user, session) }
+    { 'conferences' => json }
   end
 
   def api_conference_json(conference, user, session)
@@ -75,7 +74,7 @@ module Api::V1::Conferences
       permissions: {
         user: user,
         session: session,
-        },
+      },
       url: named_context_url(context, :context_conferences_url),
     )
   end
@@ -108,7 +107,7 @@ module Api::V1::Conferences
   def translate_strings(object)
     object.each_with_object({}) do |(k, v), h|
       if v.is_a? Array
-        h[k] = v.map{|a| translate_strings(a)}
+        h[k] = v.map { |a| translate_strings(a) }
       else
         h[k] = v.respond_to?(:call) ? v.call() : v
       end
@@ -117,13 +116,11 @@ module Api::V1::Conferences
 
   def signed_id_invalid_json
     { status: I18n.t(:unprocessable_entity, 'unprocessable entity'),
-      errors: [{message: I18n.t(:unprocessable_entity_message, 'Signed meeting id invalid')}]
-    }.to_json
+      errors: [{ message: I18n.t(:unprocessable_entity_message, 'Signed meeting id invalid') }] }.to_json
   end
 
   def invalid_jwt_token_json
-    {status: I18n.t(:unauthorized, 'unauthorized'),
-     errors: [{message: I18n.t(:unauthorized_message, 'JWT signature invalid')}]
-    }.to_json
+    { status: I18n.t(:unauthorized, 'unauthorized'),
+      errors: [{ message: I18n.t(:unauthorized_message, 'JWT signature invalid') }] }.to_json
   end
 end

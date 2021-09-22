@@ -19,97 +19,97 @@
 #
 
 module Lti
-# @API Originality Reports
-# **LTI API for OriginalityReports (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
-#
-# Originality reports may be used by external tools providing plagiarism
-# detection services to give an originality score to an assignment
-# submission's file. An originality report has an associated
-# file ID (the file submitted by the student) and an originality score
-# between 0 and 100.
-#
-# Note that when creating or updating an originality report a
-# `tool_setting[resource_type_code]` may be specified as part of the originality report.
-# This parameter should be used if the tool provider wishes to display
-# originality reports as LTI launches.
-#
-# The value of `tool_setting[resource_type_code]` should be a
-# resource_handler's "resource_type" code. Canvas will lookup the resource
-# handler specified and do a launch to the message with the type
-# "basic-lti-launch-request" using its "path". If the optional
-# `tool_setting[resource_url]` parameter is provided, Canvas
-# will use this URL instead of the message's `path` but will
-# still send all the parameters specified by the message. When using the
-# `tool_setting[resource_url]` the `tool_setting[resource_type_code]` must also be
-# specified.
-#
-# @model ToolSetting
-#     {
-#       "id": "ToolSetting",
-#       "description": "",
-#       "properties": {
-#          "resource_type_code": {
-#            "description": "the resource type code of the resource handler to use to display originality reports",
-#            "example": "originality_reports",
-#            "type": "string"
-#          },
-#          "resource_url": {
-#            "description": "a URL that may be used to override the launch URL inferred by the specified resource_type_code. If used a 'resource_type_code' must also be specified.",
-#            "example": "http://www.test.com/originality_report",
-#            "type": "string"
-#          }
-#       }
-#     }
-#
-# @model OriginalityReport
-#     {
-#       "id": "OriginalityReport",
-#       "description": "",
-#       "properties": {
-#         "id": {
-#           "description": "The id of the OriginalityReport",
-#           "example": "4",
-#           "type": "integer"
-#         },
-#         "file_id": {
-#           "description": "The id of the file receiving the originality score",
-#           "example": "8",
-#           "type": "integer"
-#         },
-#         "originality_score": {
-#           "description": "A number between 0 and 100 representing the originality score",
-#           "example": "0.16",
-#           "type": "number"
-#         },
-#         "originality_report_file_id": {
-#           "description": "The ID of the file within Canvas containing the originality report document (if provided)",
-#           "example": "23",
-#           "type": "integer"
-#         },
-#         "originality_report_url": {
-#           "description": "A non-LTI launch URL where the originality score of the file may be found.",
-#           "example": "http://www.example.com/report",
-#           "type": "string"
-#         },
-#         "tool_setting": {
-#            "description": "A ToolSetting object containing optional 'resource_type_code' and 'resource_url'",
-#            "$ref": "ToolSetting"
-#         },
-#         "error_report": {
-#            "description": "A message describing the error. If set, the workflow_state will become 'error.'",
-#            "type": "string"
-#         },
-#         "submission_time": {
-#            "description": "The submitted_at date time of the submission.",
-#            "type": "datetime"
-#         },
-#         "root_account_id": {
-#            "description": "The id of the root Account associated with the OriginalityReport",
-#            "example": "1",
-#            "type": "integer"
-#         }
-#       }
-#     }
+  # @API Originality Reports
+  # **LTI API for OriginalityReports (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # Originality reports may be used by external tools providing plagiarism
+  # detection services to give an originality score to an assignment
+  # submission's file. An originality report has an associated
+  # file ID (the file submitted by the student) and an originality score
+  # between 0 and 100.
+  #
+  # Note that when creating or updating an originality report a
+  # `tool_setting[resource_type_code]` may be specified as part of the originality report.
+  # This parameter should be used if the tool provider wishes to display
+  # originality reports as LTI launches.
+  #
+  # The value of `tool_setting[resource_type_code]` should be a
+  # resource_handler's "resource_type" code. Canvas will lookup the resource
+  # handler specified and do a launch to the message with the type
+  # "basic-lti-launch-request" using its "path". If the optional
+  # `tool_setting[resource_url]` parameter is provided, Canvas
+  # will use this URL instead of the message's `path` but will
+  # still send all the parameters specified by the message. When using the
+  # `tool_setting[resource_url]` the `tool_setting[resource_type_code]` must also be
+  # specified.
+  #
+  # @model ToolSetting
+  #     {
+  #       "id": "ToolSetting",
+  #       "description": "",
+  #       "properties": {
+  #          "resource_type_code": {
+  #            "description": "the resource type code of the resource handler to use to display originality reports",
+  #            "example": "originality_reports",
+  #            "type": "string"
+  #          },
+  #          "resource_url": {
+  #            "description": "a URL that may be used to override the launch URL inferred by the specified resource_type_code. If used a 'resource_type_code' must also be specified.",
+  #            "example": "http://www.test.com/originality_report",
+  #            "type": "string"
+  #          }
+  #       }
+  #     }
+  #
+  # @model OriginalityReport
+  #     {
+  #       "id": "OriginalityReport",
+  #       "description": "",
+  #       "properties": {
+  #         "id": {
+  #           "description": "The id of the OriginalityReport",
+  #           "example": "4",
+  #           "type": "integer"
+  #         },
+  #         "file_id": {
+  #           "description": "The id of the file receiving the originality score",
+  #           "example": "8",
+  #           "type": "integer"
+  #         },
+  #         "originality_score": {
+  #           "description": "A number between 0 and 100 representing the originality score",
+  #           "example": "0.16",
+  #           "type": "number"
+  #         },
+  #         "originality_report_file_id": {
+  #           "description": "The ID of the file within Canvas containing the originality report document (if provided)",
+  #           "example": "23",
+  #           "type": "integer"
+  #         },
+  #         "originality_report_url": {
+  #           "description": "A non-LTI launch URL where the originality score of the file may be found.",
+  #           "example": "http://www.example.com/report",
+  #           "type": "string"
+  #         },
+  #         "tool_setting": {
+  #            "description": "A ToolSetting object containing optional 'resource_type_code' and 'resource_url'",
+  #            "$ref": "ToolSetting"
+  #         },
+  #         "error_report": {
+  #            "description": "A message describing the error. If set, the workflow_state will become 'error.'",
+  #            "type": "string"
+  #         },
+  #         "submission_time": {
+  #            "description": "The submitted_at date time of the submission.",
+  #            "type": "datetime"
+  #         },
+  #         "root_account_id": {
+  #            "description": "The id of the root Account associated with the OriginalityReport",
+  #            "example": "1",
+  #            "type": "integer"
+  #         }
+  #       }
+  #     }
   class OriginalityReportsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
@@ -299,7 +299,7 @@ module Lti
     end
 
     def lti_link_attributes
-       [tool_setting: %i(resource_url resource_type_code)].freeze
+      [tool_setting: %i(resource_url resource_type_code)].freeze
     end
 
     def assignment
@@ -356,10 +356,10 @@ module Lti
       @_lti_link_params ||= begin
         if lti_link_settings&.dig('tool_setting', 'resource_type_code')
           lti_link_settings['tool_setting'].merge({
-            id: @report&.lti_link&.id,
-            product_code: tool_proxy.product_family.product_code,
-            vendor_code: tool_proxy.product_family.vendor_code
-          })
+                                                    id: @report&.lti_link&.id,
+                                                    product_code: tool_proxy.product_family.product_code,
+                                                    vendor_code: tool_proxy.product_family.vendor_code
+                                                  })
         else
           {
             id: @report&.lti_link&.id,
@@ -393,18 +393,21 @@ module Lti
       # Assign @version so if create a new originality report, we can match up
       # the submission time with the version.  This is important because they
       # could be creating a report for the version that is not the latest.
-      @version = submission.versions.map(&:model).find{|m| m.attempt.to_s == attempt.to_s}
+      @version = submission.versions.map(&:model).find { |m| m.attempt.to_s == attempt.to_s }
       raise ActiveRecord::RecordNotFound unless @version
+
       submission.originality_reports.find_by(submission_time: @version.submitted_at)
     end
 
     def find_originality_report
       raise ActiveRecord::RecordNotFound if submission.blank?
+
       @report = OriginalityReport.find_by(id: params[:id])
       # Note: we could end up looking up by file_id, attachment: nil or attempt
       # even in the `update` or `show` endpoints, if they give us a bogus report id :/
       @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?
+
       unless attachment_required?
         # For Text Entry cases (there is never an attachment), in the `create`
         # method, clients can choose which submission version the report is for
@@ -421,6 +424,7 @@ module Lti
 
     def report_by_attachment(attachment)
       return if attachment.blank?
+
       if submission.present?
         OriginalityReport.find_by(attachment_id: attachment&.id, submission: submission)
       else
@@ -430,18 +434,20 @@ module Lti
 
     def report_in_context
       raise ActiveRecord::RecordNotFound if @report.blank?
+
       verify_submission_attachment(@report.attachment, submission)
     end
 
     def attachment_in_history?(attachment, submission)
       submission.submission_history.any? do |s|
         s.attachment_ids.include?(attachment.id.to_s) ||
-        s.attachment_ids.include?(attachment.global_id.to_s)
+          s.attachment_ids.include?(attachment.global_id.to_s)
       end
     end
 
     def verify_submission_attachment(attachment, submission)
       raise ActiveRecord::RecordNotFound if submission.blank? || (attachment_required? && attachment.blank?)
+
       if submission.assignment != assignment || (attachment_required? && !attachment_in_history?(attachment, submission))
         render_unauthorized_action
       end

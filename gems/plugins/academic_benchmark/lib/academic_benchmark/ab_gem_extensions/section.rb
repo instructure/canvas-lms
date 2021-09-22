@@ -23,11 +23,11 @@ module AcademicBenchmarks
   module Standards
     class Section
       include Common
-      def build_outcomes(ratings={}, _parent=nil)
+      def build_outcomes(ratings = {}, _parent = nil)
         build_common_outcomes(ratings).merge!({
-          title: description,
-          description: description,
-        })
+                                                title: description,
+                                                description: description,
+                                              })
       end
     end
   end

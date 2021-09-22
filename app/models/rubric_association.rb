@@ -30,8 +30,8 @@ class RubricAssociation < ActiveRecord::Base
 
   belongs_to :rubric
   belongs_to :association_object, polymorphic: [:account, :course, :assignment],
-             foreign_type: :association_type, foreign_key: :association_id,
-             polymorphic_prefix: :association
+                                  foreign_type: :association_type, foreign_key: :association_id,
+                                  polymorphic_prefix: :association
 
   belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_assessments
@@ -40,7 +40,7 @@ class RubricAssociation < ActiveRecord::Base
   has_a_broadcast_policy
 
   validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
-  validates :workflow_state, inclusion: {in: ["active", "deleted"]}
+  validates :workflow_state, inclusion: { in: ["active", "deleted"] }
 
   before_create :set_root_account_id
   before_save :update_assignment_points
@@ -75,11 +75,14 @@ class RubricAssociation < ActiveRecord::Base
   # object.
   def self.get_association_object(params)
     return nil unless params
+
     a_type = params.delete(:association_type)
     a_id = params.delete(:association_id)
     return @context if a_type == @context.class.to_s && a_id == @context.id
+
     klass = ValidAssociationModels[a_type]
     return nil unless klass
+
     klass.where(id: a_id).first if a_id.present? # authorization is checked in the calling method
   end
 
@@ -95,7 +98,7 @@ class RubricAssociation < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
     p.to { self.context.students rescue [] }
-    p.whenever {|record|
+    p.whenever { |record|
       record.just_created && !record.context.is_a?(Course)
     }
     p.data { course_broadcast_data }
@@ -171,22 +174,24 @@ class RubricAssociation < ActiveRecord::Base
 
   def user_can_assess_for?(assessor: nil, assessee: nil)
     raise "assessor and assessee required" unless assessor && assessee
+
     self.context.grants_right?(assessor, :manage_grades) || self.assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id)
   end
 
   def user_did_assess_for?(assessor: nil, assessee: nil)
     raise "assessor and assessee required" unless assessor && assessee
+
     self.assessment_requests.complete.for_assessee(assessee).for_assessor(assessor).any?
   end
 
   set_policy do
-    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete and can :manage
 
-    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) }
+    given { |user, session| self.context.grants_right?(user, session, :participate_as_student) }
     can :submit
 
-    given {|user, session| self.context.grants_right?(user, session, :view_all_grades)}
+    given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
     can :view_rubric_assessments
   end
 
@@ -235,17 +240,19 @@ class RubricAssociation < ActiveRecord::Base
   protected :link_to_assessments
 
   def unsubmitted_users
-    self.context.students - self.rubric_assessments.map{|a| a.user} - self.assessment_requests.map{|a| a.user}
+    self.context.students - self.rubric_assessments.map { |a| a.user } - self.assessment_requests.map { |a| a.user }
   end
 
   def self.generate(current_user, rubric, context, params)
     raise "context required" unless context
+
     association_object = params.delete :association_object
     if (association_id = params.delete(:id)) && association_id.present?
       association = RubricAssociation.where(id: association_id).first
     end
     association = nil unless association && association.context == context && association.association_object == association_object
     raise "association required" unless association || association_object
+
     # Update/create the association -- this is what ties the rubric to an entity
     update_if_existing = params.delete(:update_if_existing)
     if params[:hide_points] == '1'
@@ -284,7 +291,7 @@ class RubricAssociation < ActiveRecord::Base
   end
   protected :assessment_points
 
-  def assess(opts={})
+  def assess(opts = {})
     # TODO: what if this is for a group assignment?  Seems like it should
     # give all students for the group assignment the same rubric assessment
     # results.
@@ -353,7 +360,7 @@ class RubricAssociation < ActiveRecord::Base
           self.summary_data[:saved_comments][criterion.id.to_s] ||= []
           self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
           # TODO i18n
-          self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select{|desc| desc && !desc.empty? && desc != "No Details"}.uniq.sort
+          self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc && !desc.empty? && desc != "No Details" }.uniq.sort
           self.save
         end
         rating[:description] = t('no_details', "No details") if !rating[:description] || rating[:description].empty?
@@ -397,10 +404,10 @@ class RubricAssociation < ActiveRecord::Base
     existing_association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     event_type = existing_association.present? ? 'rubric_updated' : 'rubric_created'
     payload = if event_type == 'rubric_created'
-      {id: rubric_id}
-    else
-      {id: [existing_association.rubric_id, rubric_id]}
-    end
+                { id: rubric_id }
+              else
+                { id: [existing_association.rubric_id, rubric_id] }
+              end
 
     AnonymousOrModerationEvent.create!(
       assignment: assignment,
@@ -414,7 +421,7 @@ class RubricAssociation < ActiveRecord::Base
     AnonymousOrModerationEvent.create!(
       assignment: assignment,
       event_type: 'rubric_deleted',
-      payload: {id: rubric_id},
+      payload: { id: rubric_id },
       user: @updating_user
     )
   end

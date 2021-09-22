@@ -48,6 +48,7 @@ module CC
 
         @course.assessment_question_banks.active.each do |bank|
           next unless export_object?(bank)
+
           begin
             generate_question_bank(bank)
           rescue
@@ -87,7 +88,7 @@ module CC
         end
       end
 
-      def generate_quiz(quiz, for_cc=true)
+      def generate_quiz(quiz, for_cc = true)
         add_exported_asset(quiz)
 
         cc_qti_migration_id = create_key(quiz)
@@ -100,7 +101,7 @@ module CC
         cc_qti_path = File.join(@export_dir, cc_qti_rel_path)
 
         File.open(cc_qti_path, 'w') do |file|
-          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          doc = Builder::XmlMarkup.new(:target => file, :indent => 2)
           generate_assessment(doc, quiz, cc_qti_migration_id, for_cc)
         end
 
@@ -109,7 +110,7 @@ module CC
           canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + QTI_EXTENSION)
           canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
           File.open(canvas_qti_path, 'w') do |file|
-            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            doc = Builder::XmlMarkup.new(:target => file, :indent => 2)
             generate_assessment(doc, quiz, cc_qti_migration_id, false)
           end
         end
@@ -119,25 +120,25 @@ module CC
         meta_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_META)
         meta_path = File.join(resource_dir, ASSESSMENT_META)
         File.open(meta_path, 'w') do |file|
-          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          doc = Builder::XmlMarkup.new(:target => file, :indent => 2)
           generate_assessment_meta(doc, quiz, cc_qti_migration_id)
         end
 
         @resources_node.resource(
-                :identifier => cc_qti_migration_id,
-                "type" => for_cc ? ASSESSMENT_TYPE : QTI_ASSESSMENT_TYPE
+          :identifier => cc_qti_migration_id,
+          "type" => for_cc ? ASSESSMENT_TYPE : QTI_ASSESSMENT_TYPE
         ) do |res|
-          res.file(:href=>cc_qti_rel_path)
-          res.dependency(:identifierref=>alt_migration_id)
+          res.file(:href => cc_qti_rel_path)
+          res.dependency(:identifierref => alt_migration_id)
         end
 
         @resources_node.resource(
-                :identifier => alt_migration_id,
-                :type => LOR,
-                :href => meta_rel_path
+          :identifier => alt_migration_id,
+          :type => LOR,
+          :href => meta_rel_path
         ) do |res|
-          res.file(:href=>meta_rel_path)
-          res.file(:href=>canvas_qti_rel_path) if for_cc
+          res.file(:href => meta_rel_path)
+          res.file(:href => canvas_qti_rel_path) if for_cc
         end
       end
 
@@ -149,6 +150,7 @@ module CC
 
         @course.quizzes.active.each do |quiz|
           next unless export_object?(quiz)
+
           begin
             generate_quiz(quiz, false)
           rescue
@@ -166,26 +168,25 @@ module CC
         rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + QTI_EXTENSION)
         full_path = File.join(@export_dir, rel_path)
         File.open(full_path, 'w') do |file|
-          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          doc = Builder::XmlMarkup.new(:target => file, :indent => 2)
           generate_bank(doc, bank, bank_mig_id)
         end
 
         @resources_node.resource(
-                :identifier => bank_mig_id,
-                :type => LOR,
-                :href => rel_path
+          :identifier => bank_mig_id,
+          :type => LOR,
+          :href => rel_path
         ) do |res|
-          res.file(:href=>rel_path)
+          res.file(:href => rel_path)
         end
       end
 
       def generate_assessment_meta(doc, quiz, migration_id)
         doc.instruct!
         doc.quiz("identifier" => migration_id,
-                        "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-        ) do |q_node|
+                 "xmlns" => CCHelper::CANVAS_NAMESPACE,
+                 "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                 "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}") do |q_node|
           q_node.title quiz.title
           q_node.description @html_exporter.html_content(quiz.description || '')
           q_node.lock_at ims_datetime(quiz.lock_at, nil) if quiz.lock_at
@@ -219,7 +220,7 @@ module CC
           q_node.module_locked quiz.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = create_key(quiz.assignment)
-            doc.assignment(:identifier=>assignment_migration_id) do |a|
+            doc.assignment(:identifier => assignment_migration_id) do |a|
               AssignmentResources.create_canvas_assignment(a, quiz.assignment, @manifest)
             end
           end
@@ -232,6 +233,7 @@ module CC
               override_attrs = o.slice(:set_type, :set_id, :title)
               AssignmentOverride.overridden_dates.each do |field|
                 next unless o.send("#{field}_overridden")
+
                 override_attrs[field] = o[field]
               end
               ao_node.override(override_attrs)
@@ -240,18 +242,17 @@ module CC
         end
       end
 
-      def generate_assessment(doc, quiz, migration_id, for_cc=true)
+      def generate_assessment(doc, quiz, migration_id, for_cc = true)
         doc.instruct!
 
         xsd_uri = for_cc ? 'http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_qtiasiv1p2p1_v1p0.xsd' : 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd'
 
         doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 #{xsd_uri}"
-        ) do |qti_node|
+                            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                            "xsi:schemaLocation" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 #{xsd_uri}") do |qti_node|
           qti_node.assessment(
-                  :ident => migration_id,
-                  :title => quiz.title
+            :ident => migration_id,
+            :title => quiz.title
           ) do |asmnt_node|
             asmnt_node.qtimetadata do |meta_node|
               if for_cc
@@ -266,7 +267,7 @@ module CC
             end # meta_node
 
             asmnt_node.section(
-                    :ident => "root_section"
+              :ident => "root_section"
             ) do |section_node|
               quiz.root_entries.each do |item|
                 if item[:answers]
@@ -291,13 +292,11 @@ module CC
       def generate_bank(doc, bank, migration_id)
         doc.instruct!
         doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd"
-        ) do |qti_node|
+                            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                            "xsi:schemaLocation" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd") do |qti_node|
           qti_node.objectbank(
-                  :ident => migration_id
+            :ident => migration_id
           ) do |bank_node|
-
             bank_node.qtimetadata do |meta_node|
               meta_field(meta_node, 'bank_title', bank.title)
             end # meta_node
@@ -305,7 +304,6 @@ module CC
             bank.assessment_questions.active.each do |aq|
               add_question(bank_node, aq.data.with_indifferent_access)
             end
-
           end # bank_node
         end # qti node
       end
@@ -344,8 +342,8 @@ module CC
       def add_group(node, group)
         id = create_key("quizzes/quiz_group_#{group['id']}")
         node.section(
-                :ident => id,
-                :title => group['name']
+          :ident => id,
+          :title => group['name']
         ) do |section_node|
           section_node.selection_ordering do |so_node|
             so_node.selection do |sel_node|
@@ -378,7 +376,6 @@ module CC
           end
         end # section node
       end
-
     end
   end
 end

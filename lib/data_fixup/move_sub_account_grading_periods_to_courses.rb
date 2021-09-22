@@ -49,6 +49,7 @@ module DataFixup::MoveSubAccountGradingPeriodsToCourses
   def self.copy_periods_to_courses_under_account(account, current_grading_period_group)
     account.courses.find_each do |course|
       next if course.grading_periods.active.exists?
+
       copy_periods_to_course(course, current_grading_period_group)
     end
   end

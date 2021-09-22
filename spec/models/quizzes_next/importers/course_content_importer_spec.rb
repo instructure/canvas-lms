@@ -64,15 +64,15 @@ describe QuizzesNext::Importers::CourseContentImporter do
     let(:data) { double }
 
     before do
-      allow(migration).
-        to receive(:imported_migration_items_by_class).
-        with(Quizzes::Quiz).
-        and_return([quiz01, quiz02, quiz03, practice_quiz])
+      allow(migration)
+        .to receive(:imported_migration_items_by_class)
+        .with(Quizzes::Quiz)
+        .and_return([quiz01, quiz02, quiz03, practice_quiz])
     end
 
     it 'makes lti assignments' do
-      expect(Importers::CourseContentImporter).
-        to receive(:import_content)
+      expect(Importers::CourseContentImporter)
+        .to receive(:import_content)
       original_setup_assets_imported = importer.method(:setup_assets_imported)
       expect(importer).to receive(:setup_assets_imported) do |lti_assignment_quiz_set|
         expect(migration.workflow_state).not_to eq('imported')
@@ -82,13 +82,13 @@ describe QuizzesNext::Importers::CourseContentImporter do
       expect(migration.workflow_state).to eq('imported')
       practice_assginment = Assignment.find_by(title: practice_quiz_title)
       expect(practice_assginment).not_to be_nil
-      expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set]).
-        to eq([
-          [assignment01.global_id, quiz01.global_id],
-          [assignment02.global_id, quiz02.global_id],
-          [quiz03.assignment.global_id, quiz03.global_id],
-          [practice_assginment.global_id, practice_quiz.global_id]
-        ])
+      expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set])
+        .to eq([
+                 [assignment01.global_id, quiz01.global_id],
+                 [assignment02.global_id, quiz02.global_id],
+                 [quiz03.assignment.global_id, quiz03.global_id],
+                 [practice_assginment.global_id, practice_quiz.global_id]
+               ])
       expect(practice_assginment.omit_from_final_grade).to be(true)
     end
   end
@@ -100,13 +100,13 @@ describe QuizzesNext::Importers::CourseContentImporter do
 
     before do
       allow(migration).to receive(:context).and_return(context)
-      allow(context).to receive(:instance_of?).
-        with(Course).and_return(false)
+      allow(context).to receive(:instance_of?)
+        .with(Course).and_return(false)
     end
 
     it 'does nothing' do
-      expect(Importers::CourseContentImporter).
-        to receive(:import_content).never
+      expect(Importers::CourseContentImporter)
+        .to receive(:import_content).never
       importer.import_content(double)
     end
   end

@@ -20,9 +20,7 @@
 
 require 'account_reports/report_helper'
 
-
 module AccountReports
-
   class OutcomeReports
     include ReportHelper
 
@@ -33,7 +31,7 @@ module AccountReports
     end
 
     def self.student_assignment_outcome_headers
-       {
+      {
         'student name' => I18n.t('student name'),
         'student id' => I18n.t('student id'),
         'student sis id' => I18n.t('student sis id'),
@@ -117,8 +115,8 @@ module AccountReports
         :account_id => account.id,
         :root_account_id => root_account.id
       }
-      students = root_account.pseudonyms.except(:preload).
-        select(%{
+      students = root_account.pseudonyms.except(:preload)
+                             .select(%{
           pseudonyms.id,
           u.sortable_name        AS "student name",
           pseudonyms.user_id     AS "student id",
@@ -146,8 +144,8 @@ module AccountReports
           lo.context_id          AS "outcome context id",
           lo.context_type        AS "outcome context type",
           acct.id                AS "account id",
-          acct.name              AS "account name"}).
-        joins(Pseudonym.send(:sanitize_sql, ["
+          acct.name              AS "account name"})
+                             .joins(Pseudonym.send(:sanitize_sql, ["
           INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
           INNER JOIN (
             SELECT user_id, course_id, course_section_id, workflow_state
@@ -175,8 +173,8 @@ module AccountReports
               AND r.content_tag_id = ct.id)
             LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
               AND sub.user_id = pseudonyms.user_id AND sub.workflow_state <> 'deleted'
-              AND sub.workflow_state <> 'unsubmitted'", parameters])).
-        where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
+              AND sub.workflow_state <> 'unsubmitted'", parameters]))
+                             .where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
             AND (r.id IS NULL OR (r.workflow_state <> 'deleted' AND r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
@@ -188,68 +186,68 @@ module AccountReports
     end
 
     def outcome_results_scope
-      students = account.learning_outcome_links.active.
-        select(<<~SELECT).
-          distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
-          u.sortable_name                             AS "student name",
-          p.user_id                                   AS "student id",
-          p.sis_user_id                               AS "student sis id",
-          a.id                                        AS "assignment id",
-          COALESCE(q.title, a.title)                  AS "assessment title",
-          COALESCE(q.id, a.id)                        AS "assessment id",
-          COALESCE(qs.finished_at, subs.submitted_at) AS "submission date",
-          COALESCE(qs.score, subs.score)              AS "submission score",
-          aq.name                                     AS "assessment question",
-          aq.id                                       AS "assessment question id",
-          learning_outcomes.short_description         AS "learning outcome name",
-          learning_outcomes.id                        AS "learning outcome id",
-          learning_outcomes.display_name              AS "learning outcome friendly name",
-          COALESCE(qr.possible, r.possible)           AS "learning outcome points possible",
-          COALESCE(qr.mastery, r.mastery)             AS "learning outcome mastered",
-          learning_outcomes.data                      AS "learning outcome data",
-          COALESCE(qr.attempt, r.attempt)             AS "attempt",
-          r.hide_points                               AS "learning outcome points hidden",
-          COALESCE(qr.score, r.score)                 AS "outcome score",
-          r.percent                                   AS "total percent outcome score",
-          c.name                                      AS "course name",
-          c.id                                        AS "course id",
-          c.sis_source_id                             AS "course sis id",
-          CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
-               WHEN ct.content_type = 'Assignment' THEN 'assignment'
-          END                                         AS "assessment type",
-          s.name                                      AS "section name",
-          s.id                                        AS "section id",
-          s.sis_source_id                             AS "section sis id",
-          e.workflow_state                            AS "enrollment state",
-          acct.id                                     AS "account id",
-          acct.name                                   AS "account name"
-        SELECT
-        joins(<<~JOINS).
-          INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
-            AND content_tags.content_type = 'LearningOutcome'
-          INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
-          INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
-          INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
-          INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
-          INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
-          INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
-          INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}
-            AND e.user_id = p.user_id AND e.course_id = c.id
-            #{@include_deleted ? '' : "AND e.workflow_state <> 'deleted'"}
-          INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-          LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
-          LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
-           AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
-          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.id = ct.content_id
-           AND ct.content_type = 'Assignment') OR a.id = q.assignment_id
-          LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
-           AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
-          LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
-           AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
-          LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
-           AND qr.associated_asset_type = 'AssessmentQuestion'
-        JOINS
-        where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
+      students = account.learning_outcome_links.active
+                        .select(<<~SELECT).
+                          distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
+                          u.sortable_name                             AS "student name",
+                          p.user_id                                   AS "student id",
+                          p.sis_user_id                               AS "student sis id",
+                          a.id                                        AS "assignment id",
+                          COALESCE(q.title, a.title)                  AS "assessment title",
+                          COALESCE(q.id, a.id)                        AS "assessment id",
+                          COALESCE(qs.finished_at, subs.submitted_at) AS "submission date",
+                          COALESCE(qs.score, subs.score)              AS "submission score",
+                          aq.name                                     AS "assessment question",
+                          aq.id                                       AS "assessment question id",
+                          learning_outcomes.short_description         AS "learning outcome name",
+                          learning_outcomes.id                        AS "learning outcome id",
+                          learning_outcomes.display_name              AS "learning outcome friendly name",
+                          COALESCE(qr.possible, r.possible)           AS "learning outcome points possible",
+                          COALESCE(qr.mastery, r.mastery)             AS "learning outcome mastered",
+                          learning_outcomes.data                      AS "learning outcome data",
+                          COALESCE(qr.attempt, r.attempt)             AS "attempt",
+                          r.hide_points                               AS "learning outcome points hidden",
+                          COALESCE(qr.score, r.score)                 AS "outcome score",
+                          r.percent                                   AS "total percent outcome score",
+                          c.name                                      AS "course name",
+                          c.id                                        AS "course id",
+                          c.sis_source_id                             AS "course sis id",
+                          CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
+                               WHEN ct.content_type = 'Assignment' THEN 'assignment'
+                          END                                         AS "assessment type",
+                          s.name                                      AS "section name",
+                          s.id                                        AS "section id",
+                          s.sis_source_id                             AS "section sis id",
+                          e.workflow_state                            AS "enrollment state",
+                          acct.id                                     AS "account id",
+                          acct.name                                   AS "account name"
+                        SELECT
+                 joins(<<~JOINS).
+                   INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
+                     AND content_tags.content_type = 'LearningOutcome'
+                   INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
+                   INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
+                   INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
+                   INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
+                   INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
+                   INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
+                   INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}
+                     AND e.user_id = p.user_id AND e.course_id = c.id
+                     #{@include_deleted ? '' : "AND e.workflow_state <> 'deleted'"}
+                   INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
+                   LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
+                   LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
+                    AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
+                   LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.id = ct.content_id
+                    AND ct.content_type = 'Assignment') OR a.id = q.assignment_id
+                   LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
+                    AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
+                   LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
+                    AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
+                   LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
+                    AND qr.associated_asset_type = 'AssessmentQuestion'
+                 JOINS
+                 where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
       unless @include_deleted
         students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
@@ -266,9 +264,9 @@ module AccountReports
       order_options = %w(users courses outcomes)
       select = order_options & [param]
 
-      order_sql = {'users' => 'u.id, learning_outcomes.id, c.id',
-                   'courses' => 'c.id, u.id, learning_outcomes.id',
-                   'outcomes' => 'learning_outcomes.id, u.id, c.id'}
+      order_sql = { 'users' => 'u.id, learning_outcomes.id, c.id',
+                    'courses' => 'c.id, u.id, learning_outcomes.id',
+                    'outcomes' => 'learning_outcomes.id, u.id, c.id' }
       if select.length == 1
         order = order_sql[select.first]
         add_extra_text(I18n.t('account_reports.outcomes.order',
@@ -319,7 +317,7 @@ module AccountReports
       result = {}
       proficiency = course.resolved_outcome_proficiency
       ratings = proficiency_ratings(proficiency)
-      result[:mastery_points] = ratings.find {|rating| rating[:mastery] }[:points]
+      result[:mastery_points] = ratings.find { |rating| rating[:mastery] }[:points]
       result[:points_possible] = ratings.first[:points]
       result[:ratings] = ratings
       result
@@ -333,9 +331,9 @@ module AccountReports
 
     def convert_rating(rating_obj)
       {
-          description: rating_obj.description,
-          points: rating_obj.points,
-          mastery: rating_obj.mastery
+        description: rating_obj.description,
+        points: rating_obj.points,
+        mastery: rating_obj.mastery
       }
     end
 
@@ -350,16 +348,16 @@ module AccountReports
                   nil
                 else
                   (row['outcome score'] / row['learning outcome points possible']) * outcome_data[:points_possible]
-        end
+                end
       end
       score
     end
 
     def set_rating(row, score, outcome_data)
-        ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
-        rating = ratings.detect { |r| r[:points] <= score } || {}
-        row['learning outcome rating'] = rating[:description]
-        rating
+      ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
+      rating = ratings.detect { |r| r[:points] <= score } || {}
+      row['learning outcome rating'] = rating[:description]
+      rating
     end
 
     def hide_points(row)
@@ -372,16 +370,16 @@ module AccountReports
     def add_outcomes_data(row)
       row['learning outcome mastered'] = unless row['learning outcome mastered'].nil?
                                            row['learning outcome mastered'] ? 1 : 0
-      end
+                                         end
 
       course = Course.find(row['course id'])
       outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) && course.resolved_outcome_proficiency.present?
                        proficiency(course)
                      elsif row['learning outcome data'].present?
-                         YAML.safe_load(row['learning outcome data'])[:rubric_criterion]
+                       YAML.safe_load(row['learning outcome data'])[:rubric_criterion]
                      else
-                         LearningOutcome.default_rubric_criterion
-      end
+                       LearningOutcome.default_rubric_criterion
+                     end
       row['learning outcome mastery score'] = outcome_data[:mastery_points]
       score = set_score(row, outcome_data)
       rating = set_rating(row, score, outcome_data) if score.present?

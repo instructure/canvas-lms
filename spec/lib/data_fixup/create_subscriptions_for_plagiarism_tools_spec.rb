@@ -41,7 +41,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
     allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
     allow(psh).to receive(:create_subscription).and_return(nil)
     tool = create_tool_proxy(account)
-    tool.update(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
+    tool.update(raw_data: { 'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] } })
     tool
   end
 
@@ -71,7 +71,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id',
         context: course_factory(account: account),
@@ -98,7 +98,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id3',
         context: course_factory(account: account),
@@ -124,7 +124,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id3',
         context: course_factory(account: account),

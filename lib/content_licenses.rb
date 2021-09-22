@@ -56,7 +56,7 @@ module ContentLicenses
     'cc_by_nc_sa',
     {
       :readable_license =>
-        -> { I18n.t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike')},
+        -> { I18n.t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike') },
       :license_url => "http://creativecommons.org/licenses/by-nc-sa/4.0"
     },
     'cc_by_nd',

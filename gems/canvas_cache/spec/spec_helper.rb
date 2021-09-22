@@ -30,7 +30,7 @@ Time.zone = 'UTC' # This is simplest, fight me.
 # depend on as an adapter that Canvas can submit Setting itself
 # as a strategy for...anyway, use this for now for specs
 class MemorySettings
-  def initialize(data={})
+  def initialize(data = {})
     @settings = data || {}
   end
 
@@ -52,11 +52,10 @@ CanvasCache.settings_store = MemorySettings.new
 # we aren't initializing a full app in these specs
 Rails.logger = Logger.new(STDOUT)
 
-
 RSpec.shared_context "caching_helpers", :shared_context => :metadata do
   # provide a way to temporarily replace the rails
   # cache with one constructed in a spec.
-  def override_cache(new_cache=:memory_store)
+  def override_cache(new_cache = :memory_store)
     previous_cache = Rails.cache
     previous_perform_caching = ActionController::Base.perform_caching
     set_cache(new_cache)
@@ -100,11 +99,12 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
 
     collector_class = Class.new(ActiveSupport::Logger) do
       attr_reader :captured_message_stack
+
       def initialize
         @captured_message_stack ||= []
       end
 
-      def add(severity, message=nil, progname=nil, &block)
+      def add(severity, message = nil, progname = nil, &block)
         message = (message || (block && block.call) || progname).to_s
         @captured_message_stack << message
       end
@@ -135,5 +135,4 @@ RSpec.configure do |config|
     # make sure redis is in a stable state before every spec
     GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb }
   end
-
 end

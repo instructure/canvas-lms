@@ -63,6 +63,7 @@ module Canvas
 
       def config
         return @_config if @_config.present?
+
         dynamic_settings = Canvas::DynamicSettings.find(tree: :private)
         if self.canvas_cluster.present?
           dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: self.canvas_cluster)
@@ -72,16 +73,19 @@ module Canvas
 
       def sample_rate
         return @_sample_rate if @_sample_rate.present?
+
         @_sample_rate = self.config.fetch('sample_rate', 0.0).to_f
       end
 
       def host_sample_rate
         return @_host_sample_rate if @_host_sample_rate.present?
+
         @_host_sample_rate = self.config.fetch('host_sample_rate', 0.0).to_f
       end
 
       def analytics_enabled?
         return @_app_analytics_enabled unless @_app_analytics_enabled.nil?
+
         @_app_analytics_enabled = self.config.fetch('app_analytics_enabled', false)
       end
 
@@ -93,6 +97,7 @@ module Canvas
         return @_host_sampling_decision if @_host_sampling_decision.present?
         return false if @hostname.blank? || host_sample_rate <= 0
         return false if host_sample_rate > 1.0 # invalid ratio
+
         @_host_sampling_decision = get_sampling_decision(@hostname, host_sample_rate, HOST_SAMPLING_INTERVAL)
       end
 
@@ -139,8 +144,10 @@ module Canvas
 
       def annotate_trace(shard, root_account, request_context_id, current_user)
         return unless self.configured?
+
         apm_root_span = tracer.active_root_span
         return if apm_root_span.blank?
+
         apm_root_span.set_tag('request_context_id', request_context_id.to_s) if request_context_id.present?
         apm_root_span.set_tag('shard', shard.id.to_s) if shard.try(:id).present?
         act_global_id = root_account.try(:global_id)
@@ -165,6 +172,7 @@ module Canvas
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
       def tracer
         return Canvas::Apm::StubTracer.instance unless self.configured?
+
         @tracer || Datadog.tracer
       end
 

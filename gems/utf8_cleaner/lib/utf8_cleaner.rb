@@ -26,6 +26,7 @@ module Utf8Cleaner
   # report to the database.
   def self.strip_invalid_utf8(string)
     return string if string.nil?
+
     string = String.new(string, encoding: Encoding::UTF_8) unless string.encoding == Encoding::UTF_8
 
     string = string.encode("UTF-8", :undef => :replace, :invalid => :replace, :replace => '')

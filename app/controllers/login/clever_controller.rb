@@ -30,6 +30,7 @@ module Login
       if !params[:state]
         return redirect_to(clever_login_url)
       end
+
       super
     end
 

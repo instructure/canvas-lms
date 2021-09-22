@@ -42,7 +42,7 @@ module IncomingMailProcessor
         name = "incoming_mail_processor.mailbox_queue_size.#{identifier}"
         InstStatsd::Statsd.gauge(name, count,
                                  short_stat: 'incoming_mail_processor.mailbox_queue_size',
-                                 tags: {identifier: identifier})
+                                 tags: { identifier: identifier })
       end
     end
     private_class_method :report_unreads

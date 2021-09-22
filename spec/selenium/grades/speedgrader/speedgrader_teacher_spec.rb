@@ -81,7 +81,7 @@ describe "speed grader" do
   context "url submissions" do
     before do
       @assignment.update! submission_types: 'online_url',
-                                     title: "url submission"
+                          title: "url submission"
       student_in_course
       @assignment.submit_homework(@student, submission_type: "online_url", workflow_state: "submitted", url: "http://www.instructure.com")
     end
@@ -125,7 +125,7 @@ describe "speed grader" do
     @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
     @teacher.save
 
-    student_submission(username:'inactivestudent@example.com')
+    student_submission(username: 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
 
@@ -142,7 +142,7 @@ describe "speed grader" do
   end
 
   it "can grade and comment active students", :xbrowser do
-    student_submission(username:'activestudent@example.com')
+    student_submission(username: 'activestudent@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
@@ -204,7 +204,7 @@ describe "speed grader" do
         Speedgrader.submit_settings_form
       end
 
-      list_items = ff('#students_selectmenu option').map{|i| i['value']}
+      list_items = ff('#students_selectmenu option').map { |i| i['value'] }
       expect(list_items).to contain_exactly(@student1.id.to_s, @student3.id.to_s, @student2.id.to_s)
     end
 
@@ -228,7 +228,7 @@ describe "speed grader" do
         Speedgrader.submit_settings_form
       end
 
-      list_items = ff('#students_selectmenu option').map{|i| i['value']}
+      list_items = ff('#students_selectmenu option').map { |i| i['value'] }
 
       expect(list_items).to contain_exactly(@student2.id.to_s, @student1.id.to_s, @student3.id.to_s)
     end
@@ -403,7 +403,7 @@ describe "speed grader" do
       # Switch to the right panel
       # Verify that the grade is .5
       wait_for_ajaximations
-      expect{f('#grading-box-extended')['value']}.to become('3.5')
+      expect { f('#grading-box-extended')['value'] }.to become('3.5')
       expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
       expect(f("#students_selectmenu-button")).to have_class("graded")
     end
@@ -413,7 +413,7 @@ describe "speed grader" do
     # set up course and users
     let(:test_course) { @course }
     let(:student)     { user_factory(active_all: true) }
-    let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: {api_key: "abc123"} }
+    let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: { api_key: "abc123" } }
     let!(:enroll_student) do
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
     end

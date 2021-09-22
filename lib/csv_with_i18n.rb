@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 class CsvWithI18n < CSV
-
   BYTE_ORDER_MARK = "\xEF\xBB\xBF".freeze
 
   def initialize(data, **options)
@@ -55,6 +54,7 @@ class CsvWithI18n < CSV
   def self.determine_column_separator(user)
     return ';' if user.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
     return ',' unless user.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
+
     I18n.t('number.format.separator', '.') == ',' ? ';' : ','
   end
   private_class_method :determine_column_separator

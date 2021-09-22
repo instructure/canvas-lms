@@ -60,8 +60,8 @@ describe CanvasPartman::Concerns::Partitioned do
           expect {
             # this would be at new years of 2015 in UTC: 1/1/2015 00:00:00
             Animal.create({
-              created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
-            })
+                            created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
+                          })
           }.not_to raise_error
         end
       end
@@ -74,14 +74,14 @@ describe CanvasPartman::Concerns::Partitioned do
           zoo = Zoo.create!
 
           monkey = zoo.animals.create!({
-            race: 'monkey',
-            created_at: Time.new(2014, 11, 5)
-          })
+                                         race: 'monkey',
+                                         created_at: Time.new(2014, 11, 5)
+                                       })
 
           parrot = zoo.animals.create({
-            race: 'parrot',
-            created_at: Time.new(2014, 12, 5)
-          })
+                                        race: 'parrot',
+                                        created_at: Time.new(2014, 12, 5)
+                                      })
 
           expect(count_records('partman_animals')).to eq 2
           expect(count_records('partman_animals_2014_11')).to eq 1
@@ -133,9 +133,9 @@ describe CanvasPartman::Concerns::Partitioned do
         subject.create_partition(Time.new(2014, 11, 1))
 
         @pt = Animal.create({
-          created_at: Time.new(2014, 11, 8),
-          race: 'monkey'
-        })
+                              created_at: Time.new(2014, 11, 8),
+                              race: 'monkey'
+                            })
       end
 
       it 'works using #save' do

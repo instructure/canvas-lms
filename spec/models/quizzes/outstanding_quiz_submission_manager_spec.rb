@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::OutstandingQuizSubmissionManager do
-
   describe "outstanding submissions by quiz" do
     before do
       course_factory
@@ -82,7 +81,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       end
 
       expect(ungraded_qs.needs_grading?).to be true
-        expect(graded_qs.needs_grading?).to be false
+      expect(graded_qs.needs_grading?).to be false
 
       described_class.grade_by_course(@course)
 
@@ -107,7 +106,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       end
 
       expect(ungraded_qs.needs_grading?).to be true
-        expect(graded_qs.needs_grading?).to be false
+      expect(graded_qs.needs_grading?).to be false
 
       described_class.grade_by_course(@course)
 

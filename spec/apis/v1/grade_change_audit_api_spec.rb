@@ -41,7 +41,7 @@ describe "GradeChangeAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
@@ -55,7 +55,7 @@ describe "GradeChangeAudit API", type: :request do
       @event = Auditors::GradeChange.record(submission: @submission)
     end
 
-    def fetch_for_context(context, options={})
+    def fetch_for_context(context, options = {})
       type = context.class.to_s.downcase unless type = options.delete(:type)
       user = options.delete(:user) || @viewing_user
       id = Shard.global_id_for(context).to_s
@@ -89,17 +89,17 @@ describe "GradeChangeAudit API", type: :request do
       api_call_as_user(user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
-    def fetch_for_course_and_other_contexts(contexts, options={})
+    def fetch_for_course_and_other_contexts(contexts, options = {})
       expected_contexts = [:course, :assignment, :grader, :student].freeze
-      sorted_contexts = contexts.select { |key,_| expected_contexts.include?(key) }.
-        sort_by { |key, _| expected_contexts.index(key) }
+      sorted_contexts = contexts.select { |key, _| expected_contexts.include?(key) }
+                                .sort_by { |key, _| expected_contexts.index(key) }
 
       arguments = sorted_contexts.map { |key, value| ["#{key}_id".to_sym, value.id] }.to_h
       arguments.merge!({
-        controller: :grade_change_audit_api,
-        action: :for_course_and_other_parameters,
-        format: :json
-      })
+                         controller: :grade_change_audit_api,
+                         action: :for_course_and_other_parameters,
+                         format: :json
+                       })
 
       query_string = []
 
@@ -136,13 +136,13 @@ describe "GradeChangeAudit API", type: :request do
       api_call_as_user(user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
-    def events_for_context(context, options={})
+    def events_for_context(context, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
       json['events'].map { |e| [e['id'], e['event_type']] }
     end
 
-    def expect_event_for_context(context, event, options={})
+    def expect_event_for_context(context, event, options = {})
       json = fetch_for_context(context, options)
       events = events_for_context(context, options.merge(json: json))
       expect(events).to include([event.id, event.event_type])
@@ -152,28 +152,28 @@ describe "GradeChangeAudit API", type: :request do
     def events_for_course_and_contexts(contexts, options)
       json = options.delete(:json)
       json ||= fetch_for_course_and_other_contexts(contexts, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
+      json['events'].map { |e| [e['id'], e['event_type']] }
     end
 
-    def expect_event_for_course_and_contexts(contexts, event, options={})
+    def expect_event_for_course_and_contexts(contexts, event, options = {})
       json = fetch_for_course_and_other_contexts(contexts, options)
       events = events_for_course_and_contexts(contexts, options.merge(json: json))
       expect(events).to include([event.id, event.event_type])
       json
     end
 
-    def forbid_event_for_context(context, event, options={})
+    def forbid_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .not_to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .not_to include([event.id, event.event_type])
       json
     end
 
-    def forbid_event_for_course_and_contexts(contexts, event, options={})
+    def forbid_event_for_course_and_contexts(contexts, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_course_and_contexts(contexts, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
         .not_to include([event.id, event.event_type])
       json
     end
@@ -195,7 +195,7 @@ describe "GradeChangeAudit API", type: :request do
       contexts.delete(:assignment)
       yield(contexts)
       # course grader
-      contexts = { course: @course, grader: @teacher}
+      contexts = { course: @course, grader: @teacher }
       yield(contexts)
       # course grader student
       contexts[:student] = student
@@ -336,7 +336,6 @@ describe "GradeChangeAudit API", type: :request do
         events = fetch_for_context(@assignment)["events"]
         expect(events.first).not_to have_key "grade_current"
       end
-
     end
 
     context "deleted entities" do
@@ -350,7 +349,7 @@ describe "GradeChangeAudit API", type: :request do
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
         end
-        contexts = {course: @course, assignment: @assignment}
+        contexts = { course: @course, assignment: @assignment }
         fetcher.call(contexts)
         contexts[:grader] = @teacher
         fetcher.call(contexts)
@@ -378,13 +377,13 @@ describe "GradeChangeAudit API", type: :request do
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
         end
-        contexts = {course: @course, assignment: @assignment, grader: @teacher, student: @student}
+        contexts = { course: @course, assignment: @assignment, grader: @teacher, student: @student }
         fetcher.call(contexts)
         contexts.delete(:grader)
         fetcher.call(contexts)
         contexts.delete(:assignment)
         fetcher.call(contexts)
-        contexts = {course: @course, student: @student}
+        contexts = { course: @course, student: @student }
         fetcher.call(contexts)
       end
 
@@ -398,7 +397,7 @@ describe "GradeChangeAudit API", type: :request do
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
         end
-        contexts = {course: @course, assignment: @assignment, grader: @teacher, student: @student}
+        contexts = { course: @course, assignment: @assignment, grader: @teacher, student: @student }
         fetcher.call(contexts)
         contexts.delete(:student)
         fetcher.call(contexts)
@@ -480,11 +479,11 @@ describe "GradeChangeAudit API", type: :request do
 
       it "should not authorize the endpoints with :view_all_grades, :view_grade_changes and :manage_grades revoked" do
         RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-          :view_grade_changes.to_s, override: false)
+                                          :view_grade_changes.to_s, override: false)
         RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-          :manage_grades.to_s, override: false)
+                                          :manage_grades.to_s, override: false)
         RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-          :view_all_grades.to_s, override: false)
+                                          :view_all_grades.to_s, override: false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@assignment, expected_status: 401)
@@ -556,7 +555,7 @@ describe "GradeChangeAudit API", type: :request do
         specs_require_sharding
 
         before do
-          @new_root_account = @shard2.activate{ Account.create!(name: 'New Account') }
+          @new_root_account = @shard2.activate { Account.create!(name: 'New Account') }
           allow(LoadAccount).to receive(:default_domain_root_account).and_return(@new_root_account)
           allow(@new_root_account).to receive(:grants_right?).and_return(true)
           @viewing_user = user_with_pseudonym(account: @new_root_account)

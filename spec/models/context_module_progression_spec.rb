@@ -36,8 +36,8 @@ describe ContextModuleProgression do
 
   def setup_modules
     @assignment = @course.assignments.create!(:title => "some assignment")
-    @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-    @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+    @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+    @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
     @module.workflow_state = 'unpublished'
     @module.save!
 
@@ -83,7 +83,7 @@ describe ContextModuleProgression do
 
     it "should be satisfied if dependent on both a published and unpublished module" do
       @module3.prerequisites = "module_#{@module.id}"
-      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id, :name=>@module.name}, {:type=>"context_module", :id=>@module2.id, :name=>@module2.name}]
+      @module3.prerequisites = [{ :type => "context_module", :id => @module.id, :name => @module.name }, { :type => "context_module", :id => @module2.id, :name => @module2.name }]
       @module3.save!
       @module3.reload
       expect(@module3.prerequisites.count).to eq 2
@@ -92,8 +92,8 @@ describe ContextModuleProgression do
     end
 
     it "should skip incorrect prereq hashes" do
-      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id},
-                                {:type=>"not_context_module", :id=>@module2.id, :name=>@module2.name}]
+      @module3.prerequisites = [{ :type => "context_module", :id => @module.id },
+                                { :type => "not_context_module", :id => @module2.id, :name => @module2.name }]
       @module3.save!
 
       expect(@module3.prerequisites.count).to eq 0
@@ -169,11 +169,11 @@ describe ContextModuleProgression do
 
     context "when post policies enabled" do
       let(:assignment) { @course.assignments.create! }
-      let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
+      let(:tag) { @module.add_item({ id: assignment.id, type: "assignment" }) }
       let(:min_score) { 90 }
 
       before(:each) do
-        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: min_score}})
+        @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: min_score } })
         @submission = assignment.submit_homework(@user, body: "my homework")
       end
 
@@ -184,7 +184,7 @@ describe ContextModuleProgression do
         it 'evaluates requirement as complete' do
           @submission.update!(score: score, posted_at: 1.second.ago)
           progression = @module.context_module_progressions.find_by(user: @user)
-          requirement = {id: tag.id, type: 'min_score', min_score: min_score}
+          requirement = { id: tag.id, type: 'min_score', min_score: min_score }
           expect(progression.requirements_met).to include requirement
         end
       end
@@ -202,14 +202,14 @@ describe ContextModuleProgression do
       it "does not evaluate requirements when grade has not posted" do
         @submission.update!(score: 100, posted_at: nil)
         progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0, score: nil}
+        requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
         expect(progression.incomplete_requirements).to include requirement
       end
 
       it "evaluates requirements when grade has posted" do
         @submission.update!(score: 100, posted_at: 1.second.ago)
         progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0}
+        requirement = { id: tag.id, type: "min_score", min_score: 90.0 }
         expect(progression.requirements_met).to include requirement
       end
     end
@@ -279,7 +279,6 @@ describe ContextModuleProgression do
       progression = @tag.context_module_action(@user, :read)
       progression.uncomplete_requirement(@tag.id)
       expect(progression.requirements_met.length).to be(0)
-
     end
 
     it "should not change anything when given an ID that does not exist" do
@@ -293,30 +292,30 @@ describe ContextModuleProgression do
 
   it "should update progressions when adding a must_contribute requirement on a topic" do
     @assignment = @course.assignments.create!
-    @tag1 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+    @tag1 = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
     @topic = @course.discussion_topics.create!
     entry = @topic.discussion_entries.create!(:user => @user)
-    @module.completion_requirements = {@tag1.id => {:type => 'must_view'}}
+    @module.completion_requirements = { @tag1.id => { :type => 'must_view' } }
 
     progression = @module.evaluate_for(@user)
     expect(progression).to be_unlocked
 
-    @tag2 = @module.add_item({:id => @topic.id, :type => 'discussion_topic'})
-    @module.update_attribute(:completion_requirements, {@tag1.id => {:type => 'must_view'}, @tag2.id => {:type => 'must_contribute'}})
+    @tag2 = @module.add_item({ :id => @topic.id, :type => 'discussion_topic' })
+    @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_view' }, @tag2.id => { :type => 'must_contribute' } })
 
     progression.reload
     expect(progression).to be_started
 
     expect_any_instantiation_of(@topic).to receive(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
-    @module.update_attribute(:completion_requirements, {@tag1.id => {:type => 'must_submit'}, @tag2.id => {:type => 'must_contribute'}})
+    @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_submit' }, @tag2.id => { :type => 'must_contribute' } })
   end
 
   context "assignment muting" do
     it "should work with muted assignments" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+      tag = @module.add_item({ :id => assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
@@ -337,8 +336,8 @@ describe ContextModuleProgression do
     it "should complete when the assignment is unmuted after a grade is assigned without a submission" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+      tag = @module.add_item({ :id => assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
@@ -356,8 +355,8 @@ describe ContextModuleProgression do
     it "should work with muted quiz assignments" do
       quiz = @course.quizzes.create(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest', :workflow_state => 'available')
       quiz.assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({:id => quiz.id, :type => 'quiz'})
-      @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+      tag = @module.add_item({ :id => quiz.id, :type => 'quiz' })
+      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
@@ -380,8 +379,8 @@ describe ContextModuleProgression do
       assignment.reload
 
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({:id => topic.id, :type => 'discussion_topic'})
-      @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+      tag = @module.add_item({ :id => topic.id, :type => 'discussion_topic' })
+      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)

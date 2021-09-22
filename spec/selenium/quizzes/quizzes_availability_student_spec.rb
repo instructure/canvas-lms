@@ -63,7 +63,7 @@ describe 'Taking a quiz as a student' do
   context 'when the due date is in the past' do
     before(:each) do
       create_quiz_with_due_date(
-        due_at: default_time_for_due_date(Time.zone.now.advance(days:-1))
+        due_at: default_time_for_due_date(Time.zone.now.advance(days: -1))
       )
     end
 

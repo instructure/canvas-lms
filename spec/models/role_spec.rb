@@ -210,7 +210,7 @@ describe Role do
     end
 
     def get_base_type(hash, name)
-      hash.find{|br|br[:base_role_name] == name}
+      hash.find { |br| br[:base_role_name] == name }
     end
 
     it "should find all custom roles" do
@@ -254,7 +254,7 @@ describe Role do
     end
 
     it "should include inactive roles" do
-      @account.roles.each{|r| r.deactivate! }
+      @account.roles.each { |r| r.deactivate! }
       all = Role.all_enrollment_roles_for_account(@sub_account, true)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
@@ -272,10 +272,10 @@ describe Role do
 
         roles = Role.role_data(@course, @ta)
         [ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
+          expect(roles.detect { |r| r[:id] == role.id }[:manageable_by_user]).to be_falsey
         end
         [student_role, observer_role].each do |role|
-          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
         end
       end
 
@@ -284,9 +284,9 @@ describe Role do
         @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
 
         roles = Role.role_data(@course, @ta)
-        expect(roles.find{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
+        expect(roles.find { |r| r[:id] == student_role.id }[:manageable_by_user]).to be_falsey
         [observer_role, ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
         end
       end
     end

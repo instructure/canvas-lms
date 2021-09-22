@@ -48,7 +48,6 @@ class Mutations::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
 end
 
 class Mutations::AssignmentBase < Mutations::BaseMutation
-
   # we are required to wrap the update method with a proxy class because
   # we are required to include `Api` for instance methods within the module.
   # the main problem is that including the `Api` module conflicts with the
@@ -168,7 +167,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
       moderated_grading = input_hash.delete(:moderated_grading)
       input_hash[:moderated_grading] = moderated_grading[:enabled] if moderated_grading.key? :enabled
       input_hash.merge!(moderated_grading.slice(:grader_count, :grader_comments_visible_to_graders,
-                                                            :grader_names_visible_to_final_grader, :graders_anonymous_to_graders))
+                                                :grader_names_visible_to_final_grader, :graders_anonymous_to_graders))
       if moderated_grading.key? :final_grader_id
         input_hash[:final_grader_id] = GraphQLHelpers.parse_relay_or_legacy_id(moderated_grading[:final_grader_id], "User")
       end

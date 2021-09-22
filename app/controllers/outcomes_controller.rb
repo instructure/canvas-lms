@@ -32,7 +32,8 @@ class OutcomesController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_OUTCOMES)
-    log_asset_access([ "outcomes", @context ], "outcomes", "other")
+
+    log_asset_access(["outcomes", @context], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
 
@@ -79,7 +80,7 @@ class OutcomesController < ApplicationController
       if @context == @outcome.context
         codes = "all"
       else
-        codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
+        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
       end
     end
     @alignments = @outcome.alignments.active.for_context(@context)
@@ -87,10 +88,10 @@ class OutcomesController < ApplicationController
     @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
 
     js_env({
-     :PERMISSIONS => {
-       :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
-      }
-    })
+             :PERMISSIONS => {
+               :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+             }
+           })
   end
 
   def details
@@ -100,7 +101,8 @@ class OutcomesController < ApplicationController
     @outcome.tie_to(@context)
     render :json => @outcome.as_json(
       :methods => :artifacts_count_for_tied_context,
-      :user_content => %w(description))
+      :user_content => %w(description)
+    )
   end
 
   def outcome_results
@@ -112,7 +114,7 @@ class OutcomesController < ApplicationController
       if @context == @outcome.context
         codes = "all"
       else
-        codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
+        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
       end
     end
     @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort])
@@ -136,7 +138,7 @@ class OutcomesController < ApplicationController
     else
       @outcomes = @context.available_outcomes
     end
-    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
+    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) # .for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
     @google_analytics_page_title = t("Outcomes for Student")
@@ -157,7 +159,7 @@ class OutcomesController < ApplicationController
     if params[:unused]
       @outcomes -= @current_outcomes
     end
-    render :json => @outcomes.map{ |o| o.as_json(methods: :cached_context_short_name) }
+    render :json => @outcomes.map { |o| o.as_json(methods: :cached_context_short_name) }
   end
 
   # as in, add existing outcome from another context to this context
@@ -177,7 +179,7 @@ class OutcomesController < ApplicationController
     else
       @group.add_outcome(@outcome)
     end
-    render :json => @outcome.as_json(:methods => :cached_context_short_name, :permissions => {:user => @current_user, :session => session})
+    render :json => @outcome.as_json(:methods => :cached_context_short_name, :permissions => { :user => @current_user, :session => session })
   end
 
   def align
@@ -226,18 +228,18 @@ class OutcomesController < ApplicationController
       if @submission.attempt <= @result.attempt
         @submission_version = @submission
       else
-        @submission_version = @submission.submitted_attempts.detect{|s| s.attempt >= @result.attempt }
+        @submission_version = @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
       end
       if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
         # anchor to first question in aligned bank
         question_bank_id = @result.alignment.content_id
-        first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id).
-          joins(:assessment_question).
-          where(assessment_questions: { assessment_question_bank_id: question_bank_id }).
-          order(:position).first
+        first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id)
+                                                      .joins(:assessment_question)
+                                                      .where(assessment_questions: { assessment_question_bank_id: question_bank_id })
+                                                      .order(:position).first
         anchor = first_aligned_question ? "question_#{first_aligned_question.id}" : nil
       elsif @asset.is_a? AssessmentQuestion
-        question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @asset.data[:id] }
+        question = @submission.quiz_data.detect { |q| q['assessment_question_id'] == @asset.data[:id] }
         question_id = (question && question['id']) || @asset.data[:id]
         anchor = "question_#{question_id}"
       end
@@ -245,7 +247,8 @@ class OutcomesController < ApplicationController
         @result.context, :context_quiz_history_url, @submission.quiz_id,
         :quiz_submission_id => @submission.id,
         :version => @submission_version.version_number,
-        :anchor => anchor)
+        :anchor => anchor
+      )
     else
       flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || 'nil'}"
       redirect_to named_context_url(@context, :context_outcome_url, @outcome.id)
@@ -311,13 +314,14 @@ class OutcomesController < ApplicationController
         format.json { render :json => @link.learning_outcome }
       else
         flash[:notice] = t :missing_outcome, "Couldn't find that learning outcome"
-        format.json { render :json => {:errors => {:base => t(:missing_outcome, "Couldn't find that learning outcome")}}, :status => :bad_request }
+        format.json { render :json => { :errors => { :base => t(:missing_outcome, "Couldn't find that learning outcome") } }, :status => :bad_request }
       end
       format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
     end
   end
 
   protected
+
   def learning_outcome_params
     params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
   end

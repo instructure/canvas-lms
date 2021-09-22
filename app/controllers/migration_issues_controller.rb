@@ -162,5 +162,4 @@ class MigrationIssuesController < ApplicationController
     @content_migration = @context.content_migrations.find(params[:content_migration_id])
     return authorized_action(@context, @current_user, :manage_content)
   end
-
 end

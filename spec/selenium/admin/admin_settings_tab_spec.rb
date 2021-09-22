@@ -34,7 +34,7 @@ describe "admin settings tab" do
     service_hash = Account.default.allowed_services_hash
     service_hash.each do |k, v|
       default_services.push k if v[:expose_to_ui] &&
-        (!v[:expose_to_ui_proc] || v[:expose_to_ui_proc].call(@user, Account.default))
+                                 (!v[:expose_to_ui_proc] || v[:expose_to_ui_proc].call(@user, Account.default))
     end
     default_services
   end
@@ -47,7 +47,7 @@ describe "admin settings tab" do
     end
   end
 
-  def check_box_verifier (css_selectors, features, checker = true)
+  def check_box_verifier(css_selectors, features, checker = true)
     is_symbol = false
 
     css_selectors = [css_selectors] unless (css_selectors.is_a? Array)
@@ -130,7 +130,7 @@ describe "admin settings tab" do
     end
 
     describe "allow self-enrollment" do
-      def enrollment_helper (value='')
+      def enrollment_helper(value = '')
         if (value == '')
           f("#account_settings_self_enrollment option[value='']").click
         else
@@ -185,21 +185,21 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
     end
 
-    def add_quiz_filter name ="www.canvas.instructure.com", value="192.168.217.1/24"
+    def add_quiz_filter name = "www.canvas.instructure.com", value = "192.168.217.1/24"
       fj("#ip_filters .name[value='']:visible").send_keys name
       fj("#ip_filters .value[value='']:visible").send_keys value
       click_submit
-      filter_hash = {name => value}
+      filter_hash = { name => value }
       expect(Account.default.settings[:ip_filters]).to include filter_hash
       expect(fj("#ip_filters .name[value='#{name}']")).to be_displayed
       expect(fj("#ip_filters .value[value='#{value}']")).to be_displayed
       filter_hash
     end
 
-    def create_quiz_filter(name="www.canvas.instructure.com", value="192.168.217.1/24")
+    def create_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
       Account.default.tap do |a|
         a.settings[:ip_filters] ||= []
-        a.settings[:ip_filters] << {name => value}
+        a.settings[:ip_filters] << { name => value }
         a.save!
       end
     end
@@ -226,7 +226,7 @@ describe "admin settings tab" do
       replace_content(fj("#ip_filters .name:visible"), new_name)
       replace_content(fj("#ip_filters .value:visible"), new_value)
       click_submit
-      filter_hash = {new_name => new_value}
+      filter_hash = { new_name => new_value }
       expect(Account.default.settings[:ip_filters]).to include filter_hash
       expect(fj("#ip_filters .name[value='#{new_name}']")).to be_displayed
       expect(fj("#ip_filters .value[value='#{new_value}']")).to be_displayed
@@ -257,7 +257,6 @@ describe "admin settings tab" do
     end
 
     describe "equella settings" do
-
       def add_equella_feature
         equella_url = "http://oer.equella.com/signon.do"
         f("#account_settings_equella_endpoint").send_keys(equella_url)
@@ -315,23 +314,23 @@ describe "admin settings tab" do
     end
 
     it "should unclick and then click on skype" do
-      check_box_verifier("#account_services_skype", {:allowed_services => :skype}, false)
-      check_box_verifier("#account_services_skype", {:allowed_services => :skype})
+      check_box_verifier("#account_services_skype", { :allowed_services => :skype }, false)
+      check_box_verifier("#account_services_skype", { :allowed_services => :skype })
     end
 
     it "should unclick and then click on delicious" do
-      check_box_verifier("#account_services_delicious", {:allowed_services => :delicious}, false)
-      check_box_verifier("#account_services_delicious", {:allowed_services => :delicious})
+      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious }, false)
+      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious })
     end
 
     it "should unclick and click on google docs previews" do
-      check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews}, false)
-      check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews})
+      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews }, false)
+      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews })
     end
 
     it "should click on user avatars" do
-      check_box_verifier("#account_services_avatars", {:allowed_services => :avatars})
-      check_box_verifier("#account_services_avatars", {:allowed_services => :avatars}, false)
+      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars })
+      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars }, false)
     end
 
     it "should disable all web services" do
@@ -343,17 +342,17 @@ describe "admin settings tab" do
     end
 
     it "should enable and disable a plugin service (setting)" do
-      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
+      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
-      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
+      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
+      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
     end
 
     it "should enable and disable a plugin service (service)" do
-      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
+      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
-      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
+      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
+      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
     end
   end
 
@@ -409,7 +408,8 @@ describe "admin settings tab" do
 
     it "should not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
-          {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}]
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+      ]
       Account.default.save!
 
       get "/accounts/#{Account.default.id}/settings"
@@ -419,12 +419,12 @@ describe "admin settings tab" do
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
-        {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
       ]
     end
 
     it "should preserve the default help links if the account hasn't been configured with the new ui yet" do
-      help_link = {:text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"]}
+      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"] }
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
@@ -464,13 +464,13 @@ describe "admin settings tab" do
       cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
       expect(cl).to include(
         {
-          "text"=>"text",
-          "subtext"=>"subtext",
-          "url"=>"https://url.example.com",
-          "type"=>"custom",
-          "is_featured"=>true,
-          "is_new"=>false,
-          "available_to"=>["user", "student", "teacher", "admin", "observer", "unenrolled"]
+          "text" => "text",
+          "subtext" => "subtext",
+          "url" => "https://url.example.com",
+          "type" => "custom",
+          "is_featured" => true,
+          "is_new" => false,
+          "available_to" => ["user", "student", "teacher", "admin", "observer", "unenrolled"]
         }
       )
     end
@@ -490,15 +490,15 @@ describe "admin settings tab" do
       cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://newurl.example.com' }
       expect(cl).to include(
         {
-          "is_featured"=>false,
-          "is_new"=>true,
+          "is_featured" => false,
+          "is_new" => true,
         }
       )
     end
 
     it "edits a custom link" do
       a = Account.default
-      a.settings[:custom_help_links] = [{"text"=>"custom-link-text-frd", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]}]
+      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => ["user", "student", "teacher", "admin"] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
@@ -600,6 +600,7 @@ describe "admin settings tab" do
     features_text = f("#tab-features").text
     Feature.applicable_features(Account.default).each do |feature|
       next if feature.visible_on && !feature.visible_on.call(Account.default)
+
       # We don't want flags that are enabled in code to appear in the UI
       if feature.enabled? && !feature.can_override?
         expect(features_text).not_to include(feature.display_name.call)

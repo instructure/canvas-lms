@@ -80,7 +80,7 @@ module MicrosoftSync
       end
 
       def public_interpolated_values
-        {max: MAX_ENROLLMENT_MEMBERS}
+        { max: MAX_ENROLLMENT_MEMBERS }
       end
     end
 
@@ -90,11 +90,12 @@ module MicrosoftSync
       end
 
       def public_interpolated_values
-        {max: MAX_ENROLLMENT_OWNERS}
+        { max: MAX_ENROLLMENT_OWNERS }
       end
     end
 
     attr_reader :group
+
     delegate :course, to: :group
 
     def initialize(group)
@@ -147,7 +148,7 @@ module MicrosoftSync
 
     # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
-      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map{|c| c['id']}
+      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map { |c| c['id'] }
 
       # If we've created the group previously, we're good to go
       if group.ms_group_id && remote_ids == [group.ms_group_id]
@@ -208,7 +209,7 @@ module MicrosoftSync
       # looking up the same ULUV multiple times; but this should be very rare
       users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
         uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(remote_attr, slice.map(&:last))
-        user_id_to_aad = slice.map{|user_id, uluv| [user_id, uluv_to_aad[uluv]]}.to_h.compact
+        user_id_to_aad = slice.map { |user_id, uluv| [user_id, uluv_to_aad[uluv]] }.to_h.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
         # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.
@@ -240,9 +241,9 @@ module MicrosoftSync
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
                         "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
-                                   tags: {sync_type: sync_type})
+                                   tags: { sync_type: sync_type })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
-                               tags: {sync_type: sync_type})
+                               tags: { sync_type: sync_type })
     end
 
     # Run the API calls to add/remove users.
@@ -316,19 +317,20 @@ module MicrosoftSync
     # [[234, 'member', timestamp1], [456, 'member', timestamp2], [456, 'owner', timestamp3]]
     def load_partial_sync_changes
       PartialSyncChange.where(course: course).limit(MAX_PARTIAL_SYNC_CHANGES + 1)
-        .pluck(:user_id, :enrollment_type, :updated_at)
+                       .pluck(:user_id, :enrollment_type, :updated_at)
     end
 
     def step_partial_sync(_mem_state, _job_state)
       # Step 1. Kick off a full sync if we haven't created a group yet, or if
       # there are too many changes to effectively handle here.
       if group.ms_group_id.nil? ||
-          (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
+         (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
         InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full")
         return StateMachineJob::NextStep.new(:step_full_sync_prerequisites)
       end
 
       return StateMachineJob::COMPLETE if changes.empty?
+
       # Set sync_type before graph_service used (created) but after we may switch to full sync:
       self.sync_type = 'partial'
 
@@ -347,17 +349,17 @@ module MicrosoftSync
       # because the user could be removed as an owner but not as a member, etc.
 
       # e.g., { 123 => ['member', 'owner'], 1230000000000099 => ['owner']}
-      users_to_msft_role_types = changes_by_user_id.transform_values{|chgs| chgs.map(&:second)}
+      users_to_msft_role_types = changes_by_user_id.transform_values { |chgs| chgs.map(&:second) }
       diff = PartialMembershipDiff.new(users_to_msft_role_types)
 
       mappings = UserMapping.where(root_account_id: course.root_account_id, user_id: user_ids)
-        .pluck(:user_id, :aad_id)
+                            .pluck(:user_id, :aad_id)
       mappings.each { |user_id, aad_id| diff.set_member_mapping(user_id, aad_id) }
 
       users_with_mappings = mappings.map(&:first)
       enrollments = Enrollment.microsoft_sync_relevant
-        .where(course: course, user_id: users_with_mappings)
-        .pluck(:user_id, :type)
+                              .where(course: course, user_id: users_with_mappings)
+                              .pluck(:user_id, :type)
       enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
 
       # Step 4. Execute diff and delete changes. Match additionally on
@@ -396,6 +398,7 @@ module MicrosoftSync
     private
 
     attr_writer :sync_type
+
     def sync_type
       @sync_type || 'full'
     end

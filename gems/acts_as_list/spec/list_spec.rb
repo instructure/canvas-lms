@@ -140,7 +140,6 @@ describe "ListTest" do
       expect(UnscopedListMixin.where('parent_id IS NULL').order('pos').to_a).to eq [new2, new1, new3]
     end
 
-
     it 'remove_from_list should then fail in_list?' do
       expect(ListMixin.find(1)).to be_in_list
       ListMixin.find(1).remove_from_list
@@ -201,8 +200,8 @@ describe "ListTest" do
     end
 
     it 'injection' do
-      item = ListMixin.new("parent_id"=>1)
-      expect(item.scope_condition). to eq parent_id: 1
+      item = ListMixin.new("parent_id" => 1)
+      expect(item.scope_condition).to eq parent_id: 1
       expect(item.class.position_column).to eq "pos"
     end
 

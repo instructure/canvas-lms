@@ -29,7 +29,7 @@ describe ExternalFeed do
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
-    expect(res.all?{|r| r.valid?}).to be_truthy
+    expect(res.all? { |r| r.valid? }).to be_truthy
     expect(res[0].title).to eql("Star City")
     expect(res[1].title).to eql("Space Exploration")
     expect(res[2].title).to eql("The Engine That Does More")
@@ -113,7 +113,7 @@ describe ExternalFeed do
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
     expect(@course.announcements.count).to eql(4)
-    expect(res.map{|i| i.asset} - @course.announcements).to be_empty
+    expect(res.map { |i| i.asset } - @course.announcements).to be_empty
 
     # don't create duplicates
     @feed.add_rss_entries(rss)
@@ -161,7 +161,7 @@ describe ExternalFeed do
 end
 
 def atom_example
-%{<?xml version="1.0" encoding="utf-8"?>
+  %{<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>Example Feed</title>
@@ -187,7 +187,7 @@ def atom_example
 end
 
 def rss_example
-%{<?xml version="1.0"?>
+  %{<?xml version="1.0"?>
 <rss version="2.0">
   <channel>
     <title>Lift Off News</title>

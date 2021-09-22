@@ -21,7 +21,6 @@ require 'ims/lti'
 
 module Lti
   class RegistrationRequestService
-
     def self.retrieve_registration_password(context, guid)
       Rails.cache.read(req_cache_key(context, guid))
     end
@@ -51,7 +50,7 @@ module Lti
     end
 
     def self.req_cache_key(context, reg_key)
-      ['lti_registration_request', context.class.name, context.global_id,  reg_key].cache_key
+      ['lti_registration_request', context.class.name, context.global_id, reg_key].cache_key
     end
   end
 end

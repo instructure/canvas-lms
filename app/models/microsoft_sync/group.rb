@@ -91,7 +91,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
     update!(
       workflow_state: 'pending',
-      job_state: {restored: true},
+      job_state: { restored: true },
       last_error: nil
     )
   end
@@ -103,9 +103,9 @@ class MicrosoftSync::Group < ActiveRecord::Base
   # Whatever the result, this also updates workflow_state on the model passed
   # in to reflect the actual DB state.
   # Returns true if the record was updated (i.e. record exists and is not deleted).
-  def update_unless_deleted(attrs={})
+  def update_unless_deleted(attrs = {})
     records_updated = self.class
-      .where(id: id).where.not(workflow_state: 'deleted').update_all(attrs)
+                          .where(id: id).where.not(workflow_state: 'deleted').update_all(attrs)
     if records_updated == 0
       # It could actually be that the record was hard-deleted and not
       # workflow_state=deleted, but whatever

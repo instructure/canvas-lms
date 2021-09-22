@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module AlignmentsHelper
-  def link_to_outcome_alignment(context, outcome, alignment=nil)
+  def link_to_outcome_alignment(context, outcome, alignment = nil)
     html_class = [
       "title"
     ]
     html_class << "icon-#{alignment.content_type.downcase}" if alignment
     link_to(alignment.try(:title) || nbsp, outcome_alignment_url(context, outcome, alignment), {
-      class: html_class
-    })
+              class: html_class
+            })
   end
 
-  def outcome_alignment_tag(context, outcome, alignment=nil, &block)
+  def outcome_alignment_tag(context, outcome, alignment = nil, &block)
     options = {
       id: "alignment_#{alignment.try(:id) || "blank"}",
       class: [
@@ -51,7 +51,7 @@ module AlignmentsHelper
     content_tag(:li, options, &block)
   end
 
-  def outcome_alignment_url(context, outcome, alignment=nil)
+  def outcome_alignment_url(context, outcome, alignment = nil)
     if alignment.present?
       [
         context_prefix(alignment.context_code), "outcomes",

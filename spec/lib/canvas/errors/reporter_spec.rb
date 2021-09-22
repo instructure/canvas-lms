@@ -26,7 +26,6 @@ class MyTestError < StandardError
 end
 
 describe Canvas::Errors::Reporter do
-
   it "Should be able to catch a composed exception" do
     new_class = error_instance
     exception_handled = false
@@ -66,7 +65,7 @@ describe Canvas::Errors::Reporter do
   end
 
   it "Typical usecase" do
-    expect{typical_usage}.to raise_error(MyTestError)
+    expect { typical_usage }.to raise_error(MyTestError)
   end
 
   def extra_error_info

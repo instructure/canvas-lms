@@ -39,11 +39,11 @@ describe "course catalog" do
     Account.default.settings[:enable_course_catalog] = true
     Account.default.save!
     # create_courses factory returns id's of courses unless you specify return_type
-    create_courses([ public_indexed_course_attrs ], {return_type: :record}).first
+    create_courses([public_indexed_course_attrs], { return_type: :record }).first
   end
 
   def public_indexed_course_attrs
-     {
+    {
       name: 'Intro to Testing',
       public_description: 'An overview of testing with Selenium',
       is_public: true,
@@ -69,8 +69,8 @@ describe "course catalog" do
   end
 
   it "should list a next button when >12 courses are in the index and public", priority: "1", test_id: 2963672 do
-      create_courses(13.times.map{ |i| public_indexed_course_attrs.merge(name: "#{i}") })
-      refresh_page
-      expect(f('#next-link').displayed?).to be(true)
+    create_courses(13.times.map { |i| public_indexed_course_attrs.merge(name: "#{i}") })
+    refresh_page
+    expect(f('#next-link').displayed?).to be(true)
   end
 end

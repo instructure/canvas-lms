@@ -26,7 +26,7 @@ module ConditionalRelease
     validate :not_trigger
     validate :assignment_in_same_course
 
-    acts_as_list :scope => {:assignment_set => self, :deleted_at => nil}
+    acts_as_list :scope => { :assignment_set => self, :deleted_at => nil }
 
     belongs_to :assignment_set, required: true
     belongs_to :assignment

@@ -31,7 +31,7 @@ describe LoginController do
     it "should set merge params correctly in the session" do
       user_with_pseudonym(active: true)
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
-      get 'new', params: {:confirm => @cc.confirmation_code, :expected_user_id => @user.id}
+      get 'new', params: { :confirm => @cc.confirmation_code, :expected_user_id => @user.id }
       expect(response).to be_redirect
       expect(session[:confirm]).to eq @cc.confirmation_code
       expect(session[:expected_user_id]).to eq @user.id
@@ -59,7 +59,7 @@ describe LoginController do
     it "handles legacy canvas_login=1 param" do
       account_with_cas(account: Account.default)
 
-      get 'new', params: {canvas_login: '1'}
+      get 'new', params: { canvas_login: '1' }
       expect(response).to redirect_to(canvas_login_url)
     end
 
@@ -70,7 +70,7 @@ describe LoginController do
 
       account_with_saml(account: Account.default)
       aac = Account.default.authentication_providers.first
-      get 'new', params: {id: aac}
+      get 'new', params: { id: aac }
       expect(response).to redirect_to(saml_login_url(aac))
     end
 
@@ -98,7 +98,7 @@ describe LoginController do
       Account.default.authentication_providers.create!(auth_type: 'facebook')
       account_with_cas(account: Account.default)
 
-      get 'new', params: {authentication_provider: 'cas'}
+      get 'new', params: { authentication_provider: 'cas' }
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
     end
 
@@ -106,22 +106,24 @@ describe LoginController do
       ap2 = Account.default.authentication_providers.create!(auth_type: 'cas')
       account_with_cas(account: Account.default)
 
-      get 'new', params: {authentication_provider: ap2.id}
+      get 'new', params: { authentication_provider: ap2.id }
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new, id: ap2.id))
     end
 
     it "should pass pseudonym_session[unique_id] to redirect to populate username textbox" do
-      get 'new', params: {"pseudonym_session" => {"unique_id"=>"test"}}
+      get 'new', params: { "pseudonym_session" => { "unique_id" => "test" } }
       expect(response).to redirect_to(
-        controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
+        controller.url_for(controller: 'login/canvas', action: :new) + '?pseudonym_session%5Bunique_id%5D=test'
+      )
     end
 
     it "should pass pseudonym_session[unique_id] to redirect from current username" do
       user_with_pseudonym(unique_id: 'test', active: 1)
       user_session(@user, @pseudonym)
-      get 'new', params: {"pseudonym_session" => {"unique_id"=>"test"}, force_login: 1}
+      get 'new', params: { "pseudonym_session" => { "unique_id" => "test" }, force_login: 1 }
       expect(response).to redirect_to(
-                            controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
+        controller.url_for(controller: 'login/canvas', action: :new) + '?pseudonym_session%5Bunique_id%5D=test'
+      )
     end
 
     context 'given an html request' do
@@ -145,7 +147,7 @@ describe LoginController do
     it "doesn't explode on a bad input url" do
       user_session(user_with_pseudonym(active: true))
       request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
-      get 'session_token', format: :json, params: {return_to: "not-a url"}
+      get 'session_token', format: :json, params: { return_to: "not-a url" }
       expect(response.status.to_i).to eq(400)
     end
   end

@@ -39,6 +39,7 @@ module MicrosoftSync
     # which localizes the error into whatever language that user is using.
     class PublicError < StandardError
       def self.public_message; end
+
       def public_interpolated_values; end
     end
 
@@ -46,7 +47,7 @@ module MicrosoftSync
       # Returns a JSONified hash with class, message, public_message, and
       # public_interpolated_values. class and message are for internal debugging only.
       def serialize(error)
-        result = {class: error.class.name, message: error.message&.truncate(1000)}
+        result = { class: error.class.name, message: error.message&.truncate(1000) }
 
         if error.is_a?(MicrosoftSync::Errors::PublicError)
           locale_was = I18n.locale
@@ -83,6 +84,7 @@ module MicrosoftSync
       end
 
       private
+
       def deserialize(err)
         # I18n interpolations and message ("one"/"multiple") have to have symbol keys
         deserialized = JSON.parse(err, symbolize_names: true)
@@ -139,7 +141,7 @@ module MicrosoftSync
       end
 
       def public_interpolated_values
-        {status_code: code}
+        { status_code: code }
       end
 
       def self.subclasses_by_status_code
@@ -177,12 +179,19 @@ module MicrosoftSync
     end
 
     class HTTPNotFound < HTTPInvalidStatus; end
+
     class HTTPBadRequest < HTTPInvalidStatus; end
+
     class HTTPConflict < HTTPInvalidStatus; end
+
     class HTTPFailedDependency < HTTPInvalidStatus; end
+
     class HTTPInternalServerError < HTTPInvalidStatus; end
+
     class HTTPBadGateway < HTTPInvalidStatus; end
+
     class HTTPServiceUnavailable < HTTPInvalidStatus; end
+
     class HTTPGatewayTimeout < HTTPInvalidStatus; end
 
     class HTTPTooManyRequests < HTTPInvalidStatus

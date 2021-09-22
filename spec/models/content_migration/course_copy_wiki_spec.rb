@@ -25,7 +25,7 @@ describe ContentMigration do
 
     it "should copy wiki page attributes" do
       page = @copy_from.wiki_pages.create!(:title => "title", :body => "<address><ul></ul></address>",
-                                                :editing_roles => "teachers", :todo_date => Time.zone.now)
+                                           :editing_roles => "teachers", :todo_date => Time.zone.now)
 
       run_course_copy
 
@@ -185,7 +185,7 @@ describe ContentMigration do
 
         # only select one of each type
         @cm.copy_options = {
-            :wiki_pages => {mig_id(other_page) => "1", mig_id(front_page) => "0"}
+          :wiki_pages => { mig_id(other_page) => "1", mig_id(front_page) => "0" }
         }
         @cm.save!
 

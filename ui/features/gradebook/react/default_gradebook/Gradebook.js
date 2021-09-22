@@ -448,7 +448,7 @@ class Gradebook extends React.Component {
     // aspect of their presence here.
     this._gridHasRendered = this._gridHasRendered.bind(this)
     this._updateEssentialDataLoaded = this._updateEssentialDataLoaded.bind(this)
-    this.options = props
+    this.options = {...(props.gradebookEnv || {}), ...props}
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {

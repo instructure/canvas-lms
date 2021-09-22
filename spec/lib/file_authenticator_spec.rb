@@ -75,21 +75,21 @@ describe FileAuthenticator do
     describe "download_url" do
       it "should construct an instfs download url" do
         download_url = 'http://downloadUrl'
-        expect(InstFS).to receive(:authenticated_url).
-          with(@attachment, include(download: true)).
-          and_return(download_url)
+        expect(InstFS).to receive(:authenticated_url)
+          .with(@attachment, include(download: true))
+          .and_return(download_url)
         expect(@authenticator.download_url(@attachment)).to eql(download_url)
       end
 
       it "should construct a url specific to the authenticator params" do
-        expect(InstFS).to receive(:authenticated_url).
-          with(@attachment, include(
-            user: @user,
-            acting_as: @acting_as,
-            access_token: @access_token,
-            root_account: Account.default,
-            oauth_host: @oauth_host
-          ))
+        expect(InstFS).to receive(:authenticated_url)
+          .with(@attachment, include(
+                               user: @user,
+                               acting_as: @acting_as,
+                               access_token: @access_token,
+                               root_account: Account.default,
+                               oauth_host: @oauth_host
+                             ))
         @authenticator.download_url(@attachment)
       end
     end
@@ -97,21 +97,21 @@ describe FileAuthenticator do
     describe "inline_url" do
       it "should construct an instfs inline url" do
         inline_url = 'http://inlineUrl'
-        expect(InstFS).to receive(:authenticated_url).
-          with(@attachment, include(download: false)).
-          and_return(inline_url)
+        expect(InstFS).to receive(:authenticated_url)
+          .with(@attachment, include(download: false))
+          .and_return(inline_url)
         expect(@authenticator.inline_url(@attachment)).to eql(inline_url)
       end
 
       it "should construct a url specific to the authenticator params" do
-        expect(InstFS).to receive(:authenticated_url).
-          with(@attachment, include(
-            user: @user,
-            acting_as: @acting_as,
-            access_token: @access_token,
-            root_account: Account.default,
-            oauth_host: @oauth_host
-          ))
+        expect(InstFS).to receive(:authenticated_url)
+          .with(@attachment, include(
+                               user: @user,
+                               acting_as: @acting_as,
+                               access_token: @access_token,
+                               root_account: Account.default,
+                               oauth_host: @oauth_host
+                             ))
         @authenticator.inline_url(@attachment)
       end
     end
@@ -131,38 +131,38 @@ describe FileAuthenticator do
       it "should construct an instfs thumbnail url" do
         thumbnail_url = 'http://thumbnailUrl'
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
-        expect(InstFS).to receive(:authenticated_thumbnail_url).
-          with(@attachment, anything).
-          and_return(thumbnail_url)
+        expect(InstFS).to receive(:authenticated_thumbnail_url)
+          .with(@attachment, anything)
+          .and_return(thumbnail_url)
         expect(@authenticator.thumbnail_url(@attachment)).to eql(thumbnail_url)
       end
 
       it "should pass along the thumbnail geometry" do
         geometry = "640>"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
-        expect(InstFS).to receive(:authenticated_thumbnail_url).
-          with(@attachment, include(geometry: geometry))
+        expect(InstFS).to receive(:authenticated_thumbnail_url)
+          .with(@attachment, include(geometry: geometry))
         @authenticator.thumbnail_url(@attachment, size: geometry)
       end
 
       it "should pass along the original_url" do
         original_url = "http://example.com/preview/1234"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
-        expect(InstFS).to receive(:authenticated_thumbnail_url).
-          with(@attachment, include(original_url: original_url))
+        expect(InstFS).to receive(:authenticated_thumbnail_url)
+          .with(@attachment, include(original_url: original_url))
         @authenticator.thumbnail_url(@attachment, original_url: original_url)
       end
 
       it "should construct a url specific to the authenticator params" do
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
-        expect(InstFS).to receive(:authenticated_thumbnail_url).
-          with(@attachment, include(
-            user: @user,
-            acting_as: @acting_as,
-            access_token: @access_token,
-            root_account: Account.default,
-            oauth_host: @oauth_host
-          ))
+        expect(InstFS).to receive(:authenticated_thumbnail_url)
+          .with(@attachment, include(
+                               user: @user,
+                               acting_as: @acting_as,
+                               access_token: @access_token,
+                               root_account: Account.default,
+                               oauth_host: @oauth_host
+                             ))
         @authenticator.thumbnail_url(@attachment)
       end
     end
@@ -176,9 +176,9 @@ describe FileAuthenticator do
     it "should delegate to attachment.thumbnail_url" do
       geometry = "640>"
       thumbnail = double()
-      expect(@attachment).to receive(:thumbnail_url).
-        with(include(size: geometry)).
-        and_return(thumbnail)
+      expect(@attachment).to receive(:thumbnail_url)
+        .with(include(size: geometry))
+        .and_return(thumbnail)
       expect(@authenticator.thumbnail_url(@attachment, size: geometry)).to be(thumbnail)
     end
 

@@ -28,7 +28,7 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
-    dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
+           dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :context, polymorphic: %i[account course], required: true
 
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }, unless: :deleted?
@@ -59,7 +59,7 @@ class OutcomeProficiency < ApplicationRecord
     end
   end
 
-  def as_json(_options={})
+  def as_json(_options = {})
     {
       'ratings' => self.outcome_proficiency_ratings.map(&:as_json)
     }
@@ -99,11 +99,11 @@ class OutcomeProficiency < ApplicationRecord
 
   def self.default_ratings
     ratings = []
-    ratings << {description: I18n.t('Exceeds Mastery'), points: 4, mastery: false, color: '008EE2'}
-    ratings << {description: I18n.t('Mastery'), points: 3, mastery: true, color: '00AC18'}
-    ratings << {description: I18n.t('Near Mastery'), points: 2, mastery: false, color: 'FAB901'}
-    ratings << {description: I18n.t('Below Mastery'), points: 1, mastery: false, color: 'D97900'}
-    ratings << {description: I18n.t('No Evidence'), points: 0, mastery: false, color: 'EE0612'}
+    ratings << { description: I18n.t('Exceeds Mastery'), points: 4, mastery: false, color: '008EE2' }
+    ratings << { description: I18n.t('Mastery'), points: 3, mastery: true, color: '00AC18' }
+    ratings << { description: I18n.t('Near Mastery'), points: 2, mastery: false, color: 'FAB901' }
+    ratings << { description: I18n.t('Below Mastery'), points: 1, mastery: false, color: 'D97900' }
+    ratings << { description: I18n.t('No Evidence'), points: 0, mastery: false, color: 'EE0612' }
     ratings
   end
 
@@ -177,11 +177,11 @@ class OutcomeProficiency < ApplicationRecord
   def update_associated_rubrics
     updateable_rubric_scopes.each do |rubric_scope|
       rubric_scope.in_batches do |batch|
-        updateable = batch.
-          active.
-          aligned_to_outcomes.
-          unassessed.
-          with_at_most_one_association
+        updateable = batch
+                     .active
+                     .aligned_to_outcomes
+                     .unassessed
+                     .with_at_most_one_association
         updateable.each(&:update_mastery_scales)
       end
     end

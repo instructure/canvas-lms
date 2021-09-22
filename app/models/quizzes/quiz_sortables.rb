@@ -28,7 +28,7 @@ class Quizzes::QuizSortables
   end
 
   def reorder!
-    items.each_with_index { |item, i| item.position = i+1 }
+    items.each_with_index { |item, i| item.position = i + 1 }
     questions.each { |question| question.quiz_group_id = quiz_group_id }
     update_object_positions!
     quiz.mark_edited!

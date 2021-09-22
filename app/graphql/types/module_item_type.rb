@@ -55,38 +55,40 @@ module Types
 
     field :url, Types::UrlType, null: true
     def url
-        GraphQLHelpers::UrlHelpers.course_context_modules_item_redirect_url(
-          id: content_tag.id,
-          course_id: content_tag.context_id,
-          host: context[:request].host_with_port
-        )
+      GraphQLHelpers::UrlHelpers.course_context_modules_item_redirect_url(
+        id: content_tag.id,
+        course_id: content_tag.context_id,
+        host: context[:request].host_with_port
+      )
     end
 
-   field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
-   def next_resolver
-     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
-       ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
-         index = visible_tag_ids.index(content_tag.id)
-         next nil if index.nil?
-         next nil if index == visible_tag_ids.size - 1
-         next_id = visible_tag_ids[index + 1]
-         Loaders::IDLoader.for(ContentTag).load(next_id)
-       end
-     end
-   end
+    field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
+    def next_resolver
+      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+          index = visible_tag_ids.index(content_tag.id)
+          next nil if index.nil?
+          next nil if index == visible_tag_ids.size - 1
 
-   field :previous, Types::ModuleItemType, null: true
-   def previous
-     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
-       ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
-         index = visible_tag_ids.index(content_tag.id)
-         next nil if index.nil?
-         next nil if index == 0
-         previous_id = visible_tag_ids[index - 1]
-         Loaders::IDLoader.for(ContentTag).load(previous_id)
-       end
-     end
-   end
+          next_id = visible_tag_ids[index + 1]
+          Loaders::IDLoader.for(ContentTag).load(next_id)
+        end
+      end
+    end
+
+    field :previous, Types::ModuleItemType, null: true
+    def previous
+      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+          index = visible_tag_ids.index(content_tag.id)
+          next nil if index.nil?
+          next nil if index == 0
+
+          previous_id = visible_tag_ids[index - 1]
+          Loaders::IDLoader.for(ContentTag).load(previous_id)
+        end
+      end
+    end
 
     field :content, Interfaces::ModuleItemInterface, null: true
     def content

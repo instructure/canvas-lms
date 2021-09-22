@@ -86,6 +86,7 @@ describe('CreateCourseModal', () => {
   })
 
   it('shows a spinner with correct title while loading accounts', async () => {
+    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByText('Loading accounts...')).toBeInTheDocument())
   })

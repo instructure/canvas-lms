@@ -30,16 +30,16 @@ module Canvas
       class StubSpan
         include Singleton
 
-        def set_tag(key, value=nil); end
+        def set_tag(key, value = nil); end
 
-        def set_metric(key, value=nil); end
+        def set_metric(key, value = nil); end
 
         def to_h
           {}
         end
       end
 
-      def trace(_name, _opts={})
+      def trace(_name, _opts = {})
         yield StubSpan.instance
       end
     end

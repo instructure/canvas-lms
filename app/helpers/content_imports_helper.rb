@@ -19,7 +19,6 @@
 #
 
 module ContentImportsHelper
-
   def return_or_context_url
     if params[:return_to]
       clean_return_to(params[:return_to])

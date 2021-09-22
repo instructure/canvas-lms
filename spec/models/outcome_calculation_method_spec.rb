@@ -34,7 +34,6 @@ describe OutcomeCalculationMethod, type: :model do
     it { is_expected.to validate_inclusion_of(:calculation_method).in_array(OutcomeCalculationMethod::CALCULATION_METHODS) }
 
     context 'calculation_int' do
-
       context 'decaying_average' do
         let(:calculation_method) { 'decaying_average' }
         let(:calculation_int) { 3 }

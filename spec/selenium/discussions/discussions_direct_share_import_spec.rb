@@ -82,7 +82,7 @@ describe 'discussions' do
       fj("span[role='menuitem']:contains('Send To...')").click
       expect(fj("h2:contains('Send To...')")).to be_present
     end
-  
+
     it 'allows user to copy discussion from individual discussion page' do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion1.id}"
       f("button[data-testid='discussion-post-menu-trigger']").click

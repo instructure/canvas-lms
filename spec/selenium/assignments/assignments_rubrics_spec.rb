@@ -51,25 +51,25 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/rubrics"
 
       expect do
-       f('.add_rubric_link').click
-       f('#add_criterion_container a:nth-of-type(1)').click
-       f('#add_criterion_button').click
-       set_value(f('#edit_criterion_form .description'), 'criterion 1')
-       f('.ui-dialog-buttonset .save_button').click
-       wait_for_ajaximations
-       f('#criterion_2 .add_rating_link_after').click
+        f('.add_rubric_link').click
+        f('#add_criterion_container a:nth-of-type(1)').click
+        f('#add_criterion_button').click
+        set_value(f('#edit_criterion_form .description'), 'criterion 1')
+        f('.ui-dialog-buttonset .save_button').click
+        wait_for_ajaximations
+        f('#criterion_2 .add_rating_link_after').click
 
-       expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
-       set_value(f('.rating_description'), 'rating 1')
-       fj('.ui-dialog-buttonset:visible .save_button').click
-       wait_for_ajaximations
-       submit_form('#edit_rubric_form')
-       wait_for_ajaximations
+        expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
+        set_value(f('.rating_description'), 'rating 1')
+        fj('.ui-dialog-buttonset:visible .save_button').click
+        wait_for_ajaximations
+        submit_form('#edit_rubric_form')
+        wait_for_ajaximations
       end.to change(Rubric, :count).by(1)
-      expect(f('.rubric_table tbody tr:nth-of-type(3) .description_title')).
-                                to include_text('criterion 1')
-      expect(f('.rubric_table tbody tr:nth-of-type(3) .ratings td:nth-of-type(2) .rating_description_value')).
-          to include_text('rating 1')
+      expect(f('.rubric_table tbody tr:nth-of-type(3) .description_title'))
+        .to include_text('criterion 1')
+      expect(f('.rubric_table tbody tr:nth-of-type(3) .ratings td:nth-of-type(2) .rating_description_value'))
+        .to include_text('rating 1')
     end
 
     it "should add a new rubric to assignment and verify points", priority: "1", test_id: 114341 do
@@ -115,9 +115,9 @@ describe "assignment rubrics" do
       wait_for_ajaximations
       fln('My Rubric').click
       wait_for_ajaximations
-      f('#rubric_dialog_'+course_rubric.id.to_s+' .select_rubric_link').click
+      f('#rubric_dialog_' + course_rubric.id.to_s + ' .select_rubric_link').click
       wait_for_ajaximations
-      expect(f('#rubric_'+course_rubric.id.to_s+' .rubric_title .title')).to include_text(course_rubric.title)
+      expect(f('#rubric_' + course_rubric.id.to_s + ' .rubric_title .title')).to include_text(course_rubric.title)
 
       # Find the associated rubric for the assignment we just edited
       association = RubricAssociation.where(title: "first test assignment")
@@ -160,10 +160,10 @@ describe "assignment rubrics" do
       f('.add_rubric_link').click
       f('#rubric_new .editing .find_rubric_link').click
       wait_for_ajax_requests
-      expect(f('#rubric_dialog_'+@rubric.id.to_s+' .title')).to include_text(@rubric.title)
-      f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
+      expect(f('#rubric_dialog_' + @rubric.id.to_s + ' .title')).to include_text(@rubric.title)
+      f('#rubric_dialog_' + @rubric.id.to_s + ' .select_rubric_link').click
       wait_for_ajaximations
-      expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
+      expect(f('#rubric_' + @rubric.id.to_s + ' .rubric_title .title')).to include_text(@rubric.title)
       expect(f('#rubrics span .rubric_total').text).to eq '8'
     end
 
@@ -179,7 +179,7 @@ describe "assignment rubrics" do
         before do
           @course.account.enable_feature!(:account_level_mastery_scales)
           proficiency = outcome_proficiency_model(@course)
-          @proficiency_rating_points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s}
+          @proficiency_rating_points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s }
         end
 
         it "should use the course mastery scale for outcome criterion when editing account rubrics within an assignment" do
@@ -275,7 +275,7 @@ describe "assignment rubrics" do
       outcome_with_rubric
       @assignment = @course.assignments.create(name: 'assignment with rubric')
       @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
-      @submission = @assignment.submit_homework(@student, {url: "http://www.instructure.com/"})
+      @submission = @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
       @rubric.save!
@@ -298,16 +298,16 @@ describe "assignment rubrics" do
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
       @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
-      @submission = @assignment.submit_homework(@student, {url: "http://www.instructure.com/"})
+      @submission = @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       wait_for_ajaximations
       f(".assess_submission_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".hide_rubric_link"))
       driver.action.key_down(:shift)
-        .send_keys(:tab)
-        .key_up(:shift)
-        .perform
+            .send_keys(:tab)
+            .key_up(:shift)
+            .perform
       check_element_has_focus(f(".save_rubric_button"))
       driver.action.send_keys(:tab).perform
       check_element_has_focus(f(".hide_rubric_link"))
@@ -486,12 +486,12 @@ describe "assignment rubrics" do
                   :description => "Amazing",
                 },
                 "1" => {
-                    :points => 50,
-                    :description => "Reduced Marks",
+                  :points => 50,
+                  :description => "Reduced Marks",
                 },
                 "2" => {
-                    :points => 20,
-                    :description => "Less than twenty percent",
+                  :points => 20,
+                  :description => "Less than twenty percent",
                 }
               }
             }
@@ -686,13 +686,12 @@ describe "assignment rubrics" do
                          assessor: @teacher,
                          artifact: assignment.find_or_create_submission(@student),
                          assessment: {
-                             assessment_type: 'grading',
-                             :"criterion_#{@rubric.criteria_object.first.id}" => {
-                                 points: 3,
-                                 comments: comment,
-                             }
-                         }
-                         )
+                           assessment_type: 'grading',
+                           :"criterion_#{@rubric.criteria_object.first.id}" => {
+                             points: 3,
+                             comments: comment,
+                           }
+                         })
       # when
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       f('.assess_submission_link').click

@@ -58,12 +58,12 @@ describe ContentMigration do
       page = @copy_from.wiki_pages.create(:title => "some page")
       page.workflow_state = :unpublished
       page.save!
-      mod1.add_item({:id => page.id, :type => 'wiki_page'})
+      mod1.add_item({ :id => page.id, :type => 'wiki_page' })
 
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       asmnt1.workflow_state = :unpublished
       asmnt1.save!
-      mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
 
       run_course_copy
 
@@ -112,8 +112,8 @@ describe ContentMigration do
       expect(@quiz.assignment).to be_unpublished
 
       @cm.copy_options = {
-          :assignments => {mig_id(@quiz.assignment) => "0"},
-          :quizzes => {mig_id(@quiz) => "1"},
+        :assignments => { mig_id(@quiz.assignment) => "0" },
+        :quizzes => { mig_id(@quiz) => "1" },
       }
       @cm.save!
 

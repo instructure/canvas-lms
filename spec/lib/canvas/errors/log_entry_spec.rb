@@ -23,7 +23,7 @@ require_dependency "canvas/errors/log_entry"
 module Canvas
   class Errors
     describe LogEntry do
-      let(:data){ {tags: { foo: "bar"}} }
+      let(:data) { { tags: { foo: "bar" } } }
 
       describe "with an exception" do
         before(:each) do
@@ -35,7 +35,7 @@ module Canvas
         end
 
         describe "#message" do
-          let(:message){ @entry.message }
+          let(:message) { @entry.message }
 
           it "includes an easily greppable tag" do
             expect(message).to include("[CANVAS_ERRORS]")
@@ -88,7 +88,7 @@ module Canvas
         end
 
         describe "#message" do
-          let(:message){ @entry.message }
+          let(:message) { @entry.message }
 
           it "includes an easily greppable tag" do
             expect(message).to include("[CANVAS_ERRORS]")

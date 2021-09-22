@@ -39,7 +39,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
           end
         end
 
-        expect(Apple.new({}).run([ {}, {} ])).to eq({ something: 2 })
+        expect(Apple.new({}).run([{}, {}])).to eq({ something: 2 })
 
         unset Apple
       end
@@ -70,7 +70,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
               { colors: responses.map { |r| r[:color] } }
             end
 
-            metric something: [ :colors ] do |responses, colors|
+            metric something: [:colors] do |responses, colors|
               colors.join(', ')
             end
           end
@@ -129,6 +129,5 @@ describe CanvasQuizStatistics::Analyzers::Base do
         unset Apple, Orange
       end
     end
-
   end
 end

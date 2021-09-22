@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::XlistImporter do
-
   before { account_model }
 
   context 'account associations' do
@@ -33,14 +32,14 @@ describe SIS::CSV::XlistImporter do
         "A003,A002,English Literature,active",
         "A004,,Awesomeness,active"
       )
-        process_csv_data_cleanly(
-          "course_id,short_name,long_name,account_id,term_id,status",
-          "C001,TC 101,Test Course 101,,,active",
-          "C002,TC 101,Test Course 101,A001,,active",
-          "C003,TC 101,Test Course 101,A002,,active",
-          "C004,TC 101,Test Course 101,A003,,active",
-          "C005,TC 101,Test Course 101,A004,,active"
-        )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 101,Test Course 101,A001,,active",
+        "C003,TC 101,Test Course 101,A002,,active",
+        "C004,TC 101,Test Course 101,A003,,active",
+        "C005,TC 101,Test Course 101,A004,,active"
+      )
     end
 
     it 'should have proper account associations when new' do
@@ -178,7 +177,5 @@ describe SIS::CSV::XlistImporter do
       expect(@account.courses.where(sis_source_id: "C001").first.students.size).to eq 0
       expect(@account.courses.where(sis_source_id: "X001").first.students.first.name).to eq "User Uno"
     end
-
   end
-
 end

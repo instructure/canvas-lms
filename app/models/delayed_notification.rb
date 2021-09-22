@@ -29,6 +29,7 @@ class DelayedNotification < ActiveRecord::Base
   include NotificationPreloader
 
   attr_accessor :data
+
   validates_presence_of :notification_id, :asset_id, :asset_type, :workflow_state
 
   serialize :recipient_keys
@@ -41,10 +42,10 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
 
-
   def self.process(asset, notification, recipient_keys, data = {}, **kwargs)
     # RUBY 2.7 this can go away (**{} will work at the caller)
     raise ArgumentError, "Only send one hash" if !data&.empty? && !kwargs.empty?
+
     data = kwargs if data&.empty? && !kwargs.empty?
 
     DelayedNotification.new(
@@ -89,12 +90,12 @@ class DelayedNotification < ActiveRecord::Base
       # rails de-dups them and only does one query, but if not included twice,
       # they will not show as loaded against both objects.
       includes = if klass == CommunicationChannel
-        [:notification_policies, :notification_policy_overrides, { user: [:pseudonyms, :notification_policies, :notification_policy_overrides] }]
-      elsif klass == User
-        [:pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] }, :notification_policies, :notification_policy_overrides]
-      else
-        []
-      end
+                   [:notification_policies, :notification_policy_overrides, { user: [:pseudonyms, :notification_policies, :notification_policy_overrides] }]
+                 elsif klass == User
+                   [:pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] }, :notification_policies, :notification_policy_overrides]
+                 else
+                   []
+                 end
 
       ids.each_slice(100) do |slice|
         yield klass.where(:id => slice).preload(includes).to_a

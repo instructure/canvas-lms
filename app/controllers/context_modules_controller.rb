@@ -48,7 +48,7 @@ class ContextModulesController < ApplicationController
       @modules_cache_key ||= begin
         visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
         cache_key_items = [@context.cache_key, @can_edit, @is_student, @can_view_unpublished, 'all_context_modules_draft_10',
-          collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
+                           collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
         cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
@@ -58,7 +58,7 @@ class ContextModulesController < ApplicationController
     def load_modules
       @modules = @context.modules_visible_to(@current_user).limit(Setting.get('course_module_limit', '1000').to_i)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select { |cm_id, collapsed| !!collapsed }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
@@ -79,9 +79,9 @@ class ContextModulesController < ApplicationController
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
       tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
-          :root_account => @domain_root_account, :current_user => @current_user).to_a
+                                                    :root_account => @domain_root_account, :current_user => @current_user).to_a
       end
-      placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
+      placements.select { |p| @menu_tools[p] = tools.select { |t| t.has_placement? p } }
 
       favorites_enabled = @domain_root_account&.feature_enabled?(:commons_favorites)
       @module_index_tools = favorites_enabled ? external_tools_display_hashes(:module_index_menu) : []
@@ -89,61 +89,63 @@ class ContextModulesController < ApplicationController
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
-        :CONTEXT_URL_ROOT => polymorphic_path([@context]),
-        :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
-        :MODULE_FILE_DETAILS => module_file_details,
-        :MODULE_FILE_PERMISSIONS => {
-           usage_rights_required: @context.usage_rights_required?,
-           manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
-        },
-        :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},
-        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
-        :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
+             :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+             :FILES_CONTEXTS => [{ asset_string: @context.asset_string }],
+             :MODULE_FILE_DETAILS => module_file_details,
+             :MODULE_FILE_PERMISSIONS => {
+               usage_rights_required: @context.usage_rights_required?,
+               manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
+             },
+             :MODULE_TRAY_TOOLS => { :module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools },
+             :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+             :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
       if is_master_course || is_child_course
         js_env(:MASTER_COURSE_SETTINGS => {
-          :IS_MASTER_COURSE => is_master_course,
-          :IS_CHILD_COURSE => is_child_course,
-          :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
-        })
+                 :IS_MASTER_COURSE => is_master_course,
+                 :IS_CHILD_COURSE => is_child_course,
+                 :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
+               })
       end
 
       conditional_release_js_env(includes: :active_rules)
     end
 
     private
-    def combined_active_quizzes
-      classic_quizzes = @context.
-        active_quizzes.
-        reorder(Quizzes::Quiz.best_unicode_collation_key('title')).
-        limit(400).
-        pluck(:id, :title, Arel.sql("'quiz' AS type"))
 
-      lti_quizzes = @context.
-        active_assignments.
-        type_quiz_lti.
-        reorder(Assignment.best_unicode_collation_key('title')).
-        limit(400).
-        pluck(:id, :title, Arel.sql("'assignment' AS type"))
+    def combined_active_quizzes
+      classic_quizzes = @context
+                        .active_quizzes
+                        .reorder(Quizzes::Quiz.best_unicode_collation_key('title'))
+                        .limit(400)
+                        .pluck(:id, :title, Arel.sql("'quiz' AS type"))
+
+      lti_quizzes = @context
+                    .active_assignments
+                    .type_quiz_lti
+                    .reorder(Assignment.best_unicode_collation_key('title'))
+                    .limit(400)
+                    .pluck(:id, :title, Arel.sql("'assignment' AS type"))
 
       @combined_active_quizzes_includes_both_types = !classic_quizzes.empty? && !lti_quizzes.empty?
-      (classic_quizzes + lti_quizzes).sort_by{ |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
+      (classic_quizzes + lti_quizzes).sort_by { |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
     end
   end
   include ModuleIndexHelper
 
   def index
     if authorized_action(@context, @current_user, :read)
-      log_asset_access([ "modules", @context ], "modules", "other")
+      log_asset_access(["modules", @context], "modules", "other")
       load_modules
 
       set_tutorial_js_env
 
       if @is_student
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        @modules.each{|m| m.evaluate_for(@current_user) }
+
+        @modules.each { |m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
       add_body_class('padless-content')
@@ -182,14 +184,14 @@ class ContextModulesController < ApplicationController
             }
 
             js_env({
-              CHOOSE_MASTERY_PATH_DATA: {
-                options: options,
-                selectedOption: rule[:selected_set_id],
-                courseId: @context.id,
-                moduleId: item.context_module.id,
-                itemId: id
-              }
-            })
+                     CHOOSE_MASTERY_PATH_DATA: {
+                       options: options,
+                       selectedOption: rule[:selected_set_id],
+                       courseId: @context.id,
+                       moduleId: item.context_module.id,
+                       itemId: id
+                     }
+                   })
 
             css_bundle :choose_mastery_path
             js_bundle :choose_mastery_path
@@ -292,7 +294,7 @@ class ContextModulesController < ApplicationController
       respond_to do |format|
         if @module.save
           format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-          format.json { render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => { :user => @current_user, :session => session }) }
         else
           format.html
           format.json { render :json => @module.errors, :status => :bad_request }
@@ -325,7 +327,7 @@ class ContextModulesController < ApplicationController
 
       # # Background this, not essential that it happen right away
       # ContextModule.delay.update_tag_order(@context)
-      render :json => @modules.map{ |m| m.as_json(include: :content_tags, methods: :workflow_state) }
+      render :json => @modules.map { |m| m.as_json(include: :content_tags, methods: :workflow_state) }
     end
   end
 
@@ -351,27 +353,27 @@ class ContextModulesController < ApplicationController
       end
 
       submitted_assignment_ids = if @current_user && assignment_ids.any?
-        assignments_key = Digest::MD5.hexdigest(assignment_ids.sort.join(","))
-        Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
-            batch_object: @current_user, batched_keys: :submissions) do
-          @current_user.submissions.shard(@context.shard).
-            having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
-        end
-      end
-      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard).
-        completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
-      submitted_assignment_ids ||=[]
-      submitted_quiz_ids ||=[]
+                                   assignments_key = Digest::MD5.hexdigest(assignment_ids.sort.join(","))
+                                   Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
+                                                                       batch_object: @current_user, batched_keys: :submissions) do
+                                     @current_user.submissions.shard(@context.shard)
+                                                  .having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
+                                   end
+                                 end
+      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard)
+                                        .completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
+      submitted_assignment_ids ||= []
+      submitted_quiz_ids ||= []
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
-          tag.assignment.context_module_tag_info(@current_user, @context,
-            user_is_admin: user_is_admin, has_submission: submitted_assignment_ids.include?(tag.assignment.id))
-        elsif tag.content_type_quiz?
-          tag.content.context_module_tag_info(@current_user, @context,
-            user_is_admin: user_is_admin, has_submission: submitted_quiz_ids.include?(tag.content.id))
-        else
-          {:points_possible => nil, :due_date => nil}
-        end
+                         tag.assignment.context_module_tag_info(@current_user, @context,
+                                                                user_is_admin: user_is_admin, has_submission: submitted_assignment_ids.include?(tag.assignment.id))
+                       elsif tag.content_type_quiz?
+                         tag.content.context_module_tag_info(@current_user, @context,
+                                                             user_is_admin: user_is_admin, has_submission: submitted_quiz_ids.include?(tag.content.id))
+                       else
+                         { :points_possible => nil, :due_date => nil }
+                       end
         info[tag.id][:todo_date] = tag.content && tag.content[:todo_date]
 
         if tag.try(:assignment).try(:external_tool_tag).try(:external_data).try(:[], 'key') == 'https://canvas.instructure.com/lti/mastery_connect_assessment'
@@ -406,13 +408,13 @@ class ContextModulesController < ApplicationController
     end
   end
 
-  def prerequisites_needing_finishing_for(mod, progression, before_tag=nil)
+  def prerequisites_needing_finishing_for(mod, progression, before_tag = nil)
     tags = mod.content_tags_visible_to(@current_user)
     pres = []
     tags.each do |tag|
-      if req = (mod.completion_requirements || []).detect{|r| r[:id] == tag.id }
+      if req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id }
         progression.requirements_met ||= []
-        if !progression.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
+        if !progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
           if !before_tag || tag.position <= before_tag.position
             pre = {
               :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
@@ -435,6 +437,7 @@ class ContextModulesController < ApplicationController
   def content_tag_prerequisites_needing_finishing
     type, id = ActiveRecord::Base.parse_asset_string params[:code]
     raise ActiveRecord::RecordNotFound if id == 0
+
     if type == 'ContentTag'
       @tag = @context.context_module_tags.active.where(id: id).first
     else
@@ -451,11 +454,11 @@ class ContextModulesController < ApplicationController
       previous_modules = @context.context_modules.active.where('position<?', @module.position).ordered.to_a
       previous_modules.reverse!
       valid_previous_modules = []
-      prereq_ids = @module.prerequisites.select{|p| p[:type] == 'context_module' }.map{|p| p[:id] }
+      prereq_ids = @module.prerequisites.select { |p| p[:type] == 'context_module' }.map { |p| p[:id] }
       previous_modules.each do |mod|
         if prereq_ids.include?(mod.id)
           valid_previous_modules << mod
-          prereq_ids += mod.prerequisites.select{|p| p[:type] == 'context_module' }.map{|p| p[:id] }
+          prereq_ids += mod.prerequisites.select { |p| p[:type] == 'context_module' }.map { |p| p[:id] }
         end
       end
       valid_previous_modules.reverse!
@@ -497,11 +500,12 @@ class ContextModulesController < ApplicationController
   def toggle_collapse
     if authorized_action(@context, @current_user, :read)
       return unless params.key?(:collapse)
+
       @module = @context.modules_visible_to(@current_user).find(params[:context_module_id])
       progression = collapse(@module, params[:collapse])
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-        format.json { render :json => (progression.collapsed ? progression : @module.content_tags_visible_to(@current_user))}
+        format.json { render :json => (progression.collapsed ? progression : @module.content_tags_visible_to(@current_user)) }
       end
     end
   end
@@ -509,6 +513,7 @@ class ContextModulesController < ApplicationController
   def toggle_collapse_all
     if authorized_action(@context, @current_user, :read)
       return unless params.key?(:collapse)
+
       @modules = @context.modules_visible_to(@current_user)
       @modules.each do |mod|
         collapse(mod, params[:collapse])
@@ -529,11 +534,11 @@ class ContextModulesController < ApplicationController
   def reorder_items
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      order = params[:order].split(",").map{|id| id.to_i}
+      order = params[:order].split(",").map { |id| id.to_i }
       tags = @context.context_module_tags.not_deleted.where(id: order)
       affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
-      items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
+      items = order.map { |id| tags.detect { |t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
         item.position = idx + 1
         item.context_module_id = @module.id
@@ -547,10 +552,9 @@ class ContextModulesController < ApplicationController
       ContentTag.update_could_be_locked(affected_items)
       @context.touch
       @module.reload
-      render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
+      render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => { :user => @current_user, :session => session })
     end
   end
-
 
   def item_details
     if authorized_action(@context, @current_user, :read)
@@ -559,9 +563,9 @@ class ContextModulesController < ApplicationController
       id = code.pop.to_i
       type = code.join("_").classify
       @modules = @context.modules_visible_to(@current_user)
-      @tags = @context.context_module_tags.active.sort_by{|t| t.position ||= 999}
+      @tags = @context.context_module_tags.active.sort_by { |t| t.position ||= 999 }
       result = {}
-      possible_tags = @tags.find_all {|t| t.content_type == type && t.content_id == id }
+      possible_tags = @tags.find_all { |t| t.content_type == type && t.content_id == id }
       if possible_tags.size > 1
         # if there's more than one tag for the item, but the caller didn't
         # specify which one they want, we don't want to return any information.
@@ -574,22 +578,22 @@ class ContextModulesController < ApplicationController
         if !result[:current_item]
           obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
           if obj.is_a?(ContentTag)
-            result[:current_item] = @tags.detect{|t| t.id == obj.id }
+            result[:current_item] = @tags.detect { |t| t.id == obj.id }
           elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
-            result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+            result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           elsif obj.is_a?(Quizzes::Quiz) && obj.assignment_id
-            result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+            result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           end
         end
       end
       result[:current_item].evaluate_for(@current_user) rescue nil
       if result[:current_item] && result[:current_item].position
-        result[:previous_item] = @tags.reverse.detect{|t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position <= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
-        result[:next_item] = @tags.detect{|t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position >= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
-        current_module = @modules.detect{|m| m.id == result[:current_item].context_module_id}
+        result[:previous_item] = @tags.reverse.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position <= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
+        result[:next_item] = @tags.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position >= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
+        current_module = @modules.detect { |m| m.id == result[:current_item].context_module_id }
         if current_module
-          result[:previous_module] = @modules.reverse.detect{|m| (m.position || 0) < (current_module.position || 0) }
-          result[:next_module] = @modules.detect{|m| (m.position || 0) > (current_module.position || 0) }
+          result[:previous_module] = @modules.reverse.detect { |m| (m.position || 0) < (current_module.position || 0) }
+          result[:next_module] = @modules.detect { |m| (m.position || 0) > (current_module.position || 0) }
         end
       end
       render :json => result
@@ -610,7 +614,7 @@ class ContextModulesController < ApplicationController
         publishable: module_item_publishable?(@tag),
         published: @tag.published?,
         publishable_id: module_item_publishable_id(@tag),
-        unpublishable:  module_item_unpublishable?(@tag),
+        unpublishable: module_item_unpublishable?(@tag),
         graded: @tag.graded?,
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
@@ -653,17 +657,17 @@ class ContextModulesController < ApplicationController
       if request.format == :json
         if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
-            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user) }
+            @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
           else
             if @context.large_roster
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each{|p| p.evaluate }
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each { |p| p.evaluate }
             end
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
-          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user) }
+          @progressions = @context.context_modules.active.order(:id).map { |m| m.evaluate_for(@current_user) }
         else
           # module progressions don't apply, but unlock_at still does
           @progressions = @context.context_modules.active.order(:id).map do |m|
@@ -679,7 +683,7 @@ class ContextModulesController < ApplicationController
         @restrict_student_list = true
         student_ids = @context.observer_enrollments.for_user(@current_user).map(&:associated_user_id)
         student_ids << @current_user.id if @context.user_is_student?(@current_user)
-        students = UserSearch.scope_for(@context, @current_user, {:enrollment_type => 'student'}).where(:id => student_ids)
+        students = UserSearch.scope_for(@context, @current_user, { :enrollment_type => 'student' }).where(:id => student_ids)
         @visible_students = students.map { |u| user_json(u, @current_user, session) }
       end
     end
@@ -695,7 +699,7 @@ class ContextModulesController < ApplicationController
         @module.unpublish
       end
       if @module.update(context_module_params)
-        json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
+        json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => { :user => @current_user, :session => session })
         json['context_module']['relock_warning'] = true if @module.relock_warning?
         render :json => json
       else
@@ -716,21 +720,22 @@ class ContextModulesController < ApplicationController
   end
 
   private
+
   def preload_assignments_and_quizzes(tags, user_is_admin)
-    assignment_tags = tags.select{|ct| ct.can_have_assignment?}
+    assignment_tags = tags.select { |ct| ct.can_have_assignment? }
     return unless assignment_tags.any?
 
-    content_with_assignments = assignment_tags.
-      select{|ct| ct.content_type != "Assignment" && ct.content.assignment_id}.map(&:content)
+    content_with_assignments = assignment_tags
+                               .select { |ct| ct.content_type != "Assignment" && ct.content.assignment_id }.map(&:content)
     ActiveRecord::Associations::Preloader.new.preload(content_with_assignments, :assignment) if content_with_assignments.any?
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.map(&:assignment).compact
-      plain_quizzes = assignment_tags.select{|ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment}.map(&:content)
+      plain_quizzes = assignment_tags.select { |ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment }.map(&:content)
 
       preload_has_too_many_overrides(assignments, :assignment_id)
       preload_has_too_many_overrides(plain_quizzes, :quiz_id)
-      overrideables = (assignments + plain_quizzes).select{|o| !o.has_too_many_overrides}
+      overrideables = (assignments + plain_quizzes).select { |o| !o.has_too_many_overrides }
 
       if overrideables.any?
         ActiveRecord::Associations::Preloader.new.preload(overrideables, :assignment_overrides)
@@ -753,18 +758,18 @@ class ContextModulesController < ApplicationController
   def preload_has_too_many_overrides(assignments_or_quizzes, override_column)
     # find the assignments/quizzes with too many active overrides and mark them as such
     if assignments_or_quizzes.any?
-      ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes).
-        group(override_column).having("COUNT(*) > ?", Setting.get('assignment_all_dates_too_many_threshold', '25').to_i).
-        active.pluck(override_column)
+      ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes)
+                              .group(override_column).having("COUNT(*) > ?", Setting.get('assignment_all_dates_too_many_threshold', '25').to_i)
+                              .active.pluck(override_column)
 
       if ids.any?
-        assignments_or_quizzes.each{|o| o.has_too_many_overrides = true if ids.include?(o.id) }
+        assignments_or_quizzes.each { |o| o.has_too_many_overrides = true if ids.include?(o.id) }
       end
     end
   end
 
   def context_module_params
     params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
-      :completion_requirements => strong_anything, :prerequisites => strong_anything)
+                                           :completion_requirements => strong_anything, :prerequisites => strong_anything)
   end
 end

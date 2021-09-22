@@ -35,7 +35,7 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
-     it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
+    it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
       @unpub_page = @course.wiki_pages.create!(title: 'Unpublished Page')
       @unpub_page.workflow_state = 'unpublished'
       @unpub_page.save!
@@ -43,7 +43,7 @@ describe "context modules" do
       go_to_modules
       verify_module_title('Unpublished Page')
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-     end
+    end
 
     it 'should add a published page to a module', priority: "1", test_id: 126710 do
       @pub_page = @course.wiki_pages.create!(title: 'Published Page')
@@ -290,7 +290,7 @@ describe "context modules" do
       course_factory(active_course: true)
       @course.usage_rights_required = true
       @course.save!
-      #adding file to course
+      # adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
       @file.save!
@@ -343,7 +343,7 @@ describe "context modules" do
         file_names = [FILE_NAME, "another.txt"]
         get "/courses/#{@course.id}/modules"
         add_existing_module_file_items('#attachments_select', file_names)
-        file_names.each {|item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed}
+        file_names.each { |item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed }
       end
 
       it "should upload mutiple files to add items to a module" do
@@ -363,7 +363,7 @@ describe "context modules" do
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
-        @mod.add_item({:id => file.id, :type => 'attachment'})
+        @mod.add_item({ :id => file.id, :type => 'attachment' })
 
         get "/courses/#{@course.id}/modules"
         upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
@@ -458,7 +458,7 @@ describe "context modules" do
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
-        @mod.add_item({:id => file.id, :type => 'attachment'})
+        @mod.add_item({ :id => file.id, :type => 'attachment' })
         # create a new module
         @mod2 = @course.context_modules.create!(:name => "another module")
 
@@ -509,7 +509,7 @@ describe "context modules" do
 
     it "should not remove the file link in a module when file is overwritten" do
       course_module
-      @module.add_item({:id => @file.id, :type => 'attachment'})
+      @module.add_item({ :id => @file.id, :type => 'attachment' })
       get "/courses/#{@course.id}/modules"
 
       expect(f('.context_module_item')).to include_text(FILE_NAME)

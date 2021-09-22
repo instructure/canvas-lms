@@ -62,7 +62,7 @@ describe CutyCapt do
       expect(CutyCapt.verify_url("http://169.254.169.254/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://4.4.4.4/blah")).to be_truthy
 
-      allow(Resolv).to receive(:getaddresses).and_return([ "8.8.8.8", "10.0.1.1" ])
+      allow(Resolv).to receive(:getaddresses).and_return(["8.8.8.8", "10.0.1.1"])
       expect(CutyCapt.verify_url("http://workingexample.com/blah")).to be_falsey
     end
 
@@ -76,7 +76,7 @@ describe CutyCapt do
     it "should time out cuty processes" do
       ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
 
-      allow(CutyCapt).to receive(:cuty_arguments).and_return([ "/bin/sleep", "60" ])
+      allow(CutyCapt).to receive(:cuty_arguments).and_return(["/bin/sleep", "60"])
       expect {
         Timeout::timeout(10) { CutyCapt.snapshot_url("http://google.com/") }
       }.not_to raise_error

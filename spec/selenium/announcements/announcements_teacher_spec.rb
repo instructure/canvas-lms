@@ -37,7 +37,7 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    it "should allow saving of section announcement", test_id:3469728, priority: "1" do
+    it "should allow saving of section announcement", test_id: 3469728, priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -45,11 +45,11 @@ describe "announcements" do
       AnnouncementNewEdit.add_message("Announcement Body")
       AnnouncementNewEdit.add_title("Announcement Title")
       AnnouncementNewEdit.submit_announcement_form
-      expect(driver.current_url).to include(AnnouncementNewEdit.
-                                            individual_announcement_url(Announcement.last))
+      expect(driver.current_url).to include(AnnouncementNewEdit
+                                            .individual_announcement_url(Announcement.last))
     end
 
-    it "should not allow empty sections", test_id:3469730, priority: "1" do
+    it "should not allow empty sections", test_id: 3469730, priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -132,7 +132,7 @@ describe "announcements" do
         submit_form('.form-actions')
         wait_for_ajaximations
 
-        expect(ff('.error_box').any?{|box| box.text.include?("A message is required")}).to be_truthy
+        expect(ff('.error_box').any? { |box| box.text.include?("A message is required") }).to be_truthy
       end
 
       it "should add an attachment to a graded topic", priority: "1", test_id: 220367 do
@@ -178,7 +178,7 @@ describe "announcements" do
 
     it "displayed delayed post note on page of delayed announcement" do
       a = @course.announcements.create!(:title => "Announcement", :message => "foobers",
-        :delayed_post_at => 1.week.from_now)
+                                        :delayed_post_at => 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
       expect(f('.discussion-fyi')).to include_text(
         'The content of this announcement will not be visible to users until'

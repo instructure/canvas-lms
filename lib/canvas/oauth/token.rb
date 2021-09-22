@@ -29,14 +29,13 @@ module Canvas::Oauth
     PURPOSE_KEY = 'purpose'
     REMEMBER_ACCESS = 'remember_access'
 
-    def initialize(key, code, access_token=nil)
+    def initialize(key, code, access_token = nil)
       @key = key
       @code = code if code
       if access_token
         @access_token = access_token
         @user = @access_token.user
       end
-
     end
 
     def is_for_valid_code?
@@ -117,7 +116,7 @@ module Canvas::Oauth
       end
     end
 
-    def as_json(_options={})
+    def as_json(_options = {})
       json = {
         'access_token' => access_token.full_token,
         'token_type' => 'Bearer',

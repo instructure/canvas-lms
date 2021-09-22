@@ -333,7 +333,7 @@ module Lti::Ims
     end
 
     def find_memberships_page
-      {url: request.url}.reverse_merge(new_provider.find)
+      { url: request.url }.reverse_merge(new_provider.find)
     end
 
     def new_provider

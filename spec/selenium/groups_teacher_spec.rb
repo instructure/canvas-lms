@@ -42,7 +42,7 @@ describe "new groups" do
     end
 
     it "should allow teachers to create groups within group sets", priority: "1", test_id: 94153 do
-      seed_groups(1,0)
+      seed_groups(1, 0)
 
       get "/courses/#{@course.id}/groups"
 
@@ -57,7 +57,7 @@ describe "new groups" do
 
     it "should allow teachers to add a student to a group", priority: "1", test_id: 94155 do
       # Creates one user, and one groupset with a group inside it
-      group_test_setup(1,1,1)
+      group_test_setup(1, 1, 1)
 
       get "/courses/#{@course.id}/groups"
 
@@ -78,9 +78,9 @@ describe "new groups" do
 
     it "should allow teachers to move a student to a different group", priority: "1", test_id: 94157 do
       # Creates 1 user, 1 groupset, and 2 groups within the groupset
-      group_test_setup(1,1,2)
+      group_test_setup(1, 1, 2)
       # Add seeded student to first seeded group
-      add_user_to_group(@students.first,@testgroup[0])
+      add_user_to_group(@students.first, @testgroup[0])
 
       get "/courses/#{@course.id}/groups"
 
@@ -112,7 +112,7 @@ describe "new groups" do
 
     it "should allow teachers to remove a student from a group", priority: "1", test_id: 94158 do
       group_test_setup
-      add_user_to_group(@students.first,@testgroup[0])
+      add_user_to_group(@students.first, @testgroup[0])
 
       get "/courses/#{@course.id}/groups"
 
@@ -134,7 +134,7 @@ describe "new groups" do
 
     it "should allow teachers to make a student a group leader", priority: "1", test_id: 96021 do
       group_test_setup
-      add_user_to_group(@students.first,@testgroup[0])
+      add_user_to_group(@students.first, @testgroup[0])
 
       get "/courses/#{@course.id}/groups"
 
@@ -171,7 +171,7 @@ describe "new groups" do
     end
 
     it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
-      group_test_setup(3,0,0)
+      group_test_setup(3, 0, 0)
       get "/courses/#{@course.id}/groups"
 
       click_add_group_set
@@ -187,8 +187,8 @@ describe "new groups" do
 
     it "should update student count when they're added to groups limited by group set", priority: "1", test_id: 94162 do
       seed_students(3)
-      @category = create_category(has_max_membership:true, member_limit:3)
-      @group = @course.groups.create!(name:"test group", group_category:@category)
+      @category = create_category(has_max_membership: true, member_limit: 3)
+      @group = @course.groups.create!(name: "test group", group_category: @category)
 
       get "/courses/#{@course.id}/groups"
 
@@ -204,27 +204,27 @@ describe "new groups" do
 
       manually_set_groupset_limit("2")
       expect(f('.group-summary')).to include_text("0 / 2 students")
-      manually_fill_limited_group("2",2)
+      manually_fill_limited_group("2", 2)
     end
 
     it "should allow a teacher to set up a group with member limits", priority: "1", test_id: 94161 do
-      group_test_setup(3,1,0)
+      group_test_setup(3, 1, 0)
       get "/courses/#{@course.id}/groups"
 
-      manually_create_group(has_max_membership:true, member_limit:2)
+      manually_create_group(has_max_membership: true, member_limit: 2)
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
 
     it "should Allow teacher to join students to groups in unpublished courses", priority: "1", test_id: 245957 do
-      group_test_setup(3,1,2)
+      group_test_setup(3, 1, 2)
       @course.workflow_state = 'unpublished'
       @course.save!
       get "/courses/#{@course.id}/groups"
-      @group_category.first.update_attribute(:group_limit,2)
+      @group_category.first.update_attribute(:group_limit, 2)
       2.times do |n|
-        add_user_to_group(@students[n],@testgroup[0],false)
+        add_user_to_group(@students[n], @testgroup[0], false)
       end
-      add_user_to_group(@students.last,@testgroup[1],false)
+      add_user_to_group(@students.last, @testgroup[1], false)
       get "/courses/#{@course.id}/groups"
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
       ff(".group-name")[0].click
@@ -250,23 +250,23 @@ describe "new groups" do
     end
 
     it "should update student count when they're added to groups limited by group", priority: "1", test_id: 94167 do
-      group_test_setup(3,1,0)
-      create_group(group_category:@group_category.first,has_max_membership:true,member_limit:2)
+      group_test_setup(3, 1, 0)
+      create_group(group_category: @group_category.first, has_max_membership: true, member_limit: 2)
       get "/courses/#{@course.id}/groups"
 
       expect(f('.group-summary')).to include_text("0 / 2 students")
-      manually_fill_limited_group("2",2)
+      manually_fill_limited_group("2", 2)
     end
 
     it "should show the FULL icon moving from one group to the next", priority: "1", test_id: 94163 do
-      group_test_setup(4,1,2)
-      @group_category.first.update_attribute(:group_limit,2)
+      group_test_setup(4, 1, 2)
+      @group_category.first.update_attribute(:group_limit, 2)
 
       2.times do |n|
-        add_user_to_group(@students[n],@testgroup.first,false)
+        add_user_to_group(@students[n], @testgroup.first, false)
       end
 
-      add_user_to_group(@students.last,@testgroup[1],false)
+      add_user_to_group(@students.last, @testgroup[1], false)
       get "/courses/#{@course.id}/groups"
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
@@ -295,13 +295,13 @@ describe "new groups" do
 
     it "should remove a student from a group and update the group status", priority: "1", test_id: 94165 do
       group_test_setup(4, 1, 2)
-      @group_category.first.update_attribute(:group_limit,2)
+      @group_category.first.update_attribute(:group_limit, 2)
 
       2.times do |n|
-        add_user_to_group(@students[n],@testgroup.first,false)
+        add_user_to_group(@students[n], @testgroup.first, false)
       end
 
-      add_user_to_group(@students.last,@testgroup[1],false)
+      add_user_to_group(@students.last, @testgroup[1], false)
       get "/courses/#{@course.id}/groups"
 
       expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (1)")
@@ -324,10 +324,10 @@ describe "new groups" do
     end
 
     it 'should move group leader', priority: "1", test_id: 96023 do
-      group_test_setup(4,1,2)
-      add_user_to_group(@students[0],@testgroup.first,true)
+      group_test_setup(4, 1, 2)
+      add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|
-        add_user_to_group(@students[n+1], @testgroup.first,false)
+        add_user_to_group(@students[n + 1], @testgroup.first, false)
       end
       get "/courses/#{@course.id}/groups"
 
@@ -349,10 +349,10 @@ describe "new groups" do
 
     it 'moves non-leader', priority: "1", test_id: 96024 do
       skip_if_chrome('research')
-      group_test_setup(4,1,2)
+      group_test_setup(4, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|
-        add_user_to_group(@students[n+1], @testgroup.first, false)
+        add_user_to_group(@students[n + 1], @testgroup.first, false)
       end
       add_user_to_group(@students[3], @testgroup.last, false)
 
@@ -381,10 +381,10 @@ describe "new groups" do
     end
 
     it 'should remove group leader', priority: "1", test_id: 96025 do
-      group_test_setup(4,1,2)
+      group_test_setup(4, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|
-        add_user_to_group(@students[n+1], @testgroup.first, false)
+        add_user_to_group(@students[n + 1], @testgroup.first, false)
       end
       add_user_to_group(@students[3], @testgroup.last, false)
 
@@ -421,7 +421,7 @@ describe "new groups" do
       f('#split_groups').click
       expect(f('.auto-group-leader-controls')).to be_displayed
 
-      replace_content(fj('.input-micro[name="create_group_count"]'),2)
+      replace_content(fj('.input-micro[name="create_group_count"]'), 2)
       save_group_set
       # Need to run delayed jobs for the random group assignments to work, and then refresh the page
       run_jobs
@@ -433,8 +433,8 @@ describe "new groups" do
     end
 
     it 'should respect individual group member limits when randomly assigning', priority: "1", test_id: 134767 do
-      group_test_setup(16,1,2)
-      @testgroup.first.update_attribute(:max_membership,7)
+      group_test_setup(16, 1, 2)
+      @testgroup.first.update_attribute(:max_membership, 7)
       get "/courses/#{@course.id}/groups"
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('0 / 7 students')
@@ -459,9 +459,9 @@ describe "new groups" do
 
     it 'should create a group with a given name and limit', priority: "2", test_id: 94166 do
       skip("broken qa-729")
-      group_test_setup(5,1,1)
+      group_test_setup(5, 1, 1)
       3.times do |n|
-        add_user_to_group(@students[n+1], @testgroup.first, false)
+        add_user_to_group(@students[n + 1], @testgroup.first, false)
       end
 
       get "/courses/#{@course.id}/groups"
@@ -478,7 +478,7 @@ describe "new groups" do
       2.times do |n|
         f('.btn.add-group').click
         wait_for_ajaximations
-        f('#group_name').send_keys("Test Group #{n+2}")
+        f('#group_name').send_keys("Test Group #{n + 2}")
         wait_for_ajaximations
         f('#group_max_membership').send_keys('2')
         wait_for_ajaximations
@@ -493,7 +493,7 @@ describe "new groups" do
     end
 
     it 'should add students via drag and drop', priority: "1", test_id: 94154 do
-      group_test_setup(2,1,2)
+      group_test_setup(2, 1, 2)
       get "/courses/#{@course.id}/groups"
 
       drag_item1 = '.group-user-name:contains("Test Student 1")'
@@ -516,7 +516,7 @@ describe "new groups" do
     end
 
     it 'should move student using drag and drop', priority: "1", test_id: 94156 do
-      group_test_setup(2,1,2)
+      group_test_setup(2, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, false)
       add_user_to_group(@students[1], @testgroup.last, false)
 
@@ -543,7 +543,7 @@ describe "new groups" do
     end
 
     it 'should remove student using drag and drop', priority: "1", test_id: 94159 do
-      group_test_setup(1,1,1)
+      group_test_setup(1, 1, 1)
       add_user_to_group(@students[0], @testgroup.first, false)
 
       drag_item1 = '.group-user-name:contains("Test Student 1")'
@@ -566,8 +566,8 @@ describe "new groups" do
     end
 
     it 'should change group limit status with student drag and drop', priority: "1", test_id: 94164 do
-      group_test_setup(5,1,1)
-      @group_category.first.update_attribute(:group_limit,5)
+      group_test_setup(5, 1, 1)
+      @group_category.first.update_attribute(:group_limit, 5)
       5.times do |n|
         add_user_to_group(@students[n], @testgroup.first, false)
       end
@@ -594,10 +594,10 @@ describe "new groups" do
     end
 
     it 'should move leader via drag and drop', priority: "1", test_id: 96022 do
-      group_test_setup(5,1,2)
+      group_test_setup(5, 1, 2)
       2.times do |n|
         add_user_to_group(@students[n], @testgroup.first, false)
-        add_user_to_group(@students[n+2], @testgroup.last, false)
+        add_user_to_group(@students[n + 2], @testgroup.last, false)
       end
       add_user_to_group(@students[4], @testgroup.last, true)
 
@@ -624,8 +624,8 @@ describe "new groups" do
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         skip('KNO-185')
-        group_test_setup(2,1,2)
-        add_user_to_group(@students.first,@testgroup[0],true)
+        group_test_setup(2, 1, 2)
+        add_user_to_group(@students.first, @testgroup[0], true)
 
         get "/courses/#{@course.id}/groups"
 
@@ -633,17 +633,17 @@ describe "new groups" do
         manually_set_groupset_limit
 
         open_clone_group_set_option
-        set_cloned_groupset_name(@group_category.first.name+' clone',true)
+        set_cloned_groupset_name(@group_category.first.name + ' clone', true)
 
-        expect(ff('.group-category-tab-link').last.text).to match @group_category.first.name+' clone'
+        expect(ff('.group-category-tab-link').last.text).to match @group_category.first.name + ' clone'
 
         ff('.group-category-tab-link').last.click
         wait_for_ajaximations
 
         # Scope of cloned group set
         group_set_clone = fj('#group_categories_tabs > div:last > .group-category-contents > .row-fluid')
-        group1_clone = fj('.groups > div:last > .collectionViewItems > li:first',group_set_clone)
-        group2_clone = fj('.groups > div:last > .collectionViewItems > li:last',group_set_clone)
+        group1_clone = fj('.groups > div:last > .collectionViewItems > li:first', group_set_clone)
+        group2_clone = fj('.groups > div:last > .collectionViewItems > li:last', group_set_clone)
 
         # Verifies group leader's name appears in group header of cloned group set
         expect(ffj('.group-leader', group_set_clone).first).to include_text(@students.first.name)
@@ -654,7 +654,7 @@ describe "new groups" do
         expect(group2_clone).to include_text('0 / 2 students')
 
         # Toggles the first group collapse arrow to see the student
-        fj('.row-fluid > .group-header > .span5 > .toggle-group',group1_clone).click
+        fj('.row-fluid > .group-header > .span5 > .toggle-group', group1_clone).click
         wait_for_ajaximations
 
         # Verifies group membership within the cloned group set
@@ -676,12 +676,12 @@ describe "new groups" do
         set_cloned_groupset_name(@group_category.first.name)
 
         # Verifies error text
-        expect(f('.errorBox:not(#error_box_template)')).to include_text(@group_category.first.name+' is already in use.')
+        expect(f('.errorBox:not(#error_box_template)')).to include_text(@group_category.first.name + ' is already in use.')
       end
 
       it "should change group membership after an assignment has been deleted" do
         group_test_setup
-        add_user_to_group(@students.first,@testgroup[0])
+        add_user_to_group(@students.first, @testgroup[0])
 
         create_and_submit_assignment_from_group(@students.first)
 
@@ -708,8 +708,8 @@ describe "new groups" do
 
       context "choosing New Group Set option" do
         it "should clone group set when adding an unassigned student to a group with submission" do
-          group_test_setup(2,1,1)
-          add_user_to_group(@students.last,@testgroup.first)
+          group_test_setup(2, 1, 1)
+          add_user_to_group(@students.last, @testgroup.first)
           create_and_submit_assignment_from_group(@students.last)
 
           CourseGroups.visit_course_groups(@course.id)
@@ -723,9 +723,9 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group to a group with submission" do
-          group_test_setup(2,1,2)
+          group_test_setup(2, 1, 2)
           # add second student to second test group
-          add_user_to_group(@students.last,@testgroup.last)
+          add_user_to_group(@students.last, @testgroup.last)
           # make a submission for second student
           create_and_submit_assignment_from_group(@students.last)
 
@@ -733,7 +733,7 @@ describe "new groups" do
           # move unassigned first-student to first test group
           CourseGroups.move_unassigned_user_to_group(@students.first.id, @testgroup.first.id)
           # Moves Student1 from first test group to second test group
-          CourseGroups.move_student_to_different_group(@students.first.id,@testgroup.first.name, @testgroup.last.name)
+          CourseGroups.move_student_to_different_group(@students.first.id, @testgroup.first.name, @testgroup.last.name)
           CourseGroups.clone_category_confirm
           CourseGroups.toggle_group_detail_view(@testgroup.first.name)
 
@@ -743,15 +743,15 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group with submission to a group" do
-          group_test_setup(2,1,2)
-          add_user_to_group(@students.last,@testgroup.last)
+          group_test_setup(2, 1, 2)
+          add_user_to_group(@students.last, @testgroup.last)
           create_and_submit_assignment_from_group(@students.last)
 
           CourseGroups.visit_course_groups(@course.id)
           # move unassigned first-student to first test group
           CourseGroups.move_unassigned_user_to_group(@students.first.id, @testgroup.first.id)
           # Moves student from Test Group 2 to Test Group 1
-          CourseGroups.move_student_to_different_group(@students.last.id,@testgroup.last.name, @testgroup.first.name)
+          CourseGroups.move_student_to_different_group(@students.last.id, @testgroup.last.name, @testgroup.first.name)
           CourseGroups.clone_category_confirm
           # Toggles the second group collapse arrow to see the student
           CourseGroups.toggle_group_detail_view(@testgroup.last.name)
@@ -764,7 +764,7 @@ describe "new groups" do
         it "should clone group set when deleting a group with submission" do
           skip('KNO-187')
           group_test_setup
-          add_user_to_group(@students.first,@testgroup.first)
+          add_user_to_group(@students.first, @testgroup.first)
           create_and_submit_assignment_from_group(@students.first)
 
           CourseGroups.visit_course_groups(@course.id)
@@ -778,8 +778,8 @@ describe "new groups" do
         end
 
         it "should clone group set when using randomly assign students option when group has submission" do
-          group_test_setup(2,1,1)
-          add_user_to_group(@students.last,@testgroup.first)
+          group_test_setup(2, 1, 1)
+          add_user_to_group(@students.last, @testgroup.first)
           create_and_submit_assignment_from_group(@students.last)
 
           CourseGroups.visit_course_groups(@course.id)
@@ -794,8 +794,8 @@ describe "new groups" do
 
         context "dragging and dropping a student" do
           it "should clone group set when moving an unassigned student to a group with submission" do
-            group_test_setup(2,1,1)
-            add_user_to_group(@students.last,@testgroup[0])
+            group_test_setup(2, 1, 1)
+            add_user_to_group(@students.last, @testgroup[0])
 
             create_and_submit_assignment_from_group(@students.last)
 
@@ -809,7 +809,7 @@ describe "new groups" do
             drag_and_drop_element(f('.unassigned-students .group-user'), f('.toggle-group'))
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name,true)
+            set_cloned_groupset_name(@cloned_group_set_name, true)
 
             # Verifies student has not changed groups in group set
             expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (1)")
@@ -819,8 +819,8 @@ describe "new groups" do
           end
 
           it "should clone group set when moving a student from a group to a group with submission" do
-            group_test_setup(2,1,2)
-            add_user_to_group(@students.last,@testgroup[1])
+            group_test_setup(2, 1, 2)
+            add_user_to_group(@students.last, @testgroup[1])
 
             create_and_submit_assignment_from_group(@students.last)
 
@@ -836,7 +836,7 @@ describe "new groups" do
             drag_and_drop_element(ff('.group-users .group-user').first, ff('.toggle-group .group-name').last)
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name,true)
+            set_cloned_groupset_name(@cloned_group_set_name, true)
 
             toggle_group_collapse_arrow
 
@@ -847,8 +847,8 @@ describe "new groups" do
           end
 
           it "should clone group set when moving a student from a group with submission to a group" do
-            group_test_setup(2,1,2)
-            add_user_to_group(@students.last,@testgroup[0])
+            group_test_setup(2, 1, 2)
+            add_user_to_group(@students.last, @testgroup[0])
 
             create_and_submit_assignment_from_group(@students.last)
 
@@ -864,7 +864,7 @@ describe "new groups" do
             drag_and_drop_element(ff('.group-users .group-user').first, ff('.toggle-group .group-name').last)
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name,true)
+            set_cloned_groupset_name(@cloned_group_set_name, true)
 
             toggle_group_collapse_arrow
 
@@ -876,7 +876,7 @@ describe "new groups" do
 
           it "should clone group set when moving a student from a group to unassigned students" do
             group_test_setup
-            add_user_to_group(@students.first,@testgroup[0])
+            add_user_to_group(@students.first, @testgroup[0])
 
             create_and_submit_assignment_from_group(@students.first)
 
@@ -890,7 +890,7 @@ describe "new groups" do
             drag_and_drop_element(ff('.group-users .group-user').first, f('.ui-cnvs-scrollable'))
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name,true)
+            set_cloned_groupset_name(@cloned_group_set_name, true)
 
             toggle_group_collapse_arrow
 
@@ -904,8 +904,8 @@ describe "new groups" do
 
       context "choosing Change Groups option" do
         it "changes group membership when an assignment has been submitted by a group" do
-          group_test_setup(2,1,2)
-          add_user_to_group(@students.last,@testgroup[0])
+          group_test_setup(2, 1, 2)
+          add_user_to_group(@students.last, @testgroup[0])
 
           create_and_submit_assignment_from_group(@students.last)
 
@@ -923,7 +923,7 @@ describe "new groups" do
           expect(f('.group-users .group-user-name')).to include_text @students.first.name
 
           # Moves Test User 2 to Test Group 2
-          move_student_to_group(1,1)
+          move_student_to_group(1, 1)
 
           select_change_groups_option
 
@@ -995,8 +995,8 @@ describe "new groups" do
         end
 
         it "changes group membership when using randomly assign students option when group has submission" do
-          group_test_setup(2,1,1)
-          add_user_to_group(@students.first,@testgroup[0])
+          group_test_setup(2, 1, 1)
+          add_user_to_group(@students.first, @testgroup[0])
 
           create_and_submit_assignment_from_group(@students.first)
 
@@ -1011,8 +1011,8 @@ describe "new groups" do
 
         context "dragging and dropping a student" do
           it "changes group membership when an assignment has been submitted by a group" do
-            group_test_setup(2,1,2)
-            add_user_to_group(@students.last,@testgroup[0])
+            group_test_setup(2, 1, 2)
+            add_user_to_group(@students.last, @testgroup[0])
 
             create_and_submit_assignment_from_group(@students.last)
 

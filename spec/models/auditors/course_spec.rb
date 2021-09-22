@@ -40,7 +40,7 @@ describe Auditors::Course do
 
   describe "with cassandra backend" do
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
     end
 
     include_examples "cassandra audit logs"
@@ -200,7 +200,7 @@ describe Auditors::Course do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
     end
 
     it "writes to cassandra" do

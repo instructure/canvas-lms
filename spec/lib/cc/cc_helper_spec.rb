@@ -26,16 +26,16 @@ describe CC::CCHelper do
       content = '<a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>' \
                 '<img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />'
       linked_objects = CC::CCHelper.map_linked_objects(content)
-      expect(linked_objects[0]).to eq({identifier: '123456789', type: 'assignments'})
-      expect(linked_objects[1]).to eq({local_path: '/media/folder 1/file.jpg', type: 'Attachment'})
+      expect(linked_objects[0]).to eq({ identifier: '123456789', type: 'assignments' })
+      expect(linked_objects[1]).to eq({ local_path: '/media/folder 1/file.jpg', type: 'Attachment' })
     end
 
     it 'should find linked canvas items in exported html content with old escapes' do
       content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
                 '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
       linked_objects = CC::CCHelper.map_linked_objects(content)
-      expect(linked_objects[0]).to eq({identifier: '123456789', type: 'assignments'})
-      expect(linked_objects[1]).to eq({local_path: '/media/folder 1/file.jpg', type: 'Attachment'})
+      expect(linked_objects[0]).to eq({ identifier: '123456789', type: 'assignments' })
+      expect(linked_objects[1]).to eq({ local_path: '/media/folder 1/file.jpg', type: 'Attachment' })
     end
   end
 
@@ -50,26 +50,26 @@ describe CC::CCHelper do
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@kaltura)
       allow(@kaltura).to receive(:startSession)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with('abcde').and_return([
-      {
-        :isOriginal => 1,
-        :containerFormat => 'mp4',
-        :fileExt => 'mp4',
-        :id => 'one',
-        :size => 15,
-      },
-      {
-        :containerFormat => 'flash video',
-        :fileExt => 'flv',
-        :id => 'smaller',
-        :size => 3,
-      },
-      {
-        :containerFormat => 'flash video',
-        :fileExt => 'flv',
-        :id => 'two',
-        :size => 5,
-      },
-      ])
+                                                                                      {
+                                                                                        :isOriginal => 1,
+                                                                                        :containerFormat => 'mp4',
+                                                                                        :fileExt => 'mp4',
+                                                                                        :id => 'one',
+                                                                                        :size => 15,
+                                                                                      },
+                                                                                      {
+                                                                                        :containerFormat => 'flash video',
+                                                                                        :fileExt => 'flv',
+                                                                                        :id => 'smaller',
+                                                                                        :size => 3,
+                                                                                      },
+                                                                                      {
+                                                                                        :containerFormat => 'flash video',
+                                                                                        :fileExt => 'flv',
+                                                                                        :id => 'two',
+                                                                                        :size => 5,
+                                                                                      },
+                                                                                    ])
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId('abcde').first)
     end
 
@@ -83,7 +83,7 @@ describe CC::CCHelper do
     end
 
     it "should not touch media links on course copy" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy=>true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       orig = <<-HTML
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
@@ -152,7 +152,6 @@ describe CC::CCHelper do
       expect(translated).to include %{src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4"}
     end
 
-
     it "ignores new RCE media iframes with an unknown media id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>}
@@ -196,7 +195,7 @@ describe CC::CCHelper do
     end
 
     it "should only translate course when trying to translate /cousers/x/users/y type links" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy=>true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       orig = <<-HTML
       <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
       HTML
@@ -228,7 +227,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls = doc.css('a').map { |attr| attr[:href] }
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/front-page"
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
@@ -242,7 +241,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls = doc.css('a').map { |attr| attr[:href] }
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
@@ -255,7 +254,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls = doc.css('a').map { |attr| attr[:href] }
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 

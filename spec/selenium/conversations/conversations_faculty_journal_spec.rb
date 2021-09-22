@@ -27,8 +27,8 @@ describe "conversations new" do
 
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
-  let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
-  let(:student_user_notes_url) {"/users/#{@s1.id}/user_notes"}
+  let(:user_notes_url) { "/courses/#{@course.id}/user_notes" }
+  let(:student_user_notes_url) { "/users/#{@s1.id}/user_notes" }
 
   before do
     conversation_setup
@@ -91,8 +91,8 @@ describe "conversations new" do
       get student_user_notes_url
       f('#new_user_note_button').click
       wait_for_ajaximations # wait for the form to `.slideDown()`
-      replace_content(f('#user_note_title'),'FJ Title 2')
-      replace_content(f('textarea'),'FJ Body text 2')
+      replace_content(f('#user_note_title'), 'FJ Title 2')
+      replace_content(f('textarea'), 'FJ Body text 2')
       f('.send_button').click
       wait_for_ajaximations
       time = format_time_for_view(UserNote.last.updated_at)

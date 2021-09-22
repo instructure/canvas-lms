@@ -183,14 +183,14 @@ class SectionsController < ApplicationController
 
   def require_section
     case @context
-      when Course
-        section_id = params[:section_id] || params[:id]
-        @section = api_find(@context.active_course_sections, section_id)
-      when CourseSection
-        @section = @context
-        raise ActiveRecord::RecordNotFound if @section.deleted? || @section.course.try(:deleted?)
-      else
-        raise ActiveRecord::RecordNotFound
+    when Course
+      section_id = params[:section_id] || params[:id]
+      @section = api_find(@context.active_course_sections, section_id)
+    when CourseSection
+      @section = @context
+      raise ActiveRecord::RecordNotFound if @section.deleted? || @section.course.try(:deleted?)
+    else
+      raise ActiveRecord::RecordNotFound
     end
   end
 
@@ -200,7 +200,7 @@ class SectionsController < ApplicationController
     @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
-    res = {:allowed => !!allowed}
+    res = { :allowed => !!allowed }
     if allowed
       @account = @new_course.account
       res[:section] = @section.as_json(include_root: false)
@@ -233,7 +233,8 @@ class SectionsController < ApplicationController
   # @returns Section
   def uncrosslist
     @new_course = @section.nonxlist_course
-    return render(:json => {:message => "section is not cross-listed"}, :status => :bad_request) if @new_course.nil?
+    return render(:json => { :message => "section is not cross-listed" }, :status => :bad_request) if @new_course.nil?
+
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.uncrosslist(updating_user: @current_user)
       respond_to do |format|
@@ -275,7 +276,7 @@ class SectionsController < ApplicationController
       if sis_id || integration_id
         if @section.root_account.grants_right?(@current_user, :manage_sis)
           @section.sis_source_id = (sis_id == '') ?  nil : sis_id if sis_id
-          @section.integration_id = (integration_id == '') ?  nil : integration_id if integration_id
+          @section.integration_id = (integration_id == '') ? nil : integration_id if integration_id
         else
           return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized if api_request?
         end
@@ -352,6 +353,7 @@ class SectionsController < ApplicationController
   end
 
   protected
+
   def course_section_params
     params[:course_section] ? params[:course_section].permit(:name, :start_at, :end_at, :restrict_enrollments_to_section_dates) : {}
   end

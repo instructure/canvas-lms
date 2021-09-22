@@ -23,6 +23,6 @@ module Interfaces::AssetStringInterface
 
   field :asset_string, String, null: true
   def asset_string
-      object.asset_string
+    object.asset_string
   end
 end

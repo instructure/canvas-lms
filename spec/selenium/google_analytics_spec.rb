@@ -51,8 +51,7 @@ describe "google analytics" do
 
     let(:ga_script) do
       driver.execute_script('return arguments[0].innerText',
-        fj('head script:contains(window.ga)')
-      )
+                            fj('head script:contains(window.ga)'))
     end
 
     def expect_dimensions_to_include(expected_values)
@@ -108,10 +107,10 @@ describe "google analytics" do
         masquerade_as(
           user_with_pseudonym(active_all: true).tap do |user|
             course_with_student({
-              active_course: true,
-              active_enrollment: true,
-              user: user,
-            })
+                                  active_course: true,
+                                  active_enrollment: true,
+                                  user: user,
+                                })
           end
         )
       end

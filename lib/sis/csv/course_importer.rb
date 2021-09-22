@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class CourseImporter < CSVBaseImporter
-
       def self.course_csv?(row)
         row.include?('course_id') && row.include?('short_name')
       end
@@ -32,7 +31,7 @@ module SIS
 
       # expected columns
       # course_id,short_name,long_name,account_id,term_id,status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         messages = []
         count = SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|

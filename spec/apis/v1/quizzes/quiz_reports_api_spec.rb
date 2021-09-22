@@ -22,19 +22,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
 describe Quizzes::QuizReportsController, type: :request do
-
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports [index]" do
-    def api_index(params={}, options={})
+    def api_index(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
       send method, :get,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
-          controller: "quizzes/quiz_reports",
-          action: "index",
-          format: "json",
-          course_id: @course.id.to_s,
-          quiz_id: @quiz.id.to_s
-        }, params, headers
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+             controller: "quizzes/quiz_reports",
+             action: "index",
+             format: "json",
+             course_id: @course.id.to_s,
+             quiz_id: @quiz.id.to_s
+           }, params, headers
     end
 
     it 'denies unprivileged access' do
@@ -56,8 +55,8 @@ describe Quizzes::QuizReportsController, type: :request do
 
         json = api_index
         expect(json.length).to eq 2
-        expect(json.map { |report| report['report_type'] }.sort).
-          to eq %w[ item_analysis student_analysis ]
+        expect(json.map { |report| report['report_type'] }.sort)
+          .to eq %w[item_analysis student_analysis]
       end
 
       context 'flags' do
@@ -99,25 +98,25 @@ describe Quizzes::QuizReportsController, type: :request do
 
           expect(json['quiz_reports']).to be_present
           expect(json['quiz_reports'].length).to eq 2
-          expect(json['quiz_reports'].map { |report| report['report_type'] }.sort).
-            to eq %w[ item_analysis student_analysis ]
+          expect(json['quiz_reports'].map { |report| report['report_type'] }.sort)
+            .to eq %w[item_analysis student_analysis]
         end
       end
     end
   end
 
   describe "POST /courses/:course_id/quizzes/:quiz_id/reports" do
-    def api_create(params={}, options={})
+    def api_create(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
       send method, :post,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
-          controller: "quizzes/quiz_reports",
-          action: "create",
-          format: "json",
-          course_id: @course.id.to_s,
-          quiz_id: @quiz.id.to_s
-        }, params, headers
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+             controller: "quizzes/quiz_reports",
+             action: "create",
+             format: "json",
+             course_id: @course.id.to_s,
+             quiz_id: @quiz.id.to_s
+           }, params, headers
     end
 
     before :once do
@@ -129,7 +128,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
     it "should create a new report" do
       expect(Quizzes::QuizStatistics.count).to eq 0
-      json = api_create({:quiz_report => {:report_type => "item_analysis"}})
+      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
       expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
@@ -137,7 +136,7 @@ describe Quizzes::QuizReportsController, type: :request do
     it "should reuse an existing report" do
       @quiz.statistics_csv('item_analysis')
       expect(Quizzes::QuizStatistics.count).to eq 1
-      json = api_create({:quiz_report => {:report_type => "item_analysis"}})
+      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
       expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
@@ -147,10 +146,10 @@ describe Quizzes::QuizReportsController, type: :request do
         expect(Quizzes::QuizStatistics.count).to eq 0
 
         json = api_create({
-          quiz_reports: [{
-            report_type: "item_analysis"
-          }]
-        }, { jsonapi: true })
+                            quiz_reports: [{
+                              report_type: "item_analysis"
+                            }]
+                          }, { jsonapi: true })
 
         expect(Quizzes::QuizStatistics.count).to eq 1
 
@@ -178,16 +177,16 @@ describe Quizzes::QuizReportsController, type: :request do
 
           run_jobs
 
-          [ stats.reload, job ]
+          [stats.reload, job]
         end
 
         expect(stats.csv_generation_failed?).to be_truthy
 
         api_create({
-          quiz_reports: [{
-            report_type: report_type
-          }]
-        }, { jsonapi: true })
+                     quiz_reports: [{
+                       report_type: report_type
+                     }]
+                   }, { jsonapi: true })
 
         new_job = Delayed::Job.where(tag: JOB_TAG).first
 
@@ -200,10 +199,10 @@ describe Quizzes::QuizReportsController, type: :request do
         stats.generate_csv_in_background
 
         api_create({
-          quiz_reports: [{
-            report_type: report_type
-          }]
-        }, { jsonapi: true, raw: true })
+                     quiz_reports: [{
+                       report_type: report_type
+                     }]
+                   }, { jsonapi: true, raw: true })
 
         assert_status(409)
       end
@@ -280,18 +279,18 @@ describe Quizzes::QuizReportsController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports/:id [show]" do
-    def api_show(params={}, options={})
+    def api_show(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
-      headers = options[:jsonapi] ? {'Accept' => 'application/vnd.api+json'} : {}
+      headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
       send method, :get,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}", {
-          controller: "quizzes/quiz_reports",
-          action: "show",
-          format: "json",
-          course_id: @course.id.to_s,
-          quiz_id: @quiz.id.to_s,
-          id: @report.id.to_s
-        }, params, headers
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}", {
+             controller: "quizzes/quiz_reports",
+             action: "show",
+             format: "json",
+             course_id: @course.id.to_s,
+             quiz_id: @quiz.id.to_s,
+             id: @report.id.to_s
+           }, params, headers
     end
 
     it 'denies unprivileged access' do
@@ -336,7 +335,7 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.generate_csv
           @report.reload
 
-          json = api_show({:include=>['file']}, { jsonapi: true })
+          json = api_show({ :include => ['file'] }, { jsonapi: true })
           expect(json['quiz_reports'][0]['file']).to be_present
           expect(json['quiz_reports'][0]['file']['id']).to eq @report.csv_attachment.id
         end
@@ -345,7 +344,7 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.generate_csv_in_background
           @report.reload
 
-          json = api_show({:include=>['progress']}, { jsonapi: true })
+          json = api_show({ :include => ['progress'] }, { jsonapi: true })
 
           expect(json['quiz_reports'][0]['file']).not_to be_present
           expect(json['quiz_reports'][0]['progress']).to be_present

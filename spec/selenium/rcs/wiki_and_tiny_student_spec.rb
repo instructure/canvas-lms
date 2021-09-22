@@ -26,7 +26,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   include RCENextPage
 
   context "as a student" do
-
     before(:each) do
       course_with_student_logged_in
       stub_rcs_config
@@ -46,7 +45,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should not allow students to edit if marked for only teachers can edit" do
-      #vars for the create_wiki_page method which seeds the used page
+      # vars for the create_wiki_page method which seeds the used page
       title = "test_page"
       hfs = false
       edit_roles = "teachers"
@@ -70,7 +69,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       expect(f('a.edit-wiki')).to be_displayed
 
-      #vars for 2nd wiki page with different permissions
+      # vars for 2nd wiki page with different permissions
       title2 = "test_page2"
       edit_roles2 = "members"
 

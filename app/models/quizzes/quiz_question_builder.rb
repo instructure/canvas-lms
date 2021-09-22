@@ -23,7 +23,7 @@ class Quizzes::QuizQuestionBuilder
     shuffle_answers: false
   }
 
-  def initialize(options={})
+  def initialize(options = {})
     self.options = DEFAULT_OPTIONS.merge(options)
   end
 
@@ -40,8 +40,8 @@ class Quizzes::QuizQuestionBuilder
     questions.each do |val|
       # A quiz group linked to a question bank:
       if val[:entry_type] == QUIZ_GROUP_ENTRY && val[:assessment_question_bank_id]
-        # It points to a question bank, question/answer/match shuffling happens
-        # when a submission is generated. See #build_submission_questions()
+      # It points to a question bank, question/answer/match shuffling happens
+      # when a submission is generated. See #build_submission_questions()
 
       # A normal quiz group with questions:
       elsif val[:entry_type] == QUIZ_GROUP_ENTRY
@@ -88,34 +88,34 @@ class Quizzes::QuizQuestionBuilder
     quiz_data.reduce([]) do |submission_questions, descriptor|
       # pulling from question bank
       questions = if descriptor[:entry_type] == QUIZ_GROUP_ENTRY && descriptor[:assessment_question_bank_id]
-        if (bank = ::AssessmentQuestionBank.where(id: descriptor[:assessment_question_bank_id]).first)
-          pool = BankPool.new(bank, @picked, &method(:mark_picked))
-          pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
-            question[:points_possible] = descriptor[:question_points]
-            question[:published_at] = descriptor[:published_at]
+                    if (bank = ::AssessmentQuestionBank.where(id: descriptor[:assessment_question_bank_id]).first)
+                      pool = BankPool.new(bank, @picked, &method(:mark_picked))
+                      pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
+                        question[:points_possible] = descriptor[:question_points]
+                        question[:published_at] = descriptor[:published_at]
 
-            # since these questions were not resolved when the quiz's questions
-            # were generated (because they're different for each user/submission),
-            # so we need to decorate them like we did the group questions back in
-            # #shuffle_quiz_data!()
-            if question[:answers]
-              question[:answers] = shuffle_answers(question)
-              question[:matches] = shuffle_matches(question) if question[:matches]
-            end
-          end
-        end
+                        # since these questions were not resolved when the quiz's questions
+                        # were generated (because they're different for each user/submission),
+                        # so we need to decorate them like we did the group questions back in
+                        # #shuffle_quiz_data!()
+                        if question[:answers]
+                          question[:answers] = shuffle_answers(question)
+                          question[:matches] = shuffle_matches(question) if question[:matches]
+                        end
+                      end
+                    end
 
-      # pulling from questions defined directly in a group
-      elsif descriptor[:entry_type] == QUIZ_GROUP_ENTRY
-        pool = GroupPool.new(descriptor[:questions], @picked, &method(:mark_picked))
-        pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
-          question[:points_possible] = descriptor[:question_points]
-        end
+                  # pulling from questions defined directly in a group
+                  elsif descriptor[:entry_type] == QUIZ_GROUP_ENTRY
+                    pool = GroupPool.new(descriptor[:questions], @picked, &method(:mark_picked))
+                    pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
+                      question[:points_possible] = descriptor[:question_points]
+                    end
 
-      # just a question
-      else
-        questions = [ descriptor ]
-      end
+                  # just a question
+                  else
+                    questions = [descriptor]
+                  end
 
       questions.each do |question|
         decorate_question_for_submission(question)
@@ -130,7 +130,8 @@ class Quizzes::QuizQuestionBuilder
       '#quizzes.quiz.question_name_counter',
       "Question %{question_number}", {
         question_number: position
-      })
+      }
+    )
 
     q[:position] = position
 

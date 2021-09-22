@@ -27,7 +27,7 @@ module CC::Importer::Canvas
       process_outcome_children(doc.at_css('learningOutcomes'))
     end
 
-    def process_outcome_children(node, list=[])
+    def process_outcome_children(node, list = [])
       return list unless node
 
       node.children.each do |child|
@@ -90,6 +90,5 @@ module CC::Importer::Canvas
 
       outcome
     end
-
   end
 end

@@ -45,9 +45,9 @@ describe "groups" do
     before :once do
       @course = course_model.tap(&:offer!)
       @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
-      group_test_setup(4,1,1)
+      group_test_setup(4, 1, 1)
       # adds all students to the group
-      add_users_to_group(@students,@testgroup.first)
+      add_users_to_group(@students, @testgroup.first)
     end
 
     before :each do
@@ -75,7 +75,7 @@ describe "groups" do
       it "should allow teachers to create an announcement" do
         # Checks that initial user can create an announcement
         AnnouncementNewEdit.create_group_announcement(@testgroup.first,
-          "Announcement by #{@teacher.name}", 'sup')
+                                                      "Announcement by #{@teacher.name}", 'sup')
         get announcements_page
         expect(ff('.ic-announcement-row').size).to eq 1
       end
@@ -143,7 +143,7 @@ describe "groups" do
           user: @teacher
         )
         AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
-          "Canvas will be rewritten in chicken")
+                                                    "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
         # message is wrapped in paragraph tags
@@ -175,7 +175,7 @@ describe "groups" do
           user: @students.first
         )
         AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
-          "Canvas will be rewritten in chicken")
+                                                    "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
         # message is wrapped in paragraph tags
@@ -231,14 +231,14 @@ describe "groups" do
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
         # Verifies teacher can access the group discussion & that it's the correct discussion
-        expect_new_page_load{f("[data-testid='discussion-link-#{dt.id}']").click}
+        expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
       it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
         skip_if_safari(:alert)
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                title: 'Group Discussion', message: 'Group')
+                                     title: 'Group Discussion', message: 'Group')
         get discussions_page
         expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
         f('.discussions-index-manage-menu').click
@@ -256,35 +256,35 @@ describe "groups" do
     # permission stuff is released, and I don't want to complicate the git history
     # for this file
     RSpec.shared_examples "group_pages_teacher_granular_permissions" do
-    describe "pages page" do
-      it_behaves_like 'pages_page', :teacher
+      describe "pages page" do
+        it_behaves_like 'pages_page', :teacher
 
-      it "should allow teachers to create a page", priority: "1", test_id: 289993 do
-        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
-        get pages_page
-        manually_create_wiki_page('stuff','it happens')
+        it "should allow teachers to create a page", priority: "1", test_id: 289993 do
+          skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
+          get pages_page
+          manually_create_wiki_page('stuff', 'it happens')
+        end
+
+        it "should allow teachers to access a page", priority: "1", test_id: 289992 do
+          @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
+          # Verifies teacher can access the group page & that it's the correct page
+          verify_member_sees_group_page
+        end
+
+        it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
+          @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
+          get pages_page
+          expect(f('.index-content')).to contain_css('.wiki-page-link')
+
+          category = @course.group_categories.create!(:name => "Group Category")
+          @group_category.first.clone_groups_and_memberships(category)
+          category.reload
+          new_group = category.groups.first
+
+          get "/groups/#{new_group.id}/pages"
+          expect(f('.index-content')).not_to contain_css('.wiki-page-link')
+        end
       end
-
-      it "should allow teachers to access a page", priority: "1", test_id: 289992 do
-        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
-        # Verifies teacher can access the group page & that it's the correct page
-        verify_member_sees_group_page
-      end
-
-      it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
-        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
-        get pages_page
-        expect(f('.index-content')).to contain_css('.wiki-page-link')
-
-        category = @course.group_categories.create!(:name => "Group Category")
-        @group_category.first.clone_groups_and_memberships(category)
-        category.reload
-        new_group = category.groups.first
-
-        get "/groups/#{new_group.id}/pages"
-        expect(f('.index-content')).not_to contain_css('.wiki-page-link')
-      end
-    end
     end
 
     describe 'With granular permission on' do
@@ -322,7 +322,7 @@ describe "groups" do
         add_test_files
         get files_page
         add_folder('destination_folder')
-        move_file_to_folder('example.pdf','destination_folder')
+        move_file_to_folder('example.pdf', 'destination_folder')
       end
 
       it "should allow teachers to move a folder", priority: "2", test_id: 304667 do
@@ -349,7 +349,7 @@ describe "groups" do
     #-------------------------------------------------------------------------------------------------------------------
     describe "conferences page" do
       before(:once) do
-        PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
+        PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
       end
 
       it_behaves_like 'conferences_page', :teacher

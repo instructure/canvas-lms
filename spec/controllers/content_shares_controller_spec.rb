@@ -124,42 +124,42 @@ describe ContentSharesController do
     end
 
     it "returns 400 if required parameters aren't included" do
-      post :create, params: {user_id: @teacher_1.id, content_type: 'assignment', content_id: @assignment.id}
+      post :create, params: { user_id: @teacher_1.id, content_type: 'assignment', content_id: @assignment.id }
       expect(response).to have_http_status(:bad_request)
 
-      post :create, params: {user_id: @teacher_1.id, content_type: 'assignment', receiver_ids: [@teacher_2.id]}
+      post :create, params: { user_id: @teacher_1.id, content_type: 'assignment', receiver_ids: [@teacher_2.id] }
       expect(response).to have_http_status(:bad_request)
 
-      post :create, params: {user_id: @teacher_1.id, content_id: @assignment.id, receiver_ids: [@teacher_2.id]}
+      post :create, params: { user_id: @teacher_1.id, content_id: @assignment.id, receiver_ids: [@teacher_2.id] }
       expect(response).to have_http_status(:bad_request)
 
       announcement_model(context: @course_1)
-      post :create, params: {user_id: @teacher_1.id, content_type: 'announcement', content_id: @a.id, receiver_ids: [@teacher_2.id]}
+      post :create, params: { user_id: @teacher_1.id, content_type: 'announcement', content_id: @a.id, receiver_ids: [@teacher_2.id] }
       expect(response).to have_http_status(:bad_request)
     end
 
     it 'returns 400 if the associated content cannot be found' do
-      post :create, params: {user_id: @teacher_1.id, content_type: 'discussion_topic', content_id: @assignment.id, receiver_ids: [@teacher_2.id]}
+      post :create, params: { user_id: @teacher_1.id, content_type: 'discussion_topic', content_id: @assignment.id, receiver_ids: [@teacher_2.id] }
       expect(response).to have_http_status(:bad_request)
     end
 
     it "returns 401 if the user doesn't have access to export the associated content" do
       user_session(@teacher_2)
-      post :create, params: {user_id: @teacher_2.id, content_type: 'assignment', content_id: @assignment.id, receiver_ids: [@teacher_1.id]}
+      post :create, params: { user_id: @teacher_2.id, content_type: 'assignment', content_id: @assignment.id, receiver_ids: [@teacher_1.id] }
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns 401 if the sharing user doesn't match current user" do
       user_session(@teacher_2)
-      post :create, params: {user_id: @teacher_1.id, content_type: 'assignment', content_id: @assignment.id, receiver_ids: [@teacher_2.id]}
+      post :create, params: { user_id: @teacher_1.id, content_type: 'assignment', content_id: @assignment.id, receiver_ids: [@teacher_2.id] }
       expect(response).to have_http_status(:forbidden)
     end
   end
 
   describe "rest of CRUD" do
     before :once do
-      @export = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment) => '1'}}})
-      @export_2 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment) => '1'}}})
+      @export = @course_1.content_exports.create!(settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment) => '1' } } })
+      @export_2 = @course_1.content_exports.create!(settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment) => '1' } } })
       @sent_share = @teacher_1.sent_content_shares.create! name: 'booga', content_export: @export, read_state: 'read'
       @received_share = @teacher_2.received_content_shares.create! name: 'booga', content_export: @export, sender: @teacher_1, read_state: 'unread'
       @teacher_2.received_content_shares.create! name: 'u read me', content_export: @export_2, sender: @teacher_1, read_state: 'read'
@@ -179,13 +179,13 @@ describe ContentSharesController do
         expect(json[0]['receivers'].length).to eq 1
         expect(json[0]['receivers'][0]['id']).to eq @teacher_2.id
         expect(json[0]['content_type']).to eq 'assignment'
-        expect(json[0]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json[0]['source_course']).to eq({ 'id' => @course_1.id, 'name' => @course_1.name })
         expect(json[0]['content_export']).to be_present
       end
 
       it "paginates sent content shares" do
         Timecop.travel(1.hour.ago) do
-          export2 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {'foo' => '1'}, "content_tags" => {'bar' => '1'}}})
+          export2 = @course_1.content_exports.create!(settings: { "selected_content" => { "assignments" => { 'foo' => '1' }, "content_tags" => { 'bar' => '1' } } })
           sent_share2 = @teacher_1.sent_content_shares.create! name: 'ooga', content_export: export2, read_state: 'read'
         end
         user_session @teacher_1
@@ -224,7 +224,7 @@ describe ContentSharesController do
         expect(json[1]['sender']['id']).to eq @teacher_1.id
         expect(json[1]['receivers']).to eq([])
         expect(json[1]['content_type']).to eq 'assignment'
-        expect(json[1]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json[1]['source_course']).to eq({ 'id' => @course_1.id, 'name' => @course_1.name })
         expect(json[1]['content_export']).to be_present
       end
 
@@ -237,7 +237,7 @@ describe ContentSharesController do
 
       it "paginates received content shares" do
         Timecop.travel(1.hour.ago) do
-          export2 = @course_1.content_exports.create!(settings: {"selected_content" => {"quizzes" => {'foo' => '1'}, "content_tags" => {'bar' => '1'}, "context_modules" => {'baz' => '1'}}})
+          export2 = @course_1.content_exports.create!(settings: { "selected_content" => { "quizzes" => { 'foo' => '1' }, "content_tags" => { 'bar' => '1' }, "context_modules" => { 'baz' => '1' } } })
           received_share2 = @teacher_2.received_content_shares.create! name: 'ooga', content_export: export2, sender_id: user_with_pseudonym, read_state: 'unread'
         end
         user_session @teacher_2
@@ -284,7 +284,7 @@ describe ContentSharesController do
         expect(json['receivers'].length).to eq 1
         expect(json['receivers'][0]['id']).to eq @teacher_2.id
         expect(json['content_type']).to eq 'assignment'
-        expect(json['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json['source_course']).to eq({ 'id' => @course_1.id, 'name' => @course_1.name })
         expect(json['content_export']).to be_present
       end
 

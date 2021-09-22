@@ -237,24 +237,23 @@ describe GradingStandard do
       decimal_part = score.to_s.split('.')[1]
       expect(decimal_part.length).to be <= 3
     end
-
   end
 
   context "place in scheme" do
     before do
       @gs = GradingStandard.default_instance
-      @gs.data = {"4.0" => 0.94,
-                  "3.7" => 0.90,
-                  "3.3" => 0.87,
-                  "3.0" => 0.84,
-                  "2.7" => 0.80,
-                  "2.3" => 0.77,
-                  "2.0" => 0.74,
-                  "1.7" => 0.70,
-                  "1.3" => 0.67,
-                  "1.0" => 0.64,
-                  "0" => 0.01,
-                  "M" => 0.0 }
+      @gs.data = { "4.0" => 0.94,
+                   "3.7" => 0.90,
+                   "3.3" => 0.87,
+                   "3.0" => 0.84,
+                   "2.7" => 0.80,
+                   "2.3" => 0.77,
+                   "2.0" => 0.74,
+                   "1.7" => 0.70,
+                   "1.3" => 0.67,
+                   "1.0" => 0.64,
+                   "0" => 0.01,
+                   "M" => 0.0 }
     end
 
     it "should match alphabetical keys regardless of case" do
@@ -268,12 +267,12 @@ describe GradingStandard do
     end
 
     it "should not confuse letters and zeros" do
-      @gs.data = {"4.0" => 0.9,
-                  "M" => 0.8,
-                  "0" => 0.7,
-                  "C" => 0.6,
-                  "1.4" => 0.5}
-      [[4,0],["m",1],[0,2],["C",3],["1.4",4]].each do |grade,exp_index|
+      @gs.data = { "4.0" => 0.9,
+                   "M" => 0.8,
+                   "0" => 0.7,
+                   "C" => 0.6,
+                   "1.4" => 0.5 }
+      [[4, 0], ["m", 1], [0, 2], ["C", 3], ["1.4", 4]].each do |grade, exp_index|
         idx = @gs.place_in_scheme(grade)
         expect(idx).to eql(exp_index)
       end
@@ -307,7 +306,7 @@ describe GradingStandard do
     context "with assignment link" do
       before(:once) do
         @assignment = @course.assignments.create!(:title => "hi",
-          :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
+                                                  :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
       end
 
       context "without submissions" do
@@ -343,7 +342,6 @@ describe GradingStandard do
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
         @course_standard = grading_standard_for(@course)
-
       end
 
       context "root-account admin" do
@@ -358,7 +356,6 @@ describe GradingStandard do
         it "should be able to manage sub-account level grading standards" do
           expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
         end
-
 
         it "should be able to manage course level grading standards" do
           expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
@@ -377,7 +374,6 @@ describe GradingStandard do
         it "should be able to manage sub-account level grading standards" do
           expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
         end
-
 
         it "should NOT be able to manage course level grading standards, when the course is under the root-account" do
           expect(@course_standard.grants_right?(@admin, :manage)).to eq(false)
@@ -422,7 +418,6 @@ describe GradingStandard do
           expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
         end
 
-
         it "should be able to manage course level grading standards" do
           expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
         end
@@ -440,7 +435,6 @@ describe GradingStandard do
         it "should be able to manage sub-account level grading standards" do
           expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
         end
-
 
         it "should be able to manage course level grading standards, when the course is under the sub-account" do
           expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
@@ -481,7 +475,6 @@ describe GradingStandard do
       it "is set to the account's ID if the account is a root account" do
         grading_standard = subaccount.grading_standards.create!(workflow_state: "active", data: data)
         expect(grading_standard.root_account_id).to eq root_account.id
-
       end
 
       it "is set to the account's root account ID if the account is not a root account" do

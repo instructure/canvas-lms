@@ -64,7 +64,6 @@ class SharedBrandConfigsController < ApplicationController
   before_action :require_user
   before_action :set_shared_brand_config, only: [:destroy, :update]
 
-
   # @API Share a BrandConfig (Theme)
   #
   # Create a SharedBrandConfig, which will give the given brand_config a name
@@ -133,12 +132,13 @@ class SharedBrandConfigsController < ApplicationController
   end
 
   private
-    def set_shared_brand_config
-      @shared_brand_config = SharedBrandConfig.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def shared_brand_config_params
-      params.require(:shared_brand_config).permit(:brand_config_md5, :name)
-    end
+  def set_shared_brand_config
+    @shared_brand_config = SharedBrandConfig.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def shared_brand_config_params
+    params.require(:shared_brand_config).permit(:brand_config_md5, :name)
+  end
 end

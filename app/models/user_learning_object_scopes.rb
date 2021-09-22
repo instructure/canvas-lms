@@ -69,19 +69,19 @@ module UserLearningObjectScopes
     shard.activate do
       GuardRail.activate(:secondary) do
         result = if include_concluded
-          all_course_ids
-        else
-          case permission_type
-          when :student
-            participating_student_course_ids
-          else
-            manageable_enrollments_by_permission(permission_type).map(&:course_id)
-          end
-        end
+                   all_course_ids
+                 else
+                   case permission_type
+                   when :student
+                     participating_student_course_ids
+                   else
+                     manageable_enrollments_by_permission(permission_type).map(&:course_id)
+                   end
+                 end
 
-       result &= course_ids if course_ids
-       result &= Array.wrap(contexts).select { |c| c.is_a?(Course) }.map(&:id) if contexts
-       result
+        result &= course_ids if course_ids
+        result &= Array.wrap(contexts).select { |c| c.is_a?(Course) }.map(&:id) if contexts
+        result
       end
     end
   end
@@ -108,9 +108,9 @@ module UserLearningObjectScopes
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type,
-         course_ids: course_ids, contexts: contexts, include_concluded: include_concluded)
+                                             course_ids: course_ids, contexts: contexts, include_concluded: include_concluded)
       group_ids = group_ids_for_todo_lists(group_ids: group_ids, contexts: contexts)
-      ids_by_shard = Hash.new({course_ids: [], group_ids: []})
+      ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
       end
@@ -184,7 +184,7 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing('Assignment', purpose, :student, params, cache_timeout,
-      limit: limit, **opts) do |assignment_scope|
+                    limit: limit, **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
       assignments = assignments.need_submitting_info(id, limit) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
@@ -207,6 +207,7 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     assignments = assignments_for_student('submitting', **params)
     return assignments if scope_only
+
     select_available_assignments(assignments, include_concluded: include_concluded)
   end
 
@@ -218,6 +219,7 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     assignments = assignments_for_student('submitted', **params)
     return assignments if scope_only
+
     select_available_assignments(assignments, include_concluded: include_concluded)
   end
 
@@ -236,11 +238,12 @@ module UserLearningObjectScopes
     objects_needing('Quizzes::Quiz', 'viewing', :student, params, 15.minutes, **opts) do |quiz_scope|
       quizzes = quiz_scope.available
       quizzes = quizzes.not_locked unless include_locked
-      quizzes = quizzes.
-        ungraded_due_between_for_user(due_after, due_before, self).
-        preload(:context)
+      quizzes = quizzes
+                .ungraded_due_between_for_user(due_after, due_before, self)
+                .preload(:context)
       quizzes = quizzes.need_submitting_info(id, limit) if needing_submitting
       return quizzes if scope_only
+
       select_available_assignments(quizzes, include_concluded: include_concluded)
     end
   end
@@ -256,11 +259,11 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
     objects_needing('AssessmentRequest', 'reviewing', :student, params, 15.minutes, **opts) do |ar_scope, shard_course_ids|
-      ar_scope = ar_scope.joins(submission: :assignment).
-        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
-               AND assessor_asset.assignment_id = assignments.id").
-        where(assessor_id: id).
-        where(assessor_asset: { course_id: shard_course_ids })
+      ar_scope = ar_scope.joins(submission: :assignment)
+                         .joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
+               AND assessor_asset.assignment_id = assignments.id")
+                         .where(assessor_id: id)
+                         .where(assessor_asset: { course_id: shard_course_ids })
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
@@ -268,8 +271,8 @@ module UserLearningObjectScopes
       # for the submissions, ensuring that the user has access and can read & comment on them.
       # The check for making sure that the user is a participant in the course is already made
       # by using `course_ids_for_todo_lists` through `objects_needing`
-      ar_scope = ar_scope.merge(Submission.active).
-        merge(Assignment.published.where(peer_reviews: true))
+      ar_scope = ar_scope.merge(Submission.active)
+                         .merge(Assignment.published.where(peer_reviews: true))
 
       if due_before
         ar_scope = ar_scope.where("assessor_asset.cached_due_date <= ?", due_before)
@@ -293,54 +296,56 @@ module UserLearningObjectScopes
     if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
+
     course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
-    Submission.active.
-      needs_grading.
-      joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id").
-      where(assignments: {context_id: course_ids}).
-      merge(Assignment.expecting_submission).
-      merge(Assignment.published).
-      where(grader_enrollments: {workflow_state: 'active', user_id: self, type: ['TeacherEnrollment', 'TaEnrollment']}).
-      where("grader_enrollments.limit_privileges_to_course_section = 'f'
-        OR grader_enrollments.course_section_id = enrollments.course_section_id").
-      where("NOT EXISTS (?)",
-        Ignore.where(asset_type: 'Assignment',
-                     user_id: self,
-                     purpose: 'grading').where('asset_id=submissions.assignment_id')).count
+    Submission.active
+              .needs_grading
+              .joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id")
+              .where(assignments: { context_id: course_ids })
+              .merge(Assignment.expecting_submission)
+              .merge(Assignment.published)
+              .where(grader_enrollments: { workflow_state: 'active', user_id: self, type: ['TeacherEnrollment', 'TaEnrollment'] })
+              .where("grader_enrollments.limit_privileges_to_course_section = 'f'
+        OR grader_enrollments.course_section_id = enrollments.course_section_id")
+              .where("NOT EXISTS (?)",
+                     Ignore.where(asset_type: 'Assignment',
+                                  user_id: self,
+                                  purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
     if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return scope_only ? Assignment.none : []
     end
+
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
       if Setting.get('assignments_needing_grading_new_style', 'true') == 'true'
-        submissions_needing_grading = Submission.select(:assignment_id, :user_id).
-            joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id").
-          where(Submission.needs_grading_conditions)
-        student_enrollments = Enrollment.from("#{Enrollment.quoted_table_name} student_enrollments").
-            select("1").
-            where("student_enrollments.course_id=assignments.context_id").
-            where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'").
-            where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
-        as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id").
-            where("EXISTS(?)", student_enrollments)
+        submissions_needing_grading = Submission.select(:assignment_id, :user_id)
+                                                .joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id")
+                                                .where(Submission.needs_grading_conditions)
+        student_enrollments = Enrollment.from("#{Enrollment.quoted_table_name} student_enrollments")
+                                        .select("1")
+                                        .where("student_enrollments.course_id=assignments.context_id")
+                                        .where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'")
+                                        .where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
+        as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id")
+                             .where("EXISTS(?)", student_enrollments)
       else
-        as = assignment_scope.
-          where("EXISTS (#{grader_visible_submissions_sql})")
+        as = assignment_scope
+             .where("EXISTS (#{grader_visible_submissions_sql})")
       end
-      as = as.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
-        where(enrollments: {user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment']}).
-        group('assignments.id').
-        order('assignments.due_at').
-        preload(:context)
+      as = as.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id")
+             .where(enrollments: { user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment'] })
+             .group('assignments.id')
+             .order('assignments.due_at')
+             .preload(:context)
       if scope_only
         as # This needs the below `select` somehow to work
       else
         GuardRail.activate(:secondary) do
-          as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+          as.lazy.reject { |a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
         end
       end
     end
@@ -365,18 +370,18 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing('Assignment', 'moderation', :select_final_grade, params, 120.minutes, **params) do |assignment_scope|
-      scope = assignment_scope.active.
-        expecting_submission.
-        where(final_grader: self, moderated_grading: true).
-        where("assignments.grades_published_at IS NULL").
-        where(id: ModeratedGrading::ProvisionalGrade.joins(:submission).
-          where("submissions.assignment_id=assignments.id").
-          where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
-        preload(:context)
+      scope = assignment_scope.active
+                              .expecting_submission
+                              .where(final_grader: self, moderated_grading: true)
+                              .where("assignments.grades_published_at IS NULL")
+                              .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
+          .where("submissions.assignment_id=assignments.id")
+          .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
+                              .preload(:context)
       if scope_only
         scope # Also need to check the rights like below
       else
-        scope.lazy.select{|a| a.permits_moderation?(self)}.take(limit).to_a
+        scope.lazy.select { |a| a.permits_moderation?(self) }.take(limit).to_a
       end
     end
   end
@@ -388,12 +393,12 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing('DiscussionTopic', 'viewing', :student, params, 120.minutes, **opts) do |topics_context, shard_course_ids, shard_group_ids|
-      topics_context.
-        active.
-        published.
-        for_courses_and_groups(shard_course_ids, shard_group_ids).
-        todo_date_between(due_after, due_before).
-        visible_to_student_sections(self)
+      topics_context
+        .active
+        .published
+        .for_courses_and_groups(shard_course_ids, shard_group_ids)
+        .todo_date_between(due_after, due_before)
+        .visible_to_student_sections(self)
     end
   end
 
@@ -404,11 +409,11 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing('WikiPage', 'viewing', :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
-      wiki_pages_context.
-        available_to_planner.
-        visible_to_user(self).
-        for_courses_and_groups(shard_course_ids, shard_group_ids).
-        todo_date_between(due_after, due_before)
+      wiki_pages_context
+        .available_to_planner
+        .visible_to_user(self)
+        .for_courses_and_groups(shard_course_ids, shard_group_ids)
+        .todo_date_between(due_after, due_before)
     end
   end
 end

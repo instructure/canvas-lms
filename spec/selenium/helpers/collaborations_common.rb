@@ -75,14 +75,13 @@ module CollaborationsCommon
   #
   # Returns a boolean.
   def create_collaboration!(collaboration_type, title = 'New collaboration')
-
     plugin_type = collaboration_type
     plugin_type = 'google_drive' if plugin_type == 'google_docs'
     unless PluginSetting.where(:name => plugin_type).exists?
       PluginSetting.create!(:name => plugin_type, :settings => {})
     end
 
-    name = Collaboration.collaboration_types.detect{|t| t[:type] == collaboration_type}[:name]
+    name = Collaboration.collaboration_types.detect { |t| t[:type] == collaboration_type }[:name]
 
     @collaboration         = Collaboration.typed_collaboration_instance(name)
     @collaboration.context = @course

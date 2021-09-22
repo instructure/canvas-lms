@@ -44,7 +44,7 @@ describe "CanvasUnzip" do
       Dir.mktmpdir do |tmpdir|
         File.open(File.join(tmpdir, 'file1.txt'), 'w') { |f| f.puts "OOGA" }
         warnings = CanvasUnzip.extract_archive(fixture_filename("test.#{extension}"), tmpdir)
-        expect(warnings).to eq({already_exists: ['file1.txt']})
+        expect(warnings).to eq({ already_exists: ['file1.txt'] })
         expect(File.read(File.join(tmpdir, 'file1.txt'))).to eq "OOGA\n"
         expect(File.read(File.join(tmpdir, 'sub_dir/file2.txt'))).to eq "file2\n"
       end
@@ -118,7 +118,7 @@ describe "CanvasUnzip" do
 
   describe '.compute_uncompressed_size' do
     it "uses the sum of sizes inside the archive" do
-      filename =fixture_filename("bigcompression.zip")
+      filename = fixture_filename("bigcompression.zip")
       uncompressed_size = CanvasUnzip.compute_uncompressed_size(filename)
       expect(uncompressed_size > File.new(filename).size).to be_truthy
     end

@@ -25,15 +25,14 @@ module Canvas::Plugins::TicketingSystem
   # embedded in an email message sent to the email address in the
   # plugin configuration
   class EmailPlugin < BasePlugin
-
     def plugin_id
       'canvas_ticketing_by_email'
     end
 
     def settings
       {
-        name: ->{ I18n.t 'Canvas Ticketing Email Connector' },
-        description: ->{ I18n.t 'pick a destination, we\'ll send you errors'  },
+        name: -> { I18n.t 'Canvas Ticketing Email Connector' },
+        description: -> { I18n.t 'pick a destination, we\'ll send you errors' },
         author: 'Instructure',
         author_website: 'http://www.instructure.com',
         version: '1.0.0',
@@ -42,7 +41,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def export_error(error_report, conf)
-       Message.create!(
+      Message.create!(
         to: conf[:email_address],
         from: error_report.email,
         subject: I18n.t("Canvas Error Report"),
@@ -52,6 +51,5 @@ module Canvas::Plugins::TicketingSystem
         context: error_report.raw_report
       )
     end
-
   end
 end

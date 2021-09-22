@@ -32,7 +32,7 @@ describe "account admin terms" do
     expect(term_header).to include_text("#{course_count} Course")
 
     # TODO: pend until a better solution is found to calculate user counts
-    #expect(term_header).to include_text("#{user_count} User")
+    # expect(term_header).to include_text("#{user_count} User")
   end
 
   before do
@@ -69,7 +69,6 @@ describe "account admin terms" do
   end
 
   context "not default term" do
-
     it "should add a new term" do
       new_term_name = 'New Term'
       get "/accounts/#{Account.default.id}/terms"
@@ -125,7 +124,7 @@ describe "account admin terms" do
       let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_account(account) }
 
       before do
-        group.enrollment_terms = [ term ]
+        group.enrollment_terms = [term]
       end
 
       it "should display link to grading standards page", test_id: 2528663, priority: "1" do

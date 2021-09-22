@@ -30,4 +30,3 @@ class BackfillWorkflowStateOnRubricAssociations < ActiveRecord::Migration[5.2]
     change_column_null(:rubric_associations, :workflow_state, true)
   end
 end
-

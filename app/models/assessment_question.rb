@@ -26,6 +26,7 @@ class AssessmentQuestion < ActiveRecord::Base
   has_many :attachments, :as => :context, :inverse_of => :context
   delegate :context, :context_id, :context_type, :to => :assessment_question_bank
   attr_accessor :initial_context
+
   belongs_to :assessment_question_bank, :touch => true
   simply_versioned :automatic => false
   acts_as_list :scope => :assessment_question_bank
@@ -34,7 +35,6 @@ class AssessmentQuestion < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :workflow_state, :assessment_question_bank_id
   resolves_root_account through: :context
-
 
   ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",
                         "matching_question", "missing_word_question",
@@ -68,11 +68,11 @@ class AssessmentQuestion < ActiveRecord::Base
     can :read and can :delete
   end
 
-  def user_can_see_through_quiz_question?(user, session=nil)
+  def user_can_see_through_quiz_question?(user, session = nil)
     self.shard.activate do
       quiz_ids = self.quiz_questions.distinct.pluck(:quiz_id)
       quiz_ids.any? && Quizzes::Quiz.where(:id => quiz_ids, :context_type => "Course",
-        :context_id => Enrollment.where(user_id: user).active.select(:course_id)).to_a.any?{|q| q.grants_right?(user, session, :read)}
+                                           :context_id => Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
     end
   end
 
@@ -115,7 +115,7 @@ class AssessmentQuestion < ActiveRecord::Base
     @file_substitutions ||= {}
   end
 
-  def translate_file_link(link, match_data=nil)
+  def translate_file_link(link, match_data = nil)
     match_data ||= link.match(translate_link_regex)
     return link unless match_data
 
@@ -162,9 +162,9 @@ class AssessmentQuestion < ActiveRecord::Base
 
     deep_translate = lambda do |obj|
       if obj.is_a?(Hash)
-        obj.inject(HashWithIndifferentAccess.new) {|h,(k,v)| h[k] = deep_translate.call(v); h}
+        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)| h[k] = deep_translate.call(v); h }
       elsif obj.is_a?(Array)
-        obj.map {|v| deep_translate.call(v) }
+        obj.map { |v| deep_translate.call(v) }
       elsif obj.is_a?(String)
         obj.gsub(translate_link_regex) do |match|
           translate_file_link(match, $~)
@@ -220,8 +220,8 @@ class AssessmentQuestion < ActiveRecord::Base
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
-         write_attribute(:question_data, data.with_indifferent_access)
-         data = read_attribute(:question_data)
+        write_attribute(:question_data, data.with_indifferent_access)
+        data = read_attribute(:question_data)
       end
     end
 
@@ -256,22 +256,22 @@ class AssessmentQuestion < ActiveRecord::Base
     return [] if assessment_questions.empty?
 
     # prepopulate version_number
-    current_versions = Version.shard(Shard.shard_for(quiz_id)).
-        where(versionable_type: 'AssessmentQuestion', versionable_id: assessment_questions).
-        group(:versionable_id).
-        maximum(:number)
+    current_versions = Version.shard(Shard.shard_for(quiz_id))
+                              .where(versionable_type: 'AssessmentQuestion', versionable_id: assessment_questions)
+                              .group(:versionable_id)
+                              .maximum(:number)
     # cache all the known quiz_questions
-    scope = Quizzes::QuizQuestion.
-        shard(Shard.shard_for(quiz_id)).
-        where(quiz_id: quiz_id, workflow_state: 'generated')
+    scope = Quizzes::QuizQuestion
+            .shard(Shard.shard_for(quiz_id))
+            .where(quiz_id: quiz_id, workflow_state: 'generated')
     # we search for nil quiz_group_id and duplicate_index to find older questions
     # generated before we added proper race condition checking
-    existing_quiz_questions = scope.
-        where(assessment_question_id: assessment_questions,
-              quiz_group_id: [nil, quiz_group_id],
-              duplicate_index: [nil, duplicate_index]).
-        order("id, quiz_group_id NULLS LAST").
-        group_by(&:assessment_question_id)
+    existing_quiz_questions = scope
+                              .where(assessment_question_id: assessment_questions,
+                                     quiz_group_id: [nil, quiz_group_id],
+                                     duplicate_index: [nil, duplicate_index])
+                              .order("id, quiz_group_id NULLS LAST")
+                              .group_by(&:assessment_question_id)
 
     assessment_questions.map do |aq|
       aq.force_version_number(current_versions[aq.id] || 0)
@@ -323,8 +323,7 @@ class AssessmentQuestion < ActiveRecord::Base
     self.save
   end
 
-
-  def self.parse_question(qdata, assessment_question=nil)
+  def self.parse_question(qdata, assessment_question = nil)
     qdata = qdata.to_hash.with_indifferent_access
     qdata[:question_name] ||= qdata[:name]
 
@@ -334,7 +333,7 @@ class AssessmentQuestion < ActiveRecord::Base
                       {}
                     end.with_indifferent_access
 
-    data = previous_data.merge(qdata.delete_if {|k, v| !v}).slice(
+    data = previous_data.merge(qdata.delete_if { |k, v| !v }).slice(
       :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
       :neutral_comments, :question_type, :question_name, :question_text, :answers,
       :formulas, :variables, :answer_tolerance, :formula_decimal_places,
@@ -362,9 +361,9 @@ class AssessmentQuestion < ActiveRecord::Base
     Digest::MD5.hexdigest(["dropdown", variable, "instructure-key"].join(","))
   end
 
-  def clone_for(question_bank, dup=nil, options={})
+  def clone_for(question_bank, dup = nil, options = {})
     dup ||= AssessmentQuestion.new
-    self.attributes.delete_if{|k,v| [:id, :question_data].include?(k.to_sym) }.each do |key, val|
+    self.attributes.delete_if { |k, v| [:id, :question_data].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
     dup.assessment_question_bank_id = question_bank

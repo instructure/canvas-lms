@@ -48,15 +48,15 @@ class Lti::TokenController < ApplicationController
 
     render json: {
       status: :bad_request,
-      errors: [{message: "Tool/Developer Key must be for LTI 1.3 tool"}]
+      errors: [{ message: "Tool/Developer Key must be for LTI 1.3 tool" }]
     }, status: :bad_request
   end
 
   def key
     @key ||= if params[:client_id]
-      DeveloperKey.find params.require(:client_id)
-    else
-      ContextExternalTool.find(params.require(:tool_id)).developer_key
-    end
+               DeveloperKey.find params.require(:client_id)
+             else
+               ContextExternalTool.find(params.require(:tool_id)).developer_key
+             end
   end
 end

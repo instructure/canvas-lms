@@ -52,7 +52,7 @@ describe "utc_datetime" do
   end
 
   it "should be initialized from the given time" do
-    t = Time.utc(2000,"jan",3,20,15,1)
+    t = Time.utc(2000, "jan", 3, 20, 15, 1)
     utc_datetime = t.utc_datetime
 
     expect(utc_datetime.iso8601).to eq "2000-01-03T20:15:00+00:00"

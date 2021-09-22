@@ -32,7 +32,7 @@ describe ContextController, type: :request do
     end
 
     it "should match the create_media_object api route" do
-      assert_recognizes({:controller => 'context', :action => 'create_media_object', 'format'=>'json'}, {:path => 'api/v1/media_objects', :method => :post})
+      assert_recognizes({ :controller => 'context', :action => 'create_media_object', 'format' => 'json' }, { :path => 'api/v1/media_objects', :method => :post })
     end
 
     it "should create the object if it doesn't already exist" do
@@ -40,10 +40,10 @@ describe ContextController, type: :request do
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return("stub")
 
       json = api_call(:post, "/api/v1/media_objects",
-        { :controller => 'context', :action => 'create_media_object', :format => 'json', :context_code => "user_#{@user.id}",
-        :id => "new_object",
-        :type => "audio",
-        :title => "title"})
+                      { :controller => 'context', :action => 'create_media_object', :format => 'json', :context_code => "user_#{@user.id}",
+                        :id => "new_object",
+                        :type => "audio",
+                        :title => "title" })
       @user.reload
       expect(@user.media_objects.count).to eq @original_count + 1
       @media_object = @user.media_objects.last

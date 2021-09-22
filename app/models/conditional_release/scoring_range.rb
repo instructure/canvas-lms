@@ -35,17 +35,18 @@ module ConditionalRelease
 
     delegate :course_id, to: :rule
 
-    acts_as_list :scope => {:rule => self, :deleted_at => nil}
+    acts_as_list :scope => { :rule => self, :deleted_at => nil }
 
     scope :for_score, lambda { |score|
-      where(arel_table[:upper_bound].gt(score).or(arel_table[:upper_bound].eq(nil)).
-              and(arel_table[:lower_bound].lteq(score).or(arel_table[:lower_bound].eq(nil))))
+      where(arel_table[:upper_bound].gt(score).or(arel_table[:upper_bound].eq(nil))
+              .and(arel_table[:lower_bound].lteq(score).or(arel_table[:lower_bound].eq(nil))))
     }
 
     def contains_score(score)
       return false unless score
       return false if lower_bound.present? && lower_bound > score
       return false if upper_bound.present? && upper_bound <= score
+
       true
     end
 

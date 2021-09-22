@@ -53,6 +53,7 @@ module Types
     field :courses_connection, CourseType.connection_type, null: true
     def courses_connection
       return unless account.grants_right?(current_user, :read_course_list)
+
       account.associated_courses
     end
 
@@ -64,6 +65,7 @@ module Types
     field :sis_id, String, null: true
     def sis_id
       return if account.root_account?
+
       load_association(:root_account).then do |root_account|
         account.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end

@@ -76,7 +76,7 @@ module MicrosoftSync
         StateMachineJob::NextStep.new(:step_second, 'first_data')
       else
         raise "Unknown job_state_data/steps internal_data: " +
-          [job_state_data, @internal_data].inspect
+              [job_state_data, @internal_data].inspect
       end
     end
 
@@ -87,7 +87,7 @@ module MicrosoftSync
   end
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
-    def initialize(step_initial_retries, step_second_delay_amounts=[1,2,3])
+    def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3])
       @step_initial_retries = step_initial_retries
       @step_second_delay_amounts = step_second_delay_amounts
     end
@@ -118,8 +118,8 @@ module MicrosoftSync
     # Used as a helper to enqueue actual delayed jobs
     def direct_enqueue_run(run_at, step, initial_mem_state)
       StateMachineJob.instance_method(:delay).bind(self)
-        .call(sender: self, strand: strand, run_at: run_at)
-        .run(step, initial_mem_state)
+                     .call(sender: self, strand: strand, run_at: run_at)
+                     .run(step, initial_mem_state)
     end
 
     def delay(*args)
@@ -150,14 +150,14 @@ module MicrosoftSync
       it 'runs all the steps' do
         subject.run_synchronously
         expect(steps_object.steps_run).to eq([
-          [:step_initial, nil, nil],
-          [:stash_first],
-          [:step_initial, nil, nil],
-          [:sleep, 2.seconds],
-          [:step_initial, nil, 'retry2'],
-          [:step_second, 'first_data', nil],
-          [:after_complete],
-        ])
+                                               [:step_initial, nil, nil],
+                                               [:stash_first],
+                                               [:step_initial, nil, nil],
+                                               [:sleep, 2.seconds],
+                                               [:step_initial, nil, 'retry2'],
+                                               [:step_second, 'first_data', nil],
+                                               [:after_complete],
+                                             ])
       end
 
       context 'when there is a job currently retrying' do
@@ -182,8 +182,8 @@ module MicrosoftSync
       it 'enqueues a job calling run() with a nil step' do
         subject.run_later
         expect(steps_object.steps_run).to eq([
-          [:delay_run, [{strand: strand, run_at: nil}], [nil, nil]],
-        ])
+                                               [:delay_run, [{ strand: strand, run_at: nil }], [nil, nil]],
+                                             ])
       end
 
       # On Jenkins, global and local IDs seems to be the same, so test this explicitly:
@@ -198,8 +198,8 @@ module MicrosoftSync
       it 'takes an optional initial_mem_state parameter it passes on to run()' do
         subject.run_later('initial mem state')
         expect(steps_object.steps_run).to eq([
-          [:delay_run, [{strand: strand, run_at: nil}], [nil, 'initial mem state']],
-        ])
+                                               [:delay_run, [{ strand: strand, run_at: nil }], [nil, 'initial mem state']],
+                                             ])
       end
     end
 
@@ -207,35 +207,35 @@ module MicrosoftSync
       it 'runs steps until it hits a retry then enqueues a delayed job' do
         subject.send(:run, nil, nil)
         expect(steps_object.steps_run).to eq([
-          [:step_initial, nil, nil],
-          [:stash_first],
-          [:delay_run, [{strand: strand, run_at: nil}], [:step_initial, nil]],
-        ])
+                                               [:step_initial, nil, nil],
+                                               [:stash_first],
+                                               [:delay_run, [{ strand: strand, run_at: nil }], [:step_initial, nil]],
+                                             ])
         steps_object.steps_run.clear
 
         subject.send(:run, :step_initial, nil)
         expect(steps_object.steps_run).to eq([
-          [:step_initial, nil, nil],
-          [:delay_run, [{strand: strand, run_at: 2.seconds.from_now}], [:step_initial, nil]],
-        ])
+                                               [:step_initial, nil, nil],
+                                               [:delay_run, [{ strand: strand, run_at: 2.seconds.from_now }], [:step_initial, nil]],
+                                             ])
         steps_object.steps_run.clear
 
         subject.send(:run, :step_initial, nil)
         expect(steps_object.steps_run).to eq([
-          [:step_initial, nil, 'retry2'],
-          [:step_second, 'first_data', nil],
-          [:after_complete],
-        ])
+                                               [:step_initial, nil, 'retry2'],
+                                               [:step_second, 'first_data', nil],
+                                               [:after_complete],
+                                             ])
       end
 
       context 'when an initial memory state is given' do
         it 'uses it for the first step' do
           subject.send(:run, nil, 'passedin_initial_mem_state')
           expect(steps_object.steps_run).to eq([
-            [:step_initial, 'passedin_initial_mem_state', nil],
-            [:step_second, nil, nil],
-            [:after_complete]
-          ])
+                                                 [:step_initial, 'passedin_initial_mem_state', nil],
+                                                 [:step_second, nil, nil],
+                                                 [:after_complete]
+                                               ])
         end
       end
 
@@ -264,7 +264,7 @@ module MicrosoftSync
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         subject.send(:run, nil, nil)
         expect(InstStatsd::Statsd).to have_received(:increment)
-          .with('microsoft_sync.smj.complete', tags: {microsoft_sync_step: 'step_initial'})
+          .with('microsoft_sync.smj.complete', tags: { microsoft_sync_step: 'step_initial' })
       end
 
       describe 'retry counting' do
@@ -319,7 +319,7 @@ module MicrosoftSync
               raise_error(Errors::PublicError)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.smj.final_retry',
-              tags: {microsoft_sync_step: 'step_initial', category: 'MicrosoftSync__Errors__PublicError'}
+              tags: { microsoft_sync_step: 'step_initial', category: 'MicrosoftSync__Errors__PublicError' }
             )
           end
 
@@ -328,9 +328,9 @@ module MicrosoftSync
               expect(error).to be_a(described_class::RetriesExhaustedError)
               expect(error.cause).to be_a(MicrosoftSync::Errors::PublicError)
               expect(options).to \
-                eq(tags: {type: 'microsoft_sync_smj'})
+                eq(tags: { type: 'microsoft_sync_smj' })
               expect(level).to eq(:error)
-              {error_report: 456}
+              { error_report: 456 }
             end
             expect { subject.send(:run, :step_initial, nil) }.to \
               raise_error(Errors::PublicError)
@@ -357,16 +357,16 @@ module MicrosoftSync
 
           context 'when delay is an array of integers' do
             it 'uses delays based on the per-step retry count' do
-              delays = steps_object.steps_run.select{|step| step.is_a?(Array)}
+              delays = steps_object.steps_run.select { |step| step.is_a?(Array) }
               expect(delays).to eq([
-                [:delay_run, [{run_at: nil, strand: strand}], [:step_initial, nil]],
-                [:delay_run, [{run_at: nil, strand: strand}], [:step_initial, nil]],
-                [:delay_run, [{run_at: 1.second.from_now, strand: strand}], [:step_second, nil]],
-                [:delay_run, [{run_at: 2.seconds.from_now, strand: strand}], [:step_second, nil]],
-                [:delay_run, [{run_at: 3.seconds.from_now, strand: strand}], [:step_second, nil]],
-                # Uses last value once past end of array:
-                [:delay_run, [{run_at: 3.seconds.from_now, strand: strand}], [:step_second, nil]],
-              ])
+                                     [:delay_run, [{ run_at: nil, strand: strand }], [:step_initial, nil]],
+                                     [:delay_run, [{ run_at: nil, strand: strand }], [:step_initial, nil]],
+                                     [:delay_run, [{ run_at: 1.second.from_now, strand: strand }], [:step_second, nil]],
+                                     [:delay_run, [{ run_at: 2.seconds.from_now, strand: strand }], [:step_second, nil]],
+                                     [:delay_run, [{ run_at: 3.seconds.from_now, strand: strand }], [:step_second, nil]],
+                                     # Uses last value once past end of array:
+                                     [:delay_run, [{ run_at: 3.seconds.from_now, strand: strand }], [:step_second, nil]],
+                                   ])
             end
           end
 
@@ -376,8 +376,8 @@ module MicrosoftSync
             end
 
             let(:run_ats) do
-              delays = steps_object.steps_run.select{|step| step.is_a?(Array)}
-              delays.map{|d| d[1][0][:run_at]}
+              delays = steps_object.steps_run.select { |step| step.is_a?(Array) }
+              delays.map { |d| d[1][0][:run_at] }
             end
 
             context 'when delay is a single duration value' do
@@ -395,9 +395,9 @@ module MicrosoftSync
 
               it 'clips the delay to between 0 and the maximum' do
                 expect(run_ats).to eq([
-                  nil, nil, Time.zone.now, (max_delay - 5).from_now,
-                  max_delay.from_now, max_delay.from_now
-                ])
+                                        nil, nil, Time.zone.now, (max_delay - 5).from_now,
+                                        max_delay.from_now, max_delay.from_now
+                                      ])
               end
             end
           end
@@ -419,8 +419,8 @@ module MicrosoftSync
 
             it 'enqueues a job starting at that step' do
               expect(steps_object.steps_run).to eq([
-                [:delay_run, [{run_at: 123.seconds.from_now, strand: strand}], [:step_second, nil]],
-              ])
+                                                     [:delay_run, [{ run_at: 123.seconds.from_now, strand: strand }], [:step_second, nil]],
+                                                   ])
             end
 
             it 'sets step in job' do
@@ -428,7 +428,7 @@ module MicrosoftSync
             end
 
             it 'keeps track of retries under that step' do
-              expect(state_record.reload.job_state).to include(retries_by_step: {'step_second' => 1})
+              expect(state_record.reload.job_state).to include(retries_by_step: { 'step_second' => 1 })
             end
           end
 
@@ -465,8 +465,8 @@ module MicrosoftSync
         it 'enqueues a job for that step' do
           subject.send(:run, :step_initial, nil)
           expect(steps_object.steps_run).to eq([
-            [:delay_run, [{run_at: 1.minute.from_now, strand: strand}], [:step_second, nil]],
-          ])
+                                                 [:delay_run, [{ run_at: 1.minute.from_now, strand: strand }], [:step_second, nil]],
+                                               ])
         end
 
         context 'the delay_amount is greater than max_delay' do
@@ -477,8 +477,8 @@ module MicrosoftSync
             run_at = Time.zone.now + StateMachineJobTestStepsBase::MAX_DELAY
 
             expect(steps_object.steps_run).to eq([
-              [:delay_run, [{run_at: run_at, strand: strand}], [:step_second, nil]],
-            ])
+                                                   [:delay_run, [{ run_at: run_at, strand: strand }], [:step_second, nil]],
+                                                 ])
           end
         end
 
@@ -491,8 +491,8 @@ module MicrosoftSync
           Timecop.freeze(2.minutes.from_now) do
             expect { subject.send(:run, :step_initial, nil) }
               .to change { state_record.reload.job_state[:data] }.to('abc123')
-              .and change { state_record.reload.job_state[:step] }.to(:step_second)
-              .and change { state_record.reload.job_state[:updated_at] }.to(Time.zone.now)
+                                                                 .and change { state_record.reload.job_state[:step] }.to(:step_second)
+                                                                                                                     .and change { state_record.reload.job_state[:updated_at] }.to(Time.zone.now)
           end
         end
       end
@@ -519,8 +519,8 @@ module MicrosoftSync
 
           it 'sends the error to Canvas::Errors.capture and saves the error report' do
             expect(Canvas::Errors).to receive(:capture).with(
-              error, {tags: {type: 'microsoft_sync_smj'}}, :error
-            ).and_return({error_report: 123})
+              error, { tags: { type: 'microsoft_sync_smj' } }, :error
+            ).and_return({ error_report: 123 })
             expect { subject.send(:run, :step_initial, nil) }.to raise_error(error)
             expect(state_record.last_error_report_id).to eq(123)
           end
@@ -578,7 +578,7 @@ module MicrosoftSync
         end
 
         it "doesn't continue a retried job" do
-          state_record.update(job_state: {step: :step_initial})
+          state_record.update(job_state: { step: :step_initial })
           subject.send(:run, :step_initial, nil)
           expect(steps_object.steps_run).to eq([])
         end
@@ -631,7 +631,7 @@ module MicrosoftSync
           it 'captures an error with Canvas::Errors and then raises it' do
             expect(Canvas::Errors).to receive(:capture).with(
               instance_of(StateMachineJob::InternalError),
-              {tags: {type: 'microsoft_sync_smj'}},
+              { tags: { type: 'microsoft_sync_smj' } },
               :error
             )
             expect {
@@ -664,7 +664,7 @@ module MicrosoftSync
               subject.send(:run, nil, nil)
               expect(InstStatsd::Statsd).to have_received(:increment).with(
                 'microsoft_sync.smj.stalled',
-                tags: {microsoft_sync_step: 'step_initial'}
+                tags: { microsoft_sync_step: 'step_initial' }
               )
             end
           end
@@ -702,8 +702,8 @@ module MicrosoftSync
                 steps_object.steps_run.clear
                 subject.send(:run, nil, nil)
                 expect(steps_object.steps_run).to eq([
-                  [:delay_run, [{strand: strand, run_at: retrying_job_run_at + 1.second}], [nil, nil]]
-                ])
+                                                       [:delay_run, [{ strand: strand, run_at: retrying_job_run_at + 1.second }], [nil, nil]]
+                                                     ])
               end
             end
 
@@ -716,8 +716,8 @@ module MicrosoftSync
                 steps_object.steps_run.clear
                 subject.send(:run, nil, nil)
                 expect(steps_object.steps_run).to eq([
-                  [:delay_run, [{strand: strand, run_at: retrying_job_run_at + 1.second}], [nil, nil]]
-                ])
+                                                       [:delay_run, [{ strand: strand, run_at: retrying_job_run_at + 1.second }], [nil, nil]]
+                                                     ])
               end
             end
 
@@ -733,7 +733,7 @@ module MicrosoftSync
                   expect(state_record.job_state[:step]).to eq(:step_initial)
                   expect(steps_object).not_to receive(:step_initial)
                   expect { subject.send(:run, nil, mem_state1) }.to_not \
-                    change{ state_record.reload.attributes }
+                    change { state_record.reload.attributes }
                 end
               end
 
@@ -747,10 +747,10 @@ module MicrosoftSync
                   subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state2)
                   expect(steps_object).not_to receive(:step_initial)
                   steps_object.steps_run.clear
-                  expect { subject.send(:run, nil, mem_state1) }.to_not change{ state_record.reload.attributes }
+                  expect { subject.send(:run, nil, mem_state1) }.to_not change { state_record.reload.attributes }
                   expect(steps_object.steps_run).to eq([
-                    [:delay_run, [{strand: strand, run_at: 61.seconds.from_now}], [nil, mem_state1]]
-                  ])
+                                                         [:delay_run, [{ strand: strand, run_at: 61.seconds.from_now }], [nil, mem_state1]]
+                                                       ])
                 end
               end
             end

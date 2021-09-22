@@ -35,11 +35,10 @@ describe "quizzes questions" do
   end
 
   context "as a teacher" do
-
     it "should edit a quiz question", priority: "1", test_id: 209946 do
       @context = @course
       q = quiz_model
-      quest1 = q.quiz_questions.create!(:question_data => {:name => "first question"})
+      quest1 = q.quiz_questions.create!(:question_data => { :name => "first question" })
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"

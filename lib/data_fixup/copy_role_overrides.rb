@@ -23,14 +23,14 @@ module DataFixup::CopyRoleOverrides
       possible_new_role_overrides = RoleOverride.where(permission: new_permission.to_s, context_id: old_role_overrides.map(&:context_id)).to_a
 
       old_role_overrides.each do |old_role_override|
-        unless old_role_override.invalid? || possible_new_role_overrides.detect{|ro|
+        unless old_role_override.invalid? || possible_new_role_overrides.detect { |ro|
           ro.context_id == old_role_override.context_id &&
           ro.context_type == old_role_override.context_type &&
           ro.role_id == old_role_override.role_id
         }
 
           dup = RoleOverride.new
-          old_role_override.attributes.delete_if{|k,v| [:id, :permission, :created_at, :updated_at].include?(k.to_sym)}.each do |key, val|
+          old_role_override.attributes.delete_if { |k, v| [:id, :permission, :created_at, :updated_at].include?(k.to_sym) }.each do |key, val|
             dup.send("#{key}=", val)
           end
           dup.permission = new_permission.to_s

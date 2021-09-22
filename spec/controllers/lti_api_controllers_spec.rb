@@ -35,11 +35,11 @@ describe LtiApiController, type: :request do
   end
 
   before do
-    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
   end
 
-  def check_error_response(message, check_generated_sig=true, with_report: true)
+  def check_error_response(message, check_generated_sig = true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
     json = JSON.parse response.body
@@ -63,7 +63,7 @@ describe LtiApiController, type: :request do
     end
   end
 
-  def error_data(json=nil)
+  def error_data(json = nil)
     json ||= JSON.parse response.body
     error_report = ErrorReport.find json["error_report_id"]
     error_report.data
@@ -84,8 +84,8 @@ describe LtiApiController, type: :request do
 
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
-      params: req.body,
-      headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
+         params: req.body,
+         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
   end
 
   def source_id
@@ -156,7 +156,7 @@ describe LtiApiController, type: :request do
     end
   end
 
-  def replace_result(opts={})
+  def replace_result(opts = {})
     score = opts[:score]
     sourceid = opts[:sourceid]
     result_data = opts[:result_data]
@@ -193,78 +193,78 @@ describe LtiApiController, type: :request do
       result_data_xml += "\n</resultData>\n"
     end
 
-    body = <<-XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-  <imsx_POXHeader>
-    <imsx_POXRequestHeaderInfo>
-      <imsx_version>V1.0</imsx_version>
-      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
-    </imsx_POXRequestHeaderInfo>
-  </imsx_POXHeader>
-  <imsx_POXBody>
-    <replaceResultRequest>
-      <resultRecord>
-        <sourcedGUID>
-          <sourcedId>#{sourceid}</sourcedId>
-        </sourcedGUID>
-        <result>
-          #{score_xml}
-          #{result_data_xml}
-          #{raw_score_xml}
-        </result>
-      </resultRecord>
-    </replaceResultRequest>
-  </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-XML
+    body = <<~XML
+      <?xml version = "1.0" encoding = "UTF-8"?>
+      <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+        <imsx_POXHeader>
+          <imsx_POXRequestHeaderInfo>
+            <imsx_version>V1.0</imsx_version>
+            <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+          </imsx_POXRequestHeaderInfo>
+        </imsx_POXHeader>
+        <imsx_POXBody>
+          <replaceResultRequest>
+            <resultRecord>
+              <sourcedGUID>
+                <sourcedId>#{sourceid}</sourcedId>
+              </sourcedGUID>
+              <result>
+                #{score_xml}
+                #{result_data_xml}
+                #{raw_score_xml}
+              </result>
+            </resultRecord>
+          </replaceResultRequest>
+        </imsx_POXBody>
+      </imsx_POXEnvelopeRequest>
+    XML
   end
 
   def read_result(sourceid = nil)
     sourceid ||= source_id()
-    body = <<-XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-  <imsx_POXHeader>
-    <imsx_POXRequestHeaderInfo>
-      <imsx_version>V1.0</imsx_version>
-      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
-    </imsx_POXRequestHeaderInfo>
-  </imsx_POXHeader>
-  <imsx_POXBody>
-    <readResultRequest>
-      <resultRecord>
-        <sourcedGUID>
-          <sourcedId>#{sourceid}</sourcedId>
-        </sourcedGUID>
-      </resultRecord>
-    </readResultRequest>
-  </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
+    body = <<~XML
+      <?xml version = "1.0" encoding = "UTF-8"?>
+      <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+        <imsx_POXHeader>
+          <imsx_POXRequestHeaderInfo>
+            <imsx_version>V1.0</imsx_version>
+            <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+          </imsx_POXRequestHeaderInfo>
+        </imsx_POXHeader>
+        <imsx_POXBody>
+          <readResultRequest>
+            <resultRecord>
+              <sourcedGUID>
+                <sourcedId>#{sourceid}</sourcedId>
+              </sourcedGUID>
+            </resultRecord>
+          </readResultRequest>
+        </imsx_POXBody>
+      </imsx_POXEnvelopeRequest>
     XML
   end
 
   def delete_result(sourceid = nil)
     sourceid ||= source_id()
-    body = <<-XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-  <imsx_POXHeader>
-    <imsx_POXRequestHeaderInfo>
-      <imsx_version>V1.0</imsx_version>
-      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
-    </imsx_POXRequestHeaderInfo>
-  </imsx_POXHeader>
-  <imsx_POXBody>
-    <deleteResultRequest>
-      <resultRecord>
-        <sourcedGUID>
-          <sourcedId>#{sourceid}</sourcedId>
-        </sourcedGUID>
-      </resultRecord>
-    </deleteResultRequest>
-  </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
+    body = <<~XML
+      <?xml version = "1.0" encoding = "UTF-8"?>
+      <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+        <imsx_POXHeader>
+          <imsx_POXRequestHeaderInfo>
+            <imsx_version>V1.0</imsx_version>
+            <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+          </imsx_POXRequestHeaderInfo>
+        </imsx_POXHeader>
+        <imsx_POXBody>
+          <deleteResultRequest>
+            <resultRecord>
+              <sourcedGUID>
+                <sourcedId>#{sourceid}</sourcedId>
+              </sourcedGUID>
+            </resultRecord>
+          </deleteResultRequest>
+        </imsx_POXBody>
+      </imsx_POXEnvelopeRequest>
     XML
   end
 
@@ -286,7 +286,6 @@ XML
   end
 
   describe "replaceResult" do
-
     def verify_xml(response)
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'success'
@@ -311,7 +310,7 @@ XML
     end
 
     it "should set the submission data text" do
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text =>"oioi"}))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "oioi" }))
       check_success
 
       verify_xml(response)
@@ -322,7 +321,7 @@ XML
 
     it "should set complex submission text" do
       text = CGI::escapeHTML("<p>stuff</p>")
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text => "<![CDATA[#{text}]]>" }))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "<![CDATA[#{text}]]>" }))
       check_success
 
       verify_xml(response)
@@ -332,7 +331,7 @@ XML
     end
 
     it "should set the submission data url" do
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:url =>"http://www.example.com/lti"}))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :url => "http://www.example.com/lti" }))
       check_success
 
       verify_xml(response)
@@ -343,7 +342,7 @@ XML
     end
 
     it "should set the submission data text even with no score" do
-      make_call('body' => replace_result(score: nil, sourceid: nil, result_data: {:text =>"oioi"}))
+      make_call('body' => replace_result(score: nil, sourceid: nil, result_data: { :text => "oioi" }))
       check_success
 
       verify_xml(response)
@@ -394,7 +393,6 @@ XML
       expect(submission.score).to eq 0
     end
 
-
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
@@ -403,9 +401,9 @@ XML
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
       expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<-NO_POINTS.strip
-An external tool attempted to grade this assignment as 75%, but was unable
-to because the assignment has no points possible.
+      expect(comments.first.comment).to eq <<~NO_POINTS.strip
+        An external tool attempted to grade this assignment as 75%, but was unable
+        to because the assignment has no points possible.
       NO_POINTS
     end
 
@@ -515,9 +513,7 @@ to because the assignment has no points possible.
         expect(submission).to be_present
         expect(submission.score).to eq -7
       end
-
     end
-
   end
 
   describe "readResult" do
@@ -612,7 +608,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if course is deleted" do
-    opts = {'body' => replace_result(score: '0.6')}
+    opts = { 'body' => replace_result(score: '0.6') }
     @course.destroy
     make_call(opts)
 
@@ -620,7 +616,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if assignment is deleted" do
-    opts = {'body' => replace_result(score: '0.6')}
+    opts = { 'body' => replace_result(score: '0.6') }
     @assignment.destroy
     make_call(opts)
 
@@ -628,7 +624,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if user enrollment is deleted" do
-    opts = {'body' => replace_result(score: '0.6')}
+    opts = { 'body' => replace_result(score: '0.6') }
     @course.student_enrollments.active.where(user_id: @student.id).first.destroy
     make_call(opts)
 
@@ -636,7 +632,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if tool is deleted" do
-    opts = {'body' => replace_result(score: '0.6')}
+    opts = { 'body' => replace_result(score: '0.6') }
     @tool.destroy
     make_call(opts)
 
@@ -651,8 +647,8 @@ to because the assignment has no points possible.
       consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
       req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
-        params: req.body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
+           params: req.body,
+           headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
     end
 
     it "should require the correct shared secret" do

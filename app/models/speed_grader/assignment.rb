@@ -54,7 +54,7 @@ module SpeedGrader
 
       res = assignment.as_json(
         :include => [
-          {:context => { :only => :id }},
+          { :context => { :only => :id } },
           :rubric_association
         ],
         :include_root => false
@@ -100,7 +100,7 @@ module SpeedGrader
       ActiveRecord::Associations::Preloader.new.preload(assignment, :moderated_grading_selections) if provisional_grader_or_moderator?
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
-      includes << {all_submission_comments: {submission: {assignment: { context: :root_account }}}}
+      includes << { all_submission_comments: { submission: { assignment: { context: :root_account } } } }
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
       student_json_fields = anonymous_students?(current_user: current_user, assignment: assignment) ? [] : %i(name id sortable_name)
@@ -121,9 +121,9 @@ module SpeedGrader
         json
       end
 
-      res[:context][:active_course_sections] = assignment.context.
-        sections_visible_to(current_user, assignment.sections_with_visibility(current_user)).
-        map { |section| section.as_json(include_root: false, only: [:id, :name]) }
+      res[:context][:active_course_sections] = assignment.context
+                                                         .sections_visible_to(current_user, assignment.sections_with_visibility(current_user))
+                                                         .map { |section| section.as_json(include_root: false, only: [:id, :name]) }
 
       res[:context][:enrollments] = enrollments.map do |enrollment|
         enrollment_json = enrollment.as_json(include_root: false, only: enrollment_json_fields)
@@ -148,7 +148,7 @@ module SpeedGrader
       # Preloading submission history versioned attachments and originality reports
       submission_histories = submissions.map(&:submission_history).flatten
       ::Submission.bulk_load_versioned_attachments(submission_histories,
-                                                 preloads: attachment_includes)
+                                                   preloads: attachment_includes)
       ::Submission.bulk_load_versioned_originality_reports(submission_histories)
       ::Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
@@ -158,7 +158,7 @@ module SpeedGrader
       res[:too_many_quiz_submissions] = too_many = assignment.too_many_qs_versions?(submissions)
       qs_versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
+      enrollment_types_by_id = enrollments.inject({}) { |h, e| h[e.user_id] ||= e.type; h }
 
       if assignment.quiz
         if assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
@@ -195,7 +195,7 @@ module SpeedGrader
         # attachments again via the submission method that creates a
         # new query.
         json['attachments'] = attachments_for_submission[sub].map do |att|
-          att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id ])
+          att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id])
         end
 
         sub_attachments = []
@@ -266,14 +266,14 @@ module SpeedGrader
             # Returns the id of the Submission, but this may be too ambiguous.
             # In the future, we may want to return both a quiz_id and a
             # submission_id and let clients handle it themselves.
-            {submission: {
-                grade: qs['score'],
-                id: sub.id,
-                show_grade_in_dropdown: true,
-                submitted_at: qs['finished_at'],
-                late: Quizzes::QuizSubmission.late_from_attributes?(qs, assignment.quiz, sub),
-                version: v.number,
-              }}
+            { submission: {
+              grade: qs['score'],
+              id: sub.id,
+              show_grade_in_dropdown: true,
+              submitted_at: qs['finished_at'],
+              late: Quizzes::QuizSubmission.late_from_attributes?(qs, assignment.quiz, sub),
+              version: v.number,
+            } }
           end
         end
 
@@ -284,7 +284,7 @@ module SpeedGrader
             json['provisional_grades'] = []
             pgs.each do |pg|
               current_pg_json = provisional_grade_to_json(pg).tap do |pg_json|
-                rubric_assessments = all_provisional_rubric_assessments.select {|assessment| assessment.artifact_id == pg.id}
+                rubric_assessments = all_provisional_rubric_assessments.select { |assessment| assessment.artifact_id == pg.id }
                 pg_json[:rubric_assessments] = rubric_assessments_to_json(
                   rubric_assessments: rubric_assessments,
                   submissions: submissions
@@ -326,11 +326,11 @@ module SpeedGrader
 
         if grading_role == :provisional_grader
           provisional_grades = if grader_comments_hidden?(current_user: current_user, assignment: assignment)
-            provisional_grades.not_final.where(scorer: current_user)
-          else
-            select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
-            provisional_grades.select(select_fields)
-          end
+                                 provisional_grades.not_final.where(scorer: current_user)
+                               else
+                                 select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
+                                 provisional_grades.select(select_fields)
+                               end
         elsif grading_role == :grader
           provisional_grades = ModeratedGrading::ProvisionalGrade.none
         end
@@ -413,6 +413,7 @@ module SpeedGrader
 
     def group_id_filter
       return nil unless course.filter_speed_grader_by_student_group?
+
       group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
 
       # If we selected a group that is now deleted, don't use it

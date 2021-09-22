@@ -29,7 +29,6 @@ describe 'account authentication' do
   end
 
   describe 'sso settings' do
-
     let(:login_handle_name) { f('#sso_settings_login_handle_name') }
     let(:change_password_url) { f('#sso_settings_change_password_url') }
     let(:auth_discovery_url) { f('#sso_settings_auth_discovery_url') }
@@ -54,9 +53,7 @@ describe 'account authentication' do
   end
 
   describe 'identity provider' do
-
     context 'ldap' do
-
       let!(:ldap_aac) { AuthenticationProvider::LDAP }
 
       it 'should allow creation of config', priority: "1", test_id: 250262 do
@@ -130,7 +127,6 @@ describe 'account authentication' do
     end
 
     context 'saml' do
-
       let!(:saml_aac) { AuthenticationProvider::SAML }
 
       it 'should allow creation of config', priority: "1", test_id: 250266 do
@@ -253,7 +249,7 @@ describe 'account authentication' do
 
           ap.reload
           expect(ap.federated_attributes).to eq({ 'locale' => { 'attribute' => 'provider_locale',
-                                                                 'provisioning_only' => false} })
+                                                                'provisioning_only' => false } })
           expect(f("input[name='authentication_provider[federated_attributes][locale][attribute]']")[:value]).to eq 'provider_locale'
         end
 
@@ -274,7 +270,7 @@ describe 'account authentication' do
 
           ap.reload
           expect(ap.federated_attributes).to eq({ 'locale' => { 'attribute' => 'provider_locale',
-                                                                'provisioning_only' => true} })
+                                                                'provisioning_only' => true } })
           expect(f("input[name='authentication_provider[federated_attributes][locale][attribute]']").attribute('value')).to eq 'provider_locale'
           expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq true
         end
@@ -346,7 +342,6 @@ describe 'account authentication' do
     end
 
     context 'cas' do
-
       let!(:cas_aac) { AuthenticationProvider::CAS }
 
       it 'should allow creation of config', priority: "1", test_id: 250272 do
@@ -382,7 +377,6 @@ describe 'account authentication' do
     end
 
     context 'facebook' do
-
       let!(:facebook_aac) { AuthenticationProvider::Facebook }
 
       it 'should allow creation of config', priority: "2", test_id: 250275 do
@@ -419,7 +413,6 @@ describe 'account authentication' do
     end
 
     context 'github' do
-
       let!(:github_aac) { AuthenticationProvider::GitHub }
 
       it 'should allow creation of config', priority: "2", test_id: 250278 do
@@ -460,7 +453,6 @@ describe 'account authentication' do
     end
 
     context 'google' do
-
       let!(:google_aac) { AuthenticationProvider::Google }
 
       it 'should allow creation of config', priority: "2", test_id: 250281 do
@@ -498,7 +490,6 @@ describe 'account authentication' do
     end
 
     context 'linkedin' do
-
       let!(:linkedin_aac) { AuthenticationProvider::LinkedIn }
 
       it 'should allow creation of config', priority: "2", test_id: 250284 do
@@ -536,7 +527,6 @@ describe 'account authentication' do
     end
 
     context 'openid connect' do
-
       let!(:openid_aac) { AuthenticationProvider::OpenIDConnect }
 
       it 'should allow creation of config', priority: "2", test_id: 250287 do
@@ -583,7 +573,6 @@ describe 'account authentication' do
     end
 
     context 'twitter' do
-
       let!(:twitter_aac) { AuthenticationProvider::Twitter }
 
       it 'should allow creation of config', priority: "2", test_id: 250290 do
@@ -621,7 +610,6 @@ describe 'account authentication' do
     end
 
     context 'microsoft' do
-
       let!(:microsoft_aac) { AuthenticationProvider::Microsoft }
 
       it 'should allow creation of config', priority: "2" do
@@ -657,6 +645,5 @@ describe 'account authentication' do
         expect(microsoft_aac.count).to eq 1
       end
     end
-
   end
 end

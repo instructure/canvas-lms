@@ -21,11 +21,10 @@
 require 'account_reports/report_helper'
 
 module AccountReports
-
   class GradeReports
     include ReportHelper
 
-    def initialize(account_report, runner=nil)
+    def initialize(account_report, runner = nil)
       @account_report = account_report
       @include_deleted = value_to_boolean(account_report.parameters&.dig('include_deleted'))
 
@@ -83,7 +82,7 @@ module AccountReports
       courses = add_course_sub_account_scope(courses)
       courses = courses.active unless @include_deleted
       total = courses.count
-      courses.find_ids_in_batches(batch_size: 10_000) {|batch| create_report_runners(batch, total)} unless total == 0
+      courses.find_ids_in_batches(batch_size: 10_000) { |batch| create_report_runners(batch, total) } unless total == 0
 
       write_report_in_batches(headers)
     end
@@ -92,7 +91,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
 
       students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
         users.uniq!
         users_by_id = users.index_by(&:id)
         courses_by_id = Course.where(id: student_chunk.map(&:course_id)).preload(:grading_standard).index_by(&:id)
@@ -104,6 +103,7 @@ module AccountReports
                                include_deleted: @include_deleted,
                                enrollment: student)
           next unless p
+
           course = courses_by_id[student["course_id"]]
           arr = []
           arr << student["user_name"]
@@ -201,7 +201,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
       courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
       students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
         users.uniq!
         users_by_id = users.index_by(&:id)
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
@@ -214,6 +214,7 @@ module AccountReports
                                  include_deleted: @include_deleted,
                                  enrollment: student)
             next unless p
+
             course = courses_by_id[student["course_id"]]
             arr = []
             arr << student["user_name"]
@@ -268,8 +269,8 @@ module AccountReports
     end
 
     def student_grade_scope
-      students = root_account.enrollments.
-        select("u.name AS user_name, enrollments.user_id, enrollments.course_id,
+      students = root_account.enrollments
+                             .select("u.name AS user_name, enrollments.user_id, enrollments.course_id,
                 c.name AS course_name,
                 enrollments.root_account_id, enrollments.sis_pseudonym_id,
                 c.sis_source_id AS course_sis_id, s.name AS section_name,
@@ -285,14 +286,14 @@ module AccountReports
            CASE WHEN enrollments.workflow_state = 'active' THEN 'active'
                 WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                 WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
-                WHEN enrollments.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
-        order("t.id, c.id, enrollments.id").
-        joins("INNER JOIN #{User.quoted_table_name} u ON enrollments.user_id = u.id
+                WHEN enrollments.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state")
+                             .order("t.id, c.id, enrollments.id")
+                             .joins("INNER JOIN #{User.quoted_table_name} u ON enrollments.user_id = u.id
                INNER JOIN #{Course.quoted_table_name} c ON c.id = enrollments.course_id
                INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
                INNER JOIN #{CourseSection.quoted_table_name} s ON enrollments.course_section_id = s.id
-               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = enrollments.id AND sc.course_score IS TRUE").
-        where("enrollments.type='StudentEnrollment'")
+               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = enrollments.id AND sc.course_score IS TRUE")
+                             .where("enrollments.type='StudentEnrollment'")
 
       if @include_deleted
         students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
@@ -308,7 +309,8 @@ module AccountReports
         students = students.where(
           "c.workflow_state='available'
            AND enrollments.workflow_state IN ('active', 'completed')
-           AND sc.workflow_state <> 'deleted'")
+           AND sc.workflow_state <> 'deleted'"
+        )
       end
       students
     end

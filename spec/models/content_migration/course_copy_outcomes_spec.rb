@@ -36,13 +36,13 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
       lo.save!
 
       log.add_outcome(lo)
 
       @cm.copy_options = {
-          :all_learning_outcomes => "1"
+        :all_learning_outcomes => "1"
       }
       @cm.save!
 
@@ -59,14 +59,14 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
       lo.save!
       default.add_outcome(lo)
 
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'question_type' => 'essay_question'})
+      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
 
-      lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
+      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
 
       run_course_copy
 
@@ -210,9 +210,9 @@ describe ContentMigration do
       log.add_outcome(lo)
 
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'question_type' => 'essay_question'})
+      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
 
-      lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
+      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
 
       run_course_copy
 
@@ -224,15 +224,15 @@ describe ContentMigration do
     end
 
     it "should create outcomes in new course if external context not found" do
-      hash = {"is_global_outcome"=>true,
-               "points_possible"=>nil,
-               "type"=>"learning_outcome",
-               "ratings"=>[],
-               "description"=>nil,
-               "mastery_points"=>nil,
-               "external_identifier"=>"0",
-               "title"=>"root outcome",
-               "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
+      hash = { "is_global_outcome" => true,
+               "points_possible" => nil,
+               "type" => "learning_outcome",
+               "ratings" => [],
+               "description" => nil,
+               "mastery_points" => nil,
+               "external_identifier" => "0",
+               "title" => "root outcome",
+               "migration_id" => "id1072dcf40e801c6468d9eaa5774e56d" }
 
       @cm.outcome_to_id_map = {}
       Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
@@ -248,25 +248,26 @@ describe ContentMigration do
 
     it "should create rubrics in new course if external context not found" do
       hash = {
-              "reusable"=>false,
-              "public"=>false,
-              "hide_score_total"=>nil,
-              "free_form_criterion_comments"=>nil,
-              "points_possible"=>nil,
-              "data"=>[{"id"=>"1",
-                        "description"=>"Outcome row",
-                        "long_description"=>nil,
-                        "points"=>3,
-                        "mastery_points"=>nil,
-                        "title"=>"Outcome row",
-                        "ratings"=>[{"description"=>"Rockin'",
-                                     "id"=>"2",
-                                     "criterion_id"=>"1", "points"=>3}]}],
-              "read_only"=>false,
-              "description"=>nil,
-              "external_identifier"=>"0",
-              "title"=>"root rubric",
-              "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
+        "reusable" => false,
+        "public" => false,
+        "hide_score_total" => nil,
+        "free_form_criterion_comments" => nil,
+        "points_possible" => nil,
+        "data" => [{ "id" => "1",
+                     "description" => "Outcome row",
+                     "long_description" => nil,
+                     "points" => 3,
+                     "mastery_points" => nil,
+                     "title" => "Outcome row",
+                     "ratings" => [{ "description" => "Rockin'",
+                                     "id" => "2",
+                                     "criterion_id" => "1", "points" => 3 }] }],
+        "read_only" => false,
+        "description" => nil,
+        "external_identifier" => "0",
+        "title" => "root rubric",
+        "migration_id" => "id1072dcf40e801c6468d9eaa5774e56d"
+      }
 
       @cm.outcome_to_id_map = {}
       Importers::RubricImporter.import_from_migration(hash, @cm)
@@ -294,14 +295,14 @@ describe ContentMigration do
           :points => 3,
           :description => "Outcome row",
           :id => 1,
-          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :ratings => [{ :points => 3, :description => "Rockin'", :criterion_id => 1, :id => 2 }],
           :learning_outcome_id => lo.id
         },
         {
           :points => 3,
           :description => "Outcome row 2",
           :id => 2,
-          :ratings => [{:points => 3,:description => "lame'",:criterion_id => 2,:id => 3}],
+          :ratings => [{ :points => 3, :description => "lame'", :criterion_id => 2, :id => 3 }],
           :ignore_for_scoring => true,
           :learning_outcome_id => lo2.id
         }
@@ -327,7 +328,7 @@ describe ContentMigration do
 
     it "should still associate rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
-      @assoc.summary_data = {:saved_comments=>{"309_6312"=>["what the comment", "hey"]}}
+      @assoc.summary_data = { :saved_comments => { "309_6312" => ["what the comment", "hey"] } }
       @assoc.save!
 
       run_course_copy
@@ -354,7 +355,7 @@ describe ContentMigration do
     it "should copy rubrics associated with assignments when rubric isn't selected" do
       create_rubric_asmnt
       @cm.copy_options = {
-              :assignments => {mig_id(@assignment) => "1"},
+        :assignments => { mig_id(@assignment) => "1" },
       }
       @cm.save!
       run_course_copy
@@ -378,7 +379,7 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
       lo.save!
 
       log.add_outcome(lo)
@@ -401,7 +402,7 @@ describe ContentMigration do
       default.adopt_outcome_group(log2)
 
       lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "outcome1", :workflow_state => "active")
-      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
       lo.save!
 
       log1.add_outcome(lo)

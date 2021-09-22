@@ -39,9 +39,9 @@ describe OutcomeImportsApiController, type: :request do
 
   it "should return 404 when no latest import is available" do
     raw_api_call(:get,
-          "/api/v1/accounts/#{@account.id}/outcome_imports/latest",
-          { :controller => 'outcome_imports_api', :action => 'show',
-            :format => 'json', :account_id => @account.id.to_s, id: 'latest' })
+                 "/api/v1/accounts/#{@account.id}/outcome_imports/latest",
+                 { :controller => 'outcome_imports_api', :action => 'show',
+                   :format => 'json', :account_id => @account.id.to_s, id: 'latest' })
     assert_status(404)
   end
 
@@ -50,22 +50,22 @@ describe OutcomeImportsApiController, type: :request do
     strand = "OutcomeImport::run::#{@account.root_account.global_id}"
     expect do
       json = api_call(:post,
-            "/api/v1/accounts/#{@account.id}/outcome_imports",
-            { :controller => 'outcome_imports_api', :action => 'create',
-              :format => 'json', :account_id => @account.id.to_s },
-            { :import_type => 'instructure_csv',
-              :attachment => fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') })
+                      "/api/v1/accounts/#{@account.id}/outcome_imports",
+                      { :controller => 'outcome_imports_api', :action => 'create',
+                        :format => 'json', :account_id => @account.id.to_s },
+                      { :import_type => 'instructure_csv',
+                        :attachment => fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') })
     end.to change { Delayed::Job.strand_size(strand) }.by(1)
 
     remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
     import = OutcomeImport.last
     expect(remaining_json).to eq({
-      "data" => { "import_type"=>"instructure_csv"},
-      "progress" => 0,
-      "id" => import.id,
-      "processing_errors" => [],
-      "workflow_state"=>"created"
-    })
+                                   "data" => { "import_type" => "instructure_csv" },
+                                   "progress" => 0,
+                                   "id" => import.id,
+                                   "processing_errors" => [],
+                                   "workflow_state" => "created"
+                                 })
 
     expect(OutcomeImport.count).to eq @import_count + 1
     run_jobs
@@ -75,18 +75,18 @@ describe OutcomeImportsApiController, type: :request do
     expect(LearningOutcome.last.title).to eq "C"
 
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
-          { :controller => 'outcome_imports_api', :action => 'show', :format => 'json',
-            :account_id => @account.id.to_s, :id => import.id.to_s })
+                    { :controller => 'outcome_imports_api', :action => 'show', :format => 'json',
+                      :account_id => @account.id.to_s, :id => import.id.to_s })
     expect(json).to be_truthy
     remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
 
     expect(remaining_json).to eq({
-      "data" => { "import_type" => "instructure_csv" },
-      "processing_errors" => [],
-      "progress" => 100,
-      "id" => import.id,
-      "workflow_state" => "succeeded"
-    })
+                                   "data" => { "import_type" => "instructure_csv" },
+                                   "processing_errors" => [],
+                                   "progress" => 100,
+                                   "id" => import.id,
+                                   "workflow_state" => "succeeded"
+                                 })
   end
 
   it "should allow raw post without content-type" do
@@ -94,7 +94,7 @@ describe OutcomeImportsApiController, type: :request do
     # post work. However, long ago we added code to make it work even without the header,
     # so we are going to maintain that behavior.
     post "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-      params: "\xffab=\xffcd", headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+         params: "\xffab=\xffcd", headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
     import = OutcomeImport.last
     expect(import.attachment.filename).to eq "outcome_import.csv"
     expect(import.attachment.content_type).to eq "application/x-www-form-urlencoded"
@@ -103,12 +103,12 @@ describe OutcomeImportsApiController, type: :request do
 
   it "should allow raw post without charset" do
     api_call(:post,
-          "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-          { :controller => 'outcome_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :attachment => 'blah' },
-          {},
-          { 'CONTENT_TYPE' => 'text/csv' })
+             "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
+             { :controller => 'outcome_imports_api', :action => 'create',
+               :format => 'json', :account_id => @account.id.to_s,
+               :import_type => 'instructure_csv', :attachment => 'blah' },
+             {},
+             { 'CONTENT_TYPE' => 'text/csv' })
     import = OutcomeImport.last
     expect(import.attachment.filename).to eq "outcome_import.csv"
     expect(import.attachment.content_type).to eq "text/csv"
@@ -116,12 +116,12 @@ describe OutcomeImportsApiController, type: :request do
 
   it "should handle raw post content-types with attributes" do
     api_call(:post,
-          "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-          { :controller => 'outcome_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :attachment => 'blah' },
-          {},
-          { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
+             "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
+             { :controller => 'outcome_imports_api', :action => 'create',
+               :format => 'json', :account_id => @account.id.to_s,
+               :import_type => 'instructure_csv', :attachment => 'blah' },
+             {},
+             { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
     import = OutcomeImport.last
     expect(import.attachment.filename).to eq "outcome_import.csv"
     expect(import.attachment.content_type).to eq "text/csv"
@@ -129,36 +129,36 @@ describe OutcomeImportsApiController, type: :request do
 
   it "should reject non-utf-8 encodings on content-type" do
     raw_api_call(:post,
-          "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-          { :controller => 'outcome_imports_api', :action => 'create',
-            :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv' },
-          {},
-          { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
+                 "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
+                 { :controller => 'outcome_imports_api', :action => 'create',
+                   :format => 'json', :account_id => @account.id.to_s,
+                   :import_type => 'instructure_csv' },
+                 {},
+                 { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
     assert_status(400)
     expect(OutcomeImport.count).to eq 0
   end
 
   it "should error on user with no outcomes permissions" do
-    account_admin_user_with_role_changes(account: @account, role_changes: {manage_outcomes: true, import_outcomes: false})
+    account_admin_user_with_role_changes(account: @account, role_changes: { manage_outcomes: true, import_outcomes: false })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
-             {controller: 'outcome_imports_api', action: 'create',
-              format: 'json', account_id: @account.id.to_s},
-             {import_type: 'instructure_csv',
-              attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv')},
+             { controller: 'outcome_imports_api', action: 'create',
+               format: 'json', account_id: @account.id.to_s },
+             { import_type: 'instructure_csv',
+               attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') },
              {},
              expected_status: 401)
   end
 
   it "should work with import permissions" do
-    account_admin_user_with_role_changes(user: @user, role_changes: {manage_outcomes: false, import_outcomes: true})
+    account_admin_user_with_role_changes(user: @user, role_changes: { manage_outcomes: false, import_outcomes: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
-             {controller: 'outcome_imports_api', action: 'create',
-              format: 'json', account_id: @account.id.to_s},
-             {import_type: 'instructure_csv',
-              attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv')},
+             { controller: 'outcome_imports_api', action: 'create',
+               format: 'json', account_id: @account.id.to_s },
+             { import_type: 'instructure_csv',
+               attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", 'text/csv') },
              {},
              expected_status: 200)
   end

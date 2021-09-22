@@ -369,7 +369,7 @@ class AccountsController < ApplicationController
       account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
         Account.joins(:courses => :enrollments).merge(
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
-        ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
+        ).select("accounts.id").distinct.pluck(:id).map { |id| Shard.global_id_for(id) }
       end
       course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids), always_use_bookmarks: true)
       @accounts = Api.paginate(course_accounts, self, api_v1_course_accounts_url)
@@ -387,13 +387,16 @@ class AccountsController < ApplicationController
   # @returns Account
   def show
     return unless authorized_action(@account, @current_user, :read)
+
     respond_to do |format|
       format.html do
         @redirect_on_unauth = true
         return course_user_search
       end
-      format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
-                                                 !@account.grants_right?(@current_user, session, :manage)) }
+      format.json {
+        render :json => account_json(@account, @current_user, session, params[:includes] || [],
+                                     !@account.grants_right?(@current_user, session, :manage))
+      }
     end
   end
 
@@ -436,6 +439,7 @@ class AccountsController < ApplicationController
   #   {'manage_account_memberships': 'false', 'become_user': 'true'}
   def permissions
     return unless authorized_action(@account, @current_user, :read)
+
     permissions = Array(params[:permissions]).map(&:to_sym)
     render json: @account.rights_status(@current_user, session, *permissions)
   end
@@ -455,6 +459,7 @@ class AccountsController < ApplicationController
   # @returns [Account]
   def sub_accounts
     return unless authorized_action(@account, @current_user, :read)
+
     recursive = value_to_boolean(params[:recursive])
     if recursive
       @accounts = PaginatedCollection.build do |pager|
@@ -754,16 +759,18 @@ class AccountsController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
 
       if includes.include?("total_students")
-        student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
-          where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
-        @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+        student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+                                          .where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
+        @courses.each { |c| c.student_count = student_counts[c.id] || 0 }
       end
       all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
     end
 
-    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
-      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
-      prefer_friendly_name: false) }
+    render :json => @courses.map { |c|
+                      course_json(c, @current_user, session, includes, nil,
+                                  precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
+                                  prefer_friendly_name: false)
+                    }
   end
 
   # Delegated to by the update action (when the request is an api_request?)
@@ -812,7 +819,7 @@ class AccountsController < ApplicationController
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
-          account_settings.each {|k, v| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings'))}
+          account_settings.each { |k, v| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
           unauthorized = true
         end
       end
@@ -821,10 +828,9 @@ class AccountsController < ApplicationController
       microsoft_sync_settings = param_settings&.permit(*MicrosoftSync::SettingsValidator::SYNC_SETTINGS)
       MicrosoftSync::SettingsValidator.new(microsoft_sync_settings, @account).validate_and_save
 
-
       # quotas (:manage_account_quotas)
       quota_settings = account_params.slice(:default_storage_quota_mb, :default_user_storage_quota_mb,
-                                                      :default_group_storage_quota_mb)
+                                            :default_group_storage_quota_mb)
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
@@ -839,7 +845,7 @@ class AccountsController < ApplicationController
             end
           end
         else
-          quota_settings.each {|k, v| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings'))}
+          quota_settings.each { |k, v| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings')) }
           unauthorized = true
         end
       end
@@ -974,6 +980,7 @@ class AccountsController < ApplicationController
   # @returns Account
   def update
     return update_api if api_request?
+
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
         if @account.root_account?
@@ -996,7 +1003,7 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
+          sorted_help_links = custom_help_links.to_unsafe_h.select { |_k, h| h['state'] != 'deleted' && h['state'] != 'new' }.sort_by { |_k, h| _k.to_i }
           sorted_help_links.map! do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
@@ -1047,18 +1054,17 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          [ :admins_can_change_passwords,
-            :admins_can_view_notifications,
-            :enable_alerts,
-            :enable_eportfolios,
-            :enable_profiles,
-            :enable_turnitin,
-            :include_integration_ids_in_gradebook_exports,
-            :show_scheduler,
-            :global_includes,
-            :gmail_domain,
-            :limit_parent_app_web_access,
-          ].each do |key|
+          [:admins_can_change_passwords,
+           :admins_can_view_notifications,
+           :enable_alerts,
+           :enable_eportfolios,
+           :enable_profiles,
+           :enable_turnitin,
+           :include_integration_ids_in_gradebook_exports,
+           :show_scheduler,
+           :global_includes,
+           :gmail_domain,
+           :limit_parent_app_web_access,].each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end
@@ -1145,14 +1151,14 @@ class AccountsController < ApplicationController
       @account.shard.activate do
         scope = @account.account_reports.active.where("report_type=name").most_recent
         @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.complete.to_sql}) account_reports ").
-          order("report_types.name").
-          preload(:attachment).
-          index_by(&:report_type)
+                LATERAL (#{scope.complete.to_sql}) account_reports ")
+                                              .order("report_types.name")
+                                              .preload(:attachment)
+                                              .index_by(&:report_type)
         @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.to_sql}) account_reports ").
-          order("report_types.name").
-          index_by(&:report_type)
+                LATERAL (#{scope.to_sql}) account_reports ")
+                                     .order("report_types.name")
+                                     .index_by(&:report_type)
       end
       render :layout => false
     end
@@ -1172,37 +1178,37 @@ class AccountsController < ApplicationController
       @account.available_account_roles.each_with_index do |role, idx|
         order_hash[role.id] = idx
       end
-      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
+      @account_users = @account_users.select(&:user).sort_by { |au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
 
-      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
-      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map { |role| { :id => role.id, :label => role.label } }
+      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map { |role| { :id => role.id, :label => role.label } }
 
       @announcements = @account.announcements.order(created_at: 'desc').paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
       js_env({
-        APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
-        LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
-        EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, account_id: @context.id),
-        TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ':developer_key_id'),
-        MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
-        CONTEXT_BASE_URL: "/accounts/#{@context.id}",
-        MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
-        PERMISSIONS: {
-          :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
-          :manage_feature_flags => @account.grants_right?(@current_user, session, :manage_feature_flags)
-        },
-        CSP: {
-          :enabled => @account.csp_enabled?,
-          :inherited => @account.csp_inherited?,
-          :settings_locked => @account.csp_locked?,
-        },
-        MICROSOFT_SYNC: {
-          CLIENT_ID: MicrosoftSync::LoginService.client_id,
-          REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
-          BASE_URL: MicrosoftSync::LoginService::BASE_URL
-        }
-      })
+               APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
+               LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
+               EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, account_id: @context.id),
+               TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ':developer_key_id'),
+               MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
+               CONTEXT_BASE_URL: "/accounts/#{@context.id}",
+               MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
+               PERMISSIONS: {
+                 :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
+                 :manage_feature_flags => @account.grants_right?(@current_user, session, :manage_feature_flags)
+               },
+               CSP: {
+                 :enabled => @account.csp_enabled?,
+                 :inherited => @account.csp_inherited?,
+                 :settings_locked => @account.csp_locked?,
+               },
+               MICROSOFT_SYNC: {
+                 CLIENT_ID: MicrosoftSync::LoginService.client_id,
+                 REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
+                 BASE_URL: MicrosoftSync::LoginService::BASE_URL
+               }
+             })
       js_env(edit_help_links_env, true)
     end
   end
@@ -1220,7 +1226,7 @@ class AccountsController < ApplicationController
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
     mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
-      @account.grants_right?(@current_user, :manage_account_settings)
+                       @account.grants_right?(@current_user, :manage_account_settings)
     if authentication_logging || grade_change_logging || course_logging || mutation_logging
       logging = {
         authentication: authentication_logging,
@@ -1233,20 +1239,21 @@ class AccountsController < ApplicationController
 
     js_env :ACCOUNT_ID => @account.id
     js_env :PERMISSIONS => {
-       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
-       # Permission caching issue makes explicitly checking the account setting
-       # an easier option.
-       view_messages: (@account.settings[:admins_can_view_notifications] &&
+      restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+      # Permission caching issue makes explicitly checking the account setting
+      # an easier option.
+      view_messages: (@account.settings[:admins_can_view_notifications] &&
                        @account.grants_right?(@current_user, session, :view_notifications)) ||
-                      Account.site_admin.grants_right?(@current_user, :read_messages),
-       logging: logging
-      }
+                     Account.site_admin.grants_right?(@current_user, :read_messages),
+      logging: logging
+    }
     js_env enhanced_grade_change_query: Auditors::read_from_postgres?
     js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
 
   def confirm_delete_user
     raise ActiveRecord::RecordNotFound unless @account.root_account?
+
     @user = api_find(User, params[:user_id])
 
     unless @account.user_account_associations.where(user_id: @user).exists?
@@ -1277,8 +1284,10 @@ class AccountsController < ApplicationController
   # @returns User
   def remove_user
     raise ActiveRecord::RecordNotFound unless @account.root_account?
+
     @user = api_find(User, params[:user_id])
     raise ActiveRecord::RecordNotFound unless @account.user_account_associations.where(user_id: @user).exists?
+
     if @user.allows_user_to_remove_from_account?(@account, @current_user)
       @user.remove_from_root_account(@account, updating_user: @current_user)
       flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
@@ -1305,6 +1314,7 @@ class AccountsController < ApplicationController
   # @returns User
   def restore_user
     raise ActiveRecord::RecordNotFound unless @account.root_account?
+
     user = api_find(User, params[:user_id])
     pseudonym = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first!
 
@@ -1314,7 +1324,7 @@ class AccountsController < ApplicationController
     return render_unauthorized_action unless is_permissible
 
     if @account.pseudonyms.where(user_id: user).active.any? && !user.deleted?
-      return render json: {errors: 'User not deleted'}, status: :bad_request
+      return render json: { errors: 'User not deleted' }, status: :bad_request
     end
 
     # this is a no-op if the user was deleted from the account profile page
@@ -1330,14 +1340,14 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :moderate_user_content)
       results_per_page = Setting.get('eportfolio_moderation_results_per_page', 1000)
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
-      @eportfolios = Eportfolio.active.preload(:user).
-        joins(:user).
-        joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}").
-        where(spam_status: ["flagged_as_possible_spam", "marked_as_spam", "marked_as_safe"]).
-        where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam'])).
-        merge(User.active).
-        order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc).
-        paginate(per_page: results_per_page, page: params[:page])
+      @eportfolios = Eportfolio.active.preload(:user)
+                               .joins(:user)
+                               .joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}")
+                               .where(spam_status: ["flagged_as_possible_spam", "marked_as_spam", "marked_as_safe"])
+                               .where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam']))
+                               .merge(User.active)
+                               .order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc)
+                               .paginate(per_page: results_per_page, page: params[:page])
     end
   end
 
@@ -1383,7 +1393,7 @@ class AccountsController < ApplicationController
           res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
             @items.each do |item|
-              csv << [item[0]/1000, item[1]]
+              csv << [item[0] / 1000, item[1]]
             end
           end
           cancel_cache_buster
@@ -1528,10 +1538,10 @@ class AccountsController < ApplicationController
     if templates.any?
       MasterCourses::MasterTemplate.preload_index_data(templates)
       @master_template_index = templates.index_by(&:course_id)
-      courses_to_fetch_users_for = courses_to_fetch_users_for.reject{|c| @master_template_index[c.id]} # don't fetch the counts for the master/blueprint courses
+      courses_to_fetch_users_for = courses_to_fetch_users_for.reject { |c| @master_template_index[c.id] } # don't fetch the counts for the master/blueprint courses
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => {:workflow_state => %w{rejected deleted}})
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w{rejected deleted} })
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []
@@ -1566,6 +1576,7 @@ class AccountsController < ApplicationController
       admin.user = user
       admin.workflow_state = 'active'
       return unless authorized_action(admin, @current_user, :create)
+
       admin
     end
 
@@ -1580,15 +1591,15 @@ class AccountsController < ApplicationController
       end
 
       { :enrollment => {
-          :id => admin.id,
-          :name => admin.user.name,
-          :role_id => admin.role_id,
-          :membership_type => AccountUser.readable_type(admin.role.name),
-          :workflow_state => 'active',
-          :user_id => admin.user.id,
-          :type => 'admin',
-          :email => admin.user.email
-      }}
+        :id => admin.id,
+        :name => admin.user.name,
+        :role_id => admin.role_id,
+        :membership_type => AccountUser.readable_type(admin.role.name),
+        :workflow_state => 'active',
+        :user_id => admin.user.id,
+        :type => 'admin',
+        :email => admin.user.email
+      } }
     end
     render :json => account_users
   end
@@ -1665,6 +1676,7 @@ class AccountsController < ApplicationController
   def ensure_sis_max_name_length_value!(account_settings)
     sis_name_length_setting = account_settings[:settings][:sis_assignment_name_length_input]
     return if sis_name_length_setting.nil?
+
     value = sis_name_length_setting[:value]
     if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
       sis_name_length_setting[:value] = value
@@ -1672,7 +1684,6 @@ class AccountsController < ApplicationController
       sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
     end
   end
-
 
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
                                    :allow_invitation_previews, :allow_sending_scores_in_emails,
@@ -1687,55 +1698,54 @@ class AccountsController < ApplicationController
                                    :disable_post_to_sis_when_grading_period_closed,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
                                    :limit_parent_app_web_access,
-                                   {:enable_offline_web_export => [:value]}.freeze,
-                                   {:disable_rce_media_uploads => [:value]}.freeze,
+                                   { :enable_offline_web_export => [:value] }.freeze,
+                                   { :disable_rce_media_uploads => [:value] }.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
                                    :google_docs_domain, :help_link_icon, :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
                                    :include_students_in_global_survey, :license_type,
-                                   {:lock_all_announcements => [:value, :locked]}.freeze,
+                                   { :lock_all_announcements => [:value, :locked] }.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
                                    :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
                                    :microsoft_sync_login_attribute_suffix, :microsoft_sync_remote_attribute,
                                    :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
-                                   {:restrict_student_future_listing => [:value, :locked]}.freeze,
-                                   {:restrict_student_future_view => [:value, :locked]}.freeze,
-                                   {:restrict_student_past_view => [:value, :locked]}.freeze,
+                                   { :restrict_student_future_listing => [:value, :locked] }.freeze,
+                                   { :restrict_student_future_view => [:value, :locked] }.freeze,
+                                   { :restrict_student_past_view => [:value, :locked] }.freeze,
                                    :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,
-                                   {:sis_assignment_name_length => [:value]}.freeze,
-                                   {:sis_assignment_name_length_input => [:value]}.freeze,
-                                   {:sis_default_grade_export => [:value, :locked]}.freeze,
+                                   { :sis_assignment_name_length => [:value] }.freeze,
+                                   { :sis_assignment_name_length_input => [:value] }.freeze,
+                                   { :sis_default_grade_export => [:value, :locked] }.freeze,
                                    :sis_name,
-                                   {:sis_require_assignment_due_date => [:value]}.freeze,
-                                   {:sis_syncing => [:value, :locked]}.freeze,
+                                   { :sis_require_assignment_due_date => [:value] }.freeze,
+                                   { :sis_syncing => [:value, :locked] }.freeze,
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   {:usage_rights_required => [:value, :locked]}.freeze,
+                                   { :usage_rights_required => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
-                                   {:enable_as_k5_account => [:value, :locked]}.freeze,
+                                   { :enable_as_k5_account => [:value, :locked] }.freeze,
                                    :enable_push_notifications].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,
-      :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
-      :default_time_zone, :parent_account, :default_storage_quota,
-      :default_storage_quota_mb, :storage_quota, :default_locale,
-      :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
-      :settings => PERMITTED_SETTINGS_FOR_UPDATE, :ip_filters => strong_anything
-    ]
+     :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
+     :default_time_zone, :parent_account, :default_storage_quota,
+     :default_storage_quota_mb, :storage_quota, :default_locale,
+     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
+     :settings => PERMITTED_SETTINGS_FOR_UPDATE, :ip_filters => strong_anything]
   end
 
   def permitted_api_account_settings
     [:restrict_student_past_view,
-      :restrict_student_future_view,
-      :restrict_student_future_listing,
-      :lock_all_announcements,
-      :sis_assignment_name_length_input]
+     :restrict_student_future_view,
+     :restrict_student_future_listing,
+     :lock_all_announcements,
+     :sis_assignment_name_length_input]
   end
 
   def strong_account_params
@@ -1747,6 +1757,7 @@ class AccountsController < ApplicationController
   def edit_help_links_env
     # @domain_root_account may be cached; load settings from @account to ensure they're up to date
     return {} unless @account == @domain_root_account
+
     {
       help_link_name: @account.settings[:help_link_name] || default_help_link_name,
       help_link_icon: @account.settings[:help_link_icon] || 'help',

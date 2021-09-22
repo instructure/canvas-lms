@@ -42,7 +42,7 @@ describe('ManageOutcomeItem', () => {
     title: 'Outcome Title',
     description: 'Outcome Description',
     outcomeContextType: 'Account',
-    outcomeContextId: 1,
+    outcomeContextId: '1',
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,
@@ -66,7 +66,7 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('does not render component if title prop not passed', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({title: null})} />)
+    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({title: ''})} />)
     expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
