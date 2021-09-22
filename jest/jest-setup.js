@@ -126,7 +126,6 @@ const ignoredErrors = [
   /The prop `listDeveloperKeyScopesSet` is marked as required in `(Scopes|ScopesList)`/,
   /The prop `liveRegion` is marked as required in `(SecurityPanel|Whitelist)`/,
   /The prop `loading` is marked as required in `(HomeroomAnnouncementsLayout|LoadingWrapper)`/,
-  /The prop `loadingAnnouncements` is marked as required in `HomeroomPage`/,
   /The prop `loadingCards` is marked as required in `HomeroomPage`/,
   /The prop `ltiKeysSetLtiKey` is marked as required in `DeveloperKeyActionButtons`/,
   /The prop `name` is marked as required in `Avatar`/,
