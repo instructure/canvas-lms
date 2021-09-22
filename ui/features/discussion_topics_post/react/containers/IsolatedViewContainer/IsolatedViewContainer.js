@@ -26,6 +26,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
   CREATE_DISCUSSION_ENTRY,
+  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
@@ -207,6 +208,15 @@ export const IsolatedViewContainer = props => {
     })
   }
 
+  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    onCompleted: () => {
+      setOnSuccess('Draft message saved.')
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Unable to save draft message.'))
+    }
+  })
+
   const isolatedEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
@@ -378,6 +388,15 @@ export const IsolatedViewContainer = props => {
                     .nodes,
                   props.replyFromId
                 )}
+                updateDraft={newDraftMessage => {
+                  createDiscussionEntryDraft({
+                    variables: {
+                      discussionTopicId: props.discussionTopic._id,
+                      message: newDraftMessage,
+                      parentId: props.replyFromId
+                    }
+                  })
+                }}
               />
             </View>
           )}
