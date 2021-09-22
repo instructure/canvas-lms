@@ -116,7 +116,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     let(:unauthorized_admin) { raise 'set in example' }
     let(:params) { raise 'set in example' }
     let(:site_admin_key) { DeveloperKey.create!(account: nil) }
-    let(:binding_index) { DeveloperKeyAccountBinding.where(id: json_parse.map{ |b| b['id'] }) }
+    let(:binding_index) { DeveloperKeyAccountBinding.where(id: json_parse.map { |b| b['id'] }) }
     let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
@@ -264,9 +264,9 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         let(:expected_account) { Account.default }
         let(:params) do
           sub_account_params.merge({
-            account_id: 'self',
-            developer_key_id: DeveloperKey.create!(account: Account.default).id,
-          })
+                                     account_id: 'self',
+                                     developer_key_id: DeveloperKey.create!(account: Account.default).id,
+                                   })
         end
       end
 
@@ -311,7 +311,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
         user_session(sub_account_admin)
         get :index, params: sub_account_params.except(:developer_key_account_binding)
-        expect(json_parse.map{ |b| DeveloperKeyAccountBinding.find(b['id']) }).to include root_account_binding
+        expect(json_parse.map { |b| DeveloperKeyAccountBinding.find(b['id']) }).to include root_account_binding
       end
     end
   end

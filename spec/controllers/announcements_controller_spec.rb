@@ -34,14 +34,14 @@ describe AnnouncementsController do
 
   describe "GET 'index'" do
     it "should return unauthorized without a valid session" do
-      get 'index', params: {:course_id => @course.id}
+      get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@user)
-      @course.update_attribute(:tab_configuration, [{'id'=>14,'hidden'=>true}])
-      get 'index', params: {:course_id => @course.id}
+      @course.update_attribute(:tab_configuration, [{ 'id' => 14, 'hidden' => true }])
+      get 'index', params: { :course_id => @course.id }
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
@@ -77,12 +77,12 @@ describe AnnouncementsController do
     end
 
     it "should require authorization" do
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code + 'x'}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code + 'x' }
       expect(assigns[:problem]).to match /The verification code does not match/
     end
 
     it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
@@ -90,11 +90,11 @@ describe AnnouncementsController do
     end
 
     it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
     end
 
     it "shows the 15 most recent announcements" do
@@ -102,10 +102,10 @@ describe AnnouncementsController do
       16.times { announcement_ids << course_announcement.id }
       announcement_ids.shift # Drop first announcement so we have the 15 most recent
 
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
 
       feed_entries = Atom::Feed.load_feed(response.body).entries
-      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(announcement_ids)
     end
 
@@ -114,10 +114,10 @@ describe AnnouncementsController do
       16.times { announcement_ids << course_announcement.id }
       Announcement.where(id: announcement_ids).update_all(posted_at: nil)
       announcement_ids.shift # Drop first announcement so we have the 15 most recent
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
 
       feed_entries = Atom::Feed.load_feed(response.body).entries
-      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(announcement_ids)
     end
 
@@ -125,10 +125,10 @@ describe AnnouncementsController do
       normal_ann = @a # from the announcement_model in the before block
       closed_for_comments_ann = course_announcement(locked: true)
       post_delayed_ann = @course.announcements.build({
-        title: 'hi',
-        message: 'blah',
-        delayed_post_at: 1.day.from_now
-      })
+                                                       title: 'hi',
+                                                       message: 'blah',
+                                                       delayed_post_at: 1.day.from_now
+                                                     })
       post_delayed_ann.workflow_state = 'post_delayed'
       post_delayed_ann.save!
       deleted_ann = course_announcement
@@ -139,10 +139,10 @@ describe AnnouncementsController do
       expect(deleted_ann).to be_deleted
       visible_announcements = [normal_ann, closed_for_comments_ann]
 
-      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+      get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
 
       feed_entries = Atom::Feed.load_feed(response.body).entries
-      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(visible_announcements.map(&:id))
     end
   end

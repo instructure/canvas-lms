@@ -28,7 +28,7 @@ describe PluginsController do
       expect(PluginSetting.find_by(name: 'account_reports')).to be_nil
       allow(controller).to receive(:require_setting_site_admin).and_return(true)
 
-      put 'update', params: {id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false }}
+      put 'update', params: { id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false } }
       expect(response).to be_redirect
       ps = PluginSetting.find_by!(name: 'account_reports')
       expect(ps).to be_enabled
@@ -36,14 +36,14 @@ describe PluginsController do
 
     it 'it trims posted params' do
       ps = PluginSetting.new(name: 'big_blue_button')
-      ps.settings = { }.with_indifferent_access
+      ps.settings = {}.with_indifferent_access
       ps.disabled = false
       ps.save!
 
       allow(controller).to receive(:require_setting_site_admin).and_return(true)
       # The 'all' parameter is necessary for this test to pass when the
       # multiple root acoounts plugin is installed
-      put 'update', params: {id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0', free_trial: true, replace_with_alternatives: false, use_fallback: false }, all: 1}
+      put 'update', params: { id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0', free_trial: true, replace_with_alternatives: false, use_fallback: false }, all: 1 }
       expect(response).to be_redirect
       ps.reload
       expect(ps.settings[:domain]).to eq 'abc'
@@ -58,7 +58,7 @@ describe PluginsController do
         allow(controller).to receive(:require_setting_site_admin).and_return(true)
         # The 'all' parameter is necessary for this test to pass when the
         # multiple root acoounts plugin is installed
-        put 'update', params: {id: 'account_reports', settings: { 'course_storage_csv' => '0' }, all: 1}
+        put 'update', params: { id: 'account_reports', settings: { 'course_storage_csv' => '0' }, all: 1 }
         expect(response).to be_redirect
         ps.reload
         expect(ps.settings[:course_storage_csv]).to eq false

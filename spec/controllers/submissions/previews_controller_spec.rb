@@ -29,7 +29,7 @@ describe Submissions::PreviewsController do
     end
 
     it "should render show_preview" do
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true}
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
       expect(response).to render_template(:show_preview)
     end
 
@@ -39,7 +39,7 @@ describe Submissions::PreviewsController do
       end
 
       it "should redirect to course_quiz_url" do
-        get :show, params: {course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true}
+        get :show, params: { course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true }
         expect(response).to redirect_to(course_quiz_url(@context, @quiz, headless: 1))
       end
 
@@ -53,12 +53,12 @@ describe Submissions::PreviewsController do
         end
 
         it "should redirect to course_quiz_history_url" do
-          get :show, params: {course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true}
+          get :show, params: { course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true }
           expect(response).to redirect_to(course_quiz_history_url(@context, @quiz, {
-            headless: 1,
-            user_id: @student.id,
-            version: assigns(:submission).quiz_submission_version
-          }))
+                                                                    headless: 1,
+                                                                    user_id: @student.id,
+                                                                    version: assigns(:submission).quiz_submission_version
+                                                                  }))
         end
 
         it "should favor params[:version] when set" do
@@ -71,10 +71,10 @@ describe Submissions::PreviewsController do
             version: version
           }
           expect(response).to redirect_to(course_quiz_history_url(@context, @quiz, {
-            headless: 1,
-            user_id: @student.id,
-            version: version
-          }))
+                                                                    headless: 1,
+                                                                    user_id: @student.id,
+                                                                    version: version
+                                                                  }))
         end
       end
     end
@@ -83,7 +83,7 @@ describe Submissions::PreviewsController do
       assignment = @course.assignments.create!(title: 'shhh', anonymous_grading: true)
       user_session(@teacher)
 
-      get :show, params: {course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true}
+      get :show, params: { course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true }
       expect(response).to be_unauthorized
     end
 
@@ -93,7 +93,7 @@ describe Submissions::PreviewsController do
       assignment.assign_peer_review(reviewer, @student)
       user_session(reviewer)
 
-      get :show, params: {course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true}
+      get :show, params: { course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true }
       expect(response).to be_unauthorized
     end
   end

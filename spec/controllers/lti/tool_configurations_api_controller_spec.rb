@@ -304,6 +304,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     subject do
       make_request
       return nil if json_parse['errors'].blank?
+
       json_parse['errors'].first['message']
     end
 
@@ -404,8 +405,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
 
     it_behaves_like 'an endpoint that accepts developer key parameters' do
-      let(:bad_scope_params) {{ account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
-      let(:make_request) { post :create, params: params.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_params) { { account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ['invalid scope']) } }
+      let(:make_request) { post :create, params: params.merge({ developer_key: dev_key_params }) }
       let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
     end
 
@@ -483,8 +484,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     it_behaves_like 'an action that requires manage developer keys'
 
     it_behaves_like 'an endpoint that accepts developer key parameters' do
-      let(:bad_scope_params) {{ developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
-      let(:make_request) { put :update, params: params.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_params) { { developer_key: dev_key_params.merge(scopes: ['invalid scope']) } }
+      let(:make_request) { put :update, params: params.merge({ developer_key: dev_key_params }) }
       let(:bad_scope_request) { put :update, params: params.merge(bad_scope_params) }
     end
   end
@@ -494,9 +495,9 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     before do
       tool_configuration
-      account.developer_key_account_bindings.
-        find_by(developer_key: developer_key).
-        update!(workflow_state: 'on')
+      account.developer_key_account_bindings
+             .find_by(developer_key: developer_key)
+             .update!(workflow_state: 'on')
     end
 
     context 'when tool configuration does not exist' do
@@ -533,7 +534,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   end
 
   describe '#destroy' do
-    subject {  delete :destroy, params: params.except(:tool_configuration) }
+    subject { delete :destroy, params: params.except(:tool_configuration) }
 
     before do
       tool_configuration

@@ -35,7 +35,6 @@ describe ExternalToolsController do
   end
 
   describe "GET 'jwt_token'" do
-
     before :each do
       @iat = Time.zone.now
       allow_any_instance_of(Time.zone.class).to receive(:now).and_return(@iat)
@@ -48,14 +47,14 @@ describe ExternalToolsController do
 
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
-      get :jwt_token, params: {course_id: @course.id, tool_id: @tool.id}
+      get :jwt_token, params: { course_id: @course.id, tool_id: @tool.id }
       jwt = JSON.parse(response.body)['jwt_token']
       decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
-      expect(decoded_token['consumer_key']). to eq @tool.consumer_key
-      expect(decoded_token['iat']). to eq @iat.to_i
+      expect(decoded_token['consumer_key']).to eq @tool.consumer_key
+      expect(decoded_token['iat']).to eq @iat.to_i
     end
 
     it "does not return a JWT token for another context" do
@@ -66,38 +65,37 @@ describe ExternalToolsController do
       @tool.save!
 
       user_session(@teacher)
-      get :jwt_token, params: {course_id: teacher_course.id, tool_id: @tool.id}
+      get :jwt_token, params: { course_id: teacher_course.id, tool_id: @tool.id }
 
       expect(response.status).to eq 404
     end
 
-
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
-      get :jwt_token, params: {course_id: @course.id, tool_launch_url: @tool.url}
+      get :jwt_token, params: { course_id: @course.id, tool_launch_url: @tool.url }
       decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body)['jwt_token'], [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
-      expect(decoded_token['consumer_key']). to eq @tool.consumer_key
-      expect(decoded_token['iat']). to eq @iat.to_i
+      expect(decoded_token['consumer_key']).to eq @tool.consumer_key
+      expect(decoded_token['iat']).to eq @iat.to_i
     end
 
     it "sets status code to 404 if the requested tool id does not exist" do
       user_session(@teacher)
-      get :jwt_token, params: {course_id: @course.id, tool_id: 999999}
+      get :jwt_token, params: { course_id: @course.id, tool_id: 999999 }
       expect(response.status).to eq 404
     end
 
     it "sets status code to 404 if no query params are provided" do
       user_session(@teacher)
-      get :jwt_token, params: {course_id: @course.id}
+      get :jwt_token, params: { course_id: @course.id }
       expect(response.status).to eq 404
     end
 
     it "sets status code to 404 if the requested tool_launch_url does not exist" do
       user_session(@teacher)
-      get :jwt_token, params: {course_id: @course.id, tool_launch_url:'http://www.nothere.com/doesnt_exist'}
+      get :jwt_token, params: { course_id: @course.id, tool_launch_url: 'http://www.nothere.com/doesnt_exist' }
       expect(response.status).to eq 404
     end
   end
@@ -129,7 +127,7 @@ describe ExternalToolsController do
       context 'when the current user is nil' do
         context 'and the context is a public course' do
           subject do
-            get :show, params: {:course_id => @course.id, id: tool.id}
+            get :show, params: { :course_id => @course.id, id: tool.id }
             response
           end
 
@@ -147,7 +145,7 @@ describe ExternalToolsController do
       context 'when current user is a teacher' do
         before do
           user_session(@teacher)
-          get :show, params: {:course_id => @course.id, id: tool.id}
+          get :show, params: { :course_id => @course.id, id: tool.id }
         end
 
         it 'creates a login message' do
@@ -179,7 +177,7 @@ describe ExternalToolsController do
         it "fails gracefully" do
           user_session(@teacher)
           allow(controller).to receive(:basic_lti_launch_request).and_raise(Lti::Errors::InvalidLaunchUrlError)
-          get :show, params: {:course_id => @course.id, id: tool.id}
+          get :show, params: { :course_id => @course.id, id: tool.id }
           expect(response).to be_redirect
         end
       end
@@ -187,11 +185,11 @@ describe ExternalToolsController do
       context 'current user is a student view user' do
         before do
           user_session(@course.student_view_student)
-          get :show, params: {:course_id => @course.id, id: tool.id}
+          get :show, params: { :course_id => @course.id, id: tool.id }
         end
 
         it 'returns the TestUser claim when viewing as a student' do
-          get :show, params: {:course_id => @course.id, id: tool.id}
+          get :show, params: { :course_id => @course.id, id: tool.id }
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
         end
       end
@@ -202,12 +200,12 @@ describe ExternalToolsController do
         end
 
         it 'get passed in target_link_uri' do
-          get :show, params: {:course_id => @course.id, id: tool.id, launch_url: 'http://www.example.com/deep_link'}
+          get :show, params: { :course_id => @course.id, id: tool.id, launch_url: 'http://www.example.com/deep_link' }
           expect(cached_launch['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq 'http://www.example.com/deep_link'
         end
 
         it "does not pass in target_link_uri if it doesn't match the tool domain" do
-          get :show, params: {:course_id => @course.id, id: tool.id, launch_url: 'http://www.hi.com/deep_link'}
+          get :show, params: { :course_id => @course.id, id: tool.id, launch_url: 'http://www.hi.com/deep_link' }
           expect(cached_launch['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq 'http://www.example.com/basic_lti'
         end
       end
@@ -223,7 +221,7 @@ describe ExternalToolsController do
         tool.account_navigation = { enabled: true }
         tool.save!
 
-        get :show, params: {:account_id => @course.account.id, id: tool.id}
+        get :show, params: { :account_id => @course.account.id, id: tool.id }
 
         expect(response).to be_successful
       end
@@ -238,7 +236,7 @@ describe ExternalToolsController do
           tool.account_navigation = { enabled: true, required_permissions: 'manage_data_services' }
           tool.save!
 
-          get :show, params: {:account_id => @course.account.id, id: tool.id}
+          get :show, params: { :account_id => @course.account.id, id: tool.id }
 
           expect(response).not_to be_successful
         end
@@ -247,13 +245,13 @@ describe ExternalToolsController do
       it "generates the resource_link_id correctly for a course navigation launch" do
         user_session(@teacher)
         tool = @course.context_external_tools.new(:name => "bob",
-                                                          :consumer_key => "bob",
-                                                          :shared_secret => "bob")
+                                                  :consumer_key => "bob",
+                                                  :shared_secret => "bob")
         tool.url = "http://www.example.com/basic_lti"
         tool.course_navigation = { enabled: true }
         tool.save!
 
-        get :show, params: {:course_id => @course.id, id: tool.id}
+        get :show, params: { :course_id => @course.id, id: tool.id }
         expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
       end
 
@@ -269,7 +267,7 @@ describe ExternalToolsController do
         tool.homework_submission = { enabled: true }
         tool.save!
 
-        get :show, params: {course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id}
+        get :show, params: { course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -278,7 +276,7 @@ describe ExternalToolsController do
 
       it "returns flash error if the tool is not found" do
         user_session(@teacher)
-        get :show, params: {:account_id => @course.account.id, id: 0}
+        get :show, params: { :account_id => @course.account.id, id: 0 }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/find valid settings/)
       end
@@ -300,7 +298,7 @@ describe ExternalToolsController do
         tool.settings['post_only'] = 'true'
         tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
         tool.save!
-        get :show, params: {course_id: @course.id, id: tool.id}
+        get :show, params: { course_id: @course.id, id: tool.id }
         expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
       end
 
@@ -310,7 +308,7 @@ describe ExternalToolsController do
         tool.settings['post_only'] = 'true'
         tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
         tool.save!
-        get :show, params: {course_id: @course.id, id: tool.id}
+        get :show, params: { course_id: @course.id, id: tool.id }
         expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
       end
 
@@ -319,7 +317,7 @@ describe ExternalToolsController do
         tool = @tool
         tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
         tool.save!
-        get :show, params: {course_id: @course.id, id: tool.id}
+        get :show, params: { course_id: @course.id, id: tool.id }
         expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
       end
 
@@ -331,7 +329,7 @@ describe ExternalToolsController do
         @course.root_account.name = 'root account'
         @course.root_account.save!
 
-        get :show, params: {:course_id => @course.id, id: @tool.id}
+        get :show, params: { :course_id => @course.id, id: @tool.id }
 
         expect(response).to be_successful
         lti_launch = assigns[:lti_launch]
@@ -354,7 +352,7 @@ describe ExternalToolsController do
 
       it "sends content item json for a course" do
         user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: @tool.id}
+        get :show, params: { :course_id => @course.id, id: @tool.id }
         content_item = JSON.parse(assigns[:lti_launch].params['content_items'])
         placement = content_item['@graph'].first
 
@@ -370,7 +368,7 @@ describe ExternalToolsController do
       it "sends content item json for an assignment" do
         user_session(@teacher)
         assignment = @course.assignments.create!(name: 'an assignment')
-        get :show, params: {:course_id => @course.id, id: @tool.id, :assignments => [assignment.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :assignments => [assignment.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -384,7 +382,7 @@ describe ExternalToolsController do
       it "sends content item json for a discussion topic" do
         user_session(@teacher)
         topic = @course.discussion_topics.create!(:title => "blah")
-        get :show, params: {:course_id => @course.id, id: @tool.id, :discussion_topics => [topic.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :discussion_topics => [topic.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -398,7 +396,7 @@ describe ExternalToolsController do
       it "sends content item json for a file" do
         user_session(@teacher)
         attachment_model
-        get :show, params: {:course_id => @course.id, id: @tool.id, :files => [@attachment.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :files => [@attachment.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         download_url = placement['placementOf']['@id']
 
@@ -410,7 +408,7 @@ describe ExternalToolsController do
       it "sends content item json for a quiz" do
         user_session(@teacher)
         quiz = @course.quizzes.create!(title: 'a quiz')
-        get :show, params: {:course_id => @course.id, id: @tool.id, :quizzes => [quiz.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :quizzes => [quiz.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -424,7 +422,7 @@ describe ExternalToolsController do
       it "sends content item json for a module" do
         user_session(@teacher)
         context_module = @course.context_modules.create!(name: 'a module')
-        get :show, params: {:course_id => @course.id, id: @tool.id, :modules => [context_module.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :modules => [context_module.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -441,7 +439,7 @@ describe ExternalToolsController do
         quiz = @course.quizzes.create!(title: 'a quiz')
         tag = context_module.add_item(:id => quiz.id, :type => 'quiz')
 
-        get :show, params: {:course_id => @course.id, id: @tool.id, :module_items => [tag.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :module_items => [tag.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -455,7 +453,7 @@ describe ExternalToolsController do
       it "sends content item json for a page" do
         user_session(@teacher)
         page = @course.wiki_pages.create!(title: 'a page')
-        get :show, params: {:course_id => @course.id, id: @tool.id, :pages => [page.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :pages => [page.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -470,7 +468,7 @@ describe ExternalToolsController do
         user_session(@teacher)
         page = @course.wiki_pages.create!(title: 'a page')
         assignment = @course.assignments.create!(name: 'an assignment')
-        get :show, params: {:course_id => @course.id, id: @tool.id, :pages => [page.id], :assignments => [assignment.id]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :pages => [page.id], :assignments => [assignment.id] }
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
@@ -485,7 +483,7 @@ describe ExternalToolsController do
 
       it "returns flash error if invalid id params are passed in" do
         user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: @tool.id, :pages => [0]}
+        get :show, params: { :course_id => @course.id, id: @tool.id, :pages => [0] }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/error generating the tool launch/)
       end
@@ -507,7 +505,7 @@ describe ExternalToolsController do
 
       it "generates launch params for a ContentItemSelectionRequest message" do
         user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'migration_selection' }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -519,7 +517,7 @@ describe ExternalToolsController do
 
       it "sets proper return data for migration_selection" do
         user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'migration_selection' }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -530,7 +528,7 @@ describe ExternalToolsController do
 
       it "sets proper return data for resource_selection" do
         user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'resource_selection'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'resource_selection' }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -543,7 +541,7 @@ describe ExternalToolsController do
         user_session(@teacher)
         @tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         @tool.save!
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'collaboration'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'collaboration' }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -553,15 +551,14 @@ describe ExternalToolsController do
       end
 
       context "homework submission" do
-
         it "sets accept_copy_advice to true if submission_type includes online_upload" do
           user_session(@teacher)
           assignment = @course.assignments.new(name: 'an assignment')
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.submission_types = 'online_upload'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id,
-            launch_type: 'homework_submission', assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id,
+                               launch_type: 'homework_submission', assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
@@ -574,8 +571,8 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.submission_types = 'online_text_entry'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params['accept_copy_advice']).to eq 'false'
         end
@@ -586,8 +583,8 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.submission_types = 'online_upload'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
@@ -600,8 +597,8 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.submission_types = 'online_upload'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params['ext_content_file_extensions']).to eq 'pdf,jpeg'
         end
@@ -612,8 +609,8 @@ describe ExternalToolsController do
           assignment.submission_types = 'online_text_entry'
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params.key?('ext_content_file_extensions')).not_to be
         end
@@ -623,8 +620,8 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: 'an assignment')
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
@@ -636,8 +633,8 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: 'an assignment')
           assignment.submission_types = 'online_url'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params['accept_presentation_document_targets']).to include 'window'
         end
@@ -647,8 +644,8 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: 'an assignment')
           assignment.submission_types = 'online_url'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params['accept_presentation_document_targets']).not_to include 'none'
         end
@@ -659,20 +656,18 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ['pdf', 'jpeg']
           assignment.submission_types = 'online_upload,online_url'
           assignment.save!
-          get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
-            assignment_id: assignment.id}
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+                               assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params['accept_media_types']).to eq '*/*'
         end
-
-
       end
 
       it "sets proper return data for editor_button" do
         user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'editor_button'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'editor_button' }
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
@@ -687,7 +682,7 @@ describe ExternalToolsController do
         @tool.url = 'http://www.instructure.com/test?first=rory&last=williams'
         @tool.save!
 
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'migration_selection' }
         expect(assigns[:lti_launch].params['first']).to be_nil
       end
 
@@ -698,7 +693,7 @@ describe ExternalToolsController do
         @tool.settings[:oauth_compliant] = true
         @tool.save!
 
-        get :show, params: {course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'}
+        get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'migration_selection' }
         expect(assigns[:lti_launch].params['first']).to be_nil
       end
     end
@@ -721,7 +716,8 @@ describe ExternalToolsController do
       tool.resource_selection = {
         :url => "http://#{HostUrl.default_host}/selection_test",
         :selection_width => 400,
-        :selection_height => 400}
+        :selection_height => 400
+      }
       tool.save!
       tool
     end
@@ -739,7 +735,7 @@ describe ExternalToolsController do
 
       let(:lti_1_3_tool) do
         tool = @course.context_external_tools.new(:name => "test", :consumer_key => "key",
-          :shared_secret => "secret")
+                                                  :shared_secret => "secret")
         tool.url = "http://www.example.com/launch"
         tool.use_1_3 = true
         tool.developer_key = developer_key
@@ -760,7 +756,7 @@ describe ExternalToolsController do
       end
 
       it 'assigns @lti_launch.resource_url' do
-        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/launch"}
+        get 'retrieve', params: { course_id: @course.id, url: "http://www.example.com/launch" }
         expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
       end
 
@@ -775,12 +771,11 @@ describe ExternalToolsController do
           )
         end
 
-
         let(:rl) {
           Lti::ResourceLink.create!(
             context_external_tool: lti_1_3_tool,
             context: @course,
-            custom: {abc: 'def', expans: '$Canvas.user.id'}
+            custom: { abc: 'def', expans: '$Canvas.user.id' }
           )
         }
 
@@ -858,29 +853,28 @@ describe ExternalToolsController do
           get_page
           expect(
             launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']
-          ).to eq({"abc" => "def", "expans" => @teacher.id})
+          ).to eq({ "abc" => "def", "expans" => @teacher.id })
         end
       end
 
       context 'tool is used for assignment_selection' do
         it 'uses secure params to pass along lti_assignment_id for 1.3' do
           lti_1_3_tool.assignment_selection = { enable: true }
-          lti_1_3_tool.custom_fields = { assignment_id: "$com.instructure.Assignment.lti.id"}
+          lti_1_3_tool.custom_fields = { assignment_id: "$com.instructure.Assignment.lti.id" }
           lti_1_3_tool.save!
 
           lti_assignment_id = SecureRandom.uuid
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
-          get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection"}
+          get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection" }
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
         end
       end
-
     end
 
     it "should require authentication" do
       user_model
       user_session(@user)
-      get 'retrieve', params: {:course_id => @course.id}
+      get 'retrieve', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
@@ -889,7 +883,7 @@ describe ExternalToolsController do
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
       tool.url = "http://www.example.com/basic_lti"
       tool.save!
-      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com/basic_lti" }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params).not_to be_nil
@@ -898,7 +892,7 @@ describe ExternalToolsController do
     it "should find tools matching by domain" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
-      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com/basic_lti" }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params).not_to be_nil
@@ -906,7 +900,7 @@ describe ExternalToolsController do
 
     it "should redirect if no matching tools are found" do
       user_session(@teacher)
-      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com"}
+      get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com" }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Couldn't find valid settings for this link"
     end
@@ -924,7 +918,7 @@ describe ExternalToolsController do
       tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
       tool.settings[:custom_fields] = { 'collaboration_url' => '$Canvas.api.collaborationMembers.url' }
       tool.save!
-      get 'retrieve', params: {course_id: @course.id, url: tool.url, content_item_id: collab.id, placement: 'collaboration'}
+      get 'retrieve', params: { course_id: @course.id, url: tool.url, content_item_id: collab.id, placement: 'collaboration' }
       expect(assigns[:lti_launch].params['custom_collaboration_url']).to eq api_v1_collaboration_members_url(collab)
     end
 
@@ -933,7 +927,7 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       tool.settings[:course_navigation] = { 'required_permissions' => 'not-real-permissions,nor-this-one' }
       tool.save!
-      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com/basic_lti" }
       expect(response).to be_unauthorized
     end
 
@@ -944,7 +938,7 @@ describe ExternalToolsController do
 
       tool.settings['post_only'] = 'true'
       tool.save!
-      get :retrieve, params: {url: tool.url, account_id:account.id}
+      get :retrieve, params: { url: tool.url, account_id: account.id }
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
     end
 
@@ -954,7 +948,7 @@ describe ExternalToolsController do
       user_session(@user)
 
       tool.save!
-      get :retrieve, params: {url: tool.url, account_id:account.id}
+      get :retrieve, params: { url: tool.url, account_id: account.id }
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
 
@@ -964,8 +958,8 @@ describe ExternalToolsController do
       user_session(@user)
       tool.save!
       lti_assignment_id = SecureRandom.uuid
-      jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
-      get :retrieve, params: {url: tool.url, account_id:account.id, secure_params: jwt}
+      jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+      get :retrieve, params: { url: tool.url, account_id: account.id, secure_params: jwt }
       expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
     end
 
@@ -973,20 +967,20 @@ describe ExternalToolsController do
       let(:assignment) do
         a = assignment_model(course: @course)
         a.submission_types = 'external_tool'
-        a.external_tool_tag_attributes = {url: tool.url}
+        a.external_tool_tag_attributes = { url: tool.url }
         a.save!
         a
       end
       let(:tool) do
         account.context_external_tools.create!({
-          name: "Quizzes.Next",
-          url: 'http://example.com/launch',
-          domain: "example.com",
-          consumer_key: 'test_key',
-          shared_secret: 'test_secret',
-          privacy_level: 'public',
-          tool_id: 'Quizzes 2'
-        })
+                                                 name: "Quizzes.Next",
+                                                 url: 'http://example.com/launch',
+                                                 domain: "example.com",
+                                                 consumer_key: 'test_key',
+                                                 shared_secret: 'test_secret',
+                                                 privacy_level: 'public',
+                                                 tool_id: 'Quizzes 2'
+                                               })
       end
 
       before do
@@ -998,7 +992,7 @@ describe ExternalToolsController do
       it 'sets consistent resource_link_id with that in regular lti launch' do
         get :retrieve, params: {
           course_id: @course.id,
-          assignment_id:assignment.id,
+          assignment_id: assignment.id,
           url: 'http://example.com/launch'
         }
 
@@ -1036,52 +1030,52 @@ describe ExternalToolsController do
 
       it "lets you specify the selection_type" do
         u = user_factory(active_all: true)
-        account.account_users.create!( user: u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, account_id: account.id, placement: 'collaboration'}
+        get :retrieve, params: { url: tool.url, account_id: account.id, placement: 'collaboration' }
         expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
       end
 
       it "creates a content-item return url with an id" do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         return_url = assigns[:lti_launch].params['content_item_return_url']
         expect(return_url).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog/#{collab.id}"
       end
 
       it "sets the auto_create param to true" do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         expect(assigns[:lti_launch].params['auto_create']).to eq "true"
       end
 
       it "sets the accept_unsigned param to false" do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         expect(assigns[:lti_launch].params['accept_unsigned']).to eq "false"
       end
 
       it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         data = assigns[:lti_launch].params['data']
         json_data = Canvas::Security.decode_jwt(data)
         expect(json_data[:content_item_id]).to eq collab.id.to_s
@@ -1089,11 +1083,11 @@ describe ExternalToolsController do
 
       it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         data = assigns[:lti_launch].params['data']
         json_data = Canvas::Security.decode_jwt(data)
         expect(json_data[:oauth_consumer_key]).to eq tool.consumer_key
@@ -1101,11 +1095,11 @@ describe ExternalToolsController do
 
       it 'adds to the data element the default launch url' do
         u = user_factory(active_all: true)
-        account.account_users.create!(user:u)
+        account.account_users.create!(user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
         tool.save!
-        get :retrieve, params: {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        get :retrieve, params: { url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
         data = assigns[:lti_launch].params['data']
         json_data = Canvas::Security.decode_jwt(data)
         expect(json_data[:default_launch_url]).to eq tool.url
@@ -1116,7 +1110,7 @@ describe ExternalToolsController do
       let(:assignment) do
         a = assignment_model(course: @course, due_at: due_at)
         a.submission_types = 'external_tool'
-        a.external_tool_tag_attributes = {url: tool.url}
+        a.external_tool_tag_attributes = { url: tool.url }
         a.due_at = due_at
         a.save!
         a
@@ -1124,17 +1118,17 @@ describe ExternalToolsController do
 
       let(:tool) do
         account.context_external_tools.create!({
-          name: "Quizzes.Next",
-          url: 'http://example.com/launch',
-          domain: "example.com",
-          consumer_key: 'test_key',
-          shared_secret: 'test_secret',
-          privacy_level: 'public',
-          tool_id: 'Quizzes 2',
-          settings: {
-            custom_fields: { 'canvas_assignment_due_at' => '$Canvas.assignment.dueAt.iso8601' } 
-          }
-        })
+                                                 name: "Quizzes.Next",
+                                                 url: 'http://example.com/launch',
+                                                 domain: "example.com",
+                                                 consumer_key: 'test_key',
+                                                 shared_secret: 'test_secret',
+                                                 privacy_level: 'public',
+                                                 tool_id: 'Quizzes 2',
+                                                 settings: {
+                                                   custom_fields: { 'canvas_assignment_due_at' => '$Canvas.assignment.dueAt.iso8601' }
+                                                 }
+                                               })
       end
 
       let(:due_at) { '2021-07-29 08:26:56.000000000 +0000'.to_datetime }
@@ -1191,14 +1185,14 @@ describe ExternalToolsController do
     it "should require authentication" do
       user_model
       user_session(@user)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => 0}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => 0 }
       assert_unauthorized
     end
 
     it "should be accessible by students" do
       user_session(@student)
       tool = new_valid_tool(@course)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
     end
 
@@ -1208,7 +1202,7 @@ describe ExternalToolsController do
       tool.url = "http://www.example.com/basic_lti"
       # this tool exists, but isn't properly configured
       tool.save!
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Couldn't find valid settings for this tool"
     end
@@ -1216,7 +1210,7 @@ describe ExternalToolsController do
     it "should find a valid tool if one exists" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'active'
@@ -1226,7 +1220,7 @@ describe ExternalToolsController do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       html = "<img src='/blank.png'/>"
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['text']).to eq CGI::escape(html)
@@ -1237,7 +1231,7 @@ describe ExternalToolsController do
       user_session(@user)
 
       tool = new_valid_tool(Account.default)
-      get 'resource_selection', params: {:account_id => Account.default.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :account_id => Account.default.id, :external_tool_id => tool.id }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
     end
@@ -1250,7 +1244,7 @@ describe ExternalToolsController do
       @course.save!
 
       tool = new_valid_tool(@course)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
@@ -1261,7 +1255,7 @@ describe ExternalToolsController do
       @course.complete
 
       tool = new_valid_tool(@course)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
@@ -1275,7 +1269,7 @@ describe ExternalToolsController do
       expect(e.workflow_state).to eq 'completed'
 
       tool = new_valid_tool(@course)
-      get 'resource_selection', params: {:course_id => @course.id, :external_tool_id => tool.id}
+      get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
@@ -1298,7 +1292,7 @@ describe ExternalToolsController do
         </cartridge_basiclti_link>
       XML
     end
-    let(:xml_response) { OpenStruct.new({body: xml}) }
+    let(:xml_response) { OpenStruct.new({ body: xml }) }
 
     context 'with client id' do
       include_context 'lti_1_3_spec_helper'
@@ -1466,25 +1460,25 @@ describe ExternalToolsController do
     end
 
     it "should require authentication" do
-      post 'create', params: {:course_id => @course.id}, :format => "json"
+      post 'create', params: { :course_id => @course.id }, :format => "json"
       assert_status(401)
     end
 
     it "should not create tool if user lacks create_tool_manually" do
       user_session(@student)
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       assert_status(401)
     end
 
     it "should create tool if user is granted create_tool_manually" do
       user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       assert_status(200)
     end
 
     it "should accept basic configurations" do
       user_session(@teacher)
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
       expect(assigns[:tool].name).to eq "tool name"
@@ -1502,84 +1496,86 @@ describe ExternalToolsController do
           :url => "http://example.com",
           :consumer_key => "key",
           :shared_secret => "secret",
-          :editor_button => {url: "http://example.com", enabled: true},
-          :is_rce_favorite => true}}, :format => "json"
+          :editor_button => { url: "http://example.com", enabled: true },
+          :is_rce_favorite => true
+        }
+      }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to eq true
     end
 
     it "sets the oauth_compliant setting" do
       user_session(@teacher)
-      external_tool_settings = {name: "tool name",
-                                url: "http://example.com",
-                                consumer_key: "key",
-                                shared_secret: "secret",
-                                oauth_compliant: true}
-      post 'create', params: {course_id: @course.id, external_tool: external_tool_settings}, format: "json"
+      external_tool_settings = { name: "tool name",
+                                 url: "http://example.com",
+                                 consumer_key: "key",
+                                 shared_secret: "secret",
+                                 oauth_compliant: true }
+      post 'create', params: { course_id: @course.id, external_tool: external_tool_settings }, format: "json"
       expect(assigns[:tool].settings[:oauth_compliant]).to equal true
     end
 
     it "should fail on basic xml with no url or domain set" do
       user_session(@teacher)
-      xml = <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
-    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
-    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
-    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
-    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
-    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-    <blti:title>Other Name</blti:title>
-    <blti:description>Description</blti:description>
-    <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="privacy_level">public</lticm:property>
-    </blti:extensions>
-    <cartridge_bundle identifierref="BLTI001_Bundle"/>
-    <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>
+      xml = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:extensions platform="canvas.instructure.com">
+              <lticm:property name="privacy_level">public</lticm:property>
+            </blti:extensions>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
       XML
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
       expect(response).not_to be_successful
     end
 
     it "should handle advanced xml configurations" do
       user_session(@teacher)
-      xml = <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
-    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
-    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
-    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
-    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
-    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-    <blti:title>Other Name</blti:title>
-    <blti:description>Description</blti:description>
-    <blti:launch_url>http://example.com/other_url</blti:launch_url>
-    <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="privacy_level">public</lticm:property>
-      <lticm:property name="not_selectable">true</lticm:property>
-      <lticm:options name="editor_button">
-        <lticm:property name="url">http://example.com/editor</lticm:property>
-        <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
-        <lticm:property name="text">Editor Button</lticm:property>
-        <lticm:property name="selection_width">500</lticm:property>
-        <lticm:property name="selection_height">300</lticm:property>
-      </lticm:options>
-      <lticm:property name="oauth_compliant">
-       true
-      </lticm:property>
-    </blti:extensions>
-    <cartridge_bundle identifierref="BLTI001_Bundle"/>
-    <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>
+      xml = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:launch_url>http://example.com/other_url</blti:launch_url>
+            <blti:extensions platform="canvas.instructure.com">
+              <lticm:property name="privacy_level">public</lticm:property>
+              <lticm:property name="not_selectable">true</lticm:property>
+              <lticm:options name="editor_button">
+                <lticm:property name="url">http://example.com/editor</lticm:property>
+                <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
+                <lticm:property name="text">Editor Button</lticm:property>
+                <lticm:property name="selection_width">500</lticm:property>
+                <lticm:property name="selection_height">300</lticm:property>
+              </lticm:options>
+              <lticm:property name="oauth_compliant">
+               true
+              </lticm:property>
+            </blti:extensions>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
       XML
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml
@@ -1595,34 +1591,34 @@ describe ExternalToolsController do
 
     it "should handle advanced xml configurations with no url or domain set" do
       user_session(@teacher)
-      xml = <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
-    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
-    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
-    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
-    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
-    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-    <blti:title>Other Name</blti:title>
-    <blti:description>Description</blti:description>
-    <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="privacy_level">public</lticm:property>
-      <lticm:options name="editor_button">
-        <lticm:property name="url">http://example.com/editor</lticm:property>
-        <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
-        <lticm:property name="text">Editor Button</lticm:property>
-        <lticm:property name="selection_width">500</lticm:property>
-        <lticm:property name="selection_height">300</lticm:property>
-      </lticm:options>
-    </blti:extensions>
-    <cartridge_bundle identifierref="BLTI001_Bundle"/>
-    <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>
+      xml = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:extensions platform="canvas.instructure.com">
+              <lticm:property name="privacy_level">public</lticm:property>
+              <lticm:options name="editor_button">
+                <lticm:property name="url">http://example.com/editor</lticm:property>
+                <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
+                <lticm:property name="text">Editor Button</lticm:property>
+                <lticm:property name="selection_width">500</lticm:property>
+                <lticm:property name="selection_height">300</lticm:property>
+              </lticm:options>
+            </blti:extensions>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
       XML
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
       # User-entered name overrides name provided in xml
@@ -1637,37 +1633,37 @@ describe ExternalToolsController do
 
     it "should handle advanced xml configurations by URL retrieval" do
       user_session(@teacher)
-      xml = <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
-    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
-    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
-    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
-    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
-    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
-    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-    <blti:title>Other Name</blti:title>
-    <blti:description>Description</blti:description>
-    <blti:launch_url>http://example.com/other_url</blti:launch_url>
-    <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="privacy_level">public</lticm:property>
-      <lticm:options name="editor_button">
-        <lticm:property name="url">http://example.com/editor</lticm:property>
-        <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
-        <lticm:property name="text">Editor Button</lticm:property>
-        <lticm:property name="selection_width">500</lticm:property>
-        <lticm:property name="selection_height">300</lticm:property>
-      </lticm:options>
-    </blti:extensions>
-    <cartridge_bundle identifierref="BLTI001_Bundle"/>
-    <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>
+      xml = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:launch_url>http://example.com/other_url</blti:launch_url>
+            <blti:extensions platform="canvas.instructure.com">
+              <lticm:property name="privacy_level">public</lticm:property>
+              <lticm:options name="editor_button">
+                <lticm:property name="url">http://example.com/editor</lticm:property>
+                <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
+                <lticm:property name="text">Editor Button</lticm:property>
+                <lticm:property name="selection_width">500</lticm:property>
+                <lticm:property name="selection_height">300</lticm:property>
+              </lticm:options>
+            </blti:extensions>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
       XML
-      obj = OpenStruct.new({:body => xml})
+      obj = OpenStruct.new({ :body => xml })
       allow(CanvasHttp).to receive(:get).and_return(obj)
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com" } }, :format => "json"
 
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
@@ -1684,7 +1680,7 @@ describe ExternalToolsController do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
       xml = "bob"
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com" } }, :format => "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
@@ -1695,9 +1691,9 @@ describe ExternalToolsController do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
       xml = "bob"
-      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com",
-        :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
-        :config_url => "http://localhost:9001"}}, :format => "json"
+      post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com",
+                                                                             :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
+                                                                             :config_url => "http://localhost:9001" } }, :format => "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
@@ -1710,27 +1706,27 @@ describe ExternalToolsController do
           user_session(@teacher)
           nav_cache = Lti::NavigationCache.new(@course.root_account)
           cache_key = nav_cache.cache_key
-          xml = <<-XML
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-  <blti:title>Redirect Tool</blti:title>
-  <blti:description>
-    Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
-  </blti:description>
-  <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
-  <blti:custom>
-    <lticm:property name="url">https://</lticm:property>
-  </blti:custom>
-  <blti:extensions platform="canvas.instructure.com">
-    <lticm:property name="icon_url">
-      https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
-    </lticm:property>
-    <lticm:property name="link_text"/>
-    <lticm:property name="privacy_level">anonymous</lticm:property>
-    <lticm:property name="tool_id">redirect</lticm:property>
-  </blti:extensions>
-</cartridge_basiclti_link>
+          xml = <<~XML
+            <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+              <blti:title>Redirect Tool</blti:title>
+              <blti:description>
+                Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
+              </blti:description>
+              <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
+              <blti:custom>
+                <lticm:property name="url">https://</lticm:property>
+              </blti:custom>
+              <blti:extensions platform="canvas.instructure.com">
+                <lticm:property name="icon_url">
+                  https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
+                </lticm:property>
+                <lticm:property name="link_text"/>
+                <lticm:property name="privacy_level">anonymous</lticm:property>
+                <lticm:property name="tool_id">redirect</lticm:property>
+              </blti:extensions>
+            </cartridge_basiclti_link>
           XML
-          post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+          post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
           expect(response).to be_successful
           expect(nav_cache.cache_key).to eq cache_key
         end
@@ -1740,31 +1736,31 @@ describe ExternalToolsController do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
-          xml = <<-XML
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-  <blti:title>Redirect Tool</blti:title>
-  <blti:description>
-    Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
-  </blti:description>
-  <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
-  <blti:custom>
-    <lticm:property name="url">https://</lticm:property>
-  </blti:custom>
-  <blti:extensions platform="canvas.instructure.com">
-    <lticm:options name="course_navigation">
-      <lticm:property name="enabled">true</lticm:property>
-      <lticm:property name="visibility">public</lticm:property>
-    </lticm:options>
-    <lticm:property name="icon_url">
-      https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
-    </lticm:property>
-    <lticm:property name="link_text"/>
-    <lticm:property name="privacy_level">anonymous</lticm:property>
-    <lticm:property name="tool_id">redirect</lticm:property>
-  </blti:extensions>
-</cartridge_basiclti_link>
+          xml = <<~XML
+            <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+              <blti:title>Redirect Tool</blti:title>
+              <blti:description>
+                Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
+              </blti:description>
+              <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
+              <blti:custom>
+                <lticm:property name="url">https://</lticm:property>
+              </blti:custom>
+              <blti:extensions platform="canvas.instructure.com">
+                <lticm:options name="course_navigation">
+                  <lticm:property name="enabled">true</lticm:property>
+                  <lticm:property name="visibility">public</lticm:property>
+                </lticm:options>
+                <lticm:property name="icon_url">
+                  https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
+                </lticm:property>
+                <lticm:property name="link_text"/>
+                <lticm:property name="privacy_level">anonymous</lticm:property>
+                <lticm:property name="tool_id">redirect</lticm:property>
+              </blti:extensions>
+            </cartridge_basiclti_link>
           XML
-          post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+          post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
           expect(response).to be_successful
           expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
@@ -1774,31 +1770,31 @@ describe ExternalToolsController do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
-          xml = <<-XML
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-  <blti:title>Redirect Tool</blti:title>
-  <blti:description>
-    Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
-  </blti:description>
-  <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
-  <blti:custom>
-    <lticm:property name="url">https://</lticm:property>
-  </blti:custom>
-  <blti:extensions platform="canvas.instructure.com">
-    <lticm:options name="account_navigation">
-      <lticm:property name="enabled">true</lticm:property>
-      <lticm:property name="visibility">public</lticm:property>
-    </lticm:options>
-    <lticm:property name="icon_url">
-      https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
-    </lticm:property>
-    <lticm:property name="link_text"/>
-    <lticm:property name="privacy_level">anonymous</lticm:property>
-    <lticm:property name="tool_id">redirect</lticm:property>
-  </blti:extensions>
-</cartridge_basiclti_link>
+          xml = <<~XML
+            <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+              <blti:title>Redirect Tool</blti:title>
+              <blti:description>
+                Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
+              </blti:description>
+              <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
+              <blti:custom>
+                <lticm:property name="url">https://</lticm:property>
+              </blti:custom>
+              <blti:extensions platform="canvas.instructure.com">
+                <lticm:options name="account_navigation">
+                  <lticm:property name="enabled">true</lticm:property>
+                  <lticm:property name="visibility">public</lticm:property>
+                </lticm:options>
+                <lticm:property name="icon_url">
+                  https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
+                </lticm:property>
+                <lticm:property name="link_text"/>
+                <lticm:property name="privacy_level">anonymous</lticm:property>
+                <lticm:property name="tool_id">redirect</lticm:property>
+              </blti:extensions>
+            </cartridge_basiclti_link>
           XML
-          post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+          post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
           expect(response).to be_successful
           expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
@@ -1808,37 +1804,36 @@ describe ExternalToolsController do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
-          xml = <<-XML
-<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-  <blti:title>Redirect Tool</blti:title>
-  <blti:description>
-    Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
-  </blti:description>
-  <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
-  <blti:custom>
-    <lticm:property name="url">https://</lticm:property>
-  </blti:custom>
-  <blti:extensions platform="canvas.instructure.com">
-    <lticm:options name="user_navigation">
-      <lticm:property name="enabled">true</lticm:property>
-      <lticm:property name="visibility">public</lticm:property>
-    </lticm:options>
-    <lticm:property name="icon_url">
-      https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
-    </lticm:property>
-    <lticm:property name="link_text"/>
-    <lticm:property name="privacy_level">anonymous</lticm:property>
-    <lticm:property name="tool_id">redirect</lticm:property>
-  </blti:extensions>
-</cartridge_basiclti_link>
+          xml = <<~XML
+            <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+              <blti:title>Redirect Tool</blti:title>
+              <blti:description>
+                Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.
+              </blti:description>
+              <blti:launch_url>https://www.edu-apps.org/redirect</blti:launch_url>
+              <blti:custom>
+                <lticm:property name="url">https://</lticm:property>
+              </blti:custom>
+              <blti:extensions platform="canvas.instructure.com">
+                <lticm:options name="user_navigation">
+                  <lticm:property name="enabled">true</lticm:property>
+                  <lticm:property name="visibility">public</lticm:property>
+                </lticm:options>
+                <lticm:property name="icon_url">
+                  https://www.edu-apps.org/assets/lti_redirect_engine/redirect_icon.png
+                </lticm:property>
+                <lticm:property name="link_text"/>
+                <lticm:property name="privacy_level">anonymous</lticm:property>
+                <lticm:property name="tool_id">redirect</lticm:property>
+              </blti:extensions>
+            </cartridge_basiclti_link>
           XML
-          post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}}, :format => "json"
+          post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml } }, :format => "json"
           expect(response).to be_successful
           expect(Lti::NavigationCache.new(@course.root_account).cache_key).not_to eq cache_key
         end
       end
     end
-
   end
 
   describe "PUT 'update'" do
@@ -1846,7 +1841,7 @@ describe ExternalToolsController do
       @tool = new_valid_tool(@course)
       user_session(@teacher)
 
-      put :update, params: {course_id: @course.id, external_tool_id: @tool.id, external_tool: { tool_configuration: { prefer_sis_email: "true" } }}, format: 'json'
+      put :update, params: { course_id: @course.id, external_tool_id: @tool.id, external_tool: { tool_configuration: { prefer_sis_email: "true" } } }, format: 'json'
 
       expect(response).to be_successful
 
@@ -1862,7 +1857,7 @@ describe ExternalToolsController do
       @tool = new_valid_tool(@course)
       user_session(@teacher)
 
-      put :update, params: {course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true}}, format: 'json'
+      put :update, params: { course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true } }, format: 'json'
 
       expect(response).to be_successful
       expect(@tool.reload.allow_membership_service_access).to eq true
@@ -1872,7 +1867,7 @@ describe ExternalToolsController do
       @tool = new_valid_tool(@course)
       user_session(@teacher)
 
-      put :update, params: {course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true}}, format: 'json'
+      put :update, params: { course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true } }, format: 'json'
 
       expect(response).to be_successful
       expect(@tool.reload.allow_membership_service_access).to be_falsey
@@ -1881,9 +1876,9 @@ describe ExternalToolsController do
     it "accepts is_rce_favorite parameter" do
       user_session(account_admin_user)
       @tool = new_valid_tool(@course.root_account)
-      @tool.editor_button = {url: 'http://example.com', icon_url: 'http://example.com', enabled: true}
+      @tool.editor_button = { url: 'http://example.com', icon_url: 'http://example.com', enabled: true }
       @tool.save!
-      put :update, params: {account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: {is_rce_favorite: true}}, :format => "json"
+      put :update, params: { account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: { is_rce_favorite: true } }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to eq true
     end
@@ -1892,15 +1887,15 @@ describe ExternalToolsController do
   describe "'GET 'generate_sessionless_launch'" do
     let(:login_pseudonym) { pseudonym(@user) }
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       user_session(@user, login_pseudonym)
     end
 
     it "generates a sessionless launch" do
       @tool = new_valid_tool(@course)
 
-      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+      get :generate_sessionless_launch, params: { :course_id => @course.id, id: @tool.id }
 
       expect(response).to be_successful
 
@@ -1920,7 +1915,7 @@ describe ExternalToolsController do
     it "strips query param from launch_url before signing, attaches to post body, and removes query params in url for launch" do
       @tool = new_valid_tool(@course, { url: 'http://www.example.com/basic_lti?tripping', post_only: true })
 
-      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+      get :generate_sessionless_launch, params: { :course_id => @course.id, id: @tool.id }
 
       expect(response).to be_successful
 
@@ -1944,7 +1939,7 @@ describe ExternalToolsController do
       tag.content_type = 'ContextExternalTool'
       tag.save!
 
-      get :generate_sessionless_launch, params: {course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id}
+      get :generate_sessionless_launch, params: { course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id }
       expect(response).to be_successful
 
       json = JSON.parse(response.body)
@@ -1993,14 +1988,14 @@ describe ExternalToolsController do
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
-        context_module: @cm,
-        content_type: 'ContextExternalTool',
-        content: @tool)
+                              context_module: @cm,
+                              content_type: 'ContextExternalTool',
+                              content: @tool)
 
-       get :generate_sessionless_launch,
-        params: {course_id: @course.id,
-        launch_type: 'module_item',
-        content_type: 'ContextExternalTool'}
+      get :generate_sessionless_launch,
+          params: { course_id: @course.id,
+                    launch_type: 'module_item',
+                    content_type: 'ContextExternalTool' }
 
       expect(response).not_to be_successful
       expect(response.body).to include 'A module item id must be provided for module item LTI launch'
@@ -2010,19 +2005,19 @@ describe ExternalToolsController do
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
-        context_module: @cm,
-        content_type: 'ContextExternalTool',
-        content: @tool,
-        url: @tool.url)
+                              context_module: @cm,
+                              content_type: 'ContextExternalTool',
+                              content: @tool,
+                              url: @tool.url)
       @cm.content_tags << @tg
       @cm.save!
       @course.save!
 
       get :generate_sessionless_launch,
-        params: {course_id: @course.id,
-        launch_type: 'module_item',
-        module_item_id: @tg.id,
-        content_type: 'ContextExternalTool'}
+          params: { course_id: @course.id,
+                    launch_type: 'module_item',
+                    module_item_id: @tg.id,
+                    content_type: 'ContextExternalTool' }
 
       expect(response).to be_successful
 
@@ -2031,28 +2026,28 @@ describe ExternalToolsController do
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
 
-      expect(launch_settings['tool_settings']['resource_link_id']). to eq opaque_id(@tg)
+      expect(launch_settings['tool_settings']['resource_link_id']).to eq opaque_id(@tg)
     end
 
     it 'makes the module item available for variable expansions' do
       @tool = new_valid_tool(@course)
-      @tool.settings[:custom_fields] = {'standard' => '$Canvas.moduleItem.id'}
+      @tool.settings[:custom_fields] = { 'standard' => '$Canvas.moduleItem.id' }
       @tool.save!
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
-        context_module: @cm,
-        content_type: 'ContextExternalTool',
-        content: @tool,
-        url: @tool.url)
+                              context_module: @cm,
+                              content_type: 'ContextExternalTool',
+                              content: @tool,
+                              url: @tool.url)
       @cm.content_tags << @tg
       @cm.save!
       @course.save!
 
       get :generate_sessionless_launch,
-        params: {course_id: @course.id,
-        launch_type: 'module_item',
-        module_item_id: @tg.id,
-        content_type: 'ContextExternalTool'}
+          params: { course_id: @course.id,
+                    launch_type: 'module_item',
+                    module_item_id: @tg.id,
+                    content_type: 'ContextExternalTool' }
 
       json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
@@ -2062,26 +2057,26 @@ describe ExternalToolsController do
     end
 
     it 'redirects if there is no matching tool for the launch_url, and tool id' do
-      params = {course_id: @course.id, url: 'http://my_non_esisting_tool_domain.com', id: -1}
+      params = { course_id: @course.id, url: 'http://my_non_esisting_tool_domain.com', id: -1 }
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
     it 'redirects if there is no matching tool for the and tool id' do
-      params = {:course_id => @course.id, id: -1}
+      params = { :course_id => @course.id, id: -1 }
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
     it 'redirects if there is no launch url associated with the tool' do
       no_url_tool = new_valid_tool(@course)
       no_url_tool.update!(url: nil)
-      params = {:course_id => @course.id, id: no_url_tool.id}
+      params = { :course_id => @course.id, id: no_url_tool.id }
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
     context 'with 1.3 tool' do
       include_context 'lti_1_3_spec_helper'
 
-      let(:params) { {:course_id => @course.id, id: tool.id} }
+      let(:params) { { :course_id => @course.id, id: tool.id } }
       let(:tool) do
         t = tool_configuration.new_external_tool(@course)
         t.save!
@@ -2090,13 +2085,13 @@ describe ExternalToolsController do
 
       let(:account) { @course.account }
 
-		  before do
+      before do
         @backup_controller_access_token = controller.instance_variable_get(:@access_token)
       end
       after { controller.instance_variable_set :@access_token, @backup_controller_access_token }
 
       it 'returns the lti 1.3 launch url with a session token' do
-				controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
+        controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
         get :generate_sessionless_launch, params: params
         expect(response).to be_successful
         json = JSON.parse(response.body)
@@ -2151,14 +2146,14 @@ describe ExternalToolsController do
           course
         end
 
-        let(:user) { @shard2.activate {user_model(name: 'cross-shard user')} }
+        let(:user) { @shard2.activate { user_model(name: 'cross-shard user') } }
         let(:developer_key) { DeveloperKey.create!(account: account) }
         let(:account) { Account.default }
         let(:tool_root_account) { account_model }
         let(:access_token) { pseudonym(user).user.access_tokens.create(purpose: 'test') }
         let(:account_host) { 'canvas-test.instructure.com' }
         let(:tool_host) { 'canvas-test-2.instructure.com' }
-        let(:params) { {course_id: course.global_id, id: tool.global_id} }
+        let(:params) { { course_id: course.global_id, id: tool.global_id } }
 
         before do
           tool.update_attribute(:root_account_id, tool_root_account.id)
@@ -2179,7 +2174,7 @@ describe ExternalToolsController do
         end
 
         context 'with a "redirect" flag' do
-          let(:params) { {course_id: course.global_id, id: tool.global_id, redirect: true} }
+          let(:params) { { course_id: course.global_id, id: tool.global_id, redirect: true } }
 
           it 'uses the request host' do
             @shard2.activate { get :generate_sessionless_launch, params: params }
@@ -2194,7 +2189,7 @@ describe ExternalToolsController do
             t
           end
 
-          let(:params) { {account_id: course.account.global_id, id: tool.global_id, redirect: true} }
+          let(:params) { { account_id: course.account.global_id, id: tool.global_id, redirect: true } }
 
           it 'uses the request host' do
             @shard2.activate { get :generate_sessionless_launch, params: params }
@@ -2236,7 +2231,7 @@ describe ExternalToolsController do
 
         let(:assignment) { assignment_model(course: @course) }
         let(:launch_url) { 'https://www.my-tool.com/login' }
-        let(:params) { {course_id: @course.id, launch_type: :assessment, assignment_id: assignment.id} }
+        let(:params) { { course_id: @course.id, launch_type: :assessment, assignment_id: assignment.id } }
         let(:content_tag) do
           ContentTag.create!(
             context: assignment,
@@ -2298,10 +2293,9 @@ describe ExternalToolsController do
           json_parse['url']
         end
 
-
         let(:course) { @course }
         let(:launch_url) { 'https://www.my-tool.com/login' }
-        let(:params) { {course_id: @course.id, launch_type: :module_item, module_item_id: module_item.id} }
+        let(:params) { { course_id: @course.id, launch_type: :module_item, module_item_id: module_item.id } }
         let(:context_module) do
           ContextModule.create!(
             context: course,
@@ -2337,15 +2331,15 @@ describe ExternalToolsController do
 
   describe '#sessionless_launch' do
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       user_session(@user)
     end
 
     it "generates a sessionless launch" do
       @tool = new_valid_tool(@course)
 
-      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+      get :generate_sessionless_launch, params: { :course_id => @course.id, id: @tool.id }
 
       expect(response).to be_successful
 
@@ -2353,9 +2347,8 @@ describe ExternalToolsController do
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
 
       expect(controller).to receive(:log_asset_access).once
-      get :sessionless_launch, params: {:course_id => @course.id, verifier: verifier}
+      get :sessionless_launch, params: { :course_id => @course.id, verifier: verifier }
     end
-
   end
 
   def opaque_id(asset)
@@ -2388,19 +2381,19 @@ describe ExternalToolsController do
       @course2 = @course
 
       @tool1 = add_tool("Course nav tool 1", @course1)
-      @tool1.course_navigation = {enabled: true}
+      @tool1.course_navigation = { enabled: true }
       @tool1.save!
       @tool2 = add_tool("Course nav tool 2", @course1)
-      @tool2.course_navigation = {enabled: true}
+      @tool2.course_navigation = { enabled: true }
       @tool2.save!
       @tool3 = add_tool("Course nav tool 3", @course2)
-      @tool3.course_navigation = {enabled: true}
+      @tool3.course_navigation = { enabled: true }
       @tool3.save!
     end
 
     it "returns a 400 response if no context_codes are provided for the batch endpoint" do
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:course_id => @course1.id}
+      get :all_visible_nav_tools, params: { :course_id => @course1.id }
 
       message = json_parse(response.body)['message']
       expect(response.status).to be 400
@@ -2409,14 +2402,14 @@ describe ExternalToolsController do
 
     it "returns a 404 response if no context could be found for the single-context endpoint" do
       user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
+      get :visible_course_nav_tools, params: { :course_id => 'definitely_not_a_course' }
 
       expect(response.status).to be 404
     end
 
     it "returns a 400 response if any context_codes besides courses are provided" do
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:context_codes => ["account_#{@course.account.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["account_#{@course.account.id}"] }
 
       message = json_parse(response.body)['message']
       expect(response.status).to be 400
@@ -2427,12 +2420,12 @@ describe ExternalToolsController do
       course_with_teacher(:active_all => true)
       user_session(@teacher)
 
-      get :all_visible_nav_tools, params: {:context_codes => ["course_fake"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_fake"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 0
 
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 0
@@ -2441,67 +2434,67 @@ describe ExternalToolsController do
     it "returns unauthorized if the user lacks read access to any of the supplied courses for the batch endpoint" do
       @course2.claim!
       user_session(@student)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"] }
       assert_unauthorized
     end
 
     it "returns unauthorized if the user lacks read access the context for the single-context endpoint" do
       @course2.claim!
       user_session(@student)
-      get :visible_course_nav_tools, params: {:course_id => @course2.id}
+      get :visible_course_nav_tools, params: { :course_id => @course2.id }
       assert_unauthorized
     end
 
     it "shows course nav tools to teacher" do
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.map { |t| t['name'] }).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "shows course nav tools for the single-context endpoint" do
       user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => @course1.id}
+      get :visible_course_nav_tools, params: { :course_id => @course1.id }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 2
-      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2"]
+      expect(tools.map { |t| t['name'] }).to eq ["Course nav tool 1", "Course nav tool 2"]
     end
 
     it "shows course nav tools to student" do
       user_session(@student)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.map { |t| t['name'] }).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "only returns tools with a course navigation placement" do
-      @tool2.course_navigation = {enabled: false}
+      @tool2.course_navigation = { enabled: false }
       @tool2.save!
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course1.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 1
-      expect(tools.none?{|t| t['name'] == "Course nav tool 2"}).to be_truthy
+      expect(tools.none? { |t| t['name'] == "Course nav tool 2" }).to be_truthy
     end
 
     it "doesn't return tools to student marked with admins visibility" do
-      @tool3.course_navigation = {enabled: true, visibility: "admins"}
+      @tool3.course_navigation = { enabled: true, visibility: "admins" }
       @tool3.save!
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course2.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 1
       expect(tools.first["name"]).to eq "Course nav tool 3"
 
       user_session(@student)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course2.id}"] }
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 0
@@ -2509,13 +2502,13 @@ describe ExternalToolsController do
 
     it "returns tools in the order they are configured in the navigation settings" do
       saved_tabs = [
-        {id: "context_external_tool_#{@tool2.id}"},
-        {id: "context_external_tool_#{@tool1.id}"}
+        { id: "context_external_tool_#{@tool2.id}" },
+        { id: "context_external_tool_#{@tool1.id}" }
       ]
       @course1.tab_configuration = saved_tabs
       @course1.save!
       user_session(@teacher)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course1.id}"] }
 
       tools = json_parse(response.body)
       expect(tools.count).to eq 2
@@ -2524,11 +2517,11 @@ describe ExternalToolsController do
     end
 
     it "excludes hidden tools from response for students" do
-      saved_tabs = [{id: "context_external_tool_#{@tool3.id}", hidden: true}]
+      saved_tabs = [{ id: "context_external_tool_#{@tool3.id}", hidden: true }]
       @course2.tab_configuration = saved_tabs
       @course2.save!
       user_session(@student)
-      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+      get :all_visible_nav_tools, params: { :context_codes => ["course_#{@course2.id}"] }
 
       tools = json_parse(response.body)
       expect(tools.count).to eq 0

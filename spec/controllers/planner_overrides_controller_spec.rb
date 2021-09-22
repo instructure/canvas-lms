@@ -47,9 +47,9 @@ describe PlannerOverridesController do
       get :index
       assert_unauthorized
 
-      post :create, params: {:plannable_type => "assignment",
-                     :plannable_id => @assignment.id,
-                     :marked_complete => false}
+      post :create, params: { :plannable_type => "assignment",
+                              :plannable_id => @assignment.id,
+                              :marked_complete => false }
       assert_unauthorized
     end
   end
@@ -68,7 +68,7 @@ describe PlannerOverridesController do
 
     describe "GET #show" do
       it "returns http success" do
-        get :show, params: {id: @planner_override.id}
+        get :show, params: { id: @planner_override.id }
         expect(response).to be_successful
       end
     end
@@ -76,7 +76,7 @@ describe PlannerOverridesController do
     describe "PUT #update" do
       it "returns http success" do
         expect(@planner_override.marked_complete).to be_falsey
-        put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
+        put :update, params: { id: @planner_override.id, marked_complete: true, dismissed: true }
         expect(response).to be_successful
         expect(@planner_override.reload.marked_complete).to be_truthy
         expect(@planner_override.dismissed).to be_truthy
@@ -84,25 +84,25 @@ describe PlannerOverridesController do
 
       it "invalidates the planner cache" do
         expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
-        put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
+        put :update, params: { id: @planner_override.id, marked_complete: true, dismissed: true }
       end
     end
 
     describe "POST #create" do
       it "returns http success" do
-        post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
+        post :create, params: { plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true }
         expect(response).to have_http_status(:created)
         expect(PlannerOverride.where(user_id: @student.id).count).to be 2
       end
 
       it "invalidates the planner cache" do
         expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
-        post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
+        post :create, params: { plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true }
       end
 
       it "should save announcement overrides with a plannable_type of announcement" do
         announcement_model(context: @course)
-        post :create, params: {plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true}
+        post :create, params: { plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)
         expect(json["plannable_type"]).to eq 'announcement'
       end
@@ -113,7 +113,7 @@ describe PlannerOverridesController do
         expect(ovr).to receive(:save) do
           raise ActiveRecord::RecordNotUnique, "PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint..."
         end
-        post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
+        post :create, params: { plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true }
         expect(response).to have_http_status(:bad_request)
         expect(PlannerOverride.where(user_id: @student.id).count).to be 1
       end
@@ -121,14 +121,14 @@ describe PlannerOverridesController do
 
     describe "DELETE #destroy" do
       it "returns http success" do
-        delete :destroy, params: {id: @planner_override.id}
+        delete :destroy, params: { id: @planner_override.id }
         expect(response).to be_successful
         expect(@planner_override.reload).to be_deleted
       end
 
       it "invalidates the planner cache" do
         expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
-        delete :destroy, params: {id: @planner_override.id}
+        delete :destroy, params: { id: @planner_override.id }
       end
     end
   end

@@ -63,11 +63,11 @@ describe Submissions::SubmissionForShow do
     context 'when submission exists' do
       before :once do
         submission_model({
-          assignment: assignment,
-          body: 'here my assignment',
-          submission_type: 'online_text_entry',
-          user: student
-        })
+                           assignment: assignment,
+                           body: 'here my assignment',
+                           submission_type: 'online_text_entry',
+                           user: student
+                         })
         submission.submitted_at = 3.hours.ago
         submission.save!
       end

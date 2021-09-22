@@ -36,14 +36,14 @@ describe NotificationPreferencesController do
   describe 'update_preferences_by_category' do
     it 'should work for discussionentry' do
       put :update_preferences_by_category, params: {
-        communication_channel_id: @cc.id, category: 'registration', notification_preferences: {frequency: 'never'}
+        communication_channel_id: @cc.id, category: 'registration', notification_preferences: { frequency: 'never' }
       }
       expect(@cc.notification_policies.where(notification: @sms_notification).first.frequency).to eq 'never'
     end
 
     it 'should work for registration' do
       put :update_preferences_by_category, params: {
-        communication_channel_id: @cc.id, category: 'discussionentry', notification_preferences: {frequency: 'never'}
+        communication_channel_id: @cc.id, category: 'discussionentry', notification_preferences: { frequency: 'never' }
       }
       expect(
         @cc.notification_policies.where(notification: @discussion_entry_notification).first.frequency

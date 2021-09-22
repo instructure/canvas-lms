@@ -27,11 +27,11 @@ describe SubAccountsController do
       account_admin_user(:active_all => true)
       user_session(@user)
 
-      post 'create', params: {:account_id => root_account.id, :account => { :parent_account_id => root_account.id, :name => 'sub account' }}
+      post 'create', params: { :account_id => root_account.id, :account => { :parent_account_id => root_account.id, :name => 'sub account' } }
       sub_account = assigns[:sub_account]
       expect(sub_account).not_to be_nil
 
-      post 'create', params: {:account_id => root_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 1' }}
+      post 'create', params: { :account_id => root_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 1' } }
       sub_sub_account_1 = assigns[:sub_account]
       expect(sub_sub_account_1).not_to be_nil
       expect(sub_sub_account_1.name).to eq 'sub sub account 1'
@@ -46,7 +46,7 @@ describe SubAccountsController do
 
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
-      post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
+      post 'create', params: { :account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' } }
       sub_sub_account_2 = assigns[:sub_account]
       expect(sub_sub_account_2).not_to be_nil
       expect(sub_sub_account_2.name).to eq 'sub sub account 2'
@@ -58,9 +58,9 @@ describe SubAccountsController do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
-      post 'create', params: {:account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 1' }}
+      post 'create', params: { :account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 1' } }
       expect(response.status).to eq(200)
-      post 'create', params: {:account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 2' }}
+      post 'create', params: { :account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 2' } }
       expect(response.status).to eq(400)
       expect(JSON.parse(response.body)).to have_key("errors")
     end
@@ -78,7 +78,7 @@ describe SubAccountsController do
       # 2 courses, 1 deleted
       sub_account_2 = root_account.sub_accounts.create!
       Course.create!(:account => sub_account_2)
-      Course.create!(:account => sub_account_2) { |c| c.workflow_state ='deleted' }
+      Course.create!(:account => sub_account_2) { |c| c.workflow_state = 'deleted' }
 
       # 1 course, 2 sections
       sub_account_3 = root_account.sub_accounts.create!
@@ -107,7 +107,7 @@ describe SubAccountsController do
       section = course.course_sections.create!
       section.crosslist_to_course(other_course)
 
-      get 'index', params: {:account_id => root_account.id}
+      get 'index', params: { :account_id => root_account.id }
 
       @accounts = assigns[:accounts]
       expect(@accounts[root_account.id][:sub_account_count]).to eq 5
@@ -140,15 +140,15 @@ describe SubAccountsController do
       account_admin_user(active_all: true, account: root_account)
       user_session(@user)
 
-      get 'index', params: {:account_id => root_account.id, :term => "Acc"}, format: :json
+      get 'index', params: { :account_id => root_account.id, :term => "Acc" }, format: :json
       res = json_parse
       expect(res.count).to eq 1
       expect(res.first["id"]).to eq sub_account.id
 
-      get 'index', params: {:account_id => root_account.id, :term => "Acc", :include_self => "1"}, format: :json
+      get 'index', params: { :account_id => root_account.id, :term => "Acc", :include_self => "1" }, format: :json
       res = json_parse
       expect(res.count).to eq 2
-      expect(res.map{|r| r["id"]}).to match_array [root_account.id, sub_account.id]
+      expect(res.map { |r| r["id"] }).to match_array [root_account.id, sub_account.id]
     end
 
     describe "permissions" do
@@ -159,9 +159,9 @@ describe SubAccountsController do
 
       it "accepts :manage_courses permission" do
         @root_account.disable_feature!(:granular_permissions_manage_courses)
-        admin = account_admin_user_with_role_changes(role_changes: {manage_account_settings: false, manage_courses: true}, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
+        admin = account_admin_user_with_role_changes(role_changes: { manage_account_settings: false, manage_courses: true }, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
         user_session(admin)
-        get 'index', params: {account_id: @root_account.id}
+        get 'index', params: { account_id: @root_account.id }
         expect(response.status).to eq 200
       end
 
@@ -183,7 +183,7 @@ describe SubAccountsController do
 
       it "requires account credentials" do
         course_with_teacher_logged_in(active_all: true)
-        get 'index', params: {account_id: @root_account.id}
+        get 'index', params: { account_id: @root_account.id }
         expect(response.status).to eq 401
       end
     end
@@ -197,15 +197,15 @@ describe SubAccountsController do
     end
 
     it "requires :manage_account_settings permission" do
-      lame_admin = account_admin_user_with_role_changes(role_changes: {manage_account_settings: false, manage_courses: true}, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
+      lame_admin = account_admin_user_with_role_changes(role_changes: { manage_account_settings: false, manage_courses: true }, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
       user_session(lame_admin)
-      delete 'destroy', params: {account_id: @root_account, id: @sub_account}
+      delete 'destroy', params: { account_id: @root_account, id: @sub_account }
       expect(response.status).to eq 401
     end
 
     it "should delete a sub-account" do
       user_session(@user)
-      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
+      delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
       expect(response.status).to eq(200)
       expect(@sub_account.reload).to be_deleted
     end
@@ -214,7 +214,7 @@ describe SubAccountsController do
       @sub_account.courses.create!
       @sub_account.courses.first.destroy
       user_session(@user)
-      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
+      delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
       expect(response.status).to eq(200)
       expect(@sub_account.reload).to be_deleted
     end
@@ -222,7 +222,7 @@ describe SubAccountsController do
     it "should not delete a sub-account that contains a course" do
       @sub_account.courses.create!
       user_session(@user)
-      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
+      delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end
@@ -231,7 +231,7 @@ describe SubAccountsController do
       @sub_sub_account = @sub_account.sub_accounts.create!
       @sub_sub_account.courses.create!
       user_session(@user)
-      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
+      delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end
@@ -239,7 +239,7 @@ describe SubAccountsController do
     it "should not delete a sub-account that contains a sub-account" do
       @sub_sub_account = @sub_account.sub_accounts.create!
       user_session(@user)
-      delete 'destroy', params: {account_id: @root_account, id: @sub_account}
+      delete 'destroy', params: { account_id: @root_account, id: @sub_account }
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end
@@ -258,11 +258,11 @@ describe SubAccountsController do
 
     it 'should get sub-accounts in alphabetical order' do
       names = ["script", "bank", "cow", "program", "means"]
-      names.each {|name| Account.create!(name: name, parent_account: @sub_account)}
-      get 'show', params: {account_id: @root_account, id: @sub_account}
+      names.each { |name| Account.create!(name: name, parent_account: @sub_account) }
+      get 'show', params: { account_id: @root_account, id: @sub_account }
       expect(response.status).to eq 200
       json = JSON.parse(response.body)
-      expect(json["account"]["sub_accounts"].map{|sub| sub["account"]["name"]}).to eq names.sort
+      expect(json["account"]["sub_accounts"].map { |sub| sub["account"]["name"] }).to eq names.sort
     end
   end
 end

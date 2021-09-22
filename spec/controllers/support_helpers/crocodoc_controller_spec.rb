@@ -58,10 +58,10 @@ describe SupportHelpers::CrocodocController do
 
       it "should create a new ShardFixer with after_time" do
         fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email, '2016-05-01')
-        expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new).
-          with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
+        expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new)
+          .with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :shard, params: {after_time: '2016-05-01'}
+        get :shard, params: { after_time: '2016-05-01' }
         expect(response.body).to eq("Enqueued Crocodoc ShardFixer ##{fixer.job_id}...")
       end
     end
@@ -69,10 +69,10 @@ describe SupportHelpers::CrocodocController do
     context 'submission' do
       it "should create a new SubmissionFixer" do
         fixer = SupportHelpers::Crocodoc::SubmissionFixer.new(@user.email, nil, 1234, 5678)
-        expect(SupportHelpers::Crocodoc::SubmissionFixer).to receive(:new).
-          with(@user.email, nil, 1234, 5678).and_return(fixer)
+        expect(SupportHelpers::Crocodoc::SubmissionFixer).to receive(:new)
+          .with(@user.email, nil, 1234, 5678).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :submission, params: {assignment_id: 1234, user_id: 5678}
+        get :submission, params: { assignment_id: 1234, user_id: 5678 }
         expect(response.body).to eq("Enqueued Crocodoc SubmissionFixer ##{fixer.job_id}...")
       end
     end

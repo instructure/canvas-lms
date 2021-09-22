@@ -39,7 +39,7 @@ describe ContextController do
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
       expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins
-                    .map(&:id)
+                                                                                             .map(&:id)
     end
 
     it 'should only show active group members to students' do
@@ -54,9 +54,9 @@ describe ContextController do
       user_session(@student)
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [
-                    @student.id,
-                    active_student.id
-                  ]
+        @student.id,
+        active_student.id
+      ]
     end
 
     it 'should only show active course instructors to students' do
@@ -85,10 +85,10 @@ describe ContextController do
       user_session(@teacher)
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [
-                    @student.id,
-                    active_student.id,
-                    inactive_student.id
-                  ]
+        @student.id,
+        active_student.id,
+        inactive_student.id
+      ]
     end
 
     it "should redirect 'disabled', if disabled by the teacher" do
@@ -191,13 +191,13 @@ describe ContextController do
       before :once do
         @other_section = @course.course_sections.create! name: 'Other Section FRD'
         @course.enroll_teacher(@teacher, section: @other_section, allow_multiple_enrollments: true)
-          .accept!
+               .accept!
         @other_student = user_factory
         @course.enroll_student(
           @other_student,
           section: @other_section, limit_privileges_to_course_section: true
         )
-          .accept!
+               .accept!
       end
 
       it 'prevents section-limited users from seeing users in other sections' do
@@ -397,8 +397,8 @@ describe ContextController do
            }
       @media_object = @user.reload.media_objects.last
       expect(JSON.parse(response.body)['embedded_iframe_url']).to eq media_object_iframe_path(
-           @media_object.media_id
-         )
+        @media_object.media_id
+      )
     end
   end
 
@@ -452,18 +452,18 @@ describe ContextController do
       before(:once) do
         assignment = assignment_model(course: @course)
         rubric = rubric_model({
-          context: @course,
-          title: 'Test Rubric',
-          data: [{
-            description: 'Some criterion',
-            points: 10,
-            id: 'crit1',
-            ignore_for_scoring: true,
-            ratings: [
-              { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
-            ]
-          }]
-        })
+                                context: @course,
+                                title: 'Test Rubric',
+                                data: [{
+                                  description: 'Some criterion',
+                                  points: 10,
+                                  id: 'crit1',
+                                  ignore_for_scoring: true,
+                                  ratings: [
+                                    { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+                                  ]
+                                }]
+                              })
         @association = rubric.associate_with(assignment, @course, purpose: 'grading')
       end
 
@@ -545,18 +545,18 @@ describe ContextController do
     it 'allows undeleting rubric associations' do
       assignment = assignment_model(course: @course)
       rubric = rubric_model({
-        context: @course,
-        title: 'Test Rubric',
-        data: [{
-          description: 'Some criterion',
-          points: 10,
-          id: 'crit1',
-          ignore_for_scoring: true,
-          ratings: [
-            { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
-          ]
-        }]
-      })
+                              context: @course,
+                              title: 'Test Rubric',
+                              data: [{
+                                description: 'Some criterion',
+                                points: 10,
+                                id: 'crit1',
+                                ignore_for_scoring: true,
+                                ratings: [
+                                  { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+                                ]
+                              }]
+                            })
       association = rubric.associate_with(assignment, @course, purpose: 'grading')
       puts "association id is: #{association.id}"
       association.destroy

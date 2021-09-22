@@ -298,11 +298,11 @@ describe GradingPeriodsController do
         end
 
         it "does not paginate" do
-          period_params = (1..11).map do|i|
+          period_params = (1..11).map do |i|
             {
               title: "Period #{i}",
               start_date: i.days.from_now(now),
-              end_date: (i+1).days.from_now(now)
+              end_date: (i + 1).days.from_now(now)
             }
           end
           patch :batch_update, params: {
@@ -438,7 +438,7 @@ describe GradingPeriodsController do
 
         it "responds with json upon failure" do
           period = period_helper.create_with_group_for_course(course)
-          patch :batch_update, params: { course_id: course.id, grading_periods: [{id: period.id, title: ''}] }
+          patch :batch_update, params: { course_id: course.id, grading_periods: [{ id: period.id, title: '' }] }
           expect(response).not_to be_ok
           json = JSON.parse(response.body)
           expect(json['errors']).to be_present
