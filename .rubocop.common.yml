@@ -14,8 +14,12 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: false # this isn't good for us because of how we pin dependencies
 
-Gemspec/OrderedDependencies:
-  Enabled: false # this isn't good for us because of how we pin dependencies
+Gemspec/RequiredRubyVersion:
+  # all the gemspecs in this repo are non-published gems
+  # the root Gemfile enforces the Ruby version, and we purposely
+  # don't specify required_ruby_version in the rest to reduce
+  # maintenance pain when updating ruby versions
+  Enabled: false
 
 Layout/EmptyLineAfterMagicComment:
   Exclude:

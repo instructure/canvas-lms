@@ -16,8 +16,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "gergich", "1.2.1"
-  spec.add_development_dependency "rspec", "~> 3.5.0"
-  spec.add_development_dependency "rspec-mocks"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-nav"
+  spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "rspec-mocks"
 end

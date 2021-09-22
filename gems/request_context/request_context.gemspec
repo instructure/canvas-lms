@@ -16,8 +16,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'canvas_security'
   spec.add_dependency 'actionpack'
+  spec.add_dependency 'canvas_security'
   spec.add_dependency 'railties'
 
   spec.add_development_dependency 'bundler'
