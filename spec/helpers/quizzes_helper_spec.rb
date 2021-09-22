@@ -190,7 +190,8 @@ describe QuizzesHelper do
 
   context 'fill_in_multiple_blanks_question' do
     before(:each) do
-      @question_text = %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />|
+      @name  = "question_1_#{AssessmentQuestion.variable_id('color')}"
+      @question_text = %Q|<input name="#{@name}" 'value={{question_1}}' />|
       @answer_list = []
       @answers = []
 
@@ -206,7 +207,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %Q|<input name="#{@name}" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
     end
 
     it 'should sanitize user input' do
@@ -221,7 +222,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %Q|<input name="#{@name}" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
       expect(html).to be_html_safe
     end
 
@@ -236,7 +237,7 @@ describe QuizzesHelper do
       expect(html).to match /Fill in the blank/
     end
     it 'should handle equation img tags in the question text' do
-      broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
+      broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_#{AssessmentQuestion.variable_id('kindof')}\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_#{AssessmentQuestion.variable_id('role')}' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
       @answer_list = [
         { blank_id: 'kindof', answer: 'protein'},
         {blank_id: 'role', answer: 'fixing'}
@@ -251,7 +252,7 @@ describe QuizzesHelper do
       expect(html).to match /value='protein'/
     end
     it "should sanitize the answer blocks in the noisy question data" do
-      broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_01731fa53c4cf2f32e893d5c3dbae9c1'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
+      broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_#{AssessmentQuestion.variable_id('color1')}'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_#{AssessmentQuestion.variable_id('color2')}'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
       html = fill_in_multiple_blanks_question(
         question: {question_text: ActiveSupport::SafeBuffer.new(broken_question_text)},
         answer_list: [

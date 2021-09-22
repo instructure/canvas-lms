@@ -517,7 +517,17 @@ describe Quizzes::SubmissionGrader do
     it "should score a multiple_dropdowns_question" do
       q = multiple_dropdowns_question_data
 
-      user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"6994", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"5988", "question_1630873_78635a3709b540a59678c806b102d038"=>"9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"3353", "question_1630873_69d0969351d989767d7096f28daf7461"=>"3390"})
+      user_answer = Quizzes::SubmissionGrader.score_question(q, {
+        "question_1630873_#{AssessmentQuestion.variable_id("structure1")}"=>"4390",
+        "question_1630873_#{AssessmentQuestion.variable_id("event1")}"=>"3390",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure2")}"=>"6955",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure3")}"=>"5988",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure4")}"=>"7604",
+        "question_1630873_#{AssessmentQuestion.variable_id("event2")}"=>"3353",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure5")}"=>"9908",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure6")}"=>"6994",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure7")}"=>"1121",
+      })
       expect(user_answer.delete(:points)).to be_within(0.01).of(0.44)
       expect(user_answer).to eq({
         :question_id => 1630873, :correct => "partial", :text => "",
@@ -541,7 +551,17 @@ describe Quizzes::SubmissionGrader do
         :answer_id_for_structure7 => 1121,
       })
 
-      user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"1883", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"5988", "question_1630873_78635a3709b540a59678c806b102d038"=>"878", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"9570", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"1522", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"9532", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"1228", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"599", "question_1630873_69d0969351d989767d7096f28daf7461"=>"5498"})
+      user_answer = Quizzes::SubmissionGrader.score_question(q, {
+        "question_1630873_#{AssessmentQuestion.variable_id("structure1")}"=>"1522",
+        "question_1630873_#{AssessmentQuestion.variable_id("event1")}"=>"5498",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure2")}"=>"1228",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure3")}"=>"5988",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure4")}"=>"9532",
+        "question_1630873_#{AssessmentQuestion.variable_id("event2")}"=>"599",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure5")}"=>"878",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure6")}"=>"1883",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure7")}"=>"9570",
+      })
       expect(user_answer).to eq({
         :question_id => 1630873, :correct => false, :points => 0, :text => "",
         :answer_for_structure1 => 1522,
@@ -564,7 +584,17 @@ describe Quizzes::SubmissionGrader do
         :answer_id_for_structure7 => 9570,
       })
 
-      user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"6994", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"7676", "question_1630873_78635a3709b540a59678c806b102d038"=>"9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"3353", "question_1630873_69d0969351d989767d7096f28daf7461"=>"3390"})
+      user_answer = Quizzes::SubmissionGrader.score_question(q, {
+        "question_1630873_#{AssessmentQuestion.variable_id("structure1")}"=>"4390",
+        "question_1630873_#{AssessmentQuestion.variable_id("event1")}"=>"3390",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure2")}"=>"6955",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure3")}"=>"7676",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure4")}"=>"7604",
+        "question_1630873_#{AssessmentQuestion.variable_id("event2")}"=>"3353",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure5")}"=>"9908",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure6")}"=>"6994",
+        "question_1630873_#{AssessmentQuestion.variable_id("structure7")}"=>"1121",
+      })
       expect(user_answer).to eq({
         :question_id => 1630873, :correct => true, :points => 0.5, :text => "",
         :answer_for_structure1 => 4390,
@@ -591,12 +621,12 @@ describe Quizzes::SubmissionGrader do
     it "should score a fill_in_multiple_blanks_question" do
       q = fill_in_multiple_blanks_question_data
       user_answer = Quizzes::SubmissionGrader.score_question(q, {
-        "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
-        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "patrol",
-        "question_1_3112b644eec409c20c346d2a393bd45e" => "soul",
-        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "toll",
-        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "assplode",
-        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
+        "question_1_#{AssessmentQuestion.variable_id("answer1")}" => "control",
+        "question_1_#{AssessmentQuestion.variable_id("answer2")}" => "patrol",
+        "question_1_#{AssessmentQuestion.variable_id("answer3")}" => "soul",
+        "question_1_#{AssessmentQuestion.variable_id("answer4")}" => "toll",
+        "question_1_#{AssessmentQuestion.variable_id("answer5")}" => "assplode",
+        "question_1_#{AssessmentQuestion.variable_id("answer6")}" => "old",
       })
       expect(user_answer).to eq(
         { :question_id => 1, :correct => true, :points => 50.0, :text => "",
@@ -616,12 +646,12 @@ describe Quizzes::SubmissionGrader do
       )
 
       user_answer = Quizzes::SubmissionGrader.score_question(q, {
-        "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
-        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "patrol",
-        "question_1_3112b644eec409c20c346d2a393bd45e" => "soul",
-        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "toll",
-        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
-        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
+        "question_1_#{AssessmentQuestion.variable_id("answer1")}" => "control",
+        "question_1_#{AssessmentQuestion.variable_id("answer2")}" => "patrol",
+        "question_1_#{AssessmentQuestion.variable_id("answer3")}" => "soul",
+        "question_1_#{AssessmentQuestion.variable_id("answer4")}" => "toll",
+        "question_1_#{AssessmentQuestion.variable_id("answer5")}" => "wut",
+        "question_1_#{AssessmentQuestion.variable_id("answer6")}" => "old",
       })
       expect(user_answer.delete(:points)).to be_within(0.1).of(41.6)
       expect(user_answer).to eq(
@@ -642,11 +672,11 @@ describe Quizzes::SubmissionGrader do
       )
 
       user_answer = Quizzes::SubmissionGrader.score_question(q, {
-        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "0",
-        "question_1_3112b644eec409c20c346d2a393bd45e" => "fail",
-        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "wrong",
-        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
-        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "oh well",
+        "question_1_#{AssessmentQuestion.variable_id("answer2")}" => "0",
+        "question_1_#{AssessmentQuestion.variable_id("answer3")}" => "fail",
+        "question_1_#{AssessmentQuestion.variable_id("answer4")}" => "wrong",
+        "question_1_#{AssessmentQuestion.variable_id("answer5")}" => "wut",
+        "question_1_#{AssessmentQuestion.variable_id("answer6")}" => "oh well",
       })
       expect(user_answer).to eq(
         { :question_id => 1, :correct => false, :points => 0, :text => "",
@@ -666,14 +696,14 @@ describe Quizzes::SubmissionGrader do
       )
 
       # one blank to fill in
-      user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => " DUmB \n " })
+      user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_3f6f6611d3ce3d57964ae3011b12cad298e2d5f265b4dad9ff56742bac74af5f" => " DUmB \n " })
       expect(user_answer).to eq(
         { :question_id => 2, :correct => true, :points => 3.75, :text => "",
           :answer_for_myblank => " DUmB \n ",
           :answer_id_for_myblank => 1235, }
       )
 
-      user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => "wut" })
+      user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_3f6f6611d3ce3d57964ae3011b12cad298e2d5f265b4dad9ff56742bac74af5f" => "wut" })
       expect(user_answer).to eq(
         { :question_id => 2, :correct => false, :points => 0, :text => "",
           :answer_for_myblank => "wut",
@@ -728,7 +758,7 @@ describe Quizzes::SubmissionGrader do
       # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
       q = {:position=>1, :name=>"Question 1", :correct_comments=>"", :question_type=>"fill_in_multiple_blanks_question", :assessment_question_id=>7903, :incorrect_comments=>"", :neutral_comments=>"", :id=>1, :points_possible=>50, :question_name=>"Question 1", :answers=>[], :question_text=>"<p><span>Ayo my quality [answer1].</p>"}
       expect {
-        Quizzes::SubmissionGrader.score_question(q, { "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "bleh" })
+        Quizzes::SubmissionGrader.score_question(q, { "question_1_a6e3a7e113750bdf295818b3a4e63e77f19109fbc86f395fb3857e11441c1877" => "bleh" })
       }.not_to raise_error
     end
   end
