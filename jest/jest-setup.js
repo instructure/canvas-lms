@@ -176,7 +176,6 @@ const ignoredWarnings = [
   /`waitForElement` has been deprecated/,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
-  /Found @client directives in a query but no ApolloClient resolvers were specified/,
   /is deprecated and will be removed/,
   /Missing field errors in/,
   /Missing field moduleItem in/,
