@@ -35,6 +35,7 @@ import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
+  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
@@ -139,6 +140,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
+    }
+  })
+
+  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    onCompleted: () => {
+      setOnSuccess('Draft message saved.')
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Unable to save draft message.'))
     }
   })
 
@@ -481,6 +491,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             }}
                             onCancel={() => {
                               setExpandedReply(false)
+                            }}
+                            updateDraft={newDraftMessage => {
+                              createDiscussionEntryDraft({
+                                variables: {
+                                  discussionTopicId: props.discussionTopic._id,
+                                  message: newDraftMessage,
+                                  parentId: null
+                                }
+                              })
                             }}
                           />
                         )}
