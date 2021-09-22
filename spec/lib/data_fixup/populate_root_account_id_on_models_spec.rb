@@ -1077,15 +1077,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     end
   end
 
-  describe 'checking if a table is full' do
-    def table_has_root_account_id_filled(table)
-      assoc = described_class.migration_tables[table]
-      association_hash = described_class.hash_association(assoc)
-      direct_relation_associations = described_class.replace_polymorphic_associations(table, association_hash)
-      described_class.check_if_table_has_root_account(table, direct_relation_associations.keys)
-    end
-  end
-
   describe '.scope_for_association_does_not_exist' do
     context 'for specific associations of a polymorphic association' do
       it "returns the records for when the referenced record doesn't exist" do

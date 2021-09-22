@@ -20,19 +20,6 @@ require_relative '../../common'
 describe "Tutorials" do
   include_context "in-process server selenium tests"
 
-  context "In Teacher Settings" do
-
-    before(:once) do
-      Account.default.enable_feature!(:new_user_tutorial)
-      course_with_teacher(active_all: true, new_user: true)
-    end
-
-    before(:each) do
-      user_session(@teacher)
-      get "/profile/settings"
-    end
-  end
-
   context "In Course Pages" do
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)

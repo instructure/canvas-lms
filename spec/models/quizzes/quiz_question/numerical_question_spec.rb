@@ -112,7 +112,8 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    describe 'flexible ranges' do
+    describe 'flexible ranges' do # rubocop:disable RSpec/EmptyExampleGroup
+      # RuboCop can't detect the examples that are dynamically defined
       def self.test_range(range, answer, is_correct)
         desc = "should calculate if %s falls %s (%d,%d)" % [
           answer, is_correct ? 'within' : 'out of', range[0], range[1]

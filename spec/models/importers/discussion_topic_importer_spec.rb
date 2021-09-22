@@ -59,7 +59,8 @@ describe Importers::DiscussionTopicImporter do
     end
   end
 
-  describe "Importing announcements" do
+  describe "Importing announcements" do # rubocop:disable RSpec/EmptyExampleGroup
+    # RuboCop can't detect the examples that are dynamically defined
     SYSTEMS.each do |system|
       if import_data_exists? system, 'announcements'
         it "should import assignments for #{system}" do

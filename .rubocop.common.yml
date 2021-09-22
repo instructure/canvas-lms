@@ -57,7 +57,7 @@ RSpec/InstanceVariable:
 RSpec/MultipleExpectations:
   Enabled: false
 RSpec/NestedGroups:
-  Max: 5
+  Enabled: false
 RSpec/RepeatedDescription:
   Severity: error
 

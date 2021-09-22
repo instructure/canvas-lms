@@ -103,15 +103,6 @@ describe 'BigBlueButton conferences' do
           .with(query: bbb_fixtures[:get_recordings])
           .to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
-      end
-    end
-
-    context 'and the conference has one recording with statistics' do
-      before(:once) do
-        stub_request(:get, /getRecordings/).
-          with(query: bbb_fixtures[:get_recordings]).
-          to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
-        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
         @conference.add_user(@student, 'attendee')
       end
 
