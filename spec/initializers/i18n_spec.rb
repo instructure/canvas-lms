@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../spec_helper', File.dirname( __FILE__ ))
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 describe I18n do
   describe '.bigeasy_locale' do
@@ -65,19 +65,19 @@ describe I18n do
 
   describe "numbers" do
     it "formats count" do
-      expect(I18n.t({one: "1 thing", other: "%{count} things"}, {count: 1500})).to eq '1,500 things'
+      expect(I18n.t({ one: "1 thing", other: "%{count} things" }, { count: 1500 })).to eq '1,500 things'
     end
 
     it "formats interpolated numbers" do
-      expect(I18n.t("user count: %{foo}", {foo: 1500})).to eq "user count: 1,500"
+      expect(I18n.t("user count: %{foo}", { foo: 1500 })).to eq "user count: 1,500"
     end
 
     it "does not format numbery strings" do
-      expect(I18n.t("user count: %{foo}", {foo: "1500"})).to eq "user count: 1500"
+      expect(I18n.t("user count: %{foo}", { foo: "1500" })).to eq "user count: 1500"
     end
 
     it "does not mutate the options" do
-      options = {foo: 1500}
+      options = { foo: 1500 }
       I18n.t("user count: %{foo}", options)
       expect(options[:foo]).to eq 1500
     end

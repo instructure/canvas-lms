@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizStatisticsSerializer do
-
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -72,10 +71,10 @@ describe Quizzes::QuizStatisticsSerializer do
 
   subject do
     Quizzes::QuizStatisticsSerializer.new(statistics, {
-      controller: controller,
-      scope: user,
-      session: session
-    })
+                                            controller: controller,
+                                            scope: user,
+                                            session: session
+                                          })
   end
 
   before do
@@ -139,8 +138,8 @@ describe Quizzes::QuizStatisticsSerializer do
 
   it 'stringifies question_statistics ids' do
     allow(subject).to receive_messages(student_analysis_report: {
-      questions: [ ['question', { id: 5 }] ]
-    })
+                                         questions: [['question', { id: 5 }]]
+                                       })
 
     json = subject.as_json[:quiz_statistics]
     expect(json[:question_statistics]).to be_present
@@ -149,12 +148,12 @@ describe Quizzes::QuizStatisticsSerializer do
 
   it 'munges item_analysis with question_statistics' do
     allow(subject).to receive_messages(student_analysis_report: {
-      questions: [ ['question', { id: 5 }] ]
-    })
+                                         questions: [['question', { id: 5 }]]
+                                       })
 
     allow(subject).to receive_messages(item_analysis_report: [
-      { question_id: 5, foo: 'bar' }
-    ])
+                                         { question_id: 5, foo: 'bar' }
+                                       ])
 
     json = subject.as_json[:quiz_statistics]
     expect(json[:question_statistics]).to be_present

@@ -28,55 +28,55 @@ RSpec.shared_examples "DiscussionType" do
     [
       {
         value: 'attach',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :attach)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :attach) }
       },
       {
         value: 'create',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :create)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :create) }
       },
       {
         value: 'delete',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any) }
       },
       {
         value: 'duplicate',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :duplicate)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :duplicate) }
       },
       {
         value: 'moderateForum',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :moderate_forum)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :moderate_forum) }
       },
       {
         value: 'rate',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :rate)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :rate) }
       },
       {
         value: 'read',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read) }
       },
       {
         value: 'readAsAdmin',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read_as_admin)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read_as_admin) }
       },
       {
         value: 'manageContent',
-        allowed: -> (user) {discussion.context.grants_right?(user, :manage_content)}
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
       },
       {
         value: 'readReplies',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read_replies)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read_replies) }
       },
       {
         value: 'reply',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :reply)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :reply) }
       },
       {
         value: 'update',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :update)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :update) }
       },
       {
         value: 'speedGrader',
-        allowed: -> (user) {
+        allowed: ->(user) {
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
             return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
@@ -87,45 +87,45 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'peerReview',
-        allowed: -> (user) {
+        allowed: ->(user) {
           discussion.assignment_id &&
-          discussion.assignment.published? &&
-          discussion.assignment.has_peer_reviews? &&
-          discussion.assignment.grants_right?(user, :grade)
+            discussion.assignment.published? &&
+            discussion.assignment.has_peer_reviews? &&
+            discussion.assignment.grants_right?(user, :grade)
         }
       },
       {
         value: 'showRubric',
-        allowed: -> (user) {!discussion.assignment_id.nil? && !discussion.assignment.rubric.nil?}
+        allowed: ->(user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
       },
       {
         value: 'addRubric',
-        allowed: -> (user) {
+        allowed: ->(user) {
           !discussion.assignment_id.nil? &&
-          discussion.assignment.rubric.nil? &&
-          discussion.assignment.grants_right?(user, :update)
+            discussion.assignment.rubric.nil? &&
+            discussion.assignment.grants_right?(user, :update)
         }
       },
       {
         value: 'openForComments',
-        allowed: -> (user) {
+        allowed: ->(user) {
           !discussion.comments_disabled? &&
-          discussion.locked &&
-          discussion.grants_right?(user, :moderate_forum)
+            discussion.locked &&
+            discussion.grants_right?(user, :moderate_forum)
         }
       },
       {
         value: 'closeForComments',
-        allowed: -> (user) {
+        allowed: ->(user) {
           discussion.can_lock? &&
-          !discussion.comments_disabled? &&
-          !discussion.locked &&
-          discussion.grants_right?(user, :moderate_forum)
+            !discussion.comments_disabled? &&
+            !discussion.locked &&
+            discussion.grants_right?(user, :moderate_forum)
         }
       },
       {
         value: 'copyAndSendTo',
-        allowed: -> (user) {discussion.context.grants_right?(user, :read_as_admin)}
+        allowed: ->(user) { discussion.context.grants_right?(user, :read_as_admin) }
       }
     ]
   }

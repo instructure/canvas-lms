@@ -42,7 +42,7 @@ describe WikiPagesController do
 
   it "should not render wiki page body at all if it was deleted" do
     @wiki_page = create_page :title => "Some random wiki page",
-                                                :body => "this is the content of the wikipage body asdfasdf"
+                             :body => "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
     expect(response.body).not_to include(@wiki_page.body)
@@ -62,6 +62,7 @@ describe WikiPagesController do
       html.css('#breadcrumbs a').each do |link|
         href = link.attr('href')
         next if href == "/"
+
         expect(href).to match %r{/groups/#{@group.id}}
       end
     end
@@ -119,7 +120,5 @@ describe WikiPagesController do
       get @base_url + "wiki/a-page/revisions/42"
       expect(response).to redirect_to(course_wiki_page_revisions_url(@course, "a-page"))
     end
-
   end
 end
-

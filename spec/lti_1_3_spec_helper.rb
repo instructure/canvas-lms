@@ -25,10 +25,10 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
 
   let(:fallback_proxy) do
     Canvas::DynamicSettings::FallbackProxy.new({
-      Canvas::Security::KeyStorage::PAST => Canvas::Security::KeyStorage.new_key,
-      Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
-      Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
-    })
+                                                 Canvas::Security::KeyStorage::PAST => Canvas::Security::KeyStorage.new_key,
+                                                 Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
+                                                 Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
+                                               })
   end
 
   let(:developer_key) { DeveloperKey.create!(account: account) }

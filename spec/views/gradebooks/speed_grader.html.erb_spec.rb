@@ -40,9 +40,9 @@ describe "/gradebooks/speed_grader" do
     @group = @course.groups.create!(name: "a group", group_category: @group_category)
     add_user_to_group(@user, @group, true)
     @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
-      group_category: @group_category,
-      grade_group_students_individually: true
-    ))
+                                                group_category: @group_category,
+                                                grade_group_students_individually: true
+                                              ))
 
     assign(:assignment, @assignment)
     assign(:submissions, [])

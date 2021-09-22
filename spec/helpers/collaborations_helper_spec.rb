@@ -21,10 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CollaborationsHelper do
-
   let(:user) { double('user') }
-  let(:course) { Course.new(name: "my course").tap {|t| allow(t).to receive_messages(id: 1)} }
-  let(:collab) { double('single collaboration').tap {|t| allow(t).to receive_messages(id: 1) } }
+  let(:course) { Course.new(name: "my course").tap { |t| allow(t).to receive_messages(id: 1) } }
+  let(:collab) { double('single collaboration').tap { |t| allow(t).to receive_messages(id: 1) } }
 
   describe "collaboration" do
     it 'renders the collaborations' do
@@ -40,8 +39,8 @@ describe CollaborationsHelper do
 
     it 'constructs the data attributes' do
       expect(helper).to receive(:render).with('collaborations/collaboration', include(
-                                                                     data_attributes: include({id: 1})
-      ))
+                                                                                data_attributes: include({ id: 1 })
+                                                                              ))
       helper.collaboration(collab, user, false)
     end
 
@@ -52,16 +51,14 @@ describe CollaborationsHelper do
       allow(collab).to receive(:is_a?).with(ExternalToolCollaboration).and_return true
       allow(collab).to receive(:update_url).and_return(launch_url)
       expect(helper).to receive(:render).with('collaborations/collaboration',
-                                include(
-                                  data_attributes: include(
-                                    update_launch_url: include(CGI.escape(launch_url)),
-                                    id: collab.id
-                                  )
-                                )
-                                  )
+                                              include(
+                                                data_attributes: include(
+                                                  update_launch_url: include(CGI.escape(launch_url)),
+                                                  id: collab.id
+                                                )
+                                              ))
       helper.collaboration(collab, user, false)
     end
-
   end
 
   describe "#edit_button" do
@@ -78,7 +75,6 @@ describe CollaborationsHelper do
       expect(helper).to receive(:render).never
       helper.edit_button(collab, user)
     end
-
   end
 
   describe "#delete_button" do
@@ -90,7 +86,6 @@ describe CollaborationsHelper do
   end
 
   describe "#collaboration_links" do
-
     it 'returns collaboration links if the user has permissions' do
       allow(collab).to receive(:grants_any_right?).and_return(true)
       expect(helper).to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user)
@@ -102,8 +97,5 @@ describe CollaborationsHelper do
       expect(helper).to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user).never
       helper.collaboration_links(collab, user)
     end
-
   end
-
-
 end

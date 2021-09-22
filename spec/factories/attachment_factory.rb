@@ -41,7 +41,7 @@ Attachment.class_eval do
 end
 
 module Factories
-  def attachment_model(opts={})
+  def attachment_model(opts = {})
     attrs = valid_attachment_attributes(opts).merge(opts)
     attrs.delete(:filename) if attrs.key?(:uploaded_data)
     @attachment = factory_with_protected_attributes(Attachment, attrs, false)
@@ -49,13 +49,13 @@ module Factories
     @attachment
   end
 
-  def valid_attachment_attributes(opts={})
+  def valid_attachment_attributes(opts = {})
     @context = opts[:context] || @context || @course || course_model(:reusable => true)
     if opts.has_key?(:folder)
       folder = opts[:folder]
     else
       if @context.respond_to?(:folders)
-        @folder = Folder.root_folders(@context).find{|f| f.name == 'unfiled'} || Folder.root_folders(@context).first
+        @folder = Folder.root_folders(@context).find { |f| f.name == 'unfiled' } || Folder.root_folders(@context).first
       end
       @folder ||= folder_model
       folder = @folder
@@ -92,25 +92,25 @@ module Factories
     fixture_file_upload(fixture_path, 'image/png', true)
   end
 
-  def crocodocable_attachment_model(opts={})
-    attachment_model({:content_type => 'application/pdf'}.merge(opts))
+  def crocodocable_attachment_model(opts = {})
+    attachment_model({ :content_type => 'application/pdf' }.merge(opts))
   end
 
   alias :canvadocable_attachment_model :crocodocable_attachment_model
 
-  def attachment_obj_with_context(obj, opts={})
+  def attachment_obj_with_context(obj, opts = {})
     @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))
     @attachment.context = obj
     @attachment
   end
 
-  def attachment_with_context(obj, opts={})
+  def attachment_with_context(obj, opts = {})
     attachment_obj_with_context(obj, opts)
     @attachment.save!
     @attachment
   end
 
-  def create_attachment_for_file_upload_submission!(submission, opts={})
+  def create_attachment_for_file_upload_submission!(submission, opts = {})
     defaults = {
       :filename => "doc.doc",
       :display_name => "doc.doc",

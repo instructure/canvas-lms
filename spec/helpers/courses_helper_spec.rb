@@ -34,7 +34,7 @@ describe CoursesHelper do
                                                                                           :submission_types => "online_text_entry" }))
       @assignment2 = factory_with_protected_attributes(@course.assignments,
                                                        assignment_valid_attributes.merge({ :points_possible => 10,
-                                                       :submission_types => "none" }))
+                                                                                           :submission_types => "none" }))
     end
 
     before(:each) do
@@ -98,7 +98,6 @@ describe CoursesHelper do
                         "Assignment",
                         "icon-assignment",
                         current_user: @student_two, submission: submission, show_assignment_type_icon: true)
-
       end
 
       it "should return a no new submissions tooltip if some assignments have been submitted and graded" do
@@ -118,7 +117,7 @@ describe CoursesHelper do
       end
     end
 
-    def check_icon_data(msg, aria_label, icon, options={})
+    def check_icon_data(msg, aria_label, icon, options = {})
       base_options = {
         :context => @course,
         :contexts => [@course],

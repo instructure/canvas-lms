@@ -36,7 +36,7 @@ describe ObserverEnrollmentsHelper do
   end
 
   def enroll_observer(course, observer, linked_student)
-    course.enroll_user(observer, "ObserverEnrollment", {associated_user_id: linked_student.id})
+    course.enroll_user(observer, "ObserverEnrollment", { associated_user_id: linked_student.id })
   end
 
   it "returns empty list if user has no self or observer enrollments" do

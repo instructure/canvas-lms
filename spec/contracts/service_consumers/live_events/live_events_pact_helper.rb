@@ -39,7 +39,7 @@ module LiveEvents
     class Event
       attr_reader :event_message, :event_name, :event_settings, :event_subscriber, :stream_client
 
-      def initialize(event_name:, event_subscriber:, event_settings: nil, stream_client: nil) # rubocop:disable Lint/UnusedMethodArgument, Naming/VariableName
+      def initialize(event_name:, event_subscriber:, event_settings: nil, stream_client: nil) # rubocop:disable Lint/UnusedMethodArgument, Naming/VariableName
         @event_name = event_name
         @event_settings = event_settings || LiveEvents::PactHelper::FakeSettings.new
         @event_subscriber = event_subscriber

@@ -28,7 +28,8 @@ module RspecMockAnyInstantiation
 
     def add_any_instantiation(ar_obj)
       raise(ArgumentError, "need to save first") if ar_obj.new_record?
-      @@any_instantiation[ [ar_obj.class.base_class, ar_obj.id] ] = ar_obj
+
+      @@any_instantiation[[ar_obj.class.base_class, ar_obj.id]] = ar_obj
       # calling any_instantiation is likely to be because you're stubbing it,
       # and to later be cached inadvertently from code that *thinks* it
       # has a non-stubbed object. So let it dump, but not load (i.e.

@@ -24,7 +24,7 @@ describe Mutations::DeleteDiscussionTopic do
     course_with_teacher(:active_all => true)
   end
 
-  let(:sender) {@teacher}
+  let(:sender) { @teacher }
   let(:discussion_topic) { @course.discussion_topics.create!(user: sender) }
 
   def execute_with_input(delete_input, user_executing: sender)
@@ -41,7 +41,7 @@ describe Mutations::DeleteDiscussionTopic do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
     CanvasSchema.execute(mutation_command, context: context)
   end
 

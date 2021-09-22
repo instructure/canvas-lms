@@ -86,7 +86,7 @@ describe ContextModule do
       @discussion = @course.discussion_topics.create!(:title => "talk")
       @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id }}
+        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id } }
         expect(response).to be_redirect
       end
     end
@@ -95,7 +95,7 @@ describe ContextModule do
       @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
-        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: {:wiki_page => { :body => 'i agree', :title => 'talk page' }}
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { :wiki_page => { :body => 'i agree', :title => 'talk page' } }
       end
     end
 
@@ -103,7 +103,7 @@ describe ContextModule do
       @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
       @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id }}
+        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id } }
         expect(response).to be_redirect
       end
     end
@@ -123,7 +123,7 @@ describe ContextModule do
           @mod1.require_sequential_progress = true
           @mod1.save!
           @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
-          @mod1.completion_requirements = {@tag1.id => {:type => 'min_score', :min_score => 1}}
+          @mod1.completion_requirements = { @tag1.id => { :type => 'min_score', :min_score => 1 } }
           @mod1.save!
         end
 

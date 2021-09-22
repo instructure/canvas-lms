@@ -19,13 +19,13 @@
 #
 
 module Factories
-  def wiki_page_model(opts={})
+  def wiki_page_model(opts = {})
     context = opts.delete(:course) || opts.delete(:context) || (course_with_student(active_all: true); @course)
     opts = opts.slice(:title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update, :todo_date)
     @page = context.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
   end
 
-  def wiki_page_assignment_model(opts={})
+  def wiki_page_assignment_model(opts = {})
     @page = opts.delete(:wiki_page) || wiki_page_model(opts)
     assignment_model({
       course: @page.course,

@@ -27,7 +27,7 @@ describe "/eportfolios/_page_section" do
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
     assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))
-    render :partial => "eportfolios/page_section", :object => {"section_type" => "rich_text", "content" => "some text"}, :locals => {:idx => 0}
+    render :partial => "eportfolios/page_section", :object => { "section_type" => "rich_text", "content" => "some text" }, :locals => { :idx => 0 }
     expect(response).to have_tag("div.section")
   end
 
@@ -44,7 +44,7 @@ describe "/eportfolios/_page_section" do
       end
       view_portfolio
       assign(:page, @page)
-      render :partial => "eportfolios/page_section", :object => @page.content_sections.first, :locals => {:idx => 0}
+      render :partial => "eportfolios/page_section", :object => @page.content_sections.first, :locals => { :idx => 0 }
       expect(response).to match(/my cross-shard attachment/)
     end
   end

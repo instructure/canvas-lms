@@ -33,8 +33,8 @@ describe "user asset accesses" do
                             :password => password
     u.save!
     @e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
+                             :user => u,
+                             :active_enrollment => true
     @e.save!
     @teacher = u
     user_session(@user, @pseudonym)

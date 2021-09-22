@@ -31,7 +31,7 @@ describe Mutations::CreateLearningOutcomeGroup do
     @global_parent_group = LearningOutcomeGroup.create(title: 'Global Parent Outcome Group')
   end
 
-  let(:context) {{ current_user: @admin }}
+  let(:context) { { current_user: @admin } }
   let(:title) { 'New Group Title' }
   let(:description) { 'New Group Description' }
   let(:vendor_guid) { 'A001' }
@@ -98,7 +98,7 @@ describe Mutations::CreateLearningOutcomeGroup do
             description: description,
             vendorGuid: vendor_guid
           ),
-          {current_user: site_admin_user}
+          { current_user: site_admin_user }
         )
         expect(result.dig('errors')).to be_nil
         expect(result.dig('data', 'createLearningOutcomeGroup', 'errors')).to be_nil
@@ -131,7 +131,7 @@ describe Mutations::CreateLearningOutcomeGroup do
     it "requires user to have manage_outcomes permission to create learning outcome group" do
       result = execute_query(
         mutation_str(id: @parent_group.id, title: title),
-        {current_user: @teacher}
+        { current_user: @teacher }
       )
       expect_error(result, 'Insufficient permissions')
     end

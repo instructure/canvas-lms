@@ -61,7 +61,7 @@ describe "/submissions/show_preview" do
     before(:each) do
       @attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework.png")
       allow(Canvadocs).to receive(:enabled?).and_return(true)
-      allow(Canvadocs).to receive(:config).and_return({a: 1})
+      allow(Canvadocs).to receive(:config).and_return({ a: 1 })
       allow(Canvadoc).to receive(:mime_types).and_return(@attachment.content_type)
       view_context
     end
@@ -71,7 +71,7 @@ describe "/submissions/show_preview" do
       submission = assignment.submit_homework(@user, attachments: [@attachment])
       assign(:assignment, assignment)
       assign(:submission, submission)
-      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      render template: "submissions/show_preview", locals: { anonymize_students: assignment.anonymize_students? }
       expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
     end
 
@@ -81,7 +81,7 @@ describe "/submissions/show_preview" do
       submission = assignment.submit_homework(@user, attachments: [@attachment, another_attachment])
       assign(:assignment, assignment)
       assign(:submission, submission)
-      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      render template: "submissions/show_preview", locals: { anonymize_students: assignment.anonymize_students? }
       expect(response.body.include?("%22enable_annotations%22:null")).to be false
     end
 
@@ -98,7 +98,7 @@ describe "/submissions/show_preview" do
       )
       assign(:assignment, assignment)
       assign(:submission, submission)
-      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      render template: "submissions/show_preview", locals: { anonymize_students: assignment.anonymize_students? }
       element = Nokogiri::HTML5.fragment(response.body).at_css("iframe.ef-file-preview-frame")
 
       aggregate_failures do

@@ -55,6 +55,7 @@ module SpecTimeLimit
     def timeout_for(example)
       if example.metadata[:custom_timeout]
         raise "Custom timeouts cannot exceed #{ABSOLUTE_TIMEOUT} seconds!" if example.metadata[:custom_timeout].to_i > ABSOLUTE_TIMEOUT
+
         [:target, example.metadata[:custom_timeout].to_i]
       elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
@@ -88,7 +89,7 @@ module SpecTimeLimit
     def commit_files
       @commit_files ||=
         (`git diff-tree --no-commit-id --name-only -r HEAD | grep -E '_spec\.rb$'`
-      ).split("\n")
+        ).split("\n")
     end
   end
 end

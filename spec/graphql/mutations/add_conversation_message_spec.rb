@@ -30,7 +30,7 @@ RSpec.describe Mutations::AddConversationMessage do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_data = num_other_users.times.map { {name: 'User'} }
+    user_data = num_other_users.times.map { { name: 'User' } }
     users = opts[:users] || create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
@@ -145,13 +145,13 @@ RSpec.describe Mutations::AddConversationMessage do
     Account.default.update_attribute(:enable_user_notes, true)
     conversation(users: [@teacher])
 
-    result = run_mutation({conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s]}, @teacher)
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s] }, @teacher)
     expect(result.dig('errors')).to be nil
     cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
     student = cm.recipients.first
     expect(student.user_notes.size).to eq 0
 
-    result = run_mutation({conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s], user_note: true}, @teacher)
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s], user_note: true }, @teacher)
     expect(result.dig('errors')).to be nil
     cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
     student = cm.recipients.first
@@ -174,7 +174,7 @@ RSpec.describe Mutations::AddConversationMessage do
     conversation(users: [@teacher])
     @course.update!(workflow_state: 'completed')
 
-    result = run_mutation({conversation_id: @conversation.conversation_id, body: 'I have the power', recipients: [@student.id.to_s]}, @teacher)
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'I have the power', recipients: [@student.id.to_s] }, @teacher)
     expect(result.dig('errors')).to be nil
     expect(
       result.dig('data', 'addConversationMessage', 'conversationMessage', 'body')

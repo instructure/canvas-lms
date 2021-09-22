@@ -36,7 +36,7 @@ describe 'enrollment_notification' do
 
     context "creation_pending student" do
       before :once do
-        communication_channel(@student, {username: 'jacob@isntructure.com'})
+        communication_channel(@student, { username: 'jacob@isntructure.com' })
       end
 
       let(:asset) { @enrollment }

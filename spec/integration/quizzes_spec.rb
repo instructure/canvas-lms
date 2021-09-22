@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe Quizzes::QuizzesController do
-
   def create_section_override(section, due_at)
     override = assignment_override_model(:quiz => @quiz)
     override.set = section
@@ -89,8 +88,8 @@ describe Quizzes::QuizzesController do
 
           doc = Nokogiri::HTML5(response.body)
           expect(doc.css(".assignment_dates tbody tr").count).to be 2
-          expect(doc.css(".assignment_dates tbody tr > td:first-child").text).
-            to include(datetime_string(@due_at1), datetime_string(@due_at2))
+          expect(doc.css(".assignment_dates tbody tr > td:first-child").text)
+            .to include(datetime_string(@due_at1), datetime_string(@due_at2))
         end
 
         it "should not show a date for 'Everyone else'" do
@@ -156,14 +155,14 @@ describe Quizzes::QuizzesController do
   context "#history" do
     context "pending_review" do
       def mkquiz
-        quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
-                                   {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question'}}])
+        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                     { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
         course_with_teacher_logged_in(:active_all => true, :course => @course)
       end
 
       def mksurvey
-        survey_with_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
-                                   {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question'}}])
+        survey_with_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
         course_with_teacher_logged_in(:active_all => true, :course => @course)
       end
 
@@ -219,7 +218,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  def course_quiz(active=false)
+  def course_quiz(active = false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
     @quiz.save!

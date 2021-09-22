@@ -66,11 +66,11 @@ describe QuizzesNext::QuizSerializer do
   end
   let(:quiz_serializer) do
     QuizzesNext::QuizSerializer.new(assignment, {
-      controller: controller,
-      scope: user,
-      session: session,
-      root: false
-    })
+                                      controller: controller,
+                                      scope: user,
+                                      session: session,
+                                      root: false
+                                    })
   end
 
   before do
@@ -189,11 +189,11 @@ describe QuizzesNext::QuizSerializer do
   describe "permissions" do
     it "serializes permissions" do
       expect(subject[:permissions]).to include({
-        read: true,
-        create: true,
-        update: true,
-        delete: true
-      })
+                                                 read: true,
+                                                 create: true,
+                                                 update: true,
+                                                 delete: true
+                                               })
     end
   end
 end

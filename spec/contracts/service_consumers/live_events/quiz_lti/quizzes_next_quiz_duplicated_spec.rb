@@ -22,7 +22,6 @@ require_relative '../live_events_pact_helper'
 
 RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
   describe 'quizzes_next_quiz_duplicated' do
-
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'quizzes_next_quiz_duplicated',
@@ -47,7 +46,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         # Account.default.save!
 
         old_course = course_model(uuid: '100005')
-        old_course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        old_course.root_account.settings[:provision] = { 'lti' => 'lti url' }
         old_course.root_account.save!
         old_course.enable_feature!(:quizzes_next)
         old_assignment = assignment_model(course: old_course)
@@ -55,7 +54,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         old_assignment.save!
 
         new_course = course_model(uuid: '100006')
-        new_course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        new_course.root_account.settings[:provision] = { 'lti' => 'lti url' }
         new_course.root_account.save!
         new_course.enable_feature!(:quizzes_next)
         new_course.lti_context_id = 2
@@ -67,7 +66,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
           context: Account.default,
           user: @teacher
         )
-        migration.started_at=Time.now.utc - 1.hour
+        migration.started_at = Time.now.utc - 1.hour
         migration.save!
 
         exported_content = QuizzesNext::ExportService.begin_export(old_course, {})

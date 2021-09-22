@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def group_model(opts={})
+  def group_model(opts = {})
     @group = factory_with_protected_attributes(Group, valid_group_attributes.merge(opts))
   end
 
@@ -32,19 +32,19 @@ module Factories
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
-  def group(opts={})
+  def group(opts = {})
     context = opts[:group_context] || opts[:context] || Account.default
     @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
-  def group_with_user(opts={})
+  def group_with_user(opts = {})
     group(opts)
     u = opts[:user] || user_factory(opts)
     workflow_state = opts[:active_all] ? 'accepted' : nil
     @group.add_user(u, workflow_state, opts[:moderator])
   end
 
-  def group_with_user_logged_in(opts={})
+  def group_with_user_logged_in(opts = {})
     group_with_user(opts)
     user_session(@user)
   end

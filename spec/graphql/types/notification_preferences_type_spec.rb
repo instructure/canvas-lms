@@ -24,9 +24,9 @@ require_relative "../graphql_spec_helper"
 describe Types::NotificationPreferencesType do
   let(:user) { student_in_course.user }
   let(:preferences_type) { GraphQLTypeTester.new(user, current_user: user) }
-  let!(:email_channel) { communication_channel(user, {username: 'email@email.com', path_type: CommunicationChannel::TYPE_EMAIL}) }
-  let!(:push_channel) { communication_channel(user, {username: 'push', path_type: CommunicationChannel::TYPE_PUSH}) }
-  let!(:sms_channel) { communication_channel(user, {username: 'sms', path_type: CommunicationChannel::TYPE_SMS}) }
+  let!(:email_channel) { communication_channel(user, { username: 'email@email.com', path_type: CommunicationChannel::TYPE_EMAIL }) }
+  let!(:push_channel) { communication_channel(user, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH }) }
+  let!(:sms_channel) { communication_channel(user, { username: 'sms', path_type: CommunicationChannel::TYPE_SMS }) }
 
   describe "channels" do
     it "returns the user's supported channels" do

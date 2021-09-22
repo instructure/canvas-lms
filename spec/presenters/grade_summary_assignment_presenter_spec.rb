@@ -27,9 +27,9 @@ describe GradeSummaryAssignmentPresenter do
     student_in_course active_all: true
     teacher_in_course active_all: true
     @assignment = @course.assignments.create!(title: "some assignment",
-                                                assignment_group: @group,
-                                                points_possible: 12,
-                                                tool_settings_tool: @tool)
+                                              assignment_group: @group,
+                                              points_possible: 12,
+                                              tool_settings_tool: @tool)
     @attachment.context = @student
     @attachment.save!
     @submission = @assignment.submit_homework(@student, attachments: [@attachment])
@@ -135,7 +135,6 @@ describe GradeSummaryAssignmentPresenter do
       it "returns nil when a summary's assignment_stats is empty" do
         expect(presenter.grade_distribution).to be_nil
       end
-
     end
 
     context "when summary stats exist" do

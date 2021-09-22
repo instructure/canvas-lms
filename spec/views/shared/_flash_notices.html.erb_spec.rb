@@ -29,4 +29,3 @@ describe "shared/_flash_notices" do
     expect(response).not_to be_nil
   end
 end
-

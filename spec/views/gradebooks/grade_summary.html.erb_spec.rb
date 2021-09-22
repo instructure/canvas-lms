@@ -524,7 +524,7 @@ describe "/gradebooks/grade_summary" do
     let(:course) { Course.create! }
     let(:student) { course.enroll_student(User.create!, active_all: true).user }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
-    let(:assignment) { course.assignments.create!}
+    let(:assignment) { course.assignments.create! }
 
     before(:each) do
       view_context(course, student)

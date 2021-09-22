@@ -29,13 +29,13 @@ describe "graphql student context cards" do
 
   def grade_assignment(course, student, grader)
     @ass = course.assignments.create!({
-      title: "some assignment",
-      submission_types: "online_url,online_upload"
-    })
+                                        title: "some assignment",
+                                        submission_types: "online_url,online_upload"
+                                      })
     @ass.submit_homework(student, {
-      submission_type: "online_url",
-      url: "http://www.google.com"
-    })
+                           submission_type: "online_url",
+                           url: "http://www.google.com"
+                         })
     @ass.grade_student(student, grade: 5, grader: grader)
   end
 
@@ -122,7 +122,7 @@ describe "graphql student context cards" do
       f("a[data-student_id='#{@student.id}']").click
       wait_for_ajaximations
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link =f(".StudentContextTray-Progress__Bar a")
+      cool_link = f(".StudentContextTray-Progress__Bar a")
       expect(cool_link["href"]).to include("/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}")
     end
 
@@ -132,7 +132,7 @@ describe "graphql student context cards" do
       f("a[data-student_id='#{@student.id}']").click
       wait_for_ajaximations
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link =f(".StudentContextTray-QuickLinks a")
+      cool_link = f(".StudentContextTray-QuickLinks a")
       expect(cool_link["href"]).to include("/courses/#{@course.id}/grades/#{@student.id}")
     end
   end

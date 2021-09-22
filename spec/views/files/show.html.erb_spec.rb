@@ -41,4 +41,3 @@ describe "/files/index" do
     expect(rendered).to match /This file is currently locked/
   end
 end
-

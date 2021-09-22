@@ -57,9 +57,11 @@ module Factories
   # level)
   def create_records(klass, records, return_type = :id)
     return [] if records.empty?
+
     klass.transaction do
       klass.connection.bulk_insert klass.table_name, records
       return if return_type == :nil
+
       scope = klass.order("id DESC").limit(records.size)
       if return_type == :record
         scope.to_a.reverse
@@ -71,7 +73,7 @@ module Factories
 end
 
 legit_global_methods = Object.private_methods
-Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each {|f| require f }
+Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each { |f| require f }
 crap_factories = (Object.private_methods - legit_global_methods)
 if crap_factories.present?
   $stderr.puts "\e[31mError: Don't create global factories/helpers"

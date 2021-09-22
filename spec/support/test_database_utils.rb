@@ -38,7 +38,6 @@ module TestDatabaseUtils
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
       puts "finished resetting test db in #{Time.now - start} seconds" unless ENV['RSPECQ_ENABLED'] == '1'
-
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the
@@ -56,7 +55,7 @@ module TestDatabaseUtils
       end
     end
 
-   private
+    private
 
     def each_connection
       ::Shard.with_each_shard(::Shard.categories) do

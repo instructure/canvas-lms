@@ -50,7 +50,7 @@ describe "accounts/settings.html.erb" do
     end
 
     it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false})
+      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
       view_context(@account, admin)
       assign(:current_user, admin)
       render
@@ -122,7 +122,6 @@ describe "accounts/settings.html.erb" do
         assign(:associated_courses_count, 0)
         assign(:announcements, AccountNotification.none.paginate)
 
-
         @account = account
         assign(:account, @account)
         assign(:root_account, @account)
@@ -158,9 +157,9 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
     end
 
-    def do_render(user,account=nil)
+    def do_render(user, account = nil)
       account = @account unless account
-      view_context(account,user)
+      view_context(account, user)
       render
     end
 
@@ -265,7 +264,7 @@ describe "accounts/settings.html.erb" do
 
           context "for root account" do
             before do
-              allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true})
+              allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: true })
               do_render(current_user)
             end
 
@@ -283,7 +282,7 @@ describe "accounts/settings.html.erb" do
             context "locked" do
               before do
                 @account.enable_feature!(:post_grades)
-                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true, inherited: true })
+                allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: true, inherited: true })
                 do_render(current_user, @account)
               end
 
@@ -298,7 +297,7 @@ describe "accounts/settings.html.erb" do
 
             context "not locked" do
               before do
-                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: false, inherited: true })
+                allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: false, inherited: true })
                 do_render(current_user)
               end
 
@@ -344,7 +343,7 @@ describe "accounts/settings.html.erb" do
 
     context "without :manage_storage_quotas" do
       before do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'manage_storage_quotas' => false})
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'manage_storage_quotas' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
       end
@@ -381,7 +380,7 @@ describe "accounts/settings.html.erb" do
 
     context "without :read_reports" do
       it "should not show reports tab link" do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'read_reports' => false})
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'read_reports' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
         render
@@ -396,7 +395,8 @@ describe "accounts/settings.html.erb" do
       account_admin_user_with_role_changes(
         :account => Account.site_admin,
         :role => role,
-        :role_changes => {manage_account_memberships: true})
+        :role_changes => { manage_account_memberships: true }
+      )
       view_context(Account.default, @user)
       assign(:account, Account.default)
       assign(:announcements, AccountNotification.none.paginate)

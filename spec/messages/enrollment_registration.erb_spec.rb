@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'enrollment_registration' do
   before :once do
     @root_account = Account.create(name: 'My Root Account')
-    @sub_account = Account.create(name:'My Sub-account', parent_account: @root_account)
+    @sub_account = Account.create(name: 'My Sub-account', parent_account: @root_account)
     @user1 = user_factory
     course_with_student(:account => @sub_account, :user => @user1)
     @user1.workflow_state = 'creation_pending'

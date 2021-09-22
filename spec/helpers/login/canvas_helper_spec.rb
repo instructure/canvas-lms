@@ -27,7 +27,7 @@ describe Login::CanvasHelper do
         ps = PluginSetting.new
         ps.name = 'sessions'
         ps.disabled = false
-        ps.settings = {"session_timeout" => 123}
+        ps.settings = { "session_timeout" => 123 }
         ps.save!
         expect(helper.session_timeout_enabled?).to be_truthy
       end

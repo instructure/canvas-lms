@@ -41,4 +41,3 @@ describe "/conferences/index" do
     expect(response).to have_tag("#new-conference-list")
   end
 end
-

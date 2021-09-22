@@ -30,7 +30,7 @@ describe 'appointment_canceled_by_user.sms' do
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
                      :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because"})
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
@@ -47,7 +47,7 @@ describe 'appointment_canceled_by_user.sms' do
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
                      :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because"})
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)

@@ -25,13 +25,14 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
     course_factory
     @att1 = attachment_with_context(@course)
     @att2 = attachment_with_context(@course)
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     aq = bank.assessment_questions.create!(:question_data => {
-      :question_type => 'essay_question',
-      :question_text =>
+                                             :question_type => 'essay_question',
+                                             :question_text =>
         "File refs:
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download\">
-        <img src=\"/courses/#{@course.id}/files/#{@att2.id}/download\">"})
+        <img src=\"/courses/#{@course.id}/files/#{@att2.id}/download\">"
+                                           })
 
     aq_atts = aq.attachments.to_a
     expect(aq_atts.count).to eq 2
@@ -62,10 +63,10 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
   it "should be able to fix the broken yaml with another fixup" do
     course_factory
     @att1 = attachment_with_context(@course)
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     aq = bank.assessment_questions.create!(:question_data => {
-      :question_type => 'essay_question',
-      :question_text =>
+                                             :question_type => 'essay_question',
+                                             :question_text =>
         "File refs:
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download\">
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download?some_query=1\">
@@ -74,7 +75,8 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
         out what exactly about it does that but it somehow involves unicode\n
         hey look here's some random unicode there 𝐶𝐶=3.5𝑝𝑝\n
         i hope it doesn't ruin everything
-        "})
+        "
+                                           })
 
     aq_att = aq.attachments.first
 

@@ -49,18 +49,18 @@ describe Mutations::SetFriendlyDescription do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  def exec(attrs={})
+  def exec(attrs = {})
     attrs = attrs.reverse_merge({
-      description: description,
-      outcome_id: outcome.id,
-      context_id: context.id,
-      context_type: context.class.name,
-    })
+                                  description: description,
+                                  outcome_id: outcome.id,
+                                  context_id: context.id,
+                                  context_type: context.class.name,
+                                })
 
     execute_query(mutation_str(attrs), ctx)
   end
 
-  let(:ctx) { {current_user: current_user} }
+  let(:ctx) { { current_user: current_user } }
   let(:description) { "This is a friendly Description" }
   let(:outcome) { outcome_model }
   let(:context) { @course }
@@ -125,7 +125,7 @@ describe Mutations::SetFriendlyDescription do
         context: @course,
         description: "Some description"
       )
-      result = exec({description: ""})
+      result = exec({ description: "" })
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       expect(res_field(result, "workflowState")).to eql("deleted")
       friendly_description.reload
@@ -135,7 +135,7 @@ describe Mutations::SetFriendlyDescription do
     it "do nothing when there isn't friendly description on database" do
       result = nil
       expect {
-        result = exec({description: ""})
+        result = exec({ description: "" })
       }.not_to change(OutcomeFriendlyDescription, :count)
 
       expect(res_field(result, "_id")).to be_nil
@@ -150,7 +150,7 @@ describe Mutations::SetFriendlyDescription do
       friendly_description.destroy
       result = nil
       expect {
-        result = exec({description: ""})
+        result = exec({ description: "" })
       }.not_to change(OutcomeFriendlyDescription, :count)
 
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
@@ -176,21 +176,21 @@ describe Mutations::SetFriendlyDescription do
         }
       GQL
       result = execute_query(mutation_str, ctx)
-      expect(result.dig("errors").map {|err| err["message"]}).to eql([
-        "Argument 'description' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!",
-        "Argument 'outcomeId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
-        "Argument 'contextId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
-        "Argument 'contextType' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!"
-      ])
+      expect(result.dig("errors").map { |err| err["message"] }).to eql([
+                                                                         "Argument 'description' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!",
+                                                                         "Argument 'outcomeId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
+                                                                         "Argument 'contextId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
+                                                                         "Argument 'contextType' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!"
+                                                                       ])
     end
 
     it "returns error when pass invalid context type" do
-      result = exec({context_type: "Foo"})
+      result = exec({ context_type: "Foo" })
       expect_error(result, "Invalid context type")
     end
 
     it "returns error when context isn't on database" do
-      result = exec({context_id: "0"})
+      result = exec({ context_id: "0" })
       expect_error(result, "No such context for Course#0")
     end
 

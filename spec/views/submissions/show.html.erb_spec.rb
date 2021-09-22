@@ -44,9 +44,9 @@ describe "/submissions/show" do
       @group = @course.groups.create!(name: "a group", group_category: @group_category)
       add_user_to_group(@user, @group, true)
       @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
-        group_category: @group_category,
-        grade_group_students_individually: true,
-      ))
+                                                  group_category: @group_category,
+                                                  grade_group_students_individually: true,
+                                                ))
       @submission = @assignment.submit_homework(@user)
     end
 
@@ -167,7 +167,7 @@ describe "/submissions/show" do
       )
       @assignment.unmute!
 
-      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: 'online_text_entry' })
       @submission.turnitin_data = {
         "submission_#{@submission.id}" => {
           web_overlap: 92,
@@ -484,10 +484,10 @@ describe "/submissions/show" do
 
             render "submissions/show"
             expect(comment_contents).to match_array([
-              "I did a great job!",
-              "No, you did not.",
-              "Who cares?"
-            ])
+                                                      "I did a great job!",
+                                                      "No, you did not.",
+                                                      "Who cares?"
+                                                    ])
           end
         end
       end

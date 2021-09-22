@@ -23,7 +23,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 require 'nokogiri'
 
 describe "security" do
-
   describe "session fixation" do
     it "should change the cookie session id after logging in" do
       u = user_with_pseudonym :active_user => true,
@@ -40,10 +39,10 @@ describe "security" do
       expect(cookie).to be_present
       expect(path).to eq "/login/canvas"
 
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-                                  "pseudonym_session[password]" => "asdfasdf",
-                                  "pseudonym_session[remember_me]" => "1",
-                                  "redirect_to_ssl" => "1"}
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf",
+                                      "pseudonym_session[remember_me]" => "1",
+                                      "redirect_to_ssl" => "1" }
       follow_redirect! while response.redirect?
       assert_response :success
       expect(request.fullpath).to eql("/?login_success=1")
@@ -65,16 +64,16 @@ describe "security" do
       u.save!
       https!
 
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf"}
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf" }
       assert_response 302
       c = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
       reset!
       https!
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"}
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf",
+                                      "pseudonym_session[remember_me]" => "1" }
       assert_response 302
       c = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
@@ -86,8 +85,8 @@ describe "security" do
                               :password => "asdfasdf"
       u.save!
       https!
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf"}
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf" }
       assert_response 302
       c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
       c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
@@ -99,8 +98,8 @@ describe "security" do
   describe "remember me" do
     before do
       @u = user_with_pseudonym :active_all => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
+                               :username => "nobody@example.com",
+                               :password => "asdfasdf"
       @u.save!
       @p = @u.pseudonym
       https!
@@ -108,20 +107,20 @@ describe "security" do
 
     it "should not remember me when the wrong token is given" do
       # plain persistence_token no longer works
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{@p.persistence_token}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{@p.persistence_token}" }
       expect(response).to redirect_to("https://www.example.com/login")
       token = SessionPersistenceToken.generate(@p)
       # correct token id, but nonsense uuid and persistence_token
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::blah::blah"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::blah::blah" }
       expect(response).to redirect_to("https://www.example.com/login")
       # correct token id and persistence_token, but nonsense uuid
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::#{@p.persistence_token}::blah"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::#{@p.persistence_token}::blah" }
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
     it "should login via persistence token when no session exists" do
       token = SessionPersistenceToken.generate(@p)
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
       expect(cookies['_normandy_session']).to be_present
       expect(session[:used_remember_me_token]).to be_truthy
@@ -131,7 +130,7 @@ describe "security" do
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
 
-      post "/login/canvas", params: {:pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' }}
+      post "/login/canvas", params: { :pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' } }
       expect(response).to redirect_to settings_profile_url
       expect(session[:used_remember_me_token]).not_to be_truthy
 
@@ -141,18 +140,18 @@ describe "security" do
 
     it "should not allow login via the same valid token twice" do
       token = SessionPersistenceToken.generate(@p)
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
       expect(SessionPersistenceToken.find_by_id(token.id)).to be_nil
       reset!
       https!
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
     it "should generate a new valid token when a token is used" do
       token = SessionPersistenceToken.generate(@p)
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
       s1 = cookies['_normandy_session']
       expect(s1).to be_present
@@ -165,7 +164,7 @@ describe "security" do
       reset!
       https!
       # check that the new token is valid too
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{cookie}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{cookie}" }
       expect(response).to be_successful
       s2 = cookies['_normandy_session']
       expect(s2).to be_present
@@ -173,9 +172,9 @@ describe "security" do
     end
 
     it "should generate and return a token when remember_me is checked" do
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"}
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf",
+                                      "pseudonym_session[remember_me]" => "1" }
       assert_response 302
       cookie = cookies['pseudonym_credentials']
       expect(cookie).to be_present
@@ -191,9 +190,9 @@ describe "security" do
 
     it "should destroy the token both user agent and server side on logout" do
       expect {
-        post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-          "pseudonym_session[password]" => "asdfasdf",
-          "pseudonym_session[remember_me]" => "1"}
+        post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                        "pseudonym_session[password]" => "asdfasdf",
+                                        "pseudonym_session[remember_me]" => "1" }
       }.to change(SessionPersistenceToken, :count).by(1)
       c = cookies['pseudonym_credentials']
       expect(c).to be_present
@@ -210,32 +209,32 @@ describe "security" do
       s1.https!
       s2 = open_session
       s2.https!
-      s1.post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"}
+      s1.post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                         "pseudonym_session[password]" => "asdfasdf",
+                                         "pseudonym_session[remember_me]" => "1" }
       c1 = s1.cookies['pseudonym_credentials']
-      s2.post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"}
+      s2.post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                         "pseudonym_session[password]" => "asdfasdf",
+                                         "pseudonym_session[remember_me]" => "1" }
       c2 = s2.cookies['pseudonym_credentials']
       expect(c1).not_to eq c2
 
       s3 = open_session
       s3.https!
-      s3.get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{c1}"}
+      s3.get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{c1}" }
       expect(s3.response).to be_successful
       s3.delete "/logout"
       # make sure c2 can still work
       s4 = open_session
       s4.https!
-      s4.get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{c2}"}
+      s4.get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{c2}" }
       expect(s4.response).to be_successful
     end
 
     it "should not login if the pseudonym is deleted" do
       token = SessionPersistenceToken.generate(@p)
       @p.destroy
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
@@ -247,7 +246,7 @@ describe "security" do
       @p.save!
       pers2 = @p.persistence_token
       expect(pers1).not_to eq pers2
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{creds}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{creds}" }
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
@@ -260,7 +259,7 @@ describe "security" do
           user_with_pseudonym(:account => account)
         end
         token = SessionPersistenceToken.generate(@pseudonym)
-        get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+        get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
         expect(response).to be_successful
         expect(cookies['_normandy_session']).to be_present
         expect(session[:used_remember_me_token]).to be_truthy
@@ -274,15 +273,15 @@ describe "security" do
         Setting.set('login_attempts_total', '2')
         Setting.set('login_attempts_per_ip', '1')
         u = user_with_pseudonym :active_user => true,
-          :username => "nobody@example.com",
-          :password => "asdfasdf"
+                                :username => "nobody@example.com",
+                                :password => "asdfasdf"
         u.save!
       end
 
       def bad_login(ip)
         post "/login/canvas",
-          params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
-          headers: { "REMOTE_ADDR" => ip }
+             params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
+             headers: { "REMOTE_ADDR" => ip }
         follow_redirect! while response.redirect?
       end
 
@@ -294,8 +293,8 @@ describe "security" do
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
         post "/login/canvas",
-          params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
-          headers: { "REMOTE_ADDR" => "5.5.5.5" }
+             params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+             headers: { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
@@ -310,8 +309,8 @@ describe "security" do
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
         post "/login/canvas",
-          params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
-          headers: { "REMOTE_ADDR" => "5.5.5.7" }
+             params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+             headers: { "REMOTE_ADDR" => "5.5.5.7" }
         follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
@@ -324,8 +323,8 @@ describe "security" do
         # ever block the IP address as a whole
         user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234").save!
         post "/login/canvas",
-          params: { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
-          headers:  { "REMOTE_ADDR" => "5.5.5.5" }
+             params: { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
+             headers: { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
         expect(request.fullpath).to eql("/?login_success=1")
       end
@@ -344,8 +343,8 @@ describe "security" do
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
         post "/login/canvas",
-          params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
-          headers: { "REMOTE_ADDR" => "5.5.5.5" }
+             params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+             headers: { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
@@ -370,17 +369,17 @@ describe "security" do
     @course.reload
 
     user_session(@student)
-    post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
+    post "/courses/#{@course.id}/user_lists.json", params: { :user_list => "A1234567, A345678" }
     expect(response).not_to be_successful
 
     user_session(@teacher)
-    post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
+    post "/courses/#{@course.id}/user_lists.json", params: { :user_list => "A1234567, A345678" }
     assert_response :success
     expect(json_parse).to eq({
-      "duplicates" => [],
-      "errored_users" => [{"address" => "A345678", "details" => "not_found", "type" => "pseudonym"}],
-      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id }]
-    })
+                               "duplicates" => [],
+                               "errored_users" => [{ "address" => "A345678", "details" => "not_found", "type" => "pseudonym" }],
+                               "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id }]
+                             })
   end
 
   describe "user masquerading" do
@@ -484,14 +483,14 @@ describe "security" do
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns['current_user'].id).to eq @student.id
       expect(assigns['real_current_user'].id).to eq @admin.id
-      pv2 = PageView.all.detect{|pv| pv != pv1}
+      pv2 = PageView.all.detect { |pv| pv != pv1 }
       expect(pv2.user_id).to eq @student.id
       expect(pv2.real_user_id).to eq @admin.id
     end
 
     it "should remember the destination with an intervening auth" do
       token = SessionPersistenceToken.generate(@admin.pseudonyms.first)
-      get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
+      get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
       expect(cookies['_normandy_session']).to be_present
       expect(session[:used_remember_me_token]).to be_truthy
@@ -504,7 +503,7 @@ describe "security" do
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
 
-      post "/login/canvas", params: {:pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' }}
+      post "/login/canvas", params: { :pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' } }
       expect(response).to redirect_to user_masquerade_url(@student)
       expect(session[:used_remember_me_token]).not_to be_truthy
 
@@ -539,14 +538,14 @@ describe "security" do
 
     def add_permission(permission)
       Account.site_admin.role_overrides.create!(:permission => permission.to_s,
-        :role => @role,
-        :enabled => true)
+                                                :role => @role,
+                                                :enabled => true)
     end
 
     def remove_permission(permission, role)
       Account.default.role_overrides.create!(:permission => permission.to_s,
-              :role => role,
-              :enabled => false)
+                                             :role => role,
+                                             :enabled => false)
     end
 
     describe "site admin" do
@@ -802,7 +801,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /People/
 
-        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         # Should still be able to see People tab even if disabled, because we can
@@ -822,7 +821,7 @@ describe "security" do
         get "/courses/#{@course.id}/groups"
         expect(response).to be_successful
 
-        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         get "/courses/#{@course.id}/users"
@@ -904,7 +903,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /People/
 
-        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         get "/courses/#{@course.id}/assignments"
@@ -952,7 +951,7 @@ describe "security" do
         delete "/courses/#{@course.id}"
         assert_status(401)
 
-        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        delete "/courses/#{@course.id}", params: { :event => 'delete' }
         assert_status(401)
 
         add_permission :manage_courses
@@ -977,7 +976,7 @@ describe "security" do
         get "/courses/#{@course.id}/copy"
         expect(response).to be_successful
 
-        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        delete "/courses/#{@course.id}", params: { :event => 'delete' }
         expect(response).to be_redirect
 
         expect(@course.reload).to be_deleted
@@ -1039,7 +1038,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /People/
 
-        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         get "/courses/#{@course.id}/assignments"
@@ -1087,7 +1086,7 @@ describe "security" do
         delete "/courses/#{@course.id}"
         assert_status(401)
 
-        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        delete "/courses/#{@course.id}", params: { :event => 'delete' }
         assert_status(401)
 
         add_permission :manage_courses_add
@@ -1118,7 +1117,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /Delete this Course/
 
-        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        delete "/courses/#{@course.id}", params: { :event => 'delete' }
         expect(response).to be_redirect
 
         expect(@course.reload).to be_deleted
@@ -1191,7 +1190,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).not_to match 'End this Course'
 
-        delete "/courses/#{@course.id}", params: {:event => 'conclude'}
+        delete "/courses/#{@course.id}", params: { :event => 'conclude' }
         assert_status(401)
       end
 
@@ -1203,7 +1202,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).not_to match(/Delete this Course/)
 
-        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        delete "/courses/#{@course.id}", params: { :event => 'delete' }
         assert_status(401)
       end
 

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "authentication_providers/index" do
-  let(:account){ Account.default }
+  let(:account) { Account.default }
 
   before do
     assign(:context, assign(:account, account))

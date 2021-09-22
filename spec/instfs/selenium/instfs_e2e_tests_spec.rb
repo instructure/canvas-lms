@@ -31,9 +31,9 @@ describe "instfs file uploads" do
   include EportfoliosCommon
   include ContextModulesCommon
   include CanvasHttp
-  let(:admin_guy) {account_admin_user(account: Account.site_admin)}
+  let(:admin_guy) { account_admin_user(account: Account.site_admin) }
   let(:folder) { Folder.root_folders(admin_guy).first }
-  let(:token) {Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)}
+  let(:token) { Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret) }
 
   def enable_instfs
     setting = PluginSetting.find_by(name: 'inst_fs') || PluginSetting.new(name: 'inst_fs')
@@ -158,7 +158,6 @@ describe "instfs file uploads" do
     end
   end
 
-
   context 'when uploading to instfs as an admin' do
     before do
       user_session(admin_guy)
@@ -221,10 +220,10 @@ describe "instfs file uploads" do
     before do
       course_with_teacher_logged_in(:username => 'coolteacher@example.com')
       enable_instfs
-      enrollment = student_in_course(:workflow_state => 'active',:name => "coolguy", :course_section => @section)
+      enrollment = student_in_course(:workflow_state => 'active', :name => "coolguy", :course_section => @section)
       enrollment.accept!
       @student_folder = Folder.root_folders(@student).first
-      @ass = @course.assignments.create!({title: "some assignment", submission_types: "online_upload"})
+      @ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_upload" })
     end
 
     it 'should allow the teacher to see the uploaded file on speedgrader', priority: "1", test_id: 3399286 do
@@ -316,7 +315,7 @@ describe "instfs file uploads" do
     end
 
     it 'should upload submission discussion files to instfs', priority: "1", test_id: 3399302 do
-      ass = @course.assignments.create!({title: "some assignment", submission_types: "online_text_entry"})
+      ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_text_entry" })
       ass.submit_homework(@student, submission_type: 'online_text_entry', body: "so cool")
       user_logged_in(:user => @student)
       get "/courses/#{@course.id}/assignments/#{ass.id}/submissions/#{@student.id}"
@@ -344,11 +343,11 @@ describe "instfs file uploads" do
       quiz = @course.quizzes.create
       quiz.workflow_state = "available"
       quiz.quiz_questions.create!(:question_data => {
-        :name => "1stQ",
-        'question_type' => 'file_upload_question',
-        'question_text' => 'cooool',
-        :points_possible => 1
-      })
+                                    :name => "1stQ",
+                                    'question_type' => 'file_upload_question',
+                                    'question_text' => 'cooool',
+                                    :points_possible => 1
+                                  })
       quiz.save!
 
       # take the quiz as the student

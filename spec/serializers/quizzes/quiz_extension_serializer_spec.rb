@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizExtensionSerializer do
-
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -57,10 +56,9 @@ describe Quizzes::QuizExtensionSerializer do
 
   let :serializer do
     Quizzes::QuizExtensionSerializer.new(quiz_extension,
-      controller: controller,
-      scope: user,
-      session: session
-    )
+                                         controller: controller,
+                                         scope: user,
+                                         session: session)
   end
 
   before do

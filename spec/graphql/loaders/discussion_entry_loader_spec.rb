@@ -57,7 +57,7 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(current_user: @teacher,
                                            relative_entry_id: @de4,
                                            sort_order: :asc)
-          .load(@de1).then do |discussion_entries|
+                                      .load(@de1).then do |discussion_entries|
           expect(discussion_entries.map(&:id)).to eq [@de3.id, @de2.id, @de4.id]
         end
       end
@@ -81,7 +81,7 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(current_user: @teacher,
                                            relative_entry_id: @de4,
                                            sort_order: :desc)
-          .load(@de1).then do |discussion_entries|
+                                      .load(@de1).then do |discussion_entries|
           expect(discussion_entries.map(&:id)).to eq [@de4.id, @de2.id, @de3.id]
         end
       end
@@ -94,7 +94,7 @@ describe Loaders::DiscussionEntryLoader do
                                            before_relative_entry: false,
                                            include_relative_entry: false,
                                            sort_order: :asc)
-          .load(@de1).then do |discussion_entries|
+                                      .load(@de1).then do |discussion_entries|
           expect(discussion_entries.map(&:id)).to eq [@de5.id, @de6.id]
         end
       end
@@ -107,7 +107,7 @@ describe Loaders::DiscussionEntryLoader do
                                            before_relative_entry: false,
                                            include_relative_entry: true,
                                            sort_order: :asc)
-          .load(@de1).then do |discussion_entries|
+                                      .load(@de1).then do |discussion_entries|
           expect(discussion_entries.map(&:id)).to eq [@de4.id, @de5.id, @de6.id]
         end
       end
@@ -188,7 +188,6 @@ describe Loaders::DiscussionEntryLoader do
   end
 
   context 'allow filtering discussion entries' do
-
     it 'by any workflow state' do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(

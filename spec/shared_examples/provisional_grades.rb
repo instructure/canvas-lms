@@ -28,10 +28,10 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       @submission = @assignment.submit_homework @student, body: 'EHLO'
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/#{controller}/status"
       @resource_pair = if controller == :anonymous_provisional_grades
-        { anonymous_id: @submission.anonymous_id }
-      else
-        { student_id: @submission.user_id }
-      end
+                         { anonymous_id: @submission.anonymous_id }
+                       else
+                         { student_id: @submission.user_id }
+                       end
       @params = {
         controller: controller,
         action: :status,
@@ -48,13 +48,13 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
 
     it "gives an error message of unauthorized when called as a student" do
       json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 401 })
-      expect(json.fetch('errors')).to include({'message' => 'user not authorized to perform that action'})
+      expect(json.fetch('errors')).to include({ 'message' => 'user not authorized to perform that action' })
     end
 
     it 'when called as a student, error message is not found' do
       @params[@resource_pair.flatten.first] = nil
       json = api_call_as_user(@ta, :get, @path, @params, {}, {}, { expected_status: 404 })
-      expect(json.fetch('errors')).to include({'message' => 'The specified resource does not exist.'})
+      expect(json.fetch('errors')).to include({ 'message' => 'The specified resource does not exist.' })
     end
 
     it 'is authorized when the user is an admin with permission to select final grade' do
@@ -81,7 +81,7 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
 
         @ta.update!(name: 'Nobody Important')
         @submission.find_or_create_provisional_grade!(@ta)
-        @params.merge!(last_updated_at: @submission.updated_at-1)
+        @params.merge!(last_updated_at: @submission.updated_at - 1)
       end
 
       it 'omits the scorer_name parameter from provisional grades if the final grader cannot view grader names' do

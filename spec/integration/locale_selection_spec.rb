@@ -48,5 +48,4 @@ describe "locale_selection" do
     expect(response).to be_successful
     expect(I18n.locale).to eql(:fr)
   end
-
 end

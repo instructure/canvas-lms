@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
-
   let(:account) { Account.create! }
   let(:course) do
     course_with_student(account: account)
@@ -28,7 +27,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   end
   let(:student) { course.student_enrollments.first.user }
   let(:vendor_code) { 'com.instructure.test' }
-  let(:developer_key) {DeveloperKey.create!(redirect_uri: 'http://www.example.com/redirect', vendor_code: vendor_code)}
+  let(:developer_key) { DeveloperKey.create!(redirect_uri: 'http://www.example.com/redirect', vendor_code: vendor_code) }
   let(:product_family) do
     Lti::ProductFamily.create!(
       vendor_code: vendor_code,
@@ -41,7 +40,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:tool_proxy_context) { account }
   let(:tool_proxy) { create_tool_proxy(tool_proxy_context) }
 
-  def create_tool_proxy(context, overrides={})
+  def create_tool_proxy(context, overrides = {})
     tp = Lti::ToolProxy.create!(
       context: context,
       guid: SecureRandom.uuid,
@@ -201,15 +200,14 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:security_contract) do
     {
       "tp_half_shared_secret" => "shared-secret",
-      "tool_service"=> [
-        {"service"=>"vnd.Canvas.submission",
-          "action"=>["GET"],
-          "@type"=>"RestServiceProfile"},
-        {"service"=>"vnd.Canvas.OriginalityReport",
-          "action"=>["GET", "POST", "PUT"],
-          "@type"=>"RestServiceProfile"}
+      "tool_service" => [
+        { "service" => "vnd.Canvas.submission",
+          "action" => ["GET"],
+          "@type" => "RestServiceProfile" },
+        { "service" => "vnd.Canvas.OriginalityReport",
+          "action" => ["GET", "POST", "PUT"],
+          "@type" => "RestServiceProfile" }
       ]
     }
   end
-
 end

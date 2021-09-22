@@ -20,17 +20,16 @@
 require 'spec_helper'
 
 shared_examples_for 'QuizReportSerializer Associations' do
-
   it 'should embed its attachment as :file when present' do
     statistics.generate_csv
     statistics.reload
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-      controller: controller,
-      scope: user,
-      session: session,
-      includes: [ 'file' ]
-    })
+                                                     controller: controller,
+                                                     scope: user,
+                                                     session: session,
+                                                     includes: ['file']
+                                                   })
 
     json = serializer.as_json[:quiz_report].stringify_keys
     expect(json).to have_key 'file'
@@ -41,11 +40,11 @@ shared_examples_for 'QuizReportSerializer Associations' do
     statistics.generate_csv_in_background
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-      controller: controller,
-      scope: user,
-      session: session,
-      includes: [ 'progress' ]
-    })
+                                                     controller: controller,
+                                                     scope: user,
+                                                     session: session,
+                                                     includes: ['progress']
+                                                   })
 
     json = serializer.as_json[:quiz_report].stringify_keys
     expect(json).to have_key 'progress'
@@ -84,10 +83,10 @@ describe Quizzes::QuizReportSerializer do
 
   subject do
     Quizzes::QuizReportSerializer.new(statistics, {
-      controller: controller,
-      scope: user,
-      session: session
-    })
+                                        controller: controller,
+                                        scope: user,
+                                        session: session
+                                      })
   end
 
   let :json do

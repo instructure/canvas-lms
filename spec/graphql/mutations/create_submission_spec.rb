@@ -168,7 +168,7 @@ RSpec.describe Mutations::CreateSubmission do
       id_offset = [@attachment1.id, @attachment2.id].max
       unaffiliated_ids = [id_offset + 1, id_offset + 2, id_offset + 3]
       result = run_mutation(submission_type: 'online_upload', file_ids: unaffiliated_ids)
-      expected_message = "No attachments found for the following ids: [#{unaffiliated_ids.map{|i| "\"#{i}\""}.join(", ")}]"
+      expected_message = "No attachments found for the following ids: [#{unaffiliated_ids.map { |i| "\"#{i}\"" }.join(", ")}]"
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq expected_message
     end
 
@@ -239,7 +239,7 @@ RSpec.describe Mutations::CreateSubmission do
 
   it 'respects assignment overrides for the given user' do
     @assignment.update!(lock_at: 1.day.ago)
-    create_adhoc_override_for_assignment(@assignment, @student, {lock_at: 1.day.from_now})
+    create_adhoc_override_for_assignment(@assignment, @student, { lock_at: 1.day.from_now })
     result = run_mutation(file_ids: [@attachment1.id, @attachment2.id])
     expect(
       result.dig(:data, :createSubmission, :submission, :_id)

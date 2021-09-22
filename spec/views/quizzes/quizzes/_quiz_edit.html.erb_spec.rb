@@ -26,7 +26,7 @@ describe "/quizzes/quizzes/_quiz_edit" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
-    assign(:js_env, {quiz_max_combination_count: 200})
+    assign(:js_env, { quiz_max_combination_count: 200 })
   end
 
   it "should render" do

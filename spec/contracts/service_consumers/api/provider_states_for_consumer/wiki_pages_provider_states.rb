@@ -19,7 +19,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     # Course ID: 1
     # Wiki Page ID: 1
     provider_state 'a wiki page in a course' do
