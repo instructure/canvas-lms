@@ -175,7 +175,6 @@ const ignoredErrors = [
   /The prop `url` is marked as required in `SVGWithTextPlaceholder`/,
   /The prop `userId` is marked as required in `(CourseNotificationSettingsManager|GeneratePairingCode|NotificationPreferences)`/,
   /The prop `value` is marked as required in `CanvasSelectOption`/,
-  /The prop `win.innerHeight` is marked as required in `ExternalToolDialog`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
   /Use the `defaultValue` or `value` props on <select> instead of setting `selected` on <option>/,
   /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
