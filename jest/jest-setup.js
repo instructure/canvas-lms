@@ -182,7 +182,6 @@ const ignoredWarnings = [
   /is deprecated and will be removed/,
   /Missing field __typename in/,
   /Missing field errors in/,
-  /Missing field id in/,
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
