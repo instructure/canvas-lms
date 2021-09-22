@@ -170,7 +170,7 @@ def runRspecqSuite() {
     def rspecProcesses = env.RSPEC_PROCESSES.toInteger()
 
     rspecProcesses.times { index ->
-      def workerName = "${env.JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
+      def workerName = "${JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
       workers[workerName] = { ->
         def workerStartTime = System.currentTimeMillis()
         sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
@@ -179,7 +179,7 @@ def runRspecqSuite() {
                                         -e RAILS_DB_NAME_TEST=canvas_test_${index} \
                                         -e RSPECQ_UPDATE_TIMINGS \
                                         -T canvas bundle exec rspecq \
-                                          --build ${env.JOB_NAME}_build${BUILD_NUMBER} \
+                                          --build ${JOB_NAME}_build${BUILD_NUMBER} \
                                           --worker ${workerName} \
                                           --include-pattern '${TEST_PATTERN}'  \
                                           --exclude-pattern '${EXCLUDE_TESTS}' \
@@ -192,7 +192,7 @@ def runRspecqSuite() {
         def workerEndTime = System.currentTimeMillis()
 
         //To Do: remove once data gathering exercise is complete and RspecQ is enabled by default.
-        def specCount = sh(script: "docker-compose exec -e ${env.RSPECQ_REDIS_PASSWORD} -T redis redis-cli -h ${env.TEST_QUEUE_HOST} -p 6379 llen ${env.JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
+        def specCount = sh(script: "docker-compose exec -e $RSPECQ_REDIS_PASSWORD -T redis redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
 
         reportToSplunk('test_queue_worker_ended', [
             'workerName': workerName,
