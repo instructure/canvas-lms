@@ -57,7 +57,7 @@ module Importers
     end
 
     def placeholder(old_value)
-      "#{LINK_PLACEHOLDER}_#{Digest::MD5.hexdigest(old_value)}"
+      "#{LINK_PLACEHOLDER}_#{Digest::SHA256.hexdigest(old_value)}"
     end
 
     def convert_link(node, attr, item_type, mig_id, field)

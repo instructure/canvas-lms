@@ -231,15 +231,15 @@ describe Course do
       migration = build_migration(@course, params)
       setup_import(@course, 'assessments.json', migration)
 
-      aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
+      aqb1 = @course.assessment_question_banks.where(migration_id: "ic0f7230f2694436788cedf4d6e93ce252483978f878b8050a390d5940e78737b").first
       expect(aqb1.assessment_questions.count).to eq 3
-      aqb2 = @course.assessment_question_banks.where(migration_id: "iaac763df0de1199ef143b2ab8f237e76").first
+      aqb2 = @course.assessment_question_banks.where(migration_id: "i71b5a954dcd0e22e59adc1032a75e8c2e1b8176f203bdf110a9ac97e4fed1754").first
       expect(aqb2.assessment_questions.count).to eq 2
       expect(migration.workflow_state).to eq('imported')
     end
 
     it "should not create assessment question banks if they are not selected" do
-      params = {"copy" => {"assessment_question_banks" => {"i05dab0b3d55dae214bd0c4787bd6d20f" => true},
+      params = {"copy" => {"assessment_question_banks" => {"ic0f7230f2694436788cedf4d6e93ce252483978f878b8050a390d5940e78737b" => true},
                            "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
                                          "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
 
@@ -247,7 +247,7 @@ describe Course do
       setup_import(@course, 'assessments.json', migration)
 
       expect(@course.assessment_question_banks.count).to eq 1
-      aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
+      aqb1 = @course.assessment_question_banks.where(migration_id: "ic0f7230f2694436788cedf4d6e93ce252483978f878b8050a390d5940e78737b").first
       expect(aqb1.assessment_questions.count).to eq 3
       expect(@course.assessment_questions.count).to eq 3
 
