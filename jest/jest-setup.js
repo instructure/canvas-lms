@@ -74,7 +74,6 @@ const ignoredErrors = [
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invalid prop `shares\[0\].content_export.id` of type `number` supplied to `ReceivedTable`/,
-  /Invalid prop `submissions\[0\].submissionDraft.submissionAttempt` of type `number` supplied to `StudentsTable`/,
   /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
