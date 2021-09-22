@@ -189,7 +189,6 @@ const ignoredWarnings = [
   /The `renderSortLabel` prop should be provided when Table is sortable/,
   /toBeEmpty has been deprecated/,
   /Translation for .* is missing/,
-  /Unmatched (GET|POST) to \/api\/v1/,
   /value provided is not in a recognized RFC2822 or ISO format/
 ]
 global.console = {
