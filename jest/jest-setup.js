@@ -164,7 +164,6 @@ const ignoredErrors = [
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
   /The prop `selectedRoles\[0\].value` is marked as required in `PermissionsIndex`/,
   /The prop `students\[0\].name` is marked as required in `ScoresGrid`/,
-  /The prop `submission._id` is marked as required in `TextEntry`/,
   /The prop `text` is marked as required in `(SVGWithTextPlaceholder|TextPlaceholder)`/,
   /The prop `trayProps.canUploadFiles` is marked as required in `RCEWrapper`/,
   /The prop `userId` is marked as required in `(CourseNotificationSettingsManager|GeneratePairingCode|NotificationPreferences)`/,
