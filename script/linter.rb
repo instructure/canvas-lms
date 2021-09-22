@@ -139,10 +139,11 @@ class Linter
   def publish_comments
     processed_comments = comment_post_processing.call(generate_comments)
 
-    unless processed_comments.size > 0
+    if processed_comments.empty?
       puts "-- -- -- -- -- -- -- -- -- -- --"
       puts "No relevant #{linter_name} errors found!"
       puts "-- -- -- -- -- -- -- -- -- -- --"
+      return true
     end
 
     if gerrit_patchset
@@ -159,7 +160,7 @@ class Linter
         puts "Fix and/or git add the corrections and try to commit again."
       end
     end
-    processed_comments.size.zero?
+    false
   end
 
   def publish_gergich_comments(comments)

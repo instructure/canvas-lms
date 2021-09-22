@@ -16,14 +16,6 @@ linter_options = {
   append_files_to_command: true,
   severe_levels: [],
   boyscout_mode: false,
-  heavy_mode_proc: proc do |ruby_files|
-    args = ruby_files
-    args_index = ARGV.index('--')
-    if args_index
-      args.concat(ARGV[(args_index + 1)..-1])
-    end
-    RuboCop::CLI.new.run(args)
-  end
 }
 no_fail = false
 optional = false
