@@ -251,7 +251,8 @@ Object.assign(CommonEvent.prototype, {
     } else if (ENV.CALENDAR.SHOW_SCHEDULER) {
       if (
         this.isAppointmentGroupEvent() &&
-        (this.isAppointmentGroupFilledEvent() || this.appointmentGroupEventStatus === 'Reserved')
+        (this.isAppointmentGroupFilledEvent() ||
+          this.appointmentGroupEventStatus === I18n.t('Reserved'))
       ) {
         return 'calendar-reserved'
       } else if (this.isAppointmentGroupEvent()) {
